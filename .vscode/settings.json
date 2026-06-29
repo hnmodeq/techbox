@@ -19,7 +19,7 @@
     "**/.gitignore": true,
     "**/next-env.d.ts": true,
     "**/tailwind.config.ts": true,
-    "**/tsconfig.json": true,
+    "**/tsconfig.json": false,
     "**/components.json": true,
     "**/next.config.ts": true,
     "**/eslint.config.mjs": true,
@@ -34,8 +34,9 @@
     "**/.tsbuildinfo": true,
     "**/.coverage": true,
     "**/pnpm-debug.log": true,
-    "**/tsconfig.tsbuildinfo": true,
+    "**/tsconfig.tsbuildinfo": false,
     "**/next.config.mjs": true
   },
-  "prisma.pinToPrisma6": true
+  "prisma.pinToPrisma6": true,
+  "js/ts.tsdk.path": "node_modules\\typescript\\lib"
 }
