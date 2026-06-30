@@ -3,6 +3,7 @@ import jobs from "@/data/jobs.json";
 import Link from "next/link";
 import { use } from "react";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 export default function JobPage({ params }: { params: Promise<{slug:string}> }){
   const { slug } = use(params);
@@ -14,12 +15,12 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
       <div className="text-[11px] text-muted-foreground mb-2"><Link href="/workwithus" className="hover:text-foreground">فرصت‌های شغلی</Link> / {job.title}</div>
       <h1 className="text-2xl md:text-3xl font-black">{job.title}</h1>
       <div className="flex flex-wrap gap-2 mt-3 text-[11px]">
-        <span className="badge">{job.type}</span>
-        <span className="badge">{job.remote}</span>
-        <span className="badge">{job.team}</span>
+        <Badge variant="brand">{job.type}</Badge>
+        <Badge variant="secondary">{job.remote}</Badge>
+        <Badge variant="outline">{job.team}</Badge>
         <span className="text-muted-foreground">{job.date_fa}</span>
       </div>
-      <div className="card p-5 mt-6 text-[14px] leading-8" style={{color:"var(--muted-foreground)"}}>
+      <div className="card mt-6 p-5 text-[14px] leading-8 text-[var(--tb-muted-foreground)]">
         {job.description}
         <ul className="pr-5 mt-4 space-y-1 text-[13px]" style={{listStyle:"disc"}}>
           <li>رزومه + نمونه کار</li>
@@ -44,7 +45,7 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
           <ButtonLink href="/workwithus" variant="ghost">بازگشت</ButtonLink>
           <Button type="submit">ارسال درخواست</Button>
         </div>
-        <p className="text-[11px]" style={{color:"var(--muted-foreground)"}}>با استفاده از اطلاعات پروفایل شما پر می‌شود – می‌توانید در <Link href="/account" style={{color:"var(--brand)"}} className="underline">حساب کاربری</Link> تکمیل کنید.</p>
+        <p className="text-[11px] text-[var(--tb-muted-foreground)]">با استفاده از اطلاعات پروفایل شما پر می‌شود – می‌توانید در <Link href="/account" className="text-[var(--tb-brand)] underline">حساب کاربری</Link> تکمیل کنید.</p>
       </form>
     </main>
   );

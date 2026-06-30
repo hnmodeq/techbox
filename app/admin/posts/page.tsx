@@ -32,7 +32,7 @@ function AdminPostsInner() {
   }, [module]);
 
   if (!user) {
-    return <main className="p-10 text-center" dir="rtl"><p>لطفا ابتدا <Link href="/admin/login" className="text-brand underline">وارد شوید</Link>.</p></main>;
+    return <main className="p-10 text-center" dir="rtl"><p>لطفا ابتدا <Link href="/admin/login" className="text-[var(--tb-brand)] underline">وارد شوید</Link>.</p></main>;
   }
 
   if (!canEdit(user, module)) {

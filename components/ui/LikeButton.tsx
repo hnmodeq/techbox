@@ -82,7 +82,7 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
   };
 
   return (
-    <div className="flex items-center gap-3 text-xs" style={{color:"var(--muted-foreground)"}}>
+    <div className="flex items-center gap-3 text-xs text-[var(--tb-muted-foreground)]">
       <Button onClick={()=>vote("up")} variant="link" size="xs" className={v==="up" ? "text-[var(--tb-success)] font-bold" : "text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]"}>▲ {l.toLocaleString("fa-IR")}</Button>
       <Button onClick={()=>vote("down")} variant="link" size="xs" className={v==="down" ? "text-[var(--tb-danger)] font-bold" : "text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]"}>▼ {d.toLocaleString("fa-IR")}</Button>
     </div>

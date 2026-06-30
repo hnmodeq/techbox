@@ -32,7 +32,7 @@ export default function VideoPlayer({ src, poster, title }: { src: string; poste
     <div className="w-full bg-black rounded-[var(--tb-radius-xl)] overflow-hidden border border-[var(--tb-border)]">
       <video ref={videoRef} controls playsInline poster={poster} preload="metadata" className="w-full aspect-video bg-black" />
       {title && (
-        <div className="bg-card px-3 py-2 text-[11px] flex justify-between" style={{color:"var(--muted-foreground)"}}>
+        <div className="flex justify-between bg-[var(--tb-card)] px-3 py-2 text-[11px] text-[var(--tb-muted-foreground)]">
           <span className="truncate">{title}</span>
           <span className="text-[10px]">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
         </div>

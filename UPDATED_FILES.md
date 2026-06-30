@@ -144,3 +144,42 @@ Copy these files into your real project. Do **not** replace your `public/` folde
 - Updated `features/download/components/DownloadTable.tsx` and `features/download/components/DownloadDetail.tsx` to use centralized `Badge variant="download"` for download tags/version OS badges.
 - Updated `providers/cart.provider.tsx` and `components/ui/Modal.tsx` to reuse `OverlayBackdrop` instead of local overlay markup.
 - Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## B Step 2 — deeper design hardcode audit, controlled cleanup
+- Updated `app/admin/posts/new/page.tsx` to remove old muted/brand inline styles and display allowed modules with `ModuleBadge`.
+- Updated `app/shop/checkout/page.tsx` to replace old muted/border inline styles with `--tb-*` token classes.
+- Updated `app/workwithus/page.tsx` and `app/workwithus/[slug]/page.tsx` to use centralized `Badge` variants and tokenized brand/shadow styles.
+- Updated `features/comment/components/CommentSection.tsx` to use tokenized borders/text and `Badge variant="secondary"` for the Server Actions/Prisma label.
+- Updated `features/content/components/BentoCard.tsx` and `features/content/components/ContentDetail.tsx` to use shared `Badge` instead of legacy `.badge` markup where safe.
+- Updated `features/forum/components/ForumList.tsx` to token-clean table/list aliases and reuse `OverlayBackdrop` for the new-topic modal.
+- Updated small UI/media/tool pieces: `components/ui/Avatar.tsx`, `components/ui/Dropdown.tsx`, `components/ui/SearchBar.tsx`, `components/ui/LikeButton.tsx`, `features/media/components/VideoPlayer.tsx`, and `app/tools/subnet-calculator/page.tsx`.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## B Step 3 / A Step 3 — specialized primitive cleanup
+- Added `components/ui/FloatingActionButton.tsx` for shared floating action controls.
+- Added `components/ui/MediaSelectorCard.tsx` for reusable media/video selector cards.
+- Exported the new primitives from `components/ui/index.ts`.
+- Updated `features/chat/components/Chatbot.tsx` to use `FloatingActionButton` and tokenized remaining touched text/background aliases.
+- Updated `features/media/components/MediaGallery.tsx` to use `MediaSelectorCard` instead of local raw card buttons.
+- Updated `components/layout/SidebarShell.tsx` to use shared `Overlay` for the mobile sidebar backdrop.
+- Updated `components/layout/SidebarContent.tsx` to use shared `OverlayBackdrop`/`Panel` for the login modal and token-cleaned sidebar search/theme touched aliases.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## B Step 4 — conservative sidebar/control cleanup
+- Added `components/ui/ThemeToggleButton.tsx` and exported it from `components/ui/index.ts`.
+- Updated `components/layout/SidebarContent.tsx` to use `ThemeToggleButton` for the theme row.
+- Updated sidebar logo toggle, expanded search submit, and login row to use shared `Button` where safe without changing sidebar dimensions.
+- Removed sidebar nav/account inline active-background/font-size styles in favor of tokenized class names.
+- Updated `config/sidebar.config.ts` to replace remaining old foreground/muted aliases with `--tb-*` token classes.
+- Updated `config/module-colors.ts` base colors to use `text-[var(--tb-foreground)]`.
+- Updated `components/layout/SidebarShell.tsx` to remove hardcoded `drop-shadow-lg` from the draggable mobile FAB while keeping drag/pointer behavior untouched.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## C Step 1 — content/data realism, source JSON expansion
+- Expanded `data/blog.json` from 11 to 16 realistic infrastructure/security/network articles.
+- Expanded `data/media.json` from 3 to 9 realistic video/podcast/demo items.
+- Expanded `data/download.json` from 2 to 10 realistic download-center files across OS, firmware, drivers, monitoring, and utilities.
+- Expanded `data/jobs.json` from 4 to 7 realistic team openings.
+- Kept entries compatible with existing `ContentItem` shape and existing UI feeds.
+- Validation: edited JSON files parse successfully.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.

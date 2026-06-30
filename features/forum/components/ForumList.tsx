@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { ChipButton } from "@/components/ui/ChipButton";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { ModuleBadge } from "@/components/ui/ModuleBadge";
+import { OverlayBackdrop } from "@/components/ui/Overlay";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 
@@ -53,7 +54,7 @@ export default function ForumList(){
       <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
         <div>
           <h1 className={`text-3xl font-black ${meta.color}`}>انجمن تکباکس</h1>
-          <p className="text-xs text-muted-foreground mt-1">پرسش و پاسخ تخصصی – سبک Reddit</p>
+          <p className="text-xs text-[var(--tb-muted-foreground)] mt-1">پرسش و پاسخ تخصصی – سبک Reddit</p>
         </div>
         <div className="flex gap-2">
           <input placeholder="جستجو در انجمن…" className="input w-56 text-sm" />
@@ -68,19 +69,19 @@ export default function ForumList(){
         ))}
       </div>
 
-      <div className="card divide-y divide-border/60 overflow-hidden">
-        <div className="hidden sm:grid grid-cols-12 text-[11px] text-muted-foreground px-4 py-2 bg-muted/30">
+      <div className="card divide-y divide-[var(--tb-border)]/60 overflow-hidden">
+        <div className="hidden sm:grid grid-cols-12 text-[11px] text-[var(--tb-muted-foreground)] px-4 py-2 bg-[var(--tb-muted)]/30">
           <div className="col-span-7">موضوع</div>
           <div className="col-span-1 text-center">رای</div>
           <div className="col-span-2 text-center">پاسخ / بازدید</div>
           <div className="col-span-2 text-left">آخرین فعالیت</div>
         </div>
         {all.map(t=>(
-          <div key={t.slug} className="grid grid-cols-12 px-3 sm:px-4 py-3 hover:bg-muted/20 gap-2 items-center">
+          <div key={t.slug} className="grid grid-cols-12 px-3 sm:px-4 py-3 hover:bg-[var(--tb-muted)]/20 gap-2 items-center">
             {/* vote column – reddit style */}
-            <div className="hidden sm:flex col-span-1 flex-col items-center text-muted-foreground text-[11px]">
+            <div className="hidden sm:flex col-span-1 flex-col items-center text-[var(--tb-muted-foreground)] text-[11px]">
               <Button variant="link" size="xs" className="text-[var(--tb-muted-foreground)] hover:text-[var(--tb-blog)]">▲</Button>
-              <span className="font-bold text-foreground">{t.likes}</span>
+              <span className="font-bold text-[var(--tb-foreground)]">{t.likes}</span>
               <Button variant="link" size="xs" className="text-[var(--tb-muted-foreground)] hover:text-[var(--tb-review)]">▼</Button>
             </div>
             {/* main */}
@@ -92,19 +93,19 @@ export default function ForumList(){
                   {t.solved && <ModuleBadge module="success" className="px-1.5 py-0.5 text-[9px]">حل‌شده ✓</ModuleBadge>}
                   {!t.solved && <ModuleBadge module="warning" className="px-1.5 py-0.5 text-[9px]">باز</ModuleBadge>}
                 </div>
-                <div className="text-[11px] text-muted-foreground mt-1">
-                  ارسال شده توسط <b className="text-foreground">{t.author.name}</b> • {t.date_fa} • {t.tags.slice(0,2).map(x=>`#${x}`).join(" ")}
+                <div className="text-[11px] text-[var(--tb-muted-foreground)] mt-1">
+                  ارسال شده توسط <b className="text-[var(--tb-foreground)]">{t.author.name}</b> • {t.date_fa} • {t.tags.slice(0,2).map(x=>`#${x}`).join(" ")}
                 </div>
               </div>
             </div>
             {/* stats */}
             <div className="col-span-6 sm:col-span-2 text-center">
-              <div className="text-sm font-bold">{t.answers} <span className="text-[11px] text-muted-foreground font-normal">پاسخ</span></div>
+              <div className="text-sm font-bold">{t.answers} <span className="text-[11px] text-[var(--tb-muted-foreground)] font-normal">پاسخ</span></div>
             </div>
-            <div className="col-span-6 sm:col-span-2 text-center text-[11px] text-muted-foreground">
+            <div className="col-span-6 sm:col-span-2 text-center text-[11px] text-[var(--tb-muted-foreground)]">
               {t.views.toLocaleString("fa-IR")} بازدید
             </div>
-            <div className="hidden sm:block col-span-1 text-left text-[11px] text-muted-foreground">
+            <div className="hidden sm:block col-span-1 text-left text-[11px] text-[var(--tb-muted-foreground)]">
               {t.date_fa.split(" ")[0]}<br/>{t.author.name.split(" ")[0]}
             </div>
           </div>
@@ -114,7 +115,7 @@ export default function ForumList(){
       {/* New Topic Modal */}
       {showNew && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{zIndex:zIndex.modal}} dir="rtl">
-          <div className="absolute inset-0 tb-overlay-backdrop" onClick={()=>setShowNew(false)} />
+          <OverlayBackdrop onClick={()=>setShowNew(false)} />
           <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-5 space-y-3 z-10">
             <div className="flex justify-between items-center">
               <h3 className="font-black text-lg">موضوع جدید – انجمن تکباکس</h3>
@@ -122,7 +123,7 @@ export default function ForumList(){
             </div>
             <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="عنوان واضح بپرسید…" className="input" required />
             <textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="جزئیات مشکل، لاگ‌ها، چیزی که امتحان کردید…" className="input min-h-[160px]" required />
-            <div className="text-[11px] text-muted-foreground">با ارسال، با قوانین انجمن موافقت می‌کنید. پیش‌نویس به‌صورت لوکال ذخیره می‌شود – در نسخه Prisma به /api/posts ارسال خواهد شد.</div>
+            <div className="text-[11px] text-[var(--tb-muted-foreground)]">با ارسال، با قوانین انجمن موافقت می‌کنید. پیش‌نویس به‌صورت لوکال ذخیره می‌شود – در نسخه Prisma به /api/posts ارسال خواهد شد.</div>
             <div className="flex justify-end gap-2">
               <Button type="button" variant="ghost" onClick={()=>setShowNew(false)}>انصراف</Button>
               <Button>ارسال موضوع</Button>

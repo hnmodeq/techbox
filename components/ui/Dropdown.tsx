@@ -24,7 +24,7 @@ export function Dropdown({ trigger, items, align="end" }: {
           {items.map(it=>(
             <button key={it.value}
               onClick={()=>{ it.onSelect?.(); setOpen(false); if(it.href) window.location.href=it.href; }}
-              className="w-full text-right px-3 py-2 text-[12px] rounded-[var(--tb-radius-md)] hover:bg-[var(--muted)] transition-colors"
+              className="w-full text-right px-3 py-2 text-[12px] rounded-[var(--tb-radius-md)] hover:bg-[var(--tb-muted)] transition-colors"
             >{it.label}</button>
           ))}
         </div>
@@ -51,7 +51,7 @@ export function Select({ value, onValueChange, options, placeholder="انتخا�
         {placeholder && <option value="">{placeholder}</option>}
         {options.map(o=> <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
-      <ChevronDown size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{color:"var(--muted-foreground)"}} />
+      <ChevronDown size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--tb-muted-foreground)]" />
     </div>
   );
 }

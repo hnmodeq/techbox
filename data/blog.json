@@ -261,5 +261,129 @@
     "likes": 174,
     "views": 3880,
     "category": "امنیت"
+  },
+  {
+    "slug": "zero-trust-for-smb-iran",
+    "module": "blog",
+    "title": "Zero Trust برای شرکت‌های کوچک؛ از شعار تا اجرای عملی",
+    "excerpt": "چطور بدون بودجه سنگین، دسترسی‌ها، احراز هویت و لاگ‌ها را مرحله‌به‌مرحله امن‌تر کنیم؟",
+    "content": "Zero Trust یعنی هیچ کاربر، دستگاه یا سرویس داخلی را به صورت پیش‌فرض قابل اعتماد فرض نکنیم. در این راهنما از MFA، تفکیک شبکه، least privilege، لاگ‌گیری و تست دوره‌ای شروع می‌کنیم و یک نقشه راه کم‌هزینه برای شرکت‌های کوچک ارائه می‌دهیم.",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "zero trust",
+      "امنیت",
+      "mfa",
+      "شبکه",
+      "فایروال"
+    ],
+    "author": {
+      "name": "نسترن خداکرمی",
+      "role": "فعال حوزه فناوری اطلاعات",
+      "avatar": "/assets/nastaran.png"
+    },
+    "date": "2026-07-18",
+    "date_fa": "27 تیر 1405",
+    "likes": 187,
+    "views": 4210,
+    "category": "امنیت"
+  },
+  {
+    "slug": "postgres-backup-restore-playbook",
+    "module": "blog",
+    "title": "Playbook بکاپ و بازیابی PostgreSQL برای تیم‌های IT",
+    "excerpt": "از pg_dump تا PITR؛ برنامه‌ای که فقط روی کاغذ نباشد و واقعاً بازیابی شود.",
+    "content": "یک بکاپ خوب بدون تست restore ارزشی ندارد. این مقاله ساختار snapshot، WAL archiving، رمزنگاری، نگهداری خارج از سایت و تمرین بازیابی ماهانه را بررسی می‌کند.",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "postgresql",
+      "backup",
+      "database",
+      "لینوکس",
+      "امنیت"
+    ],
+    "author": {
+      "name": "هومن مدق",
+      "role": "کارشناس فناوری اطلاعات",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-17",
+    "date_fa": "26 تیر 1405",
+    "likes": 146,
+    "views": 3370,
+    "category": "دیتابیس"
+  },
+  {
+    "slug": "sfp-transceiver-buying-guide",
+    "module": "blog",
+    "title": "راهنمای خرید ماژول SFP؛ سازگاری، فاصله و دمای کاری",
+    "excerpt": "چرا یک SFP ارزان می‌تواند باعث packet loss، flap و قطعی‌های عجیب شود؟",
+    "content": "در خرید SFP باید به نوع فیبر، طول موج، فاصله، DOM، دمای کاری، سازگاری با برند سوئیچ و کیفیت لاگ‌ها توجه کرد. در این مطلب چک‌لیست انتخاب و تست اولیه را مرور می‌کنیم.",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "sfp",
+      "شبکه",
+      "سوئیچ",
+      "فیبر نوری",
+      "دیتاسنتر"
+    ],
+    "author": {
+      "name": "روژینا باقری",
+      "role": "کارشناس شبکه",
+      "avatar": "/assets/rojina.png"
+    },
+    "date": "2026-07-16",
+    "date_fa": "25 تیر 1405",
+    "likes": 98,
+    "views": 2440,
+    "category": "شبکه"
+  },
+  {
+    "slug": "windows-server-hardening-checklist",
+    "module": "blog",
+    "title": "چک‌لیست Hardening ویندوز سرور بعد از نصب اولیه",
+    "excerpt": "تنظیماتی که قبل از تحویل سرور به واحد عملیاتی باید بررسی شوند.",
+    "content": "از نام‌گذاری و patch policy تا audit policy، محدودسازی RDP، Windows Defender، firewall، time sync و گروه‌های ادمین؛ این چک‌لیست برای تحویل امن‌تر سرورهای ویندوزی آماده شده است.",
+    "image": "/assets/blog-1.jpg",
+    "tags": [
+      "windows server",
+      "hardening",
+      "امنیت",
+      "اکتیودایرکتوری"
+    ],
+    "author": {
+      "name": "عطیه حاتمی",
+      "role": "مهندس کامپیوتر",
+      "avatar": "/assets/atiye.png"
+    },
+    "date": "2026-07-09",
+    "date_fa": "18 تیر 1405",
+    "likes": 165,
+    "views": 3990,
+    "category": "امنیت"
+  },
+  {
+    "slug": "server-room-temperature-monitoring",
+    "module": "blog",
+    "title": "مانیتورینگ دما و رطوبت اتاق سرور با سنسورهای اقتصادی",
+    "excerpt": "قبل از خرابی تجهیزات، هشدار درست دریافت کنید؛ از سنسور تا داشبورد و پیامک.",
+    "content": "گرما و رطوبت از دلایل رایج قطعی تجهیزات هستند. در این مقاله انتخاب سنسور، آستانه هشدار، اتصال به Zabbix و سناریوی اطلاع‌رسانی بررسی می‌شود.",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "مانیتورینگ",
+      "اتاق سرور",
+      "zabbix",
+      "سنسور",
+      "زیرساخت"
+    ],
+    "author": {
+      "name": "بهناز قادری",
+      "role": "طراح سایت",
+      "avatar": "/assets/behnaz.png"
+    },
+    "date": "2026-07-03",
+    "date_fa": "12 تیر 1405",
+    "likes": 111,
+    "views": 2190,
+    "category": "مانیتورینگ"
   }
 ]

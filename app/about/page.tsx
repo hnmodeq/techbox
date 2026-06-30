@@ -23,7 +23,7 @@ export default function About(){
           ["۱۴۰۵", "هونامیک ارتباط رستاک"],
         ].map(([k,v])=>(
           <div key={k as string} className="card p-5 text-center">
-            <div className="text-2xl font-black text-brand">{k}</div>
+            <div className="text-2xl font-black text-[var(--tb-brand)]">{k}</div>
             <div className="text-xs text-muted-foreground mt-1">{v}</div>
           </div>
         ))}
@@ -37,7 +37,7 @@ export default function About(){
             <div>
               <div className="font-bold text-[14px]">{u.name}</div>
               <div className="text-[11px] text-muted-foreground">{u.role==="super_admin" ? "مدیر کل" : "ویراستار"} • {u.modules.join("، ")}</div>
-              <Link href={`/account`} className="text-[10px] text-brand hover:underline">مشاهده پروفایل →</Link>
+              <Link href={`/account`} className="text-[10px] text-[var(--tb-brand)] hover:underline">مشاهده پروفایل →</Link>
             </div>
           </div>
         ))}

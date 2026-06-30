@@ -19,3 +19,6 @@ export * from "./IconRailButton";
 export * from "./Overlay";
 export * from "./Panel";
 export * from "./ModuleBadge";
+export * from "./FloatingActionButton";
+export * from "./MediaSelectorCard";
+export * from "./ThemeToggleButton";

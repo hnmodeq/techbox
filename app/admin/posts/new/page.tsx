@@ -4,6 +4,7 @@ import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { ModuleBadge } from "@/components/ui/ModuleBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,7 @@ function NewPostInner() {
     }
   }, [editSlug, module]);
 
-  if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="underline" style={{color:"var(--brand)"}} href="/admin/login">وارد شوید</Link></main>;
+  if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="text-[var(--tb-brand)] underline" href="/admin/login">وارد شوید</Link></main>;
 
   const canEdit = user.role==="super_admin" || (user.modules||[]).includes(module);
   if (!canEdit) return <main className="p-10 text-center text-[var(--tb-danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
@@ -81,54 +82,56 @@ function NewPostInner() {
     <main className="max-w-3xl mx-auto px-4 py-10" dir="rtl">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-black">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
-        <div className="text-[11px]" style={{color:"var(--muted-foreground)"}}>{user.name} • {user.role==="super_admin"?"مدیر کل":"ویراستار"}</div>
+        <div className="text-[11px] text-[var(--tb-muted-foreground)]">{user.name} • {user.role==="super_admin"?"مدیر کل":"ویراستار"}</div>
       </div>
       <form onSubmit={save} className="card p-5 space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>ماژول *</label>
+            <label className="text-[11px] text-[var(--tb-muted-foreground)]">ماژول *</label>
             <select value={module} onChange={e=>setModule(e.target.value as ModuleSlug)} className="input mt-1" required>
               {allowed.map(m => <option key={m} value={m}>{moduleMeta[m].titleFa} – /{m}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>اسلاگ</label>
+            <label className="text-[11px] text-[var(--tb-muted-foreground)]">اسلاگ</label>
             <input value={slug} onChange={e=>setSlug(e.target.value)} className="input mt-1" placeholder="auto از عنوان" dir="ltr" />
           </div>
         </div>
         <div>
-          <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>عنوان *</label>
+          <label className="text-[11px] text-[var(--tb-muted-foreground)]">عنوان *</label>
           <input value={title} onChange={e=>setTitle(e.target.value)} className="input mt-1" required />
         </div>
         <div>
-          <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>خلاصه</label>
+          <label className="text-[11px] text-[var(--tb-muted-foreground)]">خلاصه</label>
           <textarea value={excerpt} onChange={e=>setExcerpt(e.target.value)} className="input min-h-[80px] mt-1" />
         </div>
         <div className="grid md:grid-cols-3 gap-3">
           <div className="md:col-span-2">
-            <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>برچسب‌ها – با , جدا کنید</label>
+            <label className="text-[11px] text-[var(--tb-muted-foreground)]">برچسب‌ها – با , جدا کنید</label>
             <input value={tags} onChange={e=>setTags(e.target.value)} className="input mt-1" placeholder="QNAP-2277, nas, storage" />
           </div>
           <div>
-            <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>تصویر شاخص URL</label>
+            <label className="text-[11px] text-[var(--tb-muted-foreground)]">تصویر شاخص URL</label>
             <input value={image} onChange={e=>setImage(e.target.value)} className="input mt-1" placeholder="/assets/..." dir="ltr" />
           </div>
         </div>
         <div>
-          <label className="text-[11px]" style={{color:"var(--muted-foreground)"}}>محتوا</label>
+          <label className="text-[11px] text-[var(--tb-muted-foreground)]">محتوا</label>
           <textarea value={content} onChange={e=>setContent(e.target.value)} className="input min-h-[220px] mt-1" placeholder="متن کامل / HTML / Markdown…" />
         </div>
 
         <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
-          <div className="text-[11px]" style={{color: msg.includes("✓") ? "var(--tb-success)" : "var(--tb-muted-foreground)"}}>{msg || "POST → /api/posts – RBAC server-side"}</div>
+          <div className={msg.includes("✓") ? "text-[11px] text-[var(--tb-success)]" : "text-[11px] text-[var(--tb-muted-foreground)]"}>{msg || "POST → /api/posts – RBAC server-side"}</div>
           <div className="flex gap-2">
             <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">انصراف</ButtonLink>
             <Button size="xs" disabled={saving} type="submit">{saving ? "در حال انتشار…" : (editSlug ? "ذخیره تغییرات" : "انتشار در تکباکس")}</Button>
           </div>
         </div>
       </form>
-      <p className="text-[10px] mt-3 text-center" style={{color:"var(--muted-foreground)"}}>
-        دسترسی شما: {allowed.map(m=>moduleMeta[m]?.titleFa).join("، ")} – نقش توسط مدیر کل در <Link href="/admin/roles" className="underline" style={{color:"var(--brand)"}}>/admin/roles</Link> قابل تغییر است.
+      <p className="mt-3 text-center text-[10px] text-[var(--tb-muted-foreground)]">
+        دسترسی شما:
+        <span className="mx-1 inline-flex flex-wrap justify-center gap-1 align-middle">{allowed.map(m=><ModuleBadge key={m} module={m}>{moduleMeta[m]?.titleFa}</ModuleBadge>)}</span>
+        – نقش توسط مدیر کل در <Link href="/admin/roles" className="text-[var(--tb-brand)] underline">/admin/roles</Link> قابل تغییر است.
       </p>
     </main>
   );

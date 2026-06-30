@@ -132,7 +132,7 @@ export default function AccountPage(){
             ["امتیاز","4.8"],
           ].map(([k,v])=>(
             <div key={k as string} className="card p-4 text-center">
-              <div className="text-2xl font-black text-brand">{v}</div>
+              <div className="text-2xl font-black text-[var(--tb-brand)]">{v}</div>
               <div className="text-[11px] text-muted-foreground mt-1">{k}</div>
             </div>
           ))}

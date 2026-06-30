@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/Badge";
 
 type Props = {
   title: string;
@@ -33,10 +34,10 @@ export default function BentoCard({
               <Link href={href} className="hover:opacity-90">{title}</Link>
             </h3>
             {description && (
-              <p className="text-[13px] leading-6 text-muted-foreground mt-1.5 max-w-[36ch]">{description}</p>
+              <p className="text-[13px] leading-6 text-[var(--tb-muted-foreground)] mt-1.5 max-w-[36ch]">{description}</p>
             )}
           </div>
-          {badge && <span className="badge shrink-0">{badge}</span>}
+          {badge && <Badge variant="brand" className="shrink-0">{badge}</Badge>}
         </div>
 
         <div className="min-h-0 flex-1 overflow-hidden">
@@ -47,7 +48,7 @@ export default function BentoCard({
 
         {footerLink && (
           <div className="pt-1">
-            <Link href={footerLink} className="text-xs font-semibold text-muted-foreground hover:text-foreground">
+            <Link href={footerLink} className="text-xs font-semibold text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]">
               {footerLabel}
             </Link>
           </div>

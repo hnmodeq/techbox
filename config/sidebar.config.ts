@@ -115,28 +115,28 @@ export const accountItem: NavItem = {
 export const themeIconClass = {
   buttonBase:
     "inline-flex h-10 w-10 items-center rounded-[var(--tb-radius-lg)] transition-all duration-[var(--tb-duration-normal)]",
-  buttonClassName: "text-muted-foreground",
-  buttonHoverClassName: "hover:text-foreground",
+  buttonClassName: "text-[var(--tb-muted-foreground)]",
+  buttonHoverClassName: "hover:text-[var(--tb-foreground)]",
   sunIconClassName: "text-[var(--tb-warning)]",
   sunIconHoverClassName: "group-hover:text-[var(--tb-warning)]",
-  sunIconActiveClassName: "text-foreground group-hover:text-[var(--tb-warning)]",
+  sunIconActiveClassName: "text-[var(--tb-foreground)] group-hover:text-[var(--tb-warning)]",
   moonIconClassName: "text-zinc-200 dark:text-zinc-100",
   moonIconHoverClassName: "group-hover:text-[var(--tb-info)]",
   moonIconActiveClassName:
-    "text-foreground dark:text-foreground group-hover:text-[var(--tb-info)]",
+    "text-[var(--tb-foreground)] dark:text-[var(--tb-foreground)] group-hover:text-[var(--tb-info)]",
 };
 
 export const sidebarBase = [
-  "bg-background text-foreground",
+  "bg-[var(--tb-background)] text-[var(--tb-foreground)]",
   "shadow-[var(--tb-shadow-lg)]",
 ].join(" ");
 
 export const linkBase =
   "group relative flex h-11 w-full items-center rounded-[var(--tb-radius-lg)] text-sm font-normal transition-all duration-[var(--tb-duration-normal)]";
 
-export const linkInactive = "text-muted-foreground hover:text-foreground";
+export const linkInactive = "text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]";
 
-export const linkActive = "bg-accent/50 text-secondary";
+export const linkActive = "bg-[var(--tb-muted)]/50 text-[var(--tb-secondary-foreground)]";
 
 export function isActive(pathname: string, href: string) {
   return href === "/"

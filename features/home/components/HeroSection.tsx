@@ -39,7 +39,7 @@ export default function HeroSection() {
             transition={{ duration: 0.35 }}
             className="hero-item"
           >
-            <Link href={item.href} className="hero-rotator-text hover:text-brand transition-colors">
+            <Link href={item.href} className="hero-rotator-text hover:text-[var(--tb-brand)] transition-colors">
               {item.text}
             </Link>
           </motion.div>

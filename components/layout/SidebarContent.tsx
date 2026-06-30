@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Moon, Sun, Bell, Search, Clock, ShoppingCart } from "lucide-react";
+import { Bell, Search, Clock, ShoppingCart } from "lucide-react";
 import { createPortal } from "react-dom";
 import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
 import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
@@ -16,6 +16,9 @@ import { zIndex } from "@/design";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { IconRailButton } from "@/components/ui/IconRailButton";
 import { CloseButton } from "@/components/ui/CloseButton";
+import { OverlayBackdrop } from "@/components/ui/Overlay";
+import { Panel } from "@/components/ui/Panel";
+import { ThemeToggleButton } from "@/components/ui/ThemeToggleButton";
 
 type AnchorRect = { top: number; right: number };
 
@@ -129,7 +132,7 @@ export default function SidebarContent({
           <ul className="max-h-80 space-y-2 overflow-y-auto text-[11px]">
             {notifications.map((n: any) => (
               <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--tb-border)_40%,transparent)] pb-2 last:border-0">
-                <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 leading-5 hover:text-brand">
+                <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 leading-5 hover:text-[var(--tb-brand)]">
                   {n.title}
                 </Link>
                 <div className="mt-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{n.date_fa} • {n.module}</div>
@@ -149,9 +152,9 @@ export default function SidebarContent({
           <div className="relative h-10 w-10 shrink-0">
             {onLogoClick ? (
               <SidebarTooltip label="باز/بستن منو" enabled={!expanded} tooltipClassName="text-[var(--tb-brand)]">
-                <button onClick={onLogoClick} className="relative h-10 w-10 overflow-hidden rounded-[var(--tb-radius-lg)] transition-opacity hover:opacity-90" aria-label="toggle sidebar">
+                <Button onClick={onLogoClick} variant="link" size="icon" className="relative h-10 w-10 overflow-hidden rounded-[var(--tb-radius-lg)] p-0 transition-opacity hover:opacity-90" aria-label="toggle sidebar">
                   <Image src="/logo.png" alt="تکباکس" fill sizes="40px" className="object-contain" />
-                </button>
+                </Button>
               </SidebarTooltip>
             ) : (
               <Image src="/logo.png" alt="تکباکس" fill sizes="40px" className="object-contain" />
@@ -190,9 +193,9 @@ export default function SidebarContent({
           {expanded ? (
             <form onSubmit={doSearch} className="relative h-10">
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input h-10 !py-2 pe-8 text-xs" />
-              <button type="submit" className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label="search">
+              <Button type="submit" variant="link" size="iconSm" className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]" aria-label="search">
                 <Search size={14} />
-              </button>
+              </Button>
             </form>
           ) : (
             <SidebarTooltip label="جستجو" enabled tooltipClassName="text-[var(--tb-brand)]">
@@ -219,15 +222,7 @@ export default function SidebarContent({
 
         <div className="h-10 shrink-0">
           <SidebarTooltip label={theme === "dark" ? "حالت روز" : "حالت شب"} enabled={!expanded} tooltipClassName="text-[var(--tb-warning)]">
-            <button type="button" onClick={onToggleTheme} className="group flex h-10 w-full items-center rounded-[var(--tb-radius-lg)] text-[11px] text-muted-foreground transition-colors hover:bg-[var(--tb-muted)] hover:text-foreground">
-              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
-                <Sun className={`absolute h-[18px] w-[18px] transition-all ${theme === "dark" ? "scale-100 text-[var(--tb-warning)] opacity-100" : "scale-0 opacity-0"}`} />
-                <Moon className={`absolute h-[18px] w-[18px] transition-all ${theme === "dark" ? "scale-0 opacity-0" : "scale-100 opacity-100"}`} />
-              </span>
-              <span className={`overflow-hidden whitespace-nowrap text-[11px] transition-all ${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"}`}>
-                {theme === "dark" ? "حالت روز" : "حالت شب"}
-              </span>
-            </button>
+            <ThemeToggleButton theme={theme} expanded={expanded} onClick={onToggleTheme} />
           </SidebarTooltip>
         </div>
 
@@ -239,15 +234,14 @@ export default function SidebarContent({
           {navItems.map((item) => {
             const Icon = item.icon as any;
             const active = isActive(pathname, item.href);
-            const iconClass = active ? item.iconActiveClassName || "text-primary" : item.iconClassName || "text-muted-foreground";
+            const iconClass = active ? item.iconActiveClassName || "text-primary" : item.iconClassName || "text-[var(--tb-muted-foreground)]";
             const hoverClass = item.iconHoverClassName || item.iconActiveClassName || "group-hover:text-[var(--tb-brand)]";
             return (
               <SidebarTooltip key={item.href} label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
                 <Link
                   href={item.href}
                   onClick={onLinkClick}
-                  className={`${linkBase} ${active ? "text-foreground" : linkInactive}`}
-                  style={{ background: active ? "var(--tb-muted)" : "transparent", fontSize: "13px" }}
+                  className={`${linkBase} text-[13px] ${active ? "bg-[var(--tb-muted)] text-[var(--tb-foreground)]" : linkInactive}`}
                 >
                   {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tb-brand)]" />}
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center">
@@ -263,7 +257,7 @@ export default function SidebarContent({
 
       <div className="shrink-0 space-y-2 border-t border-[var(--tb-border)] px-2 py-2">
         {user ? (
-          <Link href="/account" onClick={onLinkClick} className={`${linkBase} ${isActive(pathname, "/account") ? "" : linkInactive}`} style={{ fontSize: "12px", background: isActive(pathname, "/account") ? "var(--tb-muted)" : "transparent" }}>
+          <Link href="/account" onClick={onLinkClick} className={`${linkBase} text-[12px] ${isActive(pathname, "/account") ? "bg-[var(--tb-muted)] text-[var(--tb-foreground)]" : linkInactive}`}>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center">
               <Image src={user.avatar || "/assets/hooman.png"} alt={user.name} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
             </span>
@@ -274,20 +268,20 @@ export default function SidebarContent({
           </Link>
         ) : (
           <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--tb-account)]">
-            <button onClick={() => setLoginOpen(true)} className={`${linkBase} ${linkInactive} w-full`} style={{ fontSize: "12px" }}>
+            <Button variant="link" size="md" onClick={() => setLoginOpen(true)} className={`${linkBase} ${linkInactive} w-full justify-start p-0 text-[12px] no-underline hover:no-underline`}>
               <span className="flex h-10 w-10 items-center justify-center">
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-muted)] text-[11px]">👤</span>
               </span>
               <span className={`${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"} truncate transition-all`}>ورود</span>
-            </button>
+            </Button>
           </SidebarTooltip>
         )}
       </div>
 
       {loginOpen && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
-          <div className="absolute inset-0 tb-overlay-backdrop" onClick={() => setLoginOpen(false)} />
-          <div className="relative w-full max-w-sm space-y-3 p-5 card" style={{ zIndex: zIndex.modalContent }}>
+          <OverlayBackdrop onClick={() => setLoginOpen(false)} />
+          <Panel className="relative w-full max-w-sm space-y-3" style={{ zIndex: zIndex.modalContent }}>
             <div className="flex items-center justify-between">
               <h3 className="text-[15px] font-black">ورود به تکباکس</h3>
               <CloseButton onClick={() => setLoginOpen(false)} />
@@ -297,7 +291,7 @@ export default function SidebarContent({
             </p>
             <ButtonLink href="/admin/login" onClick={() => setLoginOpen(false)} className="w-full text-[13px]">رفتن به ورود کامل →</ButtonLink>
             <Button variant="ghost" size="xs" onClick={() => setLoginOpen(false)} className="w-full text-[11px]">بستن</Button>
-          </div>
+          </Panel>
         </div>
       )}
 

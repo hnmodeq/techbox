@@ -4,6 +4,7 @@ import { useActionState, useEffect, useOptimistic, useTransition, useState } fro
 import { getCommentsAction, createCommentAction, voteCommentAction } from "@/features/comment/actions/comments";
 import { CommentVote } from "@/components/ui/LikeButton";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 type CommentNode = any;
 
@@ -52,15 +53,15 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const renderNode = (c: CommentNode, depth = 0) => (
     <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
-      <div className="border-r-2 pe-3" style={{ borderColor: depth ? "var(--border)" : "transparent", paddingRight: depth ? 12 : 0 }}>
-        <div className="card p-4" style={{background:"var(--card)"}}>
+      <div className={depth ? "border-r-2 border-[var(--tb-border)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
+        <div className="card p-4">
           <div className="flex justify-between items-center gap-2">
             <div className="font-bold text-[13px]">{(c as any).authorName || "کاربر"}</div>
-            <div className="text-[10px]" style={{color:"var(--muted-foreground)"}}>
+            <div className="text-[10px] text-[var(--tb-muted-foreground)]">
               {new Date((c as any).createdAt).toLocaleString("fa-IR", { dateStyle:"medium", timeStyle:"short" })}
             </div>
           </div>
-          <p className="text-[13px] leading-7 mt-2" style={{color:"var(--muted-foreground)", whiteSpace:"pre-wrap"}}>{(c as any).text}</p>
+          <p className="mt-2 whitespace-pre-wrap text-[13px] leading-7 text-[var(--tb-muted-foreground)]">{(c as any).text}</p>
           <div className="flex items-center gap-4 mt-3">
             <CommentVote
               id={c.id}
@@ -106,10 +107,10 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   const totalCount = comments.reduce((s, c:any) => s + 1 + ((c.replies?.length)||0), 0);
 
   return (
-    <section className="mt-14 border-t pt-10" style={{borderColor:"var(--border)"}}>
+    <section className="mt-14 border-t border-[var(--tb-border)] pt-10">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[18px] font-black">نظرات <span style={{color:"var(--muted-foreground)"}} className="text-[12px] font-normal">({totalCount.toLocaleString("fa-IR")})</span></h3>
-        <span className="text-[10px] px-2 py-1 rounded-full" style={{background:"var(--muted)", color:"var(--muted-foreground)"}}>Server Actions • Prisma</span>
+        <h3 className="text-[18px] font-black">نظرات <span className="text-[12px] font-normal text-[var(--tb-muted-foreground)]">({totalCount.toLocaleString("fa-IR")})</span></h3>
+        <Badge variant="secondary" className="text-[10px]">Server Actions • Prisma</Badge>
       </div>
 
       {/* new top-level comment – Server Action */}
@@ -123,7 +124,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
         </div>
         <textarea name="text" required placeholder="نظر خود را بنویسید… (Server Action – app/actions/comments.ts)" className="input min-h-[110px] text-[13px]" />
         <div className="flex justify-between items-center">
-          <span className="text-[10px]" style={{color:"var(--muted-foreground)"}}>
+          <span className="text-[10px] text-[var(--tb-muted-foreground)]">
             {state?.ok ? <span className="text-[var(--tb-success)]">✓ ثبت شد – revalidatePath انجام شد</span> : "ارسال → createCommentAction → Prisma → revalidatePath"}
           </span>
           <Button disabled={isSubmitting || isPending} size="sm">
@@ -134,9 +135,9 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
       <div className="space-y-1 min-h-[60px]">
         {loading ? (
-          <p style={{color:"var(--muted-foreground)"}} className="text-sm">در حال بارگذاری نظرات از Prisma…</p>
+          <p className="text-sm text-[var(--tb-muted-foreground)]">در حال بارگذاری نظرات از Prisma…</p>
         ) : comments.length === 0 ? (
-          <p style={{color:"var(--muted-foreground)"}} className="text-sm">اولین نظر را شما ثبت کنید.</p>
+          <p className="text-sm text-[var(--tb-muted-foreground)]">اولین نظر را شما ثبت کنید.</p>
         ) : (
           comments.map(c => renderNode(c, 0))
         )}

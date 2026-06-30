@@ -7,6 +7,7 @@ import { sidebarBase } from "@/config/sidebar.config";
 import { SidebarShellProps } from "@/types/sidebar.types";
 import { useFabTop, saveFabTop } from "@/hooks/useFabTop";
 import { zIndex } from "@/design";
+import { Overlay } from "@/components/ui/Overlay";
 
 const DRAG_THRESHOLD = 6;
 const BTN_SIZE = 72;
@@ -98,7 +99,7 @@ export default function SidebarShell({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
         style={{ top: `${btnTop}px`, touchAction: "none", zIndex: zIndex.mobileFab }}
-        className={`fixed select-none rounded-full drop-shadow-lg sm:hidden
+        className={`fixed select-none rounded-full sm:hidden
           transition-[right] duration-[var(--tb-duration-slow)] translate-x-1/2
           ${mobileOpen ? MOBILE_FAB_OPEN_RIGHT : "right-0"}
           ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
@@ -119,9 +120,9 @@ export default function SidebarShell({
       </button>
 
       {mobileOpen && (
-        <div
-          className="fixed inset-0 bg-foreground/20 backdrop-blur-[var(--tb-blur-sm)] sm:hidden"
-          style={{ zIndex: zIndex.sidebarBackdrop }}
+        <Overlay
+          layer="sidebarBackdrop"
+          className="sm:hidden"
           onClick={onCloseMobile}
         />
       )}

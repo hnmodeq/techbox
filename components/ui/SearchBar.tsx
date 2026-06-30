@@ -18,8 +18,7 @@ export function SearchBar({ onSearch, containerClassName, onKeyDown, ...props }:
       <Input {...props} onKeyDown={handleKey} type="search"
         className={cn("pe-9", props.className)}
         placeholder={props.placeholder || "جستجو در تکباکس…"} />
-      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-        style={{color:"var(--muted-foreground)"}} />
+      <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--tb-muted-foreground)]" />
     </div>
   );
 }
