@@ -53,3 +53,22 @@
 - [x] Migrated button-like internal links to `ButtonLink` where safe.
 - [x] Left specialized icon/rail/chip/media-card buttons as primitives because their layout behavior is intentionally custom.
 - [x] Tokenized additional hardcoded visual styles in cards, overlays, borders, shadows, durations, radius, and module/action states.
+## UI primitives pass A2
+- [x] Created `CloseButton`.
+- [x] Created `ChipButton`.
+- [x] Created `IconRailButton`.
+- [x] Created `Overlay` / `OverlayBackdrop`.
+- [x] Created `Panel`.
+- [x] Created `ModuleBadge`.
+- [x] Exported new primitives from `components/ui/index.ts`.
+- [x] Replaced several close/icon/chip/module-badge usages with the new primitives.
+
+## B Step 1 — deeper design hardcode audit, safe cleanup
+- [x] Scanned remaining hardcoded style candidates in `app`, `components`, `features`, `providers`, and `config`.
+- [x] Centralized admin role module/status badges with `ModuleBadge`.
+- [x] Tokenized admin role table header/rows and removed old `style={{ color/background: var(--muted...) }}` aliases.
+- [x] Centralized download tag/version badges with `Badge variant="download"`.
+- [x] Reused `OverlayBackdrop` in cart drawer and shared `Modal`.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] B Step 2: continue controlled cleanup in media/chat/forum/admin forms without risky mass rewrites.

@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 type Variant = "default" | "secondary" | "outline" | "brand" |
-  "home" | "blog" | "news" | "media" | "shop" | "tools" | "raid" | "subnet" | "vip" | "forum" | "review" | "download";
+  "home" | "blog" | "news" | "media" | "shop" | "tools" | "raid" | "subnet" | "vip" | "forum" | "review" | "download" | "success" | "warning" | "danger" | "info";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: Variant;
@@ -30,6 +30,10 @@ const variants: Record<Variant, string> = {
   forum:     "",
   review:    "",
   download:  "",
+  success:   "",
+  warning:   "",
+  danger:    "",
+  info:      "",
 };
 
 // fill module variants with CSS variables – keeps everything token-driven
@@ -46,6 +50,10 @@ const moduleMap: Record<string, string> = {
   forum:    "background:color-mix(in oklch, var(--tb-forum) 14%, transparent); color:var(--tb-forum); border-color:color-mix(in oklch, var(--tb-forum) 30%, transparent)",
   review:   "background:color-mix(in oklch, var(--tb-review) 14%, transparent); color:var(--tb-review); border-color:color-mix(in oklch, var(--tb-review) 30%, transparent)",
   download: "background:color-mix(in oklch, var(--tb-download) 14%, transparent); color:var(--tb-download); border-color:color-mix(in oklch, var(--tb-download) 30%, transparent)",
+  success:  "background:color-mix(in oklch, var(--tb-success) 14%, transparent); color:var(--tb-success); border-color:color-mix(in oklch, var(--tb-success) 30%, transparent)",
+  warning:  "background:color-mix(in oklch, var(--tb-warning) 14%, transparent); color:var(--tb-warning); border-color:color-mix(in oklch, var(--tb-warning) 30%, transparent)",
+  danger:   "background:color-mix(in oklch, var(--tb-danger) 14%, transparent); color:var(--tb-danger); border-color:color-mix(in oklch, var(--tb-danger) 30%, transparent)",
+  info:     "background:color-mix(in oklch, var(--tb-info) 14%, transparent); color:var(--tb-info); border-color:color-mix(in oklch, var(--tb-info) 30%, transparent)",
 };
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(

@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import type { ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { useState, useMemo } from "react";
@@ -39,8 +40,8 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
 
       <div className="flex flex-wrap gap-2 mt-4">
         {item.tags.map(t=>(
-          <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="badge hover:bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] hover:text-[var(--tb-download)]">
-            {t.toUpperCase()}
+          <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85">
+            <Badge variant="download">{t.toUpperCase()}</Badge>
           </Link>
         ))}
       </div>
@@ -74,10 +75,10 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
             </thead>
             <tbody>
               {list.map(v=>(
-                <tr key={v.ver+v.date} className="border-b border-[var(--tb-border)]/40 hover:bg-muted/20">
+                <tr key={v.ver+v.date} className="border-b border-[var(--tb-border)]/40 hover:bg-[var(--tb-muted)]/20">
                   <td className="py-3 pe-2 font-mono text-[13px] font-bold">{v.ver}</td>
                   <td className="py-3 text-[12px]">{v.dateFa}</td>
-                  <td className="py-3 hidden sm:table-cell"><span className="badge text-[10px]">{v.os}</span></td>
+                  <td className="py-3 hidden sm:table-cell"><Badge variant="download" className="text-[10px]">{v.os}</Badge></td>
                   <td className="py-3 hidden sm:table-cell text-[12px] text-muted-foreground" dir="ltr">{v.size}</td>
                   <td className="py-3 text-[11px] text-muted-foreground">{v.notes}</td>
                   <td className="py-3 text-left">

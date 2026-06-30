@@ -14,6 +14,8 @@ import { useCart } from "@/providers/cart.provider";
 import { getAllAcross } from "@/lib/content";
 import { zIndex } from "@/design";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { IconRailButton } from "@/components/ui/IconRailButton";
+import { CloseButton } from "@/components/ui/CloseButton";
 
 type AnchorRect = { top: number; right: number };
 
@@ -163,21 +165,21 @@ export default function SidebarContent({
 
           <div className="ms-auto flex h-10 items-center gap-1">
             <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--tb-news)]">
-              <button ref={notifButtonRef} onClick={() => setNotifOpen((o) => !o)} className="icon-rail-btn relative" aria-label="notifications">
+              <IconRailButton ref={notifButtonRef} tone="news" onClick={() => setNotifOpen((o) => !o)} aria-label="notifications">
                 <Bell size={18} />
                 <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--tb-danger)]" />
-              </button>
+              </IconRailButton>
             </SidebarTooltip>
 
             <SidebarTooltip label={cartCount > 0 ? `سبد خرید – ${cartCount} قلم` : "سبد خرید"} enabled={!expanded} tooltipClassName="text-[var(--tb-shop)]">
-              <button onClick={() => setCartOpen(true)} className="icon-rail-btn relative" aria-label="سبد خرید">
+              <IconRailButton tone="shop" onClick={() => setCartOpen(true)} aria-label="سبد خرید">
                 <ShoppingCart size={18} />
                 {cartCount > 0 && (
                   <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--tb-shop)] px-1 text-[9px] font-bold text-black">
                     {cartCount > 99 ? "۹۹+" : cartCount.toLocaleString("fa-IR")}
                   </span>
                 )}
-              </button>
+              </IconRailButton>
             </SidebarTooltip>
           </div>
         </div>
@@ -194,9 +196,9 @@ export default function SidebarContent({
             </form>
           ) : (
             <SidebarTooltip label="جستجو" enabled tooltipClassName="text-[var(--tb-brand)]">
-              <button onClick={() => { const v = prompt("جستجو:"); if (v) router.push(`/search?q=${encodeURIComponent(v)}`); }} className="icon-rail-btn">
+              <IconRailButton tone="brand" onClick={() => { const v = prompt("جستجو:"); if (v) router.push(`/search?q=${encodeURIComponent(v)}`); }} aria-label="جستجو">
                 <Search size={18} />
-              </button>
+              </IconRailButton>
             </SidebarTooltip>
           )}
         </div>
@@ -288,7 +290,7 @@ export default function SidebarContent({
           <div className="relative w-full max-w-sm space-y-3 p-5 card" style={{ zIndex: zIndex.modalContent }}>
             <div className="flex items-center justify-between">
               <h3 className="text-[15px] font-black">ورود به تکباکس</h3>
-              <Button variant="ghost" size="iconSm" onClick={() => setLoginOpen(false)} aria-label="بستن">✕</Button>
+              <CloseButton onClick={() => setLoginOpen(false)} />
             </div>
             <p className="text-[11px] text-[var(--tb-muted-foreground)]">
               حساب تست: <b>sara</b> / <b>nima</b> / <b>rojina</b> / <b>admin</b><br />رمز همه: <code>techbox123</code>

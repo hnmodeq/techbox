@@ -126,3 +126,21 @@ Copy these files into your real project. Do **not** replace your `public/` folde
 - Kept specialized controls as custom primitives where appropriate: sidebar rail icons, sidebar links, chips, switch/tabs internals, chatbot FAB, media card buttons.
 - Continued hardcoded design cleanup: tokenized additional borders, shadows, radius, blur/backdrop, durations, overlay backgrounds, and module-color states.
 - Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## UI primitives pass A2
+- Added dedicated primitives: `CloseButton`, `ChipButton`, `IconRailButton`, `Overlay`, `OverlayBackdrop`, `Panel`, and `ModuleBadge`.
+- Exported the new primitives from `components/ui/index.ts`.
+- Updated `components/ui/IconButton.tsx` so it respects passed size and shares Button styles.
+- Migrated sidebar notification/cart/search icon buttons to `IconRailButton` where safe.
+- Migrated chatbot quick prompt chips and forum filter chips to `ChipButton`.
+- Migrated chatbot/cart/forum/sidebar close buttons to `CloseButton`.
+- Migrated forum solved/open status badges to `ModuleBadge`.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## B Step 1 — deeper design hardcode audit, safe cleanup
+- Audited remaining style hardcode candidates and intentionally avoided risky mass rewrites.
+- Updated `app/admin/roles/page.tsx` to use `ModuleBadge` for role/module/status badges and tokenized table surfaces.
+- Updated `app/admin/posts/page.tsx` to use module badges for allowed-module summary and tokenized table/link hover colors.
+- Updated `features/download/components/DownloadTable.tsx` and `features/download/components/DownloadDetail.tsx` to use centralized `Badge variant="download"` for download tags/version OS badges.
+- Updated `providers/cart.provider.tsx` and `components/ui/Modal.tsx` to reuse `OverlayBackdrop` instead of local overlay markup.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.

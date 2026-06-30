@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { Button } from "@/components/ui/Button";
+import { ModuleBadge } from "@/components/ui/ModuleBadge";
 
 type RoleRow = { id:string; name:string; titleFa:string; modules:ModuleSlug[]; users:number };
 
@@ -42,7 +43,7 @@ export default function RolesPage(){
           <h1 className="text-2xl font-black">مدیریت نقش‌ها – RBAC</h1>
           <p className="text-xs text-muted-foreground mt-1">مدیر کل می‌تواند نقش بسازد، دسترسی ماژول‌ها را تعیین کند – مثل Blog Editor / Content Creator</p>
         </div>
-        <span className="text-[11px] px-2 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-success)_10%,transparent)] text-[var(--tb-success)] border border-[color-mix(in_oklch,var(--tb-success)_20%,transparent)]">super_admin only</span>
+        <ModuleBadge module="success">super_admin only</ModuleBadge>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5 items-start">
@@ -69,7 +70,7 @@ export default function RolesPage(){
 
         <div className="lg:col-span-2 card p-0 overflow-hidden">
           <table className="w-full text-[13px]">
-            <thead style={{background:"var(--muted)"}} className="text-[11px]">
+            <thead className="bg-[var(--tb-muted)]/50 text-[11px] text-[var(--tb-muted-foreground)]">
               <tr>
                 <th className="text-right p-3">نقش</th>
                 <th className="text-right p-3">دسترسی ماژول</th>
@@ -79,15 +80,15 @@ export default function RolesPage(){
             </thead>
             <tbody>
               {roles.map(r=>(
-                <tr key={r.id} className="border-t" style={{borderColor:"var(--border)"}}>
+                <tr key={r.id} className="border-t border-[var(--tb-border)] hover:bg-[var(--tb-muted)]/20">
                   <td className="p-3">
                     <div className="font-bold">{r.titleFa}</div>
-                    <div className="text-[10px] font-mono" style={{color:"var(--muted-foreground)"}}>{r.name}</div>
+                    <div className="text-[10px] font-mono text-[var(--tb-muted-foreground)]">{r.name}</div>
                   </td>
                   <td className="p-3">
                     <div className="flex flex-wrap gap-1">
                       {r.modules.map(m=>(
-                        <span key={m} className="badge text-[10px]">{moduleMeta[m]?.titleFa || m}</span>
+                        <ModuleBadge key={m} module={m} className="text-[10px]">{moduleMeta[m]?.titleFa || m}</ModuleBadge>
                       ))}
                     </div>
                   </td>
@@ -103,7 +104,7 @@ export default function RolesPage(){
         </div>
       </div>
 
-      <div className="card p-4 mt-6 text-[12px] leading-7" style={{color:"var(--muted-foreground)"}}>
+      <div className="card p-4 mt-6 text-[12px] leading-7 text-[var(--tb-muted-foreground)]">
         <b>نقش‌های پیش‌فرض تکباکس:</b><br/>
         • <b>super_admin</b> (admin) – همه ۸ ماژول – مدیر کل<br/>
         • <b>blog_editor</b> (sara) – مجله<br/>

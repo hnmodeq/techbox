@@ -5,6 +5,7 @@ import { getModuleItems, moduleMeta, type ModuleSlug, type ContentItem } from "@
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { ModuleBadge } from "@/components/ui/ModuleBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,7 @@ function AdminPostsInner() {
 
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-muted/40 text-[11px] text-muted-foreground">
+          <thead className="bg-[var(--tb-muted)]/40 text-[11px] text-[var(--tb-muted-foreground)]">
             <tr>
               <th className="text-right p-3">عنوان</th>
               <th className="text-right p-3 hidden sm:table-cell">تاریخ</th>
@@ -81,8 +82,8 @@ function AdminPostsInner() {
                 <td className="p-3 text-xs">{it.views.toLocaleString("fa-IR")}</td>
                 <td className="p-3">
                   <div className="flex gap-2 text-[11px]">
-                    <Link href={`/${module}/${it.slug}`} target="_blank" className="hover:text-brand">مشاهده</Link>
-                    <Link href={`/admin/posts/new?module=${module}&edit=${it.slug}`} className="hover:text-brand">ویرایش</Link>
+                    <Link href={`/${module}/${it.slug}`} target="_blank" className="hover:text-[var(--tb-brand)]">مشاهده</Link>
+                    <Link href={`/admin/posts/new?module=${module}&edit=${it.slug}`} className="hover:text-[var(--tb-brand)]">ویرایش</Link>
                   </div>
                 </td>
               </tr>
@@ -93,7 +94,8 @@ function AdminPostsInner() {
       </div>
 
       <p className="text-[11px] text-muted-foreground mt-4">
-        کاربر فعلی: <b>{user.name}</b> ({user.role}) – قابل ویرایش: {allowedModules.map(m=>moduleMeta[m].titleFa).join("، ")}
+        کاربر فعلی: <b>{user.name}</b> ({user.role}) – قابل ویرایش:
+        <span className="mr-2 inline-flex flex-wrap gap-1 align-middle">{allowedModules.map(m=><ModuleBadge key={m} module={m}>{moduleMeta[m].titleFa}</ModuleBadge>)}</span>
       </p>
     </main>
   );

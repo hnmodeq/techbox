@@ -13,3 +13,9 @@ export * from "./LikeButton";
 
 // Re-export design tokens for TS usage
 export * from "@/design";
+export * from "./CloseButton";
+export * from "./ChipButton";
+export * from "./IconRailButton";
+export * from "./Overlay";
+export * from "./Panel";
+export * from "./ModuleBadge";

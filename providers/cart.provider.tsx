@@ -4,6 +4,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { zIndex } from "@/design";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { CloseButton } from "@/components/ui/CloseButton";
+import { IconRailButton } from "@/components/ui/IconRailButton";
+import { OverlayBackdrop } from "@/components/ui/Overlay";
 
 export type CartItem = { slug: string; title: string; price: string; image?: string; qty: number };
 type CartCtx = {
@@ -55,11 +58,11 @@ function CartDrawer(){
   const { items, setOpen, remove, setQty, clear, count } = ctx;
   return (
     <div dir="rtl" className="fixed inset-0" style={{ zIndex: zIndex.cart }}>
-      <div className="absolute inset-0 tb-overlay-backdrop" onClick={()=>setOpen(false)} />
+      <OverlayBackdrop onClick={()=>setOpen(false)} />
       <aside className="absolute left-0 top-0 flex h-full w-[380px] max-w-[92vw] flex-col border-r border-[var(--tb-border)] bg-[var(--tb-card)] p-4 shadow-[var(--tb-shadow-lg)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-black text-lg">سبد خرید ({count.toLocaleString("fa-IR")})</h3>
-          <Button onClick={()=>setOpen(false)} variant="ghost" size="iconSm" aria-label="بستن سبد">✕</Button>
+          <CloseButton onClick={()=>setOpen(false)} label="بستن سبد" />
         </div>
         <div className="flex-1 overflow-y-auto space-y-3">
           {items.length===0 && <p className="text-sm text-muted-foreground text-center py-10">سبد خالی است</p>}
@@ -99,10 +102,10 @@ export function useCart(){
 export function CartIconButton(){
   const { count, setOpen } = useCart();
   return (
-    <button onClick={()=>setOpen(true)} className="relative inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+    <IconRailButton tone="shop" onClick={()=>setOpen(true)} className="gap-1 text-sm" aria-label="سبد خرید">
       <span>🛒</span>
       <span className="hidden sm:inline">سبد</span>
-      {count>0 && <span className="absolute -top-1 -left-1 bg-[var(--tb-shop)] text-black text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 font-bold">{count.toLocaleString("fa-IR")}</span>}
-    </button>
+      {count>0 && <span className="absolute -top-1 -left-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-[var(--tb-radius-full)] bg-[var(--tb-shop)] px-1 text-[10px] font-bold text-black">{count.toLocaleString("fa-IR")}</span>}
+    </IconRailButton>
   );
 }

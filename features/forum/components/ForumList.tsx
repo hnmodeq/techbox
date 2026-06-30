@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { zIndex } from "@/design";
 import { Button } from "@/components/ui/Button";
+import { ChipButton } from "@/components/ui/ChipButton";
+import { CloseButton } from "@/components/ui/CloseButton";
+import { ModuleBadge } from "@/components/ui/ModuleBadge";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 
@@ -61,7 +64,7 @@ export default function ForumList(){
       {/* sub nav like reddit */}
       <div className="flex gap-2 text-[11px] mb-4">
         {["داغ","جدید","برتر","حل‌شده"].map(t=>(
-          <button key={t} className="tb-action-chip px-3 py-1.5">{t}</button>
+          <ChipButton key={t} tone="forum">{t}</ChipButton>
         ))}
       </div>
 
@@ -86,8 +89,8 @@ export default function ForumList(){
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Link href={`/forum/${t.slug}`} className="font-bold text-[14px] leading-6 hover:text-[var(--tb-forum)]">{t.title}</Link>
-                  {t.solved && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] text-[var(--tb-success)] border border-[color-mix(in_oklch,var(--tb-success)_20%,transparent)]">حل‌شده ✓</span>}
-                  {!t.solved && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[color-mix(in_oklch,var(--tb-warning)_10%,transparent)] text-[var(--tb-warning)] border border-[color-mix(in_oklch,var(--tb-warning)_20%,transparent)]">باز</span>}
+                  {t.solved && <ModuleBadge module="success" className="px-1.5 py-0.5 text-[9px]">حل‌شده ✓</ModuleBadge>}
+                  {!t.solved && <ModuleBadge module="warning" className="px-1.5 py-0.5 text-[9px]">باز</ModuleBadge>}
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-1">
                   ارسال شده توسط <b className="text-foreground">{t.author.name}</b> • {t.date_fa} • {t.tags.slice(0,2).map(x=>`#${x}`).join(" ")}
@@ -115,7 +118,7 @@ export default function ForumList(){
           <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-5 space-y-3 z-10">
             <div className="flex justify-between items-center">
               <h3 className="font-black text-lg">موضوع جدید – انجمن تکباکس</h3>
-              <Button type="button" variant="ghost" size="iconSm" onClick={()=>setShowNew(false)} aria-label="بستن">✕</Button>
+              <CloseButton onClick={()=>setShowNew(false)} />
             </div>
             <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="عنوان واضح بپرسید…" className="input" required />
             <textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="جزئیات مشکل، لاگ‌ها، چیزی که امتحان کردید…" className="input min-h-[160px]" required />

@@ -2,6 +2,8 @@
 import { useState, useRef, useEffect } from "react";
 import { zIndex } from "@/design";
 import { Button } from "@/components/ui/Button";
+import { CloseButton } from "@/components/ui/CloseButton";
+import { ChipButton } from "@/components/ui/ChipButton";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };
 
@@ -70,7 +72,7 @@ export default function Chatbot(){
               <div className="text-[13px] font-black">دستیار تکباکس <span className="text-[10px] font-normal" style={{color:"var(--tb-muted-foreground)"}}>AI Beta</span></div>
               <div className="flex items-center gap-2">
                 <Button variant="link" size="xs" onClick={()=>{setMsgs([]); localStorage.removeItem(STORAGE_KEY)}} className="text-[10px] text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]">پاک‌سازی</Button>
-                <Button variant="ghost" size="iconSm" onClick={()=>setOpen(false)} aria-label="بستن چت">✕</Button>
+                <CloseButton onClick={()=>setOpen(false)} label="بستن چت" />
               </div>
             </div>
 
@@ -81,7 +83,7 @@ export default function Chatbot(){
                   درباره محصولات (مثلا <b>QNAP-2277</b>)، مشکلات شبکه، یا مقالات بپرسید.<br/>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {["قیمت QNAP-2277؟","RAID مناسب سرور HP؟","فرق NAS و SAN؟","مشکل iSCSI؟"].map(s=>(
-                      <button key={s} onClick={()=>setInput(s)} className="tb-action-chip px-2 py-1 text-[10px]">{s}</button>
+                      <ChipButton key={s} tone="brand" onClick={()=>setInput(s)} className="px-2 py-1 text-[10px]">{s}</ChipButton>
                     ))}
                   </div>
                 </div>

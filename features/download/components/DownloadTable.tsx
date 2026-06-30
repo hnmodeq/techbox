@@ -2,6 +2,7 @@
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { useMemo, useState } from "react";
 
 export default function DownloadTable(){
@@ -58,7 +59,7 @@ export default function DownloadTable(){
 
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-muted/30 text-[11px] text-muted-foreground">
+          <thead className="bg-[var(--tb-muted)]/30 text-[11px] text-[var(--tb-muted-foreground)]">
             <tr>
               <th className="text-right p-3">نام فایل</th>
               <th className="p-3 hidden sm:table-cell text-right">برچسب‌ها</th>
@@ -74,8 +75,8 @@ export default function DownloadTable(){
                   <div className="text-[12px] text-muted-foreground mt-1 line-clamp-2">{f.excerpt}</div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {f.tags.slice(0,5).map(t=>(
-                      <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="text-[10px] px-2 py-0.5 rounded-[var(--tb-radius-full)] bg-[var(--tb-muted)] hover:bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] hover:text-[var(--tb-download)] border border-[var(--tb-border)] transition-colors duration-[var(--tb-duration-fast)]">
-                        {t.toUpperCase()}
+                      <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85">
+                        <Badge variant="download" className="text-[10px]">{t.toUpperCase()}</Badge>
                       </Link>
                     ))}
                   </div>
