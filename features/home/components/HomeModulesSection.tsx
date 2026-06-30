@@ -26,10 +26,11 @@ export default function HomeModulesSection() {
           <h2 className="text-2xl font-black">آخرین‌ها از تکباکس</h2>
           <span className="text-xs text-muted-foreground">فید زنده ماژول‌ها</span>
         </div>
-        <div className="grid auto-rows-[360px] md:auto-rows-[340px] grid-cols-1 gap-5 md:grid-cols-7">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-7 md:auto-rows-min">
           {sortedModules.map((module) => {
             const slug = module.slug as ModuleSlug;
-            const feed = getLatest(slug, slug==="media" ? 2 : 3);
+            const feedCount = slug === "shop" ? 6 : slug === "review" ? 4 : slug === "forum" ? 4 : slug === "news" ? 6 : slug === "media" ? 2 : 3;
+            const feed = getLatest(slug, feedCount);
             const meta = moduleMeta[slug];
             const variant = feedVariant[slug] || "image";
             return (
@@ -39,7 +40,7 @@ export default function HomeModulesSection() {
                 description={module.description}
                 href={`/${module.slug}`}
                 color={module.color}
-                className={`${module.cols ?? ""} ${module.rows ?? ""} !p-4 hover:translate-y-0 hover:shadow-card`} /* disable card hover – inner items hover separately */
+                className={`${module.cols ?? ""} ${module.rows ?? ""} !p-4 hover:translate-y-0 hover:shadow-[var(--tb-shadow)]`} /* disable card hover – inner items hover separately */
                 badge={`${feed.length} جدید`}
                 footerLink={`/${module.slug}`}
                 footerLabel={`همه ${meta.titleFa} →`}

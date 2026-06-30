@@ -34,6 +34,7 @@ import toolsData from "@/data/tools.json";
 import downloadData from "@/data/download.json";
 import shopData from "@/data/shop.json";
 import forumData from "@/data/forum.json";
+import { moduleColors } from "@/config/module-colors";
 
 const all: Record<ModuleSlug, ContentItem[]> = {
   blog: blogData as ContentItem[],
@@ -101,12 +102,12 @@ export function searchAcross(q: string) {
 }
 
 export const moduleMeta: Record<ModuleSlug, { title: string; titleFa: string; color: string; href: string }> = {
-  blog: { title: "blog", titleFa: "مجله", color: "text-orange-400", href: "/blog" },
-  news: { title: "news", titleFa: "اخبار", color: "text-rose-500", href: "/news" },
-  media: { title: "media", titleFa: "رسانه", color: "text-amber-300", href: "/media" },
-  review: { title: "review", titleFa: "نقد و بررسی", color: "text-sky-500", href: "/review" },
-  tools: { title: "tools", titleFa: "ابزارها", color: "text-cyan-300", href: "/tools" },
-  download: { title: "download", titleFa: "دانلود", color: "text-pink-400", href: "/download" },
-  shop: { title: "shop", titleFa: "فروشگاه", color: "text-lime-400", href: "/shop" },
-  forum: { title: "forum", titleFa: "انجمن", color: "text-rose-300", href: "/forum" },
+  blog: { title: "blog", titleFa: "مجله", color: moduleColors.blog.active, href: "/blog" },
+  news: { title: "news", titleFa: "اخبار", color: moduleColors.news.active, href: "/news" },
+  media: { title: "media", titleFa: "رسانه", color: moduleColors.media.active, href: "/media" },
+  review: { title: "review", titleFa: "نقد و بررسی", color: moduleColors.review.active, href: "/review" },
+  tools: { title: "tools", titleFa: "ابزارها", color: moduleColors.tools.active, href: "/tools" },
+  download: { title: "download", titleFa: "دانلود", color: moduleColors.download.active, href: "/download" },
+  shop: { title: "shop", titleFa: "فروشگاه", color: moduleColors.shop.active, href: "/shop" },
+  forum: { title: "forum", titleFa: "انجمن", color: moduleColors.forum.active, href: "/forum" },
 };

@@ -1,8 +1,10 @@
 "use client";
+import Image from "next/image";
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "@/providers/cart.provider";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 const prices: Record<string, {price: string, old?: string}> = {
   "qnap-ts-2277": { price: "۴۸,۹۰۰,۰۰۰", old: "۵۲,۰۰۰,۰۰۰" },
@@ -55,7 +57,7 @@ export default function ShopGrid(){
           return (
             <div key={p.slug} className="card overflow-hidden group flex flex-col rounded-[24px]">
               <Link href={`/shop/${p.slug}`} className="block relative aspect-[4/3] bg-muted overflow-hidden">
-                <img src={p.image||""} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[var(--tb-duration-slower)] group-hover:scale-105" />
                 <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-shop)_15%,transparent)] text-[var(--tb-shop)] border border-[color-mix(in_oklch,var(--tb-shop)_20%,transparent)]">موجود</span>
                 {pr.old && <span className="absolute top-3 right-3 text-[10px] bg-[var(--tb-danger)] text-white px-2 py-1 rounded-full">تخفیف</span>}
               </Link>
@@ -68,8 +70,8 @@ export default function ShopGrid(){
                   <div className="text-[18px] font-black text-[var(--tb-shop)]">{pr.price} <span className="text-[11px] text-muted-foreground font-normal">تومان</span></div>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button onClick={()=>add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1)} className="btn btn-primary flex-1 text-xs">افزودن به سبد</button>
-                  <Link href={`/shop/${p.slug}`} className="btn btn-ghost text-xs px-3">جزئیات</Link>
+                  <Button onClick={()=>add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1)} size="xs" className="flex-1">افزودن به سبد</Button>
+                  <ButtonLink href={`/shop/${p.slug}`} variant="ghost" size="xs" className="px-3">جزئیات</ButtonLink>
                 </div>
                 <div className="text-[10px] text-muted-foreground mt-2">👁 {p.views.toLocaleString("fa-IR")} • ♥ {p.likes}</div>
               </div>

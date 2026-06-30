@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { Heart, Eye } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 function getFingerprint(){
   if(typeof window==="undefined") return "srv";
@@ -41,12 +42,12 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
   }, [liked, busy, contentType, slug, key]);
 
   return (
-    <button onClick={toggle} disabled={busy} className={`btn ${liked ? "btn-primary" : "btn-ghost"} text-[13px] gap-2 disabled:opacity-60`} aria-pressed={liked}>
+    <Button onClick={toggle} disabled={busy} variant={liked ? "primary" : "ghost"} size="sm" className="gap-2 text-[13px] disabled:opacity-60" aria-pressed={liked}>
       <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-[var(--tb-danger)]" : ""} aria-hidden />
       <span className="font-black" style={{fontVariantNumeric:"tabular-nums"}}>{count.toLocaleString("fa-IR")}</span>
       <span className="hidden sm:inline">پسندیدم</span>
       <Eye size={16} className="opacity-60 hidden md:inline" />
-    </button>
+    </Button>
   );
 }
 
@@ -82,8 +83,8 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
 
   return (
     <div className="flex items-center gap-3 text-xs" style={{color:"var(--muted-foreground)"}}>
-      <button onClick={()=>vote("up")} className={v==="up" ? "text-[var(--tb-success)] font-bold" : "hover:text-foreground"}>▲ {l.toLocaleString("fa-IR")}</button>
-      <button onClick={()=>vote("down")} className={v==="down" ? "text-[var(--tb-danger)] font-bold" : "hover:text-foreground"}>▼ {d.toLocaleString("fa-IR")}</button>
+      <Button onClick={()=>vote("up")} variant="link" size="xs" className={v==="up" ? "text-[var(--tb-success)] font-bold" : "text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]"}>▲ {l.toLocaleString("fa-IR")}</Button>
+      <Button onClick={()=>vote("down")} variant="link" size="xs" className={v==="down" ? "text-[var(--tb-danger)] font-bold" : "text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]"}>▼ {d.toLocaleString("fa-IR")}</Button>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 import jobs from "@/data/jobs.json";
 import Link from "next/link";
 import { use } from "react";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export default function JobPage({ params }: { params: Promise<{slug:string}> }){
   const { slug } = use(params);
@@ -40,8 +41,8 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
           <input type="file" accept=".pdf,.doc,.docx" className="block mt-1 text-[11px]" />
         </label>
         <div className="flex justify-end gap-2">
-          <Link href="/workwithus" className="btn btn-ghost">بازگشت</Link>
-          <button className="btn btn-primary" type="submit">ارسال درخواست</button>
+          <ButtonLink href="/workwithus" variant="ghost">بازگشت</ButtonLink>
+          <Button type="submit">ارسال درخواست</Button>
         </div>
         <p className="text-[11px]" style={{color:"var(--muted-foreground)"}}>با استفاده از اطلاعات پروفایل شما پر می‌شود – می‌توانید در <Link href="/account" style={{color:"var(--brand)"}} className="underline">حساب کاربری</Link> تکمیل کنید.</p>
       </form>

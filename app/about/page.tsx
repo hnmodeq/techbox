@@ -1,5 +1,7 @@
+import Image from "next/image";
 import users from "@/data/users.json";
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 
 export const metadata = { title: "درباره تکباکس" };
 
@@ -31,7 +33,7 @@ export default function About(){
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
         {team.map(u=>(
           <div key={u.username} className="card p-4 flex items-center gap-3">
-            <img src={u.avatar || "/assets/hooman.png"} className="w-14 h-14 rounded-2xl object-cover ring-1 ring-border" alt="" />
+            <Image src={u.avatar || "/assets/hooman.png"} width={56} height={56} className="h-14 w-14 rounded-[var(--tb-radius-lg)] object-cover ring-1 ring-[var(--tb-border)]" alt={u.name} />
             <div>
               <div className="font-bold text-[14px]">{u.name}</div>
               <div className="text-[11px] text-muted-foreground">{u.role==="super_admin" ? "مدیر کل" : "ویراستار"} • {u.modules.join("، ")}</div>
@@ -43,7 +45,7 @@ export default function About(){
 
       <div className="grid lg:grid-cols-5 gap-5 items-start">
         <div className="lg:col-span-3 card p-0 overflow-hidden">
-          <div className="p-4 border-b border-border">
+          <div className="p-4 border-b border-[var(--tb-border)]">
             <h3 className="font-bold">دفتر تهران</h3>
             <p className="text-xs text-muted-foreground mt-1">میرداماد، هونامیک ارتباط رستاک</p>
           </div>
@@ -59,8 +61,8 @@ export default function About(){
           <p>تماس: <span dir="ltr">021-9100xxxx</span></p>
           <p>ایمیل: info@techbox.ir</p>
           <p>ساعت کاری: شنبه–چهارشنبه ۹–۱۷</p>
-          <Link href="/contact" className="btn btn-primary w-full mt-2 text-sm">ارتباط با ما</Link>
-          <Link href="/consultation" className="btn btn-ghost w-full text-sm">درخواست مشاوره VIP</Link>
+          <ButtonLink href="/contact" className="mt-2 w-full text-sm">ارتباط با ما</ButtonLink>
+          <ButtonLink href="/consultation" variant="ghost" className="w-full text-sm">درخواست مشاوره VIP</ButtonLink>
         </div>
       </div>
     </main>

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 export default function Consultation(){
   return (
     <main className="max-w-2xl mx-auto px-5 py-16" dir="rtl">
@@ -6,7 +7,7 @@ export default function Consultation(){
         <input className="input" placeholder="نام سازمان" />
         <input className="input" placeholder="تلفن" />
         <textarea className="input min-h-[120px]" placeholder="نیاز شما؟ سرور، شبکه، ذخیره‌سازی..." />
-        <button className="btn btn-primary">ارسال درخواست</button>
+        <Button>ارسال درخواست</Button>
       </div>
     </main>
   )

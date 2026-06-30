@@ -1,7 +1,9 @@
 "use client";
+import Image from "next/image";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { zIndex } from "@/design";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export type CartItem = { slug: string; title: string; price: string; image?: string; qty: number };
 type CartCtx = {
@@ -53,34 +55,34 @@ function CartDrawer(){
   const { items, setOpen, remove, setQty, clear, count } = ctx;
   return (
     <div dir="rtl" className="fixed inset-0" style={{ zIndex: zIndex.cart }}>
-      <div className="absolute inset-0 bg-black/45 backdrop-blur-[var(--tb-blur-sm)]" onClick={()=>setOpen(false)} />
+      <div className="absolute inset-0 tb-overlay-backdrop" onClick={()=>setOpen(false)} />
       <aside className="absolute left-0 top-0 flex h-full w-[380px] max-w-[92vw] flex-col border-r border-[var(--tb-border)] bg-[var(--tb-card)] p-4 shadow-[var(--tb-shadow-lg)]">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-black text-lg">سبد خرید ({count.toLocaleString("fa-IR")})</h3>
-          <button onClick={()=>setOpen(false)} className="text-muted-foreground hover:text-foreground">✕</button>
+          <Button onClick={()=>setOpen(false)} variant="ghost" size="iconSm" aria-label="بستن سبد">✕</Button>
         </div>
         <div className="flex-1 overflow-y-auto space-y-3">
           {items.length===0 && <p className="text-sm text-muted-foreground text-center py-10">سبد خالی است</p>}
           {items.map(it=>(
-            <div key={it.slug} className="flex gap-3 border border-border rounded-xl p-2">
-              <img src={it.image} alt="" className="w-16 h-16 object-cover rounded-lg bg-muted" />
+            <div key={it.slug} className="flex gap-3 border border-[var(--tb-border)] rounded-[var(--tb-radius-lg)] p-2">
+              <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[var(--tb-radius-md)] bg-[var(--tb-muted)]"><Image src={it.image || "/assets/blog-1.jpg"} alt={it.title} fill sizes="64px" className="object-cover" /></div>
               <div className="flex-1 min-w-0">
                 <div className="text-[13px] font-bold leading-5 line-clamp-2">{it.title}</div>
                 <div className="text-[11px] text-[var(--tb-shop)] mt-1">{it.price} تومان</div>
                 <div className="flex items-center gap-2 mt-2">
-                  <button onClick={()=>setQty(it.slug, it.qty-1)} className="w-6 h-6 rounded border border-border text-xs">−</button>
+                  <Button onClick={()=>setQty(it.slug, it.qty-1)} variant="outline" size="iconSm" className="h-6 w-6 text-xs">−</Button>
                   <span className="text-xs w-6 text-center">{it.qty.toLocaleString("fa-IR")}</span>
-                  <button onClick={()=>setQty(it.slug, it.qty+1)} className="w-6 h-6 rounded border border-border text-xs">+</button>
-                  <button onClick={()=>remove(it.slug)} className="ms-auto text-[11px] text-[var(--tb-danger)] hover:underline">حذف</button>
+                  <Button onClick={()=>setQty(it.slug, it.qty+1)} variant="outline" size="iconSm" className="h-6 w-6 text-xs">+</Button>
+                  <Button onClick={()=>remove(it.slug)} variant="link" size="xs" className="ms-auto text-[11px] text-[var(--tb-danger)]">حذف</Button>
                 </div>
               </div>
             </div>
           ))}
         </div>
         {items.length>0 && (
-          <div className="border-t border-border pt-3 space-y-2">
-            <Link href="/shop/checkout" onClick={()=>setOpen(false)} className="btn btn-primary w-full">ادامه خرید / تسویه</Link>
-            <button onClick={clear} className="btn btn-ghost w-full text-xs">خالی کردن سبد</button>
+          <div className="border-t border-[var(--tb-border)] pt-3 space-y-2">
+            <ButtonLink href="/shop/checkout" onClick={()=>setOpen(false)} className="w-full">ادامه خرید / تسویه</ButtonLink>
+            <Button onClick={clear} variant="ghost" className="w-full text-xs">خالی کردن سبد</Button>
           </div>
         )}
       </aside>

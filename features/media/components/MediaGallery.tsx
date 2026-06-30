@@ -1,6 +1,8 @@
 "use client";
+import Image from "next/image";
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 import { useState } from "react";
 
 const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
@@ -43,7 +45,7 @@ export default function MediaGallery(){
                 <span>• {active.date_fa}</span>
               </div>
             </div>
-            <Link href={`/media/${active.slug}`} className="btn btn-ghost text-xs whitespace-nowrap">صفحه اختصاصی →</Link>
+            <ButtonLink href={`/media/${active.slug}`} variant="ghost" size="xs" className="whitespace-nowrap">صفحه اختصاصی →</ButtonLink>
           </div>
         </div>
       )}
@@ -53,14 +55,14 @@ export default function MediaGallery(){
           <button
             key={v.slug}
             onClick={()=>setActive(v)}
-            className={`text-right card overflow-hidden text-start transition-all group ${active?.slug===v.slug ? "ring-2 ring-amber-300 shadow-glow" : "hover:-translate-y-1"}`}
+            className={`text-right card overflow-hidden text-start transition-all group ${active?.slug===v.slug ? "ring-2 ring-[var(--tb-media)] shadow-[var(--tb-shadow-glow)]" : "hover:-translate-y-1"}`}
           >
             <div className="aspect-video relative bg-black">
-              <img src={v.image||""} alt={v.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+              <Image src={v.image || "/assets/blog-1.jpg"} alt={v.title} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover opacity-90 transition-opacity group-hover:opacity-100" />
               <span className="absolute inset-0 flex items-center justify-center">
-                <span className="w-14 h-14 rounded-full bg-black/55 backdrop-blur border border-white/25 flex items-center justify-center text-white text-xl">▶</span>
+                <span className="tb-image-badge flex h-14 w-14 items-center justify-center text-xl text-white">▶</span>
               </span>
-              <span className="absolute bottom-2 left-2 text-[10px] bg-black/70 text-white px-2 py-0.5 rounded">۱۲:۴۴</span>
+              <span className="absolute bottom-2 left-2 rounded-[var(--tb-radius-sm)] bg-[var(--tb-image-overlay)] px-2 py-0.5 text-[10px] text-white">۱۲:۴۴</span>
               <span className="absolute top-2 right-2 badge !text-[10px]">{v.category}</span>
             </div>
             <div className="p-3">
@@ -69,7 +71,7 @@ export default function MediaGallery(){
                 <span>{v.author.name}</span>
                 <span>{v.date_fa}</span>
               </div>
-              <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground border-t border-border/50 pt-2">
+              <div className="flex items-center gap-3 mt-2 text-[11px] text-muted-foreground border-t border-[color-mix(in_oklch,var(--tb-border)_50%,transparent)] pt-2">
                 <span>👁 {v.views.toLocaleString("fa-IR")}</span>
                 <span>♥ {v.likes}</span>
                 <span>💬 {commentsCount(v.slug)}</span>

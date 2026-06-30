@@ -20,7 +20,7 @@ export function Dropdown({ trigger, items, align="end" }: {
     <div className="relative" ref={ref} dir="rtl">
       <div onClick={()=>setOpen(o=>!o)} className="cursor-pointer">{trigger}</div>
       {open && (
-        <div className={`absolute top-full mt-2 min-w-[180px] card p-1 ${align==="end" ? "left-0" : "right-0"}`} style={{zIndex:zIndex.popover}}>
+        <div className={`absolute top-full mt-2 min-w-[180px] card p-1 ${align==="end" ? "left-0" : "right-0"}`} style={{zIndex:zIndex.dropdown}}>
           {items.map(it=>(
             <button key={it.value}
               onClick={()=>{ it.onSelect?.(); setOpen(false); if(it.href) window.location.href=it.href; }}

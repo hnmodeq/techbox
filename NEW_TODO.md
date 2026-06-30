@@ -14,14 +14,14 @@
 - [x] Keep z-index centralized.
 
 ## 3 — Centralized UI/look
-- [ ] Add/extend shared primitive classes for CTA/icon buttons where safe.
-- [ ] Sync VIP button and Chatbot button styling through design primitives/tokens.
-- [ ] Avoid risky mass rewrites where components need special layout.
+- [x] Add/extend shared primitive classes for CTA/icon buttons where safe.
+- [x] Sync VIP button and Chatbot button styling through design primitives/tokens.
+- [x] Avoid risky mass rewrites where components need special layout.
 
 ## 4 — Remove hardcoded visual styles
-- [ ] Add missing design tokens for borders/drop shadows if needed.
-- [ ] Replace obvious hardcoded shadows/drop-shadows/borders/durations with tokens.
-- [ ] Keep Tailwind layout utilities, but centralize visual decisions.
+- [x] Add missing design tokens for borders/drop shadows/overlays if needed.
+- [x] Replace obvious hardcoded shadows/drop-shadows/borders/durations with tokens in the shared CTA/chat overlay path.
+- [x] Keep Tailwind layout utilities, but centralize visual decisions.
 
 ## 5 — Sidebar tools cleanup
 - [x] Remove generic Tools nav item from sidebar.
@@ -53,4 +53,4 @@
 ## Validation
 - [x] Run typecheck.
 - [x] Run lint if dependency version allows. ESLint passes with warnings only.
-- [ ] Rebuild patch archive.
+- [x] Rebuild patch archive.

@@ -11,11 +11,12 @@
     "typecheck": "tsc --noEmit --pretty false",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate || node -e \"console.warn('Prisma generate failed/skipped. Run pnpm prisma:generate manually.')\"",
     "data": "node scripts/transferdata.cjs",
     "tree": "node scripts/transfertree.cjs",
     "data:legacy": "node scripts/data.cjs",
-    "tree:legacy": "node scripts/tree.cjs"
+    "tree:legacy": "node scripts/tree.cjs",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.8",

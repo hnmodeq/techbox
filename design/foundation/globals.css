@@ -79,15 +79,15 @@ p,li{
 
 @keyframes tb-ticker-scroll-right{
   from{
-    transform:translate3d(-33.333%,0,0);
+    transform:translate3d(0,0,0);
   }
   to{
-    transform:translate3d(0,0,0);
+    transform:translate3d(33.333%,0,0);
   }
 }
 
 .ticker-track{
-  transform:translate3d(-33.333%,0,0);
+  transform:translate3d(0,0,0);
   animation:tb-ticker-scroll-right 80s linear infinite;
   will-change:transform;
   backface-visibility:hidden;

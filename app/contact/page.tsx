@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 export const metadata = { title: "ارتباط با ما | تکباکس" };
 export default function Contact() {
   return (
@@ -11,7 +12,7 @@ export default function Contact() {
         </div>
         <input className="input" placeholder="موضوع" />
         <textarea className="input min-h-[140px]" placeholder="پیام شما…" />
-        <button className="btn btn-primary">ارسال</button>
+        <Button>ارسال</Button>
         <p className="text-[11px] text-muted-foreground">پاسخ ظرف 24 ساعت – info@techbox.ir</p>
       </div>
     </main>

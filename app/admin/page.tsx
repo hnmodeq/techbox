@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getCurrentUserClient, logout, type AppUser, canEdit } from "@/lib/auth";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useRouter } from "next/navigation";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export default function AdminPage() {
   const [user, setUser] = useState<AppUser | null>(null);
@@ -23,7 +24,7 @@ export default function AdminPage() {
           <h1 className="text-2xl font-black">ورود ادمین</h1>
           <p className="text-sm text-muted-foreground">برای تست سریع یکی را انتخاب کنید:</p>
           <div className="grid gap-2 text-right text-sm">
-            <button onClick={()=>{location.href="/admin/login"}} className="btn btn-primary w-full">رفتن به صفحه ورود</button>
+            <Button onClick={()=>{location.href="/admin/login"}} className="w-full">رفتن به صفحه ورود</Button>
           </div>
           <div className="text-[11px] text-muted-foreground leading-6">
             super_admin: admin<br/>
@@ -51,7 +52,7 @@ export default function AdminPage() {
               نقش: {user.role === "super_admin" ? "مدیر کل" : "ویراستار"} • دسترسی: {user.modules.map(m => moduleMeta[m as ModuleSlug]?.titleFa).join("، ")}
             </p>
           </div>
-          <button onClick={()=>{logout(); setUser(null); router.refresh();}} className="btn btn-ghost text-xs">خروج</button>
+          <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="text-xs">خروج</Button>
         </header>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -62,8 +63,8 @@ export default function AdminPage() {
                 <div className={`text-lg font-extrabold ${meta.color}`}>{meta.titleFa}</div>
                 <div className="text-xs text-muted-foreground mt-1">/{m}</div>
                 <div className="flex gap-2 mt-4">
-                  <Link href={`/admin/posts?module=${m}`} className="btn btn-ghost text-xs flex-1 text-center">مدیریت</Link>
-                  <Link href={`/admin/posts/new?module=${m}`} className="btn btn-primary text-xs flex-1 text-center">جدید +</Link>
+                  <ButtonLink href={`/admin/posts?module=${m}`} variant="ghost" size="xs" className="flex-1 text-center">مدیریت</ButtonLink>
+                  <ButtonLink href={`/admin/posts/new?module=${m}`} size="xs" className="flex-1 text-center">جدید +</ButtonLink>
                 </div>
               </div>
             );

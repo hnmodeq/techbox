@@ -104,7 +104,7 @@ export default function SidebarShell({
           ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
         aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
       >
-        <div className="relative h-[72px] w-[72px] rounded-full bg-card/90 border border-border shadow-glass backdrop-blur flex items-center justify-center">
+        <div className="relative flex h-[72px] w-[72px] items-center justify-center rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-[var(--tb-card)]/90 shadow-[var(--tb-shadow-glow)] backdrop-blur-[var(--tb-blur-md)]">
           <Image
             src="/logo.png"
             alt="لوگو تکباکس"
@@ -120,16 +120,18 @@ export default function SidebarShell({
 
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm sm:hidden"
+          className="fixed inset-0 bg-foreground/20 backdrop-blur-[var(--tb-blur-sm)] sm:hidden"
+          style={{ zIndex: zIndex.sidebarBackdrop }}
           onClick={onCloseMobile}
         />
       )}
 
       <aside
-        className={`fixed right-0 top-0 z-50 h-full transform transition-transform duration-[var(--tb-duration-slow)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
+        className={`fixed right-0 top-0 h-full transform transition-transform duration-[var(--tb-duration-slow)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-hidden={!mobileOpen}
+        style={{ zIndex: zIndex.sidebar }}
       >
         <SidebarContent
           expanded

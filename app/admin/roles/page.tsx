@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
+import { Button } from "@/components/ui/Button";
 
 type RoleRow = { id:string; name:string; titleFa:string; modules:ModuleSlug[]; users:number };
 
@@ -53,14 +54,14 @@ export default function RolesPage(){
             <div className="text-[11px] text-muted-foreground mb-2">دسترسی ماژول‌ها:</div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               {allMods.map(m=>(
-                <label key={m} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${mods[m] ? "bg-primary/10 border-primary/40" : "border-border hover:bg-muted"}`}>
+                <label key={m} className={`flex items-center gap-2 p-2 rounded-[var(--tb-radius-md)] border cursor-pointer transition-colors ${mods[m] ? "bg-[color-mix(in_oklch,var(--tb-primary)_10%,transparent)] border-[color-mix(in_oklch,var(--tb-primary)_40%,transparent)]" : "border-[var(--tb-border)] hover:bg-[var(--tb-muted)]"}`}>
                   <input type="checkbox" checked={!!mods[m]} onChange={()=>toggleMod(m)} />
                   <span>{moduleMeta[m].titleFa}</span>
                 </label>
               ))}
             </div>
           </div>
-          <button className="btn btn-primary w-full text-xs">ایجاد نقش +</button>
+          <Button size="xs" className="w-full">ایجاد نقش +</Button>
           <p className="text-[10px] text-muted-foreground leading-5">
             ذخیره در: <code>localStorage tb_roles_v4</code> + آماده POST <code>/api/roles</code> – در پروداکشن به Prisma Role table متصل می‌شود.
           </p>
@@ -92,8 +93,8 @@ export default function RolesPage(){
                   </td>
                   <td className="p-3 text-center">{r.users.toLocaleString("fa-IR")}</td>
                   <td className="p-3 text-[11px] text-right">
-                    <button className="hover:text-brand ms-3">ویرایش</button>
-                    <button className="hover:text-[var(--tb-danger)]">حذف</button>
+                    <Button variant="link" size="xs" className="ms-3 text-[var(--tb-brand)]">ویرایش</Button>
+                    <Button variant="link" size="xs" className="text-[var(--tb-danger)]">حذف</Button>
                   </td>
                 </tr>
               ))}

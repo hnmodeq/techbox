@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 
@@ -25,8 +26,8 @@ export default function NewsList() {
             {mainNews.map((n: any, i: number) => (
               <article key={n.slug} className={`card overflow-hidden group hover:shadow-[var(--tb-shadow-lg)] transition-all ${i === 0 ? "sm:col-span-2" : ""}`} style={{ padding: 0 }}>
                 <Link href={`/news/${n.slug}`} className="block relative aspect-[16/9] overflow-hidden bg-[var(--tb-muted)]">
-                  <img src={n.image || ""} alt={n.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[var(--tb-duration-slower)]" />
-                  <span className="absolute top-3 right-3 badge !bg-black/55 !text-white backdrop-blur-[var(--tb-blur-sm)] border-white/20">{n.category}</span>
+                  <Image src={n.image || "/assets/blog-1.jpg"} alt={n.title} fill sizes="(min-width:1024px) 55vw, 100vw" className="object-cover transition-transform duration-[var(--tb-duration-slower)] group-hover:scale-105" />
+                  <span className="absolute top-3 right-3 badge !bg-[var(--tb-image-overlay)] !text-white backdrop-blur-[var(--tb-blur-sm)] border-white/20">{n.category}</span>
                   {n.source && (
                     <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-info)_90%,transparent)] text-white font-bold">📰 {n.source}</span>
                   )}

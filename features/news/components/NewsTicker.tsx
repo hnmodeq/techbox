@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { moduleColors } from "@/config/module-colors";
 
 type NewsItem = {
   slug: string;
@@ -11,9 +12,12 @@ type NewsTickerProps = {
   className?: string;
 };
 
+function getTickerModule(item: NewsItem) {
+  return item.module === "blog" || item.module === "news" ? item.module : "news";
+}
+
 function getTickerHref(item: NewsItem) {
-  const itemModule = item.module === "blog" || item.module === "news" ? item.module : "news";
-  return `/${itemModule}/${item.slug}`;
+  return `/${getTickerModule(item)}/${item.slug}`;
 }
 
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
@@ -23,21 +27,26 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
 
   return (
     <section className={`w-full overflow-hidden ${className}`} aria-label="اخبار و مجله">
-      <div dir="rtl" className="ticker-wrapper relative w-full overflow-hidden border-y border-[var(--tb-border)] bg-[var(--tb-card)]/65 backdrop-blur-[var(--tb-blur-sm)]">
-        <div className="ticker-track flex w-max min-w-full items-center gap-10 py-2.5">
-          {loopItems.map((item, index) => (
-            <Link
-              key={`${item.module || "news"}-${item.slug}-${index}`}
-              href={getTickerHref(item)}
-              className="ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-sm text-[var(--tb-muted-foreground)] transition-colors duration-[var(--tb-duration-fast)] hover:text-[var(--tb-brand)]"
-            >
-              <span className="text-[10px] leading-none text-[var(--tb-brand)]/70 transition-transform group-hover:scale-125">●</span>
-              <span className="text-[11px] rounded-full border border-[var(--tb-border)] px-2 py-0.5 text-[var(--tb-muted-foreground)]">
-                {item.module === "blog" ? "مجله" : "خبر"}
-              </span>
-              <span>{item.title}</span>
-            </Link>
-          ))}
+      <div dir="rtl" className="ticker-wrapper relative w-full overflow-hidden bg-[var(--tb-surface-1)]/70 backdrop-blur-[var(--tb-blur-sm)]">
+        <div className="ticker-track flex w-max min-w-full items-center gap-8 py-2.5">
+          {loopItems.map((item, index) => {
+            const itemModule = getTickerModule(item);
+            const tone = moduleColors[itemModule].active;
+            const hoverTone = moduleColors[itemModule].hover;
+            return (
+              <Link
+                key={`${item.module || "news"}-${item.slug}-${index}`}
+                href={getTickerHref(item)}
+                className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-sm text-[var(--tb-muted-foreground)] transition-colors duration-[var(--tb-duration-fast)] ${hoverTone}`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-[var(--tb-radius-full)] bg-current opacity-70 transition-transform group-hover:scale-125 ${tone}`} />
+                <span className={`rounded-[var(--tb-radius-full)] bg-[color-mix(in_oklch,currentColor_10%,transparent)] px-2 py-0.5 text-[11px] ${tone}`}>
+                  {itemModule === "blog" ? "مجله" : "خبر"}
+                </span>
+                <span>{item.title}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

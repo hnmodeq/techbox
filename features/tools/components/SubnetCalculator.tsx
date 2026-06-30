@@ -48,7 +48,7 @@ export default function SubnetCalculator(){
             "Last Host": out.last,
             "Usable Hosts": out.hosts.toString()
           }).map(([k,v])=>(
-            <div key={k} className="rounded-lg bg-surface-1 px-3 py-2">
+            <div key={k} className="rounded-[var(--tb-radius-md)] bg-[var(--tb-surface-1)] px-3 py-2">
               <div className="text-[10px] text-muted-foreground font-sans" dir="rtl">{k}</div>
               <div>{v}</div>
             </div>

@@ -59,7 +59,7 @@ export default function RaidCalculator(){
           ["تحمل خطا", `${calc.fault.toLocaleString("fa-IR")} دیسک`],
           ["راندمان", `${calc.eff.toLocaleString("fa-IR")}%`],
         ].map(([k,v])=>(
-          <div key={k as string} className="rounded-xl border border-border bg-surface-1/60 p-3">
+          <div key={k as string} className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-surface-1)]/60 p-3">
             <div className="text-[11px] text-muted-foreground">{k}</div>
             <div className="font-black text-[var(--tb-raid)] mt-1">{v}</div>
           </div>

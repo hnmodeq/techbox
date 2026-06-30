@@ -3,6 +3,7 @@ import { useEffect, useState, Suspense } from "react";
 import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export const dynamic = "force-dynamic";
 
@@ -121,8 +122,8 @@ function NewPostInner() {
         <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
           <div className="text-[11px]" style={{color: msg.includes("✓") ? "var(--tb-success)" : "var(--tb-muted-foreground)"}}>{msg || "POST → /api/posts – RBAC server-side"}</div>
           <div className="flex gap-2">
-            <Link href={`/admin/posts?module=${module}`} className="btn btn-ghost text-xs">انصراف</Link>
-            <button className="btn btn-primary text-xs" disabled={saving} type="submit">{saving ? "در حال انتشار…" : (editSlug ? "ذخیره تغییرات" : "انتشار در تکباکس")}</button>
+            <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">انصراف</ButtonLink>
+            <Button size="xs" disabled={saving} type="submit">{saving ? "در حال انتشار…" : (editSlug ? "ذخیره تغییرات" : "انتشار در تکباکس")}</Button>
           </div>
         </div>
       </form>

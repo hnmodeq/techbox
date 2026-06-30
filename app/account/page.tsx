@@ -1,8 +1,10 @@
 "use client";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getCurrentUserClient, logout } from "@/lib/auth";
 import type { AppUser } from "@/lib/auth";
 import Link from "next/link";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export default function AccountPage(){
   const [user, setUser] = useState<AppUser | null>(null);
@@ -27,7 +29,7 @@ export default function AccountPage(){
       setAvatar(u.avatar || "/assets/hooman.png");
       // load local profile overrides
       const local = localStorage.getItem("tb_profile_"+u.username);
-      if(local){ try{ const p=JSON.parse(local); setNick(p.nick||nick); setJob(p.job||""); setBirthday(p.birthday||""); setAvatar(p.avatar||avatar);}catch{} }
+      if(local){ try{ const p=JSON.parse(local); setNick(p.nick || u.username); setJob(p.job || ""); setBirthday(p.birthday || ""); setAvatar(p.avatar || u.avatar || "/assets/hooman.png");}catch{} }
     }
   },[]);
 
@@ -54,7 +56,7 @@ export default function AccountPage(){
         <div className="card p-8 space-y-4">
           <h1 className="text-xl font-black">حساب کاربری</h1>
           <p className="text-sm text-muted-foreground">برای دسترسی به پروفایل وارد شوید.</p>
-          <Link href="/admin/login" className="btn btn-primary w-full">ورود ویراستار</Link>
+          <ButtonLink href="/admin/login" className="w-full">ورود ویراستار</ButtonLink>
           <p className="text-[11px] text-muted-foreground">تست: sara / nima / rojina / admin – رمز: techbox123</p>
         </div>
       </main>
@@ -72,8 +74,8 @@ export default function AccountPage(){
         {/* avatar card */}
         <div className="card p-5 text-center space-y-3 h-fit">
           <div className="relative w-28 h-28 mx-auto">
-            <img src={avatar} className="w-28 h-28 rounded-full object-cover ring-2 ring-border" alt="" />
-            <label className="absolute bottom-0 left-0 bg-primary text-primary-foreground text-[10px] px-2 py-1 rounded-full cursor-pointer shadow">
+            <Image src={avatar} width={112} height={112} className="h-28 w-28 rounded-[var(--tb-radius-full)] object-cover ring-2 ring-[var(--tb-border)]" alt={user.name} />
+            <label className="absolute bottom-0 left-0 cursor-pointer rounded-[var(--tb-radius-full)] bg-[var(--tb-primary)] px-2 py-1 text-[10px] text-[var(--tb-primary-foreground)] shadow-[var(--tb-shadow-sm)]">
               تغییر
               <input type="file" accept="image/*" className="hidden" onChange={onAvatar} />
             </label>
@@ -81,7 +83,7 @@ export default function AccountPage(){
           <div className="font-bold">{name} {lastName}</div>
           <div className="text-[11px] text-muted-foreground">@{nick}</div>
           <div className="text-[11px]">{job || "—"}</div>
-          <button type="button" onClick={()=>{logout(); location.href="/";}} className="btn btn-ghost w-full text-xs mt-2">خروج از حساب</button>
+          <Button type="button" variant="ghost" onClick={()=>{logout(); location.href="/";}} className="mt-2 w-full text-xs">خروج از حساب</Button>
         </div>
 
         {/* form */}
@@ -107,7 +109,7 @@ export default function AccountPage(){
             </label>
           </div>
 
-          <div className="border-t border-border pt-4 space-y-3">
+          <div className="border-t border-[var(--tb-border)] pt-4 space-y-3">
             <h4 className="font-bold text-sm">تغییر رمز عبور</h4>
             <div className="grid sm:grid-cols-2 gap-3">
               <input type="password" placeholder="رمز فعلی" className="input text-sm" />
@@ -118,7 +120,7 @@ export default function AccountPage(){
 
           <div className="flex justify-end gap-2 pt-2">
             <span className={`text-xs transition-opacity ${saved ? "opacity-100 text-[var(--tb-success)]" : "opacity-0"}`}>ذخیره شد ✓</span>
-            <button className="btn btn-primary">ذخیره پروفایل</button>
+            <Button>ذخیره پروفایل</Button>
           </div>
         </div>
 

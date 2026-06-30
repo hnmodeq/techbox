@@ -17,7 +17,6 @@ export const modules: ModuleItem[] = [
     description: "مقالات تخصصی، تحلیل‌ها و راهنماهای عمیق.",
     color: moduleColors.blog.active,
     cols: "md:col-span-4",
-    rows: "md:row-span-2",
     order: 1,
   },
   {
@@ -26,7 +25,6 @@ export const modules: ModuleItem[] = [
     description: "آخرین خبرهای فناوری، زیرساخت و هوش مصنوعی.",
     color: moduleColors.news.active,
     cols: "md:col-span-3",
-    rows: "md:row-span-2",
     order: 2,
   },
   {
@@ -35,7 +33,6 @@ export const modules: ModuleItem[] = [
     description: "ویدیوهای آموزشی، بررسی‌ها و محتوای چندرسانه‌ای.",
     color: moduleColors.media.active,
     cols: "md:col-span-3",
-    rows: "md:row-span-3",
     order: 3,
   },
   {
@@ -44,7 +41,6 @@ export const modules: ModuleItem[] = [
     description: "پرسش و پاسخ تخصصی کاربران و مهندسین.",
     color: moduleColors.forum.active,
     cols: "md:col-span-4",
-    rows: "md:row-span-2",
     order: 4,
   },
   {
@@ -53,7 +49,6 @@ export const modules: ModuleItem[] = [
     description: "ISO، Firmware، فایل‌ها و منابع قابل دانلود.",
     color: moduleColors.download.active,
     cols: "md:col-span-4",
-    rows: "md:row-span-2",
     order: 5,
   },
   {
@@ -62,7 +57,6 @@ export const modules: ModuleItem[] = [
     description: "ابزارهای کاربردی برای شبکه و مهندسی سیستم.",
     color: moduleColors.tools.active,
     cols: "md:col-span-3",
-    rows: "md:row-span-3",
     order: 6,
   },
   {
@@ -71,7 +65,6 @@ export const modules: ModuleItem[] = [
     description: "بررسی تخصصی تجهیزات، سرویس‌ها و نرم‌افزارها.",
     color: moduleColors.review.active,
     cols: "md:col-span-4",
-    rows: "md:row-span-2",
     order: 7,
   },
   {
@@ -80,7 +73,6 @@ export const modules: ModuleItem[] = [
     description: "سرور، استوریج و تجهیزات تخصصی زیرساخت.",
     color: moduleColors.shop.active,
     cols: "md:col-span-7",
-    rows: "md:row-span-2",
     order: 8,
   },
 ];

@@ -3,6 +3,7 @@ import { getModuleItems, moduleMeta } from "@/lib/content";
 import { useState } from "react";
 import RaidCalculator from "@/features/tools/components/RaidCalculator";
 import SubnetCalculator from "@/features/tools/components/SubnetCalculator";
+import { Button } from "@/components/ui/Button";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "raid-calculator": RaidCalculator,
@@ -22,16 +23,17 @@ export default function ToolsGrid(){
 
       <div className="flex flex-wrap gap-2 mb-6">
         {items.map(t => (
-          <button
+          <Button
             key={t.slug}
             onClick={()=>setActive(t.slug)}
-            className={`btn text-xs ${active===t.slug ? "btn-primary" : "btn-ghost"}`}
+            variant={active===t.slug ? "primary" : "ghost"}
+            size="xs"
           >
             {t.title}
-          </button>
+          </Button>
         ))}
         {/* quick extra tools */}
-        <button onClick={()=>setActive("subnet-calculator")} className={`btn text-xs ${active==="subnet-calculator" ? "btn-primary":"btn-ghost"}`}>Subnet Calculator</button>
+        <Button onClick={()=>setActive("subnet-calculator")} variant={active==="subnet-calculator" ? "primary" : "ghost"} size="xs">Subnet Calculator</Button>
       </div>
 
       <ActiveComp />

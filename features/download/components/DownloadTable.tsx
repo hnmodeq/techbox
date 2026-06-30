@@ -1,6 +1,7 @@
 "use client";
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
+import { ButtonLink } from "@/components/ui/Button";
 import { useMemo, useState } from "react";
 
 export default function DownloadTable(){
@@ -67,13 +68,13 @@ export default function DownloadTable(){
           </thead>
           <tbody>
             {filtered.map(f=>(
-              <tr key={f.slug} className="border-t border-border/60 hover:bg-muted/20 align-top">
+              <tr key={f.slug} className="border-t border-[color-mix(in_oklch,var(--tb-border)_60%,transparent)] hover:bg-[var(--tb-muted)]/20 align-top">
                 <td className="p-3">
                   <Link href={`/download/${f.slug}`} className="font-bold hover:text-[var(--tb-download)] text-[14px]">{f.title}</Link>
                   <div className="text-[12px] text-muted-foreground mt-1 line-clamp-2">{f.excerpt}</div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {f.tags.slice(0,5).map(t=>(
-                      <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="text-[10px] px-2 py-0.5 rounded-full bg-muted hover:bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] hover:text-[var(--tb-download)] border border-border transition-colors">
+                      <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="text-[10px] px-2 py-0.5 rounded-[var(--tb-radius-full)] bg-[var(--tb-muted)] hover:bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] hover:text-[var(--tb-download)] border border-[var(--tb-border)] transition-colors duration-[var(--tb-duration-fast)]">
                         {t.toUpperCase()}
                       </Link>
                     ))}
@@ -82,7 +83,7 @@ export default function DownloadTable(){
                 <td className="p-3 hidden sm:table-cell text-[11px] text-muted-foreground">{f.category}</td>
                 <td className="p-3 hidden md:table-cell text-[11px] text-muted-foreground">{f.date_fa}</td>
                 <td className="p-3 text-left align-top">
-                  <Link href={`/download/${f.slug}`} className="btn btn-primary text-[11px] whitespace-nowrap">⬇ دریافت</Link>
+                  <ButtonLink href={`/download/${f.slug}`} size="xs" className="whitespace-nowrap text-[11px]">⬇ دریافت</ButtonLink>
                   <div className="text-[10px] text-muted-foreground mt-1">{f.likes.toLocaleString("fa-IR")} بار</div>
                 </td>
               </tr>

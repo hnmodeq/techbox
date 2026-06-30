@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/Button";
 import type { ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { useState, useMemo } from "react";
@@ -61,7 +62,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-[11px] text-muted-foreground border-b border-border">
+            <thead className="text-[11px] text-muted-foreground border-b border-[var(--tb-border)]">
               <tr>
                 <th className="text-right py-2 pe-2">نسخه</th>
                 <th className="text-right py-2">تاریخ</th>
@@ -73,14 +74,14 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
             </thead>
             <tbody>
               {list.map(v=>(
-                <tr key={v.ver+v.date} className="border-b border-border/40 hover:bg-muted/20">
+                <tr key={v.ver+v.date} className="border-b border-[var(--tb-border)]/40 hover:bg-muted/20">
                   <td className="py-3 pe-2 font-mono text-[13px] font-bold">{v.ver}</td>
                   <td className="py-3 text-[12px]">{v.dateFa}</td>
                   <td className="py-3 hidden sm:table-cell"><span className="badge text-[10px]">{v.os}</span></td>
                   <td className="py-3 hidden sm:table-cell text-[12px] text-muted-foreground" dir="ltr">{v.size}</td>
                   <td className="py-3 text-[11px] text-muted-foreground">{v.notes}</td>
                   <td className="py-3 text-left">
-                    <a href="#" onClick={e=>{e.preventDefault(); alert(`شروع دانلود ${item.title} – ${v.ver} (${v.os})`);}} className="btn btn-primary text-[11px] px-3 py-1.5">دانلود</a>
+                    <Button size="xs" onClick={e=>{e.preventDefault(); alert(`شروع دانلود ${item.title} – ${v.ver} (${v.os})`);}} className="px-3 py-1.5 text-[11px]">دانلود</Button>
                   </td>
                 </tr>
               ))}

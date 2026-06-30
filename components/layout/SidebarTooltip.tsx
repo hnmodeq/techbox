@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { zIndex } from "@/design";
 
 type Props = {
@@ -23,7 +24,12 @@ export default function SidebarTooltip({
 }: Props) {
   const [visible, setVisible] = React.useState(false);
   const [pos, setPos] = React.useState<Position | null>(null);
+  const [mounted, setMounted] = React.useState(false);
   const triggerRef = React.useRef<HTMLSpanElement | null>(null);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const updatePosition = React.useCallback(() => {
     if (!enabled || !triggerRef.current) return;
@@ -71,10 +77,10 @@ export default function SidebarTooltip({
       >
         {children}
       </span>
-      {visible && pos && (
+      {mounted && visible && pos && createPortal(
         <span
           role="tooltip"
-          className={`pointer-events-none fixed whitespace-nowrap rounded-md bg-popover px-2.5 py-1.5 text-xs font-medium shadow-md ring-1 ring-border/40 animate-in fade-in-0 zoom-in-95 duration-150 ${tooltipClassName}`}
+          className={`pointer-events-none fixed whitespace-nowrap rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-popover)] px-2.5 py-1.5 text-xs font-medium shadow-[var(--tb-shadow-md)] animate-in fade-in-0 zoom-in-95 duration-[var(--tb-duration-fast)] ${tooltipClassName}`}
           style={{
             right: pos.right,
             top: pos.top,
@@ -83,7 +89,8 @@ export default function SidebarTooltip({
           }}
         >
           {label}
-        </span>
+        </span>,
+        document.body
       )}
     </>
   );

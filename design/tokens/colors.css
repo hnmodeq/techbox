@@ -3,6 +3,13 @@
   --tb-brand: oklch(0.62 0.21 255);
   --tb-brand-foreground: oklch(0.98 0.005 255);
   --tb-brand-dim: oklch(0.62 0.21 255 / 0.14);
+  --tb-primary: var(--tb-brand);
+  --tb-primary-foreground: var(--tb-brand-foreground);
+
+  /* — Overlay / glass tokens — */
+  --tb-overlay-backdrop: color-mix(in oklch, black 48%, transparent);
+  --tb-image-overlay: color-mix(in oklch, black 58%, transparent);
+  --tb-scrim-soft: color-mix(in oklch, black 34%, transparent);
 
   /* — Semantic – light — */
   --tb-background: oklch(0.985 0.006 270);
@@ -32,8 +39,8 @@
   --popover: var(--tb-popover);
   --popover-foreground: var(--tb-popover-foreground);
   --brand: var(--tb-brand);
-  --primary: var(--tb-brand);
-  --primary-foreground: var(--tb-brand-foreground);
+  --primary: var(--tb-primary);
+  --primary-foreground: var(--tb-primary-foreground);
   --secondary: var(--tb-muted);
   --secondary-foreground: var(--tb-foreground);
   --accent-cyan: var(--tb-tools);
@@ -135,6 +142,11 @@
 
   --tb-brand: #60a5fa;
   --tb-brand-dim: rgba(96,165,250,.18);
+  --tb-primary: var(--tb-brand);
+  --tb-primary-foreground: var(--tb-brand-foreground);
+  --tb-overlay-backdrop: rgba(0,0,0,.55);
+  --tb-image-overlay: rgba(0,0,0,.60);
+  --tb-scrim-soft: rgba(0,0,0,.38);
 
   /* module accents – dark tuned */
   --tb-blog:    #fb923c;

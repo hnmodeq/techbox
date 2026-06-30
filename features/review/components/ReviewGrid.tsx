@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
 
@@ -24,9 +25,9 @@ export default function ReviewGrid(){
           return (
           <article key={r.slug} className="card overflow-hidden group flex flex-col">
             <Link href={`/review/${r.slug}`} className="block relative aspect-square bg-muted overflow-hidden">
-              <img src={r.image||""} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={r.title}/>
-              <span className="absolute top-3 right-3 badge !bg-black/55 !text-white backdrop-blur border-white/20">{r.category}</span>
-              <span className="absolute bottom-3 left-3 text-[11px] bg-black/60 text-[var(--tb-warning)] px-2 py-1 rounded-full backdrop-blur">{stars(rating)} {rating.toFixed(1)}</span>
+              <Image src={r.image || "/assets/blog-1.jpg"} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-[var(--tb-duration-slower)] group-hover:scale-105" alt={r.title}/>
+              <span className="absolute top-3 right-3 badge !bg-[var(--tb-image-overlay)] !text-white backdrop-blur-[var(--tb-blur-sm)] border-white/20">{r.category}</span>
+              <span className="absolute bottom-3 left-3 rounded-[var(--tb-radius-full)] bg-[var(--tb-image-overlay)] px-2 py-1 text-[11px] text-[var(--tb-warning)] backdrop-blur-[var(--tb-blur-sm)]">{stars(rating)} {rating.toFixed(1)}</span>
             </Link>
             <div className="p-4 flex flex-col flex-1">
               <h3 className="font-extrabold text-[15px] leading-7 line-clamp-2 min-h-[56px]">
@@ -35,9 +36,9 @@ export default function ReviewGrid(){
               <p className="text-xs text-muted-foreground line-clamp-2 mt-2 flex-1">{r.excerpt}</p>
 
               {/* author row with avatar */}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/60">
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-[color-mix(in_oklch,var(--tb-border)_60%,transparent)]">
                 <div className="flex items-center gap-2">
-                  <img src={r.author.avatar || "/assets/hooman.png"} className="w-8 h-8 rounded-full object-cover ring-1 ring-border" alt={r.author.name} />
+                  <Image src={r.author.avatar || "/assets/hooman.png"} width={32} height={32} className="h-8 w-8 rounded-[var(--tb-radius-full)] object-cover ring-1 ring-[var(--tb-border)]" alt={r.author.name} />
                   <div>
                     <div className="text-[12px] font-bold leading-tight">{r.author.name}</div>
                     <div className="text-[10px] text-muted-foreground">{r.author.role || "نویسنده"}</div>

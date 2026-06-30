@@ -73,7 +73,7 @@ export default function FooterSection() {
           </div>
         </div>
         {/* کپی‌رایت */}
-        <div className="mt-12 border-t border-border pt-6 text-center">
+        <div className="mt-12 border-t border-[var(--tb-border)] pt-6 text-center">
           <p className="text-sm text-muted-foreground">
             © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «هونامیک ارتباط رستاک» میباشد.
           </p>

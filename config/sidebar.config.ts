@@ -114,7 +114,7 @@ export const accountItem: NavItem = {
 
 export const themeIconClass = {
   buttonBase:
-    "inline-flex h-10 w-10 items-center rounded-lg transition-all duration-200",
+    "inline-flex h-10 w-10 items-center rounded-[var(--tb-radius-lg)] transition-all duration-[var(--tb-duration-normal)]",
   buttonClassName: "text-muted-foreground",
   buttonHoverClassName: "hover:text-foreground",
   sunIconClassName: "text-[var(--tb-warning)]",

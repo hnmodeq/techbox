@@ -13,6 +13,7 @@ import { getCurrentUserClient, type AppUser } from "@/lib/auth";
 import { useCart } from "@/providers/cart.provider";
 import { getAllAcross } from "@/lib/content";
 import { zIndex } from "@/design";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 type AnchorRect = { top: number; right: number };
 
@@ -119,13 +120,13 @@ export default function SidebarContent({
     ? createPortal(
         <div
           className="fixed w-[320px] max-w-[92vw] p-3 text-right card"
-          style={{ zIndex: zIndex.popover, top: notifPos.top, right: notifPos.right }}
+          style={{ zIndex: zIndex.notification, top: notifPos.top, right: notifPos.right }}
           dir="rtl"
         >
           <div className="mb-2 text-[12px] font-bold">آخرین رویدادها</div>
           <ul className="max-h-80 space-y-2 overflow-y-auto text-[11px]">
             {notifications.map((n: any) => (
-              <li key={`${n.module}-${n.slug}`} className="border-b border-border/40 pb-2 last:border-0">
+              <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--tb-border)_40%,transparent)] pb-2 last:border-0">
                 <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 leading-5 hover:text-brand">
                   {n.title}
                 </Link>
@@ -133,7 +134,7 @@ export default function SidebarContent({
               </li>
             ))}
           </ul>
-          <button onClick={() => setNotifOpen(false)} className="mt-2 w-full text-center text-[10px] text-muted-foreground hover:text-foreground">بستن</button>
+          <Button variant="ghost" size="xs" onClick={() => setNotifOpen(false)} className="mt-2 w-full text-[10px]">بستن</Button>
         </div>,
         document.body
       )
@@ -262,7 +263,7 @@ export default function SidebarContent({
         {user ? (
           <Link href="/account" onClick={onLinkClick} className={`${linkBase} ${isActive(pathname, "/account") ? "" : linkInactive}`} style={{ fontSize: "12px", background: isActive(pathname, "/account") ? "var(--tb-muted)" : "transparent" }}>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center">
-              <img src={user.avatar || "/assets/hooman.png"} alt={user.name} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
+              <Image src={user.avatar || "/assets/hooman.png"} alt={user.name} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
             </span>
             <span className={`truncate leading-tight ${expanded ? "w-[140px] opacity-100" : "w-0 opacity-0"} overflow-hidden transition-all`}>
               <span className="block text-[12px] font-bold">{user.name}</span>
@@ -283,17 +284,17 @@ export default function SidebarContent({
 
       {loginOpen && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-[var(--tb-blur-sm)]" onClick={() => setLoginOpen(false)} />
+          <div className="absolute inset-0 tb-overlay-backdrop" onClick={() => setLoginOpen(false)} />
           <div className="relative w-full max-w-sm space-y-3 p-5 card" style={{ zIndex: zIndex.modalContent }}>
             <div className="flex items-center justify-between">
               <h3 className="text-[15px] font-black">ورود به تکباکس</h3>
-              <button onClick={() => setLoginOpen(false)} className="text-muted-foreground hover:text-foreground">✕</button>
+              <Button variant="ghost" size="iconSm" onClick={() => setLoginOpen(false)} aria-label="بستن">✕</Button>
             </div>
             <p className="text-[11px] text-[var(--tb-muted-foreground)]">
               حساب تست: <b>sara</b> / <b>nima</b> / <b>rojina</b> / <b>admin</b><br />رمز همه: <code>techbox123</code>
             </p>
-            <a href="/admin/login" onClick={() => setLoginOpen(false)} className="btn btn-primary w-full text-[13px]">رفتن به ورود کامل →</a>
-            <button onClick={() => setLoginOpen(false)} className="btn btn-ghost w-full text-[11px]">بستن</button>
+            <ButtonLink href="/admin/login" onClick={() => setLoginOpen(false)} className="w-full text-[13px]">رفتن به ورود کامل →</ButtonLink>
+            <Button variant="ghost" size="xs" onClick={() => setLoginOpen(false)} className="w-full text-[11px]">بستن</Button>
           </div>
         </div>
       )}

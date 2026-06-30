@@ -1,13 +1,117 @@
 [
   {
+    "slug": "best-firewall-for-small-office",
+    "module": "forum",
+    "title": "برای دفتر ۳۰ نفره MikroTik بهتره یا FortiGate؟",
+    "excerpt": "بودجه محدود داریم ولی VPN و گزارش‌گیری خوب می‌خوایم.",
+    "content": "دوستان برای یک دفتر حدود ۳۰ نفر با دو لینک اینترنت، بین MikroTik و FortiGate کدام انتخاب منطقی‌تر است؟",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "firewall",
+      "mikrotik",
+      "fortigate",
+      "پرسش"
+    ],
+    "author": {
+      "name": "کاربر شبکه",
+      "role": "عضو انجمن",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-20",
+    "date_fa": "29 تیر 1405",
+    "likes": 14,
+    "views": 430,
+    "category": "پرسش"
+  },
+  {
+    "slug": "raid10-or-raid6-for-vm-storage",
+    "module": "forum",
+    "title": "برای Storage ماشین‌های مجازی RAID10 یا RAID6؟",
+    "excerpt": "IOPS مهمه ولی ظرفیت هم محدود داریم.",
+    "content": "روی سرور HPE با ۸ دیسک SAS برای مجازی‌سازی RAID10 بهتر است یا RAID6؟",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "raid",
+      "storage",
+      "virtualization",
+      "پرسش"
+    ],
+    "author": {
+      "name": "سعید دیتاسنتر",
+      "role": "عضو انجمن",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-19",
+    "date_fa": "28 تیر 1405",
+    "likes": 21,
+    "views": 620,
+    "category": "ذخیره‌سازی"
+  },
+  {
+    "slug": "wifi7-controller-placement",
+    "module": "forum",
+    "title": "کنترلر Wi‑Fi 7 را Cloud بگیریم یا On‑prem؟",
+    "excerpt": "برای شرکت چند شعبه‌ای دنبال تجربه عملی هستم.",
+    "content": "برای چند شعبه با ۴۰ اکسس‌پوینت، کنترلر ابری بهتر است یا داخلی؟",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "wifi7",
+      "wireless",
+      "controller",
+      "پرسش"
+    ],
+    "author": {
+      "name": "مهندس وایرلس",
+      "role": "عضو انجمن",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-18",
+    "date_fa": "27 تیر 1405",
+    "likes": 9,
+    "views": 275,
+    "category": "شبکه"
+  },
+  {
+    "slug": "proxmox-backup-server-retention",
+    "module": "forum",
+    "title": "Retention مناسب برای Proxmox Backup Server چطور تنظیم شود؟",
+    "excerpt": "روزانه بکاپ می‌گیریم و فضای دیسک سریع پر می‌شود.",
+    "content": "برای نگهداری بکاپ روزانه/هفتگی/ماهانه روی PBS چه سیاستی پیشنهاد می‌کنید؟",
+    "image": "/assets/blog-3.jpeg",
+    "tags": [
+      "proxmox",
+      "backup",
+      "pbs",
+      "پرسش"
+    ],
+    "author": {
+      "name": "آرش مجازی‌سازی",
+      "role": "عضو انجمن",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-17",
+    "date_fa": "26 تیر 1405",
+    "likes": 16,
+    "views": 510,
+    "category": "مجازی‌سازی"
+  },
+  {
     "slug": "qnap-2277-iscsi-issue",
     "module": "forum",
     "title": "مشکل iSCSI در QNAP-2277",
     "excerpt": "کسی تجربه قطعی لحظه‌ای iSCSI داشته؟",
     "content": "سلام دوستان...",
     "image": "/assets/blog-6.png",
-    "tags": ["QNAP-2277", "iscsi", "nas", "پرسش"],
-    "author": { "name": "کاربر 9821", "role": "عضو انجمن" },
+    "tags": [
+      "QNAP-2277",
+      "iscsi",
+      "nas",
+      "پرسش"
+    ],
+    "author": {
+      "name": "کاربر 9821",
+      "role": "عضو انجمن"
+    },
     "date": "2026-07-13",
     "date_fa": "22 تیر 1405",
     "likes": 5,
@@ -21,8 +125,16 @@
     "excerpt": "جمع‌بندی تجربیات.",
     "content": "...",
     "image": "/assets/blog-3.jpeg",
-    "tags": ["مجازی‌سازی", "proxmox", "vmware", "پرسش"],
-    "author": { "name": "admin", "role": "مدیر" },
+    "tags": [
+      "مجازی‌سازی",
+      "proxmox",
+      "vmware",
+      "پرسش"
+    ],
+    "author": {
+      "name": "admin",
+      "role": "مدیر"
+    },
     "date": "2026-07-02",
     "date_fa": "11 تیر 1405",
     "likes": 18,

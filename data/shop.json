@@ -1,5 +1,51 @@
 [
   {
+    "slug": "fortigate-60f-firewall",
+    "module": "shop",
+    "title": "فایروال FortiGate 60F",
+    "excerpt": "فایروال UTM برای دفاتر کوچک و شعب سازمانی.",
+    "content": "مشخصات کامل FortiGate 60F...",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "fortigate",
+      "firewall",
+      "security",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
+    "date": "2026-07-18",
+    "date_fa": "27 تیر 1405",
+    "likes": 33,
+    "views": 920,
+    "category": "امنیت"
+  },
+  {
+    "slug": "samsung-pm9a3-nvme",
+    "module": "shop",
+    "title": "SSD سازمانی Samsung PM9A3 NVMe",
+    "excerpt": "درایو NVMe دیتاسنتری برای کش و دیتابیس.",
+    "content": "مشخصات کامل PM9A3...",
+    "image": "/assets/blog-6.png",
+    "tags": [
+      "ssd",
+      "nvme",
+      "storage",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
+    "date": "2026-07-17",
+    "date_fa": "26 تیر 1405",
+    "likes": 29,
+    "views": 810,
+    "category": "ذخیره‌سازی"
+  },
+  {
     "slug": "qnap-ts-2277",
     "module": "shop",
     "title": "ذخیره‌ساز تحت شبکه QNAP TS-2277",

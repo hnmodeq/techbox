@@ -1,8 +1,10 @@
 "use client";
+import Image from "next/image";
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
 import { useState } from "react";
 import { zIndex } from "@/design";
+import { Button } from "@/components/ui/Button";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 
@@ -52,14 +54,14 @@ export default function ForumList(){
         </div>
         <div className="flex gap-2">
           <input placeholder="جستجو در انجمن…" className="input w-56 text-sm" />
-          <button onClick={()=>setShowNew(true)} className="btn btn-primary text-sm">+ موضوع جدید</button>
+          <Button onClick={()=>setShowNew(true)} className="text-sm">+ موضوع جدید</Button>
         </div>
       </div>
 
       {/* sub nav like reddit */}
       <div className="flex gap-2 text-[11px] mb-4">
         {["داغ","جدید","برتر","حل‌شده"].map(t=>(
-          <button key={t} className="px-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted">{t}</button>
+          <button key={t} className="tb-action-chip px-3 py-1.5">{t}</button>
         ))}
       </div>
 
@@ -74,13 +76,13 @@ export default function ForumList(){
           <div key={t.slug} className="grid grid-cols-12 px-3 sm:px-4 py-3 hover:bg-muted/20 gap-2 items-center">
             {/* vote column – reddit style */}
             <div className="hidden sm:flex col-span-1 flex-col items-center text-muted-foreground text-[11px]">
-              <button className="hover:text-[var(--tb-blog)]">▲</button>
+              <Button variant="link" size="xs" className="text-[var(--tb-muted-foreground)] hover:text-[var(--tb-blog)]">▲</Button>
               <span className="font-bold text-foreground">{t.likes}</span>
-              <button className="hover:text-[var(--tb-review)]">▼</button>
+              <Button variant="link" size="xs" className="text-[var(--tb-muted-foreground)] hover:text-[var(--tb-review)]">▼</Button>
             </div>
             {/* main */}
             <div className="col-span-12 sm:col-span-6 flex gap-3">
-              <img src={t.avatar} alt={t.author.name} className="w-10 h-10 rounded-full object-cover ring-1 ring-border mt-1 shrink-0" />
+              <Image src={t.avatar} alt={t.author.name} width={40} height={40} className="mt-1 h-10 w-10 shrink-0 rounded-[var(--tb-radius-full)] object-cover ring-1 ring-[var(--tb-border)]" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Link href={`/forum/${t.slug}`} className="font-bold text-[14px] leading-6 hover:text-[var(--tb-forum)]">{t.title}</Link>
@@ -109,18 +111,18 @@ export default function ForumList(){
       {/* New Topic Modal */}
       {showNew && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{zIndex:zIndex.modal}} dir="rtl">
-          <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={()=>setShowNew(false)} />
+          <div className="absolute inset-0 tb-overlay-backdrop" onClick={()=>setShowNew(false)} />
           <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-5 space-y-3 z-10">
             <div className="flex justify-between items-center">
               <h3 className="font-black text-lg">موضوع جدید – انجمن تکباکس</h3>
-              <button type="button" onClick={()=>setShowNew(false)} className="text-muted-foreground">✕</button>
+              <Button type="button" variant="ghost" size="iconSm" onClick={()=>setShowNew(false)} aria-label="بستن">✕</Button>
             </div>
             <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="عنوان واضح بپرسید…" className="input" required />
             <textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="جزئیات مشکل، لاگ‌ها، چیزی که امتحان کردید…" className="input min-h-[160px]" required />
             <div className="text-[11px] text-muted-foreground">با ارسال، با قوانین انجمن موافقت می‌کنید. پیش‌نویس به‌صورت لوکال ذخیره می‌شود – در نسخه Prisma به /api/posts ارسال خواهد شد.</div>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={()=>setShowNew(false)} className="btn btn-ghost">انصراف</button>
-              <button className="btn btn-primary">ارسال موضوع</button>
+              <Button type="button" variant="ghost" onClick={()=>setShowNew(false)}>انصراف</Button>
+              <Button>ارسال موضوع</Button>
             </div>
           </form>
         </div>

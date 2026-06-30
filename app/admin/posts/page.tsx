@@ -4,6 +4,7 @@ import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
 import { getModuleItems, moduleMeta, type ModuleSlug, type ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 export const dynamic = "force-dynamic";
 
@@ -41,18 +42,19 @@ function AdminPostsInner() {
     <main className="max-w-6xl mx-auto px-4 py-10" dir="rtl">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-black">مدیریت محتوا</h1>
-        <Link href={`/admin/posts/new?module=${module}`} className="btn btn-primary text-sm">+ مطلب جدید</Link>
+        <ButtonLink href={`/admin/posts/new?module=${module}`} size="sm">+ مطلب جدید</ButtonLink>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
         {allowedModules.map(m => (
-          <button
+          <Button
             key={m}
             onClick={()=>{ setModule(m); router.push(`/admin/posts?module=${m}`); }}
-            className={`btn text-xs ${m===module ? "btn-primary" : "btn-ghost"}`}
+            variant={m===module ? "primary" : "ghost"}
+            size="xs"
           >
             {moduleMeta[m].titleFa}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -69,7 +71,7 @@ function AdminPostsInner() {
           </thead>
           <tbody>
             {items.map(it => (
-              <tr key={it.slug} className="border-t border-border/60 hover:bg-muted/20">
+              <tr key={it.slug} className="border-t border-[color-mix(in_oklch,var(--tb-border)_60%,transparent)] hover:bg-[var(--tb-muted)]/20">
                 <td className="p-3">
                   <div className="font-semibold">{it.title}</div>
                   <div className="text-[11px] text-muted-foreground">{it.slug}</div>

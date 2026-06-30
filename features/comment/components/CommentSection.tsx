@@ -3,6 +3,7 @@ import * as React from "react";
 import { useActionState, useEffect, useOptimistic, useTransition, useState } from "react";
 import { getCommentsAction, createCommentAction, voteCommentAction } from "@/features/comment/actions/comments";
 import { CommentVote } from "@/components/ui/LikeButton";
+import { Button } from "@/components/ui/Button";
 
 type CommentNode = any;
 
@@ -66,14 +67,15 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               initialLikes={(c as any).likes ?? 0}
               initialDislikes={(c as any).dislikes ?? 0}
             />
-            <button
+            <Button
               onClick={()=> setReplyOpen(replyOpen===c.id ? null : c.id)}
-              className="text-[11px] hover:underline"
-              style={{color:"var(--muted-foreground)"}}
+              variant="link"
+              size="xs"
+              className="text-[11px] text-[var(--tb-muted-foreground)]"
               type="button"
             >
               {replyOpen===c.id ? "بستن" : "پاسخ"}
-            </button>
+            </Button>
           </div>
 
           {replyOpen===c.id && (
@@ -84,10 +86,10 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <input type="hidden" name="authorName" value="مهمان" />
               <textarea name="text" required className="input min-h-[90px] text-[12px]" placeholder={`پاسخ به ${(c as any).authorName}…`} />
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={()=>setReplyOpen(null)} className="btn btn-ghost text-[11px]">انصراف</button>
-                <button disabled={isSubmitting || isPending} className="btn btn-primary text-[11px]">
+                <Button type="button" variant="ghost" size="xs" onClick={()=>setReplyOpen(null)}>انصراف</Button>
+                <Button disabled={isSubmitting || isPending} size="xs">
                   {isSubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
-                </button>
+                </Button>
               </div>
             </form>
           )}
@@ -124,9 +126,9 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           <span className="text-[10px]" style={{color:"var(--muted-foreground)"}}>
             {state?.ok ? <span className="text-[var(--tb-success)]">✓ ثبت شد – revalidatePath انجام شد</span> : "ارسال → createCommentAction → Prisma → revalidatePath"}
           </span>
-          <button disabled={isSubmitting || isPending} className="btn btn-primary text-[13px]">
+          <Button disabled={isSubmitting || isPending} size="sm">
             {isSubmitting ? "…" : "ارسال نظر"}
-          </button>
+          </Button>
         </div>
       </form>
 

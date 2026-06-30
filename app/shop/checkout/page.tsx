@@ -1,7 +1,9 @@
 "use client";
+import Image from "next/image";
 import { useCart } from "@/providers/cart.provider";
 import Link from "next/link";
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
 
 function parseFaPrice(s:string){
   // "۴۸,۹۰۰,۰۰۰" -> 48900000
@@ -88,17 +90,17 @@ export default function CheckoutPage(){
 
           <h3 className="font-bold pt-2">پرداخت</h3>
           <div className="flex gap-4 text-xs flex-wrap">
-            <label className="flex items-center gap-2 px-3 py-2 rounded-xl border" style={{borderColor:"var(--primary)", background:"rgba(96,165,250,.08)"}}>
+            <label className="flex items-center gap-2 rounded-[var(--tb-radius-lg)] border border-[var(--tb-primary)] bg-[color-mix(in_oklch,var(--tb-primary)_8%,transparent)] px-3 py-2">
               <input type="radio" name="pay" defaultChecked readOnly /> 
               <span>درگاه <b>زرین‌پال</b> – کارت شتاب</span>
-              <img alt="zarinpal" src="https://cdn.zarinpal.com/badges/trustLogo/1.svg" className="h-5 opacity-80" onError={e=>{(e.target as HTMLElement).style.display="none"}} />
+              <Image alt="zarinpal" src="https://cdn.zarinpal.com/badges/trustLogo/1.svg" width={64} height={20} className="h-5 w-auto opacity-80" unoptimized />
             </label>
-            <label className="flex items-center gap-2 px-3 py-2 rounded-xl border" style={{borderColor:"var(--border)"}}><input type="radio" name="pay" disabled /> کارت به کارت (غیرفعال در دمو)</label>
+            <label className="flex items-center gap-2 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] px-3 py-2"><input type="radio" name="pay" disabled /> کارت به کارت (غیرفعال در دمو)</label>
           </div>
 
-          <button onClick={pay} disabled={loading || items.length===0} className="btn btn-primary w-full text-[14px] disabled:opacity-60">
+          <Button onClick={pay} disabled={loading || items.length===0} className="w-full text-[14px] disabled:opacity-60">
             {loading ? "در حال اتصال به زرین‌پال…" : `پرداخت ${totalToman>0 ? totalToman.toLocaleString("fa-IR")+" تومان" : "–"} با زرین‌پال`}
-          </button>
+          </Button>
           <p className="text-[11px]" style={{color:"var(--muted-foreground)"}}>
             پرداخت امن – اگر <code>ZARIN_MERCHANT_ID</code> تنظیم نباشد، تراکنش شبیه‌سازی می‌شود و به‌صورت خودکار Verify می‌شود – مناسب تست لوکال.
           </p>

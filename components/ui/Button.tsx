@@ -1,14 +1,20 @@
 "use client";
+import Link, { type LinkProps } from "next/link";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "outline" | "danger" | "link";
-type Size = "sm" | "md" | "lg" | "icon";
+type Variant = "primary" | "secondary" | "ghost" | "outline" | "danger" | "vip" | "link";
+type Size = "xs" | "sm" | "md" | "lg" | "icon" | "iconSm";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   size?: Size;
   loading?: boolean;
+}
+
+export interface ButtonLinkProps extends LinkProps, Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> {
+  variant?: Variant;
+  size?: Size;
 }
 
 const base =
@@ -20,34 +26,32 @@ const base =
 const variants: Record<Variant,string> = {
   primary:   "text-[var(--tb-primary-foreground)] bg-[var(--tb-primary)] hover:brightness-[1.06] active:scale-[0.985] shadow-[var(--tb-shadow-sm)]",
   secondary: "text-[var(--tb-secondary-foreground)] bg-[var(--tb-secondary)] hover:brightness-[1.03]",
-  ghost:     "bg-transparent text-[var(--tb-foreground)] hover:bg-[var(--tb-muted)]",
-  outline:   "bg-transparent border text-[var(--tb-foreground)] hover:bg-[var(--tb-muted)]",
-  danger:    "text-white",
-  link:      "bg-transparent underline-offset-4 hover:underline p-0 h-auto"
+  ghost:     "bg-transparent text-[var(--tb-foreground)] hover:bg-[var(--tb-muted)] border border-[var(--tb-border)]",
+  outline:   "bg-transparent border border-[var(--tb-border)] text-[var(--tb-foreground)] hover:bg-[var(--tb-muted)]",
+  danger:    "text-white bg-[var(--tb-danger)] border-transparent hover:brightness-[1.05] active:scale-[0.985]",
+  vip:       "tb-cta tb-cta-vip px-4",
+  link:      "bg-transparent underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none"
 };
 
 const sizes: Record<Size,string> = {
+  xs: "h-7 px-2.5 text-[11px] rounded-[var(--tb-radius-md)]",
   sm: "h-8 px-3 text-[11.5px] rounded-[var(--tb-radius-md)]",
-  md: "h-10 px-4 text-[13px]  rounded-[var(--tb-radius-lg)]",
-  lg: "h-11 px-5 text-[14px]  rounded-[var(--tb-radius-xl)]",
-  icon: "h-10 w-10 p-0 rounded-[var(--tb-radius-lg)]"
+  md: "h-10 px-4 text-[13px] rounded-[var(--tb-radius-lg)]",
+  lg: "h-11 px-5 text-[14px] rounded-[var(--tb-radius-xl)]",
+  icon: "h-10 w-10 p-0 rounded-[var(--tb-radius-lg)]",
+  iconSm: "h-7 w-7 p-0 rounded-[var(--tb-radius-md)]"
 };
 
+export function buttonClassName({ variant = "primary", size = "md", className }: { variant?: Variant; size?: Size; className?: string } = {}) {
+  return cn(base, variants[variant], sizes[size], className);
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant="primary", size="md", loading, children, style, ...props }, ref) => {
-    const v = variant==="danger" ? {} : {};
-    const dangerStyle = variant==="danger" ? { background:"oklch(0.60 0.22 25)", color:"white", borderColor:"transparent" } : {};
+  ({ className, variant="primary", size="md", loading, children, ...props }, ref) => {
     return (
       <button
         ref={ref}
-        className={cn(
-          base,
-          variants[variant],
-          sizes[size],
-          "rounded-[var(--tb-radius-lg)]",
-          className
-        )}
-        style={{ ...dangerStyle, ...style, borderColor: variant==="outline" ? "var(--tb-border)" : undefined }}
+        className={buttonClassName({ variant, size, className })}
         disabled={loading || props.disabled}
         {...props}
       >
@@ -58,4 +62,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 );
 Button.displayName = "Button";
+
+export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
+  ({ className, variant="primary", size="md", children, ...props }, ref) => (
+    <Link ref={ref} className={buttonClassName({ variant, size, className })} {...props}>
+      {children}
+    </Link>
+  )
+);
+ButtonLink.displayName = "ButtonLink";
+
 export default Button;

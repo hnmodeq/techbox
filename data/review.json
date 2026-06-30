@@ -1,13 +1,94 @@
 [
   {
+    "slug": "mikrotik-crs-10g-review",
+    "module": "review",
+    "title": "بررسی MikroTik CRS 10G برای رک‌های کوچک",
+    "excerpt": "سوئیچ اقتصادی 10GbE تا کجا جواب می‌دهد؟",
+    "content": "در این بررسی کارایی، مصرف انرژی، RouterOS و سناریوهای مناسب CRS 10G را مرور می‌کنیم.",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "mikrotik",
+      "switch",
+      "10gbe",
+      "بررسی"
+    ],
+    "author": {
+      "name": "نیما راد",
+      "role": "کارشناس شبکه",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-18",
+    "date_fa": "27 تیر 1405",
+    "likes": 61,
+    "views": 2680,
+    "category": "شبکه"
+  },
+  {
+    "slug": "synology-rackstation-rs2426-review",
+    "module": "review",
+    "title": "بررسی Synology RackStation RS2426+ برای بکاپ سازمانی",
+    "excerpt": "یک NAS رک‌مونت قابل اعتماد برای فایل‌سرور و آرشیو؟",
+    "content": "در این بررسی DSM، کارایی RAID، Snapshot و سناریوهای بکاپ سازمانی را ارزیابی می‌کنیم.",
+    "image": "/assets/blog-6.png",
+    "tags": [
+      "synology",
+      "nas",
+      "backup",
+      "بررسی"
+    ],
+    "author": {
+      "name": "رژینا کریمی",
+      "role": "تحلیلگر ذخیره‌سازی",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-17",
+    "date_fa": "26 تیر 1405",
+    "likes": 73,
+    "views": 3190,
+    "category": "ذخیره‌سازی"
+  },
+  {
+    "slug": "hpe-dl380-gen11-review",
+    "module": "review",
+    "title": "بررسی HPE DL380 Gen11 در سناریوی مجازی‌سازی",
+    "excerpt": "نسل جدید DL380 برای کلاسترهای متوسط چه مزیتی دارد؟",
+    "content": "کارایی CPU، توسعه‌پذیری، مدیریت iLO و مصرف انرژی در این بررسی مرور شده است.",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "hpe",
+      "server",
+      "virtualization",
+      "بررسی"
+    ],
+    "author": {
+      "name": "هومن مدق",
+      "role": "کارشناس فناوری اطلاعات",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-16",
+    "date_fa": "25 تیر 1405",
+    "likes": 95,
+    "views": 4020,
+    "category": "سرور"
+  },
+  {
     "slug": "qnap-2277-full-review",
     "module": "review",
     "title": "نقد و بررسی تخصصی QNAP TS-2277",
     "excerpt": "آیا QNAP-2277 بهترین NAS میان‌رده 2026 است؟",
     "content": "بررسی کامل سخت‌افزار، نرم‌افزار، سرعت...",
     "image": "/assets/blog-6.png",
-    "tags": ["QNAP-2277", "nas", "بررسی", "ذخیره‌سازی", "سخت‌افزار"],
-    "author": { "name": "هومن مدق", "role": "کارشناس فناوری اطلاعات" },
+    "tags": [
+      "QNAP-2277",
+      "nas",
+      "بررسی",
+      "ذخیره‌سازی",
+      "سخت‌افزار"
+    ],
+    "author": {
+      "name": "هومن مدق",
+      "role": "کارشناس فناوری اطلاعات"
+    },
     "date": "2026-07-11",
     "date_fa": "20 تیر 1405",
     "likes": 87,
@@ -21,8 +102,15 @@
     "excerpt": "هیولای رک‌مونت جدید دل.",
     "content": "...",
     "image": "/assets/blog-1.jpg",
-    "tags": ["dell", "سرور", "بررسی"],
-    "author": { "name": "عطیه حاتمی", "role": "مهندس کامپیوتر" },
+    "tags": [
+      "dell",
+      "سرور",
+      "بررسی"
+    ],
+    "author": {
+      "name": "عطیه حاتمی",
+      "role": "مهندس کامپیوتر"
+    },
     "date": "2026-07-01",
     "date_fa": "10 تیر 1405",
     "likes": 54,

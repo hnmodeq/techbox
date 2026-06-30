@@ -1,9 +1,11 @@
+import Image from "next/image";
 import { type ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { LikeButton } from "@/components/ui/LikeButton";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
   const meta = moduleMeta[item.module];
@@ -22,7 +24,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
       <div className="flex flex-wrap items-center gap-3 mt-6 text-xs">
         <div className="flex items-center gap-2">
-          {item.author.avatar && <img src={item.author.avatar} className="w-8 h-8 rounded-full ring-1 ring-border" alt="" />}
+          {item.author.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--tb-radius-full)] object-cover ring-1 ring-[var(--tb-border)]" alt={item.author.name} />}
           <div>
             <div className="font-semibold text-[13px]">{item.author.name}</div>
             <div className="text-muted-foreground text-[11px]">{item.author.role}</div>
@@ -34,7 +36,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
       </div>
 
       {item.module === "media" ? (
-        <div className="mt-8 rounded-[22px] overflow-hidden border border-border shadow-card bg-black">
+        <div className="mt-8 overflow-hidden rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-black shadow-[var(--tb-shadow)]">
           <video
             controls
             playsInline
@@ -49,8 +51,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
           </div>
         </div>
       ) : item.image && (
-        <div className="mt-8 rounded-[22px] overflow-hidden border border-border shadow-card">
-          <img src={item.image} alt={item.title} className="w-full object-cover max-h-[420px]" />
+        <div className="mt-8 overflow-hidden rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] shadow-[var(--tb-shadow)]">
+          <div className="relative aspect-[16/9] max-h-[420px]"><Image src={item.image} alt={item.title} fill sizes="(min-width:768px) 768px, 100vw" className="object-cover" /></div>
         </div>
       )}
 
@@ -69,7 +71,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <LikeButton contentType={item.module} slug={item.slug} initial={item.likes} />
-        <button className="btn btn-ghost text-sm">اشتراک‌گذاری</button>
+        <Button variant="ghost" size="sm">اشتراک‌گذاری</Button>
       </div>
 
       <SuggestionGrid current={item} />
