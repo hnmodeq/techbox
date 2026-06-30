@@ -4,17 +4,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import PixelBlastBackground from "@/components/effects/PixelBlastBackground";
-import Shuffle from "@/components/effects/Shuffle";
+import { moduleColors } from "@/config/module-colors";
 
-const items = [
-  { text: "اخبار تکنولوژی رو با تکباکس دنبال کن", href: "/news" },
-  { text: "محصولات زیرساختی رو از تکباکس خریداری کن", href: "/shop" },
-  { text: "مشکلات فنی رو داخل انجمن تکباکس مطرح کن", href: "/forum" },
-  { text: "از ابزارهای زیرساختی تکباکس استفاده کن", href: "/tools" },
-  { text: "فایل‌هایی که نیاز داری رو از تکباکس دانلود کن", href: "/download" },
-  { text: "نقد و بررسی‌های تکباکس رو دنبال کن", href: "/review" },
-  { text: "مقاله‌های تکنولوژی رو از تکباکس دنبال کن", href: "/blog" },
-  { text: "ویدیوهای سرگرم‌کننده حوزه تکنولوژی رو از تکباکس دنبال کن", href: "/media" },
+const items: { text: string; href: string; module: keyof typeof moduleColors }[] = [
+  { text: "اخبار تکنولوژی رو با تکباکس دنبال کن", href: "/news", module: "news" },
+  { text: "محصولات زیرساختی رو از تکباکس خریداری کن", href: "/shop", module: "shop" },
+  { text: "مشکلات فنی رو داخل انجمن تکباکس مطرح کن", href: "/forum", module: "forum" },
+  { text: "از ابزارهای زیرساختی تکباکس استفاده کن", href: "/tools", module: "tools" },
+  { text: "فایل‌هایی که نیاز داری رو از تکباکس دانلود کن", href: "/download", module: "download" },
+  { text: "نقد و بررسی‌های تکباکس رو دنبال کن", href: "/review", module: "review" },
+  { text: "مقاله‌های تکنولوژی رو از تکباکس دنبال کن", href: "/blog", module: "blog" },
+  { text: "ویدیوهای سرگرم‌کننده حوزه تکنولوژی رو از تکباکس دنبال کن", href: "/media", module: "media" },
 ];
 
 export default function HeroSection() {
@@ -32,25 +32,7 @@ export default function HeroSection() {
       <PixelBlastBackground variant="square" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--tb-background)]/30 via-transparent to-[var(--tb-background)]" aria-hidden="true" />
       <div className="relative z-10 flex flex-col items-center">
-        <Shuffle
-          text="تکباکس"
-          tag="h1"
-          textAlign="center"
-          shuffleDirection="right"
-          duration={0.35}
-          animationMode="evenodd"
-          shuffleTimes={1}
-          ease="power3.out"
-          stagger={0.03}
-          threshold={0.1}
-          triggerOnce
-          triggerOnHover
-          respectReducedMotion
-          colorFrom="var(--tb-shuffle-color-from)"
-          colorTo="var(--tb-shuffle-color-to)"
-          className="text-5xl font-black tracking-tight text-[var(--tb-brand)] md:text-7xl"
-          style={{ direction: "rtl" }}
-        />
+        <h1 className="text-5xl font-black tracking-tight text-[var(--tb-brand)] md:text-7xl">تکباکس</h1>
         <p className="mt-3 text-sm text-[var(--tb-muted-foreground)] md:text-base">پاتوق بچه‌های فناوری اطلاعات</p>
         <div className="hero-rotator mt-6 w-full max-w-2xl">
           <AnimatePresence mode="wait">
@@ -62,7 +44,7 @@ export default function HeroSection() {
               transition={{ duration: 0.35 }}
               className="hero-item"
             >
-              <Link href={item.href} className="hero-rotator-text transition-colors hover:text-[var(--tb-brand)]">
+              <Link href={item.href} className={`hero-rotator-text transition-colors ${moduleColors[item.module].active} hover:opacity-80`}>
                 {item.text}
               </Link>
             </motion.div>

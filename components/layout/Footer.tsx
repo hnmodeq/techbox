@@ -3,10 +3,9 @@ import { SVGProps } from "react"
 
 const navigation = {
   main: [
-    { name: "ارتباط با ما", href: "/contact" },
-    { name: "درباره ما", href: "/about" },
-    { name: "فرصت‌های شغلی", href: "/workwithus" },
-    { name: "درخواست مشاوره", href: "/consultation" },
+    { name: "ارتباط با ما", href: "/contact", hover: "hover:text-[var(--tb-contact)]" },
+    { name: "درباره ما", href: "/about", hover: "hover:text-[var(--tb-about)]" },
+    { name: "فرصت‌های شغلی", href: "/workwithus", hover: "hover:text-[var(--tb-workwithus)]" },
   ],
   social: [
     {
@@ -53,7 +52,7 @@ export default function FooterSection() {
             <h4 className="text-sm font-semibold text-foreground">لینک‌های سریع</h4>
             <div className="mt-4 flex flex-col gap-3">
               {navigation.main.map((item) => (
-                <Link key={item.name} href={item.href} className="text-sm text-muted-foreground hover:text-foreground">
+                <Link key={item.name} href={item.href} className={`text-sm text-muted-foreground transition-colors ${item.hover}`}>
                   {item.name}
                 </Link>
               ))}

@@ -1,10 +1,15 @@
 import SubnetCalculator from "@/features/tools/components/SubnetCalculator";
+import PageHeader from "@/components/effects/PageHeader";
 export const metadata = { title: "ماشین حساب Subnet | تکباکس" };
 export default function Page(){
   return (
     <main className="max-w-3xl mx-auto px-4 py-12" dir="rtl">
-      <h1 className="mb-2 text-2xl font-black text-[var(--tb-subnet)]">Subnet Calculator فارسی</h1>
-      <p className="mb-6 text-sm text-[var(--tb-muted-foreground)]">CIDR → Network / Broadcast / Host Range</p>
+      <PageHeader
+        colorVar="--tb-subnet"
+        title="Subnet Calculator فارسی"
+        description="CIDR → Network / Broadcast / Host Range"
+        titleClassName="text-[var(--tb-subnet)]"
+      />
       <SubnetCalculator />
     </main>
   );

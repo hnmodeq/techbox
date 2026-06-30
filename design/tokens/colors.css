@@ -12,7 +12,7 @@
   --gradient-brand-3: var(--tb-vip);
 
   /* — React Bits effects: PixelBlast (hero header dithered background) — */
-  --tb-pixelblast-color: #3b46f6;
+  --tb-pixelblast-color: #ffffff;
   --tb-pixelblast-pixel-size: 4;
   --tb-pixelblast-pattern-scale: 2;
   --tb-pixelblast-pattern-density: 1.1;
@@ -108,13 +108,20 @@
   --tb-home:    oklch(0.62 0.22 290);  /* violet */
   --tb-account: oklch(0.80 0.12 15);   /* red-200 */
 
-  /* — Radius — */
-  --tb-radius-xs: 6px;
-  --tb-radius-sm: 8px;
-  --tb-radius-md: 12px;
-  --tb-radius-lg: 16px;
-  --tb-radius-xl: 20px;
-  --tb-radius-2xl: 24px;
+  /* — Page accent tokens (placeholders – set your own later) — */
+  --tb-admin:        oklch(0.66 0.22 300);  /* fuchsia (placeholder) */
+  --tb-about:        oklch(0.72 0.16 230);  /* sky (placeholder) */
+  --tb-contact:      oklch(0.72 0.18 150);  /* green (placeholder) */
+  --tb-workwithus:   oklch(0.70 0.17 52);   /* orange (placeholder) */
+  --tb-consultation: oklch(0.66 0.22 300);  /* fuchsia (placeholder) */
+
+  /* — Radius (reduced for a tighter, flatter look) — */
+  --tb-radius-xs: 3px;
+  --tb-radius-sm: 5px;
+  --tb-radius-md: 7px;
+  --tb-radius-lg: 9px;
+  --tb-radius-xl: 11px;
+  --tb-radius-2xl: 14px;
   --tb-radius-full: 9999px;
 
   /* — Elevation / Shadow — */
@@ -210,7 +217,7 @@
   --tb-tools:   #67e8f9;
   --tb-raid:    #2dd4bf;
   --tb-subnet:  #60a5fa;
-  --tb-vip:     #e879f9;
+  --tb-vip:     #8679f9;
   --tb-success: #4ade80;
   --tb-danger:  #fb7185;
   --tb-warning: #fcd34d;
@@ -220,6 +227,13 @@
   --tb-download:#f472b6;
   --tb-home:    #a78bfa;
   --tb-account: #fca5a5;
+
+  /* page accents – dark tuned (placeholders) */
+  --tb-admin:        #e879f9;
+  --tb-about:        #7dd3fc;
+  --tb-contact:      #4ade80;
+  --tb-workwithus:   #fb923c;
+  --tb-consultation: #e879f9;
 
   --tb-shadow-sm: 0 1px 3px rgba(0,0,0,.30), 0 1px 2px rgba(0,0,0,.22);
   --tb-shadow: 0 6px 24px rgba(0,0,0,.38), 0 2px 8px rgba(0,0,0,.24);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { ModuleBadge } from "@/components/ui/ModuleBadge";
 import { Badge } from "@/components/ui/Badge";
+import PageHeader from "@/components/effects/PageHeader";
 
 const moduleOrder = Object.keys(moduleMeta) as ModuleSlug[];
 
@@ -76,25 +77,18 @@ export default function AdminPage() {
   return (
     <main className="min-h-dvh px-4 py-10" dir="rtl">
       <section className="mx-auto max-w-6xl space-y-8">
-        <header className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs text-[var(--tb-muted-foreground)]">پنل مدیریت</p>
-            <h1 className="text-2xl font-black">سلام، {user.name}</h1>
-            <p className="mt-1 text-xs text-[var(--tb-muted-foreground)]">
-              نقش: {user.role === "super_admin" ? "مدیر کل" : "ویراستار"}
-            </p>
-            <div className="mt-2 flex flex-wrap gap-1">
-              {user.modules.map(m => (
-                <ModuleBadge key={m} module={m as ModuleSlug}>{moduleMeta[m as ModuleSlug]?.titleFa || m}</ModuleBadge>
-              ))}
-            </div>
-          </div>
+        <PageHeader colorVar="--tb-admin" title={`سلام، ${user.name}`} titleClassName="text-[var(--tb-admin)]" description={`پنل مدیریت • نقش: ${user.role === "super_admin" ? "مدیر کل" : "ویراستار"}`}>
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
             {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
             <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="text-xs">خروج</Button>
           </div>
-        </header>
+        </PageHeader>
+        <div className="flex flex-wrap gap-1">
+          {user.modules.map(m => (
+            <ModuleBadge key={m} module={m as ModuleSlug}>{moduleMeta[m as ModuleSlug]?.titleFa || m}</ModuleBadge>
+          ))}
+        </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="card p-4">

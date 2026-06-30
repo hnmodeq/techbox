@@ -5,6 +5,7 @@ import { getCurrentUserClient, logout } from "@/lib/auth";
 import type { AppUser } from "@/lib/auth";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import PageHeader from "@/components/effects/PageHeader";
 
 export default function AccountPage(){
   const [user, setUser] = useState<AppUser | null>(null);
@@ -65,10 +66,13 @@ export default function AccountPage(){
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-        <h1 className="text-2xl font-black">حساب کاربری</h1>
+      <PageHeader
+        colorVar="--tb-account"
+        title="حساب کاربری"
+        titleClassName="text-[var(--tb-account)]"
+      >
         <div className="text-xs text-muted-foreground">{user.role==="super_admin" ? "مدیر کل" : "ویراستار"} • {user.modules.join("، ")}</div>
-      </div>
+      </PageHeader>
 
       <form onSubmit={save} className="grid lg:grid-cols-3 gap-5">
         {/* avatar card */}

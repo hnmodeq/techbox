@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Search, Clock, ShoppingCart, ShieldCheck } from "lucide-react";
+import { Bell, Search, Clock, ShoppingCart, ShieldCheck, Headset, X } from "lucide-react";
+import ConsultationModal from "@/features/consultation/components/ConsultationModal";
 import { createPortal } from "react-dom";
 import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
 import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
@@ -11,7 +12,8 @@ import SidebarTooltip from "@/components/layout/SidebarTooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getCurrentUserClient, type AppUser } from "@/lib/auth";
 import { useCart } from "@/providers/cart.provider";
-import { getAllAcross } from "@/lib/content";
+import { getAllAcross, moduleMeta, type ModuleSlug } from "@/lib/content";
+import { moduleColors } from "@/config/module-colors";
 import { zIndex } from "@/design";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { IconRailButton } from "@/components/ui/IconRailButton";
@@ -28,7 +30,7 @@ function TehranDateTime({ now, expanded }: { now: Date | null; expanded: boolean
     : "ساعت تهران";
 
   return (
-    <div className="h-[58px] shrink-0">
+    <div className={expanded ? "shrink-0" : "h-[58px] shrink-0"}>
       {!expanded ? (
         <SidebarTooltip enabled label={label} tooltipClassName="text-[var(--tb-muted-foreground)]">
           <span className="icon-rail-btn" aria-label="ساعت تهران">
@@ -36,15 +38,17 @@ function TehranDateTime({ now, expanded }: { now: Date | null; expanded: boolean
           </span>
         </SidebarTooltip>
       ) : (
-        <div className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-muted)] px-3 py-2 text-center shadow-[var(--tb-shadow-sm)]">
-          <div className="text-[10px] text-[var(--tb-muted-foreground)]">
-            {now?.toLocaleDateString("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }) || "تهران"}
+        <div className="flex items-center justify-between gap-2 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-muted)] px-3 py-2 shadow-[var(--tb-shadow-sm)]">
+          <div className="min-w-0">
+            <div className="truncate text-[10px] text-[var(--tb-muted-foreground)]">
+              {now?.toLocaleDateString("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }) || "تهران"}
+            </div>
+            <div className="truncate text-[10px] text-[var(--tb-muted-foreground)]">
+              {now?.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Tehran" }) || "—"}
+            </div>
           </div>
-          <div className="text-[11px] font-bold tabular-nums" dir="ltr">
+          <div className="shrink-0 text-[12px] font-bold tabular-nums" dir="ltr">
             {now?.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Tehran" }) || "--:--:--"}
-          </div>
-          <div className="text-[10px] text-[var(--tb-muted-foreground)]">
-            {now?.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Tehran" }) || "—"}
           </div>
         </div>
       )}
@@ -75,6 +79,10 @@ export default function SidebarContent({
   const [now, setNow] = useState<Date | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [consultOpen, setConsultOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const collapsedSearchRef = useRef<HTMLInputElement | null>(null);
+  const notifPanelRef = useRef<HTMLDivElement | null>(null);
   const { count: cartCount, setOpen: setCartOpen } = useCart();
 
   useEffect(() => {
@@ -111,6 +119,31 @@ export default function SidebarContent({
     };
   }, [notifOpen]);
 
+  // Close the notification popover when clicking anywhere outside it / its trigger.
+  useEffect(() => {
+    if (!notifOpen) return;
+    const onDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (notifPanelRef.current?.contains(target)) return;
+      if (notifButtonRef.current?.contains(target)) return;
+      setNotifOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setNotifOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [notifOpen]);
+
+  // Focus the collapsed search field when it expands.
+  useEffect(() => {
+    if (searchOpen) collapsedSearchRef.current?.focus();
+  }, [searchOpen]);
+
   const notifications = useMemo(() => getAllAcross().slice(0, 8), []);
 
   const doSearch = (e?: React.FormEvent) => {
@@ -124,20 +157,25 @@ export default function SidebarContent({
   const notificationPanel = notifOpen && mounted && notifPos
     ? createPortal(
         <div
+          ref={notifPanelRef}
           className="fixed w-[320px] max-w-[92vw] p-3 text-right card"
           style={{ zIndex: zIndex.notification, top: notifPos.top, right: notifPos.right }}
           dir="rtl"
         >
           <div className="mb-2 text-[12px] font-bold">آخرین رویدادها</div>
           <ul className="max-h-80 space-y-2 overflow-y-auto text-[11px]">
-            {notifications.map((n: any) => (
-              <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--tb-border)_40%,transparent)] pb-2 last:border-0">
-                <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 leading-5 hover:text-[var(--tb-brand)]">
-                  {n.title}
-                </Link>
-                <div className="mt-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{n.date_fa} • {n.module}</div>
-              </li>
-            ))}
+            {notifications.map((n: any) => {
+              // Title is tinted with the source module's color; unknown/general → neutral.
+              const titleColor = moduleColors[n.module as keyof typeof moduleColors]?.active ?? "text-[var(--tb-foreground)]";
+              return (
+                <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--tb-border)_40%,transparent)] pb-2 last:border-0">
+                  <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className={`line-clamp-2 leading-5 transition-opacity hover:opacity-80 ${titleColor}`}>
+                    {n.title}
+                  </Link>
+                  <div className="mt-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{n.date_fa}{n.time ? ` • ${n.time}` : ""} • {moduleMeta[n.module as ModuleSlug]?.titleFa ?? n.module}</div>
+                </li>
+              );
+            })}
           </ul>
           <Button variant="ghost" size="xs" onClick={() => setNotifOpen(false)} className="mt-2 w-full text-[10px]">بستن</Button>
         </div>,
@@ -189,7 +227,7 @@ export default function SidebarContent({
 
         <TehranDateTime now={now} expanded={expanded} />
 
-        <div className="h-10 shrink-0">
+        <div className="relative h-10 shrink-0">
           {expanded ? (
             <form onSubmit={doSearch} className="relative h-10">
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input h-10 !py-2 pe-8 text-xs" />
@@ -198,24 +236,55 @@ export default function SidebarContent({
               </Button>
             </form>
           ) : (
-            <SidebarTooltip label="جستجو" enabled tooltipClassName="text-[var(--tb-brand)]">
-              <IconRailButton tone="brand" onClick={() => { const v = prompt("جستجو:"); if (v) router.push(`/search?q=${encodeURIComponent(v)}`); }} aria-label="جستجو">
-                <Search size={18} />
-              </IconRailButton>
-            </SidebarTooltip>
+            <>
+              <SidebarTooltip label="جستجو" enabled={!searchOpen} tooltipClassName="text-[var(--tb-brand)]">
+                <IconRailButton tone="brand" onClick={() => setSearchOpen((o) => !o)} aria-label="جستجو" aria-expanded={searchOpen}>
+                  {searchOpen ? <X size={18} /> : <Search size={18} />}
+                </IconRailButton>
+              </SidebarTooltip>
+
+              {/* Expanding search that pops out to the left of the rail icon. */}
+              {searchOpen && (
+                <form
+                  onSubmit={(e) => { doSearch(e); setSearchOpen(false); }}
+                  className="absolute left-full top-1/2 z-20 ms-2 flex h-10 -translate-y-1/2 items-center"
+                  dir="rtl"
+                >
+                  <div className="relative w-56 max-w-[60vw] rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-card)] shadow-[var(--tb-shadow-md)]">
+                    <input
+                      ref={collapsedSearchRef}
+                      value={q}
+                      onChange={(e) => setQ(e.target.value)}
+                      onBlur={() => { if (!q.trim()) setSearchOpen(false); }}
+                      placeholder="جستجو در تکباکس…"
+                      className="input h-10 w-full !py-2 pe-9 text-xs !border-0 !bg-transparent"
+                    />
+                    <Button type="submit" variant="link" size="iconSm" className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[var(--tb-muted-foreground)] hover:text-[var(--tb-foreground)]" aria-label="search">
+                      <Search size={14} />
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </>
           )}
         </div>
 
         <div className="h-10 shrink-0">
           {expanded ? (
-            <Link href="/consultation" onClick={onLinkClick} className="vip-cta flex h-10 w-full items-center justify-center text-center text-[12px] font-black">
-              مشاوره VIP ⚡
-            </Link>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setConsultOpen(true)}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--tb-radius-lg)] border border-[color-mix(in_oklch,var(--tb-consultation)_35%,transparent)] text-center text-[12px] font-black text-[var(--tb-consultation)] hover:bg-[color-mix(in_oklch,var(--tb-consultation)_12%,transparent)]"
+            >
+              <Headset size={16} strokeWidth={1.75} />
+              مشاوره زیرساخت
+            </Button>
           ) : (
-            <SidebarTooltip label="مشاوره VIP" enabled tooltipClassName="text-[var(--tb-vip)]">
-              <Link href="/consultation" onClick={onLinkClick} className="icon-rail-btn text-[var(--tb-vip)] hover:text-[var(--tb-vip)]">
-                <span className="text-[16px]">⚡</span>
-              </Link>
+            <SidebarTooltip label="مشاوره زیرساخت" enabled tooltipClassName="text-[var(--tb-consultation)]">
+              <IconRailButton tone="consultation" onClick={() => setConsultOpen(true)} aria-label="مشاوره زیرساخت">
+                <Headset size={18} strokeWidth={1.75} />
+              </IconRailButton>
             </SidebarTooltip>
           )}
         </div>
@@ -313,6 +382,8 @@ export default function SidebarContent({
           </Panel>
         </div>
       )}
+
+      <ConsultationModal open={consultOpen} onClose={() => setConsultOpen(false)} />
 
       {notificationPanel}
     </div>

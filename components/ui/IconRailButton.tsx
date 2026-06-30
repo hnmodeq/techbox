@@ -18,6 +18,11 @@ type Tone =
   | "review"
   | "download"
   | "account"
+  | "admin"
+  | "consultation"
+  | "about"
+  | "contact"
+  | "workwithus"
   | "warning"
   | "danger";
 
@@ -37,6 +42,11 @@ const toneVar: Record<Tone, string> = {
   review: "--tb-review",
   download: "--tb-download",
   account: "--tb-account",
+  admin: "--tb-admin",
+  consultation: "--tb-consultation",
+  about: "--tb-about",
+  contact: "--tb-contact",
+  workwithus: "--tb-workwithus",
   warning: "--tb-warning",
   danger: "--tb-danger",
 };

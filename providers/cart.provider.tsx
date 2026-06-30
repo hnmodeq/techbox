@@ -54,6 +54,17 @@ export function CartProvider({ children }: { children: React.ReactNode }){
 
 function CartDrawer(){
   const ctx = useContext(Ctx);
+  const open = ctx?.open ?? false;
+  const setOpenFn = ctx?.setOpen;
+
+  // Close on Escape.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpenFn?.(false); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, setOpenFn]);
+
   if(!ctx || !ctx.open) return null;
   const { items, setOpen, remove, setQty, clear, count } = ctx;
   return (

@@ -64,4 +64,29 @@ export const moduleColors = {
     hover: "group-hover:text-[var(--tb-account)]",
     active: "text-[var(--tb-account)]",
   },
+  admin: {
+    base: "text-[var(--tb-foreground)]",
+    hover: "group-hover:text-[var(--tb-admin)]",
+    active: "text-[var(--tb-admin)]",
+  },
+  about: {
+    base: "text-[var(--tb-foreground)]",
+    hover: "group-hover:text-[var(--tb-about)]",
+    active: "text-[var(--tb-about)]",
+  },
+  contact: {
+    base: "text-[var(--tb-foreground)]",
+    hover: "group-hover:text-[var(--tb-contact)]",
+    active: "text-[var(--tb-contact)]",
+  },
+  workwithus: {
+    base: "text-[var(--tb-foreground)]",
+    hover: "group-hover:text-[var(--tb-workwithus)]",
+    active: "text-[var(--tb-workwithus)]",
+  },
+  consultation: {
+    base: "text-[var(--tb-foreground)]",
+    hover: "group-hover:text-[var(--tb-consultation)]",
+    active: "text-[var(--tb-consultation)]",
+  },
 } as const;

@@ -5,7 +5,10 @@ import TechLogoLoopSection from "@/features/home/components/TechLogoLoopSection"
 import { getAllAcross } from "@/lib/content";
 
 export default function Page() {
-  const ticker = getAllAcross().filter(i => ["news","blog"].includes(i.module)).slice(0,12);
+  // Pull recent updates from multiple modules (news, blog, media videos, forum topics, downloads, reviews).
+  const ticker = getAllAcross()
+    .filter(i => ["news", "blog", "media", "forum", "download", "review"].includes(i.module))
+    .slice(0, 16);
   return (
     <main className="relative">
       <HeroSection />
