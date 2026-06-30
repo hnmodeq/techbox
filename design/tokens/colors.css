@@ -1,61 +1,45 @@
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · DESIGN TOKENS — colors.css
+   ────────────────────────────────────────────────────────────────────────
+   The single source of truth for every color, radius, shadow, blur and
+   motion value on the site. Nothing is hardcoded at call sites — components
+   read these CSS variables, so changing a value here changes it everywhere.
+
+   HOW TO READ THIS FILE
+   • Light theme lives in  :root { … }
+   • Dark theme overrides live in  .dark { … }   (only the values that differ)
+   • Every variable is prefixed  --tb-*  (TechBox).
+   • The bare aliases at the bottom of section 2 (e.g. --card) exist only so
+     older class names keep working; prefer the --tb-* names in new code.
+
+   TABLE OF CONTENTS
+     1. BRAND                – primary brand color + brand gradient
+     2. SEMANTIC SURFACES    – background / foreground / card / border … (+ aliases)
+     3. MODULE COLORS        – the 8 modules + status colors (blog, news, …)
+     4. PAGE COLORS          – non-module pages (admin, about, contact …)  ← placeholders
+     5. RADIUS               – corner roundness scale
+     6. EFFECTS              – Aurora / PixelBlast / BorderGlow / Dock / Chroma …
+     7. OVERLAYS             – scrims & glass
+     8. ELEVATION            – shadows
+     9. BLUR
+    10. MOTION               – durations & easings
+    11. TYPOGRAPHY           – size / leading / weight scales
+   ════════════════════════════════════════════════════════════════════════ */
+
 :root {
-  /* — Brand — */
+  /* ───────────────────────── 1 · BRAND ───────────────────────── */
   --tb-brand: oklch(0.62 0.21 255);
   --tb-brand-foreground: oklch(0.98 0.005 255);
   --tb-brand-dim: oklch(0.62 0.21 255 / 0.14);
   --tb-primary: var(--tb-brand);
   --tb-primary-foreground: var(--tb-brand-foreground);
 
-  /* — Brand gradients — */
+  /* Brand gradient (built from brand + two module accents) */
   --gradient-brand-1: var(--tb-brand);
   --gradient-brand-2: var(--tb-subnet);
   --gradient-brand-3: var(--tb-vip);
 
-  /* — React Bits effects: PixelBlast (hero header dithered background) — */
-  --tb-pixelblast-color: #ffffff;
-  --tb-pixelblast-pixel-size: 4;
-  --tb-pixelblast-pattern-scale: 2;
-  --tb-pixelblast-pattern-density: 1.1;
-  --tb-pixelblast-edge-fade: 0.32;
-  --tb-pixelblast-speed: 0.45;
-  --tb-pixelblast-ripple-speed: 0.4;
-  --tb-pixelblast-ripple-thickness: 0.12;
-  --tb-pixelblast-ripple-intensity: 1.4;
-  --tb-pixelblast-opacity: 0.55;
-
-  /* — React Bits effects: BorderGlow (feed/module cards) — */
-  --tb-borderglow-bg: var(--tb-card);
-  --tb-borderglow-glow-hsl: 222 89% 62%;   /* glow color in "H S% L%" for box-shadow layers */
-  --tb-borderglow-radius: 24px;
-  --tb-borderglow-glow-radius: 34px;
-  --tb-borderglow-glow-intensity: 0.55;
-  --tb-borderglow-cone-spread: 25;
-  --tb-borderglow-edge-sensitivity: 32;
-  --tb-borderglow-fill-opacity: 0.45;
-  --tb-borderglow-border: color-mix(in oklch, var(--tb-border) 80%, transparent);
-
-  /* — React Bits effects: Dock (vertical sidebar dock) — */
-  --tb-dock-bg: var(--tb-surface-1);
-  --tb-dock-border: var(--tb-border);
-  --tb-dock-shadow: var(--tb-shadow);
-  --tb-dock-label-bg: var(--tb-popover);
-  --tb-dock-label-fg: var(--tb-popover-foreground);
-  --tb-dock-label-border: var(--tb-border);
-
-  /* — React Bits effects: Shuffle (animated title) — */
-  --tb-shuffle-color-from: var(--tb-muted-foreground);
-  --tb-shuffle-color-to: var(--tb-brand);
-
-  /* — React Bits effects: ChromaGrid (team cards) — */
-  --tb-chroma-spotlight: color-mix(in oklch, white 30%, transparent);
-  --tb-chroma-card-radius: var(--tb-radius-xl);
-
-  /* — Overlay / glass tokens — */
-  --tb-overlay-backdrop: color-mix(in oklch, black 48%, transparent);
-  --tb-image-overlay: color-mix(in oklch, black 58%, transparent);
-  --tb-scrim-soft: color-mix(in oklch, black 34%, transparent);
-
-  /* — Semantic – light — */
+  /* ──────────────────── 2 · SEMANTIC SURFACES (light) ──────────────────── */
   --tb-background: oklch(0.985 0.006 270);
   --tb-foreground: oklch(0.18 0.025 270);
   --tb-surface-1: oklch(0.96 0.012 270);
@@ -69,7 +53,7 @@
   --tb-popover: oklch(1 0 0);
   --tb-popover-foreground: oklch(0.18 0.025 270);
 
-  /* — Compatibility aliases for legacy components/classes — */
+  /* Compatibility aliases for legacy components/classes (don't use in new code) */
   --background: var(--tb-background);
   --foreground: var(--tb-foreground);
   --surface-1: var(--tb-surface-1);
@@ -89,56 +73,117 @@
   --secondary-foreground: var(--tb-foreground);
   --accent-cyan: var(--tb-tools);
 
-  /* — Module accent tokens — */
-  --tb-blog:    oklch(0.70 0.17 52);   /* orange */
-  --tb-news:    oklch(0.64 0.22 25);   /* rose */
-  --tb-media:   oklch(0.82 0.15 85);   /* amber */
-  --tb-shop:    oklch(0.80 0.19 125);  /* lime */
-  --tb-tools:   oklch(0.82 0.12 200);  /* cyan */
-  --tb-raid:    oklch(0.66 0.18 175);  /* teal */
-  --tb-subnet:  oklch(0.68 0.19 230);  /* blue */
-  --tb-vip:     oklch(0.66 0.22 300);  /* fuchsia */
-  --tb-success: oklch(0.72 0.18 150);
-  --tb-danger:  oklch(0.64 0.22 25);
-  --tb-warning: oklch(0.82 0.15 85);
-  --tb-info:    oklch(0.72 0.16 230);
-  --tb-forum:   oklch(0.78 0.16 5);    /* rose-300 */
-  --tb-review:  oklch(0.70 0.17 240);  /* sky */
-  --tb-download: oklch(0.72 0.20 350);
-  --tb-home:    oklch(0.62 0.22 290);  /* violet */
-  --tb-account: oklch(0.80 0.12 15);   /* red-200 */
+  /* ──────────────────── 3 · MODULE COLORS (light) ────────────────────
+     One accent per content module + shared status colors. These are the
+     ONLY colors allowed to identify a module across the UI. */
+  --tb-blog:     oklch(0.70 0.17 52);   /* orange   */
+  --tb-news:     oklch(0.64 0.22 25);   /* rose     */
+  --tb-media:    oklch(0.82 0.15 85);   /* amber    */
+  --tb-shop:     oklch(0.80 0.19 125);  /* lime     */
+  --tb-tools:    oklch(0.82 0.12 200);  /* cyan     */
+  --tb-raid:     oklch(0.66 0.18 175);  /* teal     */
+  --tb-subnet:   oklch(0.68 0.19 230);  /* blue     */
+  --tb-vip:      oklch(0.66 0.22 300);  /* fuchsia  */
+  --tb-forum:    oklch(0.78 0.16 5);    /* rose-300 */
+  --tb-review:   oklch(0.70 0.17 240);  /* sky      */
+  --tb-download: oklch(0.72 0.20 350);  /* pink     */
+  --tb-home:     oklch(0.62 0.22 290);  /* violet   */
+  --tb-account:  oklch(0.80 0.12 15);   /* red-200  */
+  /* status */
+  --tb-success:  oklch(0.72 0.18 150);
+  --tb-danger:   oklch(0.64 0.22 25);
+  --tb-warning:  oklch(0.82 0.15 85);
+  --tb-info:     oklch(0.72 0.16 230);
 
-  /* — Page accent tokens (placeholders – set your own later) — */
+  /* ──────────────────── 4 · PAGE COLORS (light) ────────────────────
+     Accents for non-module pages. These are PLACEHOLDERS — pick your own. */
   --tb-admin:        oklch(0.66 0.22 300);  /* fuchsia (placeholder) */
-  --tb-about:        oklch(0.72 0.16 230);  /* sky (placeholder) */
-  --tb-contact:      oklch(0.72 0.18 150);  /* green (placeholder) */
-  --tb-workwithus:   oklch(0.70 0.17 52);   /* orange (placeholder) */
+  --tb-about:        oklch(0.72 0.16 230);  /* sky     (placeholder) */
+  --tb-contact:      oklch(0.72 0.18 150);  /* green   (placeholder) */
+  --tb-workwithus:   oklch(0.70 0.17 52);   /* orange  (placeholder) */
   --tb-consultation: oklch(0.66 0.22 300);  /* fuchsia (placeholder) */
 
-  /* — Radius (reduced for a tighter, flatter look) — */
+  /* ───────────────────────── 5 · RADIUS ─────────────────────────
+     Reduced for a tighter, flatter look. */
   --tb-radius-xs: 3px;
-  --tb-radius-sm: 5px;
-  --tb-radius-md: 7px;
-  --tb-radius-lg: 9px;
-  --tb-radius-xl: 11px;
-  --tb-radius-2xl: 14px;
+  --tb-radius-sm: 3px;
+  --tb-radius-md: 3px;
+  --tb-radius-lg: 3px;
+  --tb-radius-xl: 3px;
+  --tb-radius-2xl: 3px;
   --tb-radius-full: 9999px;
 
-  /* — Elevation / Shadow — */
+  /* ───────────────────────── 6 · EFFECTS ─────────────────────────
+     Tunables for the WebGL / canvas effects. Each block = one component. */
+
+  /* 6a · Aurora — the site-wide hero / page-header background (HeroBackground) */
+  --tb-aurora-color-1: #1d2a8a;   /* edge stop */
+  --tb-aurora-color-2: #3b46f6;   /* mid stop  */
+  --tb-aurora-color-3: #1d2a8a;   /* edge stop */
+  --tb-aurora-amplitude: 1.0;
+  --tb-aurora-blend: 0.5;
+  --tb-aurora-speed: 1.0;
+  --tb-aurora-opacity: 0.6;
+
+  /* 6b · PixelBlast — legacy dithered hero background (kept available, unused) */
+  --tb-pixelblast-color: #3b46f6;
+  --tb-pixelblast-pixel-size: 4;
+  --tb-pixelblast-pattern-scale: 2;
+  --tb-pixelblast-pattern-density: 1.1;
+  --tb-pixelblast-edge-fade: 0.32;
+  --tb-pixelblast-speed: 0.45;
+  --tb-pixelblast-ripple-speed: 0.4;
+  --tb-pixelblast-ripple-thickness: 0.12;
+  --tb-pixelblast-ripple-intensity: 1.4;
+  --tb-pixelblast-opacity: 0.55;
+
+  /* 6c · BorderGlow — interactive feed/module card glow */
+  --tb-borderglow-bg: var(--tb-card);
+  --tb-borderglow-glow-hsl: 222 89% 62%;   /* glow color in "H S% L%" for box-shadow layers */
+  --tb-borderglow-radius: 5px;
+  --tb-borderglow-glow-radius: 5px;
+  --tb-borderglow-glow-intensity: 0.55;
+  --tb-borderglow-cone-spread: 14;         /* shorter glowing arc, concentrated near the cursor */
+  --tb-borderglow-edge-sensitivity: 32;
+  --tb-borderglow-fill-opacity: 0.45;
+  --tb-borderglow-border: color-mix(in oklch, var(--tb-border) 80%, transparent);
+
+  /* 6d · Dock — vertical sidebar dock */
+  --tb-dock-bg: var(--tb-surface-1);
+  --tb-dock-border: var(--tb-border);
+  --tb-dock-shadow: var(--tb-shadow);
+  --tb-dock-label-bg: var(--tb-popover);
+  --tb-dock-label-fg: var(--tb-popover-foreground);
+  --tb-dock-label-border: var(--tb-border);
+
+  /* 6e · Shuffle — animated title (kept available, unused) */
+  --tb-shuffle-color-from: var(--tb-muted-foreground);
+  --tb-shuffle-color-to: var(--tb-brand);
+
+  /* 6f · ChromaGrid — team cards */
+  --tb-chroma-spotlight: color-mix(in oklch, white 30%, transparent);
+  --tb-chroma-card-radius: var(--tb-radius-xl);
+
+  /* ───────────────────────── 7 · OVERLAYS ───────────────────────── */
+  --tb-overlay-backdrop: color-mix(in oklch, black 48%, transparent);
+  --tb-image-overlay: color-mix(in oklch, black 58%, transparent);
+  --tb-scrim-soft: color-mix(in oklch, black 34%, transparent);
+
+  /* ───────────────────────── 8 · ELEVATION ───────────────────────── */
   --tb-shadow-sm: 0 1px 3px rgba(2,8,23,.06), 0 1px 2px rgba(2,8,23,.04);
   --tb-shadow: 0 4px 16px rgba(2,8,23,.08), 0 2px 6px rgba(2,8,23,.05);
   --tb-shadow-md: 0 8px 28px rgba(2,8,23,.10), 0 3px 10px rgba(2,8,23,.06);
   --tb-shadow-lg: 0 16px 44px rgba(2,8,23,.14), 0 6px 16px rgba(2,8,23,.08);
   --tb-shadow-glow: 0 0 24px rgba(59,130,246,.22), 0 0 72px rgba(14,165,233,.10);
 
-  /* — Blur — */
+  /* ───────────────────────── 9 · BLUR ───────────────────────── */
   --tb-blur-sm: 6px;
   --tb-blur-md: 12px;
   --tb-blur-lg: 20px;
   --tb-blur-xl: 28px;
   --tb-glass-blur: 18px;
 
-  /* — Motion — */
+  /* ───────────────────────── 10 · MOTION ───────────────────────── */
   --tb-duration-instant: 80ms;
   --tb-duration-fast: 150ms;
   --tb-duration-normal: 220ms;
@@ -149,7 +194,8 @@
   --tb-ease-out: cubic-bezier(0,0,.38,1);
   --tb-ease-in-out: cubic-bezier(.4,0,.2,1);
 
-  /* — Typography scale — */
+  /* ───────────────────────── 11 · TYPOGRAPHY ───────────────────────── */
+  /* size scale */
   --tb-text-2xs: 0.6875rem; /*11px*/
   --tb-text-xs: 0.75rem;    /*12px*/
   --tb-text-sm: 0.8125rem;  /*13px*/
@@ -161,23 +207,38 @@
   --tb-text-3xl: 1.875rem;  /*30px*/
   --tb-text-4xl: 2.25rem;   /*36px*/
   --tb-text-5xl: 3rem;      /*48px*/
-
+  /* leading */
   --tb-leading-tight: 1.25;
   --tb-leading-snug: 1.45;
   --tb-leading-normal: 1.7;
   --tb-leading-relaxed: 1.95;
-
+  /* weight */
   --tb-weight-regular: 400;
   --tb-weight-medium: 500;
   --tb-weight-semibold: 600;
   --tb-weight-bold: 700;
   --tb-weight-extrabold: 800;
   --tb-weight-black: 900;
+  /* focus */
   --tb-focus-ring: 0 0 0 3px rgba(59,130,246,.35);
 }
 
-/* DARK – TechBox cube – #020617 → #0b1e4a */
+/* ════════════════════════════════════════════════════════════════════════
+   DARK THEME — TechBox cube  (#020617 → #0b1e4a)
+   Only the values that differ from :root are overridden below; everything
+   else (radius, motion, typography, page colors structure) is inherited.
+   ════════════════════════════════════════════════════════════════════════ */
 .dark {
+  /* 1 · BRAND */
+  --tb-brand: #60a5fa;
+  --tb-brand-dim: rgba(96,165,250,.18);
+  --tb-primary: var(--tb-brand);
+  --tb-primary-foreground: var(--tb-brand-foreground);
+  --gradient-brand-1: var(--tb-brand);
+  --gradient-brand-2: var(--tb-subnet);
+  --gradient-brand-3: var(--tb-vip);
+
+  /* 2 · SEMANTIC SURFACES */
   --tb-background: #050a14;
   --tb-foreground: #e6edff;
   --tb-surface-1: #0f172a;
@@ -191,54 +252,55 @@
   --tb-popover: #0b152a;
   --tb-popover-foreground: #e6edff;
 
-  --tb-brand: #60a5fa;
-  --tb-brand-dim: rgba(96,165,250,.18);
-  --tb-primary: var(--tb-brand);
-  --tb-primary-foreground: var(--tb-brand-foreground);
-  --gradient-brand-1: var(--tb-brand);
-  --gradient-brand-2: var(--tb-subnet);
-  --gradient-brand-3: var(--tb-vip);
+  /* 3 · MODULE COLORS – dark tuned */
+  --tb-blog:     #fb923c;
+  --tb-news:     #fb7185;
+  --tb-media:    #fcd34d;
+  --tb-shop:     #a3e635;
+  --tb-tools:    #67e8f9;
+  --tb-raid:     #2dd4bf;
+  --tb-subnet:   #60a5fa;
+  --tb-vip:      #e879f9;
+  --tb-forum:    #fda4af;
+  --tb-review:   #38bdf8;
+  --tb-download: #f472b6;
+  --tb-home:     #a78bfa;
+  --tb-account:  #fca5a5;
+  /* status */
+  --tb-success:  #4ade80;
+  --tb-danger:   #fb7185;
+  --tb-warning:  #fcd34d;
+  --tb-info:     #7dd3fc;
 
-  /* React Bits effects – dark tuned */
-  --tb-pixelblast-color: #60a5fa;
-  --tb-pixelblast-opacity: 0.6;
-  --tb-borderglow-glow-hsl: 213 94% 68%;
-  --tb-chroma-spotlight: color-mix(in oklch, white 22%, transparent);
-
-  --tb-overlay-backdrop: rgba(0,0,0,.55);
-  --tb-image-overlay: rgba(0,0,0,.60);
-  --tb-scrim-soft: rgba(0,0,0,.38);
-
-  /* module accents – dark tuned */
-  --tb-blog:    #fb923c;
-  --tb-news:    #fb7185;
-  --tb-media:   #fcd34d;
-  --tb-shop:    #a3e635;
-  --tb-tools:   #67e8f9;
-  --tb-raid:    #2dd4bf;
-  --tb-subnet:  #60a5fa;
-  --tb-vip:     #8679f9;
-  --tb-success: #4ade80;
-  --tb-danger:  #fb7185;
-  --tb-warning: #fcd34d;
-  --tb-info:    #7dd3fc;
-  --tb-forum:   #fda4af;
-  --tb-review:  #38bdf8;
-  --tb-download:#f472b6;
-  --tb-home:    #a78bfa;
-  --tb-account: #fca5a5;
-
-  /* page accents – dark tuned (placeholders) */
+  /* 4 · PAGE COLORS – dark tuned (placeholders) */
   --tb-admin:        #e879f9;
   --tb-about:        #7dd3fc;
   --tb-contact:      #4ade80;
   --tb-workwithus:   #fb923c;
   --tb-consultation: #e879f9;
 
+  /* 6 · EFFECTS – dark tuned */
+  --tb-aurora-color-1: #0a1f6e;
+  --tb-aurora-color-2: #60a5fa;
+  --tb-aurora-color-3: #0a1f6e;
+  --tb-aurora-opacity: 0.65;
+  --tb-pixelblast-color: #60a5fa;
+  --tb-pixelblast-opacity: 0.6;
+  --tb-borderglow-glow-hsl: 213 94% 68%;
+  --tb-chroma-spotlight: color-mix(in oklch, white 22%, transparent);
+
+  /* 7 · OVERLAYS */
+  --tb-overlay-backdrop: rgba(0,0,0,.55);
+  --tb-image-overlay: rgba(0,0,0,.60);
+  --tb-scrim-soft: rgba(0,0,0,.38);
+
+  /* 8 · ELEVATION */
   --tb-shadow-sm: 0 1px 3px rgba(0,0,0,.30), 0 1px 2px rgba(0,0,0,.22);
   --tb-shadow: 0 6px 24px rgba(0,0,0,.38), 0 2px 8px rgba(0,0,0,.24);
   --tb-shadow-md: 0 10px 36px rgba(0,0,0,.42), 0 4px 12px rgba(0,0,0,.28);
   --tb-shadow-lg: 0 20px 60px rgba(0,0,0,.5), 0 8px 20px rgba(0,0,0,.32);
   --tb-shadow-glow: 0 0 28px rgba(59,130,246,.28), 0 0 80px rgba(14,165,233,.14);
+
+  /* 9 · BLUR */
   --tb-glass-blur: 24px;
 }

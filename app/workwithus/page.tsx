@@ -1,14 +1,19 @@
 import jobs from "@/data/jobs.json";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
+import PageHeader from "@/components/effects/PageHeader";
 
 export const metadata = { title: "فرصت‌های شغلی | تکباکس" };
 
 export default function WorkWithUs(){
   return (
     <main className="max-w-5xl mx-auto px-4 py-14" dir="rtl">
-      <h1 className="text-3xl font-black mb-2">فرصت‌های شغلی تکباکس</h1>
-      <p className="text-sm text-muted-foreground mb-8">به تیم رسانه زیرساخت ایران بپیوندید – {jobs.length} موقعیت فعال</p>
+      <PageHeader
+        colorVar="--tb-workwithus"
+        title="فرصت‌های شغلی تکباکس"
+        titleClassName="text-[var(--tb-workwithus)]"
+        description={`به تیم رسانه زیرساخت ایران بپیوندید – ${jobs.length} موقعیت فعال`}
+      />
 
       <div className="grid gap-4">
         {jobs.map(j=>(

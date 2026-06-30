@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/Button";
+import PageHeader from "@/components/effects/PageHeader";
 export const metadata = { title: "ارتباط با ما | تکباکس" };
 export default function Contact() {
   return (
     <main className="max-w-3xl mx-auto px-5 py-16" dir="rtl">
-      <h1 className="text-3xl font-black mb-3">ارتباط با ما</h1>
-      <p className="text-muted-foreground mb-8">پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک</p>
+      <PageHeader
+        colorVar="--tb-contact"
+        title="ارتباط با ما"
+        titleClassName="text-[var(--tb-contact)]"
+        description="پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک"
+      />
       <div className="card p-6 space-y-4">
         <div className="grid md:grid-cols-2 gap-4">
           <input className="input" placeholder="نام" />

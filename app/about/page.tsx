@@ -1,6 +1,7 @@
 import users from "@/data/users.json";
 import { ButtonLink } from "@/components/ui/Button";
 import TeamChromaSection, { type TeamMember } from "@/features/home/components/TeamChromaSection";
+import PageHeader from "@/components/effects/PageHeader";
 
 export const metadata = { title: "درباره تکباکس" };
 
@@ -8,12 +9,12 @@ export default function About(){
   const team = (users as TeamMember[]).slice(0,6);
   return (
     <main className="max-w-6xl mx-auto px-4 py-14" dir="rtl">
-      <div className="text-center max-w-2xl mx-auto mb-10">
-        <h1 className="text-3xl md:text-4xl font-black">درباره تکباکس</h1>
-        <p className="text-muted-foreground mt-3 leading-8">
-          تکباکس – پاتوق بچه‌های فناوری اطلاعات ایران. مجله، اخبار فوری، رسانه ویدیویی، نقد تخصصی، ابزارهای مهندسی، دانلود، فروشگاه زیرساخت و انجمن – همه در یک Bento feed زنده، با CMS نقش‌محور.
-        </p>
-      </div>
+      <PageHeader
+        colorVar="--tb-about"
+        title="درباره تکباکس"
+        titleClassName="text-[var(--tb-about)]"
+        description="تکباکس – پاتوق بچه‌های فناوری اطلاعات ایران. مجله، اخبار فوری، رسانه ویدیویی، نقد تخصصی، ابزارهای مهندسی، دانلود، فروشگاه زیرساخت و انجمن – همه در یک Bento feed زنده، با CMS نقش‌محور."
+      />
 
       <div className="grid md:grid-cols-3 gap-5 mb-14">
         {[

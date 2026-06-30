@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import PixelBlastBackground from "@/components/effects/PixelBlastBackground";
+import HeroBackground from "@/components/effects/HeroBackground";
 import { moduleColors } from "@/config/module-colors";
 
 const items: { text: string; href: string; module: keyof typeof moduleColors }[] = [
@@ -29,7 +29,7 @@ export default function HeroSection() {
 
   return (
     <section className="relative flex min-h-[300px] flex-col items-center overflow-hidden px-4 pb-10 pt-14 text-center md:min-h-[360px] md:pt-20" dir="rtl">
-      <PixelBlastBackground variant="square" />
+      <HeroBackground variant="square" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--tb-background)]/30 via-transparent to-[var(--tb-background)]" aria-hidden="true" />
       <div className="relative z-10 flex flex-col items-center">
         <h1 className="text-5xl font-black tracking-tight text-[var(--tb-brand)] md:text-7xl">تکباکس</h1>

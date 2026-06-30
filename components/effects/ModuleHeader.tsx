@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import PixelBlastBackground from "@/components/effects/PixelBlastBackground";
+import HeroBackground from "@/components/effects/HeroBackground";
 import type { ModuleSlug } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ export default function ModuleHeader({ module, title, description, eyebrow, coun
   const colorVar = extractColorVar(meta.color);
   return (
     <header className={cn("relative mb-6 overflow-hidden rounded-[var(--tb-radius-2xl)] border border-[var(--tb-border)] bg-[var(--tb-card)]/70 p-5 md:p-6", className)}>
-      <PixelBlastBackground variant="square" colorVar={colorVar} />
+      <HeroBackground variant="square" colorVar={colorVar} />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-[var(--tb-card)]/85 via-[var(--tb-card)]/55 to-[var(--tb-card)]/20" aria-hidden="true" />
       <div className="relative z-10 flex flex-wrap items-end justify-between gap-3">
         <div>
