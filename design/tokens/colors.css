@@ -6,6 +6,50 @@
   --tb-primary: var(--tb-brand);
   --tb-primary-foreground: var(--tb-brand-foreground);
 
+  /* — Brand gradients — */
+  --gradient-brand-1: var(--tb-brand);
+  --gradient-brand-2: var(--tb-subnet);
+  --gradient-brand-3: var(--tb-vip);
+
+  /* — React Bits effects: PixelBlast (hero header dithered background) — */
+  --tb-pixelblast-color: #3b46f6;
+  --tb-pixelblast-pixel-size: 4;
+  --tb-pixelblast-pattern-scale: 2;
+  --tb-pixelblast-pattern-density: 1.1;
+  --tb-pixelblast-edge-fade: 0.32;
+  --tb-pixelblast-speed: 0.45;
+  --tb-pixelblast-ripple-speed: 0.4;
+  --tb-pixelblast-ripple-thickness: 0.12;
+  --tb-pixelblast-ripple-intensity: 1.4;
+  --tb-pixelblast-opacity: 0.55;
+
+  /* — React Bits effects: BorderGlow (feed/module cards) — */
+  --tb-borderglow-bg: var(--tb-card);
+  --tb-borderglow-glow-hsl: 222 89% 62%;   /* glow color in "H S% L%" for box-shadow layers */
+  --tb-borderglow-radius: 24px;
+  --tb-borderglow-glow-radius: 34px;
+  --tb-borderglow-glow-intensity: 0.55;
+  --tb-borderglow-cone-spread: 25;
+  --tb-borderglow-edge-sensitivity: 32;
+  --tb-borderglow-fill-opacity: 0.45;
+  --tb-borderglow-border: color-mix(in oklch, var(--tb-border) 80%, transparent);
+
+  /* — React Bits effects: Dock (vertical sidebar dock) — */
+  --tb-dock-bg: var(--tb-surface-1);
+  --tb-dock-border: var(--tb-border);
+  --tb-dock-shadow: var(--tb-shadow);
+  --tb-dock-label-bg: var(--tb-popover);
+  --tb-dock-label-fg: var(--tb-popover-foreground);
+  --tb-dock-label-border: var(--tb-border);
+
+  /* — React Bits effects: Shuffle (animated title) — */
+  --tb-shuffle-color-from: var(--tb-muted-foreground);
+  --tb-shuffle-color-to: var(--tb-brand);
+
+  /* — React Bits effects: ChromaGrid (team cards) — */
+  --tb-chroma-spotlight: color-mix(in oklch, white 30%, transparent);
+  --tb-chroma-card-radius: var(--tb-radius-xl);
+
   /* — Overlay / glass tokens — */
   --tb-overlay-backdrop: color-mix(in oklch, black 48%, transparent);
   --tb-image-overlay: color-mix(in oklch, black 58%, transparent);
@@ -144,6 +188,16 @@
   --tb-brand-dim: rgba(96,165,250,.18);
   --tb-primary: var(--tb-brand);
   --tb-primary-foreground: var(--tb-brand-foreground);
+  --gradient-brand-1: var(--tb-brand);
+  --gradient-brand-2: var(--tb-subnet);
+  --gradient-brand-3: var(--tb-vip);
+
+  /* React Bits effects – dark tuned */
+  --tb-pixelblast-color: #60a5fa;
+  --tb-pixelblast-opacity: 0.6;
+  --tb-borderglow-glow-hsl: 213 94% 68%;
+  --tb-chroma-spotlight: color-mix(in oklch, white 22%, transparent);
+
   --tb-overlay-backdrop: rgba(0,0,0,.55);
   --tb-image-overlay: rgba(0,0,0,.60);
   --tb-scrim-soft: rgba(0,0,0,.38);

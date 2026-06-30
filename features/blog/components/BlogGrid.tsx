@@ -2,23 +2,18 @@
 import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
+import ModuleHeader from "@/components/effects/ModuleHeader";
 
 export default function BlogGrid(){
   const items = getModuleItems("blog");
   return (
     <main className="mx-auto max-w-7xl px-4 md:px-8 py-14" dir="rtl">
-      <div className="flex items-end justify-between mb-8">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-black text-[var(--tb-blog)]">مجله تکباکس</h1>
-          <p className="text-sm text-muted-foreground mt-2">مقالات تخصصی زیرساخت • {items.length.toLocaleString("fa-IR")} مطلب</p>
-        </div>
-      </div>
+      <ModuleHeader module="blog" title="مجله تکباکس" description={`مقالات تخصصی زیرساخت • ${items.length.toLocaleString("fa-IR")} مطلب`} />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(p=>(
           <article key={p.slug} className="group flex flex-col overflow-hidden rounded-[var(--tb-radius-2xl)] border border-[var(--tb-border)] bg-[var(--tb-card)] shadow-[var(--tb-shadow)] transition-all duration-[var(--tb-duration-normal)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-glow)]">
             <Link href={`/blog/${p.slug}`} className="block relative aspect-square overflow-hidden bg-muted">
               <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-[var(--tb-duration-slower)] group-hover:scale-105" />
-              {p.category && <span className="absolute top-3 right-3 badge">{p.category}</span>}
             </Link>
             <div className="p-4 flex flex-col flex-1">
               <h3 className="font-extrabold text-[17px] leading-7 line-clamp-2 min-h-[56px]">

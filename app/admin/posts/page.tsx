@@ -156,7 +156,7 @@ function AdminPostsInner() {
                     <div className="font-semibold leading-6">{it.title}</div>
                     <div className="mt-1 font-mono text-[11px] text-[var(--tb-muted-foreground)]" dir="ltr">/{module}/{it.slug}</div>
                     <div className="mt-2 flex flex-wrap gap-1 lg:hidden">
-                      {it.tags.slice(0, 3).map(t => <Badge key={t} variant={module} className="text-[10px]">{t}</Badge>)}
+                      {it.tags.slice(0, 3).map(t => <span key={t} className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{t}</span>)}
                     </div>
                   </td>
                   <td className="hidden p-3 align-top md:table-cell">

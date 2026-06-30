@@ -2,21 +2,15 @@
 import Image from "next/image";
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
+import ModuleHeader from "@/components/effects/ModuleHeader";
 
 function stars(n=4.5){ const f=Math.floor(n); return "★".repeat(f)+"☆".repeat(5-f); }
 
 export default function ReviewGrid(){
   const items=getModuleItems("review");
-  const meta=moduleMeta.review;
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <h1 className={`text-3xl font-black ${meta.color}`}>نقد و بررسی تخصصی</h1>
-          <p className="text-sm text-muted-foreground mt-1">تست لَب • بنچمارک واقعی • عکس مربعی</p>
-        </div>
-        <div className="text-[11px] text-muted-foreground">{items.length} بررسی</div>
-      </div>
+      <ModuleHeader module="review" title="نقد و بررسی تخصصی" description="تست لَب • بنچمارک واقعی • عکس مربعی" count={`${items.length.toLocaleString("fa-IR")} بررسی`} />
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {items.map((r,i)=>{
@@ -26,7 +20,7 @@ export default function ReviewGrid(){
           <article key={r.slug} className="card overflow-hidden group flex flex-col">
             <Link href={`/review/${r.slug}`} className="block relative aspect-square bg-muted overflow-hidden">
               <Image src={r.image || "/assets/blog-1.jpg"} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-[var(--tb-duration-slower)] group-hover:scale-105" alt={r.title}/>
-              <span className="absolute top-3 right-3 badge !bg-[var(--tb-image-overlay)] !text-white backdrop-blur-[var(--tb-blur-sm)] border-white/20">{r.category}</span>
+              <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 text-[10px] text-white backdrop-blur-[var(--tb-blur-sm)]">{r.category}</span>
               <span className="absolute bottom-3 left-3 rounded-[var(--tb-radius-full)] bg-[var(--tb-image-overlay)] px-2 py-1 text-[11px] text-[var(--tb-warning)] backdrop-blur-[var(--tb-blur-sm)]">{stars(rating)} {rating.toFixed(1)}</span>
             </Link>
             <div className="p-4 flex flex-col flex-1">

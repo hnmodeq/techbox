@@ -130,7 +130,7 @@ function ProductFeedCard({item}:{item:ContentItem}){
     <Link href={`/${item.module}/${item.slug}`} className="block overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-card)]/70 transition-colors hover:border-[color-mix(in_oklch,var(--tb-shop)_40%,transparent)] hover:bg-[var(--tb-card)]">
       <div className="relative aspect-[4/3] overflow-hidden bg-[var(--tb-muted)]">
         <SafeImage src={item.image} alt={item.title} className="object-cover transition-transform duration-[var(--tb-duration-normal)] hover:scale-105" sizes="(min-width:1024px) 180px, 50vw" />
-        <span className="absolute left-2 top-2 rounded-[var(--tb-radius-full)] bg-[color-mix(in_oklch,var(--tb-shop)_15%,transparent)] px-2 py-0.5 text-[9px] text-[var(--tb-shop)]">موجود</span>
+        <span className="absolute left-2 top-2 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-0.5 text-[9px] text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
       </div>
       <div className="p-2.5">
         <div className="line-clamp-2 min-h-[34px] text-[11.5px] font-bold leading-5">{item.title}</div>
@@ -147,7 +147,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
         <Link href={`/${item.module}/${item.slug}`} className="line-clamp-1 text-[12px] font-bold hover:text-[var(--tb-download)]">{item.title}</Link>
         <div className="mt-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{item.date_fa} • {item.category}</div>
       </div>
-      <ButtonLink href={`/${item.module}/${item.slug}`} size="xs" className="whitespace-nowrap px-3 py-1.5 text-[10px]">دانلود</ButtonLink>
+      <ButtonLink href={`/${item.module}/${item.slug}`} size="xs" className="whitespace-nowrap px-3 py-1.5 text-[10px]">انتخاب نسخه</ButtonLink>
     </div>
   );
 }

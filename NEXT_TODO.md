@@ -203,3 +203,23 @@
 - [x] Validation: `npx tsc --noEmit --pretty false` passes.
 - [x] Validation: `npx eslint .` passes cleanly.
 - [ ] Optional next: final full audit/checklist or local apply instructions.
+
+## React Bits effects + requested UX logic batch
+- [x] Added `ogl` and `react-icons` dependencies to `package.json`.
+- [x] Created reusable effects: `Aurora`, `GradientText`, `LogoLoop`, `BorderGlow`.
+- [x] Added `lib/get-module-gradient.ts` helper returning exactly 3 gradient colors.
+- [x] Added brand gradient CSS variables in `design/tokens/colors.css`.
+- [x] Homepage hero now uses Aurora background and GradientText title.
+- [x] Homepage now has a technology LogoLoop section above the footer.
+- [x] Module listing headers now use subtle Aurora synced with module colors.
+- [x] Home module feed cards are wrapped with BorderGlow synced to module colors.
+- [x] Ticker background removed while preserving layout/spacing.
+- [x] Shop search moved to top with a filter modal trigger; filter state still works.
+- [x] Download main page no longer shows a direct receive/download button; it links to version selection/detail page.
+- [x] Download detail/version page keeps OS/version-specific download buttons.
+- [x] Admin sidebar item added for admin/super_admin users only.
+- [x] Admin edit auth fallback fixed so local demo admins can edit without being forced back to login when server cookie is absent.
+- [x] Magazine/blog image category/source tag removed from image.
+- [x] Tag styling cleaned to neutral styling in touched high-impact tag areas.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.

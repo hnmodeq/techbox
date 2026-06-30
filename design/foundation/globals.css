@@ -103,3 +103,30 @@ p,li{
     transform:none;
   }
 }
+
+@keyframes tb-logo-loop-left{
+  from{ transform:translate3d(0,0,0); }
+  to{ transform:translate3d(calc(-33.333% - var(--tb-logo-gap) / 3),0,0); }
+}
+
+@keyframes tb-logo-loop-right{
+  from{ transform:translate3d(calc(-33.333% - var(--tb-logo-gap) / 3),0,0); }
+  to{ transform:translate3d(0,0,0); }
+}
+
+.tb-logo-loop-track{
+  animation-duration:var(--tb-logo-duration);
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+  will-change:transform;
+}
+
+.tb-logo-loop-left{ animation-name:tb-logo-loop-left; }
+.tb-logo-loop-right{ animation-name:tb-logo-loop-right; }
+
+@media (prefers-reduced-motion: reduce){
+  .tb-logo-loop-track{
+    animation:none;
+    transform:none;
+  }
+}

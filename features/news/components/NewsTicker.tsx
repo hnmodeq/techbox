@@ -27,7 +27,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
 
   return (
     <section className={`w-full overflow-hidden ${className}`} aria-label="اخبار و مجله">
-      <div dir="rtl" className="ticker-wrapper relative w-full overflow-hidden bg-[var(--tb-surface-1)]/70 backdrop-blur-[var(--tb-blur-sm)]">
+      <div dir="rtl" className="ticker-wrapper relative w-full overflow-hidden">
         <div className="ticker-track flex w-max min-w-full items-center gap-8 py-2.5">
           {loopItems.map((item, index) => {
             const itemModule = getTickerModule(item);
@@ -40,7 +40,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
                 className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-sm text-[var(--tb-muted-foreground)] transition-colors duration-[var(--tb-duration-fast)] ${hoverTone}`}
               >
                 <span className={`h-1.5 w-1.5 rounded-[var(--tb-radius-full)] bg-current opacity-70 transition-transform group-hover:scale-125 ${tone}`} />
-                <span className={`rounded-[var(--tb-radius-full)] bg-[color-mix(in_oklch,currentColor_10%,transparent)] px-2 py-0.5 text-[11px] ${tone}`}>
+                <span className={`rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] px-2 py-0.5 text-[11px] text-[var(--tb-muted-foreground)]`}>
                   {itemModule === "blog" ? "مجله" : "خبر"}
                 </span>
                 <span>{item.title}</span>

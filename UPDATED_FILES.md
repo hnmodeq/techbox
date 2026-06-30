@@ -258,3 +258,26 @@ Copy these files into your real project. Do **not** replace your `public/` folde
 - Confirmed remaining raw buttons are internal UI/behavior primitives or the intentionally preserved draggable mobile sidebar FAB.
 - Confirmed all data JSON files parse and summarized current data counts.
 - Updated final status/checklist docs.
+
+## React Bits effects + requested UX logic batch
+- Added dependencies in `package.json`: `ogl`, `react-icons`.
+- Added `components/effects/Aurora.tsx` using OGL/WebGL as a client-safe, pointer-events-none reusable background effect.
+- Added `components/effects/GradientText.tsx` for reusable animated gradient text powered by existing Framer Motion.
+- Added `components/effects/LogoLoop.tsx` for accessible, reduced-motion-aware logo loops supporting React icons and image logos.
+- Added `components/effects/BorderGlow.tsx` for subtle pointer-edge glow effects.
+- Added `components/effects/ModuleHeader.tsx` for module headers with Aurora backgrounds synced to module colors.
+- Added `lib/get-module-gradient.ts` to derive exactly 3 gradient colors from module color tokens/classes.
+- Added brand gradient CSS variables to `design/tokens/colors.css` and LogoLoop animation CSS to `design/foundation/globals.css`.
+- Updated `features/home/components/HeroSection.tsx` to use Aurora behind the hero and GradientText for the site title.
+- Added `features/home/components/TechLogoLoopSection.tsx` and rendered it on `app/page.tsx` above the footer.
+- Updated module listing components to use Aurora module headers: blog, news, media, shop, download, forum, review, tools.
+- Updated `features/home/components/HomeModulesSection.tsx` to wrap module feed cards with `BorderGlow` using module gradients.
+- Updated `features/news/components/NewsTicker.tsx` to remove ticker background and neutralize ticker tag styling.
+- Updated `features/shop/components/ShopGrid.tsx` so search/filter controls are at the top and filters open in a modal.
+- Updated `features/download/components/DownloadTable.tsx` so the main download page navigates to version selection instead of showing a direct receive/download button.
+- Kept OS/version-specific download buttons in `features/download/components/DownloadDetail.tsx`.
+- Updated `components/layout/SidebarContent.tsx` with an admin/super-admin-only sidebar item linking to `/admin`.
+- Updated `app/admin/posts/new/page.tsx` so local demo admin users can edit even when the server cookie session is absent, while keeping API/server checks intact.
+- Removed the magazine/blog category tag displayed on the image while keeping metadata elsewhere.
+- Neutralized tag styles in touched high-impact tag areas so tags do not use colored backgrounds.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.

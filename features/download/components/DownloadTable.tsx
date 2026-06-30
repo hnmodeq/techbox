@@ -1,14 +1,13 @@
 "use client";
-import { getModuleItems, moduleMeta } from "@/lib/content";
+import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { useMemo, useState } from "react";
+import ModuleHeader from "@/components/effects/ModuleHeader";
 
 export default function DownloadTable(){
   const items = getModuleItems("download");
-  const meta = moduleMeta.download;
-
   const brands = Array.from(new Set(items.flatMap(i=> i.tags.filter(t=>["dell","hp","qnap","ubuntu","mikrotik"].includes(t.toLowerCase())))));
   const types = Array.from(new Set(items.map(i=>i.category).filter(Boolean))) as string[];
 
@@ -29,8 +28,7 @@ export default function DownloadTable(){
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <h1 className={`text-3xl font-black mb-2 ${meta.color}`}>مرکز دانلود تکباکس</h1>
-      <p className="text-sm text-muted-foreground mb-5">ISO • Firmware • Driver – لینک مستقیم داخل ایران</p>
+      <ModuleHeader module="download" title="مرکز دانلود تکباکس" description="ISO • Firmware • Driver – لینک مستقیم داخل ایران" count={`${filtered.length.toLocaleString("fa-IR")} فایل`} />
 
       {/* filters */}
       <div className="card p-4 mb-6 grid md:grid-cols-4 gap-3 text-sm">
@@ -64,7 +62,7 @@ export default function DownloadTable(){
               <th className="text-right p-3">نام فایل</th>
               <th className="p-3 hidden sm:table-cell text-right">برچسب‌ها</th>
               <th className="p-3 hidden md:table-cell text-right">تاریخ</th>
-              <th className="p-3 text-left">دریافت</th>
+              <th className="p-3 text-left">جزئیات</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +74,7 @@ export default function DownloadTable(){
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {f.tags.slice(0,5).map(t=>(
                       <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85">
-                        <Badge variant="download" className="text-[10px]">{t.toUpperCase()}</Badge>
+                        <span className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{t.toUpperCase()}</span>
                       </Link>
                     ))}
                   </div>
@@ -84,7 +82,7 @@ export default function DownloadTable(){
                 <td className="p-3 hidden sm:table-cell text-[11px] text-muted-foreground">{f.category}</td>
                 <td className="p-3 hidden md:table-cell text-[11px] text-muted-foreground">{f.date_fa}</td>
                 <td className="p-3 text-left align-top">
-                  <ButtonLink href={`/download/${f.slug}`} size="xs" className="whitespace-nowrap text-[11px]">⬇ دریافت</ButtonLink>
+                  <ButtonLink href={`/download/${f.slug}`} variant="ghost" size="xs" className="whitespace-nowrap text-[11px]">انتخاب نسخه</ButtonLink>
                   <div className="text-[10px] text-muted-foreground mt-1">{f.likes.toLocaleString("fa-IR")} بار</div>
                 </td>
               </tr>
