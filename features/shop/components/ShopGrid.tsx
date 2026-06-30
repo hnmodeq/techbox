@@ -56,16 +56,16 @@ export default function ShopGrid(){
             <div key={p.slug} className="card overflow-hidden group flex flex-col rounded-[24px]">
               <Link href={`/shop/${p.slug}`} className="block relative aspect-[4/3] bg-muted overflow-hidden">
                 <img src={p.image||""} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-lime-500/15 text-lime-300 border border-lime-500/20">موجود</span>
-                {pr.old && <span className="absolute top-3 right-3 text-[10px] bg-rose-500 text-white px-2 py-1 rounded-full">تخفیف</span>}
+                <span className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-shop)_15%,transparent)] text-[var(--tb-shop)] border border-[color-mix(in_oklch,var(--tb-shop)_20%,transparent)]">موجود</span>
+                {pr.old && <span className="absolute top-3 right-3 text-[10px] bg-[var(--tb-danger)] text-white px-2 py-1 rounded-full">تخفیف</span>}
               </Link>
               <div className="p-4 flex-1 flex flex-col">
                 <div className="text-[11px] text-muted-foreground">{p.category}</div>
-                <Link href={`/shop/${p.slug}`} className="font-extrabold text-[14px] leading-6 mt-1 hover:text-lime-400 line-clamp-2 min-h-[48px]">{p.title}</Link>
+                <Link href={`/shop/${p.slug}`} className="font-extrabold text-[14px] leading-6 mt-1 hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</Link>
                 <p className="text-[12px] text-muted-foreground line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
                 <div className="mt-3">
                   {pr.old && <div className="text-[11px] line-through text-muted-foreground">{pr.old} تومان</div>}
-                  <div className="text-[18px] font-black text-lime-400">{pr.price} <span className="text-[11px] text-muted-foreground font-normal">تومان</span></div>
+                  <div className="text-[18px] font-black text-[var(--tb-shop)]">{pr.price} <span className="text-[11px] text-muted-foreground font-normal">تومان</span></div>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button onClick={()=>add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1)} className="btn btn-primary flex-1 text-xs">افزودن به سبد</button>

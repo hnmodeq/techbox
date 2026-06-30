@@ -1,120 +1,84 @@
-// Prisma 6 – TechBox CMS
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
-enum Role {
-  super_admin
-  editor
-  author
-  user
-}
-
-enum Module {
-  blog
-  news
-  media
-  review
-  tools
-  download
-  shop
-  forum
+  url      = "file:./dev.db"
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  username  String   @unique
-  email     String   @unique
-  password  String   // bcrypt
-  role      Role     @default(user)
-  avatar    String?
-  modules   String   @default("[]") // JSON string array of Module
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id       String  @id @default(cuid())
+  name     String
+  username String  @unique
+  email    String
+  role     String
+  modules  String  @default("[]")
+  avatar   String?
+  password String
 
-  posts     Post[]
-  comments  Comment[]
-  likes     Like[]
-  votes     CommentVote[]
+  posts    Post[]
+  comments Comment[]
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  slug      String
-  module    Module
-  title     String
-  excerpt   String
-  content   String   @default("")
-  image     String?
-  tags      String   @default("[]") // JSON
-  category  String?
-  authorId  String?
-  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorName String
-  date      DateTime @default(now())
-  dateFa    String
-  views     Int      @default(0)
-  likes     Int      @default(0)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  slug       String
+  module     String
+  title      String
+  excerpt    String   @default("")
+  content    String   @default("")
+  image      String?
+  tags       String   @default("[]")
+  category   String?
+  authorId   String?
+  authorName String   @default("تحریریه")
+  date       DateTime @default(now())
+  dateFa     String   @default("")
+  likes      Int      @default(0)
+  views      Int      @default(0)
+  published  Boolean  @default(true)
 
-  comments  Comment[]
+  author   User?     @relation(fields: [authorId], references: [id])
+  comments Comment[]
 
-  @@unique([module, slug])
-  @@index([module, date])
+  @@unique([module, slug], name: "module_slug")
 }
 
 model Comment {
-  id          String   @id @default(cuid())
-  postId      String
-  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parentId    String?
-  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies     Comment[] @relation("CommentReplies")
+  id         String   @id @default(cuid())
+  postId     String
+  parentId   String?
+  authorId   String?
+  authorName String   @default("مهمان")
+  text       String
+  likes      Int      @default(0)
+  dislikes   Int      @default(0)
+  createdAt  DateTime @default(now())
 
-  authorId    String?
-  author      User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  authorName  String
-  text        String
-  likes       Int      @default(0)
-  dislikes    Int      @default(0)
-  createdAt   DateTime @default(now())
-
-  votes       CommentVote[]
-
-  @@index([postId, createdAt])
-}
-
-model Like {
-  id        String   @id @default(cuid())
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  fingerprint String // anon client id
-  module    Module
-  slug      String
-  createdAt DateTime @default(now())
-
-  @@unique([fingerprint, module, slug])
-  @@index([module, slug])
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author  User?     @relation(fields: [authorId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+  votes   CommentVote[]
 }
 
 model CommentVote {
-  id        String   @id @default(cuid())
-  commentId String
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id          String  @id @default(cuid())
   fingerprint String
-  vote      Int      // 1 up, -1 down
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  commentId   String
+  vote        Int
 
-  @@unique([fingerprint, commentId])
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([fingerprint, commentId], name: "fingerprint_commentId")
+}
+
+model Like {
+  id          String @id @default(cuid())
+  fingerprint String
+  module      String
+  slug        String
+
+  @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
 }

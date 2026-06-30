@@ -52,7 +52,7 @@ export function ContentFeedList({ items, variant="compact" }: { items: ContentIt
 
 function VideoFeedCard({item}:{item:ContentItem}){
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="block rounded-xl overflow-hidden border border-border bg-card/70 hover:border-amber-300/40 transition-colors">
+    <Link href={`/${item.module}/${item.slug}`} className="block rounded-xl overflow-hidden border border-border bg-card/70 hover:border-[color-mix(in_oklch,var(--tb-media)_40%,transparent)] transition-colors">
       <div className="relative aspect-video bg-black">
         <img src={item.image||""} className="w-full h-full object-cover" alt="" />
         <span className="absolute inset-0 flex items-center justify-center"><span className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center text-white">▶</span></span>
@@ -75,7 +75,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
         <div className="text-[10px] mt-1 flex items-center gap-2 flex-wrap" style={{color:"var(--muted-foreground)"}}>
           <span>{item.author.name}</span>
           <span>• {answers} پاسخ</span>
-          <span className={`px-1.5 py-0.5 rounded text-[9px] ${solved ? "bg-emerald-500/15" : "bg-amber-500/15"}`} style={{color: solved ? "#6ee7b7" : "#fcd34d"}}>{solved ? "حل‌شده" : "باز"}</span>
+          <span className={`px-1.5 py-0.5 rounded text-[9px] ${solved ? "bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] text-[var(--tb-success)]" : "bg-[color-mix(in_oklch,var(--tb-warning)_15%,transparent)] text-[var(--tb-warning)]"}`}>{solved ? "حل‌شده" : "باز"}</span>
         </div>
       </div>
     </Link>
@@ -84,14 +84,14 @@ function ForumFeedCard({item}:{item:ContentItem}){
 function ProductFeedCard({item}:{item:ContentItem}){
   // SQUARE product card for home feed – per request
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="block rounded-2xl border border-border bg-card/70 overflow-hidden hover:border-lime-400/40 transition-colors">
+    <Link href={`/${item.module}/${item.slug}`} className="block rounded-2xl border border-border bg-card/70 overflow-hidden hover:border-[color-mix(in_oklch,var(--tb-shop)_40%,transparent)] transition-colors">
       <div className="aspect-square bg-muted relative overflow-hidden">
         <img src={item.image||""} className="w-full h-full object-cover" alt="" />
-        <span className="absolute top-2 left-2 text-[9px] px-2 py-0.5 rounded-full" style={{background:"rgba(163,230,53,.15)", color:"#bef264"}}>موجود</span>
+        <span className="absolute top-2 left-2 text-[9px] px-2 py-0.5 rounded-full bg-[color-mix(in_oklch,var(--tb-shop)_15%,transparent)] text-[var(--tb-shop)]">موجود</span>
       </div>
       <div className="p-2.5">
         <div className="text-[12px] font-bold line-clamp-2 min-h-[36px]">{item.title}</div>
-        <div className="text-[13px] font-black mt-1" style={{color:"#a3e635"}}>۴۸,۹۰۰,۰۰۰ <span className="text-[10px]" style={{color:"var(--muted-foreground)"}}>تومان</span></div>
+        <div className="text-[13px] font-black mt-1 text-[var(--tb-shop)]">۴۸,۹۰۰,۰۰۰ <span className="text-[10px] text-[var(--tb-muted-foreground)]">تومان</span></div>
       </div>
     </Link>
   );
@@ -100,7 +100,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
   return (
     <div className="flex items-center gap-2 p-2.5 rounded-xl border border-border bg-card/60">
       <div className="flex-1 min-w-0">
-        <Link href={`/${item.module}/${item.slug}`} className="text-[12px] font-bold line-clamp-1 hover:text-pink-400">{item.title}</Link>
+        <Link href={`/${item.module}/${item.slug}`} className="text-[12px] font-bold line-clamp-1 hover:text-[var(--tb-download)]">{item.title}</Link>
         <div className="text-[10px] mt-0.5" style={{color:"var(--muted-foreground)"}}>{item.date_fa} • {item.category}</div>
       </div>
       <Link href={`/${item.module}/${item.slug}`} className="btn btn-primary text-[10px] px-3 py-1.5 whitespace-nowrap">دانلود</Link>
@@ -109,7 +109,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
 }
 function ReviewFeedCard({item}:{item:ContentItem}){
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="block rounded-xl border border-border bg-card/70 overflow-hidden hover:border-sky-400/30">
+    <Link href={`/${item.module}/${item.slug}`} className="block rounded-xl border border-border bg-card/70 overflow-hidden hover:border-[color-mix(in_oklch,var(--tb-review)_30%,transparent)]">
       {item.image && <img src={item.image} className="w-full aspect-square object-cover" alt="" />}
       <div className="p-2.5 space-y-2">
         <div className="text-[12px] font-bold line-clamp-2">{item.title}</div>

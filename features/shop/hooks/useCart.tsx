@@ -64,12 +64,12 @@ function CartDrawer(){
               <img src={it.image} alt="" className="w-16 h-16 object-cover rounded-lg bg-muted" />
               <div className="flex-1 min-w-0">
                 <div className="text-[13px] font-bold leading-5 line-clamp-2">{it.title}</div>
-                <div className="text-[11px] text-lime-400 mt-1">{it.price} تومان</div>
+                <div className="text-[11px] text-[var(--tb-shop)] mt-1">{it.price} تومان</div>
                 <div className="flex items-center gap-2 mt-2">
                   <button onClick={()=>setQty(it.slug, it.qty-1)} className="w-6 h-6 rounded border border-border text-xs">−</button>
                   <span className="text-xs w-6 text-center">{it.qty.toLocaleString("fa-IR")}</span>
                   <button onClick={()=>setQty(it.slug, it.qty+1)} className="w-6 h-6 rounded border border-border text-xs">+</button>
-                  <button onClick={()=>remove(it.slug)} className="ms-auto text-[11px] text-rose-400 hover:underline">حذف</button>
+                  <button onClick={()=>remove(it.slug)} className="ms-auto text-[11px] text-[var(--tb-danger)] hover:underline">حذف</button>
                 </div>
               </div>
             </div>
@@ -98,7 +98,7 @@ export function CartIconButton(){
     <button onClick={()=>setOpen(true)} className="relative inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
       <span>🛒</span>
       <span className="hidden sm:inline">سبد</span>
-      {count>0 && <span className="absolute -top-1 -left-1 bg-lime-500 text-black text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 font-bold">{count.toLocaleString("fa-IR")}</span>}
+      {count>0 && <span className="absolute -top-1 -left-1 bg-[var(--tb-shop)] text-black text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 font-bold">{count.toLocaleString("fa-IR")}</span>}
     </button>
   );
 }

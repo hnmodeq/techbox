@@ -42,7 +42,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
 
   return (
     <button onClick={toggle} disabled={busy} className={`btn ${liked ? "btn-primary" : "btn-ghost"} text-[13px] gap-2 disabled:opacity-60`} aria-pressed={liked}>
-      <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-rose-400" : ""} aria-hidden />
+      <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-[var(--tb-danger)]" : ""} aria-hidden />
       <span className="font-black" style={{fontVariantNumeric:"tabular-nums"}}>{count.toLocaleString("fa-IR")}</span>
       <span className="hidden sm:inline">پسندیدم</span>
       <Eye size={16} className="opacity-60 hidden md:inline" />
@@ -82,8 +82,8 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
 
   return (
     <div className="flex items-center gap-3 text-xs" style={{color:"var(--muted-foreground)"}}>
-      <button onClick={()=>vote("up")} className={v==="up" ? "text-emerald-400 font-bold" : "hover:text-foreground"}>▲ {l.toLocaleString("fa-IR")}</button>
-      <button onClick={()=>vote("down")} className={v==="down" ? "text-rose-400 font-bold" : "hover:text-foreground"}>▼ {d.toLocaleString("fa-IR")}</button>
+      <button onClick={()=>vote("up")} className={v==="up" ? "text-[var(--tb-success)] font-bold" : "hover:text-foreground"}>▲ {l.toLocaleString("fa-IR")}</button>
+      <button onClick={()=>vote("down")} className={v==="down" ? "text-[var(--tb-danger)] font-bold" : "hover:text-foreground"}>▼ {d.toLocaleString("fa-IR")}</button>
     </div>
   );
 }

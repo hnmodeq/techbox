@@ -34,7 +34,7 @@ function AdminPostsInner() {
   }
 
   if (!canEdit(user, module)) {
-    return <main className="p-10 text-center" dir="rtl"><p className="text-rose-400">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="text-xs mt-3">دسترسی شما: {user.modules.join(", ")}</p></main>;
+    return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--tb-danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="text-xs mt-3">دسترسی شما: {user.modules.join(", ")}</p></main>;
   }
 
   return (

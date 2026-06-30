@@ -4,21 +4,53 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Moon, Sun, Bell, Search, Clock, ShoppingCart } from "lucide-react";
-import {
-  ICON_STROKE,
-  navItems,
-  accountItem,
-  themeIconClass,
-  linkBase,
-  linkInactive,
-  isActive,
-} from "@/config/sidebar.config";
-import { SidebarContentProps } from "@/types/sidebar.types";
+import { createPortal } from "react-dom";
+import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
+import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
 import SidebarTooltip from "@/components/layout/SidebarTooltip";
-import { useEffect, useState, useMemo } from "react";
-import { getCurrentUserClient, logout, type AppUser } from "@/lib/auth";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { getCurrentUserClient, type AppUser } from "@/lib/auth";
 import { useCart } from "@/providers/cart.provider";
 import { getAllAcross } from "@/lib/content";
+import { zIndex } from "@/design";
+
+type AnchorRect = { top: number; right: number };
+
+function TehranDateTime({ now, expanded }: { now: Date | null; expanded: boolean }) {
+  const label = now
+    ? `${now.toLocaleDateString("fa-IR", { timeZone: "Asia/Tehran" })} – ${now.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Tehran" })} تهران`
+    : "ساعت تهران";
+
+  return (
+    <div className="h-[58px] shrink-0">
+      {!expanded ? (
+        <SidebarTooltip enabled label={label} tooltipClassName="text-[var(--tb-muted-foreground)]">
+          <span className="icon-rail-btn" aria-label="ساعت تهران">
+            <Clock size={18} />
+          </span>
+        </SidebarTooltip>
+      ) : (
+        <div className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-muted)] px-3 py-2 text-center shadow-[var(--tb-shadow-sm)]">
+          <div className="text-[10px] text-[var(--tb-muted-foreground)]">
+            {now?.toLocaleDateString("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }) || "تهران"}
+          </div>
+          <div className="text-[11px] font-bold tabular-nums" dir="ltr">
+            {now?.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Tehran" }) || "--:--:--"}
+          </div>
+          <div className="text-[10px] text-[var(--tb-muted-foreground)]">
+            {now?.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Tehran" }) || "—"}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function getTooltipColorClass(item: NavItem, active: boolean) {
+  return active
+    ? item.iconActiveClassName || item.tooltipClassName || "text-[var(--tb-brand)]"
+    : item.tooltipClassName || item.iconActiveClassName || "text-[var(--tb-muted-foreground)]";
+}
 
 export default function SidebarContent({
   expanded,
@@ -29,43 +61,92 @@ export default function SidebarContent({
 }: SidebarContentProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const notifButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [notifPos, setNotifPos] = useState<AnchorRect | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<AppUser | null>(null);
   const [q, setQ] = useState("");
   const [now, setNow] = useState<Date | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const { count: cartCount, setOpen: setCartOpen } = useCart();
 
-  useEffect(()=>{ setUser(getCurrentUserClient()); setNow(new Date()); const t=setInterval(()=>setNow(new Date()), 30000); return ()=>clearInterval(t); },[]);
-  useEffect(()=>{ const h=()=>setUser(getCurrentUserClient()); window.addEventListener("storage",h); return ()=>window.removeEventListener("storage",h);},[]);
+  useEffect(() => {
+    setMounted(true);
+    setUser(getCurrentUserClient());
+    setNow(new Date());
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
-  const notifications = useMemo(()=> getAllAcross().slice(0,6), []);
-  const cart = (()=>{ try{ const { useCart:uc } = require("@/providers/cart.provider"); return null;}catch{return null} })();
-  // useCart must be inside a client that is under CartProvider – Sidebar is under CartProvider via LayoutShell – safe:
-  let cartCount = 0;
-  try { /* eslint-disable-next-line react-hooks/rules-of-hooks */ const { count } = require("@/providers/cart.provider").useCart(); cartCount = count; } catch {}
-  // fallback – read directly:
-  if(typeof window !== "undefined" && cartCount===0){
-    try{ const raw = localStorage.getItem("tb_cart_v2"); if(raw){ const arr = JSON.parse(raw); cartCount = arr.reduce((s:number,i:any)=>s+(i.qty||0),0);} }catch{}
-  }
+  useEffect(() => {
+    const h = () => setUser(getCurrentUserClient());
+    window.addEventListener("storage", h);
+    return () => window.removeEventListener("storage", h);
+  }, []);
 
-  const doSearch = (e?: React.FormEvent)=>{ e?.preventDefault(); if(q.trim()) { router.push(`/search?q=${encodeURIComponent(q.trim())}`); onLinkClick?.(); } };
+  useEffect(() => {
+    if (!notifOpen) return;
+    const update = () => {
+      const rect = notifButtonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const panelW = 320;
+      const safe = 12;
+      const right = Math.max(safe, window.innerWidth - rect.right);
+      const top = Math.min(window.innerHeight - 80, rect.bottom + 8);
+      setNotifPos({ right: Math.min(right, window.innerWidth - panelW - safe), top });
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [notifOpen]);
 
-  const iconRail = [
-    { label: "جستجو", icon: Search, onClick: ()=> { if(!expanded){ const v = prompt("جستجو در تکباکس:"); if(v) router.push(`/search?q=${encodeURIComponent(v)}`);} } },
-    { label: "مشاوره VIP", href: "/consultation", icon: null, emoji: "⚡" },
-    { label: "سبد خرید", onClick: ()=> { try{ const ev = new CustomEvent("tb_cart_open"); window.dispatchEvent(ev); }catch{} /* CartIconButton handles */ }, badge: cartCount>0 ? String(cartCount) : "", icon: ShoppingCart },
-    { label: now ? new Intl.DateTimeFormat("fa-IR",{dateStyle:"full", timeStyle:"short", timeZone:"Asia/Tehran"}).format(now) : "ساعت تهران", icon: Clock },
-  ];
+  const notifications = useMemo(() => getAllAcross().slice(0, 8), []);
+
+  const doSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (q.trim()) {
+      router.push(`/search?q=${encodeURIComponent(q.trim())}`);
+      onLinkClick?.();
+    }
+  };
+
+  const notificationPanel = notifOpen && mounted && notifPos
+    ? createPortal(
+        <div
+          className="fixed w-[320px] max-w-[92vw] p-3 text-right card"
+          style={{ zIndex: zIndex.popover, top: notifPos.top, right: notifPos.right }}
+          dir="rtl"
+        >
+          <div className="mb-2 text-[12px] font-bold">آخرین رویدادها</div>
+          <ul className="max-h-80 space-y-2 overflow-y-auto text-[11px]">
+            {notifications.map((n: any) => (
+              <li key={`${n.module}-${n.slug}`} className="border-b border-border/40 pb-2 last:border-0">
+                <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 leading-5 hover:text-brand">
+                  {n.title}
+                </Link>
+                <div className="mt-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{n.date_fa} • {n.module}</div>
+              </li>
+            ))}
+          </ul>
+          <button onClick={() => setNotifOpen(false)} className="mt-2 w-full text-center text-[10px] text-muted-foreground hover:text-foreground">بستن</button>
+        </div>,
+        document.body
+      )
+    : null;
 
   return (
     <div className="relative flex h-full w-full flex-col text-[13px]" dir="rtl">
-      {/* Header */}
-      <header className="shrink-0 p-3 space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="h-10 w-10 shrink-0 relative">
+      <header className="shrink-0 space-y-3 p-3">
+        <div className="flex h-10 items-center gap-2">
+          <div className="relative h-10 w-10 shrink-0">
             {onLogoClick ? (
-              <SidebarTooltip label="باز/بستن منو" enabled={!expanded}>
-                <button onClick={onLogoClick} className="relative w-10 h-10 rounded-xl overflow-hidden hover:opacity-90 transition-opacity" aria-label="toggle sidebar">
+              <SidebarTooltip label="باز/بستن منو" enabled={!expanded} tooltipClassName="text-[var(--tb-brand)]">
+                <button onClick={onLogoClick} className="relative h-10 w-10 overflow-hidden rounded-[var(--tb-radius-lg)] transition-opacity hover:opacity-90" aria-label="toggle sidebar">
                   <Image src="/logo.png" alt="تکباکس" fill sizes="40px" className="object-contain" />
                 </button>
               </SidebarTooltip>
@@ -73,111 +154,103 @@ export default function SidebarContent({
               <Image src="/logo.png" alt="تکباکس" fill sizes="40px" className="object-contain" />
             )}
           </div>
-          <div className={`transition-all duration-300 overflow-hidden ${expanded ? "max-w-[170px] opacity-100" : "max-w-0 opacity-0"}`}>
-            <div className="text-[14px] font-black leading-tight" style={{color:"var(--foreground)"}}>تکباکس</div>
-            <div className="text-[10px] leading-tight" style={{color:"var(--muted-foreground)"}}>پاتوق بچه‌های فناوری اطلاعات</div>
+
+          <div className={`overflow-hidden transition-all duration-[var(--tb-duration-normal)] ${expanded ? "w-[170px] opacity-100" : "w-0 opacity-0"}`}>
+            <div className="text-[14px] font-black leading-tight text-[var(--tb-foreground)]">تکباکس</div>
+            <div className="text-[10px] leading-tight text-[var(--tb-muted-foreground)]">پاتوق بچه‌های فناوری اطلاعات</div>
           </div>
-          {/* notif + cart – always visible, even collapsed */}
-          <div className="ms-auto flex items-center gap-1">
-            <div className="relative">
-              <SidebarTooltip label="اعلان‌ها" enabled={!expanded}>
-                <button onClick={()=>setNotifOpen(o=>!o)} className="icon-rail-btn relative" aria-label="notifications">
-                  <Bell size={18} />
-                  <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full" />
-                </button>
-              </SidebarTooltip>
-              {notifOpen && (
-                <div className="fixed sm:absolute right-3 sm:right-0 top-20 sm:top-10 w-[320px] max-w-[92vw] card p-3 z-modal text-right" style={{zIndex:500}}>
-                  <div className="text-[12px] font-bold mb-2">آخرین رویدادها</div>
-                  <ul className="space-y-2 max-h-80 overflow-y-auto text-[11px]">
-                    {notifications.map((n:any)=>(
-                      <li key={n.slug} className="border-b border-border/40 pb-2 last:border-0">
-                        <Link href={`/${n.module}/${n.slug}`} onClick={()=>setNotifOpen(false)} className="hover:text-brand line-clamp-2 leading-5">{n.title}</Link>
-                        <div style={{color:"var(--muted-foreground)"}} className="text-[10px] mt-0.5">{n.date_fa} • {n.module}</div>
-                      </li>
-                    ))}
-                  </ul>
-                  <button onClick={()=>setNotifOpen(false)} className="text-[10px] text-muted-foreground mt-2 hover:text-foreground w-full text-center">بستن</button>
-                </div>
-              )}
-            </div>
-            <SidebarTooltip label={cartCount>0 ? `سبد خرید – ${cartCount} قلم` : "سبد خرید"} enabled={!expanded}>
-              <button onClick={()=>{ try{ (document.querySelector('[class*="CartIconButton"]') as HTMLElement)?.click(); }catch{}; /* fallback */ const el=document.querySelector('button[aria-label*="سبد"]') as HTMLElement; el?.click(); const ev = new Event("click"); }} className="icon-rail-btn relative" aria-label="سبد خرید">
+
+          <div className="ms-auto flex h-10 items-center gap-1">
+            <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--tb-news)]">
+              <button ref={notifButtonRef} onClick={() => setNotifOpen((o) => !o)} className="icon-rail-btn relative" aria-label="notifications">
+                <Bell size={18} />
+                <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--tb-danger)]" />
+              </button>
+            </SidebarTooltip>
+
+            <SidebarTooltip label={cartCount > 0 ? `سبد خرید – ${cartCount} قلم` : "سبد خرید"} enabled={!expanded} tooltipClassName="text-[var(--tb-shop)]">
+              <button onClick={() => setCartOpen(true)} className="icon-rail-btn relative" aria-label="سبد خرید">
                 <ShoppingCart size={18} />
-                {cartCount>0 && <span className="absolute -top-0.5 -left-0.5 bg-lime-400 text-black text-[9px] min-w-[16px] h-[16px] rounded-full flex items-center justify-center px-1 font-bold">{cartCount > 99 ? "۹۹+" : cartCount.toLocaleString("fa-IR")}</span>}
+                {cartCount > 0 && (
+                  <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--tb-shop)] px-1 text-[9px] font-bold text-black">
+                    {cartCount > 99 ? "۹۹+" : cartCount.toLocaleString("fa-IR")}
+                  </span>
+                )}
               </button>
             </SidebarTooltip>
           </div>
         </div>
 
-        {/* search – expanded full, collapsed icon */}
-        {expanded ? (
-          <form onSubmit={doSearch} className="relative">
-            <input value={q} onChange={e=>setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input !py-2 text-xs pe-8" />
-            <button type="submit" className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label="search">
-              <Search size={14} />
-            </button>
-          </form>
-        ) : (
-          <div className="flex flex-col items-center gap-1">
-            <SidebarTooltip label="جستجو" enabled={true}>
-              <button onClick={()=>{ const v = prompt("جستجو:"); if(v) router.push(`/search?q=${encodeURIComponent(v)}`); }} className="icon-rail-btn">
+        <TehranDateTime now={now} expanded={expanded} />
+
+        <div className="h-10 shrink-0">
+          {expanded ? (
+            <form onSubmit={doSearch} className="relative h-10">
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input h-10 !py-2 pe-8 text-xs" />
+              <button type="submit" className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label="search">
+                <Search size={14} />
+              </button>
+            </form>
+          ) : (
+            <SidebarTooltip label="جستجو" enabled tooltipClassName="text-[var(--tb-brand)]">
+              <button onClick={() => { const v = prompt("جستجو:"); if (v) router.push(`/search?q=${encodeURIComponent(v)}`); }} className="icon-rail-btn">
                 <Search size={18} />
               </button>
             </SidebarTooltip>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* VIP consultation – expanded full, collapsed icon */}
-        {expanded ? (
-          <Link href="/consultation" onClick={onLinkClick}
-            className="w-full rounded-xl text-white text-[12px] font-black py-2.5 text-center shadow-lg hover:brightness-110 transition-all block"
-            style={{background:"linear-gradient(135deg,#1e40af 0%, #3b82f6 50%, #0ea5e9 100%)"}}>
-            مشاوره VIP ⚡
-          </Link>
-        ) : (
-          <SidebarTooltip label="مشاوره VIP" enabled={true}>
-            <Link href="/consultation" onClick={onLinkClick} className="icon-rail-btn" style={{color:"#60a5fa"}}>
-              <span className="text-[16px]">⚡</span>
+        <div className="h-10 shrink-0">
+          {expanded ? (
+            <Link href="/consultation" onClick={onLinkClick} className="vip-cta flex h-10 w-full items-center justify-center text-center text-[12px] font-black">
+              مشاوره VIP ⚡
             </Link>
+          ) : (
+            <SidebarTooltip label="مشاوره VIP" enabled tooltipClassName="text-[var(--tb-vip)]">
+              <Link href="/consultation" onClick={onLinkClick} className="icon-rail-btn text-[var(--tb-vip)] hover:text-[var(--tb-vip)]">
+                <span className="text-[16px]">⚡</span>
+              </Link>
+            </SidebarTooltip>
+          )}
+        </div>
+
+        <div className="h-10 shrink-0">
+          <SidebarTooltip label={theme === "dark" ? "حالت روز" : "حالت شب"} enabled={!expanded} tooltipClassName="text-[var(--tb-warning)]">
+            <button type="button" onClick={onToggleTheme} className="group flex h-10 w-full items-center rounded-[var(--tb-radius-lg)] text-[11px] text-muted-foreground transition-colors hover:bg-[var(--tb-muted)] hover:text-foreground">
+              <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
+                <Sun className={`absolute h-[18px] w-[18px] transition-all ${theme === "dark" ? "scale-100 text-[var(--tb-warning)] opacity-100" : "scale-0 opacity-0"}`} />
+                <Moon className={`absolute h-[18px] w-[18px] transition-all ${theme === "dark" ? "scale-0 opacity-0" : "scale-100 opacity-100"}`} />
+              </span>
+              <span className={`overflow-hidden whitespace-nowrap text-[11px] transition-all ${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"}`}>
+                {theme === "dark" ? "حالت روز" : "حالت شب"}
+              </span>
+            </button>
           </SidebarTooltip>
-        )}
+        </div>
 
-        {/* theme toggle – font size FIXED to text-xs (was larger than logo) */}
-        <SidebarTooltip label={theme==="dark" ? "حالت روز" : "حالت شب"} enabled={!expanded}>
-          <button type="button" onClick={onToggleTheme}
-            className="group flex w-full items-center text-[11px] text-muted-foreground hover:text-foreground transition-colors rounded-lg h-10">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center">
-              <Sun className={`h-[18px] w-[18px] absolute transition-all ${theme==="dark" ? "opacity-100 scale-100 text-yellow-400" : "opacity-0 scale-0"}`} />
-              <Moon className={`h-[18px] w-[18px] absolute transition-all ${theme==="dark" ? "opacity-0 scale-0" : "opacity-100 scale-100"}`} style={{color:"var(--muted-foreground)"}} />
-            </span>
-            <span className={`whitespace-nowrap overflow-hidden transition-all ${expanded ? "max-w-[120px] opacity-100" : "max-w-0 opacity-0"} text-[11px]`}>
-              {theme==="dark" ? "حالت روز" : "حالت شب"}
-            </span>
-          </button>
-        </SidebarTooltip>
-
-        <div className="border-t" style={{borderColor:"var(--border)"}} />
+        <div className="border-t border-[var(--tb-border)]" />
       </header>
 
-      {/* NAV – includes: Home, Blog, News, Media, Shop, Tools, Forum, Review, Download, + RAID Calculator, Subnet Calculator, مشاوره VIP – all from navItems */}
       <nav className="flex-1 overflow-y-auto px-2 py-1">
         <div className="flex flex-col gap-[2px]">
-          {navItems.map(item=>{
+          {navItems.map((item) => {
             const Icon = item.icon as any;
             const active = isActive(pathname, item.href);
-            const iconClass = active ? (item.iconActiveClassName || "text-primary") : (item.iconClassName || "text-muted-foreground");
+            const iconClass = active ? item.iconActiveClassName || "text-primary" : item.iconClassName || "text-muted-foreground";
+            const hoverClass = item.iconHoverClassName || item.iconActiveClassName || "group-hover:text-[var(--tb-brand)]";
             return (
-              <SidebarTooltip key={item.href} label={item.title} enabled={!expanded}>
-                <Link href={item.href} onClick={onLinkClick}
+              <SidebarTooltip key={item.href} label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
+                <Link
+                  href={item.href}
+                  onClick={onLinkClick}
                   className={`${linkBase} ${active ? "text-foreground" : linkInactive}`}
-                  style={{background: active ? "var(--secondary)" : "transparent", fontSize:"13px"}}
+                  style={{ background: active ? "var(--tb-muted)" : "transparent", fontSize: "13px" }}
                 >
-                  {active && <span className="absolute right-0 top-[8px] bottom-[8px] w-[3px] rounded-full" style={{background:"var(--primary)"}} />}
-                  <span className="w-10 h-10 flex items-center justify-center shrink-0">
-                    <Icon size={19} className={iconClass} strokeWidth={1.75} />
+                  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tb-brand)]" />}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                    <Icon size={19} className={`${iconClass} ${hoverClass}`} strokeWidth={1.75} />
                   </span>
-                  <span className={`truncate transition-all ${expanded ? "opacity-100 max-w-[160px]" : "opacity-0 max-w-0"}`}>{item.title}</span>
+                  <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>{item.title}</span>
                 </Link>
               </SidebarTooltip>
             );
@@ -185,77 +258,47 @@ export default function SidebarContent({
         </div>
       </nav>
 
-      {/* bottom – date/time + account – collapsed icons included */}
-      <div className="shrink-0 border-t px-2 py-2 space-y-2" style={{borderColor:"var(--border)"}}>
-        {/* date/time */}
-        {expanded ? (
-          now && (
-            <div className="text-center py-1 rounded-lg" style={{background:"var(--muted)"}}>
-              <div className="text-[10px]" style={{color:"var(--muted-foreground)"}}>
-                {now.toLocaleDateString("fa-IR", { weekday:"long", timeZone:"Asia/Tehran" })}
-              </div>
-              <div className="text-[11px] font-mono font-bold" dir="ltr">
-                {now.toLocaleTimeString("fa-IR", { hour:"2-digit", minute:"2-digit", second:"2-digit", timeZone:"Asia/Tehran" })}
-              </div>
-              <div className="text-[10px]" style={{color:"var(--muted-foreground)"}}>
-                {now.toLocaleDateString("fa-IR", { year:"numeric", month:"long", day:"numeric", timeZone:"Asia/Tehran" })}
-              </div>
-            </div>
-          )
-        ) : (
-          <SidebarTooltip
-            enabled={true}
-            label={now ? `${now.toLocaleDateString("fa-IR",{timeZone:"Asia/Tehran"})} – ${now.toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Tehran"})} تهران` : "ساعت تهران"}
-          >
-            <button className="icon-rail-btn w-full" aria-label="date time">
-              <Clock size={18} />
-            </button>
-          </SidebarTooltip>
-        )}
-
-        {/* account */}
+      <div className="shrink-0 space-y-2 border-t border-[var(--tb-border)] px-2 py-2">
         {user ? (
-          <Link href="/account" onClick={onLinkClick}
-            className={`${linkBase} ${isActive(pathname,"/account") ? "" : linkInactive}`}
-            style={{fontSize:"12px", background: isActive(pathname,"/account") ? "var(--secondary)" : "transparent"}}
-          >
-            <span className="w-10 h-10 flex items-center justify-center shrink-0">
-              <img src={user.avatar || "/assets/hooman.png"} alt={user.name} width={28} height={28} className="rounded-full object-cover" style={{border:"1px solid var(--border)"}} />
+          <Link href="/account" onClick={onLinkClick} className={`${linkBase} ${isActive(pathname, "/account") ? "" : linkInactive}`} style={{ fontSize: "12px", background: isActive(pathname, "/account") ? "var(--tb-muted)" : "transparent" }}>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+              <img src={user.avatar || "/assets/hooman.png"} alt={user.name} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
             </span>
-            <span className={`truncate leading-tight ${expanded ? "opacity-100 max-w-[140px]" : "opacity-0 max-w-0"} overflow-hidden transition-all`}>
-              <span className="block font-bold text-[12px]">{user.name}</span>
-              <span className="block text-[10px]" style={{color:"var(--muted-foreground)"}}>{user.role==="super_admin"?"مدیر کل":"ویراستار"}</span>
+            <span className={`truncate leading-tight ${expanded ? "w-[140px] opacity-100" : "w-0 opacity-0"} overflow-hidden transition-all`}>
+              <span className="block text-[12px] font-bold">{user.name}</span>
+              <span className="block text-[10px] text-[var(--tb-muted-foreground)]">{user.role === "super_admin" ? "مدیر کل" : "ویراستار"}</span>
             </span>
           </Link>
         ) : (
-          <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded}>
-            <button onClick={()=>setLoginOpen(true)} className={`${linkBase} ${linkInactive} w-full`} style={{fontSize:"12px"}}>
-              <span className="w-10 h-10 flex items-center justify-center">
-                <span className="w-7 h-7 rounded-full flex items-center justify-center text-[11px]" style={{background:"var(--muted)"}}>👤</span>
+          <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--tb-account)]">
+            <button onClick={() => setLoginOpen(true)} className={`${linkBase} ${linkInactive} w-full`} style={{ fontSize: "12px" }}>
+              <span className="flex h-10 w-10 items-center justify-center">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-muted)] text-[11px]">👤</span>
               </span>
-              <span className={`${expanded ? "opacity-100 max-w-[120px]" : "opacity-0 max-w-0"} truncate transition-all`}>ورود</span>
+              <span className={`${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"} truncate transition-all`}>ورود</span>
             </button>
           </SidebarTooltip>
         )}
       </div>
 
-      {/* login modal – z-[500] – fixes “behind feeds” bug */}
       {loginOpen && (
-        <div className="fixed inset-0 flex items-center justify-center p-4" style={{zIndex:500}} dir="rtl">
-          <div className="absolute inset-0" style={{background:"rgba(0,0,0,.6)", backdropFilter:"blur(4px)"}} onClick={()=>setLoginOpen(false)} />
-          <div className="relative card w-full max-w-sm p-5 space-y-3" style={{zIndex:501}}>
-            <div className="flex justify-between items-center">
-              <h3 className="font-black text-[15px]">ورود به تکباکس</h3>
-              <button onClick={()=>setLoginOpen(false)} className="text-muted-foreground hover:text-foreground">✕</button>
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[var(--tb-blur-sm)]" onClick={() => setLoginOpen(false)} />
+          <div className="relative w-full max-w-sm space-y-3 p-5 card" style={{ zIndex: zIndex.modalContent }}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[15px] font-black">ورود به تکباکس</h3>
+              <button onClick={() => setLoginOpen(false)} className="text-muted-foreground hover:text-foreground">✕</button>
             </div>
-            <p className="text-[11px]" style={{color:"var(--muted-foreground)"}}>
-              حساب تست: <b>sara</b> / <b>nima</b> / <b>rojina</b> / <b>admin</b><br/>رمز همه: <code>techbox123</code>
+            <p className="text-[11px] text-[var(--tb-muted-foreground)]">
+              حساب تست: <b>sara</b> / <b>nima</b> / <b>rojina</b> / <b>admin</b><br />رمز همه: <code>techbox123</code>
             </p>
-            <a href="/admin/login" onClick={()=>setLoginOpen(false)} className="btn btn-primary w-full text-[13px]">رفتن به ورود کامل →</a>
-            <button onClick={()=>setLoginOpen(false)} className="btn btn-ghost w-full text-[11px]">بستن</button>
+            <a href="/admin/login" onClick={() => setLoginOpen(false)} className="btn btn-primary w-full text-[13px]">رفتن به ورود کامل →</a>
+            <button onClick={() => setLoginOpen(false)} className="btn btn-ghost w-full text-[11px]">بستن</button>
           </div>
         </div>
       )}
+
+      {notificationPanel}
     </div>
   );
 }

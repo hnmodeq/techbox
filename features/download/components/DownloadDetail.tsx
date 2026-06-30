@@ -31,14 +31,14 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
   return (
     <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
       <div className="text-[11px] text-muted-foreground mb-2">
-        <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-pink-400">{item.category}</span>
+        <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--tb-download)]">{item.category}</span>
       </div>
       <h1 className="text-2xl md:text-3xl font-black leading-9">{item.title}</h1>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 
       <div className="flex flex-wrap gap-2 mt-4">
         {item.tags.map(t=>(
-          <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="badge hover:bg-pink-500/15 hover:text-pink-300">
+          <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="badge hover:bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] hover:text-[var(--tb-download)]">
             {t.toUpperCase()}
           </Link>
         ))}

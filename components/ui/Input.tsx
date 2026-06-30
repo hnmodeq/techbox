@@ -18,7 +18,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         "placeholder:text-[var(--tb-muted-foreground)]/80",
         "focus:outline-none focus:border-[var(--tb-ring)] focus:shadow-[var(--tb-focus-ring)]",
         "disabled:opacity-50 disabled:cursor-not-allowed",
-        invalid && "border-red-500/70 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,.18)]",
+        invalid && "border-[var(--tb-danger)] focus:border-[var(--tb-danger)] focus:shadow-[0_0_0_3px_color-mix(in_oklch,var(--tb-danger)_24%,transparent)]",
         className
       )}
       {...props}

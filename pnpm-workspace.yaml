@@ -5,3 +5,6 @@ allowBuilds:
   prisma: true
   sharp: true
   unrs-resolver: true
+
+overrides:
+  eslint: ^9.39.1

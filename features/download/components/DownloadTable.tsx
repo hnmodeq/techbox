@@ -69,11 +69,11 @@ export default function DownloadTable(){
             {filtered.map(f=>(
               <tr key={f.slug} className="border-t border-border/60 hover:bg-muted/20 align-top">
                 <td className="p-3">
-                  <Link href={`/download/${f.slug}`} className="font-bold hover:text-pink-400 text-[14px]">{f.title}</Link>
+                  <Link href={`/download/${f.slug}`} className="font-bold hover:text-[var(--tb-download)] text-[14px]">{f.title}</Link>
                   <div className="text-[12px] text-muted-foreground mt-1 line-clamp-2">{f.excerpt}</div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {f.tags.slice(0,5).map(t=>(
-                      <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="text-[10px] px-2 py-0.5 rounded-full bg-muted hover:bg-pink-500/15 hover:text-pink-300 border border-border transition-colors">
+                      <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="text-[10px] px-2 py-0.5 rounded-full bg-muted hover:bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] hover:text-[var(--tb-download)] border border-border transition-colors">
                         {t.toUpperCase()}
                       </Link>
                     ))}

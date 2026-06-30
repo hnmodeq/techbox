@@ -5,10 +5,10 @@ import { z } from "zod";
 
 export async function GET(req: NextRequest){
   const { searchParams } = new URL(req.url);
-  const module = searchParams.get("module") || undefined;
+  const postModule = searchParams.get("module") || undefined;
   const take = Math.min(parseInt(searchParams.get("take") || "50"), 100);
   const posts = await prisma.post.findMany({
-    where: { published: true, ...(module ? { module: module as any } : {}) },
+    where: { published: true, ...(postModule ? { module: postModule as any } : {}) },
     orderBy: { date: "desc" },
     take,
     select: {

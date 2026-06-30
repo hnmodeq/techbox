@@ -41,7 +41,7 @@ export default function RolesPage(){
           <h1 className="text-2xl font-black">مدیریت نقش‌ها – RBAC</h1>
           <p className="text-xs text-muted-foreground mt-1">مدیر کل می‌تواند نقش بسازد، دسترسی ماژول‌ها را تعیین کند – مثل Blog Editor / Content Creator</p>
         </div>
-        <span className="text-[11px] px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">super_admin only</span>
+        <span className="text-[11px] px-2 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-success)_10%,transparent)] text-[var(--tb-success)] border border-[color-mix(in_oklch,var(--tb-success)_20%,transparent)]">super_admin only</span>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-5 items-start">
@@ -93,7 +93,7 @@ export default function RolesPage(){
                   <td className="p-3 text-center">{r.users.toLocaleString("fa-IR")}</td>
                   <td className="p-3 text-[11px] text-right">
                     <button className="hover:text-brand ms-3">ویرایش</button>
-                    <button className="hover:text-rose-400">حذف</button>
+                    <button className="hover:text-[var(--tb-danger)]">حذف</button>
                   </td>
                 </tr>
               ))}

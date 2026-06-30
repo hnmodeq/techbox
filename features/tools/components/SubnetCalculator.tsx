@@ -27,7 +27,7 @@ export default function SubnetCalculator(){
 
   return (
     <div className="card p-5 space-y-4" dir="rtl">
-      <h3 className="font-extrabold text-lg text-cyan-300">ماشین‌حساب ساب‌نت</h3>
+      <h3 className="font-extrabold text-lg text-[var(--tb-subnet)]">ماشین‌حساب ساب‌نت</h3>
       <div className="grid sm:grid-cols-2 gap-3">
         <label className="text-sm space-y-1">
           <span className="text-[11px] text-muted-foreground">IP</span>

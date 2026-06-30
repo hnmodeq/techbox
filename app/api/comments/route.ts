@@ -13,11 +13,11 @@ const postSchema = z.object({
 
 export async function GET(req: NextRequest){
   const { searchParams } = new URL(req.url);
-  const module = searchParams.get("module");
+  const postModule = searchParams.get("module");
   const slug = searchParams.get("slug");
-  if(!module || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400 });
+  if(!postModule || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400 });
 
-  const post = await prisma.post.findUnique({ where: { module_slug: { module: module as any, slug } }, select: { id: true }});
+  const post = await prisma.post.findUnique({ where: { module_slug: { module: postModule as any, slug } }, select: { id: true }});
   if(!post) return NextResponse.json([]);
   
   const comments = await prisma.comment.findMany({

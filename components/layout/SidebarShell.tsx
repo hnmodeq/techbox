@@ -6,6 +6,7 @@ import SidebarContent from "@/components/layout/SidebarContent";
 import { sidebarBase } from "@/config/sidebar.config";
 import { SidebarShellProps } from "@/types/sidebar.types";
 import { useFabTop, saveFabTop } from "@/hooks/useFabTop";
+import { zIndex } from "@/design";
 
 const DRAG_THRESHOLD = 6;
 const BTN_SIZE = 72;
@@ -96,9 +97,9 @@ export default function SidebarShell({
         onPointerMove={handlePointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        style={{ top: `${btnTop}px`, touchAction: "none" }}
-        className={`fixed z-[60] select-none rounded-full drop-shadow-lg sm:hidden
-          transition-[right] duration-300 translate-x-1/2
+        style={{ top: `${btnTop}px`, touchAction: "none", zIndex: zIndex.mobileFab }}
+        className={`fixed select-none rounded-full drop-shadow-lg sm:hidden
+          transition-[right] duration-[var(--tb-duration-slow)] translate-x-1/2
           ${mobileOpen ? MOBILE_FAB_OPEN_RIGHT : "right-0"}
           ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
         aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
@@ -125,7 +126,7 @@ export default function SidebarShell({
       )}
 
       <aside
-        className={`fixed right-0 top-0 z-50 h-full transform transition-transform duration-300 sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
+        className={`fixed right-0 top-0 z-50 h-full transform transition-transform duration-[var(--tb-duration-slow)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
           mobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
         aria-hidden={!mobileOpen}
@@ -139,7 +140,7 @@ export default function SidebarShell({
       </aside>
 
       <div
-        className={`hidden shrink-0 sm:block transition-[width] duration-300 ease-in-out ${
+        className={`hidden shrink-0 sm:block transition-[width] duration-[var(--tb-duration-slow)] ease-[var(--tb-ease-in-out)] ${
           desktopOpen
             ? DESKTOP_SIDEBAR_OPEN_WIDTH
             : DESKTOP_SIDEBAR_CLOSED_WIDTH
@@ -148,7 +149,7 @@ export default function SidebarShell({
       />
 
       <aside
-        className={`fixed right-0 top-0 hidden h-screen flex-col overflow-hidden sm:flex transition-[width] duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 hidden h-screen flex-col overflow-hidden sm:flex transition-[width] duration-[var(--tb-duration-slow)] ease-[var(--tb-ease-in-out)] ${
           desktopOpen
             ? DESKTOP_SIDEBAR_OPEN_WIDTH
             : DESKTOP_SIDEBAR_CLOSED_WIDTH

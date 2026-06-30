@@ -18,12 +18,39 @@
   --tb-popover: oklch(1 0 0);
   --tb-popover-foreground: oklch(0.18 0.025 270);
 
+  /* — Compatibility aliases for legacy components/classes — */
+  --background: var(--tb-background);
+  --foreground: var(--tb-foreground);
+  --surface-1: var(--tb-surface-1);
+  --surface-2: var(--tb-surface-2);
+  --muted: var(--tb-muted);
+  --muted-foreground: var(--tb-muted-foreground);
+  --border: var(--tb-border);
+  --ring: var(--tb-ring);
+  --card: var(--tb-card);
+  --card-foreground: var(--tb-card-foreground);
+  --popover: var(--tb-popover);
+  --popover-foreground: var(--tb-popover-foreground);
+  --brand: var(--tb-brand);
+  --primary: var(--tb-brand);
+  --primary-foreground: var(--tb-brand-foreground);
+  --secondary: var(--tb-muted);
+  --secondary-foreground: var(--tb-foreground);
+  --accent-cyan: var(--tb-tools);
+
   /* — Module accent tokens — */
   --tb-blog:    oklch(0.70 0.17 52);   /* orange */
   --tb-news:    oklch(0.64 0.22 25);   /* rose */
   --tb-media:   oklch(0.82 0.15 85);   /* amber */
   --tb-shop:    oklch(0.80 0.19 125);  /* lime */
   --tb-tools:   oklch(0.82 0.12 200);  /* cyan */
+  --tb-raid:    oklch(0.66 0.18 175);  /* teal */
+  --tb-subnet:  oklch(0.68 0.19 230);  /* blue */
+  --tb-vip:     oklch(0.66 0.22 300);  /* fuchsia */
+  --tb-success: oklch(0.72 0.18 150);
+  --tb-danger:  oklch(0.64 0.22 25);
+  --tb-warning: oklch(0.82 0.15 85);
+  --tb-info:    oklch(0.72 0.16 230);
   --tb-forum:   oklch(0.78 0.16 5);    /* rose-300 */
   --tb-review:  oklch(0.70 0.17 240);  /* sky */
   --tb-download: oklch(0.72 0.20 350);
@@ -115,6 +142,13 @@
   --tb-media:   #fcd34d;
   --tb-shop:    #a3e635;
   --tb-tools:   #67e8f9;
+  --tb-raid:    #2dd4bf;
+  --tb-subnet:  #60a5fa;
+  --tb-vip:     #e879f9;
+  --tb-success: #4ade80;
+  --tb-danger:  #fb7185;
+  --tb-warning: #fcd34d;
+  --tb-info:    #7dd3fc;
   --tb-forum:   #fda4af;
   --tb-review:  #38bdf8;
   --tb-download:#f472b6;

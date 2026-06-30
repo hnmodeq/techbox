@@ -40,7 +40,7 @@ function NewPostInner() {
   if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="underline" style={{color:"var(--brand)"}} href="/admin/login">وارد شوید</Link></main>;
 
   const canEdit = user.role==="super_admin" || (user.modules||[]).includes(module);
-  if (!canEdit) return <main className="p-10 text-center" style={{color:"#fb7185"}} dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
+  if (!canEdit) return <main className="p-10 text-center text-[var(--tb-danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setMsg("");
@@ -119,7 +119,7 @@ function NewPostInner() {
         </div>
 
         <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
-          <div className="text-[11px]" style={{color: msg.includes("✓") ? "#4ade80" : "var(--muted-foreground)"}}>{msg || "POST → /api/posts – RBAC server-side"}</div>
+          <div className="text-[11px]" style={{color: msg.includes("✓") ? "var(--tb-success)" : "var(--tb-muted-foreground)"}}>{msg || "POST → /api/posts – RBAC server-side"}</div>
           <div className="flex gap-2">
             <Link href={`/admin/posts?module=${module}`} className="btn btn-ghost text-xs">انصراف</Link>
             <button className="btn btn-primary text-xs" disabled={saving} type="submit">{saving ? "در حال انتشار…" : (editSlug ? "ذخیره تغییرات" : "انتشار در تکباکس")}</button>

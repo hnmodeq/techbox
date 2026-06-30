@@ -27,7 +27,7 @@ export default function RaidCalculator(){
   return (
     <div className="card p-5 space-y-4" dir="rtl">
       <div className="flex items-center justify-between">
-        <h3 className="font-extrabold text-lg text-cyan-300">RAID Calculator</h3>
+        <h3 className="font-extrabold text-lg text-[var(--tb-raid)]">RAID Calculator</h3>
         <span className="text-[11px] text-muted-foreground">تکباکس – ابزار زیرساخت</span>
       </div>
 
@@ -61,7 +61,7 @@ export default function RaidCalculator(){
         ].map(([k,v])=>(
           <div key={k as string} className="rounded-xl border border-border bg-surface-1/60 p-3">
             <div className="text-[11px] text-muted-foreground">{k}</div>
-            <div className="font-black text-cyan-300 mt-1">{v}</div>
+            <div className="font-black text-[var(--tb-raid)] mt-1">{v}</div>
           </div>
         ))}
       </div>

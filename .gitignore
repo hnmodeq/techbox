@@ -1,86 +1,12 @@
-# ======================================
-# Dependencies
-# ======================================
-node_modules/
-.pnpm-store/
-
-# ======================================
-# Next.js build output
-# ======================================
-.next/
-out/
-build/
-dist/
-
-# ======================================
-# Environment variables
-# ======================================
+node_modules
+.next
+out
+dist
+build
+coverage
+.cache
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env*.local
+.env.*
 !.env.example
-
-# ======================================
-# Logs
-# ======================================
-logs/
-*.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# ======================================
-# TypeScript
-# ======================================
 *.tsbuildinfo
-
-# ======================================
-# Prisma
-# ======================================
-node_modules/.prisma/client
-prisma/*.db
-prisma/*.db-journal
-
-# ======================================
-# Cache
-# ======================================
-.cache/
-.turbo/
-
-# ======================================
-# Coverage
-# ======================================
-coverage/
-
-# ======================================
-# Temporary files
-# ======================================
-tmp/
-temp/
-
-# ======================================
-# OS files
-# ======================================
 .DS_Store
-Thumbs.db
-
-# ======================================
-# IDE / Editor
-# ======================================
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-.idea/
-*.swp
-*.swo
-
-# ======================================
-# Local config
-# ======================================
-.config/local*
-.vercel
-.env*

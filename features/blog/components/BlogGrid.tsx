@@ -8,7 +8,7 @@ export default function BlogGrid(){
     <main className="mx-auto max-w-7xl px-4 md:px-8 py-14" dir="rtl">
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h1 className="text-3xl md:text-4xl font-black text-orange-400">مجله تکباکس</h1>
+          <h1 className="text-3xl md:text-4xl font-black text-[var(--tb-blog)]">مجله تکباکس</h1>
           <p className="text-sm text-muted-foreground mt-2">مقالات تخصصی زیرساخت • {items.length.toLocaleString("fa-IR")} مطلب</p>
         </div>
       </div>
@@ -21,7 +21,7 @@ export default function BlogGrid(){
             </Link>
             <div className="p-4 flex flex-col flex-1">
               <h3 className="font-extrabold text-[17px] leading-7 line-clamp-2 min-h-[56px]">
-                <Link href={`/blog/${p.slug}`} className="hover:text-orange-400">{p.title}</Link>
+                <Link href={`/blog/${p.slug}`} className="hover:text-[var(--tb-blog)]">{p.title}</Link>
               </h3>
               <p className="text-[13px] text-muted-foreground leading-6 line-clamp-3 mt-2 flex-1">{p.excerpt}</p>
               <div className="flex items-center justify-between mt-4 pt-3 border-t border-border/50 text-[11px] text-muted-foreground">

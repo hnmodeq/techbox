@@ -6,8 +6,18 @@
     "excerpt": "نصب و تنظیم سیستم عامل سرور نیاز به حوصله و تجربه دارد. قدم به قدم با من همراه باشید.",
     "content": "در این مقاله نحوه نصب ESXi و Ubuntu Server روی Dell R740 را بررسی می‌کنیم...",
     "image": "/assets/blog-1.jpg",
-    "tags": ["dell", "سرور", "لینوکس", "زیرساخت", "QNAP-2277"],
-    "author": { "name": "هومن مدق", "role": "کارشناس فناوری اطلاعات", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "dell",
+      "سرور",
+      "لینوکس",
+      "زیرساخت",
+      "QNAP-2277"
+    ],
+    "author": {
+      "name": "هومن مدق",
+      "role": "کارشناس فناوری اطلاعات",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-06-22",
     "date_fa": "1 تیر 1405",
     "likes": 124,
@@ -21,8 +31,17 @@
     "excerpt": "بهترین تعادل بین کارایی و امنیت اطلاعات برای زیرساخت سازمان شما.",
     "content": "RAID 10 vs RAID 5 ...",
     "image": "/assets/blog-2.jpg",
-    "tags": ["hp", "raid", "storage", "زیرساخت"],
-    "author": { "name": "عطیه حاتمی", "role": "مهندس کامپیوتر", "avatar": "/assets/atiye.png" },
+    "tags": [
+      "hp",
+      "raid",
+      "storage",
+      "زیرساخت"
+    ],
+    "author": {
+      "name": "عطیه حاتمی",
+      "role": "مهندس کامپیوتر",
+      "avatar": "/assets/atiye.png"
+    },
     "date": "2026-06-26",
     "date_fa": "5 تیر 1405",
     "likes": 98,
@@ -36,8 +55,16 @@
     "excerpt": "کندی VMها را با تنظیمات درست از بین ببرید.",
     "content": "...",
     "image": "/assets/blog-3.jpeg",
-    "tags": ["vmware", "مجازی‌سازی", "بهینه‌سازی"],
-    "author": { "name": "بهناز قادری", "role": "طراح سایت", "avatar": "/assets/behnaz.png" },
+    "tags": [
+      "vmware",
+      "مجازی‌سازی",
+      "بهینه‌سازی"
+    ],
+    "author": {
+      "name": "بهناز قادری",
+      "role": "طراح سایت",
+      "avatar": "/assets/behnaz.png"
+    },
     "date": "2026-06-30",
     "date_fa": "9 تیر 1405",
     "likes": 76,
@@ -51,8 +78,17 @@
     "excerpt": "از VLAN تا مانیتورینگ ترافیک.",
     "content": "...",
     "image": "/assets/blog-4.jpg",
-    "tags": ["امنیت", "شبکه", "vlan", "فایروال"],
-    "author": { "name": "نسترن خداکرمی", "role": "فعال حوزه فناوری اطلاعات", "avatar": "/assets/nastaran.png" },
+    "tags": [
+      "امنیت",
+      "شبکه",
+      "vlan",
+      "فایروال"
+    ],
+    "author": {
+      "name": "نسترن خداکرمی",
+      "role": "فعال حوزه فناوری اطلاعات",
+      "avatar": "/assets/nastaran.png"
+    },
     "date": "2026-07-04",
     "date_fa": "13 تیر 1405",
     "likes": 210,
@@ -66,8 +102,17 @@
     "excerpt": "نصب Zabbix، تریگرها و داشبورد کاربردی.",
     "content": "...",
     "image": "/assets/blog-5.jpg",
-    "tags": ["zabbix", "مانیتورینگ", "لینوکس", "سرور"],
-    "author": { "name": "روژینا باقری", "role": "کارشناس شبکه", "avatar": "/assets/rojina.png" },
+    "tags": [
+      "zabbix",
+      "مانیتورینگ",
+      "لینوکس",
+      "سرور"
+    ],
+    "author": {
+      "name": "روژینا باقری",
+      "role": "کارشناس شبکه",
+      "avatar": "/assets/rojina.png"
+    },
     "date": "2026-07-08",
     "date_fa": "17 تیر 1405",
     "likes": 142,
@@ -81,12 +126,140 @@
     "excerpt": "مزایا، محدودیت‌ها و سناریوهای مناسب هرکدام.",
     "content": "...",
     "image": "/assets/blog-6.png",
-    "tags": ["nas", "san", "storage", "QNAP-2277", "ذخیره‌سازی"],
-    "author": { "name": "هومن مدق", "role": "کارشناس فناوری اطلاعات", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nas",
+      "san",
+      "storage",
+      "QNAP-2277",
+      "ذخیره‌سازی"
+    ],
+    "author": {
+      "name": "هومن مدق",
+      "role": "کارشناس فناوری اطلاعات",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-12",
     "date_fa": "21 تیر 1405",
     "likes": 88,
     "views": 2540,
     "category": "ذخیره‌سازی"
+  },
+  {
+    "slug": "immutable-backup-guide",
+    "module": "blog",
+    "title": "راهنمای پیاده‌سازی Immutable Backup برای سازمان‌ها",
+    "excerpt": "چطور بکاپی بسازیم که باج‌افزار نتواند آن را حذف یا رمزنگاری کند؟",
+    "content": "در این راهنما سیاست‌های retention، نسخه‌بندی، air-gap و تست بازیابی را بررسی می‌کنیم...",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "backup",
+      "امنیت",
+      "storage",
+      "باج‌افزار"
+    ],
+    "author": {
+      "name": "نسترن خداکرمی",
+      "role": "فعال حوزه فناوری اطلاعات",
+      "avatar": "/assets/nastaran.png"
+    },
+    "date": "2026-07-15",
+    "date_fa": "24 تیر 1405",
+    "likes": 156,
+    "views": 3650,
+    "category": "امنیت"
+  },
+  {
+    "slug": "wifi-7-network-design",
+    "module": "blog",
+    "title": "طراحی شبکه سازمانی با Wi‑Fi 7؛ از کانال‌بندی تا Roaming",
+    "excerpt": "نکات عملی برای طراحی وایرلس پرظرفیت در شرکت‌ها و محیط‌های آموزشی.",
+    "content": "Wi‑Fi 7 با MLO و کانال‌های عریض‌تر فرصت‌های جدیدی ایجاد می‌کند...",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "wifi7",
+      "شبکه",
+      "طراحی شبکه"
+    ],
+    "author": {
+      "name": "روژینا باقری",
+      "role": "کارشناس شبکه",
+      "avatar": "/assets/rojina.png"
+    },
+    "date": "2026-07-14",
+    "date_fa": "23 تیر 1405",
+    "likes": 132,
+    "views": 2810,
+    "category": "شبکه"
+  },
+  {
+    "slug": "proxmox-cluster-basics",
+    "module": "blog",
+    "title": "ساخت کلاستر Proxmox برای کسب‌وکارهای کوچک",
+    "excerpt": "از نصب نودها تا shared storage و HA؛ یک مسیر عملی برای شروع.",
+    "content": "در این مقاله سناریوی سه نود Proxmox را قدم‌به‌قدم طراحی می‌کنیم...",
+    "image": "/assets/blog-3.jpeg",
+    "tags": [
+      "proxmox",
+      "مجازی‌سازی",
+      "cluster"
+    ],
+    "author": {
+      "name": "هومن مدق",
+      "role": "کارشناس فناوری اطلاعات",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-13",
+    "date_fa": "22 تیر 1405",
+    "likes": 201,
+    "views": 4920,
+    "category": "مجازی‌سازی"
+  },
+  {
+    "slug": "nvme-vs-sata-server",
+    "module": "blog",
+    "title": "NVMe یا SATA SSD برای سرور؟ انتخاب درست بر اساس workload",
+    "excerpt": "همیشه سریع‌ترین گزینه بهترین نیست؛ latency، endurance و بودجه را با هم ببینید.",
+    "content": "برای دیتابیس، مجازی‌سازی و فایل‌سرور رفتار I/O متفاوت است...",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "nvme",
+      "ssd",
+      "سرور",
+      "storage"
+    ],
+    "author": {
+      "name": "عطیه حاتمی",
+      "role": "مهندس کامپیوتر",
+      "avatar": "/assets/atiye.png"
+    },
+    "date": "2026-07-11",
+    "date_fa": "20 تیر 1405",
+    "likes": 119,
+    "views": 2710,
+    "category": "ذخیره‌سازی"
+  },
+  {
+    "slug": "mikrotik-firewall-baseline",
+    "module": "blog",
+    "title": "Baseline فایروال MikroTik برای شبکه‌های کوچک",
+    "excerpt": "قوانین پایه، input chain، محدودسازی مدیریت و ثبت لاگ‌های ضروری.",
+    "content": "یک کانفیگ پایه امن برای شروع مدیریت روترهای MikroTik...",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "میکروتیک",
+      "فایروال",
+      "امنیت",
+      "شبکه"
+    ],
+    "author": {
+      "name": "روژینا باقری",
+      "role": "کارشناس شبکه",
+      "avatar": "/assets/rojina.png"
+    },
+    "date": "2026-07-10",
+    "date_fa": "19 تیر 1405",
+    "likes": 174,
+    "views": 3880,
+    "category": "امنیت"
   }
 ]

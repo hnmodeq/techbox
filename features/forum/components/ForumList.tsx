@@ -2,6 +2,7 @@
 import { getModuleItems, moduleMeta } from "@/lib/content";
 import Link from "next/link";
 import { useState } from "react";
+import { zIndex } from "@/design";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 
@@ -73,18 +74,18 @@ export default function ForumList(){
           <div key={t.slug} className="grid grid-cols-12 px-3 sm:px-4 py-3 hover:bg-muted/20 gap-2 items-center">
             {/* vote column – reddit style */}
             <div className="hidden sm:flex col-span-1 flex-col items-center text-muted-foreground text-[11px]">
-              <button className="hover:text-orange-400">▲</button>
+              <button className="hover:text-[var(--tb-blog)]">▲</button>
               <span className="font-bold text-foreground">{t.likes}</span>
-              <button className="hover:text-sky-400">▼</button>
+              <button className="hover:text-[var(--tb-review)]">▼</button>
             </div>
             {/* main */}
             <div className="col-span-12 sm:col-span-6 flex gap-3">
               <img src={t.avatar} alt={t.author.name} className="w-10 h-10 rounded-full object-cover ring-1 ring-border mt-1 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Link href={`/forum/${t.slug}`} className="font-bold text-[14px] leading-6 hover:text-rose-300">{t.title}</Link>
-                  {t.solved && <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">حل‌شده ✓</span>}
-                  {!t.solved && <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">باز</span>}
+                  <Link href={`/forum/${t.slug}`} className="font-bold text-[14px] leading-6 hover:text-[var(--tb-forum)]">{t.title}</Link>
+                  {t.solved && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] text-[var(--tb-success)] border border-[color-mix(in_oklch,var(--tb-success)_20%,transparent)]">حل‌شده ✓</span>}
+                  {!t.solved && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[color-mix(in_oklch,var(--tb-warning)_10%,transparent)] text-[var(--tb-warning)] border border-[color-mix(in_oklch,var(--tb-warning)_20%,transparent)]">باز</span>}
                 </div>
                 <div className="text-[11px] text-muted-foreground mt-1">
                   ارسال شده توسط <b className="text-foreground">{t.author.name}</b> • {t.date_fa} • {t.tags.slice(0,2).map(x=>`#${x}`).join(" ")}
@@ -107,7 +108,7 @@ export default function ForumList(){
 
       {/* New Topic Modal */}
       {showNew && (
-        <div className="fixed inset-0 z-[220] flex items-center justify-center p-4" dir="rtl">
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{zIndex:zIndex.modal}} dir="rtl">
           <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={()=>setShowNew(false)} />
           <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-5 space-y-3 z-10">
             <div className="flex justify-between items-center">

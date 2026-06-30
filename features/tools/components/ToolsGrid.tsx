@@ -39,7 +39,7 @@ export default function ToolsGrid(){
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         {items.map(t=>(
           <div key={t.slug} className="card p-4">
-            <div className="text-[11px] text-cyan-300">{t.category}</div>
+            <div className="text-[11px] text-[var(--tb-tools)]">{t.category}</div>
             <div className="font-bold mt-1 text-[14px]">{t.title}</div>
             <div className="text-xs text-muted-foreground mt-2">{t.excerpt}</div>
             <div className="text-[10px] text-muted-foreground mt-3">استفاده: {t.views.toLocaleString("fa-IR")} بار</div>

@@ -6,8 +6,17 @@
     "excerpt": "2Bay، 10GbE، پردازنده Ryzen.",
     "content": "مشخصات کامل QNAP-2277...",
     "image": "/assets/blog-6.png",
-    "tags": ["QNAP-2277", "nas", "qnap", "ذخیره‌سازی", "فروشگاه"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش" },
+    "tags": [
+      "QNAP-2277",
+      "nas",
+      "qnap",
+      "ذخیره‌سازی",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
     "date": "2026-07-12",
     "date_fa": "21 تیر 1405",
     "likes": 31,
@@ -21,12 +30,88 @@
     "excerpt": "2U، Xeon Scalable نسل 3.",
     "content": "...",
     "image": "/assets/blog-1.jpg",
-    "tags": ["dell", "سرور", "فروشگاه"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش" },
+    "tags": [
+      "dell",
+      "سرور",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
     "date": "2026-06-10",
     "date_fa": "20 خرداد 1405",
     "likes": 12,
     "views": 540,
     "category": "سرور"
+  },
+  {
+    "slug": "hpe-dl380-gen11",
+    "module": "shop",
+    "title": "سرور HPE ProLiant DL380 Gen11",
+    "excerpt": "2U، پردازنده Xeon نسل چهارم، مناسب مجازی‌سازی سازمانی.",
+    "content": "مشخصات کامل HPE DL380 Gen11...",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "hp",
+      "hpe",
+      "سرور",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
+    "date": "2026-07-16",
+    "date_fa": "25 تیر 1405",
+    "likes": 22,
+    "views": 760,
+    "category": "سرور"
+  },
+  {
+    "slug": "mikrotik-crs-10g-switch",
+    "module": "shop",
+    "title": "سوئیچ MikroTik CRS 10G Enterprise",
+    "excerpt": "سوییچ مدیریتی با پورت‌های 10GbE برای رک‌های کوچک.",
+    "content": "...",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "mikrotik",
+      "switch",
+      "شبکه",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
+    "date": "2026-07-15",
+    "date_fa": "24 تیر 1405",
+    "likes": 18,
+    "views": 690,
+    "category": "شبکه"
+  },
+  {
+    "slug": "synology-rackstation-rs2426",
+    "module": "shop",
+    "title": "ذخیره‌ساز Synology RackStation RS2426+",
+    "excerpt": "NAS رک‌مونت برای بکاپ و فایل‌سرور سازمانی.",
+    "content": "...",
+    "image": "/assets/blog-6.png",
+    "tags": [
+      "synology",
+      "nas",
+      "storage",
+      "فروشگاه"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش"
+    },
+    "date": "2026-07-14",
+    "date_fa": "23 تیر 1405",
+    "likes": 27,
+    "views": 820,
+    "category": "NAS"
   }
 ]

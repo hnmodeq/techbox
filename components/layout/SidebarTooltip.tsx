@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { zIndex } from "@/design";
 
 type Props = {
   label: string;
@@ -73,10 +74,11 @@ export default function SidebarTooltip({
       {visible && pos && (
         <span
           role="tooltip"
-          className={`pointer-events-none fixed z-[250] whitespace-nowrap rounded-md bg-popover px-2.5 py-1.5 text-xs font-medium shadow-md ring-1 ring-border/40 animate-in fade-in-0 zoom-in-95 duration-150 ${tooltipClassName}`}
+          className={`pointer-events-none fixed whitespace-nowrap rounded-md bg-popover px-2.5 py-1.5 text-xs font-medium shadow-md ring-1 ring-border/40 animate-in fade-in-0 zoom-in-95 duration-150 ${tooltipClassName}`}
           style={{
             right: pos.right,
             top: pos.top,
+            zIndex: zIndex.tooltip,
             transform: "translateY(-50%)",
           }}
         >

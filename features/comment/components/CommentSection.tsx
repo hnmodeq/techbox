@@ -122,7 +122,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
         <textarea name="text" required placeholder="نظر خود را بنویسید… (Server Action – app/actions/comments.ts)" className="input min-h-[110px] text-[13px]" />
         <div className="flex justify-between items-center">
           <span className="text-[10px]" style={{color:"var(--muted-foreground)"}}>
-            {state?.ok ? <span style={{color:"#4ade80"}}>✓ ثبت شد – revalidatePath انجام شد</span> : "ارسال → createCommentAction → Prisma → revalidatePath"}
+            {state?.ok ? <span className="text-[var(--tb-success)]">✓ ثبت شد – revalidatePath انجام شد</span> : "ارسال → createCommentAction → Prisma → revalidatePath"}
           </span>
           <button disabled={isSubmitting || isPending} className="btn btn-primary text-[13px]">
             {isSubmitting ? "…" : "ارسال نظر"}

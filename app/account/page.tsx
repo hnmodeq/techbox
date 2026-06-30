@@ -117,7 +117,7 @@ export default function AccountPage(){
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <span className={`text-xs transition-opacity ${saved ? "opacity-100 text-emerald-400" : "opacity-0"}`}>ذخیره شد ✓</span>
+            <span className={`text-xs transition-opacity ${saved ? "opacity-100 text-[var(--tb-success)]" : "opacity-0"}`}>ذخیره شد ✓</span>
             <button className="btn btn-primary">ذخیره پروفایل</button>
           </div>
         </div>

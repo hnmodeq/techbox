@@ -23,7 +23,7 @@ export default function AdminLogin() {
           <label className="text-xs text-muted-foreground">نام کاربری</label>
           <input value={u} onChange={e=>setU(e.target.value)} className="input mt-1" placeholder="sara / admin / nima ..." />
         </div>
-        {err && <p className="text-xs text-rose-400">{err}</p>}
+        {err && <p className="text-xs text-[var(--tb-danger)]">{err}</p>}
         <button className="btn btn-primary w-full">ورود</button>
         <div className="text-[11px] text-muted-foreground leading-6 border-t border-border pt-3">
           کاربران تست:<br/>

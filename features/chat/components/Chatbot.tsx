@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { zIndex } from "@/design";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };
 
@@ -52,8 +53,8 @@ export default function Chatbot(){
       {/* FAB */}
       <button
         onClick={()=>setOpen(true)}
-        className="fixed bottom-5 left-5 z-[240] rounded-full shadow-2xl flex items-center gap-2 px-4 py-3 text-sm font-bold transition-transform hover:scale-105"
-        style={{background:"linear-gradient(135deg,#1e3a8a,#2563eb)", color:"white", display: open ? "none" : "flex"}}
+        className="fixed bottom-5 left-5 rounded-full shadow-2xl flex items-center gap-2 px-4 py-3 text-sm font-bold transition-transform hover:scale-105"
+        style={{background:"linear-gradient(135deg, color-mix(in oklch, var(--tb-brand) 70%, black), var(--tb-brand))", color:"var(--tb-brand-foreground)", display: open ? "none" : "flex", zIndex: zIndex.popover}}
         aria-label="چت با تکباکس"
       >
         <span className="text-lg">💬</span>
@@ -62,7 +63,7 @@ export default function Chatbot(){
 
       {/* panel */}
       {open && (
-        <div dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px] z-[500]" style={{zIndex:500}}>
+        <div dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{zIndex:zIndex.chatbot}}>
           <div className="card flex flex-col h-[520px] max-h-[72vh] overflow-hidden p-0" style={{boxShadow:"0 20px 60px rgba(0,0,0,.45)"}}>
             <div className="flex items-center justify-between px-3 py-2.5 border-b" style={{borderColor:"var(--border)", background:"var(--surface-1, var(--muted))"}}>
               <div className="text-[13px] font-black">دستیار تکباکس <span className="text-[10px] font-normal" style={{color:"var(--muted-foreground)"}}>AI Beta</span></div>

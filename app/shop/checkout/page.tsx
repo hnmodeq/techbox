@@ -51,12 +51,12 @@ export default function CheckoutPage(){
           if(v.verified){
             alert(`پرداخت موفق! \nRefID: ${v.ref_id || "TEST"}\nمتشکرم از خرید شما از تکباکس.`);
             clear();
-            location.href = "/shop?thanks=1";
+            window.location.assign("/shop?thanks=1");
             return;
           }
         }
         // real redirect
-        window.location.href = data.url;
+        window.location.assign(data.url);
         return;
       }
       alert("خطا در ایجاد تراکنش: " + (data.error || "نامشخص"));
@@ -67,7 +67,7 @@ export default function CheckoutPage(){
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-12" dir="rtl">
-      <h1 className="text-2xl font-black mb-2" style={{color:"#a3e635"}}>تسویه حساب – زرین‌پال</h1>
+      <h1 className="text-2xl font-black mb-2 text-[var(--tb-shop)]">تسویه حساب – زرین‌پال</h1>
       <p className="text-xs mb-6" style={{color:"var(--muted-foreground)"}}>
         درگاه: <b>ZarinPal</b> – {process.env.NEXT_PUBLIC_ZARIN_MERCHANT_ID ? "Live" : "Sandbox / Mock"} – برای فعال‌سازی واقعی، در .env بگذارید: <code>ZARIN_MERCHANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>
       </p>
@@ -107,7 +107,7 @@ export default function CheckoutPage(){
         <div className="card p-5 h-fit sticky top-24">
           <h4 className="font-bold mb-3">خلاصه سبد ({count.toLocaleString("fa-IR")} قلم)</h4>
           <div className="space-y-2 max-h-80 overflow-y-auto text-[12px]">
-            {items.length===0 ? <p style={{color:"var(--muted-foreground)"}}>سبد خالی است – <Link href="/shop" style={{color:"#a3e635"}} className="underline">فروشگاه</Link></p> :
+            {items.length===0 ? <p style={{color:"var(--muted-foreground)"}}>سبد خالی است – <Link href="/shop" className="underline text-[var(--tb-shop)]">فروشگاه</Link></p> :
               items.map(i=>(
                 <div key={i.slug} className="flex justify-between border-b pb-2" style={{borderColor:"var(--border)"}}>
                   <span className="truncate ps-2">{i.title} × {i.qty.toLocaleString("fa-IR")}</span>
@@ -119,7 +119,7 @@ export default function CheckoutPage(){
           <div className="mt-3 space-y-1 text-[13px]">
             <div className="flex justify-between"><span>جمع جزء</span><span>{totalToman.toLocaleString("fa-IR")} تومان</span></div>
             <div className="flex justify-between" style={{color:"var(--muted-foreground)"}}><span>ارسال</span><span>رایگان</span></div>
-            <div className="flex justify-between font-black text-[15px] pt-2 border-t" style={{borderColor:"var(--border)"}}><span>مبلغ قابل پرداخت</span><span style={{color:"#a3e635"}}>{totalToman.toLocaleString("fa-IR")} تومان</span></div>
+            <div className="flex justify-between font-black text-[15px] pt-2 border-t" style={{borderColor:"var(--border)"}}><span>مبلغ قابل پرداخت</span><span className="text-[var(--tb-shop)]">{totalToman.toLocaleString("fa-IR")} تومان</span></div>
             <div className="text-[10px]" style={{color:"var(--muted-foreground)"}}>≈ {(amountRial).toLocaleString("fa-IR")} ریال – درگاه زرین‌پال</div>
           </div>
         </div>

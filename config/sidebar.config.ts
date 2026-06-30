@@ -5,14 +5,12 @@ import {
   Newspaper,
   Clapperboard,
   ShoppingBag,
-  Wrench,
   Users,
   ShieldCheck,
   Download,
   CircleUser,
   Calculator,
   Network,
-  MessageCircleQuestion,
 } from "lucide-react";
 import { NavItem } from "@/types/sidebar.types";
 import { moduleColors } from "@/config/module-colors";
@@ -64,36 +62,20 @@ export const navItems: NavItem[] = [
     iconActiveClassName: moduleColors.shop.active,
   },
   {
-    title: "ابزارها",
-    href: "/tools",
-    icon: Wrench,
-    iconClassName: moduleColors.tools.base,
-    iconHoverClassName: moduleColors.tools.hover,
-    iconActiveClassName: moduleColors.tools.active,
-  },
-  {
     title: "RAID Calculator",
     href: "/tools/raid-calculator",
     icon: Calculator,
-    iconClassName: "text-cyan-400",
-    iconHoverClassName: "group-hover:text-cyan-300",
-    iconActiveClassName: "text-cyan-300",
+    iconClassName: moduleColors.raid.base,
+    iconHoverClassName: moduleColors.raid.hover,
+    iconActiveClassName: moduleColors.raid.active,
   },
   {
     title: "Subnet Calculator",
     href: "/tools/subnet-calculator",
     icon: Network,
-    iconClassName: "text-cyan-400",
-    iconHoverClassName: "group-hover:text-cyan-300",
-    iconActiveClassName: "text-cyan-300",
-  },
-  {
-    title: "مشاوره VIP",
-    href: "/consultation",
-    icon: MessageCircleQuestion,
-    iconClassName: "text-fuchsia-400",
-    iconHoverClassName: "group-hover:text-fuchsia-300",
-    iconActiveClassName: "text-fuchsia-300",
+    iconClassName: moduleColors.subnet.base,
+    iconHoverClassName: moduleColors.subnet.hover,
+    iconActiveClassName: moduleColors.subnet.active,
   },
   {
     title: "انجمن",
@@ -135,23 +117,22 @@ export const themeIconClass = {
     "inline-flex h-10 w-10 items-center rounded-lg transition-all duration-200",
   buttonClassName: "text-muted-foreground",
   buttonHoverClassName: "hover:text-foreground",
-  sunIconClassName: "text-yellow-500",
-  sunIconHoverClassName: "group-hover:text-yellow-400",
-  sunIconActiveClassName: "text-foreground group-hover:text-yellow-400",
+  sunIconClassName: "text-[var(--tb-warning)]",
+  sunIconHoverClassName: "group-hover:text-[var(--tb-warning)]",
+  sunIconActiveClassName: "text-foreground group-hover:text-[var(--tb-warning)]",
   moonIconClassName: "text-zinc-200 dark:text-zinc-100",
-  moonIconHoverClassName: "group-hover:text-blue-200",
+  moonIconHoverClassName: "group-hover:text-[var(--tb-info)]",
   moonIconActiveClassName:
-    "text-foreground dark:text-foreground group-hover:text-blue-200",
+    "text-foreground dark:text-foreground group-hover:text-[var(--tb-info)]",
 };
 
 export const sidebarBase = [
   "bg-background text-foreground",
-  "shadow-[0_4px_24px_0_oklch(0_0_0/0.10)]",
-  "dark:shadow-[0_4px_32px_0_oklch(0_0_0/0.35)]",
+  "shadow-[var(--tb-shadow-lg)]",
 ].join(" ");
 
 export const linkBase =
-  "group relative flex h-11 w-full items-center rounded-lg text-sm font-normal transition-all duration-200";
+  "group relative flex h-11 w-full items-center rounded-[var(--tb-radius-lg)] text-sm font-normal transition-all duration-[var(--tb-duration-normal)]";
 
 export const linkInactive = "text-muted-foreground hover:text-foreground";
 

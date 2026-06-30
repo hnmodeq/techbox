@@ -5,13 +5,17 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:webpack": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --pretty false",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "data": "node scripts/data.cjs",
-    "tree": "node scripts/tree.cjs"
+    "data": "node scripts/transferdata.cjs",
+    "tree": "node scripts/transfertree.cjs",
+    "data:legacy": "node scripts/data.cjs",
+    "tree:legacy": "node scripts/tree.cjs"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.8",
@@ -36,7 +40,7 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^10",
+    "eslint": "^9.39.1",
     "eslint-config-next": "16.2.9",
     "postcss": "^8",
     "prisma": "^6.19.3",

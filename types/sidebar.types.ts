@@ -13,6 +13,7 @@ export type NavItem = {
   iconClassName?: string;        // رنگ عادی آیکون
   iconHoverClassName?: string;   // رنگ hover آیکون
   iconActiveClassName?: string;  // رنگ active آیکون
+  tooltipClassName?: string;     // رنگ tooltip در حالت بسته
 };
 
 export type SidebarContentProps = {

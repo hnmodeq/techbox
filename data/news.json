@@ -6,8 +6,15 @@
     "excerpt": "شرکت نوپای ایرانی چیپ‌ست 3 نانومتری را معرفی کرد.",
     "content": "متن کامل خبر هوش مصنوعی...",
     "image": "/assets/blog-4.jpg",
-    "tags": ["هوش مصنوعی", "تراشه", "سخت‌افزار"],
-    "author": { "name": "تحریریه تکباکس", "role": "اخبار" },
+    "tags": [
+      "هوش مصنوعی",
+      "تراشه",
+      "سخت‌افزار"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
     "date": "2026-06-28",
     "date_fa": "7 تیر 1405",
     "time": "14:32",
@@ -23,8 +30,15 @@
     "excerpt": "ظرفیت جدید 40 رک در تهران.",
     "content": "...",
     "image": "/assets/blog-2.jpg",
-    "tags": ["زیرساخت", "دیتاسنتر", "ایران"],
-    "author": { "name": "تحریریه تکباکس", "role": "اخبار" },
+    "tags": [
+      "زیرساخت",
+      "دیتاسنتر",
+      "ایران"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
     "date": "2026-06-27",
     "date_fa": "6 تیر 1405",
     "time": "11:15",
@@ -40,8 +54,14 @@
     "excerpt": "پایداری 5 میلی‌ثانیه.",
     "content": "...",
     "image": "/assets/blog-3.jpeg",
-    "tags": ["کوانتوم", "پژوهش"],
-    "author": { "name": "تحریریه تکباکس", "role": "اخبار" },
+    "tags": [
+      "کوانتوم",
+      "پژوهش"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
     "date": "2026-06-25",
     "date_fa": "4 تیر 1405",
     "time": "09:40",
@@ -57,8 +77,15 @@
     "excerpt": "کرنل 6.9 منتشر شد.",
     "content": "...",
     "image": "/assets/blog-1.jpg",
-    "tags": ["لینوکس", "کرنل", "شبکه"],
-    "author": { "name": "تحریریه تکباکس", "role": "اخبار" },
+    "tags": [
+      "لینوکس",
+      "کرنل",
+      "شبکه"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
     "date": "2026-06-24",
     "date_fa": "3 تیر 1405",
     "time": "16:05",
@@ -74,8 +101,15 @@
     "excerpt": "5G در 12 شهر جدید.",
     "content": "...",
     "image": "/assets/blog-5.jpg",
-    "tags": ["5g", "شبکه", "ایران"],
-    "author": { "name": "تحریریه تکباکس", "role": "اخبار" },
+    "tags": [
+      "5g",
+      "شبکه",
+      "ایران"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
     "date": "2026-06-20",
     "date_fa": "30 خرداد 1405",
     "time": "10:20",
@@ -91,8 +125,15 @@
     "excerpt": "رشد 34 درصدی.",
     "content": "...",
     "image": "/assets/blog-4.jpg",
-    "tags": ["امنیت", "باج‌افزار", "cybersecurity"],
-    "author": { "name": "تحریریه تکباکس", "role": "اخبار" },
+    "tags": [
+      "امنیت",
+      "باج‌افزار",
+      "cybersecurity"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
     "date": "2026-06-18",
     "date_fa": "28 خرداد 1405",
     "time": "08:15",
@@ -100,5 +141,126 @@
     "likes": 90,
     "views": 3100,
     "category": "امنیت"
+  },
+  {
+    "slug": "datacenter-cooling-liquid-iran",
+    "module": "news",
+    "title": "خنک‌سازی مایع در دیتاسنترهای ایران جدی‌تر شد",
+    "excerpt": "اپراتورهای زیرساخت برای کاهش مصرف انرژی به سراغ liquid cooling می‌روند.",
+    "content": "...",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "دیتاسنتر",
+      "خنک‌سازی",
+      "زیرساخت"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
+    "date": "2026-07-14",
+    "date_fa": "23 تیر 1405",
+    "time": "12:10",
+    "source": "TechBox Lab",
+    "likes": 76,
+    "views": 2380,
+    "category": "زیرساخت"
+  },
+  {
+    "slug": "wifi-7-enterprise-rollout",
+    "module": "news",
+    "title": "تجهیزات Wi‑Fi 7 سازمانی وارد بازار ایران شدند",
+    "excerpt": "روترها و اکسس‌پوینت‌های نسل جدید با تمرکز بر latency پایین عرضه شدند.",
+    "content": "...",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "wifi7",
+      "شبکه",
+      "enterprise"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
+    "date": "2026-07-13",
+    "date_fa": "22 تیر 1405",
+    "time": "17:45",
+    "source": "NetworkWorld",
+    "likes": 121,
+    "views": 4210,
+    "category": "شبکه"
+  },
+  {
+    "slug": "backup-strategy-ransomware",
+    "module": "news",
+    "title": "گزارش تازه: بکاپ آفلاین هنوز بهترین دفاع در برابر باج‌افزار است",
+    "excerpt": "کارشناسان امنیت روی immutable backup و تست بازیابی دوره‌ای تاکید می‌کنند.",
+    "content": "...",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "امنیت",
+      "backup",
+      "باج‌افزار"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
+    "date": "2026-07-12",
+    "date_fa": "21 تیر 1405",
+    "time": "08:55",
+    "source": "BleepingComputer",
+    "likes": 184,
+    "views": 5080,
+    "category": "امنیت"
+  },
+  {
+    "slug": "arm-servers-hosting-growth",
+    "module": "news",
+    "title": "رشد استفاده از سرورهای ARM در هاستینگ ابری",
+    "excerpt": "مصرف انرژی کمتر و تراکم بالاتر، ARM را برای سرویس‌های ابری جذاب کرده است.",
+    "content": "...",
+    "image": "/assets/blog-1.jpg",
+    "tags": [
+      "arm",
+      "سرور",
+      "cloud"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
+    "date": "2026-07-11",
+    "date_fa": "20 تیر 1405",
+    "time": "19:20",
+    "source": "The Register",
+    "likes": 99,
+    "views": 2990,
+    "category": "سرور"
+  },
+  {
+    "slug": "nvme-of-storage-adoption",
+    "module": "news",
+    "title": "پروتکل NVMe‑oF در ذخیره‌سازی سازمانی پررنگ‌تر شد",
+    "excerpt": "اتصال کم‌تاخیر استوریج به سرورها بدون وابستگی به SAN سنتی.",
+    "content": "...",
+    "image": "/assets/blog-6.png",
+    "tags": [
+      "nvme",
+      "storage",
+      "san",
+      "nas"
+    ],
+    "author": {
+      "name": "تحریریه تکباکس",
+      "role": "اخبار"
+    },
+    "date": "2026-07-09",
+    "date_fa": "18 تیر 1405",
+    "time": "13:05",
+    "source": "SNIA",
+    "likes": 64,
+    "views": 1760,
+    "category": "ذخیره‌سازی"
   }
 ]

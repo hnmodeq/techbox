@@ -26,11 +26,11 @@ export default function ReviewGrid(){
             <Link href={`/review/${r.slug}`} className="block relative aspect-square bg-muted overflow-hidden">
               <img src={r.image||""} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={r.title}/>
               <span className="absolute top-3 right-3 badge !bg-black/55 !text-white backdrop-blur border-white/20">{r.category}</span>
-              <span className="absolute bottom-3 left-3 text-[11px] bg-black/60 text-amber-300 px-2 py-1 rounded-full backdrop-blur">{stars(rating)} {rating.toFixed(1)}</span>
+              <span className="absolute bottom-3 left-3 text-[11px] bg-black/60 text-[var(--tb-warning)] px-2 py-1 rounded-full backdrop-blur">{stars(rating)} {rating.toFixed(1)}</span>
             </Link>
             <div className="p-4 flex flex-col flex-1">
               <h3 className="font-extrabold text-[15px] leading-7 line-clamp-2 min-h-[56px]">
-                <Link href={`/review/${r.slug}`} className="hover:text-sky-400">{r.title}</Link>
+                <Link href={`/review/${r.slug}`} className="hover:text-[var(--tb-review)]">{r.title}</Link>
               </h3>
               <p className="text-xs text-muted-foreground line-clamp-2 mt-2 flex-1">{r.excerpt}</p>
 
