@@ -4,7 +4,7 @@ const path = require("path");
 
 const rootDir = process.cwd();
 
-const outputFile = path.join(rootDir, "readme", "transferdata.md");
+const outputFile = path.join(rootDir, "readme", "data.md");
 
 const targets = [
 "app",
@@ -21,7 +21,15 @@ const targets = [
 "public",
 "stores",
 "tests",
-"types"
+"types",
+"package.json",
+"tsconfig.json",
+"pnpm-workspace.yaml",
+"next.config.mjs",
+"next-env.d.ts",
+"postcss.config.mjs",
+".env",
+".env.local"
 ];
 
 const allowedExtensions = [

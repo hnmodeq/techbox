@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const rootDir = process.cwd();
-const outputFile = path.join(rootDir, "readme", "transfertree.md");
+const outputFile = path.join(rootDir, "readme", "tree.md");
 
 const ignored = new Set([
   ".git",

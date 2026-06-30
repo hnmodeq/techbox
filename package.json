@@ -10,8 +10,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
-    "transferdata": "node scripts/transferdata.cjs",
-    "transfertree": "node scripts/transfertree.cjs"
+    "data": "node scripts/data.cjs",
+    "tree": "node scripts/tree.cjs"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.8",
