@@ -116,3 +116,65 @@
 - [x] Validation: `npx tsc --noEmit --pretty false` passes.
 - [x] Validation: `npx eslint .` passes cleanly.
 - [ ] C Step 2: optional next content pass for users/comments/categories/search variety.
+
+## C Step 2 — richer source data variety
+- [x] Expanded `data/users.json` with more realistic editors/moderators across modules.
+- [x] Expanded `data/comments.json` with seeded threads across blog, media, review, shop, download, and forum content.
+- [x] Expanded `data/forum.json` with more realistic active technical topics.
+- [x] Expanded `data/shop.json` with more product variety for feeds/search.
+- [x] Expanded `data/review.json` with more review variety.
+- [x] Kept all content source-driven from JSON; no component hardcoding.
+- [x] JSON validation passed for edited files.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] C Step 3 optional: taxonomy/category normalization and search/tag consistency audit.
+
+## C Step 3 — taxonomy/category/tag consistency audit
+- [x] Audited categories and tags across source JSON files.
+- [x] Added missing author avatars for content authors/teams across news, media, download, forum, review, shop, and tools data.
+- [x] Added safe paired Persian/English tag aliases for better cross-module search coverage.
+- [x] Added optional `author_avatar` to seeded comments for future UI/CMS use without breaking current UI.
+- [x] Kept categories intact where they are meaningful/module-specific; avoided risky mass category rewrites.
+- [x] JSON validation passed for edited files.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] Next: D admin/CMS cleanup.
+
+## D Step 1 — admin/CMS cleanup, dashboard/login consistency
+- [x] Admin dashboard now uses real `allUsers` source data instead of a hardcoded user list.
+- [x] Admin dashboard displays module access with `ModuleBadge` instead of comma-only text.
+- [x] Admin login test users are easier to scan and show module badges.
+- [x] Admin posts heading shows the current module with `ModuleBadge`.
+- [x] Admin roles module selector uses `ModuleBadge` for module access labels.
+- [x] Token-cleaned touched admin muted/foreground aliases.
+- [x] Kept existing auth/localStorage/API fallback behavior unchanged.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] D Step 2: post editor UX cleanup and safer draft/local feedback.
+
+## D Step 2 — post editor UX cleanup and safer draft/local feedback
+- [x] Reworked `app/admin/posts/new/page.tsx` into a clearer CMS editor layout.
+- [x] Added module badge and edit/create state badge in the editor header.
+- [x] Added category field with module-specific category hints.
+- [x] Added slug helper button and shared slug generation logic.
+- [x] Improved API payload to send `category` when provided instead of always `undefined`.
+- [x] Improved localStorage fallback draft payload with `savedAt`, `savedAtFa`, and `apiError`.
+- [x] Added source preview panel showing route, category, tag count, excerpt length, and content length.
+- [x] Added CMS guidance panel for editors.
+- [x] Kept `/api/posts` endpoint and local fallback behavior compatible.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] D Step 3: admin posts list filters/table UX cleanup.
+
+## D Step 3 — admin posts list filters/table UX cleanup
+- [x] Reworked `app/admin/posts/page.tsx` with search and category filters.
+- [x] Added source stats cards for filtered result count, views, likes, and unique tags.
+- [x] Added local draft count/latest draft summary from `localStorage` per module.
+- [x] Improved current module/status badges in the header.
+- [x] Reworked table columns with category badges, stats, author/date, and responsive tag display.
+- [x] Replaced plain view/edit links with `ButtonLink` actions.
+- [x] Added clearer empty filtered-state with reset button.
+- [x] Kept existing source JSON loading and module permission behavior unchanged.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] D Step 4: roles page UX cleanup and local role management safeguards.

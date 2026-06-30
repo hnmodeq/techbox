@@ -10,11 +10,15 @@
       "fortigate",
       "firewall",
       "security",
-      "فروشگاه"
+      "فروشگاه",
+      "امنیت",
+      "فایروال",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-18",
     "date_fa": "27 تیر 1405",
@@ -33,11 +37,14 @@
       "ssd",
       "nvme",
       "storage",
-      "فروشگاه"
+      "فروشگاه",
+      "ذخیره‌سازی",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-17",
     "date_fa": "26 تیر 1405",
@@ -57,11 +64,14 @@
       "nas",
       "qnap",
       "ذخیره‌سازی",
-      "فروشگاه"
+      "فروشگاه",
+      "storage",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-12",
     "date_fa": "21 تیر 1405",
@@ -79,11 +89,14 @@
     "tags": [
       "dell",
       "سرور",
-      "فروشگاه"
+      "فروشگاه",
+      "server",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-10",
     "date_fa": "20 خرداد 1405",
@@ -102,11 +115,14 @@
       "hp",
       "hpe",
       "سرور",
-      "فروشگاه"
+      "فروشگاه",
+      "server",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-16",
     "date_fa": "25 تیر 1405",
@@ -125,11 +141,15 @@
       "mikrotik",
       "switch",
       "شبکه",
-      "فروشگاه"
+      "فروشگاه",
+      "network",
+      "سوئیچ",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-15",
     "date_fa": "24 تیر 1405",
@@ -148,16 +168,99 @@
       "synology",
       "nas",
       "storage",
-      "فروشگاه"
+      "فروشگاه",
+      "ذخیره‌سازی",
+      "shop"
     ],
     "author": {
       "name": "فروشگاه تکباکس",
-      "role": "فروش"
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-14",
     "date_fa": "23 تیر 1405",
     "likes": 27,
     "views": 820,
     "category": "NAS"
+  },
+  {
+    "slug": "ubiquiti-u7-pro-access-point",
+    "module": "shop",
+    "title": "اکسس‌پوینت Ubiquiti UniFi U7 Pro",
+    "excerpt": "Wi‑Fi 7 برای دفاتر مدرن، مناسب نصب سقفی و مدیریت متمرکز.",
+    "content": "مشخصات کامل UniFi U7 Pro شامل Wi‑Fi 7، PoE+ و مدیریت از طریق کنترلر UniFi.",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "ubiquiti",
+      "wifi7",
+      "access point",
+      "شبکه",
+      "فروشگاه",
+      "network",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-21",
+    "date_fa": "30 تیر 1405",
+    "likes": 24,
+    "views": 740,
+    "category": "شبکه"
+  },
+  {
+    "slug": "apc-smart-ups-1500va",
+    "module": "shop",
+    "title": "UPS رک‌مونت APC Smart‑UPS 1500VA",
+    "excerpt": "محافظت برق برای سرور، NAS و تجهیزات شبکه در رک‌های کوچک.",
+    "content": "مشخصات کامل UPS شامل مدیریت هوشمند، باتری قابل تعویض و خروجی پایدار برای تجهیزات حساس.",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "apc",
+      "ups",
+      "power",
+      "rack",
+      "فروشگاه",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-20",
+    "date_fa": "29 تیر 1405",
+    "likes": 16,
+    "views": 510,
+    "category": "برق و رک"
+  },
+  {
+    "slug": "intel-x710-da2-10gbe-card",
+    "module": "shop",
+    "title": "کارت شبکه Intel X710‑DA2 Dual 10GbE",
+    "excerpt": "دو پورت SFP+ برای سرورهای مجازی‌سازی، NAS و storage network.",
+    "content": "کارت شبکه Intel X710 برای سناریوهای 10GbE، iSCSI، vMotion و uplink سرور.",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "intel",
+      "10gbe",
+      "sfp+",
+      "network",
+      "فروشگاه",
+      "شبکه",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-19",
+    "date_fa": "28 تیر 1405",
+    "likes": 21,
+    "views": 680,
+    "category": "شبکه"
   }
 ]

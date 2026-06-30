@@ -10,11 +10,14 @@
       "هوش مصنوعی",
       "edge",
       "امنیت",
-      "شبکه"
+      "شبکه",
+      "network",
+      "security"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-22",
     "date_fa": "31 تیر 1405",
@@ -35,11 +38,13 @@
       "ddr6",
       "سرور",
       "حافظه",
-      "دیتاسنتر"
+      "دیتاسنتر",
+      "server"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-21",
     "date_fa": "30 تیر 1405",
@@ -60,11 +65,13 @@
       "امنیت",
       "siem",
       "open-source",
-      "soc"
+      "soc",
+      "security"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-20",
     "date_fa": "29 تیر 1405",
@@ -85,11 +92,14 @@
       "backup",
       "cloud",
       "storage",
-      "آرشیو"
+      "آرشیو",
+      "ذخیره‌سازی",
+      "بکاپ"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-19",
     "date_fa": "28 تیر 1405",
@@ -113,7 +123,8 @@
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-28",
     "date_fa": "7 تیر 1405",
@@ -137,7 +148,8 @@
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-27",
     "date_fa": "6 تیر 1405",
@@ -160,7 +172,8 @@
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-25",
     "date_fa": "4 تیر 1405",
@@ -180,11 +193,14 @@
     "tags": [
       "لینوکس",
       "کرنل",
-      "شبکه"
+      "شبکه",
+      "network",
+      "linux"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-24",
     "date_fa": "3 تیر 1405",
@@ -204,11 +220,13 @@
     "tags": [
       "5g",
       "شبکه",
-      "ایران"
+      "ایران",
+      "network"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-20",
     "date_fa": "30 خرداد 1405",
@@ -228,11 +246,13 @@
     "tags": [
       "امنیت",
       "باج‌افزار",
-      "cybersecurity"
+      "cybersecurity",
+      "security"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-06-18",
     "date_fa": "28 خرداد 1405",
@@ -256,7 +276,8 @@
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-14",
     "date_fa": "23 تیر 1405",
@@ -276,11 +297,13 @@
     "tags": [
       "wifi7",
       "شبکه",
-      "enterprise"
+      "enterprise",
+      "network"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-13",
     "date_fa": "22 تیر 1405",
@@ -300,11 +323,14 @@
     "tags": [
       "امنیت",
       "backup",
-      "باج‌افزار"
+      "باج‌افزار",
+      "security",
+      "بکاپ"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-12",
     "date_fa": "21 تیر 1405",
@@ -324,11 +350,13 @@
     "tags": [
       "arm",
       "سرور",
-      "cloud"
+      "cloud",
+      "server"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-11",
     "date_fa": "20 تیر 1405",
@@ -349,11 +377,13 @@
       "nvme",
       "storage",
       "san",
-      "nas"
+      "nas",
+      "ذخیره‌سازی"
     ],
     "author": {
       "name": "تحریریه تکباکس",
-      "role": "اخبار"
+      "role": "اخبار",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-09",
     "date_fa": "18 تیر 1405",

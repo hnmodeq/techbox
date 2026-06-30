@@ -183,3 +183,50 @@ Copy these files into your real project. Do **not** replace your `public/` folde
 - Kept entries compatible with existing `ContentItem` shape and existing UI feeds.
 - Validation: edited JSON files parse successfully.
 - Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## C Step 2 — richer source data variety
+- Expanded `data/users.json` from 6 to 10 users/editors with module coverage.
+- Expanded `data/comments.json` from 3 to 15 seeded comments/replies across multiple modules.
+- Expanded `data/forum.json` from 6 to 10 realistic technical topics.
+- Expanded `data/shop.json` from 7 to 10 products for better shop/home feed variety.
+- Expanded `data/review.json` from 5 to 8 reviews for better review feed/grid variety.
+- Kept data compatible with existing source loaders and UI components.
+- Validation: edited JSON files parse successfully.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## C Step 3 — taxonomy/category/tag consistency audit
+- Audited taxonomy across `data/blog.json`, `data/news.json`, `data/media.json`, `data/download.json`, `data/forum.json`, `data/review.json`, `data/shop.json`, and `data/tools.json`.
+- Added missing `author.avatar` values to content authors/teams so cards/details can render avatars consistently.
+- Added paired Persian/English tag aliases such as `network/شبکه`, `security/امنیت`, `storage/ذخیره‌سازی`, `backup/بکاپ`, `virtualization/مجازی‌سازی`, and similar safe aliases for better search/tag coverage.
+- Added optional `author_avatar` to `data/comments.json` entries for future comment UI/CMS use; current UI remains compatible.
+- Preserved existing categories where useful and module-specific.
+- Validation: edited JSON files parse successfully.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## D Step 1 — admin/CMS cleanup, dashboard/login consistency
+- Updated `app/admin/page.tsx` so the super-admin user list is rendered from `allUsers` source data instead of hardcoded names.
+- Updated `app/admin/page.tsx` to display current user module access and managed users with `ModuleBadge`.
+- Updated `app/admin/login/page.tsx` so test users show module badges and are easier to scan.
+- Updated `app/admin/posts/page.tsx` to show the current module as a `ModuleBadge` in the page heading.
+- Updated `app/admin/roles/page.tsx` so module selector labels use `ModuleBadge`.
+- Token-cleaned touched admin text aliases while preserving current localStorage/auth/API fallback behavior.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## D Step 2 — post editor UX cleanup and safer draft/local feedback
+- Reworked `app/admin/posts/new/page.tsx` into a two-column CMS editor with a source preview sidebar.
+- Added module/edit-state badges, category input with module-specific hints, and a slug generation helper.
+- Improved save payload handling so `category` is included when provided.
+- Improved local draft fallback stored in `localStorage` with timestamp, Persian timestamp, and API error message.
+- Added preview details for route, category, tag count, excerpt length, and content length.
+- Added a CMS guidance panel for editors while preserving the existing `/api/posts` and local fallback behavior.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## D Step 3 — admin posts list filters/table UX cleanup
+- Reworked `app/admin/posts/page.tsx` with query search and category filtering for the selected module.
+- Added module source summary badges and local draft count/latest draft detection from `localStorage`.
+- Added stat cards for filtered result count, total views, total likes, and unique tag count.
+- Improved the posts table with category badges, responsive tag badges, author/date details, and clearer stats.
+- Replaced plain view/edit action links with shared `ButtonLink` actions.
+- Added a clearer empty filtered-state with reset filters action.
+- Preserved existing JSON source loading, permissions, and admin routing behavior.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.

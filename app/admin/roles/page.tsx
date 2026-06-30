@@ -41,7 +41,7 @@ export default function RolesPage(){
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black">مدیریت نقش‌ها – RBAC</h1>
-          <p className="text-xs text-muted-foreground mt-1">مدیر کل می‌تواند نقش بسازد، دسترسی ماژول‌ها را تعیین کند – مثل Blog Editor / Content Creator</p>
+          <p className="text-xs text-[var(--tb-muted-foreground)] mt-1">مدیر کل می‌تواند نقش بسازد، دسترسی ماژول‌ها را تعیین کند – مثل Blog Editor / Content Creator</p>
         </div>
         <ModuleBadge module="success">super_admin only</ModuleBadge>
       </div>
@@ -52,18 +52,18 @@ export default function RolesPage(){
           <input value={name} onChange={e=>setName(e.target.value)} className="input text-sm" placeholder="role_name – ex: blog_editor" dir="ltr" />
           <input value={titleFa} onChange={e=>setTitleFa(e.target.value)} className="input text-sm" placeholder="عنوان فارسی – ex: ویراستار مجله" />
           <div>
-            <div className="text-[11px] text-muted-foreground mb-2">دسترسی ماژول‌ها:</div>
+            <div className="text-[11px] text-[var(--tb-muted-foreground)] mb-2">دسترسی ماژول‌ها:</div>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               {allMods.map(m=>(
                 <label key={m} className={`flex items-center gap-2 p-2 rounded-[var(--tb-radius-md)] border cursor-pointer transition-colors ${mods[m] ? "bg-[color-mix(in_oklch,var(--tb-primary)_10%,transparent)] border-[color-mix(in_oklch,var(--tb-primary)_40%,transparent)]" : "border-[var(--tb-border)] hover:bg-[var(--tb-muted)]"}`}>
                   <input type="checkbox" checked={!!mods[m]} onChange={()=>toggleMod(m)} />
-                  <span>{moduleMeta[m].titleFa}</span>
+                  <ModuleBadge module={m}>{moduleMeta[m].titleFa}</ModuleBadge>
                 </label>
               ))}
             </div>
           </div>
           <Button size="xs" className="w-full">ایجاد نقش +</Button>
-          <p className="text-[10px] text-muted-foreground leading-5">
+          <p className="text-[10px] text-[var(--tb-muted-foreground)] leading-5">
             ذخیره در: <code>localStorage tb_roles_v4</code> + آماده POST <code>/api/roles</code> – در پروداکشن به Prisma Role table متصل می‌شود.
           </p>
         </form>

@@ -10,7 +10,9 @@
       "mikrotik",
       "switch",
       "10gbe",
-      "بررسی"
+      "بررسی",
+      "سوئیچ",
+      "review"
     ],
     "author": {
       "name": "نیما راد",
@@ -34,7 +36,9 @@
       "synology",
       "nas",
       "backup",
-      "بررسی"
+      "بررسی",
+      "بکاپ",
+      "review"
     ],
     "author": {
       "name": "رژینا کریمی",
@@ -58,7 +62,10 @@
       "hpe",
       "server",
       "virtualization",
-      "بررسی"
+      "بررسی",
+      "سرور",
+      "مجازی‌سازی",
+      "review"
     ],
     "author": {
       "name": "هومن مدق",
@@ -83,11 +90,14 @@
       "nas",
       "بررسی",
       "ذخیره‌سازی",
-      "سخت‌افزار"
+      "سخت‌افزار",
+      "storage",
+      "review"
     ],
     "author": {
       "name": "هومن مدق",
-      "role": "کارشناس فناوری اطلاعات"
+      "role": "کارشناس فناوری اطلاعات",
+      "avatar": "/assets/hooman.png"
     },
     "date": "2026-07-11",
     "date_fa": "20 تیر 1405",
@@ -105,16 +115,96 @@
     "tags": [
       "dell",
       "سرور",
-      "بررسی"
+      "بررسی",
+      "server",
+      "review"
     ],
     "author": {
       "name": "عطیه حاتمی",
-      "role": "مهندس کامپیوتر"
+      "role": "مهندس کامپیوتر",
+      "avatar": "/assets/atiye.png"
     },
     "date": "2026-07-01",
     "date_fa": "10 تیر 1405",
     "likes": 54,
     "views": 2100,
     "category": "سرور"
+  },
+  {
+    "slug": "ubiquiti-u7-pro-review",
+    "module": "review",
+    "title": "بررسی Ubiquiti U7 Pro؛ Wi‑Fi 7 برای دفترهای کوچک",
+    "excerpt": "سرعت، پوشش، roaming و مصرف PoE در یک سناریوی واقعی اداری.",
+    "content": "در این بررسی U7 Pro را در محیط اداری با چند کلاینت Wi‑Fi 6/7 تست می‌کنیم.",
+    "image": "/assets/blog-5.jpg",
+    "tags": [
+      "ubiquiti",
+      "wifi7",
+      "access point",
+      "بررسی",
+      "review"
+    ],
+    "author": {
+      "name": "روژینا باقری",
+      "role": "کارشناس شبکه",
+      "avatar": "/assets/rojina.png"
+    },
+    "date": "2026-07-20",
+    "date_fa": "29 تیر 1405",
+    "likes": 66,
+    "views": 2880,
+    "category": "شبکه"
+  },
+  {
+    "slug": "fortigate-60f-office-review",
+    "module": "review",
+    "title": "بررسی FortiGate 60F در سناریوی شعبه کوچک",
+    "excerpt": "UTM، VPN، گزارش‌گیری و مدیریت policy در یک دفتر ۳۰ نفره.",
+    "content": "FortiGate 60F را از نظر throughput، مدیریت، VPN و هزینه نگهداری بررسی می‌کنیم.",
+    "image": "/assets/blog-4.jpg",
+    "tags": [
+      "fortigate",
+      "firewall",
+      "security",
+      "بررسی",
+      "امنیت",
+      "فایروال",
+      "review"
+    ],
+    "author": {
+      "name": "نسترن خداکرمی",
+      "role": "فعال حوزه فناوری اطلاعات",
+      "avatar": "/assets/nastaran.png"
+    },
+    "date": "2026-07-19",
+    "date_fa": "28 تیر 1405",
+    "likes": 82,
+    "views": 3410,
+    "category": "امنیت"
+  },
+  {
+    "slug": "apc-smart-ups-review",
+    "module": "review",
+    "title": "بررسی APC Smart‑UPS 1500VA برای رک‌های کوچک",
+    "excerpt": "زمان پشتیبانی، کیفیت خروجی و مدیریت خاموشی کنترل‌شده سرورها.",
+    "content": "در این بررسی رفتار UPS زیر بار سرور و NAS، هشدارها و سناریوی shutdown بررسی شده است.",
+    "image": "/assets/blog-2.jpg",
+    "tags": [
+      "apc",
+      "ups",
+      "power",
+      "بررسی",
+      "review"
+    ],
+    "author": {
+      "name": "عطیه حاتمی",
+      "role": "مهندس کامپیوتر",
+      "avatar": "/assets/atiye.png"
+    },
+    "date": "2026-07-14",
+    "date_fa": "23 تیر 1405",
+    "likes": 47,
+    "views": 1980,
+    "category": "برق و رک"
   }
 ]
