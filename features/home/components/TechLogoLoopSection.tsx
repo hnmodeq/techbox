@@ -33,8 +33,8 @@ export default function TechLogoLoopSection() {
           logos={techLogos}
           speed={120}
           direction="left"
-          logoHeight={40}
-          gap={48}
+          logoHeight={60}
+          gap={64}
           pauseOnHover
           scaleOnHover
           fadeOut

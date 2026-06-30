@@ -8,9 +8,15 @@ import { ButtonLink } from "@/components/ui/Button";
 const fallbackImage = "/assets/blog-1.jpg";
 const fallbackAvatar = "/assets/hooman.png";
 
-/** Module-synced hover color class for titles (group-hover:text-[var(--tb-<module>)]). */
+/**
+ * Module-synced hover color class for a feed card's title, scoped to THIS card only.
+ * Each feed card uses `group/card`, so we retarget the centralized `group-hover:` token
+ * to the named `group-hover/card:` variant. This prevents hovering one card from changing
+ * every title inside the same Bento (which has its own outer `group`).
+ */
 function moduleHover(module: ContentItem["module"]) {
-  return moduleColors[module]?.hover ?? "group-hover:text-[var(--tb-foreground)]";
+  const cls = moduleColors[module]?.hover ?? "group-hover:text-[var(--tb-foreground)]";
+  return cls.replaceAll("group-hover:", "group-hover/card:");
 }
 
 function SafeImage({
@@ -40,7 +46,7 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
   return (
     <Link
       href={`/${item.module}/${item.slug}`}
-      className="group block rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]"
+      className="group/card block rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]"
     >
       <div className="flex gap-3">
         {item.image && !compact && (
@@ -100,7 +106,7 @@ export function ContentFeedList({ items, variant="compact" }: { items: ContentIt
 
 function VideoFeedCard({item}:{item:ContentItem}){
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="group block overflow-hidden rounded-[var(--tb-radius-md)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
+    <Link href={`/${item.module}/${item.slug}`} className="group/card block overflow-hidden rounded-[var(--tb-radius-md)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
       <div className="relative aspect-video overflow-hidden rounded-[var(--tb-radius-sm)] bg-black">
         <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:768px) 33vw, 100vw" />
         <span className="absolute inset-0 flex items-center justify-center"><span className="tb-image-badge h-10 w-10 text-white">▶</span></span>
@@ -117,7 +123,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
   const answers = (item.likes % 7) + 2;
   const solved = !item.slug.includes("proxmox");
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="group flex gap-2.5 rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
+    <Link href={`/${item.module}/${item.slug}`} className="group/card flex gap-2.5 rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
       <div className="relative mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-[var(--tb-radius-full)] bg-[var(--tb-muted)]">
         <Image src={item.author.avatar || fallbackAvatar} alt={item.author.name} fill sizes="32px" className="object-cover" />
       </div>
@@ -135,7 +141,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
 
 function ProductFeedCard({item}:{item:ContentItem}){
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="group block overflow-hidden rounded-[var(--tb-radius-md)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
+    <Link href={`/${item.module}/${item.slug}`} className="group/card block overflow-hidden rounded-[var(--tb-radius-md)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
       <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--tb-radius-sm)] bg-[var(--tb-muted)]">
         <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:1024px) 180px, 50vw" />
         <span className="absolute left-2 top-2 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-0.5 text-[9px] text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
@@ -150,7 +156,7 @@ function ProductFeedCard({item}:{item:ContentItem}){
 
 function DownloadFeedCard({item}:{item:ContentItem}){
   return (
-    <div className="group flex items-center gap-2 rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
+    <div className="group/card flex items-center gap-2 rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
       <div className="min-w-0 flex-1">
         <Link href={`/${item.module}/${item.slug}`} className={`line-clamp-1 text-[12px] font-bold transition-colors ${moduleHover(item.module)}`}>{item.title}</Link>
         <div className="mt-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{item.date_fa} • {item.category}</div>
@@ -162,7 +168,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
 
 function ReviewFeedCard({item}:{item:ContentItem}){
   return (
-    <Link href={`/${item.module}/${item.slug}`} className="group flex gap-2.5 overflow-hidden rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
+    <Link href={`/${item.module}/${item.slug}`} className="group/card flex gap-2.5 overflow-hidden rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-muted)_45%,transparent)]">
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[var(--tb-radius-md)] bg-[var(--tb-muted)]">
         <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="64px" />
       </div>

@@ -282,8 +282,9 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
         style={
           {
             inset: `${-glowRadius}px`,
-            maskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,
-            WebkitMaskImage: `conic-gradient(from ${angleDeg} at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%)`,
+            // Bloom arc length follows coneSpread so the glow stays concentrated near the cursor.
+            maskImage: `conic-gradient(from ${angleDeg} at center, black 0%, transparent ${coneSpread}%, transparent ${100 - coneSpread}%, black 100%)`,
+            WebkitMaskImage: `conic-gradient(from ${angleDeg} at center, black 0%, transparent ${coneSpread}%, transparent ${100 - coneSpread}%, black 100%)`,
             opacity: glowOpacity,
             mixBlendMode: "plus-lighter",
             transition: isVisible ? "opacity 0.25s ease-out" : "opacity 0.75s ease-in-out",
