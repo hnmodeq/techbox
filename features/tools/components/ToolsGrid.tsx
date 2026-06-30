@@ -4,6 +4,7 @@ import { useState } from "react";
 import RaidCalculator from "@/features/tools/components/RaidCalculator";
 import SubnetCalculator from "@/features/tools/components/SubnetCalculator";
 import { Button } from "@/components/ui/Button";
+import ModuleHeader from "@/components/effects/ModuleHeader";
 
 const toolComponents: Record<string, React.ComponentType> = {
   "raid-calculator": RaidCalculator,
@@ -12,14 +13,12 @@ const toolComponents: Record<string, React.ComponentType> = {
 
 export default function ToolsGrid(){
   const items = getModuleItems("tools");
-  const meta = moduleMeta.tools;
   const [active, setActive] = useState(items[0]?.slug || "raid-calculator");
   const ActiveComp = toolComponents[active] || RaidCalculator;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <h1 className={`text-3xl font-black mb-2 ${meta.color}`}>ابزارهای زیرساختی</h1>
-      <p className="text-sm text-muted-foreground mb-6">اجرای مستقیم در مرورگر – بدون نصب</p>
+      <ModuleHeader module="tools" title="ابزارهای زیرساختی" description="اجرای مستقیم در مرورگر – بدون نصب" />
 
       <div className="flex flex-wrap gap-2 mb-6">
         {items.map(t => (

@@ -2,6 +2,7 @@ import BentoCard from "@/features/content/components/BentoCard";
 import { modules } from "@/config/modules.config";
 import { getLatest, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { ContentFeedList } from "@/features/content/components/ContentCard";
+import ModuleBorderGlow from "@/components/effects/ModuleBorderGlow";
 
 const feedVariant: Record<ModuleSlug, "image"|"video"|"forum"|"product"|"download"|"review"|"compact"> = {
   blog: "image",
@@ -34,21 +35,22 @@ export default function HomeModulesSection() {
             const meta = moduleMeta[slug];
             const variant = feedVariant[slug] || "image";
             return (
-              <BentoCard
-                key={module.slug}
-                title={module.title}
-                description={module.description}
-                href={`/${module.slug}`}
-                color={module.color}
-                className={`${module.cols ?? ""} ${module.rows ?? ""} !p-4 hover:translate-y-0 hover:shadow-[var(--tb-shadow)]`} /* disable card hover – inner items hover separately */
-                badge={`${feed.length} جدید`}
-                footerLink={`/${module.slug}`}
-                footerLabel={`همه ${meta.titleFa} →`}
-              >
-                <div className="[&>*>a:hover]:scale-[1.01] transition-transform">
-                  <ContentFeedList items={feed} variant={variant as any} />
-                </div>
-              </BentoCard>
+              <ModuleBorderGlow key={module.slug} moduleColor={meta.color} className={`${module.cols ?? ""} ${module.rows ?? ""}`}>
+                <BentoCard
+                  title={module.title}
+                  description={module.description}
+                  href={`/${module.slug}`}
+                  color={module.color}
+                  className="!p-4 !border-0 !bg-transparent hover:translate-y-0"
+                  badge={`${feed.length} جدید`}
+                  footerLink={`/${module.slug}`}
+                  footerLabel={`همه ${meta.titleFa} →`}
+                >
+                  <div className="[&>*>a:hover]:scale-[1.01] transition-transform">
+                    <ContentFeedList items={feed} variant={variant as any} />
+                  </div>
+                </BentoCard>
+              </ModuleBorderGlow>
             );
           })}
         </div>

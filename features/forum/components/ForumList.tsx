@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { zIndex } from "@/design";
 import { Button } from "@/components/ui/Button";
+import ModuleHeader from "@/components/effects/ModuleHeader";
 import { ChipButton } from "@/components/ui/ChipButton";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { ModuleBadge } from "@/components/ui/ModuleBadge";
@@ -19,7 +20,6 @@ export default function ForumList(){
     solved: !t.slug.includes("proxmox"),
     avatar: t.author.avatar || "/assets/hooman.png"
   })) as (ForumPost & {avatar:string})[];
-  const meta = moduleMeta.forum;
   const [showNew, setShowNew] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -51,16 +51,12 @@ export default function ForumList(){
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
-        <div>
-          <h1 className={`text-3xl font-black ${meta.color}`}>انجمن تکباکس</h1>
-          <p className="text-xs text-[var(--tb-muted-foreground)] mt-1">پرسش و پاسخ تخصصی – سبک Reddit</p>
-        </div>
+      <ModuleHeader module="forum" title="انجمن تکباکس" description="پرسش و پاسخ تخصصی – سبک Reddit" count={`${all.length.toLocaleString("fa-IR")} موضوع`}>
         <div className="flex gap-2">
           <input placeholder="جستجو در انجمن…" className="input w-56 text-sm" />
           <Button onClick={()=>setShowNew(true)} className="text-sm">+ موضوع جدید</Button>
         </div>
-      </div>
+      </ModuleHeader>
 
       {/* sub nav like reddit */}
       <div className="flex gap-2 text-[11px] mb-4">

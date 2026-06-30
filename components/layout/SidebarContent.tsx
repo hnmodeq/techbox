@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Search, Clock, ShoppingCart } from "lucide-react";
+import { Bell, Search, Clock, ShoppingCart, ShieldCheck } from "lucide-react";
 import { createPortal } from "react-dom";
 import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
 import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
@@ -252,6 +252,25 @@ export default function SidebarContent({
               </SidebarTooltip>
             );
           })}
+          {(user?.role === "super_admin" || (user?.role as string) === "admin") && (() => {
+            const active = isActive(pathname, "/admin");
+            return (
+              <SidebarTooltip key="/admin" label="مدیریت" enabled={!expanded} tooltipClassName="text-[var(--tb-vip)]">
+                <Link
+                  href="/admin"
+                  onClick={onLinkClick}
+                  className={`${linkBase} text-[13px] ${active ? "bg-[var(--tb-muted)] text-[var(--tb-foreground)]" : linkInactive}`}
+                >
+                  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tb-vip)]" />}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                    <ShieldCheck size={19} className="text-[var(--tb-vip)]" strokeWidth={1.75} />
+                  </span>
+                  <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>مدیریت</span>
+                </Link>
+              </SidebarTooltip>
+            );
+          })()}
+
         </div>
       </nav>
 

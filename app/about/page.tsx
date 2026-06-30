@@ -1,12 +1,11 @@
-import Image from "next/image";
 import users from "@/data/users.json";
-import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
+import TeamChromaSection, { type TeamMember } from "@/features/home/components/TeamChromaSection";
 
 export const metadata = { title: "درباره تکباکس" };
 
 export default function About(){
-  const team = (users as any[]).slice(0,6);
+  const team = (users as TeamMember[]).slice(0,6);
   return (
     <main className="max-w-6xl mx-auto px-4 py-14" dir="rtl">
       <div className="text-center max-w-2xl mx-auto mb-10">
@@ -30,17 +29,8 @@ export default function About(){
       </div>
 
       <h2 className="text-xl font-black mb-4">تیم تحریریه</h2>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
-        {team.map(u=>(
-          <div key={u.username} className="card p-4 flex items-center gap-3">
-            <Image src={u.avatar || "/assets/hooman.png"} width={56} height={56} className="h-14 w-14 rounded-[var(--tb-radius-lg)] object-cover ring-1 ring-[var(--tb-border)]" alt={u.name} />
-            <div>
-              <div className="font-bold text-[14px]">{u.name}</div>
-              <div className="text-[11px] text-muted-foreground">{u.role==="super_admin" ? "مدیر کل" : "ویراستار"} • {u.modules.join("، ")}</div>
-              <Link href={`/account`} className="text-[10px] text-[var(--tb-brand)] hover:underline">مشاهده پروفایل →</Link>
-            </div>
-          </div>
-        ))}
+      <div className="mb-14">
+        <TeamChromaSection team={team} />
       </div>
 
       <div className="grid lg:grid-cols-5 gap-5 items-start">

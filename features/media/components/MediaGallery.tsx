@@ -4,12 +4,12 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import { MediaSelectorCard } from "@/components/ui/MediaSelectorCard";
 import { useState } from "react";
+import ModuleHeader from "@/components/effects/ModuleHeader";
 
 const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 export default function MediaGallery(){
   const items = getModuleItems("media");
-  const meta = moduleMeta.media;
   const [active, setActive] = useState(items[0] || null);
 
   // naive comments count – pull from seed
@@ -17,10 +17,7 @@ export default function MediaGallery(){
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <div className="flex items-end justify-between mb-5">
-        <h1 className={`text-3xl font-black ${meta.color}`}>رسانه ویدیویی تکباکس</h1>
-        <span className="text-[11px] text-[var(--tb-muted-foreground)]">{items.length} ویدیو</span>
-      </div>
+      <ModuleHeader module="media" title="رسانه ویدیویی تکباکس" count={`${items.length.toLocaleString("fa-IR")} ویدیو`} />
 
       {active && (
         <div className="card overflow-hidden mb-8">

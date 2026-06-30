@@ -4,12 +4,19 @@ import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/Button";
+import { getCurrentUserClient } from "@/lib/auth";
 import { ModuleBadge } from "@/components/ui/ModuleBadge";
 
 export const dynamic = "force-dynamic";
 
 async function getMe(){
-  try{ const r = await fetch("/api/auth/me", {cache:"no-store"}); const j = await r.json(); return j.user; }catch{ return null; }
+  try{
+    const r = await fetch("/api/auth/me", {cache:"no-store"});
+    const j = await r.json();
+    return j.user || getCurrentUserClient();
+  }catch{
+    return getCurrentUserClient();
+  }
 }
 
 function slugify(input: string) {
@@ -211,7 +218,7 @@ function NewPostInner() {
               <div>محتوا: {content.length.toLocaleString("fa-IR")} کاراکتر</div>
             </div>
             <div className="mt-3 flex flex-wrap gap-1">
-              {parsedTags.slice(0, 8).map(t => <ModuleBadge key={t} module={module}>{t}</ModuleBadge>)}
+              {parsedTags.slice(0, 8).map(t => <span key={t} className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] px-2 py-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{t}</span>)}
               {parsedTags.length > 8 && <ModuleBadge module="info">+{(parsedTags.length-8).toLocaleString("fa-IR")}</ModuleBadge>}
             </div>
           </div>

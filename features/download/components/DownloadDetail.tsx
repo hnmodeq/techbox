@@ -41,7 +41,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
       <div className="flex flex-wrap gap-2 mt-4">
         {item.tags.map(t=>(
           <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85">
-            <Badge variant="download">{t.toUpperCase()}</Badge>
+            <span className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 text-[10px] text-[var(--tb-muted-foreground)]">{t.toUpperCase()}</span>
           </Link>
         ))}
       </div>

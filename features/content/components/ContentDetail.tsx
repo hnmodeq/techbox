@@ -66,7 +66,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
       <div className="flex flex-wrap gap-2 mt-8">
         {item.tags.map(t => (
-          <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85"><Badge variant={item.module}>#{t}</Badge></Link>
+          <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85"><span className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 text-[10px] text-[var(--tb-muted-foreground)]">#{t}</span></Link>
         ))}
       </div>
 
