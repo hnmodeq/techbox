@@ -1,0 +1,9 @@
+add admin item for admins when they are login in the sidebar after all items
+motion border for feed sections
+lightray header for all modules sync with their module color
+remove tickbar background
+remove tags colors/backgrounds
+move shop module search and filter modal
+remove recieve button in the first page of the download / download button must be on OS page
+admins can not edit thins, they asked to login while they are
+magazine have 2 tags for source, the one on the image remove

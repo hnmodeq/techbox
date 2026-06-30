@@ -96,3 +96,46 @@
 - Build: passing in your real project.
 - Typecheck: passing in your real project.
 - Lint: blocked only by ESLint 10 compatibility until ESLint is pinned/downgraded to ESLint 9.
+
+---
+
+## Final current status after A/B/C/D passes
+
+### Completed in latest refactor series
+- [x] A — Dedicated UI primitives and safe migration.
+- [x] B — Deeper design/style hardcode cleanup.
+- [x] C — Content/data realism and taxonomy consistency.
+- [x] D — Admin/CMS cleanup and dashboard/editor/list/roles/login polish.
+
+### Current validation in reconstructed workspace
+- [x] `npx tsc --noEmit --pretty false` passes.
+- [x] `npx eslint .` passes cleanly.
+- [x] Active `<img>` scan is clean; active image usages were migrated to Next `Image`.
+- [x] Focused old hardcode alias scan is clean for the tracked high-risk categories.
+- [x] Data JSON files parse successfully.
+
+### Intentionally remaining raw buttons
+- [x] Internal UI primitives: `Button`, `ChipButton`, `IconRailButton`, `FloatingActionButton`, `MediaSelectorCard`, `ThemeToggleButton`.
+- [x] Internal behavior primitives: `Dropdown`, `Switch`, `Tabs`.
+- [x] `components/layout/SidebarShell.tsx` mobile draggable logo FAB remains raw intentionally because it uses pointer capture and drag persistence.
+
+### Current data counts
+- `data/news.json`: 15
+- `data/blog.json`: 16
+- `data/media.json`: 9
+- `data/download.json`: 10
+- `data/forum.json`: 10
+- `data/review.json`: 8
+- `data/shop.json`: 10
+- `data/jobs.json`: 7
+- `data/users.json`: 10
+- `data/comments.json`: 15
+
+### Still must be verified locally with real assets
+- [ ] Apply latest `techbox-updated-code.tar.gz` to the real local project.
+- [ ] Run `pnpm install --ignore-scripts` if Windows/Prisma locks appear.
+- [ ] Run `pnpm exec prisma generate`.
+- [ ] Run `pnpm typecheck`.
+- [ ] Run `pnpm build`.
+- [ ] Run `pnpm lint`.
+- [ ] Run `pnpm dev` and visually test home/sidebar/ticker/admin/cart/chat flows with real `public/` assets.

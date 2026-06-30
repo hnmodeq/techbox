@@ -46,3 +46,13 @@
 - [ ] Run full production build. Attempted, but uploaded codes.txt does not include real binary public fonts/assets and original package config; local reconstructed build cannot be considered authoritative.
 - [ ] Fix errors.
 - [ ] Provide summary of files changed and remaining recommendations.
+
+---
+
+## Final A/B/C/D completion summary
+- [x] A — UI primitives: ButtonLink, CloseButton, ChipButton, IconRailButton, Overlay, Panel, ModuleBadge, FloatingActionButton, MediaSelectorCard, ThemeToggleButton.
+- [x] B — Design cleanup: tokens, z-index, overlays, sidebar/ticker/feed/button cleanup, old focused hardcode scan clean.
+- [x] C — Source data realism: expanded blog/news/media/download/forum/review/shop/jobs/users/comments and normalized avatars/tags.
+- [x] D — Admin/CMS cleanup: dashboard, login, posts list, post editor, roles page improved while preserving local/API behavior.
+- [x] Final validation: typecheck and lint pass in reconstructed workspace.
+- [ ] Final local browser QA with real assets remains required.

@@ -178,3 +178,28 @@
 - [x] Validation: `npx tsc --noEmit --pretty false` passes.
 - [x] Validation: `npx eslint .` passes cleanly.
 - [ ] D Step 4: roles page UX cleanup and local role management safeguards.
+
+## D Step 4 — roles page UX cleanup and local role safeguards
+- [x] Reworked `app/admin/roles/page.tsx` with clearer RBAC layout and stats cards.
+- [x] Added custom/protected role state and protected seed roles from deletion.
+- [x] Added delete confirmation for custom roles and blocked deleting roles with active users.
+- [x] Added reset-to-default roles action for localStorage recovery.
+- [x] Added normalized role-name preview and duplicate role-name validation.
+- [x] Added select-all/clear module access controls.
+- [x] Improved module access selector and roles table with `ModuleBadge`/`Badge`.
+- [x] Kept role behavior localStorage-based and API-ready without schema changes.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] D Step 5 optional: admin auth/login polish or dashboard final pass.
+
+## D Step 5 — admin auth/login polish and dashboard final pass
+- [x] Reworked admin login with quick-login buttons from `allUsers` source data.
+- [x] Added selected-user preview with role/module badges on login.
+- [x] Improved admin dashboard with source stats, module stats, and local draft summary.
+- [x] Dashboard now shows manageable content count, source views, managed modules, and local drafts.
+- [x] Dashboard module cards now show item count, views, latest date, and quick actions.
+- [x] Super-admin user list remains source-driven and more responsive.
+- [x] Preserved demo auth/localStorage behavior and did not change schema/API.
+- [x] Validation: `npx tsc --noEmit --pretty false` passes.
+- [x] Validation: `npx eslint .` passes cleanly.
+- [ ] Optional next: final full audit/checklist or local apply instructions.

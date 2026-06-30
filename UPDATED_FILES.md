@@ -230,3 +230,31 @@ Copy these files into your real project. Do **not** replace your `public/` folde
 - Added a clearer empty filtered-state with reset filters action.
 - Preserved existing JSON source loading, permissions, and admin routing behavior.
 - Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## D Step 4 — roles page UX cleanup and local role safeguards
+- Reworked `app/admin/roles/page.tsx` with RBAC stats cards, safer local role creation, and clearer module access UI.
+- Added protected seed role handling so default roles cannot be deleted.
+- Added safeguards for custom role deletion, including confirmation and blocking deletion when users are assigned.
+- Added reset-to-default roles action for localStorage recovery.
+- Added normalized role-name preview and duplicate role-name validation.
+- Added select-all/clear module access helper actions.
+- Improved roles table with default/custom status badges and module badges.
+- Preserved localStorage role behavior and API/Prisma readiness without schema changes.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## D Step 5 — admin auth/login polish and dashboard final pass
+- Updated `app/admin/login/page.tsx` with quick-login buttons generated from `allUsers`, selected-user preview, and clearer role/module badges.
+- Updated `app/admin/page.tsx` with source-driven dashboard stats: manageable modules, manageable content count, source views, and local draft count.
+- Added local draft summary cards by module on the dashboard when browser drafts exist.
+- Improved admin module cards with item count, views, latest source date, and quick management/create actions.
+- Kept the super-admin user list source-driven and made it more responsive.
+- Preserved demo auth/localStorage behavior and avoided schema/API changes.
+- Validation: `npx tsc --noEmit --pretty false` and `npx eslint .` pass cleanly.
+
+## Final audit/checklist pass
+- Ran final `npx tsc --noEmit --pretty false` and `npx eslint .`; both pass cleanly.
+- Confirmed active `<img>` scan is clean.
+- Confirmed focused old hardcode alias scan is clean for tracked high-risk categories.
+- Confirmed remaining raw buttons are internal UI/behavior primitives or the intentionally preserved draggable mobile sidebar FAB.
+- Confirmed all data JSON files parse and summarized current data counts.
+- Updated final status/checklist docs.
