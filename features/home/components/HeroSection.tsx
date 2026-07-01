@@ -27,8 +27,8 @@ export default function HeroSection() {
  const item = items[index];
 
  return (
-    <section className="relative flex min-h-[260px] flex-col items-center px-4 pb-10 pt-14 text-center md:min-h-[300px] md:pt-20" dir="rtl">
-      <div className="relative z-10 flex flex-col items-center">
+    <section className="relative flex min-h-[260px] w-full max-w-full overflow-x-hidden flex-col items-center px-4 pb-10 pt-14 text-center md:min-h-[300px] md:pt-20" dir="rtl">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-full">
         <h1 className="text-6xl font-black tracking-tight text-[var(--tb-primary)] md:text-8xl">تکباکس</h1>
         <div className="hero-rotator mt-3 w-full max-w-2xl">
  <AnimatePresence mode="wait">

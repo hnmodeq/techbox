@@ -50,8 +50,8 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
  const loopItems = [...items, ...items, ...items];
 
  return (
- <section className={`w-full overflow-hidden ${className}`} aria-label="آخرین به‌روزرسانی‌ها">
- <div dir="rtl" className="ticker-wrapper relative w-full overflow-hidden">
+ <section className={`w-full max-w-full overflow-x-hidden overflow-hidden ${className}`} aria-label="آخرین به‌روزرسانی‌ها">
+ <div dir="rtl" className="ticker-wrapper relative w-full max-w-full overflow-x-hidden overflow-hidden">
  <div className="ticker-track flex w-max min-w-full items-center gap-8 py-2.5">
  {loopItems.map((item, index) => {
  const itemModule = getModule(item);

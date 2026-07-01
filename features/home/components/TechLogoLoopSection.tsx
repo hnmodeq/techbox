@@ -23,8 +23,8 @@ const techLogos = [
 
 export default function TechLogoLoopSection() {
  return (
- <section className="relative overflow-hidden px-4 py-14 md:py-16" aria-labelledby="tech-stack-title">
- <div className="mx-auto max-w-6xl">
+ <section className="relative w-full max-w-full overflow-x-hidden overflow-hidden px-4 py-14 md:py-16" aria-labelledby="tech-stack-title">
+ <div className="mx-auto max-w-6xl w-full max-w-full overflow-x-hidden">
  <div className="mb-6 text-center">
  <h2 id="tech-stack-title" className="tb-text-lg md:tb-text-lg">زیرساخت مدرن تکباکس</h2>
  <p className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">ساخته‌شده با ابزارهای مدرن وب و زیرساخت</p>

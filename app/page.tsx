@@ -10,7 +10,7 @@ export default function Page() {
  .filter(i => ["news", "blog", "media", "forum", "download", "review"].includes(i.module))
  .slice(0, 16);
  return (
- <main className="relative">
+ <main className="relative overflow-x-hidden w-full max-w-full">
  <HeroSection />
  <NewsTicker items={ticker} className="pb-10" />
  <HomeModulesSection />
