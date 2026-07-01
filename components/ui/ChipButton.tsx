@@ -3,76 +3,76 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 type Tone =
-  | "default"
-  | "brand"
-  | "home"
-  | "blog"
-  | "news"
-  | "media"
-  | "shop"
-  | "tools"
-  | "raid"
-  | "subnet"
-  | "vip"
-  | "forum"
-  | "review"
-  | "download"
-  | "success"
-  | "warning"
-  | "danger"
-  | "info";
+ | "default"
+ | "brand"
+ | "home"
+ | "blog"
+ | "news"
+ | "media"
+ | "shop"
+ | "tools"
+ | "raid"
+ | "subnet"
+ | "vip"
+ | "forum"
+ | "review"
+ | "download"
+ | "success"
+ | "warning"
+ | "danger"
+ | "info";
 
 export interface ChipButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  tone?: Tone;
-  active?: boolean;
+ tone?: Tone;
+ active?: boolean;
 }
 
 const toneVar: Record<Tone, string> = {
-  default: "--tb-muted-foreground",
-  brand: "--tb-brand",
-  home: "--tb-home",
-  blog: "--tb-blog",
-  news: "--tb-news",
-  media: "--tb-media",
-  shop: "--tb-shop",
-  tools: "--tb-tools",
-  raid: "--tb-raid",
-  subnet: "--tb-subnet",
-  vip: "--tb-vip",
-  forum: "--tb-forum",
-  review: "--tb-review",
-  download: "--tb-download",
-  success: "--tb-success",
-  warning: "--tb-warning",
-  danger: "--tb-danger",
-  info: "--tb-info",
+ default: "--tb-fg-muted",
+ brand: "--tb-primary",
+ home: "--tb-home",
+ blog: "--tb-blog",
+ news: "--tb-news",
+ media: "--tb-media",
+ shop: "--tb-shop",
+ tools: "--tb-tools",
+ raid: "--tb-raid",
+ subnet: "--tb-subnet",
+ vip: "--tb-vip",
+ forum: "--tb-forum",
+ review: "--tb-review",
+ download: "--tb-download",
+ success: "--tb-success",
+ warning: "--tb-warning",
+ danger: "--tb-danger",
+ info: "--tb-info",
 };
 
 export const ChipButton = React.forwardRef<HTMLButtonElement, ChipButtonProps>(
-  ({ className, tone = "default", active = false, style, ...props }, ref) => {
-    const cssVar = toneVar[tone];
-    return (
-      <button
-        ref={ref}
-        type="button"
-        className={cn(
-          "inline-flex items-center justify-center gap-1 rounded-[var(--tb-radius-full)] border px-3 py-1.5 text-[11px] font-semibold",
-          "transition-colors duration-[var(--tb-duration-fast)] ease-[var(--tb-ease-standard)]",
-          "focus-visible:outline-none focus-visible:shadow-[var(--tb-focus-ring)] disabled:pointer-events-none disabled:opacity-50",
-          className
-        )}
-        style={{
-          color: `var(${cssVar})`,
-          borderColor: `color-mix(in oklch, var(${cssVar}) ${active ? "38%" : "22%"}, transparent)`,
-          background: active
-            ? `color-mix(in oklch, var(${cssVar}) 16%, transparent)`
-            : "color-mix(in oklch, var(--tb-muted) 78%, transparent)",
-          ...style,
-        }}
-        {...props}
-      />
-    );
-  }
+ ({ className, tone = "default", active = false, style, ...props }, ref) => {
+ const cssVar = toneVar[tone];
+ return (
+ <button
+ ref={ref}
+ type="button"
+ className={cn(
+ "inline-flex items-center justify-center gap-1 rounded-[var(--tb-radius-full)] border px-3 py-1.5 tb-text-sm ",
+ "transition-colors duration-[var(--tb-motion-sm)] ease-[var(--tb-ease)]",
+ "focus-visible:outline-none focus-visible:shadow-[var(--tb-ring-3)] disabled:pointer-events-none disabled:opacity-50",
+ className
+ )}
+ style={{
+ color: `var(${cssVar})`,
+ borderColor: `color-mix(in oklch, var(${cssVar}) ${active ? "38%" : "22%"}, transparent)`,
+ background: active
+ ? `color-mix(in oklch, var(${cssVar}) 16%, transparent)`
+ : "color-mix(in oklch, var(--tb-bg-muted) 78%, transparent)",
+ ...style,
+ }}
+ {...props}
+ />
+ );
+ }
 );
 ChipButton.displayName = "ChipButton";
 export default ChipButton;

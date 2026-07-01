@@ -1,0 +1,12 @@
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · GRADIENTS
+   Three gradient stops used by the brand gradient, hero background (Aurora),
+   and any gradient surface. Built from the brand + module accents so they
+   stay in sync. Dark values via light-dark().
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-gradient-1: var(--tb-primary);  /* brand   */
+  --tb-gradient-2: var(--tb-subnet);   /* blue    */
+  --tb-gradient-3: var(--tb-vip);      /* fuchsia */
+}
