@@ -76,3 +76,5 @@ export const modules: ModuleItem[] = [
  order: 8,
  },
 ];
+
+export { toolRoutes, moduleMap, getModuleMeta, type ToolSlug, type ModuleKey } from "./modules.config.TECHBOX_TOOLS_V2";
