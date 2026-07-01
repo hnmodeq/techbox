@@ -38,7 +38,7 @@ export function ToolPageHeader({
           ))}
         </nav>
       )}
-      <h1 className="tb-text-hero" style={{ color: "var(--tb-fg-primary)" }}>{title}</h1>
+      <h1 className="tb-text-big-title" style={{ color: "var(--tb-fg-primary)" }}>{title}</h1>
       {subtitle && (
         <p className="mt-2 max-w-2xl tb-text-md text-[var(--tb-fg-muted)]">{subtitle}</p>
       )}

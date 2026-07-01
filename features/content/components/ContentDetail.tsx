@@ -21,7 +21,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <span>{item.category}</span>
  </div>
 
-        <h1 className="tb-text-hero">{item.title}</h1>
+        <h1 className="tb-text-big-title">{item.title}</h1>
  <p className="text-[var(--tb-fg-muted)] mt-4 tb-text-md ">{item.excerpt}</p>
 
  <div className="flex flex-wrap items-center gap-3 mt-6 tb-text-sm">

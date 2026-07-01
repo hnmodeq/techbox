@@ -12,7 +12,7 @@ function SearchInner(){
  const results = searchAcross(q);
  return (
  <main className="max-w-4xl mx-auto px-4 py-12" dir="rtl">
- <h1 className="tb-text-hero mb-2">جستجو</h1>
+ <h1 className="tb-text-big-title mb-2">جستجو</h1>
  <p className="tb-text-md text-muted-foreground mb-6">{q ? <>نتایج برای <b>«{q}»</b> – {results.length.toLocaleString("fa-IR")} مورد</> : "یک عبارت وارد کنید"}</p>
  <div className="grid gap-3 md:grid-cols-2">
  {results.map(r=> <ContentCard key={r.module+r.slug} item={r} />)}

@@ -13,7 +13,7 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
  return (
  <main className="max-w-3xl mx-auto px-4 py-12" dir="rtl">
  <div className="tb-text-sm text-muted-foreground mb-2"><Link href="/workwithus" className="hover:text-foreground">فرصت‌های شغلی</Link> / {job.title}</div>
- <h1 className="tb-text-hero md:tb-text-hero ">{job.title}</h1>
+ <h1 className="tb-text-big-title md:tb-text-big-title ">{job.title}</h1>
  <div className="flex flex-wrap gap-2 mt-3 tb-text-sm">
  <Badge variant="brand">{job.type}</Badge>
  <Badge variant="secondary">{job.remote}</Badge>

@@ -23,7 +23,7 @@ export default function About(){
  ["۱۴۰۵", "هونامیک ارتباط رستاک"],
  ].map(([k,v])=>(
  <div key={k as string} className="card p-5 text-center">
- <div className="tb-text-hero text-[var(--tb-primary)]">{k}</div>
+ <div className="tb-text-big-title text-[var(--tb-primary)]">{k}</div>
  <div className="tb-text-sm text-muted-foreground mt-1">{v}</div>
  </div>
  ))}

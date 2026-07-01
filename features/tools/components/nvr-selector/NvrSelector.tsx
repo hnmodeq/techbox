@@ -63,7 +63,7 @@ export function NvrSelector({
             ماژول انتخاب ان‌وی‌آر
           </div>
         </div>
-        <h2 className="tb-text-hero mb-2">انتخابگر ان‌وی‌آر</h2>
+        <h2 className="tb-text-big-title mb-2">انتخابگر ان‌وی‌آر</h2>
         <p className="text-[var(--tb-fg-muted)] max-w-md mx-auto tb-text-md">
           تعداد دوربین، رزولوشن و مدت زمان ضبط را مشخص کنید تا بهترین مدل‌های موجود در فروشگاه را پیدا کنید
         </p>

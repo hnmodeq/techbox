@@ -5,10 +5,10 @@
      • tb-text-sm   – small / meta text
      • tb-text-md   – body / default
      • tb-text-lg   – subheadings
-     • tb-text-hero – page & section headings (fluid)
+     • tb-text-big-title – page & section headings (fluid)
 
    Responsive variants are defined manually so class names like
-   `md:tb-text-hero` work without falling back to Tailwind text/font/leading.
+   `md:tb-text-big-title` work without falling back to Tailwind text/font/leading.
    ════════════════════════════════════════════════════════════════════════ */
 
 .tb-text-sm {
@@ -29,7 +29,7 @@
   line-height: 1.45;
 }
 
-.tb-text-hero {
+.tb-text-big-title {
   font-size: clamp(1.6rem, 3.5vw, 2.5rem);
   font-weight: 900;
   line-height: 1.2;
@@ -39,7 +39,7 @@
 /* ── Dedicated Homepage Hero Display Token ──
    Single source of truth for the main homepage banner title.
    Change font-size, weight, or color here to update the hero instantly. */
-.tb-hero-display {
+.tb-hero {
   font-size: clamp(3.5rem, 9vw, 8rem);
   font-weight: 900;
   line-height: 1.1;
@@ -51,33 +51,33 @@
   .sm\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
   .sm\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
   .sm\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
-  .sm\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+  .sm\:tb-text-big-title { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
 }
 
 @media (min-width: 768px) {
   .md\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
   .md\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
   .md\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
-  .md\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+  .md\:tb-text-big-title { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
 }
 
 @media (min-width: 1024px) {
   .lg\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
   .lg\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
   .lg\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
-  .lg\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+  .lg\:tb-text-big-title { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
 }
 
 @media (min-width: 1280px) {
   .xl\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
   .xl\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
   .xl\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
-  .xl\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+  .xl\:tb-text-big-title { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
 }
 
 @media (min-width: 1536px) {
   .\32xl\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
   .\32xl\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
   .\32xl\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
-  .\32xl\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+  .\32xl\:tb-text-big-title { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
 }

@@ -20,7 +20,7 @@ export default function PageHeader({ title, description, titleClassName, classNa
   return (
     <header className={cn("mb-6 flex flex-wrap items-end justify-between gap-3", className)} dir="rtl">
       <div>
-        <h1 className={cn("tb-text-hero", titleClassName)}>{title}</h1>
+        <h1 className={cn("tb-text-big-title", titleClassName)}>{title}</h1>
         {description && <p className="mt-2 tb-text-md text-[var(--tb-fg-muted)]">{description}</p>}
       </div>
       {children}

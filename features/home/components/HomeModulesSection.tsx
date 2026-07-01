@@ -24,7 +24,7 @@ export default function HomeModulesSection() {
  <section className="px-4 md:px-10 lg:px-20 pb-24 w-full max-w-full overflow-x-hidden">
  <div className="mx-auto max-w-7xl w-full">
  <div className="flex items-end justify-between mb-6 px-1">
- <h2 className="tb-text-hero ">آخرین‌ها از تکباکس</h2>
+ <h2 className="tb-text-big-title ">آخرین‌ها از تکباکس</h2>
  <span className="tb-text-sm text-muted-foreground">فید زنده ماژول‌ها</span>
  </div>
  <div className="grid grid-cols-1 gap-5 md:grid-cols-7 md:auto-rows-min">

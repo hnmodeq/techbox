@@ -302,7 +302,7 @@ export default function RaidCalculator() {
                   <Icon name="server" className="h-3.5 w-3.5 text-[var(--tb-raid)]" />
                   ابزار محاسبه RAID
                 </div>
-                <h2 className="tb-text-hero">ماشین حساب RAID و SHR</h2>
+                <h2 className="tb-text-big-title">ماشین حساب RAID و SHR</h2>
                 <p className="mt-3 max-w-2xl tb-text-md text-[var(--tb-fg-muted)]">
                   ظرفیت قابل استفاده، افزونگی، فضای بلااستفاده و Hot Spare را برای RAIDهای کلاسیک و Synology Hybrid RAID با دیسک‌های هم‌اندازه یا ترکیبی محاسبه کنید.
                 </p>

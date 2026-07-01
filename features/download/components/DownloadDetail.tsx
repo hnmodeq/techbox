@@ -35,7 +35,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  <div className="tb-text-sm text-muted-foreground mb-2">
  <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--tb-download)]">{item.category}</span>
  </div>
- <h1 className="tb-text-hero md:tb-text-hero ">{item.title}</h1>
+ <h1 className="tb-text-big-title md:tb-text-big-title ">{item.title}</h1>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 
       {/* OS chooser */}

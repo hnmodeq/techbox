@@ -135,7 +135,7 @@ function NewPostInner() {
  <ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>
  {editSlug && <ModuleBadge module="warning">حالت ویرایش</ModuleBadge>}
  </div>
- <h1 className="tb-text-hero ">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
+ <h1 className="tb-text-big-title ">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
  <p className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">{user.name} • {user.role==="super_admin"?"مدیر کل":"ویراستار"}</p>
  </div>
  <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">بازگشت به مدیریت محتوا</ButtonLink>

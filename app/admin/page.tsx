@@ -62,7 +62,7 @@ export default function AdminPage() {
  return (
  <main className="min-h-dvh px-4 py-16" dir="rtl">
  <div className="mx-auto max-w-md card space-y-4 p-7 text-center">
- <h1 className="tb-text-hero ">ورود ادمین</h1>
+ <h1 className="tb-text-big-title ">ورود ادمین</h1>
  <p className="tb-text-md text-[var(--tb-fg-muted)]">برای مدیریت محتوا ابتدا وارد شوید.</p>
  <ButtonLink href="/admin/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
  <div className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3 text-right tb-text-sm text-[var(--tb-fg-muted)]">
@@ -93,19 +93,19 @@ export default function AdminPage() {
  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
  <div className="card p-4">
  <div className="tb-text-sm text-[var(--tb-fg-muted)]">ماژول قابل مدیریت</div>
- <div className="mt-1 tb-text-hero ">{modules.length.toLocaleString("fa-IR")}</div>
+ <div className="mt-1 tb-text-big-title ">{modules.length.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
  <div className="tb-text-sm text-[var(--tb-fg-muted)]">محتوای قابل مدیریت</div>
- <div className="mt-1 tb-text-hero ">{totals.count.toLocaleString("fa-IR")}</div>
+ <div className="mt-1 tb-text-big-title ">{totals.count.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
  <div className="tb-text-sm text-[var(--tb-fg-muted)]">بازدید منبع‌ها</div>
- <div className="mt-1 tb-text-hero ">{totals.views.toLocaleString("fa-IR")}</div>
+ <div className="mt-1 tb-text-big-title ">{totals.views.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
  <div className="tb-text-sm text-[var(--tb-fg-muted)]">پیش‌نویس لوکال</div>
- <div className="mt-1 tb-text-hero ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
+ <div className="mt-1 tb-text-big-title ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
  </div>
  </div>
 

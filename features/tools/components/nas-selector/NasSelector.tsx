@@ -396,7 +396,7 @@ export function NasSelector({
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--tb-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--tb-vip)_14%,transparent),transparent_30%)]" />
         <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
-            <h1 className="tb-text-hero">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
+            <h1 className="tb-text-big-title">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-8 text-[var(--tb-fg-muted)]">
               نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
             </p>

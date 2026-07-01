@@ -30,7 +30,7 @@ export default function BentoCard({
  <div className="flex h-full flex-col gap-3">
  <div className="flex items-start justify-between gap-3">
  <div>
- <h3 className={`tb-text-lg md:tb-text-hero ${color}`}>
+ <h3 className={`tb-text-lg md:tb-text-big-title ${color}`}>
  <Link href={href} className="hover:opacity-90">{title}</Link>
  </h3>
  {description && (

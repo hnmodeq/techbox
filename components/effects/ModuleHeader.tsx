@@ -24,7 +24,7 @@ export default function ModuleHeader({ module, title, description, eyebrow, coun
     <header className={cn("mb-6 flex flex-wrap items-end justify-between gap-3", className)}>
       <div>
         {eyebrow && <div className="mb-2 tb-text-sm text-[var(--tb-fg-muted)]">{eyebrow}</div>}
-        <h1 className={cn("tb-text-hero", meta.color)}>{title}</h1>
+        <h1 className={cn("tb-text-big-title", meta.color)}>{title}</h1>
         {description && <p className="mt-2 tb-text-md text-[var(--tb-fg-muted)]">{description}</p>}
       </div>
       {count && <div className="tb-text-sm text-[var(--tb-fg-muted)]">{count}</div>}

@@ -82,7 +82,7 @@ function AdminPostsInner() {
  <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
  <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
  <div>
- <h1 className="tb-text-hero ">مدیریت محتوا</h1>
+ <h1 className="tb-text-big-title ">مدیریت محتوا</h1>
  <div className="mt-2 flex flex-wrap items-center gap-2">
  <ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>
  <Badge variant="secondary">{items.length.toLocaleString("fa-IR")} آیتم منبع</Badge>

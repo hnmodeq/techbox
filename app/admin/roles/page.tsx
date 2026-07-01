@@ -86,7 +86,7 @@ export default function RolesPage(){
  <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
  <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
  <div>
- <h1 className="tb-text-hero ">مدیریت نقش‌ها – RBAC</h1>
+ <h1 className="tb-text-big-title ">مدیریت نقش‌ها – RBAC</h1>
  <p className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">مدیر کل می‌تواند نقش بسازد و دسترسی ماژول‌ها را تعیین کند. این نسخه فعلاً لوکال و آماده اتصال به Prisma Role table است.</p>
  </div>
  <div className="flex flex-wrap gap-2">

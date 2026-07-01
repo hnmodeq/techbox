@@ -69,7 +69,7 @@ export default function CheckoutPage(){
 
  return (
  <main className="max-w-5xl mx-auto px-4 py-12" dir="rtl">
- <h1 className="tb-text-hero mb-2 text-[var(--tb-shop)]">تسویه حساب – زرین‌پال</h1>
+ <h1 className="tb-text-big-title mb-2 text-[var(--tb-shop)]">تسویه حساب – زرین‌پال</h1>
  <p className="mb-6 tb-text-sm text-[var(--tb-fg-muted)]">
  درگاه: <b>ZarinPal</b> – {process.env.NEXT_PUBLIC_ZARIN_MERCHANT_ID ? "Live" : "Sandbox / Mock"} – برای فعال‌سازی واقعی، در .env بگذارید: <code>ZARIN_MERCHANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>
  </p>
