@@ -178,5 +178,65 @@
     "dislikes": 1,
     "date": "2026-07-20T07:30:00Z",
     "author_avatar": "/assets/hooman.png"
+  },
+  {
+    "id": "c16",
+    "content_type": "forum",
+    "content_slug": "best-firewall-for-small-office",
+    "parent_id": null,
+    "author": "کاربر شبکه",
+    "text": "ممنون از پاسخ‌ها. با دو لینک اینترنت، MikroTik با failover راه‌اندازی کردم و تا الان پایدار بوده.",
+    "likes": 6,
+    "dislikes": 0,
+    "date": "2026-07-20T10:05:00Z",
+    "author_avatar": "/assets/hooman.png"
+  },
+  {
+    "id": "c17",
+    "content_type": "forum",
+    "content_slug": "raid10-or-raid6-for-vm-storage",
+    "parent_id": null,
+    "author": "سارا",
+    "text": "برای ۸ دیسک SAS و workload مجازی‌سازی، RAID10 انتخاب امن‌تری از نظر IOPS و زمان rebuild است.",
+    "likes": 11,
+    "dislikes": 0,
+    "date": "2026-07-21T09:15:00Z",
+    "author_avatar": "/assets/hooman.png"
+  },
+  {
+    "id": "c18",
+    "content_type": "forum",
+    "content_slug": "raid10-or-raid6-for-vm-storage",
+    "parent_id": null,
+    "author": "نیما",
+    "text": "اگر ظرفیت خیلی مهم است RAID6 هم گزینه است ولی write penalty را در نظر بگیرید.",
+    "likes": 7,
+    "dislikes": 0,
+    "date": "2026-07-21T11:40:00Z",
+    "author_avatar": "/assets/hooman.png"
+  },
+  {
+    "id": "c19",
+    "content_type": "forum",
+    "content_slug": "wifi7-controller-placement",
+    "parent_id": null,
+    "author": "مهدی",
+    "text": "برای Wi-Fi 7 کنترلر را وسط ساختمان و دور از منابع تداخل بگذارید؛ پوشش یکنواخت‌تری می‌گیرید.",
+    "likes": 9,
+    "dislikes": 0,
+    "date": "2026-07-22T08:20:00Z",
+    "author_avatar": "/assets/hooman.png"
+  },
+  {
+    "id": "c20",
+    "content_type": "forum",
+    "content_slug": "wifi7-controller-placement",
+    "parent_id": null,
+    "author": "روژینا",
+    "text": "site survey قبل از نصب واقعاً فرق ایجاد می‌کند، مخصوصاً در محیط‌های شلوغ ۶ گیگاهرتز.",
+    "likes": 5,
+    "dislikes": 0,
+    "date": "2026-07-22T09:50:00Z",
+    "author_avatar": "/assets/hooman.png"
   }
 ]

@@ -1,0 +1,1116 @@
+## `design/foundation/globals.css`
+
+```css
+@import "tailwindcss";
+
+/* Design tokens — one file per family (the single source of truth) */
+@import "../tokens/colors.css";
+@import "../tokens/modules.css";
+@import "../tokens/gradient.css";
+@import "../tokens/ring.css";
+@import "../tokens/radius.css";
+@import "../tokens/shadow.css";
+@import "../tokens/blur.css";
+@import "../tokens/opacity.css";
+@import "../tokens/border.css";
+@import "../tokens/motion.css";
+@import "../tokens/typography.css";
+
+@import "./primitives.css";
+
+@theme inline {
+  --font-sans: var(--font-kalameh);
+
+  --color-background: var(--tb-bg-primary);
+  --color-foreground: var(--tb-fg-primary);
+  --color-primary: var(--tb-primary);
+  --color-primary-foreground: var(--tb-on-accent);
+  --color-muted: var(--tb-bg-muted);
+  --color-muted-foreground: var(--tb-fg-muted);
+  --color-border: var(--tb-border);
+  --color-ring: var(--tb-ring-1);
+  --color-card: var(--tb-bg-secondary);
+  --color-card-foreground: var(--tb-fg-primary);
+
+  --radius-lg: var(--tb-radius-md);
+  --radius-xl: var(--tb-radius-lg);
+  --radius-2xl: var(--tb-radius-lg);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  font-family:var(--font-kalameh),Vazirmatn,system-ui,sans-serif;
+  direction:rtl;
+}
+
+body{
+  margin:0;
+  background:var(--tb-bg-primary);
+  color:var(--tb-fg-primary);
+  min-height:100dvh;
+}
+
+/* typography — base elements map onto the text utility scales */
+
+h1{
+  font-size:clamp(1.6rem,3.5vw,2.5rem);
+  font-weight:900;
+  line-height:1.2;
+  letter-spacing:-0.01em;
+}
+
+h2{
+  font-size:clamp(1.3rem,2.5vw,1.75rem);
+  font-weight:800;
+}
+
+h3{
+  font-size:clamp(1.05rem,1.8vw,1.25rem);
+  font-weight:700;
+}
+
+p,li{
+  font-size:0.9375rem;
+  line-height:1.8;
+  color:var(--tb-fg-muted);
+}
+
+/* utilities */
+
+.line-clamp-2{
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.line-clamp-3{
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+@keyframes tb-ticker-scroll-right{
+  from{
+    transform:translate3d(0,0,0);
+  }
+  to{
+    transform:translate3d(33.333%,0,0);
+  }
+}
+
+.ticker-track{
+  transform:translate3d(0,0,0);
+  animation:tb-ticker-scroll-right 80s linear infinite;
+  will-change:transform;
+  backface-visibility:hidden;
+}
+
+.ticker-wrapper:hover .ticker-track{
+  animation-play-state:paused;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ticker-track{
+    animation:none;
+    transform:none;
+  }
+}
+
+
+```
+
+---
+
+## `design/foundation/primitives.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · PRIMITIVE COMPONENT CLASSES
+   Reusable element styles. Every value redirects to a design token — no
+   hardcoded colors / radius / shadow / blur / motion here.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.card{
+  background:var(--tb-bg-secondary);
+  color:var(--tb-fg-primary);
+  border:var(--tb-border-sm) solid var(--tb-border);
+  border-radius:var(--tb-radius-lg);
+  padding:1rem;
+  box-shadow:var(--tb-shadow-md);
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.3em;
+  border-radius:var(--tb-radius-full);
+  padding:2px 10px;
+  font-size:11px;
+  font-weight:600;
+  background:var(--tb-bg-muted);
+  color:var(--tb-fg-muted);
+  border:var(--tb-border-sm) solid var(--tb-border);
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45rem;
+  border-radius:var(--tb-radius-md);
+  padding:.58rem .95rem;
+  font-weight:700;
+  font-size:0.8125rem;
+  cursor:pointer;
+  transition:
+    color var(--tb-motion-sm) var(--tb-ease),
+    background-color var(--tb-motion-sm) var(--tb-ease),
+    border-color var(--tb-motion-sm) var(--tb-ease),
+    filter var(--tb-motion-sm) var(--tb-ease),
+    transform var(--tb-motion-sm) var(--tb-ease),
+    box-shadow var(--tb-motion-sm) var(--tb-ease);
+}
+
+.btn-primary{
+  background:var(--tb-primary);
+  color:var(--tb-on-accent);
+  box-shadow:var(--tb-shadow-sm);
+}
+
+.btn-primary:hover{
+  filter:brightness(1.06);
+  transform:translateY(-1px);
+}
+
+.btn-ghost{
+  background:transparent;
+  border:var(--tb-border-sm) solid var(--tb-border);
+  color:var(--tb-fg-primary);
+}
+
+.btn-ghost:hover{
+  background:var(--tb-bg-muted);
+}
+
+.btn-danger{
+  background:var(--tb-danger);
+  color:var(--tb-on-accent);
+}
+
+.btn-vip{
+  color:var(--tb-on-accent);
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklch, var(--tb-vip) 72%, var(--tb-primary)) 0%,
+      var(--tb-primary) 52%,
+      color-mix(in oklch, var(--tb-tools) 72%, var(--tb-primary)) 100%);
+  box-shadow:var(--tb-shadow-md);
+}
+
+.input{
+  width:100%;
+  background:var(--tb-bg-muted);
+  border:var(--tb-border-sm) solid var(--tb-border);
+  border-radius:var(--tb-radius-md);
+  padding:.6rem .85rem;
+}
+
+.icon-rail-btn{
+  display:inline-flex;
+  width:2.5rem;
+  height:2.5rem;
+  align-items:center;
+  justify-content:center;
+  border-radius:var(--tb-radius-md);
+  color:var(--tb-fg-muted);
+  transition:
+    color var(--tb-motion-sm) var(--tb-ease),
+    background-color var(--tb-motion-sm) var(--tb-ease),
+    transform var(--tb-motion-sm) var(--tb-ease);
+}
+
+.icon-rail-btn:hover{
+  color:var(--tb-fg-primary);
+  background:var(--tb-bg-muted);
+}
+
+.vip-cta{
+  color:var(--tb-on-accent);
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklch, var(--tb-vip) 72%, var(--tb-primary)) 0%,
+      var(--tb-primary) 52%,
+      color-mix(in oklch, var(--tb-tools) 72%, var(--tb-primary)) 100%);
+  box-shadow:var(--tb-shadow-md);
+  border-radius:var(--tb-radius-lg);
+  transition:
+    filter var(--tb-motion-sm) var(--tb-ease),
+    transform var(--tb-motion-sm) var(--tb-ease),
+    box-shadow var(--tb-motion-sm) var(--tb-ease);
+}
+
+.vip-cta:hover{
+  filter:brightness(1.06);
+  transform:translateY(-1px);
+  box-shadow:var(--tb-shadow-lg);
+}
+
+.tb-cta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  min-height:2.5rem;
+  border-radius:var(--tb-radius-lg);
+  font-weight:900;
+  color:var(--tb-on-accent);
+  border:var(--tb-border-sm) solid color-mix(in oklch, var(--tb-primary) 25%, transparent);
+  box-shadow:var(--tb-shadow-md);
+  transition:
+    color var(--tb-motion-sm) var(--tb-ease),
+    background-color var(--tb-motion-sm) var(--tb-ease),
+    border-color var(--tb-motion-sm) var(--tb-ease),
+    filter var(--tb-motion-sm) var(--tb-ease),
+    transform var(--tb-motion-sm) var(--tb-ease),
+    box-shadow var(--tb-motion-sm) var(--tb-ease);
+}
+
+.tb-cta:hover{
+  filter:brightness(1.06);
+  transform:translateY(-1px);
+  box-shadow:var(--tb-shadow-lg);
+}
+
+.tb-cta-brand,
+.tb-floating-action{
+  background:linear-gradient(135deg,
+    color-mix(in oklch, var(--tb-primary) 72%, black) 0%,
+    var(--tb-primary) 100%);
+}
+
+.tb-cta-vip,
+.vip-cta{
+  background:
+    linear-gradient(135deg,
+      color-mix(in oklch, var(--tb-vip) 72%, var(--tb-primary)) 0%,
+      var(--tb-primary) 52%,
+      color-mix(in oklch, var(--tb-tools) 72%, var(--tb-primary)) 100%);
+}
+
+.tb-floating-action{
+  position:fixed;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  border-radius:var(--tb-radius-full);
+  padding:.75rem 1rem;
+  color:var(--tb-on-accent);
+  font-size:0.8125rem;
+  font-weight:900;
+  box-shadow:var(--tb-shadow-lg);
+  transition:
+    transform var(--tb-motion-sm) var(--tb-ease),
+    filter var(--tb-motion-sm) var(--tb-ease),
+    box-shadow var(--tb-motion-sm) var(--tb-ease);
+}
+
+.tb-floating-action:hover{
+  filter:brightness(1.06);
+  transform:translateY(-1px) scale(1.02);
+  box-shadow:var(--tb-shadow-lg);
+}
+
+.tb-overlay-backdrop{
+  background:color-mix(in oklch, black 55%, transparent);
+  backdrop-filter:blur(var(--tb-blur-sm));
+}
+
+.tb-overlay-panel{
+  background:var(--tb-bg-secondary);
+  color:var(--tb-fg-primary);
+  border:var(--tb-border-sm) solid var(--tb-border);
+  border-radius:var(--tb-radius-lg);
+  box-shadow:var(--tb-shadow-lg);
+}
+
+.tb-soft-panel{
+  background:var(--tb-bg-secondary);
+  border:var(--tb-border-sm) solid var(--tb-border);
+  border-radius:var(--tb-radius-md);
+  box-shadow:var(--tb-shadow-sm);
+}
+
+.tb-image-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:var(--tb-radius-full);
+  background:color-mix(in oklch, black 60%, transparent);
+  color:var(--tb-on-accent);
+  border:var(--tb-border-sm) solid color-mix(in oklch, white 22%, transparent);
+  backdrop-filter:blur(var(--tb-blur-sm));
+}
+
+.tb-action-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  border-radius:var(--tb-radius-full);
+  border:var(--tb-border-sm) solid var(--tb-border);
+  background:color-mix(in oklch, var(--tb-bg-muted) 78%, transparent);
+  color:var(--tb-fg-muted);
+  transition:
+    color var(--tb-motion-sm) var(--tb-ease),
+    background-color var(--tb-motion-sm) var(--tb-ease),
+    border-color var(--tb-motion-sm) var(--tb-ease);
+}
+
+.tb-action-chip:hover{
+  color:var(--tb-fg-primary);
+  background:var(--tb-bg-muted);
+}
+
+```
+
+---
+
+## `design/icons.tsx`
+
+```tsx
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · CENTRAL ICON SYSTEM
+   ────────────────────────────────────────────────────────────────────────
+   The single source of truth for every icon/emoji used across the site.
+   Components must import icons from here (never emojis or ad-hoc imports),
+   so the whole icon set can be swapped in one place.
+
+   Usage:
+     import { Icon } from "@/design/icons";
+     <Icon name="like" className="h-4 w-4" />
+   or the named component:
+     import { LikeIcon } from "@/design/icons";
+     <LikeIcon size={16} />
+   ════════════════════════════════════════════════════════════════════════ */
+
+import {
+  Heart,
+  Eye,
+  MessageCircle,
+  Download,
+  Star,
+  Play,
+  Clock,
+  Calendar,
+  Bell,
+  Search,
+  ShoppingCart,
+  ShieldCheck,
+  Headset,
+  MessageSquare,
+  X,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Moon,
+  Sun,
+  Plus,
+  Minus,
+  Check,
+  User,
+  Users,
+  Tag,
+  Newspaper,
+  Video,
+  Wrench,
+  FolderDown,
+  Store,
+  MessagesSquare,
+  BookOpen,
+  Home,
+  Flame,
+  Send,
+  HardDrive,
+  Server,
+  type LucideIcon,
+  type LucideProps,
+} from "lucide-react";
+
+/** Canonical icon registry. Add new icons here and reference them by name. */
+export const icons = {
+  // engagement / meta
+  like: Heart,
+  view: Eye,
+  comment: MessageCircle,
+  download: Download,
+  star: Star,
+  play: Play,
+  clock: Clock,
+  date: Calendar,
+  tag: Tag,
+  flame: Flame,
+  send: Send,
+  // navigation / chrome
+  bell: Bell,
+  search: Search,
+  cart: ShoppingCart,
+  shield: ShieldCheck,
+  headset: Headset,
+  chat: MessageSquare,
+  close: X,
+  chevronDown: ChevronDown,
+  chevronLeft: ChevronLeft,
+  chevronRight: ChevronRight,
+  chevronUp: ChevronUp,
+  moon: Moon,
+  sun: Sun,
+  plus: Plus,
+  minus: Minus,
+  check: Check,
+  user: User,
+  users: Users,
+  home: Home,
+  // module glyphs
+  blog: BookOpen,
+  news: Newspaper,
+  media: Video,
+  tools: Wrench,
+  downloadModule: FolderDown,
+  shop: Store,
+  forum: MessagesSquare,
+  review: Star,
+  // hardware (raid / subnet visuals)
+  disk: HardDrive,
+  server: Server,
+} as const;
+
+export type IconName = keyof typeof icons;
+
+/** Generic icon component: <Icon name="like" className="h-4 w-4" /> */
+export function Icon({ name, ...props }: { name: IconName } & LucideProps) {
+  const Cmp = icons[name] as LucideIcon;
+  return <Cmp {...props} />;
+}
+
+// Convenience named exports (used where a direct component is cleaner)
+export const LikeIcon = Heart;
+export const ViewIcon = Eye;
+export const CommentIcon = MessageCircle;
+export const DownloadIcon = Download;
+export const StarIcon = Star;
+export const PlayIcon = Play;
+export const ClockIcon = Clock;
+export const DateIcon = Calendar;
+export const TagIcon = Tag;
+export const ChatIcon = MessageSquare;
+export const CloseIcon = X;
+export const ChevronLeftIcon = ChevronLeft;
+export const ChevronRightIcon = ChevronRight;
+export const PlusIcon = Plus;
+export const MinusIcon = Minus;
+export const DiskIcon = HardDrive;
+export const ServerIcon = Server;
+
+export type { LucideProps };
+
+```
+
+---
+
+## `design/index.ts`
+
+```ts
+// Public design exports — JS-side only.
+// Visual tokens (color/radius/shadow/blur/opacity/border/motion/typography) live as
+// CSS variables / utility classes under design/tokens/*.css and are the single source
+// of truth. The only JS exports are things components need at runtime:
+//   • zIndex  — layer ordering for inline styles
+//   • motion  — Framer Motion variants/transitions
+export * from "./tokens/z-index";
+export * from "./tokens/motion";
+
+```
+
+---
+
+## `design/presets/effects.ts`
+
+```ts
+export const hover = {
+  lift: "hover:-translate-y-[2px]",
+  brighten: "hover:brightness-[1.05]",
+  glow: "hover:shadow-[var(--tb-shadow-glow)]",
+};
+
+export const focus = {
+  ring: "focus-visible:outline-none focus-visible:shadow-[var(--tb-focus-ring)]",
+};
+
+```
+
+---
+
+## `design/presets/interactions.ts`
+
+```ts
+export const interactive = [
+  "hover:-translate-y-[1px]",
+  "hover:brightness-[1.05]",
+  "transition-all",
+  "duration-[var(--tb-duration-normal)]",
+  "ease-[var(--tb-ease-standard)]",
+].join(" ");
+
+export const press = "active:scale-[0.98]";
+
+```
+
+---
+
+## `design/presets/surfaces.ts`
+
+```ts
+export const card =
+  "bg-[var(--tb-card)] border border-[var(--tb-border)] rounded-[var(--tb-radius-lg)] shadow-[var(--tb-shadow)]";
+
+export const elevated =
+  "bg-[var(--tb-card)] rounded-[var(--tb-radius-xl)] shadow-[var(--tb-shadow-md)]";
+
+export const glass =
+  "backdrop-blur-[var(--tb-glass-blur)] bg-[color-mix(in_oklch,var(--tb-card)_72%,transparent)] border border-[color-mix(in_oklch,var(--tb-border)_80%,transparent)]";
+
+```
+
+---
+
+## `design/tokens/blur.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · BLUR  (backdrop / glass blur radii)
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-blur-sm: 6px;
+  --tb-blur-md: 14px;
+  --tb-blur-lg: 24px;
+}
+
+```
+
+---
+
+## `design/tokens/blur.ts`
+
+```ts
+export const blur = {
+  sm: "var(--tb-blur-sm)",
+  md: "var(--tb-blur-md)",
+  lg: "var(--tb-blur-lg)",
+  xl: "var(--tb-blur-xl)",
+  glass: "var(--tb-glass-blur)",
+} as const;
+
+export type BlurToken = keyof typeof blur;
+
+```
+
+---
+
+## `design/tokens/border.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · BORDERS  (border color + width)
+   The border color is derived from the semantic foreground token in
+   colors.css (a low-opacity mix), so it follows the theme automatically.
+   The sm/md/lg tokens are width helpers used as:
+     border: var(--tb-border-sm) solid var(--tb-border);
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-border: color-mix(in oklch, var(--tb-fg-primary) 14%, transparent);
+  --tb-border-sm: 1px;
+  --tb-border-md: 2px;
+  --tb-border-lg: 3px;
+}
+
+```
+
+---
+
+## `design/tokens/colors.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · COLORS  (semantic surfaces & text only)
+   ────────────────────────────────────────────────────────────────────────
+   ONLY background + foreground colors live here. Everything else moved out:
+     • module / brand / status accents → modules.css
+     • gradients → gradient.css     • rings → ring.css
+     • radius/shadow/blur/opacity/border/motion → their own files
+     • text size/weight/leading → typography.css (utility classes)
+
+   Theme: NEUTRAL (grayscale surfaces, no color cast).
+   Dark mode uses the native CSS `light-dark()` function. It follows the
+   `color-scheme` property, which we flip from the existing `.dark` class
+   (set on <html> by the theme toggle). So: light-dark(LIGHT, DARK).
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+:root {
+  /* ── Backgrounds (neutral grays) ── */
+  --tb-bg-primary:   light-dark(oklch(0.985 0 0), oklch(0.16 0 0)); /* app background      */
+  --tb-bg-secondary: light-dark(oklch(1 0 0),     oklch(0.21 0 0)); /* cards / panels / popovers */
+  --tb-bg-muted:     light-dark(oklch(0.955 0 0), oklch(0.26 0 0)); /* muted fills / inputs */
+
+  /* ── Foregrounds (text, neutral) ── */
+  --tb-fg-primary:   light-dark(oklch(0.20 0 0), oklch(0.97 0 0)); /* main text       */
+  --tb-fg-secondary: light-dark(oklch(0.38 0 0), oklch(0.82 0 0)); /* secondary text  */
+  --tb-fg-muted:     light-dark(oklch(0.55 0 0), oklch(0.65 0 0)); /* muted / meta    */
+}
+
+```
+
+---
+
+## `design/tokens/gradient.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · GRADIENTS
+   Three gradient stops used by the brand gradient, hero background (Aurora),
+   and any gradient surface. Built from the brand + module accents so they
+   stay in sync. Dark values via light-dark().
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-gradient-1: var(--tb-primary);  /* brand   */
+  --tb-gradient-2: var(--tb-subnet);   /* blue    */
+  --tb-gradient-3: var(--tb-vip);      /* fuchsia */
+}
+
+```
+
+---
+
+## `design/tokens/modules.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · MODULE / BRAND / STATUS COLORS
+   ────────────────────────────────────────────────────────────────────────
+   The identity colors. Modules are the ONLY colors allowed to brand a piece
+   of content across the UI. `--tb-primary` is the site/brand accent (buttons,
+   links, hero). Status colors are shared semantic accents.
+   Dark values via light-dark(LIGHT, DARK).
+   Page-color placeholders (admin/about/…) — pick your own anytime.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand / primary accent ── */
+  --tb-primary:    light-dark(oklch(0.62 0.21 255), #60a5fa);
+  /* fixed light text that sits on top of any saturated accent (white both modes) */
+  --tb-on-accent:  #ffffff;
+
+  /* ── Modules ── */
+  --tb-blog:     light-dark(oklch(0.70 0.17 52),  #fb923c); /* orange   */
+  --tb-news:     light-dark(oklch(0.64 0.22 25),  #fb7185); /* rose     */
+  --tb-media:    light-dark(oklch(0.82 0.15 85),  #fcd34d); /* amber    */
+  --tb-shop:     light-dark(oklch(0.80 0.19 125), #a3e635); /* lime     */
+  --tb-tools:    light-dark(oklch(0.82 0.12 200), #67e8f9); /* cyan     */
+  --tb-raid:     light-dark(oklch(0.66 0.18 175), #2dd4bf); /* teal     */
+  --tb-subnet:   light-dark(oklch(0.68 0.19 230), #60a5fa); /* blue     */
+  --tb-vip:      light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia  */
+  --tb-forum:    light-dark(oklch(0.78 0.16 5),   #fda4af); /* rose-300 */
+  --tb-review:   light-dark(oklch(0.70 0.17 240), #38bdf8); /* sky      */
+  --tb-download: light-dark(oklch(0.72 0.20 350), #f472b6); /* pink     */
+  --tb-home:     light-dark(oklch(0.62 0.22 290), #a78bfa); /* violet   */
+  --tb-account:  light-dark(oklch(0.80 0.12 15),  #fca5a5); /* red-200  */
+
+  /* ── Status ── */
+  --tb-success:  light-dark(oklch(0.72 0.18 150), #4ade80);
+  --tb-danger:   light-dark(oklch(0.64 0.22 25),  #fb7185);
+  --tb-warning:  light-dark(oklch(0.82 0.15 85),  #fcd34d);
+  --tb-info:     light-dark(oklch(0.72 0.16 230), #7dd3fc);
+
+  /* ── Page accents (placeholders) ── */
+  --tb-admin:        light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia */
+  --tb-about:        light-dark(oklch(0.72 0.16 230), #7dd3fc); /* sky     */
+  --tb-contact:      light-dark(oklch(0.72 0.18 150), #4ade80); /* green   */
+  --tb-workwithus:   light-dark(oklch(0.70 0.17 52),  #fb923c); /* orange  */
+  --tb-consultation: light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia */
+}
+
+```
+
+---
+
+## `design/tokens/motion.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · MOTION  (durations + shared easing)
+   Three durations + one standard easing curve. Use as:
+     transition: color var(--tb-motion-sm) var(--tb-ease);
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-motion-sm: 150ms;
+  --tb-motion-md: 220ms;
+  --tb-motion-lg: 340ms;
+  --tb-ease: cubic-bezier(.2,.8,.2,1);
+}
+
+```
+
+---
+
+## `design/tokens/motion.ts`
+
+```ts
+// Framer Motion – central tokens – Next 16 / React 19
+// No Tailwind / no DOM – pure JS – safe to import in hooks/services
+
+export const duration = {
+  instant: 0.08,
+  fast: 0.15,
+  normal: 0.22,
+  slow: 0.34,
+  slower: 0.52,
+} as const; // seconds – mirrors design/tokens/motion.css (--tb-motion-sm/md/lg)
+
+export const ease = {
+  standard: [0.2, 0.8, 0.2, 1] as const,
+  emphasized: [0.2, 0, 0, 1] as const,
+  out: [0, 0, 0.38, 1] as const,
+  inOut: [0.4, 0, 0.2, 1] as const,
+};
+
+export const transition = {
+  fast: { duration: duration.fast, ease: ease.standard },
+  normal: { duration: duration.normal, ease: ease.standard },
+  slow: { duration: duration.slow, ease: ease.emphasized },
+};
+
+// Framer Motion variants – reusable
+export const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: transition.normal,
+};
+
+export const fadeInUp = {
+  initial: { opacity: 0, y: 14 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+  transition: transition.normal,
+};
+
+export const scaleIn = {
+  initial: { opacity: 0, scale: 0.96 },
+  animate: { opacity: 1, scale: 1 },
+  exit: { opacity: 0, scale: 0.96 },
+  transition: transition.fast,
+};
+
+export const hoverScale = {
+  whileHover: { scale: 1.015, y: -2 },
+  whileTap: { scale: 0.99 },
+  transition: transition.fast,
+};
+
+export const slideIn = fadeInUp;
+export const slideInLeft = { initial:{opacity:0,x:-24}, animate:{opacity:1,x:0}, exit:{opacity:0,x:-24}, transition: transition.normal };
+export const slideInRight = { initial:{opacity:0,x:24}, animate:{opacity:1,x:0}, exit:{opacity:0,x:24}, transition: transition.normal };
+
+```
+
+---
+
+## `design/tokens/opacity.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · OPACITY
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-opacity-sm: 0.45;
+  --tb-opacity-md: 0.6;
+  --tb-opacity-lg: 0.85;
+}
+
+```
+
+---
+
+## `design/tokens/radius.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · RADIUS  (corner roundness)
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-radius-sm: 5px;
+  --tb-radius-md: 9px;
+  --tb-radius-lg: 14px;
+  --tb-radius-full: 9999px;
+}
+
+```
+
+---
+
+## `design/tokens/radius.ts`
+
+```ts
+export const radius = {
+  xs: "var(--tb-radius-xs)",
+  sm: "var(--tb-radius-sm)",
+  md: "var(--tb-radius-md)",
+  lg: "var(--tb-radius-lg)",
+  xl: "var(--tb-radius-xl)",
+  "2xl": "var(--tb-radius-2xl)",
+  full: "var(--tb-radius-full)",
+} as const;
+
+export type RadiusToken = keyof typeof radius;
+
+```
+
+---
+
+## `design/tokens/ring.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · RINGS  (focus / outline rings)
+   Rings are derived from the semantic color tokens in colors.css — no
+   independent color values here.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-ring-1: var(--tb-fg-primary);                                    /* solid ring color */
+  --tb-ring-2: color-mix(in oklch, var(--tb-fg-primary) 55%, transparent); /* soft ring color */
+  --tb-ring-3: 0 0 0 3px color-mix(in oklch, var(--tb-fg-primary) 35%, transparent); /* focus box-shadow */
+}
+
+```
+
+---
+
+## `design/tokens/shadow.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · SHADOWS  (elevation)
+   Dark values via light-dark().
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-shadow-sm: light-dark(
+    0 1px 3px rgba(2,8,23,.06), 
+    0 1px 3px rgba(0,0,0,.30));
+  --tb-shadow-md: light-dark(
+    0 8px 28px rgba(2,8,23,.10), 
+    0 10px 36px rgba(0,0,0,.42));
+  --tb-shadow-lg: light-dark(
+    0 16px 44px rgba(2,8,23,.14), 
+    0 20px 60px rgba(0,0,0,.5));
+}
+
+```
+
+---
+
+## `design/tokens/shadows.ts`
+
+```ts
+export const shadows = {
+  sm: "var(--tb-shadow-sm)",
+  DEFAULT: "var(--tb-shadow)",
+  md: "var(--tb-shadow-md)",
+  lg: "var(--tb-shadow-lg)",
+  glow: "var(--tb-shadow-glow)",
+  none: "none",
+} as const;
+export type ShadowToken = keyof typeof shadows;
+
+```
+
+---
+
+## `design/tokens/typography.css`
+
+```css
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · TYPOGRAPHY  (utility classes)
+   One class per text role, each bundling font-size + weight + line-height.
+   Use directly on an element:  <p class="tb-text-md">…</p>
+     • tb-text-sm   – small / meta text
+     • tb-text-md   – body / default
+     • tb-text-lg   – subheadings
+     • tb-text-hero – page & section headings (fluid)
+
+   Responsive variants are defined manually so class names like
+   `md:tb-text-hero` work without falling back to Tailwind text/font/leading.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.tb-text-sm {
+  font-size: 0.8125rem;   /* 13px */
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.tb-text-md {
+  font-size: 0.9375rem;   /* 15px */
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.tb-text-lg {
+  font-size: 1.25rem;     /* 20px */
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.tb-text-hero {
+  font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 640px) {
+  .sm\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
+  .sm\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
+  .sm\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
+  .sm\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+}
+
+@media (min-width: 768px) {
+  .md\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
+  .md\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
+  .md\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
+  .md\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+}
+
+@media (min-width: 1024px) {
+  .lg\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
+  .lg\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
+  .lg\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
+  .lg\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+}
+
+@media (min-width: 1280px) {
+  .xl\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
+  .xl\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
+  .xl\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
+  .xl\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+}
+
+@media (min-width: 1536px) {
+  .\32xl\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
+  .\32xl\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
+  .\32xl\:tb-text-lg { font-size: 1.25rem; font-weight: 700; line-height: 1.45; }
+  .\32xl\:tb-text-hero { font-size: clamp(1.6rem, 3.5vw, 2.5rem); font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
+}
+
+```
+
+---
+
+## `design/tokens/typography.ts`
+
+```ts
+export const fontSize = {
+  "2xs": "var(--tb-text-2xs)",
+  xs: "var(--tb-text-xs)",
+  sm: "var(--tb-text-sm)",
+  base: "var(--tb-text-base)",
+  md: "var(--tb-text-md)",
+  lg: "var(--tb-text-lg)",
+  xl: "var(--tb-text-xl)",
+  "2xl": "var(--tb-text-2xl)",
+  "3xl": "var(--tb-text-3xl)",
+  "4xl": "var(--tb-text-4xl)",
+  "5xl": "var(--tb-text-5xl)",
+} as const;
+
+export const lineHeight = {
+  tight: "var(--tb-leading-tight)",
+  snug: "var(--tb-leading-snug)",
+  normal: "var(--tb-leading-normal)",
+  relaxed: "var(--tb-leading-relaxed)",
+} as const;
+
+export const fontWeight = {
+  regular: "var(--tb-weight-regular)",
+  medium: "var(--tb-weight-medium)",
+  semibold: "var(--tb-weight-semibold)",
+  bold: "var(--tb-weight-bold)",
+  extrabold: "var(--tb-weight-extrabold)",
+  black: "var(--tb-weight-black)",
+} as const;
+
+export const type = {
+  "heading-1": "text-[clamp(1.6rem,3.5vw,2.25rem)] font-black leading-tight tracking-tight",
+  "heading-2": "text-[clamp(1.3rem,2.5vw,1.75rem)] font-extrabold leading-snug",
+  "heading-3": "text-[clamp(1.05rem,1.8vw,1.25rem)] font-bold",
+  "body": "text-[14px] leading-[1.9]",
+  "body-sm": "text-[13px] leading-[1.8]",
+  "meta": "text-[11px] leading-[1.6]",
+  "caption": "text-[11.5px] leading-[1.5]",
+} as const;
+
+```
+
+---
+
+## `design/tokens/z-index.ts`
+
+```ts
+export const zIndex = {
+  base: 0,
+  content: 1,
+  raised: 5,
+  docked: 10,
+  sticky: 30,
+  sidebarBackdrop: 40,
+  sidebar: 50,
+  mobileFab: 80,
+  cart: 420,
+  popover: 700,
+  dropdown: 720,
+  notification: 740,
+  modal: 900,
+  modalContent: 910,
+  chatbot: 950,
+  tooltip: 1200,
+  toast: 1300,
+  emergency: 2147483000,
+} as const;
+
+export type ZIndexToken = keyof typeof zIndex;
+
+```
+
+---
+

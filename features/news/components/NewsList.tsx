@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
+import { Icon } from "@/design/icons";
 
 export default function NewsList() {
  const items = getModuleItems("news");
@@ -21,25 +22,25 @@ export default function NewsList() {
  <section className="lg:col-span-8 order-1 lg:order-2">
  <div className="grid sm:grid-cols-2 gap-5">
  {mainNews.map((n: any, i: number) => (
- <article key={n.slug} className={`card overflow-hidden group hover:shadow-[var(--tb-shadow-lg)] transition-all ${i === 0 ? "sm:col-span-2" : ""}`} style={{ padding: 0 }}>
- <Link href={`/news/${n.slug}`} className="block relative aspect-[16/9] overflow-hidden bg-[var(--tb-bg-muted)]">
- <Image src={n.image || "/assets/blog-1.jpg"} alt={n.title} fill sizes="(min-width:1024px) 55vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
- <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">{n.category}</span>
- </Link>
- <div className="p-4">
- <div className="tb-text-sm flex flex-wrap items-center gap-2 text-[var(--tb-fg-muted)]">
- <span>🕒 {n.date_fa} {n.time ? `• ${n.time}`: ""}</span>
- <span>•</span>
- <span>{n.author?.name || "تحریریه"}</span>
- {n.source && <><span>•</span><span className="text-[var(--tb-info)]">منبع: {n.source}</span></>}
- </div>
- <h3 className=" tb-text-lg md:tb-text-lg mt-2 hover:text-[var(--tb-news)] transition-colors">
- <Link href={`/news/${n.slug}`}>{n.title}</Link>
- </h3>
- <p className="tb-text-sm line-clamp-2 mt-2 text-[var(--tb-fg-muted)]">{n.excerpt}</p>
- <div className="tb-text-sm mt-3 flex gap-3 text-[var(--tb-fg-muted)]">👁 {n.views.toLocaleString("fa-IR")} • ♥ {n.likes}</div>
- </div>
- </article>
+                <Link key={n.slug} href={`/news/${n.slug}`} className={`card overflow-hidden group hover:shadow-[var(--tb-shadow-lg)] transition-all !p-0 ${i === 0 ? "sm:col-span-2" : ""}`}>
+                  <div className="block relative aspect-[16/9] overflow-hidden bg-[var(--tb-bg-muted)]">
+                    <Image src={n.image || "/assets/blog-1.jpg"} alt={n.title} fill sizes="(min-width:1024px) 55vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
+                    <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">{n.category}</span>
+                  </div>
+                  <div className="p-4">
+                    <div className="tb-text-sm flex flex-wrap items-center gap-2 text-[var(--tb-fg-muted)]">
+                      <span className="inline-flex items-center gap-1"><Icon name="clock" size={13} strokeWidth={1.75} />{n.date_fa} {n.time ? `• ${n.time}`: ""}</span>
+                      {n.source && <><span>•</span><span>منبع: {n.source}</span></>}
+                    </div>
+                    <h3 className="tb-text-lg mt-2 transition-colors group-hover:text-[var(--tb-news)]">{n.title}</h3>
+                    <p className="tb-text-sm line-clamp-2 mt-2 text-[var(--tb-fg-muted)]">{n.excerpt}</p>
+                    <div className="tb-text-sm mt-3 flex items-center gap-3 text-[var(--tb-fg-muted)]">
+                      <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{n.views.toLocaleString("fa-IR")}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{n.likes.toLocaleString("fa-IR")}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{((n.likes % 9) + 1).toLocaleString("fa-IR")}</span>
+                    </div>
+                  </div>
+                </Link>
  ))}
  </div>
  </section>
@@ -52,20 +53,22 @@ export default function NewsList() {
  </div>
  <div className="relative">
  <div className="absolute right-[9px] top-1 bottom-1 w-px" style={{ background: "linear-gradient(to bottom, color-mix(in oklch, var(--tb-news) 60%, transparent), var(--tb-border), transparent)" }} />
- <ul className="space-y-5">
- {(forceNews.length ? forceNews : items).slice(0, 8).map((f: any) => (
- <li key={f.slug} className="relative pe-7">
- <span className="absolute right-0 top-[6px] w-[18px] h-[18px] rounded-full flex items-center justify-center bg-[var(--tb-bg-primary)] border-2 border-[color-mix(in_oklch,var(--tb-news)_55%,transparent)]">
- <span className="w-1.5 h-1.5 rounded-full bg-[var(--tb-news)]" />
- </span>
- <div className="tb-text-sm flex items-center gap-2 flex-wrap text-[var(--tb-forum)]">
- <span>🕒 {f.date_fa} {f.time || ""}</span>
- {f.source && <span className="px-1.5 py-0.5 rounded tb-text-sm bg-[color-mix(in_oklch,var(--tb-info)_12%,transparent)] text-[var(--tb-info)]">{f.source}</span>}
- </div>
- <Link href={`/news/${f.slug}`} className="tb-text-sm hover:text-[var(--tb-news)] block mt-1">{f.title}</Link>
- </li>
- ))}
- </ul>
+              <ul className="space-y-5">
+                {(forceNews.length ? forceNews : items).slice(0, 8).map((f: any) => (
+                  <li key={f.slug} className="relative pe-9">
+                    <span className="absolute right-0 top-[6px] w-[18px] h-[18px] rounded-full flex items-center justify-center bg-[var(--tb-bg-primary)] border-2 border-[color-mix(in_oklch,var(--tb-news)_55%,transparent)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--tb-news)]" />
+                    </span>
+                    <Link href={`/news/${f.slug}`} className="group block">
+                      <div className="tb-text-sm flex items-center gap-2 flex-wrap text-[var(--tb-fg-muted)]">
+                        <span className="inline-flex items-center gap-1"><Icon name="clock" size={13} strokeWidth={1.75} />{f.date_fa} {f.time || ""}</span>
+                        {f.source && <span className="px-1.5 py-0.5 rounded-[var(--tb-radius-sm)] tb-text-sm border border-[var(--tb-border)] text-[var(--tb-fg-muted)]">{f.source}</span>}
+                      </div>
+                      <span className="tb-text-sm block mt-1 transition-colors group-hover:text-[var(--tb-news)]">{f.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
  </div>
  </div>
  </aside>

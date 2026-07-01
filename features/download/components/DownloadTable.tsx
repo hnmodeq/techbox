@@ -59,28 +59,19 @@ export default function DownloadTable(){
  <table className="w-full tb-text-md">
  <thead className="bg-[var(--tb-bg-muted)]/30 tb-text-sm text-[var(--tb-fg-muted)]">
  <tr>
- <th className="text-right p-3">نام فایل</th>
- <th className="p-3 hidden sm:table-cell text-right">برچسب‌ها</th>
- <th className="p-3 hidden md:table-cell text-right">تاریخ</th>
- <th className="p-3 text-left">جزئیات</th>
+              <th className="text-right p-3">نام فایل</th>
+              <th className="p-3 hidden md:table-cell text-right">تاریخ</th>
+              <th className="p-3 text-left">جزئیات</th>
  </tr>
  </thead>
  <tbody>
  {filtered.map(f=>(
  <tr key={f.slug} className="border-t border-[color-mix(in_oklch,var(--tb-border)_60%,transparent)] hover:bg-[var(--tb-bg-muted)]/20 align-top">
- <td className="p-3">
- <Link href={`/download/${f.slug}`} className=" hover:text-[var(--tb-download)] tb-text-md">{f.title}</Link>
- <div className="tb-text-sm text-muted-foreground mt-1 line-clamp-2">{f.excerpt}</div>
- <div className="flex flex-wrap gap-1.5 mt-2">
- {f.tags.slice(0,5).map(t=>(
- <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85">
- <span className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{t.toUpperCase()}</span>
- </Link>
- ))}
- </div>
- </td>
- <td className="p-3 hidden sm:table-cell tb-text-sm text-muted-foreground">{f.category}</td>
- <td className="p-3 hidden md:table-cell tb-text-sm text-muted-foreground">{f.date_fa}</td>
+                <td className="p-3">
+                  <Link href={`/download/${f.slug}`} className=" hover:text-[var(--tb-download)] tb-text-md">{f.title}</Link>
+                  <div className="tb-text-sm text-muted-foreground mt-1 line-clamp-2">{f.excerpt}</div>
+                </td>
+                <td className="p-3 hidden md:table-cell tb-text-sm text-muted-foreground">{f.date_fa}</td>
  <td className="p-3 text-left align-top">
  <ButtonLink href={`/download/${f.slug}`} variant="ghost" size="xs" className="whitespace-nowrap tb-text-sm">انتخاب نسخه</ButtonLink>
  <div className="tb-text-sm text-muted-foreground mt-1">{f.likes.toLocaleString("fa-IR")} بار</div>

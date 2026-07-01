@@ -120,7 +120,7 @@ export const themeIconClass = {
  sunIconClassName: "text-[var(--tb-warning)]",
  sunIconHoverClassName: "group-hover:text-[var(--tb-warning)]",
  sunIconActiveClassName: "text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-warning)]",
- moonIconClassName: "text-zinc-200 dark:text-zinc-100",
+  moonIconClassName: "text-[var(--tb-fg-primary)]",
  moonIconHoverClassName: "group-hover:text-[var(--tb-info)]",
  moonIconActiveClassName:
  "text-[var(--tb-fg-primary)] dark:text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-info)]",

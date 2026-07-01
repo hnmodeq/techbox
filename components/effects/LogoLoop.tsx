@@ -193,7 +193,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
  speed = 120,
  direction = "left",
  width = "100%",
- logoHeight = 50,
+ logoHeight = 28,
  gap = 32,
  pauseOnHover,
  hoverSpeed,
@@ -281,7 +281,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
  "relative group",
  isVertical ? "overflow-hidden h-full inline-block" : "overflow-x-hidden",
  "[--logoloop-gap:32px]",
- "[--logoloop-logoHeight:50px]",
+ "[--logoloop-logoHeight:28px]",
  "[--logoloop-fadeColorAuto:var(--tb-bg-primary)]",
  scaleOnHover && "py-[calc(var(--logoloop-logoHeight)*0.1)]",
  className

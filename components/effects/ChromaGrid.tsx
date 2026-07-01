@@ -105,39 +105,39 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
  } as React.CSSProperties
  }
  >
- {data.map((c, i) => (
- <article
- key={i}
- onMouseMove={handleCardMove}
- onClick={() => handleCardClick(c.url)}
- className="group relative flex flex-col w-[300px] overflow-hidden border-2 border-transparent transition-colors duration-300 cursor-pointer rounded-[var(--tb-radius-lg)]"
- style={
- {
- "--card-border": c.borderColor || "transparent",
- background: c.gradient,
- "--spotlight-color": "color-mix(in oklch, white 25%, transparent)",
- } as React.CSSProperties
- }
- >
- <div
- className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-20 opacity-0 group-hover:opacity-100"
- style={{
- background:
- "radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%)",
- }}
- />
- <div className="relative z-10 flex-1 p-[10px] box-border">
- {/* eslint-disable-next-line @next/next/no-img-element */}
- <img src={c.image} alt={c.title} loading="lazy" className="w-full h-full object-cover rounded-[10px]" />
- </div>
- <footer className="relative z-10 p-3 text-white grid grid-cols-[1fr_auto] gap-x-3 gap-y-1">
- <h3 className="m-0 text-[1.05rem] ">{c.title}</h3>
- {c.handle && <span className="text-[0.95rem] opacity-80 text-right">{c.handle}</span>}
- <p className="m-0 text-[0.85rem] opacity-85">{c.subtitle}</p>
- {c.location && <span className="text-[0.85rem] opacity-85 text-right">{c.location}</span>}
- </footer>
- </article>
- ))}
+        {data.map((c, i) => (
+          <article
+            key={i}
+            onMouseMove={handleCardMove}
+            onClick={c.url ? () => handleCardClick(c.url) : undefined}
+            className={`group relative flex flex-col w-[300px] h-[360px] overflow-hidden border-2 border-transparent transition-colors duration-300 rounded-[var(--tb-radius-lg)] ${c.url ? "cursor-pointer" : ""}`}
+            style={
+              {
+                "--card-border": c.borderColor || "transparent",
+                background: c.gradient,
+                "--spotlight-color": "color-mix(in oklch, white 25%, transparent)",
+              } as React.CSSProperties
+            }
+          >
+            <div
+              className="absolute inset-0 pointer-events-none transition-opacity duration-500 z-20 opacity-0 group-hover:opacity-100"
+              style={{
+                background:
+                  "radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%)",
+              }}
+            />
+            <div className="relative z-10 flex-1 min-h-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={c.image} alt={c.title} loading="lazy" className="w-full h-full object-cover" />
+            </div>
+            <footer className="relative z-10 p-3 text-white grid grid-cols-[1fr_auto] gap-x-3 gap-y-1">
+              <h3 className="m-0 text-[1.05rem] ">{c.title}</h3>
+              {c.handle && <span className="text-[0.95rem] opacity-80 text-right">{c.handle}</span>}
+              <p className="m-0 text-[0.85rem] opacity-85">{c.subtitle}</p>
+              {c.location && <span className="text-[0.85rem] opacity-85 text-right">{c.location}</span>}
+            </footer>
+          </article>
+        ))}
 
  <div
  className="absolute inset-0 pointer-events-none z-30"

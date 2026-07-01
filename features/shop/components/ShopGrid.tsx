@@ -1,14 +1,15 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems, moduleMeta } from "@/lib/content";
+import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCart } from "@/providers/cart.provider";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { OverlayBackdrop } from "@/components/ui/Overlay";
 import { Panel } from "@/components/ui/Panel";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { zIndex } from "@/design";
+import { Icon } from "@/design/icons";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 
 const prices: Record<string, {price: string, old?: string}> = {
@@ -80,28 +81,31 @@ export default function ShopGrid(){
  {filtered.map(p=>{
  const pr = prices[p.slug] || { price: "تماس بگیرید" };
  return (
- <div key={p.slug} className="card overflow-hidden group flex flex-col rounded-[24px]">
- <Link href={`/shop/${p.slug}`} className="block relative aspect-[4/3] bg-muted overflow-hidden">
- <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
- <span className="absolute top-3 left-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
- {pr.old && <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
- </Link>
- <div className="p-4 flex-1 flex flex-col">
- <div className="tb-text-sm text-muted-foreground">{p.category}</div>
- <Link href={`/shop/${p.slug}`} className=" tb-text-md mt-1 hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</Link>
- <p className="tb-text-sm text-muted-foreground line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
- <div className="mt-3">
- {pr.old && <div className="tb-text-sm line-through text-muted-foreground">{pr.old} تومان</div>}
- <div className="tb-text-lg text-[var(--tb-shop)]">{pr.price} <span className="tb-text-sm text-muted-foreground ">تومان</span></div>
- </div>
- <div className="flex gap-2 mt-3">
- <Button onClick={()=>add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1)} size="xs" className="flex-1">افزودن به سبد</Button>
- <ButtonLink href={`/shop/${p.slug}`} variant="ghost" size="xs" className="px-3">جزئیات</ButtonLink>
- </div>
- <div className="tb-text-sm text-muted-foreground mt-2">👁 {p.views.toLocaleString("fa-IR")} • ♥ {p.likes}</div>
- </div>
- </div>
- )
+        <Link key={p.slug} href={`/shop/${p.slug}`} className="card overflow-hidden group flex flex-col rounded-[var(--tb-radius-lg)] !p-0">
+              <div className="block relative aspect-[4/3] bg-[var(--tb-bg-muted)] overflow-hidden">
+                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
+                <span className="absolute top-3 left-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
+                {pr.old && <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
+              </div>
+              <div className="p-4 flex-1 flex flex-col">
+                <div className="tb-text-sm text-[var(--tb-fg-muted)]">{p.category}</div>
+                <div className="tb-text-md mt-1 transition-colors group-hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
+                <p className="tb-text-sm text-[var(--tb-fg-muted)] line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
+                <div className="mt-3">
+                  {pr.old && <div className="tb-text-sm line-through text-[var(--tb-fg-muted)]">{pr.old} تومان</div>}
+                  <div className="tb-text-lg text-[var(--tb-shop)]">{pr.price} <span className="tb-text-sm text-[var(--tb-fg-muted)]">تومان</span></div>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="xs" className="flex-1">افزودن به سبد</Button>
+                </div>
+                <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)] mt-2">
+                  <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{p.views.toLocaleString("fa-IR")}</span>
+                  <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{p.likes.toLocaleString("fa-IR")}</span>
+                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{((p.likes % 9) + 1).toLocaleString("fa-IR")}</span>
+                </div>
+              </div>
+            </Link>
+          )
  })}
  </div>
  {filtered.length===0 && <div className="text-center py-16 text-muted-foreground">محصولی یافت نشد</div>}

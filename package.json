@@ -12,8 +12,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate || node -e \"console.warn('Prisma generate failed/skipped. Run pnpm prisma:generate manually.')\"",
-    "data": "node scripts/transferdata.cjs",
-    "tree": "node scripts/transfertree.cjs",
+    "data": "node scripts/data.cjs",
+    "tree": "node scripts/tree.cjs",
     "data:legacy": "node scripts/data.cjs",
     "tree:legacy": "node scripts/tree.cjs",
     "prisma:generate": "prisma generate"
