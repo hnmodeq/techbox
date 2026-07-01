@@ -39,6 +39,16 @@ export const moduleColors = {
  hover: "group-hover:text-[var(--tb-subnet)]",
  active: "text-[var(--tb-subnet)]",
  },
+ nas: {
+ base: "text-[var(--tb-fg-primary)]",
+ hover: "group-hover:text-[var(--tb-nas)]",
+ active: "text-[var(--tb-nas)]",
+ },
+ nvr: {
+ base: "text-[var(--tb-fg-primary)]",
+ hover: "group-hover:text-[var(--tb-nvr)]",
+ active: "text-[var(--tb-nvr)]",
+ },
  vip: {
  base: "text-[var(--tb-fg-primary)]",
  hover: "group-hover:text-[var(--tb-vip)]",

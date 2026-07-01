@@ -21,8 +21,8 @@ const TOOLS: ToolCard[] = [
     title: "NAS Selector",
     titleFa: "انتخاب‌گر NAS",
     descFa: "بهترین NAS را بر اساس کاربران، ظرفیت، RAID، سرویس‌ها و بودجه پیدا کنید. رتبه‌بندی زنده + دلیل پیشنهاد.",
-    icon: "server",
-    accent: "var(--tb-tools)",
+    icon: "nas",
+    accent: "var(--tb-nas)",
     badge: "جدید",
     href: "/tools/nas-selector",
     stats: [
@@ -35,8 +35,8 @@ const TOOLS: ToolCard[] = [
     title: "NVR Selector",
     titleFa: "انتخاب‌گر NVR",
     descFa: "تعداد دوربین، رزولوشن و مدت ضبط را وارد کنید تا NVR مناسب با AI پیشنهاد شود.",
-    icon: "media",
-    accent: "var(--tb-raid)",
+    icon: "nvr",
+    accent: "var(--tb-nvr)",
     badge: "جدید",
     href: "/tools/nvr-selector",
     stats: [

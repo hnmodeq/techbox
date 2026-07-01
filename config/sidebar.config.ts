@@ -12,6 +12,7 @@ import {
  Calculator,
  Network,
 } from "lucide-react";
+import { NasIcon, NvrIcon } from "@/design/icons";
 import { NavItem } from "@/types/sidebar.types";
 import { moduleColors } from "@/config/module-colors";
 
@@ -62,12 +63,31 @@ export const navItems: NavItem[] = [
  iconActiveClassName: moduleColors.shop.active,
  },
  {
+ title: "NAS Selector",
+ href: "/tools/nas-selector",
+ icon: NasIcon,
+ iconClassName: moduleColors.nas.base,
+ iconHoverClassName: moduleColors.nas.hover,
+ iconActiveClassName: moduleColors.nas.active,
+ tooltipClassName: "text-[var(--tb-nas)]",
+ },
+ {
+ title: "NVR Selector",
+ href: "/tools/nvr-selector",
+ icon: NvrIcon,
+ iconClassName: moduleColors.nvr.base,
+ iconHoverClassName: moduleColors.nvr.hover,
+ iconActiveClassName: moduleColors.nvr.active,
+ tooltipClassName: "text-[var(--tb-nvr)]",
+ },
+ {
  title: "RAID Calculator",
  href: "/tools/raid-calculator",
  icon: Calculator,
  iconClassName: moduleColors.raid.base,
  iconHoverClassName: moduleColors.raid.hover,
  iconActiveClassName: moduleColors.raid.active,
+ tooltipClassName: "text-[var(--tb-raid)]",
  },
  {
  title: "Subnet Calculator",
@@ -76,6 +96,7 @@ export const navItems: NavItem[] = [
  iconClassName: moduleColors.subnet.base,
  iconHoverClassName: moduleColors.subnet.hover,
  iconActiveClassName: moduleColors.subnet.active,
+ tooltipClassName: "text-[var(--tb-subnet)]",
  },
  {
  title: "انجمن",
