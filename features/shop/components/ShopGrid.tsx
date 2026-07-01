@@ -2,13 +2,9 @@
 import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useCart } from "@/providers/cart.provider";
 import { Button } from "@/components/ui/Button";
-import { OverlayBackdrop } from "@/components/ui/Overlay";
-import { Panel } from "@/components/ui/Panel";
-import { CloseButton } from "@/components/ui/CloseButton";
-import { zIndex } from "@/design";
 import { Icon } from "@/design/icons";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 
@@ -23,9 +19,20 @@ export default function ShopGrid(){
  const [cat, setCat] = useState<string>("all");
  const [sort, setSort] = useState<"new"|"popular"|"cheap">("new");
  const [filterOpen, setFilterOpen] = useState(false);
+ const dropdownRef = useRef<HTMLDivElement>(null);
  const { add } = useCart();
 
  const categories = Array.from(new Set(items.map(i=>i.category).filter(Boolean))) as string[];
+
+ useEffect(() => {
+   const handleClickOutside = (e: MouseEvent) => {
+     if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+       setFilterOpen(false);
+     }
+   };
+   document.addEventListener("mousedown", handleClickOutside);
+   return () => document.removeEventListener("mousedown", handleClickOutside);
+ }, []);
 
  const filtered = useMemo(()=>{
  let list = [...items];
@@ -39,43 +46,41 @@ export default function ShopGrid(){
  return (
  <main className="mx-auto max-w-7xl px-4 md:px-6 py-12" dir="rtl">
  <ModuleHeader module="shop" title="فروشگاه زیرساخت" description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`} />
- <div className="mb-6 grid gap-2 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3 sm:grid-cols-[minmax(0,1fr)_auto]">
- <input value={q} onChange={e=>setQ(e.target.value)} placeholder="جستجوی محصول…" className="input tb-text-md" />
- <Button type="button" variant="ghost" onClick={()=>setFilterOpen(true)} className="tb-text-md">
- فیلترها {cat !== "all" ? `• ${cat}`: ""}
- </Button>
- </div>
+ 
+ <div className="relative mb-6" ref={dropdownRef}>
+   <div className="grid gap-2 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
+     <input value={q} onChange={e=>setQ(e.target.value)} placeholder="جستجوی محصول…" className="input tb-text-md" />
+     <Button type="button" variant={filterOpen ? "primary" : "ghost"} onClick={()=>setFilterOpen(!filterOpen)} className="tb-text-md flex items-center gap-2">
+       <span>فیلترها {cat !== "all" ? `• ${cat}`: ""}</span>
+       <Icon name="chevronDown" className={`h-4 w-4 transition-transform ${filterOpen ? "rotate-180" : ""}`} />
+     </Button>
+   </div>
 
- {filterOpen && (
- <div className="fixed inset-0 flex items-center justify-center p-4" style={{zIndex:zIndex.modal}} dir="rtl">
- <OverlayBackdrop onClick={()=>setFilterOpen(false)} />
- <Panel className="relative w-full max-w-md space-y-4" style={{zIndex:zIndex.modalContent}}>
- <div className="flex items-center justify-between gap-3">
- <h2 className="tb-text-lg ">فیلتر محصولات</h2>
- <CloseButton onClick={()=>setFilterOpen(false)} />
+   {/* Dropdown Menu Filter */}
+   {filterOpen && (
+     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] p-4 shadow-xl space-y-4 animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)]">
+       <div className="space-y-3">
+         <label className="block tb-text-sm text-[var(--tb-fg-muted)]">دسته‌بندی
+           <select value={cat} onChange={e=>setCat(e.target.value)} className="input mt-1 w-full tb-text-md">
+             <option value="all">همه دسته‌ها</option>
+             {categories.map(c=> <option key={c} value={c}>{c}</option>)}
+           </select>
+         </label>
+         <label className="block tb-text-sm text-[var(--tb-fg-muted)]">مرتب‌سازی
+           <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input mt-1 w-full tb-text-md">
+             <option value="new">جدیدترین</option>
+             <option value="popular">پربازدیدترین</option>
+             <option value="cheap">محبوب‌ترین</option>
+           </select>
+         </label>
+       </div>
+       <div className="flex justify-end gap-2 pt-2 border-t border-[var(--tb-border)]">
+         <Button type="button" variant="ghost" size="xs" onClick={()=>{setCat("all"); setSort("new");}}>پاک کردن</Button>
+         <Button type="button" size="xs" onClick={()=>setFilterOpen(false)}>بستن منو</Button>
+       </div>
+     </div>
+   )}
  </div>
- <div className="space-y-3">
- <label className="block tb-text-sm text-[var(--tb-fg-muted)]">دسته‌بندی
- <select value={cat} onChange={e=>setCat(e.target.value)} className="input mt-1 tb-text-md">
- <option value="all">همه دسته‌ها</option>
- {categories.map(c=> <option key={c} value={c}>{c}</option>)}
- </select>
- </label>
- <label className="block tb-text-sm text-[var(--tb-fg-muted)]">مرتب‌سازی
- <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input mt-1 tb-text-md">
- <option value="new">جدیدترین</option>
- <option value="popular">پربازدیدترین</option>
- <option value="cheap">قیمت</option>
- </select>
- </label>
- </div>
- <div className="flex justify-end gap-2">
- <Button type="button" variant="ghost" onClick={()=>{setCat("all"); setSort("new");}}>پاک کردن</Button>
- <Button type="button" onClick={()=>setFilterOpen(false)}>اعمال فیلتر</Button>
- </div>
- </Panel>
- </div>
- )}
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
  {filtered.map(p=>{
@@ -88,17 +93,15 @@ export default function ShopGrid(){
                 {pr.old && <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 tb-text-sm text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
               </div>
               <div className="p-4 flex-1 flex flex-col">
-                <div className="tb-text-sm text-[var(--tb-fg-muted)]">{p.category}</div>
                 <div className="tb-text-md mt-1 transition-colors group-hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
                 <p className="tb-text-sm text-[var(--tb-fg-muted)] line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
-                <div className="mt-3">
-                  {pr.old && <div className="tb-text-sm line-through text-[var(--tb-fg-muted)]">{pr.old} تومان</div>}
-                  <div className="tb-text-lg text-[var(--tb-shop)]">{pr.price} <span className="tb-text-sm text-[var(--tb-fg-muted)]">تومان</span></div>
+                
+                {/* Price section removed from card display per request, keeping add to cart / consultation system underlying */}
+                
+                <div className="flex gap-2 mt-4">
+                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--tb-shop)] text-[var(--tb-shop)] hover:bg-[var(--tb-shop)]/10 font-bold">مشاوره خرید</Button>
                 </div>
-                <div className="flex gap-2 mt-3">
-                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="xs" className="flex-1">افزودن به سبد</Button>
-                </div>
-                <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)] mt-2">
+                <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)] mt-3 pt-3 border-t border-[var(--tb-border)]">
                   <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{p.views.toLocaleString("fa-IR")}</span>
                   <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{p.likes.toLocaleString("fa-IR")}</span>
                   <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{((p.likes % 9) + 1).toLocaleString("fa-IR")}</span>
