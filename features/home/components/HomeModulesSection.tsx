@@ -42,7 +42,6 @@ export default function HomeModulesSection() {
  href={`/${module.slug}`}
  color={module.color}
  className="!p-4 !border-0 !bg-transparent hover:translate-y-0"
- badge={`${feed.length} جدید`}
  footerLink={`/${module.slug}`}
  footerLabel={`همه ${meta.titleFa} →`}
  >

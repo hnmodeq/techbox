@@ -67,7 +67,6 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
  )}
  <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
-            <span className={`rounded-[var(--tb-radius-full)] border border-[color-mix(in_oklch,currentColor_35%,transparent)] px-2 py-0.5 ${moduleColors[item.module]?.active ?? "text-[var(--tb-fg-primary)]"}`}>{meta.titleFa}</span>
             <span>{item.date_fa}</span>
           </div>
  <h4 className={`mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-primary)] transition-colors ${moduleHover(item.module)}`}>{item.title}</h4>
