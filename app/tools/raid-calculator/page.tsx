@@ -1,20 +1,40 @@
-import Link from "next/link";
-import RaidCalculator from "@/features/tools/components/RaidCalculator";
-import PageHeader from "@/components/effects/PageHeader";
-export const metadata = { title: "ماشین حساب RAID | تکباکس" };
-export default function Page(){
- return (
- <main className="max-w-4xl mx-auto px-4 py-12" dir="rtl">
- <PageHeader
- colorVar="--tb-raid"
- title="RAID Calculator"
- description="محاسبه ظرفیت مفید، تحمل خطا و راندمان – اجرا مستقیم در مرورگر"
- titleClassName="text-[var(--tb-raid)]"
- />
- <RaidCalculator />
- <div className="tb-text-sm mt-4 text-[var(--tb-fg-muted)]">
- راهنما: <Link href="/blog/hp-raid-config" className="underline text-[var(--tb-raid)]">راهنمای RAID در سرورهای HP – بلاگ تکباکس</Link>
- </div>
- </main>
- );
+import { RaidCalculator } from "@/features/tools/components/raid-calculator";
+import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ماشین حساب RAID / SHR | TechBox",
+  description: "محاسبه ظرفیت RAID 0/1/5/6/10 و SHR-1/SHR-2 با Hot Spare و دیسک ترکیبی.",
+};
+
+export default function RaidCalculatorPage() {
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <ToolPageHeader
+        title="ماشین حساب RAID"
+        subtitle="RAID 0 · 1 · 5 · 6 · 10 · SHR-1 · SHR-2"
+        accent="var(--tb-raid)"
+        breadcrumbs={[
+          { label: "خانه", href: "/" },
+          { label: "ابزارها", href: "/tools" },
+          { label: "RAID Calculator" },
+        ]}
+      />
+      <div className="mt-8">
+        <RaidCalculator />
+      </div>
+
+      <section className="mt-10 card p-5">
+        <h2 className="tb-text-lg mb-3">پیشنهاد محصول مرتبط</h2>
+        <p className="tb-text-md text-[var(--tb-fg-muted)]">
+          بعد از محاسبه RAID، مدل NAS پیشنهادی خود را در <a className="text-[var(--tb-primary)] font-bold hover:underline" href="/tools/nas-selector">انتخاب‌گر NAS</a> ببینید یا مستقیم از فروشگاه هارد مناسب تهیه کنید.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a href="/tools/nas-selector" className="btn btn-primary">رفتن به NAS Selector</a>
+          <a href="/shop?category=nas" className="btn btn-ghost">مشاهده NAS ها در فروشگاه</a>
+          <a href="/tools/subnet-calculator" className="btn btn-ghost">Subnet Calculator</a>
+        </div>
+      </section>
+    </main>
+  );
 }

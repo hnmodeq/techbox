@@ -1,25 +1,31 @@
-import { getBySlug, getModuleItems } from "@/lib/content";
-import ContentDetail from "@/features/content/components/ContentDetail";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { toolRoutes } from "@/config/modules.config";
 
-type P = Promise<{ slug: string }>;
+type Props = { params: Promise<{ slug: string }> };
+
+const KNOWN_REDIRECTS: Record<string, string> = {
+  "nas-selector": "/tools/nas-selector",
+  "nvr-selector": "/tools/nvr-selector",
+  "raid-calculator": "/tools/raid-calculator",
+  "subnet-calculator": "/tools/subnet-calculator",
+  "raid": "/tools/raid-calculator",
+  "nas": "/tools/nas-selector",
+  "nvr": "/tools/nvr-selector",
+  "subnet": "/tools/subnet-calculator",
+};
+
+export default async function ToolSlugPage({ params }: Props) {
+  const { slug } = await params;
+  const target = KNOWN_REDIRECTS[slug];
+  if (target) redirect(target);
+
+  const tool = toolRoutes.find(t => t.slug === slug);
+  if (tool?.href) redirect(tool.href);
+  notFound();
+}
 
 export async function generateStaticParams() {
- const mod = "tools" as any;
- return getModuleItems(mod).map((p) => ({ slug: p.slug }));
+  return toolRoutes.map(t => ({ slug: t.slug }));
 }
 
-export default async function Page({ params }: { params: P }) {
- const { slug } = await params;
- const mod = "tools" as any;
- const item = getBySlug(mod, slug);
- if (!item) return notFound();
- return <ContentDetail item={item} />;
-}
-
-export async function generateMetadata({ params }: { params: P }) {
- const { slug } = await params;
- const mod = "tools" as any;
- const item = getBySlug(mod, slug);
- return { title: item ? `${item.title} | تکباکس`: "یافت نشد" };
-}
+export const dynamicParams = false;

@@ -1,53 +1,53 @@
 [
   {
-    "slug": "subnet-calculator",
-    "module": "tools",
-    "title": "ماشین‌حساب ساب‌نت فارسی",
-    "excerpt": "محاسبه سریع CIDR، IP range و broadcast.",
-    "content": "ابزار آنلاین ساب‌نت...",
-    "image": "/assets/blog-4.jpg",
-    "tags": [
-      "شبکه",
-      "ابزار",
-      "subnet",
-      "آی‌پی",
-      "network",
-      "tools"
-    ],
-    "author": {
-      "name": "تیم ابزار تکباکس",
-      "role": "ابزار",
-      "avatar": "/assets/hooman.png"
-    },
-    "date": "2026-07-09",
-    "date_fa": "18 تیر 1405",
-    "likes": 430,
-    "views": 12500,
-    "category": "شبکه"
+    "slug": "nas-selector",
+    "title": "NAS Selector",
+    "titleFa": "انتخاب‌گر NAS",
+    "descriptionFa": "بهترین NAS را بر اساس کاربران، ظرفیت، RAID، سرویس‌ها و بودجه پیدا کنید.",
+    "href": "/tools/nas-selector",
+    "icon": "server",
+    "color": "var(--tb-tools)",
+    "tags": ["NAS", "RAID", "selector", "storage"],
+    "new": true,
+    "version": "1.0.0",
+    "relatedShopCategory": "nas"
+  },
+  {
+    "slug": "nvr-selector",
+    "title": "NVR Selector",
+    "titleFa": "انتخاب‌گر NVR",
+    "descriptionFa": "انتخاب NVR مناسب پروژه دوربین مداربسته با AI.",
+    "href": "/tools/nvr-selector",
+    "icon": "media",
+    "color": "var(--tb-raid)",
+    "tags": ["NVR", "surveillance", "camera", "AI"],
+    "new": true,
+    "version": "1.0.0",
+    "relatedShopCategory": "nvr"
   },
   {
     "slug": "raid-calculator",
-    "module": "tools",
-    "title": "محاسبه‌گر RAID",
-    "excerpt": "ظرفیت مفید و تحمل خطا.",
-    "content": "...",
-    "image": "/assets/blog-2.jpg",
-    "tags": [
-      "raid",
-      "storage",
-      "ابزار",
-      "ذخیره‌سازی",
-      "tools"
-    ],
-    "author": {
-      "name": "تیم ابزار تکباکس",
-      "role": "ابزار",
-      "avatar": "/assets/hooman.png"
-    },
-    "date": "2026-06-15",
-    "date_fa": "25 خرداد 1405",
-    "likes": 110,
-    "views": 3400,
-    "category": "ذخیره‌سازی"
+    "title": "RAID Calculator",
+    "titleFa": "ماشین حساب RAID",
+    "descriptionFa": "RAID 0/1/5/6/10 + SHR-1/SHR-2 – دیسک ترکیبی – Hot Spare",
+    "href": "/tools/raid-calculator",
+    "icon": "disk",
+    "color": "var(--tb-raid)",
+    "tags": ["RAID", "SHR", "storage", "calculator"],
+    "version": "2.0.0",
+    "replaces": "legacy-raid-calculator",
+    "relatedShopCategory": "nas"
+  },
+  {
+    "slug": "subnet-calculator",
+    "title": "Subnet Calculator",
+    "titleFa": "ماشین حساب ساب‌نت",
+    "descriptionFa": "محاسبه IP، CIDR، تعداد هاست – بدون تغییر باقی می‌ماند.",
+    "href": "/tools/subnet-calculator",
+    "icon": "tools",
+    "color": "var(--tb-subnet)",
+    "tags": ["network", "subnet", "IP"],
+    "version": "1.0.0",
+    "locked": true
   }
 ]

@@ -93,6 +93,10 @@ techbox-made-by-arena
 │   ├── tools
 │   │   ├── [slug]
 │   │   │   └── page.tsx
+│   │   ├── nas-selector
+│   │   │   └── page.tsx
+│   │   ├── nvr-selector
+│   │   │   └── page.tsx
 │   │   ├── raid-calculator
 │   │   │   └── page.tsx
 │   │   ├── subnet-calculator
@@ -164,6 +168,7 @@ techbox-made-by-arena
 │       └── Tooltip.tsx
 ├── config
 │   ├── module-colors.ts
+│   ├── modules.config.TECHBOX_TOOLS_V2.ts
 │   ├── modules.config.ts
 │   └── sidebar.config.ts
 ├── constants
@@ -179,7 +184,9 @@ techbox-made-by-arena
 │   ├── forum.json
 │   ├── jobs.json
 │   ├── media.json
+│   ├── nas-products.json
 │   ├── news.json
+│   ├── nvr-products.json
 │   ├── review.json
 │   ├── shop.json
 │   ├── tools.json
@@ -263,8 +270,21 @@ techbox-made-by-arena
 │   │       └── ShopGrid.tsx
 │   └── tools
 │       └── components
+│           ├── nas-selector
+│           │   ├── index.ts
+│           │   ├── nas-selector-data.ts
+│           │   └── NasSelector.tsx
+│           ├── nvr-selector
+│           │   ├── index.ts
+│           │   ├── nvr-selector-data.ts
+│           │   └── NvrSelector.tsx
+│           ├── raid-calculator
+│           │   ├── index.ts
+│           │   └── RaidCalculator.tsx
+│           ├── index.ts
 │           ├── RaidCalculator.tsx
 │           ├── SubnetCalculator.tsx
+│           ├── ToolPageHeader.tsx
 │           └── ToolsGrid.tsx
 ├── hooks
 │   └── useFabTop.ts
@@ -276,6 +296,9 @@ techbox-made-by-arena
 │   ├── fonts.ts
 │   ├── get-module-gradient.ts
 │   ├── modules.ts
+│   ├── nas.ts
+│   ├── nvr.ts
+│   ├── tools.ts
 │   └── utils.ts
 ├── prisma
 │   ├── dev.db
@@ -337,10 +360,10 @@ techbox-made-by-arena
 │   ├── sidebar.types.ts
 │   └── user.ts
 ├── uploads
-│   └── codes.txt
+│   ├── codes.txt
+│   ├── data.txt
+│   └── tree.txt
 ├── eslint.config.mjs
-├── NEW_TODO.md
-├── NEXT_TODO.md
 ├── next-env.d.ts
 ├── next.config.mjs
 ├── package-lock.json
@@ -348,12 +371,6 @@ techbox-made-by-arena
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.mjs
-├── PROJECT_STATUS_CHECKLIST.md
-├── REACT_BITS_UPGRADE.md
-├── TECHBOX_REFACTOR_TODO.md
-├── techbox-updated-code.tar.gz
-├── to-do list.txt
 ├── tsconfig.json
-├── tsconfig.tsbuildinfo
-└── UPDATED_FILES.md
+└── tsconfig.tsbuildinfo
 ```

@@ -11,6 +11,7 @@ type ModuleHeaderProps = {
   count?: string;
   className?: string;
   children?: ReactNode;
+    subtitle?: string;
 };
 
 /**

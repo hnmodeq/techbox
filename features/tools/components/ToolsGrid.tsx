@@ -1,52 +1,140 @@
 "use client";
-import { getModuleItems, moduleMeta } from "@/lib/content";
-import { useState } from "react";
-import RaidCalculator from "@/features/tools/components/RaidCalculator";
-import SubnetCalculator from "@/features/tools/components/SubnetCalculator";
-import { Button } from "@/components/ui/Button";
-import ModuleHeader from "@/components/effects/ModuleHeader";
 
-const toolComponents: Record<string, React.ComponentType> = {
- "raid-calculator": RaidCalculator,
- "subnet-calculator": SubnetCalculator,
+import Link from "next/link";
+import { Icon, type IconName } from "@/design/icons";
+
+type ToolCard = {
+  slug: string;
+  title: string;
+  titleFa: string;
+  descFa: string;
+  icon: IconName;
+  accent: string; // css var e.g. var(--tb-tools)
+  badge?: string;
+  href: string;
+  stats?: { label: string; value: string }[];
 };
 
-export default function ToolsGrid(){
- const items = getModuleItems("tools");
- const [active, setActive] = useState(items[0]?.slug || "raid-calculator");
- const ActiveComp = toolComponents[active] || RaidCalculator;
+const TOOLS: ToolCard[] = [
+  {
+    slug: "nas-selector",
+    title: "NAS Selector",
+    titleFa: "انتخاب‌گر NAS",
+    descFa: "بهترین NAS را بر اساس کاربران، ظرفیت، RAID، سرویس‌ها و بودجه پیدا کنید. رتبه‌بندی زنده + دلیل پیشنهاد.",
+    icon: "server",
+    accent: "var(--tb-tools)",
+    badge: "جدید",
+    href: "/tools/nas-selector",
+    stats: [
+      { label: "محصول", value: "۶+" },
+      { label: "RAID", value: "۵ نوع" },
+    ],
+  },
+  {
+    slug: "nvr-selector",
+    title: "NVR Selector",
+    titleFa: "انتخاب‌گر NVR",
+    descFa: "تعداد دوربین، رزولوشن و مدت ضبط را وارد کنید تا NVR مناسب با AI پیشنهاد شود.",
+    icon: "media",
+    accent: "var(--tb-raid)",
+    badge: "جدید",
+    href: "/tools/nvr-selector",
+    stats: [
+      { label: "مدل", value: "۵" },
+      { label: "تا", value: "۶۴ دوربین" },
+    ],
+  },
+  {
+    slug: "raid-calculator",
+    title: "RAID Calculator",
+    titleFa: "ماشین حساب RAID",
+    descFa: "RAID 0/1/5/6/10 + SHR-1/SHR-2، دیسک ترکیبی، Hot Spare، نقشه ظرفیت زنده.",
+    icon: "disk",
+    accent: "var(--tb-raid)",
+    badge: "v2",
+    href: "/tools/raid-calculator",
+    stats: [
+      { label: "RAID", value: "۹ حالت" },
+      { label: "SHR", value: "۱/۲" },
+    ],
+  },
+  {
+    slug: "subnet-calculator",
+    title: "Subnet Calculator",
+    titleFa: "ماشین حساب ساب‌نت",
+    descFa: "محاسبه سریع IP، ماسک، تعداد هاست و محدوده شبکه – بدون تغییر.",
+    icon: "tools",
+    accent: "var(--tb-subnet)",
+    href: "/tools/subnet-calculator",
+    stats: [
+      { label: "IPv4", value: "✓" },
+      { label: "CIDR", value: "✓" },
+    ],
+  },
+];
 
- return (
- <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
- <ModuleHeader module="tools" title="ابزارهای زیرساختی" description="اجرای مستقیم در مرورگر – بدون نصب" />
+export function ToolsGrid({ className }: { className?: string }) {
+  return (
+    <section dir="rtl" className={["grid gap-5 sm:grid-cols-2 xl:grid-cols-4", className].filter(Boolean).join(" ")}>
+      {TOOLS.map((tool) => (
+        <Link
+          key={tool.slug}
+          href={tool.href}
+          className="group relative flex flex-col overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-5 shadow-[var(--tb-shadow-sm)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-md)]"
+        >
+          <div
+            className="absolute -left-10 -top-10 h-28 w-28 rounded-full opacity-[0.14] blur-[28px] transition-opacity group-hover:opacity-25"
+            style={{ background: tool.accent }}
+            aria-hidden
+          />
+          <div className="flex items-start justify-between gap-3">
+            <span
+              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--tb-radius-md)] border"
+              style={{
+                background: `color-mix(in oklch, ${tool.accent} 14%, var(--tb-bg-muted))`,
+                borderColor: `color-mix(in oklch, ${tool.accent} 30%, var(--tb-border))`,
+                color: tool.accent,
+              }}
+            >
+              <Icon name={tool.icon} className="h-5 w-5" />
+            </span>
+            {tool.badge && (
+              <span className="badge" style={{
+                background: `color-mix(in oklch, ${tool.accent} 12%, var(--tb-bg-muted))`,
+                color: "var(--tb-fg-primary)",
+                borderColor: `color-mix(in oklch, ${tool.accent} 28%, var(--tb-border))`
+              }}>
+                {tool.badge}
+              </span>
+            )}
+          </div>
 
- <div className="flex flex-wrap gap-2 mb-6">
- {items.map(t => (
- <Button
- key={t.slug}
- onClick={()=>setActive(t.slug)}
- variant={active===t.slug ? "primary" : "ghost"}
- size="xs"
- >
- {t.title}
- </Button>
- ))}
- {/* quick extra tools */}
- <Button onClick={()=>setActive("subnet-calculator")} variant={active==="subnet-calculator" ? "primary" : "ghost"} size="xs">Subnet Calculator</Button>
- </div>
+          <h3 className="mt-4 text-[16px] font-black text-[var(--tb-fg-primary)]">{tool.titleFa}</h3>
+          <p className="mt-2 text-[12px] leading-7 text-[var(--tb-fg-muted)] min-h-[84px]">{tool.descFa}</p>
 
- <ActiveComp />
+          {tool.stats && (
+            <div className="mt-4 flex gap-2 flex-wrap">
+              {tool.stats.map((s) => (
+                <span key={s.label} className="badge">
+                  {s.label}: <b className="mr-1" style={{ color: tool.accent }}>{s.value}</b>
+                </span>
+              ))}
+            </div>
+          )}
 
- <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
- {items.map(t=>(
- <div key={t.slug} className="card p-4">
- <div className="tb-text-sm text-[var(--tb-tools)]">{t.category}</div>
- <div className=" mt-1 tb-text-md">{t.title}</div>
- <div className="tb-text-sm text-muted-foreground mt-2">{t.excerpt}</div>
- <div className="tb-text-sm text-muted-foreground mt-3">استفاده: {t.views.toLocaleString("fa-IR")} بار</div>
- </div>
- ))}
- </div>
- </main>
- );
+          <div className="mt-5 flex items-center justify-between text-[12px] font-bold">
+            <span className="text-[var(--tb-fg-muted)] group-hover:text-[var(--tb-fg-primary)] transition-colors">
+              {tool.title}
+            </span>
+            <span style={{ color: tool.accent }} className="flex items-center gap-1">
+              باز کردن
+              <Icon name="chevronLeft" className="h-4 w-4 rtl:rotate-180" />
+            </span>
+          </div>
+        </Link>
+      ))}
+    </section>
+  );
 }
+
+export default ToolsGrid;

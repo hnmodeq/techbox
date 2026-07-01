@@ -1,6 +1,6 @@
 import { NasSelector } from "@/features/tools/components/nas-selector";
 import { getNasProducts } from "@/lib/nas";
-import { ModuleHeader } from "@/components/effects/ModuleHeader";
+import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,10 +13,10 @@ export default async function NasSelectorPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <ModuleHeader
-        module="tools"
+      <ToolPageHeader
         title="انتخاب‌گر NAS"
         subtitle="پیکربندی هوشمند بر اساس نیاز واقعی شما"
+        accent="var(--tb-tools)"
         breadcrumbs={[
           { label: "خانه", href: "/" },
           { label: "ابزارها", href: "/tools" },

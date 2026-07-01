@@ -1,6 +1,6 @@
 import { NvrSelector } from "@/features/tools/components/nvr-selector";
 import { getNvrProducts } from "@/lib/nvr";
-import { ModuleHeader } from "@/components/effects/ModuleHeader";
+import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,10 +13,10 @@ export default async function NvrSelectorPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <ModuleHeader
-        module="tools"
+      <ToolPageHeader
         title="انتخاب‌گر NVR"
         subtitle="پیشنهاد مدل NVR مناسب پروژه دوربین مداربسته"
+        accent="var(--tb-raid)"
         breadcrumbs={[
           { label: "خانه", href: "/" },
           { label: "ابزارها", href: "/tools" },
