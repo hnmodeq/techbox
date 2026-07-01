@@ -7,7 +7,7 @@ export const duration = {
   normal: 0.22,
   slow: 0.34,
   slower: 0.52,
-} as const; // seconds – matches --tb-duration-*
+} as const; // seconds – mirrors design/tokens/motion.css (--tb-motion-sm/md/lg)
 
 export const ease = {
   standard: [0.2, 0.8, 0.2, 1] as const,

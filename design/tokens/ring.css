@@ -1,0 +1,10 @@
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · RINGS  (focus / outline rings)
+   Three ring treatments. Dark values via light-dark().
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-ring-1: light-dark(oklch(0.55 0.20 260), #60a5fa);          /* solid ring color  */
+  --tb-ring-2: color-mix(in oklch, var(--tb-ring-1) 55%, transparent); /* soft ring color */
+  --tb-ring-3: 0 0 0 3px color-mix(in oklch, var(--tb-ring-1) 45%, transparent); /* focus box-shadow */
+}

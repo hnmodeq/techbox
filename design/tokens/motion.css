@@ -1,0 +1,12 @@
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · MOTION  (durations + shared easing)
+   Three durations + one standard easing curve. Use as:
+     transition: color var(--tb-motion-sm) var(--tb-ease);
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-motion-sm: 150ms;
+  --tb-motion-md: 220ms;
+  --tb-motion-lg: 340ms;
+  --tb-ease: cubic-bezier(.2,.8,.2,1);
+}

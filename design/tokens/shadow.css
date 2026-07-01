@@ -1,0 +1,16 @@
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · SHADOWS  (elevation)
+   Dark values via light-dark().
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --tb-shadow-sm: light-dark(
+    0 1px 3px rgba(2,8,23,.06), 
+    0 1px 3px rgba(0,0,0,.30));
+  --tb-shadow-md: light-dark(
+    0 8px 28px rgba(2,8,23,.10), 
+    0 10px 36px rgba(0,0,0,.42));
+  --tb-shadow-lg: light-dark(
+    0 16px 44px rgba(2,8,23,.14), 
+    0 20px 60px rgba(0,0,0,.5));
+}

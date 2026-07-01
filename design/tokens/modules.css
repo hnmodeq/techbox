@@ -1,0 +1,44 @@
+/* ════════════════════════════════════════════════════════════════════════
+   TECHBOX · MODULE / BRAND / STATUS COLORS
+   ────────────────────────────────────────────────────────────────────────
+   The identity colors. Modules are the ONLY colors allowed to brand a piece
+   of content across the UI. `--tb-primary` is the site/brand accent (buttons,
+   links, hero). Status colors are shared semantic accents.
+   Dark values via light-dark(LIGHT, DARK).
+   Page-color placeholders (admin/about/…) — pick your own anytime.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand / primary accent ── */
+  --tb-primary:    light-dark(oklch(34.846% 0.00004 271.152), #b3b3b3);
+  /* fixed light text that sits on top of any saturated accent (white both modes) */
+  --tb-on-accent:  #ffffff;
+
+  /* ── Modules ── */
+  --tb-blog:     light-dark(oklch(0.70 0.17 52),  #fb923c); /* orange   */
+  --tb-news:     light-dark(oklch(0.64 0.22 25),  #fb7185); /* rose     */
+  --tb-media:    light-dark(oklch(0.82 0.15 85),  #fcd34d); /* amber    */
+  --tb-shop:     light-dark(oklch(0.80 0.19 125), #a3e635); /* lime     */
+  --tb-tools:    light-dark(oklch(0.82 0.12 200), #67e8f9); /* cyan     */
+  --tb-raid:     light-dark(oklch(0.66 0.18 175), #2dd4bf); /* teal     */
+  --tb-subnet:   light-dark(oklch(0.68 0.19 230), #60a5fa); /* blue     */
+  --tb-vip:      light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia  */
+  --tb-forum:    light-dark(oklch(0.78 0.16 5),   #fda4af); /* rose-300 */
+  --tb-review:   light-dark(oklch(0.70 0.17 240), #38bdf8); /* sky      */
+  --tb-download: light-dark(oklch(0.72 0.20 350), #f472b6); /* pink     */
+  --tb-home:     light-dark(oklch(0.62 0.22 290), #a78bfa); /* violet   */
+  --tb-account:  light-dark(oklch(0.80 0.12 15),  #fca5a5); /* red-200  */
+
+  /* ── Status ── */
+  --tb-success:  light-dark(oklch(0.72 0.18 150), #4ade80);
+  --tb-danger:   light-dark(oklch(0.64 0.22 25),  #fb7185);
+  --tb-warning:  light-dark(oklch(0.82 0.15 85),  #fcd34d);
+  --tb-info:     light-dark(oklch(0.72 0.16 230), #7dd3fc);
+
+  /* ── Page accents (placeholders) ── */
+  --tb-admin:        light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia */
+  --tb-about:        light-dark(oklch(0.72 0.16 230), #7dd3fc); /* sky     */
+  --tb-contact:      light-dark(oklch(0.72 0.18 150), #4ade80); /* green   */
+  --tb-workwithus:   light-dark(oklch(0.70 0.17 52),  #fb923c); /* orange  */
+  --tb-consultation: light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia */
+}

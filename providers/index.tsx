@@ -12,16 +12,16 @@ import { QueryProvider } from "./query.provider";
 import Chatbot from "@/features/chat/components/Chatbot";
 
 export function AppProviders({children}:{children:React.ReactNode}){
-  return (
-    <ThemeProvider>
-      <QueryProvider>
-        <AuthProvider>
-          <CartProvider>
-            {children}
-            <Chatbot />
-          </CartProvider>
-        </AuthProvider>
-      </QueryProvider>
-    </ThemeProvider>
-  );
+ return (
+ <ThemeProvider>
+ <QueryProvider>
+ <AuthProvider>
+ <CartProvider>
+ {children}
+ <Chatbot />
+ </CartProvider>
+ </AuthProvider>
+ </QueryProvider>
+ </ThemeProvider>
+ );
 }

@@ -2,41 +2,41 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function VideoPlayer({ src, poster, title }: { src: string; poster?: string; title?: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isHls, setIsHls] = useState(false);
+ const videoRef = useRef<HTMLVideoElement>(null);
+ const [isHls, setIsHls] = useState(false);
 
-  useEffect(() => {
-    let hls: any;
-    const video = videoRef.current;
-    if (!video || !src) return;
-    const isHlsSrc = src.includes(".m3u8");
-    setIsHls(isHlsSrc);
-    if (isHlsSrc) {
-      (async () => {
-        const Hls = (await import("hls.js")).default;
-        if (Hls.isSupported()) {
-          hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-          hls.loadSource(src);
-          hls.attachMedia(video);
-        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          video.src = src;
-        }
-      })();
-    } else {
-      video.src = src;
-    }
-    return () => { try { hls?.destroy(); } catch {} };
-  }, [src]);
+ useEffect(() => {
+ let hls: any;
+ const video = videoRef.current;
+ if (!video || !src) return;
+ const isHlsSrc = src.includes(".m3u8");
+ setIsHls(isHlsSrc);
+ if (isHlsSrc) {
+ (async () => {
+ const Hls = (await import("hls.js")).default;
+ if (Hls.isSupported()) {
+ hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+ hls.loadSource(src);
+ hls.attachMedia(video);
+ } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+ video.src = src;
+ }
+ })();
+ } else {
+ video.src = src;
+ }
+ return () => { try { hls?.destroy(); } catch {} };
+ }, [src]);
 
-  return (
-    <div className="w-full bg-black rounded-[var(--tb-radius-xl)] overflow-hidden border border-[var(--tb-border)]">
-      <video ref={videoRef} controls playsInline poster={poster} preload="metadata" className="w-full aspect-video bg-black" />
-      {title && (
-        <div className="flex justify-between bg-[var(--tb-card)] px-3 py-2 text-[11px] text-[var(--tb-muted-foreground)]">
-          <span className="truncate">{title}</span>
-          <span className="text-[10px]">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
-        </div>
-      )}
-    </div>
-  );
+ return (
+ <div className="w-full bg-black rounded-[var(--tb-radius-lg)] overflow-hidden border border-[var(--tb-border)]">
+ <video ref={videoRef} controls playsInline poster={poster} preload="metadata" className="w-full aspect-video bg-black" />
+ {title && (
+ <div className="flex justify-between bg-[var(--tb-bg-secondary)] px-3 py-2 tb-text-sm text-[var(--tb-fg-muted)]">
+ <span className="truncate">{title}</span>
+ <span className="tb-text-sm">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
+ </div>
+ )}
+ </div>
+ );
 }

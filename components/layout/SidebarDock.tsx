@@ -17,51 +17,51 @@ import { cn } from "@/lib/utils";
  * e.g. as a floating rail, instead of (or alongside) the classic SidebarContent.
  */
 export default function SidebarDock({ className }: { className?: string }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [user, setUser] = useState<AppUser | null>(null);
+ const router = useRouter();
+ const pathname = usePathname();
+ const [user, setUser] = useState<AppUser | null>(null);
 
-  useEffect(() => {
-    setUser(getCurrentUserClient());
-  }, [pathname]);
+ useEffect(() => {
+ setUser(getCurrentUserClient());
+ }, [pathname]);
 
-  const isAdmin = user?.role === "super_admin" || (user?.role as string) === "admin";
+ const isAdmin = user?.role === "super_admin" || (user?.role as string) === "admin";
 
-  const items: DockItemData[] = navItems.map((item) => {
-    const Icon = item.icon;
-    const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-    return {
-      label: item.title,
-      onClick: () => router.push(item.href),
-      active,
-      icon: (
-        <Icon
-          strokeWidth={ICON_STROKE}
-          className={cn("h-5 w-5", active ? item.iconActiveClassName : item.iconClassName)}
-        />
-      ),
-    };
-  });
+ const items: DockItemData[] = navItems.map((item) => {
+ const Icon = item.icon;
+ const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+ return {
+ label: item.title,
+ onClick: () => router.push(item.href),
+ active,
+ icon: (
+ <Icon
+ strokeWidth={ICON_STROKE}
+ className={cn("h-5 w-5", active ? item.iconActiveClassName : item.iconClassName)}
+ />
+ ),
+ };
+ });
 
-  if (isAdmin) {
-    const adminActive = pathname.startsWith("/admin");
-    items.push({
-      label: "مدیریت",
-      onClick: () => router.push("/admin"),
-      active: adminActive,
-      icon: <ShieldCheck strokeWidth={ICON_STROKE} className="h-5 w-5 text-[var(--tb-vip)]" />,
-    });
-  }
+ if (isAdmin) {
+ const adminActive = pathname.startsWith("/admin");
+ items.push({
+ label: "مدیریت",
+ onClick: () => router.push("/admin"),
+ active: adminActive,
+ icon: <ShieldCheck strokeWidth={ICON_STROKE} className="h-5 w-5 text-[var(--tb-vip)]" />,
+ });
+ }
 
-  return (
-    <Dock
-      items={items}
-      orientation="vertical"
-      panelSize={64}
-      baseItemSize={46}
-      magnification={64}
-      distance={160}
-      className={className}
-    />
-  );
+ return (
+ <Dock
+ items={items}
+ orientation="vertical"
+ panelSize={64}
+ baseItemSize={46}
+ magnification={64}
+ distance={160}
+ className={className}
+ />
+ );
 }

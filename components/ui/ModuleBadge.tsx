@@ -5,11 +5,11 @@ import type { ModuleSlug } from "@/lib/content";
 type ModuleBadgeVariant = ModuleSlug | "home" | "raid" | "subnet" | "vip" | "success" | "warning" | "danger" | "info";
 
 export interface ModuleBadgeProps extends Omit<BadgeProps, "variant"> {
-  module: ModuleBadgeVariant;
+ module: ModuleBadgeVariant;
 }
 
 export function ModuleBadge({ module, ...props }: ModuleBadgeProps) {
-  return <Badge variant={module as BadgeProps["variant"]} {...props} />;
+ return <Badge variant={module as BadgeProps["variant"]} {...props} />;
 }
 
 export default ModuleBadge;

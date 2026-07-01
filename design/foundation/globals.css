@@ -1,24 +1,37 @@
 @import "tailwindcss";
+
+/* Design tokens — one file per family (the single source of truth) */
 @import "../tokens/colors.css";
+@import "../tokens/modules.css";
+@import "../tokens/gradient.css";
+@import "../tokens/ring.css";
+@import "../tokens/radius.css";
+@import "../tokens/shadow.css";
+@import "../tokens/blur.css";
+@import "../tokens/opacity.css";
+@import "../tokens/border.css";
+@import "../tokens/motion.css";
+@import "../tokens/typography.css";
+
 @import "./primitives.css";
 
 @theme inline {
   --font-sans: var(--font-kalameh);
 
-  --color-background: var(--tb-background);
-  --color-foreground: var(--tb-foreground);
-  --color-primary: var(--tb-brand);
-  --color-primary-foreground: var(--tb-brand-foreground);
-  --color-muted: var(--tb-muted);
-  --color-muted-foreground: var(--tb-muted-foreground);
+  --color-background: var(--tb-bg-primary);
+  --color-foreground: var(--tb-fg-primary);
+  --color-primary: var(--tb-primary);
+  --color-primary-foreground: var(--tb-on-accent);
+  --color-muted: var(--tb-bg-muted);
+  --color-muted-foreground: var(--tb-fg-muted);
   --color-border: var(--tb-border);
-  --color-ring: var(--tb-ring);
-  --color-card: var(--tb-card);
-  --color-card-foreground: var(--tb-card-foreground);
+  --color-ring: var(--tb-ring-1);
+  --color-card: var(--tb-bg-secondary);
+  --color-card-foreground: var(--tb-fg-primary);
 
-  --radius-lg: var(--tb-radius-lg);
-  --radius-xl: var(--tb-radius-xl);
-  --radius-2xl: var(--tb-radius-2xl);
+  --radius-lg: var(--tb-radius-md);
+  --radius-xl: var(--tb-radius-lg);
+  --radius-2xl: var(--tb-radius-lg);
 }
 
 *{
@@ -32,17 +45,18 @@ html{
 
 body{
   margin:0;
-  background:var(--tb-background);
-  color:var(--tb-foreground);
+  background:var(--tb-bg-primary);
+  color:var(--tb-fg-primary);
   min-height:100dvh;
 }
 
-/* typography */
+/* typography — base elements map onto the text utility scales */
 
 h1{
-  font-size:clamp(1.6rem,3.5vw,2.25rem);
+  font-size:clamp(1.6rem,3.5vw,2.5rem);
   font-weight:900;
-  line-height:1.35;
+  line-height:1.2;
+  letter-spacing:-0.01em;
 }
 
 h2{
@@ -56,9 +70,9 @@ h3{
 }
 
 p,li{
-  font-size:14px;
-  line-height:1.9;
-  color:var(--tb-muted-foreground);
+  font-size:0.9375rem;
+  line-height:1.8;
+  color:var(--tb-fg-muted);
 }
 
 /* utilities */
@@ -104,29 +118,3 @@ p,li{
   }
 }
 
-@keyframes tb-logo-loop-left{
-  from{ transform:translate3d(0,0,0); }
-  to{ transform:translate3d(calc(-33.333% - var(--tb-logo-gap) / 3),0,0); }
-}
-
-@keyframes tb-logo-loop-right{
-  from{ transform:translate3d(calc(-33.333% - var(--tb-logo-gap) / 3),0,0); }
-  to{ transform:translate3d(0,0,0); }
-}
-
-.tb-logo-loop-track{
-  animation-duration:var(--tb-logo-duration);
-  animation-timing-function:linear;
-  animation-iteration-count:infinite;
-  will-change:transform;
-}
-
-.tb-logo-loop-left{ animation-name:tb-logo-loop-left; }
-.tb-logo-loop-right{ animation-name:tb-logo-loop-right; }
-
-@media (prefers-reduced-motion: reduce){
-  .tb-logo-loop-track{
-    animation:none;
-    transform:none;
-  }
-}
