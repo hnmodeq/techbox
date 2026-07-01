@@ -169,13 +169,13 @@ function ProductFeedCard({item}:{item:ContentItem}){
 
 function DownloadFeedCard({item}:{item:ContentItem}){
  return (
- <div className="group/card flex items-center gap-2 rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-bg-muted)_45%,transparent)]">
+ <Link href={`/${item.module}/${item.slug}`} className="group/card flex items-center justify-between gap-3 rounded-[var(--tb-radius-md)] p-2.5 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-bg-muted)_45%,transparent)]">
  <div className="min-w-0 flex-1">
- <Link href={`/${item.module}/${item.slug}`} className={`line-clamp-1 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</Link>
+ <div className={`line-clamp-1 tb-text-sm font-bold transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{item.date_fa} • {item.category}</div>
  </div>
- <ButtonLink href={`/${item.module}/${item.slug}`} size="xs" className="whitespace-nowrap px-3 py-1.5 tb-text-sm">انتخاب نسخه</ButtonLink>
- </div>
+ <div className="tb-text-sm text-[var(--tb-fg-muted)] shrink-0 font-bold">{item.likes.toLocaleString("fa-IR")} بار دانلود</div>
+ </Link>
  );
 }
 
