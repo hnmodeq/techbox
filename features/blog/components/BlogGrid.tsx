@@ -32,9 +32,9 @@ export default function BlogGrid(){
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{p.likes.toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{p.views.toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{((p.likes % 9) + 1).toLocaleString("fa-IR")}</span>
+                  <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(p.likes ?? 0).toLocaleString("fa-IR")}</span>
+                  <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(p.views ?? 0).toLocaleString("fa-IR")}</span>
+                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{(((p.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")}</span>
                 </div>
               </div>
             </div>

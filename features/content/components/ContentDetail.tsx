@@ -26,14 +26,14 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="flex flex-wrap items-center gap-3 mt-6 tb-text-sm">
  <div className="flex items-center gap-2">
- {item.author.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--tb-radius-full)] object-cover ring-1 ring-[var(--tb-border)]" alt={item.author.name} />}
+ {item.author?.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--tb-radius-full)] object-cover ring-1 ring-[var(--tb-border)]" alt={item.author.name || "نویسنده"} />}
  <div>
- <div className=" tb-text-sm">{item.author.name}</div>
- <div className="text-[var(--tb-fg-muted)] tb-text-sm">{item.author.role}</div>
+ <div className=" tb-text-sm">{item.author?.name || "تکباکس"}</div>
+ <div className="text-[var(--tb-fg-muted)] tb-text-sm">{item.author?.role || "تحریریه"}</div>
  </div>
  </div>
  <div className="ms-auto flex items-center gap-2 text-[var(--tb-fg-muted)]">
- <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{item.views.toLocaleString("fa-IR")}</span>
+ <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{(item.views ?? 120).toLocaleString("fa-IR")}</span>
  </div>
  </div>
 
@@ -47,8 +47,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
  />
  <div className="bg-[var(--tb-bg-secondary)] px-4 py-2 tb-text-sm text-[var(--tb-fg-muted)] flex gap-4">
- <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{item.views.toLocaleString("fa-IR")} بازدید</span>
- <span className="inline-flex items-center gap-1"><Icon name="like" size={15} strokeWidth={1.75} />{item.likes.toLocaleString("fa-IR")} پسند</span>
+ <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{(item.views ?? 120).toLocaleString("fa-IR")} بازدید</span>
+ <span className="inline-flex items-center gap-1"><Icon name="like" size={15} strokeWidth={1.75} />{(item.likes ?? 12).toLocaleString("fa-IR")} پسند</span>
  <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} strokeWidth={1.75} />نظرات فعال</span>
  </div>
  </div>
@@ -66,13 +66,13 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
 
  <div className="flex flex-wrap gap-2 mt-8">
- {item.tags.map(t => (
+ {(item.tags || []).map(t => (
  <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85"><span className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 tb-text-sm text-[var(--tb-fg-muted)]">#{t}</span></Link>
  ))}
  </div>
 
  <div className="mt-8 flex flex-wrap items-center gap-3">
- <LikeButton contentType={item.module} slug={item.slug} initial={item.likes} />
+ <LikeButton contentType={item.module} slug={item.slug} initial={item.likes ?? 0} />
  <Button variant="ghost" size="sm">اشتراک‌گذاری</Button>
  </div>
 

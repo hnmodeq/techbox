@@ -7,10 +7,22 @@
     "href": "/tools/nas-selector",
     "icon": "server",
     "color": "var(--tb-tools)",
-    "tags": ["NAS", "RAID", "selector", "storage"],
+    "tags": [
+      "NAS",
+      "RAID",
+      "selector",
+      "storage"
+    ],
     "new": true,
     "version": "1.0.0",
-    "relatedShopCategory": "nas"
+    "relatedShopCategory": "nas",
+    "likes": 12,
+    "views": 150,
+    "author": {
+      "name": "تکباکس",
+      "role": "عضو",
+      "avatar": "/assets/hooman.png"
+    }
   },
   {
     "slug": "nvr-selector",
@@ -20,10 +32,22 @@
     "href": "/tools/nvr-selector",
     "icon": "media",
     "color": "var(--tb-raid)",
-    "tags": ["NVR", "surveillance", "camera", "AI"],
+    "tags": [
+      "NVR",
+      "surveillance",
+      "camera",
+      "AI"
+    ],
     "new": true,
     "version": "1.0.0",
-    "relatedShopCategory": "nvr"
+    "relatedShopCategory": "nvr",
+    "likes": 12,
+    "views": 150,
+    "author": {
+      "name": "تکباکس",
+      "role": "عضو",
+      "avatar": "/assets/hooman.png"
+    }
   },
   {
     "slug": "raid-calculator",
@@ -33,10 +57,22 @@
     "href": "/tools/raid-calculator",
     "icon": "disk",
     "color": "var(--tb-raid)",
-    "tags": ["RAID", "SHR", "storage", "calculator"],
+    "tags": [
+      "RAID",
+      "SHR",
+      "storage",
+      "calculator"
+    ],
     "version": "2.0.0",
     "replaces": "legacy-raid-calculator",
-    "relatedShopCategory": "nas"
+    "relatedShopCategory": "nas",
+    "likes": 12,
+    "views": 150,
+    "author": {
+      "name": "تکباکس",
+      "role": "عضو",
+      "avatar": "/assets/hooman.png"
+    }
   },
   {
     "slug": "subnet-calculator",
@@ -46,8 +82,19 @@
     "href": "/tools/subnet-calculator",
     "icon": "tools",
     "color": "var(--tb-subnet)",
-    "tags": ["network", "subnet", "IP"],
+    "tags": [
+      "network",
+      "subnet",
+      "IP"
+    ],
     "version": "1.0.0",
-    "locked": true
+    "locked": true,
+    "likes": 12,
+    "views": 150,
+    "author": {
+      "name": "تکباکس",
+      "role": "عضو",
+      "avatar": "/assets/hooman.png"
+    }
   }
 ]

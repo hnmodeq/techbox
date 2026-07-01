@@ -37,14 +37,14 @@ import forumData from "@/data/forum.json";
 import { moduleColors } from "@/config/module-colors";
 
 const all: Record<ModuleSlug, ContentItem[]> = {
-  blog: blogData as ContentItem[],
-  news: newsData as ContentItem[],
-  media: mediaData as ContentItem[],
-  review: reviewData as ContentItem[],
-  tools: toolsData as ContentItem[],
-  download: downloadData as ContentItem[],
-  shop: shopData as ContentItem[],
-  forum: forumData as ContentItem[],
+  blog: blogData as unknown as ContentItem[],
+  news: newsData as unknown as ContentItem[],
+  media: mediaData as unknown as ContentItem[],
+  review: reviewData as unknown as ContentItem[],
+  tools: toolsData as unknown as ContentItem[],
+  download: downloadData as unknown as ContentItem[],
+  shop: shopData as unknown as ContentItem[],
+  forum: forumData as unknown as ContentItem[],
 };
 
 export function getModuleItems(module: ModuleSlug): ContentItem[] {

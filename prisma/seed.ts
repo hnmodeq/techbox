@@ -45,16 +45,16 @@ async function main(){
     await prisma.post.create({
       data: {
         slug: p.slug,
-        module: p.module,
+        module: p.module || "tools",
         title: p.title,
-        excerpt: p.excerpt,
-        content: p.content || p.excerpt,
+        excerpt: p.excerpt || "",
+        content: p.content || p.excerpt || "",
         image: p.image || null,
         tags: JSON.stringify(p.tags || []),
         category: p.category || null,
         authorName: p.author?.name || "تحریریه",
-        date: new Date(p.date),
-        dateFa: p.date_fa,
+        date: (p.date && !isNaN(Date.parse(p.date))) ? new Date(p.date) : new Date(),
+        dateFa: p.date_fa || "۱ تیر ۱۴۰۵",
         likes: p.likes || 0,
         views: p.views || 0,
         published: true
@@ -71,11 +71,11 @@ async function main(){
     await prisma.comment.create({
       data: {
         postId: post.id,
-        authorName: c.author,
+        authorName: c.author || "کاربر",
         text: c.text,
         likes: c.likes || 0,
         dislikes: c.dislikes || 0,
-        createdAt: new Date(c.date)
+        createdAt: (c.date && !isNaN(Date.parse(c.date))) ? new Date(c.date) : new Date()
       }
     });
   }

@@ -222,7 +222,7 @@ export default function SidebarContent({
               <Icon name="cart" size={18} />
               {cartCount > 0 && (
                 <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--tb-shop)] px-1 tb-text-sm text-[var(--tb-on-accent)]">
-                  {cartCount > 99 ? "۹۹+" : cartCount.toLocaleString("fa-IR")}
+                  {cartCount > 99 ? "۹۹+" : (cartCount ?? 0).toLocaleString("fa-IR")}
                 </span>
               )}
             </IconRailButton>

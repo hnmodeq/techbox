@@ -271,8 +271,17 @@
     "content": "مشخصات کامل DS223j...",
     "image": "/assets/blog-6.png",
     "price": "۱۸,۵۰۰,۰۰۰",
-    "tags": ["nas", "storage", "فروشگاه", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nas",
+      "storage",
+      "فروشگاه",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-22",
     "date_fa": "۳۱ تیر ۱۴۰۵",
     "likes": 45,
@@ -287,8 +296,17 @@
     "content": "مشخصات کامل DS224+...",
     "image": "/assets/blog-6.png",
     "price": "۲۸,۹۰۰,۰۰۰",
-    "tags": ["nas", "storage", "plus", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nas",
+      "storage",
+      "plus",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-22",
     "date_fa": "۳۱ تیر ۱۴۰۵",
     "likes": 62,
@@ -303,8 +321,17 @@
     "content": "مشخصات کامل DS423+...",
     "image": "/assets/blog-6.png",
     "price": "۴۲,۵۰۰,۰۰۰",
-    "tags": ["nas", "4bay", "raid5", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nas",
+      "4bay",
+      "raid5",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-23",
     "date_fa": "۱ مرداد ۱۴۰۵",
     "likes": 88,
@@ -319,8 +346,18 @@
     "content": "مشخصات کامل TVS-h674...",
     "image": "/assets/blog-6.png",
     "price": "۷۸,۹۰۰,۰۰۰",
-    "tags": ["qnap", "nas", "6bay", "10gbe", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "qnap",
+      "nas",
+      "6bay",
+      "10gbe",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-23",
     "date_fa": "۱ مرداد ۱۴۰۵",
     "likes": 51,
@@ -335,8 +372,17 @@
     "content": "مشخصات کامل RS1224RP+...",
     "image": "/assets/blog-6.png",
     "price": "مشاوره خرید",
-    "tags": ["synology", "rackmount", "nas", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "synology",
+      "rackmount",
+      "nas",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-24",
     "date_fa": "۲ مرداد ۱۴۰۵",
     "likes": 39,
@@ -351,8 +397,17 @@
     "content": "مشخصات کامل TBS-464...",
     "image": "/assets/blog-6.png",
     "price": "۶۵,۹۰۰,۰۰۰",
-    "tags": ["qnap", "nvme", "creator", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "qnap",
+      "nvme",
+      "creator",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-24",
     "date_fa": "۲ مرداد ۱۴۰۵",
     "likes": 74,
@@ -367,8 +422,17 @@
     "content": "مشخصات کامل TB-NVR4 Pro...",
     "image": "/assets/blog-1.jpg",
     "price": "۱۲,۵۰۰,۰۰۰",
-    "tags": ["nvr", "cctv", "surveillance", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nvr",
+      "cctv",
+      "surveillance",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-25",
     "date_fa": "۳ مرداد ۱۴۰۵",
     "likes": 38,
@@ -383,8 +447,17 @@
     "content": "مشخصات کامل TB-NVR8...",
     "image": "/assets/blog-2.jpg",
     "price": "۱۸,۹۰۰,۰۰۰",
-    "tags": ["nvr", "8channel", "cctv", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nvr",
+      "8channel",
+      "cctv",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-25",
     "date_fa": "۳ مرداد ۱۴۰۵",
     "likes": 54,
@@ -399,8 +472,17 @@
     "content": "مشخصات کامل TB-NVR16 Elite...",
     "image": "/assets/blog-4.jpg",
     "price": "۲۷,۴۰۰,۰۰۰",
-    "tags": ["nvr", "16channel", "4k", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nvr",
+      "16channel",
+      "4k",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-26",
     "date_fa": "۴ مرداد ۱۴۰۵",
     "likes": 69,
@@ -415,8 +497,17 @@
     "content": "مشخصات کامل TB-NVR32...",
     "image": "/assets/blog-5.jpg",
     "price": "۴۲,۸۰۰,۰۰۰",
-    "tags": ["nvr", "enterprise", "raid", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nvr",
+      "enterprise",
+      "raid",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-26",
     "date_fa": "۴ مرداد ۱۴۰۵",
     "likes": 81,
@@ -431,8 +522,17 @@
     "content": "مشخصات کامل TB-NVR64...",
     "image": "/assets/blog-6.png",
     "price": "مشاوره خرید",
-    "tags": ["nvr", "64channel", "ultra", "shop"],
-    "author": { "name": "فروشگاه تکباکس", "role": "فروش", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "nvr",
+      "64channel",
+      "ultra",
+      "shop"
+    ],
+    "author": {
+      "name": "فروشگاه تکباکس",
+      "role": "فروش",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-27",
     "date_fa": "۵ مرداد ۱۴۰۵",
     "likes": 47,

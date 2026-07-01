@@ -72,9 +72,9 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
  <h4 className={`mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-primary)] transition-colors ${moduleHover(item.module)}`}>{item.title}</h4>
  {!compact && <p className="mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-muted)]">{item.excerpt}</p>}
           <div className="mt-2 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-            <Stat icon="like" value={item.likes.toLocaleString("fa-IR")} />
-            <Stat icon="view" value={item.views.toLocaleString("fa-IR")} />
-            <Stat icon="comment" value={((item.likes % 9) + 1).toLocaleString("fa-IR")} />
+            <Stat icon="like" value={(item.likes ?? 0).toLocaleString("fa-IR")} />
+            <Stat icon="view" value={(item.views ?? 0).toLocaleString("fa-IR")} />
+            <Stat icon="comment" value={(((item.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")} />
           </div>
  </div>
  </div>
@@ -123,9 +123,9 @@ function VideoFeedCard({item}:{item:ContentItem}){
       <div className="px-1 pt-2">
         <div className={`line-clamp-2 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
         <div className="mt-1 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-          <Stat icon="view" value={item.views.toLocaleString("fa-IR")} />
-          <Stat icon="like" value={item.likes.toLocaleString("fa-IR")} />
-          <Stat icon="comment" value={((item.likes % 9) + 1).toLocaleString("fa-IR")} />
+          <Stat icon="view" value={(item.views ?? 0).toLocaleString("fa-IR")} />
+          <Stat icon="like" value={(item.likes ?? 0).toLocaleString("fa-IR")} />
+          <Stat icon="comment" value={(((item.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")} />
         </div>
       </div>
  </Link>
@@ -133,17 +133,17 @@ function VideoFeedCard({item}:{item:ContentItem}){
 }
 
 function ForumFeedCard({item}:{item:ContentItem}){
- const answers = (item.likes % 7) + 2;
+ const answers = ((item.likes ?? 0) % 7) + 2;
  const solved = !item.slug.includes("proxmox");
  return (
  <Link href={`/${item.module}/${item.slug}`} className="group/card flex gap-2.5 rounded-[var(--tb-radius-md)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-bg-muted)_45%,transparent)]">
  <div className="relative mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-[var(--tb-radius-full)] bg-[var(--tb-bg-muted)]">
- <Image src={item.author.avatar || fallbackAvatar} alt={item.author.name} fill sizes="32px" className="object-cover" />
+ <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "کاربر"} fill sizes="32px" className="object-cover" />
  </div>
  <div className="min-w-0 flex-1">
  <div className={`line-clamp-2 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-1 flex flex-wrap items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
- <span>{item.author.name}</span>
+ <span>{item.author?.name || "کاربر"}</span>
  <span>• {answers} پاسخ</span>
             <span className={`rounded-[var(--tb-radius-sm)] border px-1.5 py-0.5 tb-text-sm ${solved ? "border-[color-mix(in_oklch,var(--tb-success)_45%,transparent)] text-[var(--tb-success)]" : "border-[color-mix(in_oklch,var(--tb-warning)_45%,transparent)] text-[var(--tb-warning)]"}`}>{solved ? "حل‌شده" : "باز"}</span>
  </div>
@@ -174,7 +174,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
  <div className={`line-clamp-1 tb-text-sm font-bold transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{item.date_fa} • {item.category}</div>
  </div>
- <div className="tb-text-sm text-[var(--tb-fg-muted)] shrink-0 font-bold">{item.likes.toLocaleString("fa-IR")} بار دانلود</div>
+ <div className="tb-text-sm text-[var(--tb-fg-muted)] shrink-0 font-bold">{(item.likes ?? 0).toLocaleString("fa-IR")} بار دانلود</div>
  </Link>
  );
 }
@@ -189,14 +189,14 @@ function ReviewFeedCard({item}:{item:ContentItem}){
  <div className={`line-clamp-2 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="flex items-center gap-2">
  <div className="relative h-5 w-5 overflow-hidden rounded-[var(--tb-radius-full)] bg-[var(--tb-bg-muted)]">
- <Image src={item.author.avatar || fallbackAvatar} alt={item.author.name} fill sizes="20px" className="object-cover" />
+ <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "نویسنده"} fill sizes="20px" className="object-cover" />
  </div>
- <span className="tb-text-sm text-[var(--tb-fg-muted)]">{item.author.name}</span>
+ <span className="tb-text-sm text-[var(--tb-fg-muted)]">{item.author?.name || "تکباکس"}</span>
  </div>
           <div className="flex gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-            <Stat icon="like" value={item.likes.toLocaleString("fa-IR")} />
+            <Stat icon="like" value={(item.likes ?? 0).toLocaleString("fa-IR")} />
             <Stat icon="comment" value={"۱۲"} />
-            <Stat icon="view" value={item.views.toLocaleString("fa-IR")} />
+            <Stat icon="view" value={(item.views ?? 0).toLocaleString("fa-IR")} />
           </div>
  </div>
  </Link>

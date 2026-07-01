@@ -16,7 +16,7 @@
 @import "./primitives.css";
 
 @theme inline {
-  --font-sans: var(--font-kalameh);
+  --font-sans: var(--font-kalameh), "Vazirmatn", "IRANSansWeb", "Tahoma", system-ui, sans-serif;
 
   --color-background: var(--tb-bg-primary);
   --color-foreground: var(--tb-fg-primary);
@@ -39,12 +39,13 @@
 }
 
 html{
-  font-family:var(--font-kalameh),Vazirmatn,system-ui,sans-serif;
+  font-family:var(--font-kalameh),"Vazirmatn","IRANSansWeb","Tahoma",system-ui,sans-serif;
   direction:rtl;
 }
 
 body{
   margin:0;
+  font-family:var(--font-kalameh),"Vazirmatn","IRANSansWeb","Tahoma",system-ui,sans-serif;
   background:var(--tb-bg-primary);
   color:var(--tb-fg-primary);
   min-height:100dvh;
