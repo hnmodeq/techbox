@@ -4,6 +4,8 @@ import { getSessionUser } from "@/lib/auth-server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import commentsData from "@/data/comments.json";
+
 const postSchema = z.object({
  module: z.string(),
  slug: z.string(),
@@ -13,17 +15,33 @@ const postSchema = z.object({
 });
 
 export async function getCommentsAction(module: string, slug: string){
- const post = await prisma.post.findUnique({
- where: { module_slug: { module: module as any, slug } },
- select: { id: true }
- });
- if(!post) return [];
- const comments = await prisma.comment.findMany({
- where: { postId: post.id },
- orderBy: { createdAt: "asc" },
- include: { replies: { orderBy: { createdAt: "asc" } } }
- });
- return comments;
+ try {
+  const post = await prisma.post.findUnique({
+   where: { module_slug: { module: module as any, slug } },
+   select: { id: true }
+  });
+  if(post) {
+   const comments = await prisma.comment.findMany({
+    where: { postId: post.id },
+    orderBy: { createdAt: "asc" },
+    include: { replies: { orderBy: { createdAt: "asc" } } }
+   });
+   if (comments && comments.length > 0) return comments;
+  }
+ } catch (err) {
+  // Database or table not created yet during build/runtime
+ }
+ // Fallback to local JSON comments
+ const list = (commentsData as any[]).filter(c => c.content_slug === slug || c.content_type === module);
+ return list.map((c, i) => ({
+   id: c.id || `c-${i}`,
+   authorName: c.author || "کاربر تکباکس",
+   text: c.text,
+   likes: c.likes || 2,
+   dislikes: c.dislikes || 0,
+   createdAt: new Date(c.date || Date.now()),
+   replies: [],
+ }));
 }
 
 export async function createCommentAction(prevState: any, formData: FormData){

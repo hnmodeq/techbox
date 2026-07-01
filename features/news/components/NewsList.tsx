@@ -30,9 +30,9 @@ export default function NewsList() {
                     <h3 className="tb-text-lg mt-2 transition-colors group-hover:text-[var(--tb-news)]">{n.title}</h3>
                     <p className="tb-text-sm line-clamp-2 mt-2 text-[var(--tb-fg-muted)]">{n.excerpt}</p>
                     <div className="tb-text-sm mt-3 flex items-center gap-3 text-[var(--tb-fg-muted)]">
-                      <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{n.views.toLocaleString("fa-IR")}</span>
-                      <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{n.likes.toLocaleString("fa-IR")}</span>
-                      <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{((n.likes % 9) + 1).toLocaleString("fa-IR")}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(n.views ?? 0).toLocaleString("fa-IR")}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(n.likes ?? 0).toLocaleString("fa-IR")}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{(((n.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")}</span>
                     </div>
                   </div>
                 </Link>

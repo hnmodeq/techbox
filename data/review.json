@@ -17,8 +17,19 @@
       "بافر پورت (Packet Buffer) محدود برای ترافیک‌های بسیار ناگهانی (Micro-burst)"
     ],
     "image": "/assets/blog-4.jpg",
-    "tags": ["mikrotik", "switch", "10gbe", "بررسی", "سوئیچ", "review"],
-    "author": { "name": "نیما راد", "role": "کارشناس ارشد شبکه", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "mikrotik",
+      "switch",
+      "10gbe",
+      "بررسی",
+      "سوئیچ",
+      "review"
+    ],
+    "author": {
+      "name": "نیما راد",
+      "role": "کارشناس ارشد شبکه",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-18",
     "date_fa": "27 تیر 1405",
     "likes": 61,
@@ -43,8 +54,19 @@
       "عدم وجود پورت 10GbE به صورت پیش‌فرض (نیازمند خرید کارت جانبی)"
     ],
     "image": "/assets/blog-6.png",
-    "tags": ["synology", "nas", "backup", "بررسی", "بکاپ", "review"],
-    "author": { "name": "رژینا کریمی", "role": "تحلیلگر ذخیره‌سازی", "avatar": "/assets/hooman.png" },
+    "tags": [
+      "synology",
+      "nas",
+      "backup",
+      "بررسی",
+      "بکاپ",
+      "review"
+    ],
+    "author": {
+      "name": "رژینا کریمی",
+      "role": "تحلیلگر ذخیره‌سازی",
+      "avatar": "/assets/hooman.png"
+    },
     "date": "2026-07-17",
     "date_fa": "26 تیر 1405",
     "likes": 73,

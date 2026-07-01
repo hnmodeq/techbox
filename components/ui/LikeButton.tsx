@@ -44,7 +44,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
  return (
  <Button onClick={toggle} disabled={busy} variant={liked ? "primary" : "ghost"} size="sm" className="gap-2 tb-text-sm disabled:opacity-60" aria-pressed={liked}>
  <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-[var(--tb-danger)]" : ""} aria-hidden />
- <span className="" style={{fontVariantNumeric:"tabular-nums"}}>{count.toLocaleString("fa-IR")}</span>
+ <span className="" style={{fontVariantNumeric:"tabular-nums"}}>{(count ?? 0).toLocaleString("fa-IR")}</span>
  <span className="hidden sm:inline">پسندیدم</span>
  <Eye size={16} className="opacity-60 hidden md:inline" />
  </Button>
@@ -83,8 +83,8 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
 
  return (
  <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
- <Button onClick={()=>vote("up")} variant="link" size="xs" className={v==="up" ? "text-[var(--tb-success)] " : "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]"}>▲ {l.toLocaleString("fa-IR")}</Button>
- <Button onClick={()=>vote("down")} variant="link" size="xs" className={v==="down" ? "text-[var(--tb-danger)] " : "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]"}>▼ {d.toLocaleString("fa-IR")}</Button>
+ <Button onClick={()=>vote("up")} variant="link" size="xs" className={v==="up" ? "text-[var(--tb-success)] " : "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]"}>▲ {(l ?? 0).toLocaleString("fa-IR")}</Button>
+ <Button onClick={()=>vote("down")} variant="link" size="xs" className={v==="down" ? "text-[var(--tb-danger)] " : "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]"}>▼ {(d ?? 0).toLocaleString("fa-IR")}</Button>
  </div>
  );
 }

@@ -72,7 +72,7 @@ function CartDrawer(){
  <OverlayBackdrop onClick={()=>setOpen(false)} />
  <aside className="absolute left-0 top-0 flex h-full w-[380px] max-w-[92vw] flex-col border-r border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-4 shadow-[var(--tb-shadow-lg)]">
  <div className="flex items-center justify-between mb-3">
- <h3 className=" tb-text-lg">سبد خرید ({count.toLocaleString("fa-IR")})</h3>
+ <h3 className=" tb-text-lg">سبد خرید ({(count ?? 0).toLocaleString("fa-IR")})</h3>
  <CloseButton onClick={()=>setOpen(false)} label="بستن سبد" />
  </div>
  <div className="flex-1 overflow-y-auto space-y-3">
@@ -85,7 +85,7 @@ function CartDrawer(){
  <div className="tb-text-sm text-[var(--tb-shop)] mt-1">{it.price} تومان</div>
  <div className="flex items-center gap-2 mt-2">
  <Button onClick={()=>setQty(it.slug, it.qty-1)} variant="outline" size="iconSm" className="h-6 w-6 tb-text-sm">−</Button>
- <span className="tb-text-sm w-6 text-center">{it.qty.toLocaleString("fa-IR")}</span>
+ <span className="tb-text-sm w-6 text-center">{(it.qty ?? 1).toLocaleString("fa-IR")}</span>
  <Button onClick={()=>setQty(it.slug, it.qty+1)} variant="outline" size="iconSm" className="h-6 w-6 tb-text-sm">+</Button>
  <Button onClick={()=>remove(it.slug)} variant="link" size="xs" className="ms-auto tb-text-sm text-[var(--tb-danger)]">حذف</Button>
  </div>
@@ -116,7 +116,7 @@ export function CartIconButton(){
  <IconRailButton tone="shop" onClick={()=>setOpen(true)} className="gap-1 tb-text-md" aria-label="سبد خرید">
  <span>🛒</span>
  <span className="hidden sm:inline">سبد</span>
- {count>0 && <span className="absolute -top-1 -left-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-[var(--tb-radius-full)] bg-[var(--tb-shop)] px-1 tb-text-sm text-black">{count.toLocaleString("fa-IR")}</span>}
+ {count>0 && <span className="absolute -top-1 -left-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-[var(--tb-radius-full)] bg-[var(--tb-shop)] px-1 tb-text-sm text-black">{(count ?? 0).toLocaleString("fa-IR")}</span>}
  </IconRailButton>
  );
 }

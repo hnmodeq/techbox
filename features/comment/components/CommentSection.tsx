@@ -109,7 +109,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
  return (
  <section className="mt-14 border-t border-[var(--tb-border)] pt-10">
  <div className="flex items-center justify-between mb-4">
- <h3 className="tb-text-lg ">نظرات <span className="tb-text-sm text-[var(--tb-fg-muted)]">({totalCount.toLocaleString("fa-IR")})</span></h3>
+ <h3 className="tb-text-lg ">نظرات <span className="tb-text-sm text-[var(--tb-fg-muted)]">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
  <Badge variant="secondary" className="tb-text-sm">Server Actions • Prisma</Badge>
  </div>
 
