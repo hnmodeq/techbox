@@ -7,7 +7,7 @@ type ShopItem = {
   slug?: string;
   title?: string;
   name?: string;
-  price?: number;
+  price?: number | string;
   stock?: boolean;
   inStock?: boolean;
   image?: string;
@@ -26,7 +26,7 @@ export async function getNasProducts(): Promise<NasProduct[]> {
     return {
       ...p,
       title: (s.title ?? s.name ?? p.title) as string,
-      price: typeof s.price === "number" ? s.price : p.price,
+      price: s.price !== undefined ? s.price : p.price,
       inStock: s.inStock ?? s.stock ?? p.inStock,
       imageUrl: s.image ?? s.images?.[0] ?? p.imageUrl,
       href: p.href ?? (s.slug ? `/shop/${s.slug}` : undefined),

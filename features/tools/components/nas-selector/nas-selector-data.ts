@@ -37,7 +37,7 @@ export type NasProduct = {
   tags: string[];
   bestFor: NasWorkload[];
   inStock?: boolean;
-  price?: number; // toman, optional – pulled from shop
+  price?: number | string; // toman or string like "مشاوره خرید"
 };
 
 export type SelectorState = {
@@ -83,8 +83,8 @@ export const raidLabels: Record<RaidType, { title: string; desc: string; minBays
 };
 
 export const defaultSelectorState: SelectorState = {
-  persona: "office",
-  workloads: ["backup", "fileSharing"],
+  persona: "" as any,
+  workloads: [],
   users: 12,
   usableTb: 12,
   driveTb: 8,
