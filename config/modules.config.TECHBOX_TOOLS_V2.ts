@@ -38,7 +38,8 @@ export type ModuleMeta = {
   icon: 
     | "home" | "blog" | "news" | "media" | "shop" | "tools"
     | "downloadModule" | "forum" | "review" | "server" | "disk"
-    | "user" | "users" | "shield" | "chat";
+    | "user" | "users" | "shield" | "chat"
+    | "nas" | "nvr";
   descriptionFa?: string;
 };
 
@@ -68,8 +69,8 @@ const moduleList: ModuleMeta[] = [
   { key: "search", slug: "search", title: "Search", titleFa: "جستجو", href: "/search", color: "var(--tb-primary)", icon: "home", descriptionFa: "جستجو" },
 
   // tools – explicit slugs (so HomeModulesSection / feed never gets undefined)
-  { key: "nas-selector", slug: "nas-selector", title: "NAS Selector", titleFa: "انتخاب‌گر NAS", href: "/tools/nas-selector", color: "var(--tb-tools)", icon: "server", descriptionFa: "انتخاب NAS" },
-  { key: "nvr-selector", slug: "nvr-selector", title: "NVR Selector", titleFa: "انتخاب‌گر NVR", href: "/tools/nvr-selector", color: "var(--tb-raid)", icon: "media", descriptionFa: "انتخاب NVR" },
+  { key: "nas-selector", slug: "nas-selector", title: "NAS Selector", titleFa: "انتخاب‌گر NAS", href: "/tools/nas-selector", color: "var(--tb-nas)", icon: "nas", descriptionFa: "انتخاب NAS" },
+  { key: "nvr-selector", slug: "nvr-selector", title: "NVR Selector", titleFa: "انتخاب‌گر NVR", href: "/tools/nvr-selector", color: "var(--tb-nvr)", icon: "nvr", descriptionFa: "انتخاب NVR" },
   { key: "raid-calculator", slug: "raid-calculator", title: "RAID Calculator", titleFa: "ماشین حساب RAID", href: "/tools/raid-calculator", color: "var(--tb-raid)", icon: "disk", descriptionFa: "RAID / SHR" },
   { key: "subnet-calculator", slug: "subnet-calculator", title: "Subnet Calculator", titleFa: "ماشین حساب ساب‌نت", href: "/tools/subnet-calculator", color: "var(--tb-subnet)", icon: "tools", descriptionFa: "ساب‌نت" },
 ];
@@ -113,8 +114,8 @@ export const toolRoutes = [
     title: "NAS Selector",
     href: "/tools/nas-selector",
     descriptionFa: "پیشنهاد NAS بر اساس ظرفیت، RAID، کاربران و بودجه",
-    icon: "server" as const,
-    color: "var(--tb-tools)",
+    icon: "nas" as const,
+    color: "var(--tb-nas)",
     new: true,
   },
   {
@@ -124,8 +125,8 @@ export const toolRoutes = [
     title: "NVR Selector",
     href: "/tools/nvr-selector",
     descriptionFa: "انتخاب NVR بر اساس دوربین، رزولوشن و روز ضبط",
-    icon: "media" as const,
-    color: "var(--tb-raid)",
+    icon: "nvr" as const,
+    color: "var(--tb-nvr)",
     new: true,
   },
   {

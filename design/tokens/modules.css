@@ -22,6 +22,8 @@
   --tb-tools:    light-dark(oklch(0.82 0.12 200), #67e8f9); /* cyan     */
   --tb-raid:     light-dark(oklch(0.66 0.18 175), #2dd4bf); /* teal     */
   --tb-subnet:   light-dark(oklch(0.68 0.19 230), #60a5fa); /* blue     */
+  --tb-nas:      light-dark(oklch(0.70 0.18 285), #c084fc); /* purple   */
+  --tb-nvr:      light-dark(oklch(0.75 0.18 145), #34d399); /* emerald  */
   --tb-vip:      light-dark(oklch(0.66 0.22 300), #e879f9); /* fuchsia  */
   --tb-forum:    light-dark(oklch(0.78 0.16 5),   #fda4af); /* rose-300 */
   --tb-review:   light-dark(oklch(0.70 0.17 240), #38bdf8); /* sky      */

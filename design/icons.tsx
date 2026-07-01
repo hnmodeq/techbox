@@ -53,6 +53,8 @@ import {
   Send,
   HardDrive,
   Server,
+  Database,
+  Cctv,
   type LucideIcon,
   type LucideProps,
 } from "lucide-react";
@@ -103,6 +105,8 @@ export const icons = {
   // hardware (raid / subnet visuals)
   disk: HardDrive,
   server: Server,
+  nas: Database,
+  nvr: Cctv,
 } as const;
 
 export type IconName = keyof typeof icons;
@@ -131,5 +135,7 @@ export const PlusIcon = Plus;
 export const MinusIcon = Minus;
 export const DiskIcon = HardDrive;
 export const ServerIcon = Server;
+export const NasIcon = Database;
+export const NvrIcon = Cctv;
 
 export type { LucideProps };
