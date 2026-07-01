@@ -7,7 +7,7 @@ export type NvrModel = {
   raidSupport: string;
   maxResolution: string;
   aiFeatures: boolean;
-  price?: number;
+  price?: number | string;
   priceLabel?: string;
   description: string;
   descriptionFa: string;

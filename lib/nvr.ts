@@ -7,7 +7,7 @@ type ShopItem = {
   slug?: string;
   title?: string;
   name?: string;
-  price?: number;
+  price?: number | string;
   stock?: boolean;
   inStock?: boolean;
   image?: string;
@@ -22,7 +22,7 @@ export async function getNvrProducts(): Promise<NvrModel[]> {
     return {
       ...p,
       nameFa: (s.title ?? s.name ?? p.nameFa) as string,
-      price: typeof s.price === "number" ? s.price : p.price,
+      price: s.price !== undefined ? s.price : p.price,
       inStock: s.inStock ?? s.stock ?? p.inStock,
       imageUrl: s.image ?? p.imageUrl,
       href: p.href ?? (s.slug ? `/shop/${s.slug}` : undefined),
