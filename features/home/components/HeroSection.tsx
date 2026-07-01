@@ -29,7 +29,7 @@ export default function HeroSection() {
  return (
     <section className="relative flex min-h-[260px] w-full max-w-full overflow-x-hidden flex-col items-center px-4 pb-10 pt-14 text-center md:min-h-[300px] md:pt-20" dir="rtl">
       <div className="relative z-10 flex flex-col items-center w-full max-w-full">
-        <h1 className="text-7xl font-black tracking-tight text-[var(--tb-fg-primary)] md:text-9xl">تکباکس</h1>
+        <h1 className="tb-hero-display">تکباکس</h1>
         <div className="hero-rotator mt-3 w-full max-w-2xl">
  <AnimatePresence mode="wait">
  <motion.div

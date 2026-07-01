@@ -36,6 +36,17 @@
   letter-spacing: -0.01em;
 }
 
+/* ── Dedicated Homepage Hero Display Token ──
+   Single source of truth for the main homepage banner title.
+   Change font-size, weight, or color here to update the hero instantly. */
+.tb-hero-display {
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--tb-fg-primary);
+}
+
 @media (min-width: 640px) {
   .sm\:tb-text-sm { font-size: 0.8125rem; font-weight: 500; line-height: 1.6; }
   .sm\:tb-text-md { font-size: 0.9375rem; font-weight: 500; line-height: 1.8; }
