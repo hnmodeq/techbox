@@ -36,35 +36,45 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  ref={ref}
  type="button"
  className={cn(
- "card group overflow-hidden text-start text-right transition-all duration-[var(--tb-motion-md)]",
- active ? "ring-2 ring-[var(--tb-media)] shadow-[var(--tb-shadow-lg)]" : "hover:-translate-y-1 hover:shadow-[var(--tb-shadow-md)]",
+ "group relative block w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] text-right transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-lg)]",
+ active ? "ring-2 ring-[var(--tb-media)]" : "",
  className
  )}
  {...props}
  >
- <div className="relative aspect-video bg-black">
  <Image
  src={image || "/assets/blog-1.jpg"}
  alt={title}
  fill
  sizes="(min-width:1024px) 33vw, 100vw"
- className="object-cover opacity-90 transition-opacity duration-[var(--tb-motion-md)] group-hover:opacity-100"
+ className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
  />
- <span className="absolute inset-0 flex items-center justify-center">
- <span className="tb-image-badge flex h-14 w-14 items-center justify-center tb-text-lg text-white">▶</span>
+ <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10 transition-opacity group-hover:opacity-95" />
+
+ <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+ <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white transition-transform group-hover:scale-110 shadow-lg">
+ ▶
  </span>
- <span className="absolute bottom-2 left-2 rounded-[var(--tb-radius-sm)] bg-[color-mix(in oklch, black 60%, transparent)] px-2 py-0.5 tb-text-sm text-white">
+ </span>
+
+ {category && (
+ <span className="absolute top-3 right-3 rounded-full border border-white/30 bg-black/40 px-2.5 py-0.5 tb-text-sm text-white backdrop-blur-md">
+ {category}
+ </span>
+ )}
+ <span className="absolute top-3 left-3 rounded-[var(--tb-radius-sm)] bg-black/60 px-2 py-0.5 tb-text-sm text-white backdrop-blur-sm">
  {duration}
  </span>
- {category && <Badge variant="media" className="absolute right-2 top-2 !tb-text-sm">{category}</Badge>}
- </div>
- <div className="p-3">
- <div className="min-h-[48px] line-clamp-2 tb-text-sm ">{title}</div>
- <div className="mt-2 flex items-center justify-between tb-text-sm text-[var(--tb-fg-muted)]">
+
+ <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
+ <h4 className="tb-text-md font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--tb-media)]">
+ {title}
+ </h4>
+ <div className="mt-2 flex items-center justify-between tb-text-sm text-white/80">
  {author && <span>{author}</span>}
  {dateFa && <span>{dateFa}</span>}
  </div>
- <div className="mt-2 flex items-center gap-3 border-t border-[color-mix(in_oklch,var(--tb-border)_50%,transparent)] pt-2 tb-text-sm text-[var(--tb-fg-muted)]">
+ <div className="mt-2 flex items-center gap-3 border-t border-white/20 pt-2 tb-text-sm text-white/80">
  {typeof views === "number" && <span>👁 {views.toLocaleString("fa-IR")}</span>}
  {typeof likes === "number" && <span>♥ {likes.toLocaleString("fa-IR")}</span>}
  {typeof comments === "number" && <span>💬 {comments.toLocaleString("fa-IR")}</span>}

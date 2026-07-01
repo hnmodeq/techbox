@@ -1,69 +1,189 @@
 "use client";
-import { getModuleItems, moduleMeta } from "@/lib/content";
-import Link from "next/link";
-import { ButtonLink } from "@/components/ui/Button";
+import { getModuleItems } from "@/lib/content";
 import { MediaSelectorCard } from "@/components/ui/MediaSelectorCard";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
+import { createPortal } from "react-dom";
+import { zIndex } from "@/design";
+import { Icon } from "@/design/icons";
 
 const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
-export default function MediaGallery(){
- const items = getModuleItems("media");
- const [active, setActive] = useState(items[0] || null);
+export default function MediaGallery() {
+  const allItems = useMemo(() => {
+    const raw = getModuleItems("media");
+    // Ensure we have enough items to demonstrate pagination cleanly
+    return raw.length >= 8 ? raw : [...raw, ...raw, ...raw];
+  }, []);
 
- // naive comments count – pull from seed
- const commentsCount = (slug: string) => slug.includes("qnap") ? 23 : slug.includes("mikrotik") ? 12 : 8;
+  const [activeVideo, setActiveVideo] = useState<any | null>(null);
+  const [likesMap, setLikesMap] = useState<Record<string, number>>({});
+  const [likedList, setLikedList] = useState<Record<string, boolean>>({});
+  const [commentsList, setCommentsList] = useState<Record<string, string[]>>({
+    default: ["ویدیو بسیار عالی و کاربردی بود، ممنون از تکباکس!", "لطفاً قسمت دوم این آموزش رو هم بسازید."],
+  });
+  const [newComment, setNewComment] = useState("");
 
- return (
- <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
- <ModuleHeader module="media" title="رسانه ویدیویی تکباکس" count={`${items.length.toLocaleString("fa-IR")} ویدیو`} />
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 6;
+  const totalPages = Math.max(1, Math.ceil(allItems.length / itemsPerPage));
+  const displayedItems = allItems.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
- {active && (
- <div className="card overflow-hidden mb-8">
- <div className="relative bg-black aspect-video">
- <video
- key={active.slug}
- controls
- playsInline
- poster={active.image}
- className="w-full h-full object-contain bg-black"
- src={SAMPLE_VIDEO}
- />
- </div>
- <div className="p-4 flex flex-wrap items-start justify-between gap-3">
- <div className="min-w-0">
- <div className=" tb-text-lg">{active.title}</div>
- <div className="tb-text-sm text-[var(--tb-fg-muted)] mt-1">{active.excerpt}</div>
- <div className="flex items-center gap-4 tb-text-sm text-[var(--tb-fg-muted)] mt-3">
- <span>👁 {active.views.toLocaleString("fa-IR")} بازدید</span>
- <span>♥ {active.likes.toLocaleString("fa-IR")} پسند</span>
- <span>💬 {commentsCount(active.slug).toLocaleString("fa-IR")} نظر</span>
- <span>• {active.date_fa}</span>
- </div>
- </div>
- <ButtonLink href={`/media/${active.slug}`} variant="ghost" size="xs" className="whitespace-nowrap">صفحه اختصاصی →</ButtonLink>
- </div>
- </div>
- )}
+  const getLikes = (slug: string, initial: number) => {
+    return likesMap[slug] !== undefined ? likesMap[slug] : initial;
+  };
 
- <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
- {items.map(v => (
- <MediaSelectorCard
- key={v.slug}
- active={active?.slug===v.slug}
- image={v.image}
- title={v.title}
- category={v.category}
- author={v.author.name}
- dateFa={v.date_fa}
- views={v.views}
- likes={v.likes}
- comments={commentsCount(v.slug)}
- onClick={()=>setActive(v)}
- />
- ))}
- </div>
- </main>
- );
+  const handleLike = (slug: string, initial: number) => {
+    const current = getLikes(slug, initial);
+    const isLiked = likedList[slug];
+    setLikesMap({ ...likesMap, [slug]: isLiked ? current - 1 : current + 1 });
+    setLikedList({ ...likedList, [slug]: !isLiked });
+  };
+
+  const getComments = (slug: string) => {
+    return commentsList[slug] || commentsList.default;
+  };
+
+  const handleAddComment = (e: React.FormEvent, slug: string) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    const prev = getComments(slug);
+    setCommentsList({ ...commentsList, [slug]: [...prev, newComment.trim()] });
+    setNewComment("");
+  };
+
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
+      <ModuleHeader module="media" title="رسانه ویدیویی تکباکس" count={`${allItems.length.toLocaleString("fa-IR")} ویدیو`} />
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        {displayedItems.map((v, idx) => (
+          <MediaSelectorCard
+            key={`${v.slug}-${idx}`}
+            image={v.image}
+            title={v.title}
+            category={v.category}
+            author={v.author?.name}
+            dateFa={v.date_fa}
+            views={v.views}
+            likes={getLikes(v.slug, v.likes)}
+            comments={getComments(v.slug).length}
+            onClick={() => setActiveVideo(v)}
+          />
+        ))}
+      </div>
+
+      {/* Numeric Pagination (1 2 3 4) */}
+      {totalPages > 1 && (
+        <div className="mt-12 flex items-center justify-center gap-2">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPage(p)}
+              className={`h-10 w-10 rounded-[var(--tb-radius-md)] border font-bold transition-all ${
+                page === p
+                  ? "bg-[var(--tb-media)] text-[var(--tb-on-accent)] border-[var(--tb-media)] shadow-md scale-105"
+                  : "border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-media)] hover:text-[var(--tb-media)]"
+              }`}
+            >
+              {p.toLocaleString("fa-IR")}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Pop-up Modal Video Player */}
+      {activeVideo && typeof window !== "undefined" && createPortal(
+        <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
+          
+          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
+            <div className="flex items-center justify-between p-4 border-b border-[var(--tb-border)]">
+              <h3 className="tb-text-lg font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
+              <button
+                onClick={() => setActiveVideo(null)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors"
+                aria-label="بستن"
+              >
+                <Icon name="close" size={18} />
+              </button>
+            </div>
+
+            <div className="relative aspect-video bg-black shrink-0">
+              <video
+                key={activeVideo.slug}
+                controls
+                autoPlay
+                playsInline
+                poster={activeVideo.image}
+                className="w-full h-full object-contain bg-black"
+                src={SAMPLE_VIDEO}
+              />
+            </div>
+
+            <div className="p-5 space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--tb-border)] pb-4">
+                <div className="tb-text-sm text-[var(--tb-fg-muted)] flex items-center gap-3">
+                  <span>منتشرشده توسط: <b className="text-[var(--tb-fg-primary)]">{activeVideo.author?.name || "تکباکس"}</b></span>
+                  <span>•</span>
+                  <span>{activeVideo.date_fa}</span>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <span className="inline-flex items-center gap-1.5 tb-text-sm text-[var(--tb-fg-muted)] bg-[var(--tb-bg-secondary)] px-3 py-1.5 rounded-[var(--tb-radius-full)] border border-[var(--tb-border)]">
+                    <Icon name="view" size={16} />
+                    <span>{activeVideo.views?.toLocaleString("fa-IR") || "۱,۲۰۰"} بازدید</span>
+                  </span>
+
+                  <button
+                    onClick={() => handleLike(activeVideo.slug, activeVideo.likes)}
+                    className={`inline-flex items-center gap-1.5 tb-text-sm px-4 py-1.5 rounded-[var(--tb-radius-full)] border transition-all ${
+                      likedList[activeVideo.slug]
+                        ? "bg-[var(--tb-danger)]/15 border-[var(--tb-danger)] text-[var(--tb-danger)] shadow-sm"
+                        : "bg-[var(--tb-bg-secondary)] border-[var(--tb-border)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-danger)]"
+                    }`}
+                  >
+                    <Icon name="like" size={16} className={likedList[activeVideo.slug] ? "fill-current" : ""} />
+                    <span>{getLikes(activeVideo.slug, activeVideo.likes).toLocaleString("fa-IR")} پسند</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Comments Section */}
+              <div className="space-y-4">
+                <h4 className="tb-text-md font-bold">نظرات کاربران ({getComments(activeVideo.slug).length.toLocaleString("fa-IR")})</h4>
+
+                <form onSubmit={(e) => handleAddComment(e, activeVideo.slug)} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="نظر خود را درباره این ویدیو بنویسید..."
+                    className="input flex-1 !h-11 tb-text-sm"
+                  />
+                  <button type="submit" className="btn btn-primary !h-11 px-6 tb-text-sm shrink-0">
+                    ارسال نظر
+                  </button>
+                </form>
+
+                <ul className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                  {getComments(activeVideo.slug).map((c, i) => (
+                    <li key={i} className="p-3 rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] tb-text-sm">
+                      <div className="flex items-center justify-between mb-1 text-[12px] text-[var(--tb-fg-muted)]">
+                        <b>کاربر تکباکس</b>
+                        <span>لحظاتی پیش</span>
+                      </div>
+                      <p className="text-[var(--tb-fg-primary)]">{c}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </main>
+  );
 }
