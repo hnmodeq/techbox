@@ -4,9 +4,20 @@ import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
 import { ButtonLink } from "@/components/ui/Button";
+import { Icon } from "@/design/icons";
 
 const fallbackImage = "/assets/blog-1.jpg";
 const fallbackAvatar = "/assets/hooman.png";
+
+/** Small engagement stat with a central-system icon. */
+function Stat({ icon, value }: { icon: "like" | "view" | "comment"; value: string | number }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <Icon name={icon} size={14} strokeWidth={1.75} className="shrink-0" />
+      <span>{value}</span>
+    </span>
+  );
+}
 
 /**
  * Module-synced hover color class for a feed card's title, scoped to THIS card only.
@@ -55,17 +66,17 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
  </div>
  )}
  <div className="min-w-0 flex-1">
- <div className="flex items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
- <span className=" text-[var(--tb-fg-primary)]">{meta.titleFa}</span>
- <span>•</span>
- <span>{item.date_fa}</span>
- </div>
+          <div className="flex items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
+            <span className={`rounded-[var(--tb-radius-full)] border border-[color-mix(in_oklch,currentColor_35%,transparent)] px-2 py-0.5 ${moduleColors[item.module]?.active ?? "text-[var(--tb-fg-primary)]"}`}>{meta.titleFa}</span>
+            <span>{item.date_fa}</span>
+          </div>
  <h4 className={`mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-primary)] transition-colors ${moduleHover(item.module)}`}>{item.title}</h4>
  {!compact && <p className="mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-muted)]">{item.excerpt}</p>}
- <div className="mt-2 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
- <span>♥ {item.likes}</span>
- <span>👁 {item.views.toLocaleString("fa-IR")}</span>
- </div>
+          <div className="mt-2 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
+            <Stat icon="like" value={item.likes.toLocaleString("fa-IR")} />
+            <Stat icon="view" value={item.views.toLocaleString("fa-IR")} />
+            <Stat icon="comment" value={((item.likes % 9) + 1).toLocaleString("fa-IR")} />
+          </div>
  </div>
  </div>
  </Link>
@@ -108,13 +119,16 @@ function VideoFeedCard({item}:{item:ContentItem}){
  return (
  <Link href={`/${item.module}/${item.slug}`} className="group/card block overflow-hidden rounded-[var(--tb-radius-md)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--tb-bg-muted)_45%,transparent)]">
  <div className="relative aspect-video overflow-hidden rounded-[var(--tb-radius-sm)] bg-black">
- <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:768px) 33vw, 100vw" />
- <span className="absolute inset-0 flex items-center justify-center"><span className="tb-image-badge h-10 w-10 text-white">▶</span></span>
- </div>
- <div className="px-1 pt-2">
- <div className={`line-clamp-2 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
- <div className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">👁 {item.views.toLocaleString("fa-IR")} • ♥ {item.likes} • 💬</div>
- </div>
+        <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:768px) 33vw, 100vw" />
+      </div>
+      <div className="px-1 pt-2">
+        <div className={`line-clamp-2 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
+        <div className="mt-1 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
+          <Stat icon="view" value={item.views.toLocaleString("fa-IR")} />
+          <Stat icon="like" value={item.likes.toLocaleString("fa-IR")} />
+          <Stat icon="comment" value={((item.likes % 9) + 1).toLocaleString("fa-IR")} />
+        </div>
+      </div>
  </Link>
  );
 }
@@ -132,7 +146,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
  <div className="mt-1 flex flex-wrap items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
  <span>{item.author.name}</span>
  <span>• {answers} پاسخ</span>
- <span className="rounded-[var(--tb-radius-sm)] border border-[var(--tb-border)] px-1.5 py-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{solved ? "حل‌شده" : "باز"}</span>
+            <span className={`rounded-[var(--tb-radius-sm)] border px-1.5 py-0.5 tb-text-sm ${solved ? "border-[color-mix(in_oklch,var(--tb-success)_45%,transparent)] text-[var(--tb-success)]" : "border-[color-mix(in_oklch,var(--tb-warning)_45%,transparent)] text-[var(--tb-warning)]"}`}>{solved ? "حل‌شده" : "باز"}</span>
  </div>
  </div>
  </Link>
@@ -180,11 +194,11 @@ function ReviewFeedCard({item}:{item:ContentItem}){
  </div>
  <span className="tb-text-sm text-[var(--tb-fg-muted)]">{item.author.name}</span>
  </div>
- <div className="flex gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
- <span>♥ {item.likes}</span>
- <span>💬 12</span>
- <span>👁 {item.views.toLocaleString("fa-IR")}</span>
- </div>
+          <div className="flex gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
+            <Stat icon="like" value={item.likes.toLocaleString("fa-IR")} />
+            <Stat icon="comment" value={"۱۲"} />
+            <Stat icon="view" value={item.views.toLocaleString("fa-IR")} />
+          </div>
  </div>
  </Link>
  );

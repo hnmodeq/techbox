@@ -71,7 +71,7 @@ export default function HeroBackground({ colorVar, className }: HeroBackgroundPr
  // Colors come straight from the design gradient tokens — no effect-specific color vars.
  const c1 = resolveColor("var(--tb-gradient-1)", "#3b46f6");
  const c2 = resolveColor("var(--tb-gradient-2)", "#60a5fa");
- const c3 = resolveColor("var(--tb-gradient-3)", "#ffc400");
+ const c3 = resolveColor("var(--tb-gradient-3)", "#e879f9");
  // When a module/page color var is provided, let it dominate the middle stop.
  const accent = colorVar ? resolveColor(`var(${colorVar})`, c2) : c2;
  setCfg({
@@ -79,7 +79,7 @@ export default function HeroBackground({ colorVar, className }: HeroBackgroundPr
  amplitude: 1,
  blend: 0.5,
  speed: 1,
- opacity: readNumber("--tb-opacity-md", 1),
+ opacity: readNumber("--tb-opacity-md", 0.6),
  });
  };
  setMounted(true);

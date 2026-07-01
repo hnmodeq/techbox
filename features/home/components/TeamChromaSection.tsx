@@ -4,11 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import ChromaGrid, { type ChromaItem } from "@/components/effects/ChromaGrid";
 
 export type TeamMember = {
- name: string;
- role: string;
- username: string;
- avatar?: string;
- modules: string[];
+  name: string;
+  role: string;
+  roleFa?: string;
+  username: string;
+  avatar?: string;
+  modules: string[];
 };
 
 /** Resolve a CSS var (e.g. --tb-blog) to a concrete rgb string for the card gradient. */
@@ -36,17 +37,14 @@ export default function TeamChromaSection({ team }: { team: TeamMember[] }) {
  const build = () => {
  const next = team.map((u, i) => {
  const varName = accentVars[i % accentVars.length];
- const color = resolveVarColor(varName, "#60a5fa");
- return {
- image: u.avatar || "/assets/hooman.png",
- title: u.name,
- subtitle: u.role === "super_admin" ? "مدیر کل" : "ویراستار",
- handle: `@${u.username}`,
- location: u.modules.slice(0, 2).join("، "),
- borderColor: color,
- gradient: `linear-gradient(145deg, ${color}, var(--tb-bg-secondary))`,
- url: "/account",
- } satisfies ChromaItem;
+        const color = resolveVarColor(varName, "var(--tb-primary)");
+          return {
+            image: u.avatar || "/assets/hooman.png",
+            title: u.name,
+            subtitle: u.roleFa || (u.role === "super_admin" ? "مدیر کل" : "ویراستار"),
+            borderColor: color,
+            gradient: `linear-gradient(145deg, ${color}, var(--tb-bg-secondary))`,
+          } satisfies ChromaItem;
  });
  setItems(next);
  };

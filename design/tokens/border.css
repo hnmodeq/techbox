@@ -1,11 +1,13 @@
 /* ════════════════════════════════════════════════════════════════════════
-   TECHBOX · BORDERS  (border width + border color)
-   `--tb-border` is the shared border color (light-dark). The sm/md/lg tokens
-   are width helpers used as `border: var(--tb-border-sm) solid var(--tb-border)`.
+   TECHBOX · BORDERS  (border color + width)
+   The border color is derived from the semantic foreground token in
+   colors.css (a low-opacity mix), so it follows the theme automatically.
+   The sm/md/lg tokens are width helpers used as:
+     border: var(--tb-border-sm) solid var(--tb-border);
    ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --tb-border: light-dark(oklch(0.88 0.018 270), #2c2c2c);
+  --tb-border: color-mix(in oklch, var(--tb-fg-primary) 14%, transparent);
   --tb-border-sm: 1px;
   --tb-border-md: 2px;
   --tb-border-lg: 3px;

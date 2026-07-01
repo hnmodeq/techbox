@@ -15,7 +15,8 @@
       "shop",
       "forum"
     ],
-    "avatar": "/assets/hooman.png"
+    "avatar": "/assets/hooman.png",
+    "roleFa": "مدیر کل"
   },
   {
     "id": "u2",
@@ -26,7 +27,8 @@
     "modules": [
       "blog"
     ],
-    "avatar": "/assets/behnaz.png"
+    "avatar": "/assets/behnaz.png",
+    "roleFa": "ویراستار مجله"
   },
   {
     "id": "u3",
@@ -37,7 +39,8 @@
     "modules": [
       "news"
     ],
-    "avatar": "/assets/hooman.png"
+    "avatar": "/assets/hooman.png",
+    "roleFa": "دبیر اخبار"
   },
   {
     "id": "u4",
@@ -49,7 +52,8 @@
       "media",
       "review"
     ],
-    "avatar": "/assets/rojina.png"
+    "avatar": "/assets/rojina.png",
+    "roleFa": "تولیدکننده رسانه"
   },
   {
     "id": "u5",
@@ -61,7 +65,8 @@
       "tools",
       "download"
     ],
-    "avatar": "/assets/atiye.png"
+    "avatar": "/assets/atiye.png",
+    "roleFa": "کارشناس ابزار و دانلود"
   },
   {
     "id": "u6",
@@ -73,7 +78,8 @@
       "shop",
       "forum"
     ],
-    "avatar": "/assets/nastaran.png"
+    "avatar": "/assets/nastaran.png",
+    "roleFa": "مدیر فروشگاه و انجمن"
   },
   {
     "id": "u7",
@@ -85,7 +91,8 @@
       "forum",
       "tools"
     ],
-    "avatar": "/assets/hooman.png"
+    "avatar": "/assets/hooman.png",
+    "roleFa": "ناظر انجمن"
   },
   {
     "id": "u8",
@@ -97,7 +104,8 @@
       "download",
       "blog"
     ],
-    "avatar": "/assets/behnaz.png"
+    "avatar": "/assets/behnaz.png",
+    "roleFa": "ویراستار دانلود"
   },
   {
     "id": "u9",
@@ -109,7 +117,8 @@
       "shop",
       "review"
     ],
-    "avatar": "/assets/atiye.png"
+    "avatar": "/assets/atiye.png",
+    "roleFa": "کارشناس فروش و نقد"
   },
   {
     "id": "u10",
@@ -121,6 +130,7 @@
       "news",
       "media"
     ],
-    "avatar": "/assets/rojina.png"
+    "avatar": "/assets/rojina.png",
+    "roleFa": "دبیر اخبار و رسانه"
   }
 ]

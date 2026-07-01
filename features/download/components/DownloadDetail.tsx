@@ -36,17 +36,9 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--tb-download)]">{item.category}</span>
  </div>
  <h1 className="tb-text-hero md:tb-text-hero ">{item.title}</h1>
- <p className="text-muted-foreground mt-3">{item.excerpt}</p>
+      <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 
- <div className="flex flex-wrap gap-2 mt-4">
- {item.tags.map(t=>(
- <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85">
- <span className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{t.toUpperCase()}</span>
- </Link>
- ))}
- </div>
-
- {/* OS chooser */}
+      {/* OS chooser */}
  <div className="card p-4 mt-8">
  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
  <div className="">انتخاب سیستم‌عامل / نسخه</div>

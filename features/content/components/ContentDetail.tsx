@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { type ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
+import { Icon } from "@/design/icons";
 import { LikeButton } from "@/components/ui/LikeButton";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
@@ -20,7 +21,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <span>{item.category}</span>
  </div>
 
- <h1 className="tb-text-hero md:text-[2.4rem] ">{item.title}</h1>
+        <h1 className="tb-text-hero">{item.title}</h1>
  <p className="text-[var(--tb-fg-muted)] mt-4 tb-text-md ">{item.excerpt}</p>
 
  <div className="flex flex-wrap items-center gap-3 mt-6 tb-text-sm">
@@ -32,7 +33,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  </div>
  <div className="ms-auto flex items-center gap-2 text-[var(--tb-fg-muted)]">
- <span>👁 {item.views.toLocaleString("fa-IR")}</span>
+ <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{item.views.toLocaleString("fa-IR")}</span>
  </div>
  </div>
 
@@ -46,9 +47,9 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
  />
  <div className="bg-[var(--tb-bg-secondary)] px-4 py-2 tb-text-sm text-[var(--tb-fg-muted)] flex gap-4">
- <span>👁 {item.views.toLocaleString("fa-IR")} بازدید</span>
- <span>♥ {item.likes.toLocaleString("fa-IR")} پسند</span>
- <span>💬 نظرات فعال</span>
+ <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{item.views.toLocaleString("fa-IR")} بازدید</span>
+ <span className="inline-flex items-center gap-1"><Icon name="like" size={15} strokeWidth={1.75} />{item.likes.toLocaleString("fa-IR")} پسند</span>
+ <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} strokeWidth={1.75} />نظرات فعال</span>
  </div>
  </div>
  ) : item.image && (

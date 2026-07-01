@@ -10,7 +10,7 @@
 
 :root {
   /* ── Brand / primary accent ── */
-  --tb-primary:    light-dark(oklch(34.846% 0.00004 271.152), #b3b3b3);
+  --tb-primary:    light-dark(oklch(0.62 0.21 255), #60a5fa);
   /* fixed light text that sits on top of any saturated accent (white both modes) */
   --tb-on-accent:  #ffffff;
 

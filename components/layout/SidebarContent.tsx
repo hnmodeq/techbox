@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Search, Clock, ShoppingCart, ShieldCheck, Headset, X } from "lucide-react";
+import { Icon } from "@/design/icons";
 import ConsultationModal from "@/features/consultation/components/ConsultationModal";
 import { createPortal } from "react-dom";
 import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
@@ -34,7 +34,7 @@ function TehranDateTime({ now, expanded }: { now: Date | null; expanded: boolean
  {!expanded ? (
  <SidebarTooltip enabled label={label} tooltipClassName="text-[var(--tb-fg-muted)]">
  <span className="icon-rail-btn" aria-label="ساعت تهران">
- <Clock size={18} />
+ <Icon name="clock" size={18} />
  </span>
  </SidebarTooltip>
  ) : (
@@ -164,18 +164,21 @@ export default function SidebarContent({
  >
  <div className="mb-2 tb-text-sm ">آخرین رویدادها</div>
  <ul className="max-h-80 space-y-2 overflow-y-auto tb-text-sm">
- {notifications.map((n: any) => {
- // Title is tinted with the source module's color; unknown/general → neutral.
- const titleColor = moduleColors[n.module as keyof typeof moduleColors]?.active ?? "text-[var(--tb-fg-primary)]";
- return (
- <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--tb-border)_40%,transparent)] pb-2 last:border-0">
- <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className={`line-clamp-2 transition-opacity hover:opacity-80 ${titleColor}`}>
- {n.title}
- </Link>
- <div className="mt-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{n.date_fa}{n.time ? `• ${n.time}`: ""} • {moduleMeta[n.module as ModuleSlug]?.titleFa ?? n.module}</div>
- </li>
- );
- })}
+              {notifications.map((n: any) => {
+                // Title stays neutral; the source module label carries the module color.
+                const sourceColor = moduleColors[n.module as keyof typeof moduleColors]?.active ?? "text-[var(--tb-fg-muted)]";
+                const sourceLabel = moduleMeta[n.module as ModuleSlug]?.titleFa ?? n.module;
+                return (
+                  <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--tb-border)_40%,transparent)] pb-2 last:border-0">
+                    <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 text-[var(--tb-fg-primary)] transition-opacity hover:opacity-80">
+                      {n.title}
+                    </Link>
+                    <div className="mt-0.5 tb-text-sm text-[var(--tb-fg-muted)]">
+                      <span className={sourceColor}>{sourceLabel}</span> • {n.date_fa}{n.time ? ` • ${n.time}`: ""}
+                    </div>
+                  </li>
+                );
+              })}
  </ul>
  <Button variant="ghost" size="xs" onClick={() => setNotifOpen(false)} className="mt-2 w-full tb-text-sm">بستن</Button>
  </div>,
@@ -199,47 +202,48 @@ export default function SidebarContent({
  )}
  </div>
 
- <div className={`overflow-hidden transition-all duration-[var(--tb-motion-md)] ${expanded ? "w-[170px] opacity-100" : "w-0 opacity-0"}`}>
- <div className="tb-text-md text-[var(--tb-fg-primary)]">تکباکس</div>
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">پاتوق بچه‌های فناوری اطلاعات</div>
- </div>
+          <div className={`overflow-hidden transition-all duration-[var(--tb-motion-md)] ${expanded ? "w-[170px] opacity-100" : "w-0 opacity-0"}`}>
+            <div className="tb-text-md text-[var(--tb-fg-primary)]">تکباکس</div>
+            <div className="tb-text-sm text-[var(--tb-fg-muted)]">پاتوق بچه‌های فناوری اطلاعات</div>
+          </div>
+        </div>
 
- <div className="ms-auto flex h-10 items-center gap-1">
- <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--tb-news)]">
- <IconRailButton ref={notifButtonRef} tone="news" onClick={() => setNotifOpen((o) => !o)} aria-label="notifications">
- <Bell size={18} />
- <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--tb-danger)]" />
- </IconRailButton>
- </SidebarTooltip>
+        {/* Notifications + cart — always visible, stable in both expanded & collapsed states */}
+        <div className={`flex shrink-0 items-center gap-1 ${expanded ? "flex-row justify-start" : "flex-col"}`}>
+          <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--tb-news)]">
+            <IconRailButton ref={notifButtonRef} tone="news" onClick={() => setNotifOpen((o) => !o)} aria-label="notifications">
+              <Icon name="bell" size={18} />
+              <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--tb-danger)]" />
+            </IconRailButton>
+          </SidebarTooltip>
 
- <SidebarTooltip label={cartCount > 0 ? `سبد خرید – ${cartCount} قلم`: "سبد خرید"} enabled={!expanded} tooltipClassName="text-[var(--tb-shop)]">
- <IconRailButton tone="shop" onClick={() => setCartOpen(true)} aria-label="سبد خرید">
- <ShoppingCart size={18} />
- {cartCount > 0 && (
- <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--tb-shop)] px-1 tb-text-sm text-black">
- {cartCount > 99 ? "۹۹+" : cartCount.toLocaleString("fa-IR")}
- </span>
- )}
- </IconRailButton>
- </SidebarTooltip>
- </div>
- </div>
+          <SidebarTooltip label={cartCount > 0 ? `سبد خرید – ${cartCount} قلم`: "سبد خرید"} enabled={!expanded} tooltipClassName="text-[var(--tb-shop)]">
+            <IconRailButton tone="shop" onClick={() => setCartOpen(true)} aria-label="سبد خرید">
+              <Icon name="cart" size={18} />
+              {cartCount > 0 && (
+                <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--tb-shop)] px-1 tb-text-sm text-[var(--tb-on-accent)]">
+                  {cartCount > 99 ? "۹۹+" : cartCount.toLocaleString("fa-IR")}
+                </span>
+              )}
+            </IconRailButton>
+          </SidebarTooltip>
+        </div>
 
- <TehranDateTime now={now} expanded={expanded} />
+        <TehranDateTime now={now} expanded={expanded} />
 
  <div className="relative h-10 shrink-0">
  {expanded ? (
  <form onSubmit={doSearch} className="relative h-10">
  <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input h-10 !py-2 pe-8 tb-text-sm" />
  <Button type="submit" variant="link" size="iconSm" className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]" aria-label="search">
- <Search size={14} />
+ <Icon name="search" size={14} />
  </Button>
  </form>
  ) : (
  <>
  <SidebarTooltip label="جستجو" enabled={!searchOpen} tooltipClassName="text-[var(--tb-primary)]">
  <IconRailButton tone="brand" onClick={() => setSearchOpen((o) => !o)} aria-label="جستجو" aria-expanded={searchOpen}>
- {searchOpen ? <X size={18} /> : <Search size={18} />}
+ {searchOpen ? <Icon name="close" size={18} /> : <Icon name="search" size={18} />}
  </IconRailButton>
  </SidebarTooltip>
 
@@ -260,7 +264,7 @@ export default function SidebarContent({
  className="input h-10 w-full !py-2 pe-9 tb-text-sm !border-0 !bg-transparent"
  />
  <Button type="submit" variant="link" size="iconSm" className="absolute left-1.5 top-1/2 -translate-y-1/2 text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]" aria-label="search">
- <Search size={14} />
+ <Icon name="search" size={14} />
  </Button>
  </div>
  </form>
@@ -277,13 +281,13 @@ export default function SidebarContent({
  onClick={() => setConsultOpen(true)}
  className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--tb-radius-lg)] border border-[color-mix(in_oklch,var(--tb-consultation)_35%,transparent)] text-center tb-text-sm text-[var(--tb-consultation)] hover:bg-[color-mix(in_oklch,var(--tb-consultation)_12%,transparent)]"
  >
- <Headset size={16} strokeWidth={1.75} />
+ <Icon name="headset" size={16} strokeWidth={1.75} />
  مشاوره زیرساخت
  </Button>
  ) : (
  <SidebarTooltip label="مشاوره زیرساخت" enabled tooltipClassName="text-[var(--tb-consultation)]">
  <IconRailButton tone="consultation" onClick={() => setConsultOpen(true)} aria-label="مشاوره زیرساخت">
- <Headset size={18} strokeWidth={1.75} />
+ <Icon name="headset" size={18} strokeWidth={1.75} />
  </IconRailButton>
  </SidebarTooltip>
  )}
@@ -332,7 +336,7 @@ export default function SidebarContent({
  >
  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tb-vip)]" />}
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
- <ShieldCheck size={19} className="text-[var(--tb-vip)]" strokeWidth={1.75} />
+ <Icon name="shield" size={19} className="text-[var(--tb-vip)]" strokeWidth={1.75} />
  </span>
  <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>مدیریت</span>
  </Link>
@@ -358,7 +362,7 @@ export default function SidebarContent({
  <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--tb-account)]">
  <Button variant="link" size="md" onClick={() => setLoginOpen(true)} className={`${linkBase} ${linkInactive} w-full justify-start p-0 tb-text-sm no-underline hover:no-underline`}>
  <span className="flex h-10 w-10 items-center justify-center">
- <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] tb-text-sm">👤</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-bg-muted)]"><Icon name="user" size={15} /></span>
  </span>
  <span className={`${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"} truncate transition-all`}>ورود</span>
  </Button>

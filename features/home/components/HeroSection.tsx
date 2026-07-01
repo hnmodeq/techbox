@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import HeroBackground from "@/components/effects/HeroBackground";
 import { moduleColors } from "@/config/module-colors";
 
 const items: { text: string; href: string; module: keyof typeof moduleColors }[] = [
@@ -28,13 +27,10 @@ export default function HeroSection() {
  const item = items[index];
 
  return (
- <section className="relative flex min-h-[300px] flex-col items-center overflow-hidden px-4 pb-10 pt-14 text-center md:min-h-[360px] md:pt-20" dir="rtl">
- <HeroBackground variant="square" />
- <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--tb-bg-primary)]/30 via-transparent to-[var(--tb-bg-primary)]" aria-hidden="true" />
- <div className="relative z-10 flex flex-col items-center">
- <h1 className="tb-text-hero tracking-tight text-[var(--tb-primary)] md:tb-text-hero">تکباکس</h1>
- <p className="mt-3 tb-text-md text-[var(--tb-fg-muted)] md:tb-text-md">پاتوق بچه‌های فناوری اطلاعات</p>
- <div className="hero-rotator mt-6 w-full max-w-2xl">
+    <section className="relative flex min-h-[260px] flex-col items-center px-4 pb-10 pt-14 text-center md:min-h-[300px] md:pt-20" dir="rtl">
+      <div className="relative z-10 flex flex-col items-center">
+        <h1 className="text-6xl font-black tracking-tight text-[var(--tb-primary)] md:text-8xl">تکباکس</h1>
+        <div className="hero-rotator mt-3 w-full max-w-2xl">
  <AnimatePresence mode="wait">
  <motion.div
  key={item.text}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { ChipButton } from "@/components/ui/ChipButton";
 import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
+import { Icon } from "@/design/icons";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };
 
@@ -62,8 +63,8 @@ export default function Chatbot(){
  style={{ zIndex: zIndex.popover }}
  aria-label="چت با تکباکس"
  >
- <span className="tb-text-lg">💬</span>
- <span className="hidden sm:inline">پرسش از تکباکس</span>
+        <Icon name="chat" size={20} strokeWidth={1.75} />
+        <span className="hidden sm:inline">پرسش از تکباکس</span>
  </FloatingActionButton>
 
  {/* panel */}

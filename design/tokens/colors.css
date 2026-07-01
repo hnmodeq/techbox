@@ -7,6 +7,7 @@
      • radius/shadow/blur/opacity/border/motion → their own files
      • text size/weight/leading → typography.css (utility classes)
 
+   Theme: NEUTRAL (grayscale surfaces, no color cast).
    Dark mode uses the native CSS `light-dark()` function. It follows the
    `color-scheme` property, which we flip from the existing `.dark` class
    (set on <html> by the theme toggle). So: light-dark(LIGHT, DARK).
@@ -21,13 +22,13 @@
 }
 
 :root {
-  /* ── Backgrounds ── */
-  --tb-bg-primary:   light-dark(oklch(0.985 0.006 270), #202020); /* app background      */
-  --tb-bg-secondary: light-dark(oklch(1 0 0),           #292929); /* cards / panels / popovers */
-  --tb-bg-muted:     light-dark(oklch(0.94 0.010 270),  #444444); /* muted fills / inputs */
+  /* ── Backgrounds (neutral grays) ── */
+  --tb-bg-primary:   light-dark(oklch(0.985 0 0), oklch(0.16 0 0)); /* app background      */
+  --tb-bg-secondary: light-dark(oklch(1 0 0),     oklch(0.21 0 0)); /* cards / panels / popovers */
+  --tb-bg-muted:     light-dark(oklch(0.955 0 0), oklch(0.26 0 0)); /* muted fills / inputs */
 
-  /* ── Foregrounds (text) ── */
-  --tb-fg-primary:   light-dark(oklch(0.18 0.025 270), #e6edff); /* main text            */
-  --tb-fg-secondary: light-dark(oklch(0.32 0.025 270), #b9c6e6); /* secondary text       */
-  --tb-fg-muted:     light-dark(oklch(0.50 0.025 270), #8aa0c7); /* muted / meta text     */
+  /* ── Foregrounds (text, neutral) ── */
+  --tb-fg-primary:   light-dark(oklch(0.20 0 0), oklch(0.97 0 0)); /* main text       */
+  --tb-fg-secondary: light-dark(oklch(0.38 0 0), oklch(0.82 0 0)); /* secondary text  */
+  --tb-fg-muted:     light-dark(oklch(0.55 0 0), oklch(0.65 0 0)); /* muted / meta    */
 }

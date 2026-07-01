@@ -102,16 +102,17 @@ function buildMeshGradients(colors: string[]): string[] {
 const BorderGlow: React.FC<BorderGlowProps> = ({
  children,
  className = "",
- edgeSensitivity = 30,
- glowColor = "40 80 80",
- backgroundColor = "#120F17",
- borderRadius = 28,
- glowRadius = 40,
- glowIntensity = 1.0,
- coneSpread = 25,
- animated = false,
- colors = ["#c084fc", "#f472b6", "#38bdf8"],
- fillOpacity = 0.5,
+  edgeSensitivity = 30,
+  // Fallbacks only — ModuleBorderGlow always overrides these with resolved design tokens.
+  glowColor = "40 80 80",
+  backgroundColor = "var(--tb-bg-secondary)",
+  borderRadius = 28,
+  glowRadius = 40,
+  glowIntensity = 1.0,
+  coneSpread = 25,
+  animated = false,
+  colors = ["var(--tb-primary)", "var(--tb-vip)", "var(--tb-subnet)"],
+  fillOpacity = 0.5,
 }) => {
  const cardRef = useRef<HTMLDivElement>(null);
  const [isHovered, setIsHovered] = useState(false);
