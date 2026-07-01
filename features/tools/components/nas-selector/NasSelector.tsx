@@ -270,79 +270,90 @@ function ProductCard({
   onToggleCompare: () => void;
   onSelect?: () => void;
 }) {
+  const targetHref = product.shopSlug ? `/shop/${product.shopSlug}` : product.href || `/shop/${product.id}`;
+
+  const renderPrice = () => {
+    if (!product.price || product.price === "مشاوره خرید") {
+      return "مشاوره خرید";
+    }
+    if (typeof product.price === "number") {
+      return `${persianNumber(product.price.toLocaleString("fa-IR"))} تومان`;
+    }
+    return product.price;
+  };
+
   return (
-    <article className="relative overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-4 shadow-[var(--tb-shadow-sm)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-md)]">
-      {rank === 0 ? (
-        <div className="absolute left-4 top-4 rounded-full bg-[linear-gradient(135deg,var(--tb-primary),var(--tb-vip))] px-3 py-1 text-[11px] font-black text-[var(--tb-on-accent)]">
-          بهترین پیشنهاد
-        </div>
-      ) : null}
-
-      <div className="flex items-start gap-4">
-        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--tb-primary)_20%,transparent),transparent_45%),var(--tb-bg-muted)]">
-          <Icon name={product.formFactor === "rackmount" ? "server" : "disk"} className="h-9 w-9 text-[var(--tb-primary)]" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="text-[16px] font-black text-[var(--tb-fg-primary)]">{product.title}</h3>
-          <p className="mt-1 text-[12px] leading-6 text-[var(--tb-fg-muted)]">{product.subtitle}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {product.tags.map((tag) => <span key={tag} className="badge">{tag}</span>)}
+    <article className="relative overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-5 shadow-[var(--tb-shadow-sm)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-md)] flex flex-col justify-between">
+      <div>
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--tb-primary)_20%,transparent),transparent_45%),var(--tb-bg-muted)]">
+              <Icon name={product.formFactor === "rackmount" ? "server" : "disk"} className="h-7 w-7 text-[var(--tb-primary)]" />
+            </div>
+            <div>
+              <h3 className="text-[16px] font-black text-[var(--tb-fg-primary)]">{product.title}</h3>
+              <p className="mt-0.5 text-[12px] text-[var(--tb-fg-muted)]">{product.subtitle}</p>
+            </div>
           </div>
+          {rank === 0 ? (
+            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--tb-primary),var(--tb-vip))] px-3 py-1 text-[11px] font-black text-[var(--tb-on-accent)] shadow-sm">
+              بهترین پیشنهاد
+            </span>
+          ) : null}
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {product.tags.map((tag) => <span key={tag} className="badge">{tag}</span>)}
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {[
+            ["Bay", persianNumber(product.bays)],
+            ["ظرفیت RAID", `${persianNumber(product.usableTb)} TB`],
+            ["RAM", `${persianNumber(product.maxRamGb)} GB`],
+            ["شبکه", `${persianNumber(product.networkGbE)} GbE`],
+          ].map(([label, value]) => (
+            <div key={label as string} className="rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-muted)] p-2.5 text-center">
+              <div className="text-[11px] text-[var(--tb-fg-muted)]">{label}</div>
+              <div className="mt-1 text-[13px] font-black text-[var(--tb-fg-primary)]">{value}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[var(--tb-bg-muted)]">
+            <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--tb-success),var(--tb-primary))]" style={{ width: `${product.match}%` }} />
+          </div>
+          <span className="text-[13px] font-black text-[var(--tb-fg-primary)]">{persianNumber(product.match)}٪ تطابق</span>
+        </div>
+
+        <div className="mt-4 space-y-2">
+          {product.reasons.map((reason) => (
+            <div key={reason} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--tb-fg-secondary)]">
+              <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-success)]" />
+              <span>{reason}</span>
+            </div>
+          ))}
+          {product.warnings.map((warning) => (
+            <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--tb-fg-muted)]">
+              <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-warning)]" />
+              <span>{warning}</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {[
-          ["Bay", persianNumber(product.bays)],
-          ["ظرفیت RAID", `${persianNumber(product.usableTb)} TB`],
-          ["RAM", `${persianNumber(product.maxRamGb)} GB`],
-          ["شبکه", `${persianNumber(product.networkGbE)} GbE`],
-        ].map(([label, value]) => (
-          <div key={label as string} className="rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-muted)] p-3 text-center">
-            <div className="text-[11px] text-[var(--tb-fg-muted)]">{label}</div>
-            <div className="mt-1 text-[13px] font-black text-[var(--tb-fg-primary)]">{value}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 flex items-center gap-3">
-        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[var(--tb-bg-muted)]">
-          <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--tb-success),var(--tb-primary))]" style={{ width: `${product.match}%` }} />
+      <div className="mt-5 pt-4 border-t border-[var(--tb-border)] flex flex-wrap items-center justify-between gap-3">
+        <div className="text-[14px] font-bold text-[var(--tb-shop)]">
+          {renderPrice()}
         </div>
-        <span className="text-[13px] font-black text-[var(--tb-fg-primary)]">{persianNumber(product.match)}٪ تطابق</span>
-      </div>
-
-      <div className="mt-4 space-y-2">
-        {product.reasons.map((reason) => (
-          <div key={reason} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--tb-fg-secondary)]">
-            <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-success)]" />
-            <span>{reason}</span>
-          </div>
-        ))}
-        {product.warnings.map((warning) => (
-          <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--tb-fg-muted)]">
-            <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-warning)]" />
-            <span>{warning}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-2">
-        {product.href ? (
-          <a href={product.href} onClick={onSelect} className="btn btn-primary flex-1">مشاهده / خرید</a>
-        ) : (
-          <button type="button" onClick={onSelect} className="btn btn-primary flex-1">مشاهده / خرید</button>
-        )}
-        <button type="button" onClick={onToggleCompare} className={cn("btn btn-ghost", selected && "bg-[var(--tb-bg-muted)] text-[var(--tb-primary)]")}>
-          {selected ? "حذف از مقایسه" : "افزودن به مقایسه"}
-        </button>
-      </div>
-
-      {product.price ? (
-        <div className="mt-3 text-left text-[12px] text-[var(--tb-fg-muted)]">
-          {persianNumber(product.price.toLocaleString("fa-IR"))} تومان
+        <div className="flex gap-2 flex-1 sm:flex-none">
+          <a href={targetHref} onClick={onSelect} className="btn btn-primary px-5">مشاهده در فروشگاه</a>
+          <button type="button" onClick={onToggleCompare} className={cn("btn btn-ghost", selected && "bg-[var(--tb-bg-muted)] text-[var(--tb-primary)]")}>
+            {selected ? "حذف از مقایسه" : "مقایسه"}
+          </button>
         </div>
-      ) : null}
+      </div>
     </article>
   );
 }
@@ -358,6 +369,8 @@ export function NasSelector({
   const [state, setState] = React.useState<SelectorState>({ ...defaultSelectorState, ...initialState });
   const [compareIds, setCompareIds] = React.useState<string[]>([]);
 
+  const isOptionSelected = Boolean(state.persona || state.workloads.length > 0);
+
   const minBays = React.useMemo(() => minimumBaysForCapacity(state.usableTb, state.driveTb, state.raid), [state.usableTb, state.driveTb, state.raid]);
   const recommendations = React.useMemo(
     () => products.map((product) => scoreProduct(product, state)).sort((a, b) => b.match - a.match),
@@ -370,7 +383,7 @@ export function NasSelector({
     setState((prev) => {
       const exists = prev.workloads.includes(workload);
       const next = exists ? prev.workloads.filter((item) => item !== workload) : [...prev.workloads, workload];
-      return { ...prev, workloads: next.length ? next : prev.workloads };
+      return { ...prev, workloads: next };
     });
   };
   const toggleCompare = (id: string) => {
@@ -381,17 +394,11 @@ export function NasSelector({
     <section dir="rtl" className={cn("font-sans text-[var(--tb-fg-primary)]", className)}>
       <div className="relative overflow-hidden rounded-[calc(var(--tb-radius-lg)+8px)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] shadow-[var(--tb-shadow-md)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--tb-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--tb-vip)_14%,transparent),transparent_30%)]" />
-        <div className="relative grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.05fr)_380px] lg:p-8">
+        <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="badge bg-[color-mix(in_oklch,var(--tb-tools)_16%,var(--tb-bg-muted))] text-[var(--tb-fg-primary)]">
-                <Icon name="server" className="h-3.5 w-3.5" /> انتخاب‌گر NAS
-              </span>
-              <span className="badge">RTL / فارسی / TailwindCSS 4</span>
-            </div>
-            <h1 className="mt-4 tb-text-hero">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
+            <h1 className="tb-text-hero">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-8 text-[var(--tb-fg-muted)]">
-              نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌ها را رتبه‌بندی و دلیل پیشنهاد را نمایش می‌دهد.
+              نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
             </p>
 
             <div className="mt-6 grid gap-5">
@@ -491,39 +498,51 @@ export function NasSelector({
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="rounded-[calc(var(--tb-radius-lg)+6px)] border border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-bg-secondary)_88%,transparent)] p-4 shadow-[var(--tb-shadow-lg)] backdrop-blur-[var(--tb-blur-md)]">
-              <div className="flex items-start justify-between gap-3">
+          {/* Results section positioned BELOW the tool */}
+          <div className="border-t border-[var(--tb-border)] pt-8">
+            <div className="rounded-[calc(var(--tb-radius-lg)+6px)] border border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-bg-secondary)_88%,transparent)] p-6 shadow-[var(--tb-shadow-lg)] backdrop-blur-[var(--tb-blur-md)]">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--tb-border)] pb-4">
                 <div>
-                  <h2 className="text-[18px] font-black">نتایج پیشنهادی</h2>
-                  <p className="mt-1 text-[12px] leading-6 text-[var(--tb-fg-muted)]">رتبه‌بندی زنده بر اساس امتیاز تطابق</p>
+                  <h2 className="text-[20px] font-black">نتایج و مدل‌های پیشنهادی فروشگاه</h2>
+                  <p className="mt-1 text-[13px] text-[var(--tb-fg-muted)]">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
                 </div>
-                {top ? <span className="badge text-[var(--tb-primary)]">{persianNumber(top.match)}٪ بهترین</span> : null}
+                {isOptionSelected && top ? <span className="badge text-[var(--tb-primary)]">{persianNumber(top.match)}٪ بهترین انتخاب</span> : null}
               </div>
 
-              <div className="mt-4 space-y-4">
-                {recommendations.slice(0, 4).map((product, index) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    rank={index}
-                    selected={compareIds.includes(product.id)}
-                    onToggleCompare={() => toggleCompare(product.id)}
-                    onSelect={() => onProductSelect?.(product, state)}
-                  />
-                ))}
-              </div>
+              {!isOptionSelected ? (
+                <div className="my-10 text-center p-8 rounded-[var(--tb-radius-lg)] border border-dashed border-[var(--tb-border)] bg-[var(--tb-bg-muted)]/40">
+                  <Icon name="server" className="h-10 w-10 mx-auto text-[var(--tb-fg-muted)] mb-3 opacity-60" />
+                  <p className="tb-text-md font-bold text-[var(--tb-fg-primary)]">هیچ گزینه‌ای انتخاب نشده است</p>
+                  <p className="mt-2 tb-text-sm text-[var(--tb-fg-muted)] max-w-md mx-auto">
+                    لطفاً ابتدا نوع استفاده یا حداقل یک سرویس را از گزینه‌های بالا انتخاب کنید تا بهترین دستگاه‌های NAS موجود در فروشگاه محاسبه و نمایش داده شوند.
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                  {recommendations.slice(0, 4).map((product, index) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      rank={index}
+                      selected={compareIds.includes(product.id)}
+                      onToggleCompare={() => toggleCompare(product.id)}
+                      onSelect={() => onProductSelect?.(product, state)}
+                    />
+                  ))}
+                </div>
+              )}
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="btn btn-ghost">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
-                <a href={consultationHref} className="btn btn-primary">درخواست مشاوره</a>
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--tb-border)]">
+                <div className="flex gap-2">
+                  <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="btn btn-ghost">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
+                  <a href={consultationHref} className="btn btn-primary">درخواست مشاوره تخصصی</a>
+                </div>
+                <p className="text-[12px] text-[var(--tb-fg-muted)]">
+                  ظرفیت RAID تقریبی است و باید با محدودیت فایل‌سیستم و سیاست بکاپ نهایی شود.
+                </p>
               </div>
-
-              <p className="mt-4 rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-muted)] p-3 text-[11px] leading-6 text-[var(--tb-fg-muted)]">
-                نکته: ظرفیت RAID تقریبی است و باید با محدودیت فایل‌سیستم، رزرو Snapshot، Hot Spare و سیاست بکاپ شما نهایی‌سازی شود.
-              </p>
             </div>
-          </aside>
+          </div>
         </div>
       </div>
     </section>
