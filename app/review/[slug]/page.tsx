@@ -1,5 +1,5 @@
 import { getBySlug, getModuleItems } from "@/lib/content";
-import ContentDetail from "@/features/content/components/ContentDetail";
+import ReviewDetail from "@/features/review/components/ReviewDetail";
 import { notFound } from "next/navigation";
 
 type P = Promise<{ slug: string }>;
@@ -14,12 +14,12 @@ export default async function Page({ params }: { params: P }) {
  const mod = "review" as any;
  const item = getBySlug(mod, slug);
  if (!item) return notFound();
- return <ContentDetail item={item} />;
+ return <ReviewDetail item={item} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {
  const { slug } = await params;
  const mod = "review" as any;
  const item = getBySlug(mod, slug);
- return { title: item ? `${item.title} | تکباکس`: "یافت نشد" };
+ return { title: item ? `${item.title} | نقد و بررسی تکباکس`: "یافت نشد" };
 }
