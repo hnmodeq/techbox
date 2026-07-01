@@ -318,7 +318,7 @@ export default function SidebarContent({
  >
  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tb-primary)]" />}
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
- <Icon size={19} className={`${iconClass} ${hoverClass}`} strokeWidth={1.75} />
+ <Icon size={19} className={`${iconClass} ${hoverClass} transition-colors duration-[var(--tb-motion-md)]`} strokeWidth={1.75} />
  </span>
  <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>{item.title}</span>
  </Link>

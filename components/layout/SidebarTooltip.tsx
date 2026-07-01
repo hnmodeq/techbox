@@ -69,7 +69,7 @@ export default function SidebarTooltip({
  <>
  <span
  ref={triggerRef}
- className="inline-flex"
+ className="flex w-full"
  onMouseEnter={show}
  onMouseLeave={hide}
  onFocus={show}
