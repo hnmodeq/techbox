@@ -137,3 +137,10 @@ When inspecting or extending the site, reference these exact source-of-truth imp
 9. `features/media/components/MediaGallery.tsx` – Full-bleed gradient video cards and interactive pop-up modal player.
 10. `features/review/components/ReviewGrid.tsx` & `ReviewDetail.tsx` – Wide horizontal review cards and strengths/weaknesses architecture.
 11. `features/shop/components/ShopGrid.tsx` – Hardware gallery, inline dropdown filters, and consultation actions.
+
+
+
+
+
+
+
