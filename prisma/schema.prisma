@@ -82,3 +82,59 @@ model Like {
 
   @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
 }
+
+model TimelineEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  image       String?
+  dateGr      DateTime @unique
+  dateFa      String   @unique
+  year        Int
+  yearFa      Int
+  importance  Int      @default(5)
+  tags        String   @default("[]")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  comments TimelineComment[]
+  likes    TimelineLike[]
+}
+
+model TimelineComment {
+  id         String   @id @default(cuid())
+  eventId    String
+  parentId   String?
+  authorName String   @default("مهمان")
+  text       String
+  likes      Int      @default(0)
+  dislikes   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  event   TimelineEvent       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  parent  TimelineComment?    @relation("TimelineCommentReplies", fields: [parentId], references: [id])
+  replies TimelineComment[]   @relation("TimelineCommentReplies")
+  votes   TimelineCommentVote[]
+}
+
+model TimelineCommentVote {
+  id          String  @id @default(cuid())
+  fingerprint String
+  commentId   String
+  vote        Int
+
+  comment TimelineComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([fingerprint, commentId], name: "timeline_fingerprint_commentId")
+}
+
+model TimelineLike {
+  id          String @id @default(cuid())
+  fingerprint String
+  eventId     String
+
+  event TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([fingerprint, eventId], name: "timeline_fingerprint_eventId")
+}
