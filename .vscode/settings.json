@@ -15,6 +15,7 @@
     "**/.git": true,
     "**/.env": true,
     "**/.env.local": true,
+    "**.env.example": true,
     "**/.gitattributes": true,
     "**/.gitignore": true,
     "**/next-env.d.ts": true,
@@ -23,7 +24,8 @@
     "**/components.json": true,
     "**/next.config.ts": true,
     "**/eslint.config.mjs": true,
-    "**/package.json": false,
+    "**/package.json": true,
+    "**/package-lock.json": true,
     "**/pnpm-lock.yaml": true,
     "**/pnpm-workspace.yaml": true,
     "**/postcss.config.mjs": true,
@@ -39,7 +41,6 @@
     "**/.config" : true,
     "**/.continue" : true,
     "**/.vercel" : true,
-
   },
   "prisma.pinToPrisma6": true,
   "js/ts.tsdk.path": "node_modules\\typescript\\lib"
