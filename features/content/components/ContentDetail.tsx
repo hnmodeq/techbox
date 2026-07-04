@@ -3,6 +3,7 @@ import { type ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { Icon } from "@/design/icons";
 import { LikeButton } from "@/components/ui/LikeButton";
+import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import Link from "next/link";
@@ -33,7 +34,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  </div>
  <div className="ms-auto flex items-center gap-2 text-[var(--tb-fg-muted)]">
- <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{(item.views ?? 120).toLocaleString("fa-IR")}</span>
+ <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views ?? 120} />
  </div>
  </div>
 
@@ -47,7 +48,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
  />
  <div className="bg-[var(--tb-bg-secondary)] px-4 py-2 tb-text-sm text-[var(--tb-fg-muted)] flex gap-4">
- <span className="inline-flex items-center gap-1"><Icon name="view" size={15} strokeWidth={1.75} />{(item.views ?? 120).toLocaleString("fa-IR")} بازدید</span>
+ <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views ?? 120} showLabel />
  <span className="inline-flex items-center gap-1"><Icon name="like" size={15} strokeWidth={1.75} />{(item.likes ?? 12).toLocaleString("fa-IR")} پسند</span>
  <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} strokeWidth={1.75} />نظرات فعال</span>
  </div>
