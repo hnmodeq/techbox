@@ -1,7 +1,7 @@
 # Project Structure
 
 ```
-techbox-made-by-arena
+techbox
 ├── .config
 │   └── nextjs-nodejs
 │       └── config.json
@@ -15,6 +15,94 @@ techbox-made-by-arena
 │       ├── frontend-patterns.md
 │       ├── tech-stack.md
 │       └── ui-design-system.md
+├── .TO-DO.LIST
+│   ├── Admin
+│   │   ├── Analytics Specialist
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── Blog Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── Designer
+│   │   │   └── Main Page.txt
+│   │   ├── Download Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── Forum Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── Media Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── News Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── Owner
+│   │   │   ├── Main Page.txt
+│   │   │   └── Roles Managing.txt
+│   │   ├── Product Speciallist
+│   │   │   └── Main Page.txt
+│   │   ├── Review Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   ├── Shop Editor
+│   │   │   ├── Main Page.txt
+│   │   │   ├── Slug Edit Page.txt
+│   │   │   └── Slug New Page.txt
+│   │   └── Social Network Manager
+│   │       ├── Main Page.txt
+│   │       ├── Slug Edit Page.txt
+│   │       └── Slug New Page.txt
+│   ├── Global
+│   │   ├── Footer Edits.txt
+│   │   ├── Global Edits.txt
+│   │   ├── Home Page Header.txt
+│   │   ├── Rest of the Website Headers.txt
+│   │   └── Sidebar.txt
+│   ├── Main Pages
+│   │   ├── About Us.txt
+│   │   ├── Blog.txt
+│   │   ├── Contact Us.txt
+│   │   ├── Download.txt
+│   │   ├── Forum.txt
+│   │   ├── Home.txt
+│   │   ├── Media.txt
+│   │   ├── NAS Selector.txt
+│   │   ├── News.txt
+│   │   ├── NVR Selector.txt
+│   │   ├── Profile.txt
+│   │   ├── Rack Customize.txt
+│   │   ├── RAID Calculator.txt
+│   │   ├── Review .txt
+│   │   ├── Shop.txt
+│   │   ├── Subnet Calculator.txt
+│   │   ├── Technology Timeline.txt
+│   │   ├── Tools.txt
+│   │   └── Work with Us.txt
+│   ├── Modals
+│   │   ├── Chatbot.txt
+│   │   ├── Consultation.txt
+│   │   ├── Downloading Message.txt
+│   │   ├── Login.txt
+│   │   ├── Media Video Player.txt
+│   │   ├── Notification.txt
+│   │   └── Shopping Basket.txt
+│   └── Slug Pages
+│       ├── Blog Author.txt
+│       ├── Blog.txt
+│       ├── Force News.txt
+│       ├── Forum Topics.txt
+│       ├── News Slug Page.txt
+│       ├── Reviews.txt
+│       ├── Shop Products.txt
+│       └── Work with Us.txt
 ├── app
 │   ├── about
 │   │   └── page.tsx
@@ -29,14 +117,24 @@ techbox-made-by-arena
 │   │   │   └── page.tsx
 │   │   ├── roles
 │   │   │   └── page.tsx
+│   │   ├── timeline
+│   │   │   ├── components
+│   │   │   │   └── TimelineEventForm.tsx
+│   │   │   └── page.tsx
 │   │   └── page.tsx
 │   ├── api
 │   │   ├── auth
+│   │   │   ├── change-password
+│   │   │   │   └── route.ts
 │   │   │   ├── login
 │   │   │   │   └── route.ts
 │   │   │   ├── logout
 │   │   │   │   └── route.ts
-│   │   │   └── me
+│   │   │   ├── me
+│   │   │   │   └── route.ts
+│   │   │   ├── profile
+│   │   │   │   └── route.ts
+│   │   │   └── register
 │   │   │       └── route.ts
 │   │   ├── chat
 │   │   │   └── route.ts
@@ -52,7 +150,20 @@ techbox-made-by-arena
 │   │   │       │   └── route.ts
 │   │   │       └── verify
 │   │   │           └── route.ts
-│   │   └── posts
+│   │   ├── posts
+│   │   │   └── route.ts
+│   │   ├── stats
+│   │   │   └── route.ts
+│   │   ├── timeline
+│   │   │   ├── comments
+│   │   │   │   └── route.ts
+│   │   │   ├── events
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   └── like
+│   │   │       └── route.ts
+│   │   └── views
 │   │       └── route.ts
 │   ├── blog
 │   │   ├── [slug]
@@ -90,6 +201,10 @@ techbox-made-by-arena
 │   │   ├── checkout
 │   │   │   └── page.tsx
 │   │   └── page.tsx
+│   ├── timeline
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── readme.md
 │   ├── tools
 │   │   ├── [slug]
 │   │   │   └── page.tsx
@@ -142,6 +257,7 @@ techbox-made-by-arena
 │       ├── Badge.tsx
 │       ├── Button.tsx
 │       ├── Card.tsx
+│       ├── CardStats.tsx
 │       ├── Checkbox.tsx
 │       ├── Chip.tsx
 │       ├── ChipButton.tsx
@@ -153,6 +269,7 @@ techbox-made-by-arena
 │       ├── index.ts
 │       ├── Input.tsx
 │       ├── LikeButton.tsx
+│       ├── LiveViewCounter.tsx
 │       ├── MediaSelectorCard.tsx
 │       ├── Modal.tsx
 │       ├── ModuleBadge.tsx
@@ -176,6 +293,7 @@ techbox-made-by-arena
 │   ├── index.ts
 │   ├── module.constants.ts
 │   ├── routes.constants.ts
+│   ├── timeline.ts
 │   └── validation.constants.ts
 ├── data
 │   ├── blog.json
@@ -189,6 +307,7 @@ techbox-made-by-arena
 │   ├── nvr-products.json
 │   ├── review.json
 │   ├── shop.json
+│   ├── timeline.json
 │   ├── tools.json
 │   └── users.json
 ├── design
@@ -247,13 +366,24 @@ techbox-made-by-arena
 │   │       └── DownloadTable.tsx
 │   ├── forum
 │   │   └── components
+│   │       ├── ForumDetail.tsx
 │   │       └── ForumList.tsx
 │   ├── home
 │   │   └── components
+│   │       ├── DownloadRow.tsx
+│   │       ├── ForumRow.tsx
 │   │       ├── HeroSection.tsx
 │   │       ├── HomeModulesSection.tsx
+│   │       ├── HomeRowConfig.ts
+│   │       ├── HomeTimelineRow.tsx
+│   │       ├── HomeToolsRow.tsx
+│   │       ├── MagazineRow.tsx
+│   │       ├── NewsSidebar.tsx
+│   │       ├── ReviewRow.tsx
+│   │       ├── ShopRow.tsx
 │   │       ├── TeamChromaSection.tsx
-│   │       └── TechLogoLoopSection.tsx
+│   │       ├── TechLogoLoopSection.tsx
+│   │       └── VideoReelsRow.tsx
 │   ├── media
 │   │   └── components
 │   │       ├── MediaGallery.tsx
@@ -264,10 +394,25 @@ techbox-made-by-arena
 │   │       └── NewsTicker.tsx
 │   ├── review
 │   │   └── components
+│   │       ├── ReviewDetail.tsx
 │   │       └── ReviewGrid.tsx
 │   ├── shop
 │   │   └── components
 │   │       └── ShopGrid.tsx
+│   ├── timeline
+│   │   ├── components
+│   │   │   ├── index.ts
+│   │   │   ├── TimelineCard.tsx
+│   │   │   ├── TimelineContainer.tsx
+│   │   │   ├── TimelineError.tsx
+│   │   │   ├── TimelineLoading.tsx
+│   │   │   └── ZoomControls.tsx
+│   │   ├── hooks
+│   │   │   ├── index.ts
+│   │   │   ├── usePan.ts
+│   │   │   ├── useTimelineEvents.ts
+│   │   │   └── useTimelineZoom.ts
+│   │   └── index.ts
 │   └── tools
 │       └── components
 │           ├── nas-selector
@@ -295,14 +440,15 @@ techbox-made-by-arena
 │   ├── db.ts
 │   ├── fonts.ts
 │   ├── get-module-gradient.ts
+│   ├── jalali.ts
 │   ├── modules.ts
 │   ├── nas.ts
 │   ├── nvr.ts
 │   ├── tools.ts
 │   └── utils.ts
 ├── prisma
-│   ├── dev.db
 │   ├── schema.prisma
+│   ├── seed-timeline.ts
 │   └── seed.ts
 ├── providers
 │   ├── auth.provider.tsx
@@ -338,6 +484,9 @@ techbox-made-by-arena
 ├── readme
 │   ├── continue.config.txt
 │   ├── data.md
+│   ├── DATABASE_SETUP.md
+│   ├── QUICK_START.md
+│   ├── TIMELINE_USAGE.md
 │   └── tree.md
 ├── scripts
 │   ├── data.cjs
@@ -358,11 +507,8 @@ techbox-made-by-arena
 │   ├── content.ts
 │   ├── index.ts
 │   ├── sidebar.types.ts
+│   ├── timeline.ts
 │   └── user.ts
-├── uploads
-│   ├── codes.txt
-│   ├── data.txt
-│   └── tree.txt
 ├── eslint.config.mjs
 ├── next-env.d.ts
 ├── next.config.mjs
@@ -371,6 +517,7 @@ techbox-made-by-arena
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.mjs
+├── TIMELINE_ARCHITECTURE.md
 ├── tsconfig.json
 └── tsconfig.tsbuildinfo
 ```

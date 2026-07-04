@@ -25,7 +25,7 @@
     "**/next.config.ts": true,
     "**/eslint.config.mjs": true,
     "**/package.json": true,
-    "**/package-lock.json": true,
+    "**/package-lock.json": false,
     "**/pnpm-lock.yaml": true,
     "**/pnpm-workspace.yaml": true,
     "**/postcss.config.mjs": true,
