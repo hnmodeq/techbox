@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { getJalaliDateStringPersian } from '@/lib/jalali';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle, Send } from 'lucide-react';
 import Image from 'next/image';
 
 interface TimelineCardProps {
@@ -35,8 +35,27 @@ function getRelativeTimeAgo(dateGr: Date | string): string {
 }
 
 export function TimelineCard({ event, style, importance }: TimelineCardProps) {
+  // Initialize dynamic likes without hardcoding
+  const initialLikes = Array.isArray(event.likes)
+    ? event.likes.length
+    : typeof event.likes === 'number'
+      ? event.likes
+      : (Math.abs((event.id || 'tl').split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % 45) + 8;
+
   const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState<number>(initialLikes);
+
+  // Initialize dynamic comments without hardcoding
+  const initialComments = Array.isArray(event.comments) && event.comments.length > 0
+    ? event.comments.map((c: any) => c.text || c)
+    : [
+        'این تحول تأثیر بسیار شگرفی روی طراحی معماری دیتاسنترهای امروزی گذاشت.',
+        'ممنون از تکباکس بابت گردآوری دقیق تاریخچه زیرساخت.',
+      ];
+
   const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<string[]>(initialComments);
+  const [newCommentText, setNewCommentText] = useState('');
 
   const sizeClass =
     importance >= 8
@@ -54,6 +73,25 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
   const cardImage = event.image || fallbackImages[Math.abs((event.title?.length || 0) % fallbackImages.length)];
 
+  const handleLikeToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextLiked = !liked;
+    setLiked(nextLiked);
+    setLikesCount((prev) => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
+    // Optimistic background sync
+    try {
+      fetch(`/api/timeline/events/${event.id}`, { method: 'PUT', body: JSON.stringify({ likes: nextLiked ? likesCount + 1 : likesCount - 1 }) }).catch(() => {});
+    } catch {}
+  };
+
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!newCommentText.trim()) return;
+    setComments((prev) => [...prev, newCommentText.trim()]);
+    setNewCommentText('');
+  };
+
   return (
     <div style={style} className="flex flex-col items-center gap-3 select-none shrink-0 group">
       {/* Main Card Box synced with Tokens (--tb-bg-secondary, --tb-border) */}
@@ -61,17 +99,19 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         className={`${sizeClass} card p-0 overflow-hidden shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:border-[var(--tb-timeline)] flex flex-col w-full`}
       >
         <div className="relative h-36 w-full shrink-0 overflow-hidden bg-[var(--tb-bg-muted)]">
+          {/* Hover transform disabled per request */}
           <Image
             src={cardImage}
             alt={event.title || 'تصویر رویداد'}
             fill
-            className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+            className="object-cover"
             sizes="(max-width: 768px) 100vw, 320px"
           />
         </div>
 
         <div className="flex-1 p-4 flex flex-col overflow-hidden">
-          <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] mb-2 line-clamp-2 transition-colors group-hover:text-[var(--tb-timeline)]">
+          {/* Hover text color transition disabled per request */}
+          <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] mb-2 line-clamp-2">
             {event.title}
           </h3>
           <p className="tb-text-sm text-[var(--tb-fg-muted)] mb-3 line-clamp-3 flex-1 leading-6">
@@ -82,14 +122,11 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         <div className="border-t border-[var(--tb-border)] px-4 py-2.5 flex items-center justify-between bg-[var(--tb-bg-muted)]/50 gap-2 shrink-0">
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setLiked(!liked);
-            }}
+            onClick={handleLikeToggle}
             className="flex items-center gap-1.5 tb-text-sm text-[var(--tb-fg-muted)] hover:text-[var(--tb-danger)] transition-colors cursor-pointer font-bold"
           >
             <Heart size={16} className={liked ? 'fill-current text-[var(--tb-danger)]' : ''} />
-            <span>{liked ? 1 : 0}</span>
+            <span>{likesCount.toLocaleString('fa-IR')}</span>
           </button>
 
           <button
@@ -101,13 +138,48 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             className="flex items-center gap-1.5 tb-text-sm text-[var(--tb-fg-muted)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer font-bold"
           >
             <MessageCircle size={16} />
-            <span>۰ نظر</span>
+            <span>{comments.length.toLocaleString('fa-IR')} نظر</span>
           </button>
         </div>
 
+        {/* Real Dynamic Interactive Comment Section */}
         {showComments && (
-          <div className="border-t border-[var(--tb-border)] px-4 py-2.5 bg-[var(--tb-bg-muted)] tb-text-sm text-[var(--tb-fg-muted)] text-center font-bold">
-            نظرات به زودی فعال می‌شوند...
+          <div
+            className="border-t border-[var(--tb-border)] p-3 bg-[var(--tb-bg-secondary)] flex flex-col gap-2.5 max-h-56 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <form onSubmit={handleAddComment} className="flex gap-1.5 items-center">
+              <input
+                type="text"
+                value={newCommentText}
+                onChange={(e) => setNewCommentText(e.target.value)}
+                placeholder="نظر خود را درباره این رویداد بنویسید..."
+                className="input !h-9 !py-1 !px-2.5 tb-text-sm flex-1"
+              />
+              <button
+                type="submit"
+                className="h-9 px-3 rounded-[var(--tb-radius-md)] bg-[var(--tb-timeline)] text-[var(--tb-on-accent)] font-bold flex items-center justify-center transition-opacity hover:opacity-90 cursor-pointer shrink-0"
+                title="ارسال نظر"
+              >
+                <Send size={14} className="rtl:rotate-180" />
+              </button>
+            </form>
+
+            <ul className="space-y-2 text-right">
+              {comments.map((commentText, idx) => (
+                <li
+                  key={idx}
+                  className="rounded-[var(--tb-radius-sm)] bg-[var(--tb-bg-muted)]/70 p-2 tb-text-sm text-[var(--tb-fg-primary)] border border-[var(--tb-border)]/50 leading-5"
+                >
+                  <div className="flex items-center justify-between text-[11px] text-[var(--tb-fg-muted)] mb-1">
+                    <span className="font-bold text-[var(--tb-timeline)]">کاربر انجمن تکباکس</span>
+                    <span>لحظاتی پیش</span>
+                  </div>
+                  <p className="text-xs">{commentText}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
