@@ -5,27 +5,19 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Icon } from '@/design/icons';
 
 export default function ShopRow() {
-  const products = getLatest('shop', 4);
+  const products = getLatest('shop', 5);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">
-      <div className="mx-auto max-w-7xl w-full">
-        <div className="flex items-end justify-between mb-8 border-b border-[var(--tb-border)]/60 pb-4">
-          <div>
-            <span className="badge !bg-[color-mix(in_oklch,var(--tb-shop)_15%,transparent)] !text-[var(--tb-shop)] font-black mb-2">
-              فروشگاه تخصصی زیرساخت
-            </span>
-            <h2 className="tb-text-big-title text-[var(--tb-fg-primary)]">جدیدترین تجهیزات سرور، استوریج و شبکه</h2>
-          </div>
-          <Link href="/shop" className="btn btn-ghost text-[var(--tb-shop)] font-bold">
-            مشاهده کل فروشگاه ←
-          </Link>
+      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
+        {/* Title without colorful badge and without separator border */}
+        <div className="mb-6">
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">جدیدترین تجهیزات سرور، استوریج و شبکه</h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((prod) => (
             <Link
               key={prod.slug}
@@ -40,14 +32,10 @@ export default function ShopRow() {
                   className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
-                <span className="absolute top-3 left-3 rounded-full border border-white/30 bg-black/60 px-2.5 py-0.5 tb-text-sm text-white backdrop-blur-md">
-                  موجود در فروشگاه
-                </span>
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1">{prod.category || 'تجهیزات'}</div>
                   <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[48px] leading-6">
                     {prod.title}
                   </h3>
@@ -68,6 +56,13 @@ export default function ShopRow() {
               </div>
             </Link>
           ))}
+        </div>
+
+        {/* Full-width More Button at bottom center */}
+        <div className="mt-8 w-full">
+          <Link href="/shop" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
+            مشاهده کل فروشگاه زیرساخت ←
+          </Link>
         </div>
       </div>
     </section>

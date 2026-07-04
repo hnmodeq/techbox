@@ -20,24 +20,17 @@ function Stars({ rating }: { rating: number }) {
 }
 
 export default function ReviewRow() {
-  const reviews = getLatest('review', 4);
+  const reviews = getLatest('review', 5);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.reviewMinHeight} flex flex-col justify-center`} dir="rtl">
-      <div className="mx-auto max-w-7xl w-full">
-        <div className="flex items-end justify-between mb-8 border-b border-[var(--tb-border)]/60 pb-4">
-          <div>
-            <span className="badge !bg-[color-mix(in_oklch,var(--tb-review)_15%,transparent)] !text-[var(--tb-review)] font-black mb-2">
-              نقد و بررسی آزمایشگاهی
-            </span>
-            <h2 className="tb-text-big-title text-[var(--tb-fg-primary)]">بنچمارک‌ها و تست‌های عملی سخت‌افزار</h2>
-          </div>
-          <Link href="/review" className="btn btn-ghost text-[var(--tb-review)] font-bold">
-            مشاهده تمام بررسی‌ها ←
-          </Link>
+      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
+        {/* Title without colorful badge and without separator border */}
+        <div className="mb-6">
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">بنچمارک‌ها و تست‌های عملی سخت‌افزار</h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {reviews.map((rev, idx) => {
             const rating = 4.8 - idx * 0.15;
             return (
@@ -54,9 +47,6 @@ export default function ReviewRow() {
                     className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 300px"
                   />
-                  <span className="absolute top-3 right-3 rounded-full border border-white/30 bg-black/60 px-2.5 py-0.5 tb-text-sm text-white backdrop-blur-md">
-                    {rev.category || 'بررسی'}
-                  </span>
                 </div>
 
                 <div className="p-4 flex-1 flex flex-col justify-between">
@@ -80,6 +70,13 @@ export default function ReviewRow() {
               </Link>
             );
           })}
+        </div>
+
+        {/* Full-width More Button at bottom center */}
+        <div className="mt-8 w-full">
+          <Link href="/review" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
+            مشاهده تمام بررسی‌ها ←
+          </Link>
         </div>
       </div>
     </section>

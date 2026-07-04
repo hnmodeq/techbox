@@ -321,7 +321,7 @@ export default function RaidCalculator() {
                 <div className="badge">{nf.format(drives.length)} دیسک فعال</div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-7 xl:grid-cols-13">
                 {QUICK_SIZES.map((size) => (
                   <button
                     key={size}
@@ -334,7 +334,7 @@ export default function RaidCalculator() {
                 ))}
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
                 {drives.map((drive, index) => (
                   <div key={drive.id} className="group rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-3 transition hover:border-[color-mix(in_oklch,var(--tb-raid)_42%,var(--tb-border))]">
                     <div className="mb-3 flex items-center justify-between gap-3">
@@ -380,7 +380,7 @@ export default function RaidCalculator() {
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                 {RAID_OPTIONS.map((option) => {
                   const active = raid === option.key;
                   return (

@@ -5,28 +5,20 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Icon } from '@/design/icons';
 
 export default function ForumRow() {
-  const topics = getLatest('forum', 4);
+  const topics = getLatest('forum', 6);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-forum)_4%,var(--tb-bg-primary))] ${HOME_ROW_SIZES.forumMinHeight} flex flex-col justify-center`} dir="rtl">
-      <div className="mx-auto max-w-7xl w-full">
-        <div className="flex items-end justify-between mb-8 border-b border-[var(--tb-border)]/60 pb-4">
-          <div>
-            <span className="badge !bg-[color-mix(in_oklch,var(--tb-forum)_15%,transparent)] !text-[var(--tb-forum)] font-black mb-2">
-              انجمن تخصصی تکباکس
-            </span>
-            <h2 className="tb-text-big-title text-[var(--tb-fg-primary)]">داغ‌ترین بحث‌ها و چالش‌های شبکه و دیتاسنتر</h2>
-          </div>
-          <Link href="/forum" className="btn btn-ghost text-[var(--tb-forum)] font-bold">
-            ورود به انجمن و ثبت پرسش ←
-          </Link>
+      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
+        {/* Title without colorful badge and without separator border */}
+        <div className="mb-6">
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">داغ‌ترین بحث‌ها و چالش‌های شبکه و دیتاسنتر</h2>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {topics.map((top, idx) => {
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {topics.map((top) => {
             const solved = !top.slug.includes('proxmox');
             return (
               <Link
@@ -34,7 +26,6 @@ export default function ForumRow() {
                 href={`/forum/${top.slug}`}
                 className="group card p-5 hover:bg-[var(--tb-bg-muted)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] flex items-start gap-4"
               >
-                {/* Author Avatar */}
                 <Image
                   src={top.author?.avatar || '/assets/hooman.png'}
                   alt={top.author?.name || 'کاربر'}
@@ -74,6 +65,13 @@ export default function ForumRow() {
               </Link>
             );
           })}
+        </div>
+
+        {/* Full-width More Button at bottom center */}
+        <div className="mt-8 w-full">
+          <Link href="/forum" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
+            ورود به انجمن و ثبت پرسش ←
+          </Link>
         </div>
       </div>
     </section>

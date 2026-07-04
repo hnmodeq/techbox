@@ -7,24 +7,17 @@ import Link from 'next/link';
 import { Icon } from '@/design/icons';
 
 export default function DownloadRow() {
-  const files = getLatest('download', 6);
+  const files = getLatest('download', 8);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-download)_4%,var(--tb-bg-primary))] ${HOME_ROW_SIZES.downloadMinHeight} flex flex-col justify-center`} dir="rtl">
-      <div className="mx-auto max-w-7xl w-full">
-        <div className="flex items-end justify-between mb-8 border-b border-[var(--tb-border)]/60 pb-4">
-          <div>
-            <span className="badge !bg-[color-mix(in_oklch,var(--tb-download)_15%,transparent)] !text-[var(--tb-download)] font-black mb-2">
-              مرکز دانلود تکباکس
-            </span>
-            <h2 className="tb-text-big-title text-[var(--tb-fg-primary)]">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
-          </div>
-          <Link href="/download" className="btn btn-ghost text-[var(--tb-download)] font-bold">
-            ورود به مرکز دانلود ←
-          </Link>
+      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
+        {/* Title without colorful badge and without separator border */}
+        <div className="mb-6">
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {files.map((file) => (
             <Link
               key={file.slug}
@@ -52,6 +45,13 @@ export default function DownloadRow() {
               </div>
             </Link>
           ))}
+        </div>
+
+        {/* Full-width More Button at bottom center */}
+        <div className="mt-8 w-full">
+          <Link href="/download" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
+            ورود به مرکز دانلود ←
+          </Link>
         </div>
       </div>
     </section>
