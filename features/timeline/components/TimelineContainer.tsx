@@ -167,9 +167,9 @@ export function TimelineContainer({
             {/* Landmark Dot on Axis */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-xl" />
 
-            {/* Comment Box Below Line */}
+            {/* Comment Box Below Line with more distance */}
             <div
-              className="absolute top-[14px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-xl border-[var(--tb-border)] flex flex-col gap-2.5 z-20"
+              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-xl border-[var(--tb-border)] flex flex-col gap-2.5 z-20"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <form onSubmit={handleAddEarlyComment} className="flex gap-1.5 items-center">
@@ -230,8 +230,8 @@ export function TimelineContainer({
                 {/* 2. Milestone Dot sitting directly on the axis line */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-lg transition-transform hover:scale-125" />
 
-                {/* 3. Card hanging BELOW THE LINE top-aligned (top: 14px) so opening comments expands downward without moving card top position */}
-                <div className="absolute top-[14px] left-1/2 -translate-x-1/2 flex justify-center z-10">
+                {/* 3. Card hanging BELOW THE LINE top-aligned (top: 32px) with generous padding beneath line */}
+                <div className="absolute top-[32px] left-1/2 -translate-x-1/2 flex justify-center z-10">
                   <TimelineCard event={event} importance={event.importance} />
                 </div>
               </div>
@@ -258,8 +258,8 @@ export function TimelineContainer({
             {/* Landmark Dot on Axis */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-xl animate-pulse" />
 
-            {/* Info Card Below Line */}
-            <div className="absolute top-[14px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--tb-border)] space-y-2 z-20">
+            {/* Info Card Below Line with more padding */}
+            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--tb-border)] space-y-2 z-20">
               <div className="tb-text-md font-bold text-[var(--tb-success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>
