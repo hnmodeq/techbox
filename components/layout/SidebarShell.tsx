@@ -9,7 +9,7 @@ import { useFabTop, saveFabTop } from "@/hooks/useFabTop";
 import { zIndex } from "@/design";
 import { Overlay } from "@/components/ui/Overlay";
 
-const DRAG_THRESHOLD = 6;
+const DRAG_THRESHOLD = 15;
 const BTN_SIZE = 72;
 const SAFE_MARGIN = 16;
 
@@ -78,14 +78,17 @@ export default function SidebarShell({
  try {
  e.currentTarget.releasePointerCapture(e.pointerId);
  } catch {}
+ if (!movedRef.current) {
+   lastOpenRef.current = Date.now();
+   onToggleMobile();
+ }
  };
 
  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
- if (movedRef.current) {
  e.preventDefault();
  e.stopPropagation();
- return;
- }
+ if (movedRef.current) return;
+ if (Date.now() - lastOpenRef.current < 450) return;
  lastOpenRef.current = Date.now();
  onToggleMobile();
  };
@@ -126,7 +129,7 @@ export default function SidebarShell({
           className="fixed inset-0 bg-black/60 backdrop-blur-sm sm:hidden"
           style={{ zIndex: zIndex.sidebarBackdrop }}
           onClick={() => {
-            if (Date.now() - lastOpenRef.current < 300) return;
+            if (Date.now() - lastOpenRef.current < 500) return;
             onCloseMobile();
           }}
         />
