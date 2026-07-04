@@ -39,7 +39,7 @@ export default function HeroSection() {
           {/* Strands OGL Shader sitting behind title */}
           <div className="absolute inset-0 z-0 pointer-events-none opacity-85">
             <Strands
-              colors={['#FF4242', '#7C3AED', '#06B6D4', '#EAB308']}
+              colors={['#ffffff', '#1100ff', '#06B6D4', '#ffffff']}
               count={5}
               speed={0.4}
               glow={2.2}
@@ -60,7 +60,7 @@ export default function HeroSection() {
                   transition={{ duration: 0.35 }}
                   className="hero-item"
                 >
-                  <Link href={item.href} className={`hero-rotator-text font-black text-lg sm:text-xl transition-colors ${moduleColors[item.module].active} hover:opacity-85 drop-shadow-md`}>
+                  <Link href={item.href} className={`hero-rotator-text font-md text-lg sm:text-xl transition-colors ${moduleColors[item.module].active} hover:opacity-85 drop-shadow-md`}>
                     {item.text}
                   </Link>
                 </motion.div>
