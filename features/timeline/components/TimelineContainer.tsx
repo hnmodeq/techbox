@@ -33,9 +33,9 @@ export function TimelineContainer({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Exact Edge-to-Edge math: xPos[idx] = xPos[idx - 1] + (W[idx-1]/2) + (W[idx]/2) + timeGap
-  // This guarantees that the space between physical edges of cards is strictly at least 48px + proportional historical time!
+  // Minimum physical gap strictly maintained at Math.max(36, 64 * zoom) + historical time diff
   const xPositions = React.useMemo(() => {
-    let currX = 220;
+    let currX = 240;
     return events.map((ev, idx) => {
       if (idx === 0) return currX;
       const prevDate = new Date(events[idx - 1].dateGr).getTime();
@@ -45,8 +45,9 @@ export function TimelineContainer({
       const prevWidth = events[idx - 1].importance >= 8 ? 320 : events[idx - 1].importance >= 6 ? 288 : 256;
       const currWidth = ev.importance >= 8 ? 320 : ev.importance >= 6 ? 288 : 256;
 
-      // Minimum 48px edge gap plus proportional date spacing
-      const timeGap = Math.min(Math.max(diffYears * 22 * zoom, 48 * zoom), 700 * zoom);
+      // Generous physical edge buffer so cards never overlap at any zoom level
+      const minEdgeBuffer = Math.max(36, 64 * zoom);
+      const timeGap = Math.min(Math.max(diffYears * 28 * zoom, minEdgeBuffer), 800 * zoom);
       currX += prevWidth / 2 + currWidth / 2 + timeGap;
       return currX;
     });
@@ -116,12 +117,12 @@ export function TimelineContainer({
           }}
         >
           {events.map((event, idx) => {
-            const xPos = xPositions[idx] || 220;
+            const xPos = xPositions[idx] || 240;
 
             return (
               <div
                 key={event.id}
-                className="absolute top-[62%] transform -translate-x-1/2 -translate-y-[calc(100%+14px)] transition-all duration-75 flex flex-col items-center"
+                className="absolute top-[62%] transform -translate-x-1/2 -translate-y-[calc(100%+14px)] flex flex-col items-center"
                 style={{
                   left: `${xPos}px`,
                 }}
