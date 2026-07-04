@@ -1,16 +1,17 @@
 'use client';
 
 import React from 'react';
-import { getModuleItems } from '@/lib/content';
+import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Icon } from '@/design/icons';
 
 export default function VideoReelsRow() {
-  const videos = getModuleItems('media').slice(0, 10);
+  const videos = getLatest('media', 5);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center overflow-hidden`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
@@ -21,40 +22,55 @@ export default function VideoReelsRow() {
           </Link>
         </div>
 
-        {/* Horizontal Scrolling Strip for Vertical Reel Thumbnails (aspect-[9/16]) */}
-        <div className="flex items-stretch gap-5 overflow-x-auto pb-6 pt-2 scrollbar-thin">
-          {videos.map((vid) => (
-            <Link
-              key={vid.slug}
-              href={`/media/${vid.slug}`}
-              className="group relative w-52 sm:w-60 shrink-0 aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:-translate-y-1.5 transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end"
-            >
-              <Image
-                src={vid.image || '/assets/blog-1.jpg'}
-                alt={vid.title}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="240px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
+        {/* Clean Grid Layout without scrollbars */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+          {videos.map((vid) => {
+            const commentsCount = ((vid.likes ?? 0) % 9) + 4;
+            return (
+              <Link
+                key={vid.slug}
+                href={`/media/${vid.slug}`}
+                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:-translate-y-1.5 transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end"
+              >
+                <Image
+                  src={vid.image || '/assets/blog-1.jpg'}
+                  alt={vid.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="260px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
 
-              <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-transform group-hover:scale-125 shadow-lg">
-                  ▶
+                <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                  <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-transform group-hover:scale-125 shadow-lg">
+                    ▶
+                  </div>
                 </div>
-              </div>
 
-              <div className="relative z-30 p-4 text-white">
-                <h3 className="text-sm font-bold leading-6 line-clamp-2 text-white group-hover:text-[var(--tb-media)] transition-colors">
-                  {vid.title}
-                </h3>
-                <div className="mt-2 pt-2 border-t border-white/20 flex items-center justify-between text-[11px] text-slate-300">
-                  <span>👁 {(vid.views ?? 0).toLocaleString('fa-IR')}</span>
-                  <span>♥ {(vid.likes ?? 0).toLocaleString('fa-IR')}</span>
+                <div className="relative z-30 p-3.5 text-white">
+                  <h3 className="text-xs sm:text-sm font-bold leading-5 line-clamp-2 text-white group-hover:text-[var(--tb-media)] transition-colors">
+                    {vid.title}
+                  </h3>
+                  
+                  {/* Clean, distinct icons for views, likes, comments */}
+                  <div className="mt-3 pt-2.5 border-t border-white/20 flex items-center justify-between text-[11px] text-slate-200 font-bold">
+                    <span className="inline-flex items-center gap-1" title="بازدید">
+                      <Icon name="view" size={16} strokeWidth={2} className="text-[var(--tb-media)]" />
+                      <span>{(vid.views ?? 0).toLocaleString('fa-IR')}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1" title="پسند">
+                      <Icon name="like" size={16} strokeWidth={2} className="text-red-400" />
+                      <span>{(vid.likes ?? 0).toLocaleString('fa-IR')}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1" title="نظر">
+                      <Icon name="comment" size={16} strokeWidth={2} className="text-cyan-400" />
+                      <span>{commentsCount.toLocaleString('fa-IR')}</span>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

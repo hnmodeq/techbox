@@ -18,7 +18,7 @@ export default function HomeTimelineRow() {
   }, [resetZoom, resetPan]);
 
   return (
-    <section className={`w-full py-12 bg-[color-mix(in_oklch,var(--tb-timeline)_4%,var(--tb-bg-primary))] ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full px-4 sm:px-6 lg:px-8 space-y-6`}>
         
         {/* Row Header with Simple Text Link More Button */}

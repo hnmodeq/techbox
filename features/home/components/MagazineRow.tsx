@@ -42,8 +42,8 @@ export default function MagazineRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1.5 flex items-center gap-1.5">
-                    <Icon name="clock" className="h-3.5 w-3.5" />
+                  <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1.5 flex items-center gap-1.5 font-bold">
+                    <Icon name="clock" size={16} strokeWidth={2} className="text-[var(--tb-blog)]" />
                     <span>{art.date_fa}</span>
                   </div>
                   <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
@@ -54,14 +54,26 @@ export default function MagazineRow() {
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-[11px] text-[var(--tb-fg-muted)]">
-                  <div className="flex items-center gap-1.5">
-                    <Image src={art.author?.avatar || '/assets/hooman.png'} alt={art.author?.name || 'نویسنده'} width={22} height={22} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
-                    <span className="font-bold text-[var(--tb-fg-primary)]">{art.author?.name || 'تحریریه'}</span>
-                  </div>
+                <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
                   <div className="flex items-center gap-2">
-                    <span>👁 {(art.views ?? 0).toLocaleString('fa-IR')}</span>
-                    <span>♥ {(art.likes ?? 0).toLocaleString('fa-IR')}</span>
+                    <Image
+                      src={art.author?.avatar || '/assets/hooman.png'}
+                      alt={art.author?.name || 'نویسنده'}
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 rounded-full object-cover ring-1 ring-[var(--tb-border)]"
+                    />
+                    <span className="font-extrabold text-[var(--tb-fg-primary)]">{art.author?.name || 'تحریریه'}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex items-center gap-1" title="بازدید">
+                      <Icon name="view" size={16} strokeWidth={2} className="text-[var(--tb-blog)]" />
+                      <span>{(art.views ?? 0).toLocaleString('fa-IR')}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1" title="پسند">
+                      <Icon name="like" size={16} strokeWidth={2} className="text-red-400" />
+                      <span>{(art.likes ?? 0).toLocaleString('fa-IR')}</span>
+                    </span>
                   </div>
                 </div>
               </div>
