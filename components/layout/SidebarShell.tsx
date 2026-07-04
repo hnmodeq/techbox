@@ -95,7 +95,13 @@ export default function SidebarShell({
    <button
      ref={btnRef}
      type="button"
-     onClick={() => onToggleMobile()}
+     onClick={(e) => {
+       e.preventDefault();
+       e.stopPropagation();
+       if (Date.now() - lastOpenRef.current < 400) return;
+       lastOpenRef.current = Date.now();
+       onToggleMobile();
+     }}
      style={{ top: `${btnTop}px`, zIndex: zIndex.mobileFab }}
      className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[var(--tb-motion-lg)] shadow-[var(--tb-shadow-lg)] cursor-pointer"
      aria-label="باز کردن منو"
@@ -117,7 +123,12 @@ export default function SidebarShell({
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm sm:hidden"
           style={{ zIndex: zIndex.sidebarBackdrop }}
-          onClick={() => onCloseMobile()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (Date.now() - lastOpenRef.current < 400) return;
+            onCloseMobile();
+          }}
         />
       )}
 

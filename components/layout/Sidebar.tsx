@@ -7,11 +7,17 @@ import { themeStore } from "@/stores/theme.store";
 import SidebarShell from "@/components/layout/SidebarShell";
 
 export default function SidebarMain({ onMobileOpenChange }: SidebarMainProps) {
- const [desktopOpen, setDesktopOpen] = React.useState(() => desktopStore.getSnapshot());
- const [mobileOpen, setMobileOpen] = React.useState(() => mobileStore.getSnapshot());
- const [theme, setTheme] = React.useState(() => themeStore.getClientSnapshot());
+ const [mounted, setMounted] = React.useState(false);
+ const [desktopOpen, setDesktopOpen] = React.useState(true);
+ const [mobileOpen, setMobileOpen] = React.useState(false);
+ const [theme, setTheme] = React.useState<"light" | "dark">("dark");
 
  React.useEffect(() => {
+   setMounted(true);
+   setDesktopOpen(desktopStore.getSnapshot());
+   setMobileOpen(mobileStore.getSnapshot());
+   setTheme(themeStore.getClientSnapshot());
+
    const u1 = desktopStore.subscribe(() => setDesktopOpen(desktopStore.getSnapshot()));
    const u2 = mobileStore.subscribe(() => setMobileOpen(mobileStore.getSnapshot()));
    const u3 = themeStore.subscribe(() => setTheme(themeStore.getClientSnapshot()));
