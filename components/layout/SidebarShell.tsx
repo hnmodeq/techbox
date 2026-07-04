@@ -95,10 +95,7 @@ export default function SidebarShell({
    <button
      ref={btnRef}
      type="button"
-     onClick={(e) => {
-       e.preventDefault();
-       e.stopPropagation();
-       if (Date.now() - lastOpenRef.current < 400) return;
+     onClick={() => {
        lastOpenRef.current = Date.now();
        onToggleMobile();
      }}
@@ -123,9 +120,7 @@ export default function SidebarShell({
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm sm:hidden"
           style={{ zIndex: zIndex.sidebarBackdrop }}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
+          onClick={() => {
             if (Date.now() - lastOpenRef.current < 400) return;
             onCloseMobile();
           }}
@@ -133,11 +128,12 @@ export default function SidebarShell({
       )}
 
       <aside
-        className={`fixed right-0 top-0 h-full transform transition-transform duration-[var(--tb-motion-lg)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
-          mobileOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed right-0 top-0 h-full transition-transform duration-[var(--tb-motion-lg)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase}`}
         aria-hidden={!mobileOpen}
-        style={{ zIndex: zIndex.sidebar }}
+        style={{
+          transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
+          zIndex: zIndex.sidebar
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <SidebarContent
