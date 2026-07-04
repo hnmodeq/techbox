@@ -75,7 +75,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
         <div className="absolute bottom-full mb-2 right-0 z-50 w-64 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-3 shadow-[var(--tb-shadow-lg)] text-center animate-in fade-in zoom-in-95">
           <p className="tb-text-sm text-[var(--tb-fg-primary)] mb-2">برای پسندیدن مطالب باید وارد حساب کاربری خود شوید.</p>
           <div className="flex justify-center gap-2">
-            <Button size="xs" onClick={() => router.push("/account")}>ورود / عضویت</Button>
+            <Button size="xs" onClick={() => { setShowLoginPrompt(false); window.dispatchEvent(new CustomEvent("tb_open_auth")); }}>ورود / عضویت</Button>
             <Button variant="ghost" size="xs" onClick={() => setShowLoginPrompt(false)}>بستن</Button>
           </div>
         </div>
@@ -121,7 +121,7 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-2 shadow-[var(--tb-shadow-md)] text-center">
           <p className="text-xs text-[var(--tb-fg-primary)] mb-1.5">برای امتیاز به نظر ابتدا وارد شوید</p>
           <div className="flex justify-center gap-2">
-            <Button size="xs" onClick={() => router.push("/account")}>ورود</Button>
+            <Button size="xs" onClick={() => { setNeedLogin(false); window.dispatchEvent(new CustomEvent("tb_open_auth")); }}>ورود</Button>
             <Button variant="ghost" size="xs" onClick={() => setNeedLogin(false)}>بستن</Button>
           </div>
         </div>

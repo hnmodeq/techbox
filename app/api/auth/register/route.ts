@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
           role: "user",
           roleFa: "کاربر عضو",
           modules: "[]",
-          avatar: "/assets/hooman.png"
+          avatar: ""
         }
       });
     } catch (createErr: any) {
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
             password: hashedPassword,
             role: "user",
             modules: "[]",
-            avatar: "/assets/hooman.png"
+            avatar: ""
           }
         });
       } else {

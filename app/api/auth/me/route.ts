@@ -16,7 +16,7 @@ export async function GET(){
     job: user.job || "",
     birthday: user.birthday || "",
     modules,
-    avatar: user.avatar || "/assets/hooman.png"
+    avatar: user.avatar ?? ""
   }});
 }
 
