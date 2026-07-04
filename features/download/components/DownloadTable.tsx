@@ -3,6 +3,7 @@ import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
+import { CardStats } from "@/components/ui/CardStats";
 
 export default function DownloadTable() {
   const items = getModuleItems("download");
@@ -80,9 +81,8 @@ export default function DownloadTable() {
               {f.date_fa}
             </div>
 
-            <div className="col-span-2 text-left md:text-left tb-text-sm font-bold text-[var(--tb-fg-primary)]">
-              <span className="md:hidden font-normal text-[var(--tb-fg-muted)] float-right">دفعات دانلود: </span>
-              {f.likes.toLocaleString("fa-IR")} بار
+            <div className="col-span-2 text-left md:text-left flex justify-end">
+              <CardStats module="download" slug={f.slug} initialViews={f.views ?? 0} initialLikes={f.likes ?? 0} />
             </div>
           </Link>
         ))}

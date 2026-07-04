@@ -6,6 +6,7 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
+import { CardStats } from '@/components/ui/CardStats';
 
 function Stars({ rating }: { rating: number }) {
   const full = Math.round(rating);
@@ -67,8 +68,8 @@ export default function ReviewRow() {
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-[11px] text-[var(--tb-fg-muted)]">
-                    <span>✍️ {rev.author?.name || 'تحلیلگر سخت‌افزار'}</span>
-                    <span>👁 {(rev.views ?? 0).toLocaleString('fa-IR')} بازدید</span>
+                    <span className="truncate font-bold">✍️ {rev.author?.name || 'تحلیلگر سخت‌افزار'}</span>
+                    <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} />
                   </div>
                 </div>
               </Link>

@@ -7,6 +7,7 @@ import { useCart } from "@/providers/cart.provider";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/design/icons";
 import ModuleHeader from "@/components/effects/ModuleHeader";
+import { CardStats } from "@/components/ui/CardStats";
 
 const prices: Record<string, {price: string, old?: string}> = {
  "qnap-ts-2277": { price: "۴۸,۹۰۰,۰۰۰", old: "۵۲,۰۰۰,۰۰۰" },
@@ -101,10 +102,8 @@ export default function ShopGrid(){
                 <div className="flex gap-2 mt-4">
                   <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--tb-shop)] text-[var(--tb-shop)] hover:bg-[var(--tb-shop)]/10 font-bold">مشاوره خرید</Button>
                 </div>
-                <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)] mt-3 pt-3 border-t border-[var(--tb-border)]">
-                  <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(p.views ?? 120).toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(p.likes ?? 15).toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{getCommentCount("shop", p.slug).toLocaleString("fa-IR")}</span>
+                <div className="mt-3 pt-3 border-t border-[var(--tb-border)]">
+                  <CardStats module="shop" slug={p.slug} initialViews={p.views ?? 0} initialLikes={p.likes ?? 0} initialComments={getCommentCount("shop", p.slug)} showComments={true} />
                 </div>
               </div>
             </Link>

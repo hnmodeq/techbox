@@ -6,6 +6,7 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
+import { CardStats } from '@/components/ui/CardStats';
 
 export default function MagazineRow() {
   const articles = getLatest('blog', 5);
@@ -65,16 +66,7 @@ export default function MagazineRow() {
                     />
                     <span className="font-extrabold text-[var(--tb-fg-primary)]">{art.author?.name || 'تحریریه'}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center gap-1" title="بازدید">
-                      <Icon name="view" size={16} strokeWidth={2} className="text-[var(--tb-blog)]" />
-                      <span>{(art.views ?? 0).toLocaleString('fa-IR')}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1" title="پسند">
-                      <Icon name="like" size={16} strokeWidth={2} className="text-red-400" />
-                      <span>{(art.likes ?? 0).toLocaleString('fa-IR')}</span>
-                    </span>
-                  </div>
+                  <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} />
                 </div>
               </div>
             </Link>

@@ -3,9 +3,11 @@ import Image from "next/image";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "./Badge";
+import { CardStats } from "./CardStats";
 
 export interface MediaSelectorCardProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  active?: boolean;
+ slug?: string;
  image?: string;
  title: string;
  category?: string;
@@ -20,6 +22,7 @@ export interface MediaSelectorCardProps extends React.ButtonHTMLAttributes<HTMLB
 export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelectorCardProps>(
  ({
  active,
+ slug,
  image,
  title,
  category,
@@ -74,10 +77,14 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  {author && <span>{author}</span>}
  {dateFa && <span>{dateFa}</span>}
  </div>
- <div className="mt-2 flex items-center gap-3 border-t border-white/20 pt-2 tb-text-sm text-white/80">
+ <div className="mt-2 pt-2 border-t border-white/20">
+ {slug ? <CardStats module="media" slug={slug} initialViews={views} initialLikes={likes} initialComments={comments} showComments={true} /> : (
+ <div className="flex items-center gap-3 tb-text-sm text-white/80">
  {typeof views === "number" && <span>👁 {views.toLocaleString("fa-IR")}</span>}
  {typeof likes === "number" && <span>♥ {likes.toLocaleString("fa-IR")}</span>}
  {typeof comments === "number" && <span>💬 {comments.toLocaleString("fa-IR")}</span>}
+ </div>
+ )}
  </div>
  </div>
  </button>

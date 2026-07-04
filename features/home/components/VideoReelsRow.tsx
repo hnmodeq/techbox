@@ -6,6 +6,7 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
+import { CardStats } from '@/components/ui/CardStats';
 
 export default function VideoReelsRow() {
   const videos = getLatest('media', 5);
@@ -53,19 +54,8 @@ export default function VideoReelsRow() {
                   </h3>
                   
                   {/* Clean, distinct icons for views, likes, comments */}
-                  <div className="mt-3 pt-2.5 border-t border-white/20 flex items-center justify-between text-[11px] text-slate-200 font-bold">
-                    <span className="inline-flex items-center gap-1" title="بازدید">
-                      <Icon name="view" size={16} strokeWidth={2} className="text-[var(--tb-media)]" />
-                      <span>{(vid.views ?? 0).toLocaleString('fa-IR')}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1" title="پسند">
-                      <Icon name="like" size={16} strokeWidth={2} className="text-red-400" />
-                      <span>{(vid.likes ?? 0).toLocaleString('fa-IR')}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1" title="نظر">
-                      <Icon name="comment" size={16} strokeWidth={2} className="text-cyan-400" />
-                      <span>{commentsCount.toLocaleString('fa-IR')}</span>
-                    </span>
+                  <div className="mt-3 pt-2.5 border-t border-white/20">
+                    <CardStats module="media" slug={vid.slug} initialViews={vid.views ?? 0} initialLikes={vid.likes ?? 0} initialComments={commentsCount} showComments={true} />
                   </div>
                 </div>
               </Link>

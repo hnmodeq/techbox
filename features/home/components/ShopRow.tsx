@@ -5,6 +5,7 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CardStats } from '@/components/ui/CardStats';
 
 export default function ShopRow() {
   const products = getLatest('shop', 5);
@@ -65,7 +66,11 @@ export default function ShopRow() {
                   </ul>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-[var(--tb-border)]/60">
+                <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[11px] text-[var(--tb-fg-muted)]">آمار بازدید محصول:</span>
+                    <CardStats module="shop" slug={prod.slug} initialViews={prod.views ?? 0} initialLikes={prod.likes ?? 0} />
+                  </div>
                   <span className="btn btn-primary bg-[var(--tb-shop)] text-slate-950 hover:opacity-90 font-black w-full py-2.5 text-xs shadow-md flex items-center justify-center">
                     ثبت درخواست خرید
                   </span>

@@ -5,6 +5,7 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CardStats } from '@/components/ui/CardStats';
 
 export default function ForumRow() {
   const topics = getLatest('forum', 6);
@@ -60,10 +61,7 @@ export default function ForumRow() {
 
                   <div className="mt-3 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-[11px] text-[var(--tb-fg-muted)]">
                     <span>📅 {top.date_fa}</span>
-                    <div className="flex items-center gap-3">
-                      <span>💬 {((top.likes ?? 0) % 7 + 2).toLocaleString('fa-IR')} پاسخ</span>
-                      <span>👁 {(top.views ?? 0).toLocaleString('fa-IR')} بازدید</span>
-                    </div>
+                    <CardStats module="forum" slug={top.slug} initialViews={top.views ?? 0} initialLikes={top.likes ?? 0} showComments={true} />
                   </div>
                 </div>
               </Link>

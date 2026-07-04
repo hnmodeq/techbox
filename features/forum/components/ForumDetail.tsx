@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/design/icons";
+import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
+import { LikeButton } from "@/components/ui/LikeButton";
 import commentsData from "@/data/comments.json";
 import { Button } from "@/components/ui/Button";
 
@@ -120,26 +122,13 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                 <span>•</span>
                 <span>{item.date_fa}</span>
                 <span>•</span>
-                <span>{item.views?.toLocaleString("fa-IR") || "۲۴۰"} بازدید</span>
+                <LiveViewCounter module="forum" slug={item.slug} initialViews={item.views ?? 0} showLabel={true} />
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setLikesCount((prev) => (hasLiked ? prev - 1 : prev + 1));
-                setHasLiked(!hasLiked);
-              }}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-[var(--tb-radius-full)] border font-bold transition-all ${
-                hasLiked
-                  ? "bg-[var(--tb-forum)]/15 border-[var(--tb-forum)] text-[var(--tb-forum)] shadow-sm"
-                  : "bg-[var(--tb-bg-secondary)] border-[var(--tb-border)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-forum)]"
-              }`}
-            >
-              <Icon name="like" size={16} className={hasLiked ? "fill-current" : ""} />
-              <span>{likesCount.toLocaleString("fa-IR")} رای</span>
-            </button>
+            <LikeButton contentType="forum" slug={item.slug} initial={item.likes ?? 0} />
           </div>
         </header>
 

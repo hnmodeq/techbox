@@ -47,10 +47,9 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  className="w-full aspect-video object-contain bg-black"
  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
  />
- <div className="bg-[var(--tb-bg-secondary)] px-4 py-2 tb-text-sm text-[var(--tb-fg-muted)] flex gap-4">
+ <div className="bg-[var(--tb-bg-secondary)] px-4 py-2 tb-text-sm text-[var(--tb-fg-muted)] flex items-center gap-4">
  <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views ?? 120} showLabel />
- <span className="inline-flex items-center gap-1"><Icon name="like" size={15} strokeWidth={1.75} />{(item.likes ?? 12).toLocaleString("fa-IR")} پسند</span>
- <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} strokeWidth={1.75} />نظرات فعال</span>
+ <LikeButton contentType={item.module} slug={item.slug} initial={item.likes ?? 0} />
  </div>
  </div>
  ) : item.image && (

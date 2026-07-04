@@ -2,7 +2,29 @@
 import { useEffect, useState } from "react";
 import { Icon } from "@/design/icons";
 
-export function LiveViewCounter({ module, slug, initialViews = 0, showLabel = false }: { module: string; slug: string; initialViews?: number; showLabel?: boolean }) {
+const moduleIconColors: Record<string, string> = {
+  blog: "text-[var(--tb-blog)]",
+  news: "text-[var(--tb-news)]",
+  media: "text-[var(--tb-media)]",
+  review: "text-[var(--tb-review)]",
+  tools: "text-[var(--tb-tools)]",
+  download: "text-[var(--tb-download)]",
+  shop: "text-[var(--tb-shop)]",
+  forum: "text-[var(--tb-forum)]",
+  timeline: "text-[var(--tb-timeline)]"
+};
+
+export function LiveViewCounter({
+  module,
+  slug,
+  initialViews = 0,
+  showLabel = false
+}: {
+  module: string;
+  slug: string;
+  initialViews?: number;
+  showLabel?: boolean;
+}) {
   const [views, setViews] = useState<number>(initialViews);
 
   useEffect(() => {
@@ -16,17 +38,23 @@ export function LiveViewCounter({ module, slug, initialViews = 0, showLabel = fa
       .then(data => {
         if (mounted && data.ok && typeof data.views === "number") {
           setViews(data.views);
+          // dispatch global event or update local storage so cards sync instantly
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("tb_stats_update", { detail: { module, slug, views: data.views } }));
+          }
         }
       })
       .catch(() => {});
     return () => { mounted = false; };
   }, [module, slug]);
 
+  const iconColor = moduleIconColors[module] || "text-[var(--tb-primary)]";
+
   return (
-    <span className="inline-flex items-center gap-1 font-mono" style={{ fontVariantNumeric: "tabular-nums" }}>
-      <Icon name="view" size={15} strokeWidth={1.75} />
-      <span>{views.toLocaleString("fa-IR")}</span>
-      {showLabel && <span className="font-sans ms-1">بازدید</span>}
+    <span className="inline-flex items-center gap-1.5 font-bold text-xs sm:text-sm text-[var(--tb-fg-muted)]" style={{ fontVariantNumeric: "tabular-nums" }}>
+      <Icon name="view" size={16} strokeWidth={2} className={iconColor} />
+      <span className="font-extrabold text-[var(--tb-fg-primary)]">{views.toLocaleString("fa-IR")}</span>
+      {showLabel && <span className="font-sans ms-1 font-normal text-[var(--tb-fg-muted)]">بازدید</span>}
     </span>
   );
 }

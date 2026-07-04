@@ -4,6 +4,7 @@ import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
+import { CardStats } from "@/components/ui/CardStats";
 
 export default function BlogGrid(){
   const items = getModuleItems("blog");
@@ -31,11 +32,7 @@ export default function BlogGrid(){
                     <div>{p.date_fa}</div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(p.likes ?? 0).toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(p.views ?? 0).toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{getCommentCount("blog", p.slug).toLocaleString("fa-IR")}</span>
-                </div>
+                <CardStats module="blog" slug={p.slug} initialViews={p.views ?? 0} initialLikes={p.likes ?? 0} initialComments={getCommentCount("blog", p.slug)} showComments={true} />
               </div>
             </div>
           </Link>

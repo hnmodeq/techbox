@@ -5,6 +5,7 @@ import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
+import { CardStats } from "@/components/ui/CardStats";
 
 /** Star rating rendered with central-system icons (filled + outline). */
 function Stars({ rating }: { rating: number }) {
@@ -64,11 +65,7 @@ export default function ReviewGrid() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-                    <span className="inline-flex items-center gap-1"><Icon name="view" size={15} />{r.views?.toLocaleString("fa-IR") || "۱,۲۰۰"}</span>
-                    <span className="inline-flex items-center gap-1"><Icon name="like" size={15} />{r.likes?.toLocaleString("fa-IR") || "۴۵"}</span>
-                    <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} />{getCommentCount("review", r.slug).toLocaleString("fa-IR")}</span>
-                  </div>
+                  <CardStats module="review" slug={r.slug} initialViews={r.views ?? 0} initialLikes={r.likes ?? 0} initialComments={getCommentCount("review", r.slug)} showComments={true} />
                 </div>
               </div>
             </Link>

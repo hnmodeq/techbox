@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/design/icons";
+import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
+import { LikeButton } from "@/components/ui/LikeButton";
+import CommentSection from "@/features/comment/components/CommentSection";
 
 type ReviewDetailProps = {
   item: any;
@@ -65,25 +68,8 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 tb-text-sm text-[var(--tb-fg-muted)] bg-[var(--tb-bg-muted)] px-3 py-1.5 rounded-full border border-[var(--tb-border)]">
-                <Icon name="view" size={16} />
-                <span>{item.views?.toLocaleString("fa-IR") || "۲,۱۰۰"} بازدید</span>
-              </span>
-
-              <button
-                onClick={() => {
-                  setLikesCount((prev) => (hasLiked ? prev - 1 : prev + 1));
-                  setHasLiked(!hasLiked);
-                }}
-                className={`inline-flex items-center gap-1.5 tb-text-sm px-4 py-1.5 rounded-full border font-bold transition-all ${
-                  hasLiked
-                    ? "bg-[var(--tb-review)]/15 border-[var(--tb-review)] text-[var(--tb-review)] shadow-sm"
-                    : "bg-[var(--tb-bg-secondary)] border-[var(--tb-border)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-review)]"
-                }`}
-              >
-                <Icon name="like" size={16} className={hasLiked ? "fill-current" : ""} />
-                <span>{likesCount.toLocaleString("fa-IR")} پسند</span>
-              </button>
+              <LiveViewCounter module="review" slug={item.slug} initialViews={item.views ?? 0} showLabel={true} />
+              <LikeButton contentType="review" slug={item.slug} initial={item.likes ?? 0} />
             </div>
           </div>
         </header>
@@ -138,7 +124,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           {item.content || "متن کامل ارزیابی این محصول در درگاه آزمایشگاهی تکباکس ثبت شده است."}
         </div>
 
-        {/* Notice: No internal review rating stars or tag outputs per user requirements */}
+        <CommentSection module="review" slug={item.slug} />
       </article>
     </main>
   );

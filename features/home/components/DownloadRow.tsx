@@ -5,6 +5,7 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
+import { CardStats } from '@/components/ui/CardStats';
 
 export default function DownloadRow() {
   const files = getLatest('download', 8);
@@ -71,12 +72,10 @@ export default function DownloadRow() {
                 {/* Direct Download Action Footer */}
                 <div className="pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between">
                   <span className="text-xs font-extrabold text-[var(--tb-download)] group-hover:underline flex items-center gap-1">
-                    <span>دانلود مستقیم (ایران)</span>
+                    <span>دانلود مستقیم</span>
                     <span>↓</span>
                   </span>
-                  <span className="text-[11px] text-[var(--tb-fg-muted)] font-bold">
-                    {(file.likes ?? 0).toLocaleString('fa-IR')} دانلود
-                  </span>
+                  <CardStats module="download" slug={file.slug} initialViews={file.views ?? 0} initialLikes={file.likes ?? 0} />
                 </div>
               </Link>
             );

@@ -5,6 +5,7 @@ import { moduleMeta } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
 import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/design/icons";
+import { CardStats } from "@/components/ui/CardStats";
 
 const fallbackImage = "/assets/blog-1.jpg";
 const fallbackAvatar = "/assets/hooman.png";
@@ -71,10 +72,8 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
           </div>
  <h4 className={`mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-primary)] transition-colors ${moduleHover(item.module)}`}>{item.title}</h4>
  {!compact && <p className="mt-1 line-clamp-2 tb-text-sm text-[var(--tb-fg-muted)]">{item.excerpt}</p>}
-          <div className="mt-2 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-            <Stat icon="like" value={(item.likes ?? 0).toLocaleString("fa-IR")} />
-            <Stat icon="view" value={(item.views ?? 0).toLocaleString("fa-IR")} />
-            <Stat icon="comment" value={(((item.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")} />
+          <div className="mt-2">
+            <CardStats module={item.module} slug={item.slug} initialViews={item.views ?? 0} initialLikes={item.likes ?? 0} showComments={true} />
           </div>
  </div>
  </div>
@@ -122,10 +121,8 @@ function VideoFeedCard({item}:{item:ContentItem}){
       </div>
       <div className="px-1 pt-2">
         <div className={`line-clamp-2 tb-text-sm transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
-        <div className="mt-1 flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-          <Stat icon="view" value={(item.views ?? 0).toLocaleString("fa-IR")} />
-          <Stat icon="like" value={(item.likes ?? 0).toLocaleString("fa-IR")} />
-          <Stat icon="comment" value={(((item.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")} />
+        <div className="mt-1">
+          <CardStats module={item.module} slug={item.slug} initialViews={item.views ?? 0} initialLikes={item.likes ?? 0} showComments={true} />
         </div>
       </div>
  </Link>
@@ -193,10 +190,8 @@ function ReviewFeedCard({item}:{item:ContentItem}){
  </div>
  <span className="tb-text-sm text-[var(--tb-fg-muted)]">{item.author?.name || "تکباکس"}</span>
  </div>
-          <div className="flex gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
-            <Stat icon="like" value={(item.likes ?? 0).toLocaleString("fa-IR")} />
-            <Stat icon="comment" value={"۱۲"} />
-            <Stat icon="view" value={(item.views ?? 0).toLocaleString("fa-IR")} />
+          <div className="mt-1">
+            <CardStats module={item.module} slug={item.slug} initialViews={item.views ?? 0} initialLikes={item.likes ?? 0} showComments={true} />
           </div>
  </div>
  </Link>

@@ -46,6 +46,9 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
         const data = await res.json();
         setLiked(data.liked);
         setCount(data.likes);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("tb_stats_update", { detail: { module: contentType, slug, likes: data.likes } }));
+        }
       }
     } catch {
     } finally {

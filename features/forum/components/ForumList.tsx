@@ -9,6 +9,7 @@ import ModuleHeader from "@/components/effects/ModuleHeader";
 import { ChipButton } from "@/components/ui/ChipButton";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { OverlayBackdrop } from "@/components/ui/Overlay";
+import { CardStats } from "@/components/ui/CardStats";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 
@@ -121,11 +122,8 @@ export default function ForumList() {
             </div>
 
             {/* stats */}
-            <div className="col-span-6 sm:col-span-2 text-center">
-              <div className="tb-text-md font-bold">{(t.answers ?? 0).toLocaleString("fa-IR")} <span className="tb-text-sm text-[var(--tb-fg-muted)] font-normal">پاسخ</span></div>
-            </div>
-            <div className="col-span-6 sm:col-span-2 text-center tb-text-sm text-[var(--tb-fg-muted)]">
-              {t.views.toLocaleString("fa-IR")} بازدید
+            <div className="col-span-12 sm:col-span-4 flex items-center justify-end px-2">
+              <CardStats module="forum" slug={t.slug} initialViews={t.views ?? 0} initialLikes={t.likes ?? 0} showComments={true} />
             </div>
             <div className="hidden sm:block col-span-1 text-left tb-text-sm text-[var(--tb-fg-muted)]">
               {t.date_fa.split(" ")[0]}<br />{t.author?.name.split(" ")[0]}

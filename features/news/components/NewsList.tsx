@@ -4,6 +4,7 @@ import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
+import { CardStats } from "@/components/ui/CardStats";
 
 export default function NewsList() {
  const items = getModuleItems("news");
@@ -29,10 +30,8 @@ export default function NewsList() {
                     </div>
                     <h3 className="tb-text-lg mt-2 transition-colors group-hover:text-[var(--tb-news)]">{n.title}</h3>
                     <p className="tb-text-sm line-clamp-2 mt-2 text-[var(--tb-fg-muted)]">{n.excerpt}</p>
-                    <div className="tb-text-sm mt-3 flex items-center gap-3 text-[var(--tb-fg-muted)]">
-                      <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(n.views ?? 0).toLocaleString("fa-IR")}</span>
-                      <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(n.likes ?? 0).toLocaleString("fa-IR")}</span>
-                      <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{getCommentCount("news", n.slug).toLocaleString("fa-IR")}</span>
+                    <div className="mt-3 pt-2 border-t border-[var(--tb-border)]/50">
+                      <CardStats module="news" slug={n.slug} initialViews={n.views ?? 0} initialLikes={n.likes ?? 0} initialComments={getCommentCount("news", n.slug)} showComments={true} />
                     </div>
                   </div>
                 </Link>

@@ -6,6 +6,7 @@ import ModuleHeader from "@/components/effects/ModuleHeader";
 import { createPortal } from "react-dom";
 import { zIndex } from "@/design";
 import { Icon } from "@/design/icons";
+import { CardStats } from "@/components/ui/CardStats";
 
 const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
@@ -61,6 +62,7 @@ export default function MediaGallery() {
         {displayedItems.map((v, idx) => (
           <MediaSelectorCard
             key={`${v.slug}-${idx}`}
+            slug={v.slug}
             image={v.image}
             title={v.title}
             category={v.category}
@@ -132,8 +134,7 @@ export default function MediaGallery() {
 
                 <div className="flex items-center gap-4">
                   <span className="inline-flex items-center gap-1.5 tb-text-sm text-[var(--tb-fg-muted)] bg-[var(--tb-bg-secondary)] px-3 py-1.5 rounded-[var(--tb-radius-full)] border border-[var(--tb-border)]">
-                    <Icon name="view" size={16} />
-                    <span>{activeVideo.views?.toLocaleString("fa-IR") || "۱,۲۰۰"} بازدید</span>
+                    <CardStats module="media" slug={activeVideo.slug} initialViews={activeVideo.views ?? 0} initialLikes={activeVideo.likes ?? 0} showLabel={true} />
                   </span>
 
                   <button
