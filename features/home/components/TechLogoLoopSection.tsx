@@ -23,18 +23,19 @@ const techLogos = [
 
 export default function TechLogoLoopSection() {
  return (
- <section className="relative w-full max-w-full overflow-x-hidden overflow-hidden px-4 py-14 md:py-16" aria-labelledby="tech-stack-title">
- <div className="mx-auto max-w-6xl w-full max-w-full overflow-x-hidden">
- <div className="mb-6 text-center">
- <h2 id="tech-stack-title" className="tb-text-lg md:tb-text-lg">زیرساخت مدرن تکباکس</h2>
- <p className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">ساخته‌شده با ابزارهای مدرن وب و زیرساخت</p>
+ <section className="relative w-full max-w-full overflow-x-hidden overflow-hidden px-4 py-20 md:py-24 border-t border-[var(--tb-border)] bg-[var(--tb-bg-primary)]" aria-labelledby="tech-stack-title">
+ <div className="mx-auto max-w-7xl w-full max-w-full overflow-x-hidden">
+ <div className="mb-10 text-center">
+ <span className="badge mb-2">اکوسیستم فناوری</span>
+ <h2 id="tech-stack-title" className="tb-text-big-title text-[var(--tb-fg-primary)]">زیرساخت و فناوری‌های سازنده تکباکس</h2>
+ <p className="mt-2 tb-text-md text-[var(--tb-fg-muted)]">قدرت‌گرفته از مدرن‌ترین ابزارهای توسعه، کلاود و پایگاه داده</p>
  </div>
  <LogoLoop
  logos={techLogos}
  speed={120}
  direction="left"
-          logoHeight={96}
-          gap={80}
+          logoHeight={130}
+          gap={110}
  pauseOnHover
  scaleOnHover
  fadeOut
