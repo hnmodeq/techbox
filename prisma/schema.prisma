@@ -14,6 +14,9 @@ model User {
   username String  @unique
   email    String
   role     String
+  roleFa   String?
+  job      String?
+  birthday String?
   modules  String  @default("[]")
   avatar   String?
   password String
@@ -76,8 +79,9 @@ model CommentVote {
 }
 
 model Like {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   fingerprint String
+  userId      String?
   module      String
   slug        String
 
@@ -131,8 +135,9 @@ model TimelineCommentVote {
 }
 
 model TimelineLike {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   fingerprint String
+  userId      String?
   eventId     String
 
   event TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
