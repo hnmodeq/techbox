@@ -34,6 +34,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     : [
         'این تحول تأثیر بسیار شگرفی روی طراحی معماری دیتاسنترهای امروزی گذاشت.',
         'ممنون از تکباکس بابت گردآوری دقیق تاریخچه زیرساخت.',
+        'نقطه عطف بی‌نظیری در پیشرفت فناوری اطلاعات بود.',
       ];
 
   const [showComments, setShowComments] = useState(false);
@@ -68,24 +69,26 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   };
 
   return (
-    /* Top-aligned container so opening comments expands downwards without moving the card top position */
+    /* Top-aligned container so opening comments expands downwards without moving card top position */
     <div style={style} className={`${widthClass} select-none shrink-0 group flex flex-col justify-start`}>
-      {/* Full-bleed Image Card with bottom-to-top gradient overlay */}
-      <div className="relative min-h-[310px] sm:min-h-[340px] w-full rounded-xl overflow-hidden shadow-[var(--tb-shadow-lg)] border border-[var(--tb-border)] hover:border-[var(--tb-timeline)] transition-all duration-[var(--tb-motion-md)] flex flex-col justify-end bg-slate-950">
-        {/* Background Image filling full card area */}
-        <Image
-          src={cardImage}
-          alt={event.title || 'تصویر رویداد'}
-          fill
-          className="object-cover z-0"
-          sizes="(max-width: 768px) 100vw, 320px"
-        />
+      {/* Card Box with fixed image backdrop to eliminate resizing/flicker when comments expand */}
+      <div className="relative min-h-[320px] sm:min-h-[350px] w-full rounded-xl overflow-hidden shadow-[var(--tb-shadow-lg)] border border-[var(--tb-border)] hover:border-[var(--tb-timeline)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 flex flex-col justify-end bg-slate-950">
+        
+        {/* Fixed-Height Background Image Layer (h-[280px]) so expanding comments never resizes or flickers the image */}
+        <div className="absolute top-0 inset-x-0 h-[280px] overflow-hidden z-0 pointer-events-none">
+          <Image
+            src={cardImage}
+            alt={event.title || 'تصویر رویداد'}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 320px"
+          />
+          {/* Soft bottom-to-top gradient fade out over the image */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent" />
+        </div>
 
-        {/* Soft bottom-to-top gradient overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent z-10 pointer-events-none" />
-
-        {/* Content overlaid on top of image */}
-        <div className="relative z-20 p-4.5 flex flex-col justify-end text-white">
+        {/* Content overlaid on top of fixed image background */}
+        <div className="relative z-10 p-4.5 flex flex-col justify-end text-white">
           <h3 className="tb-text-md font-bold text-white mb-2 line-clamp-2 leading-7">
             {event.title}
           </h3>
@@ -116,19 +119,20 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             </button>
           </div>
 
-          {/* Real Dynamic Interactive Comment Section */}
+          {/* Real Dynamic Interactive Comment Section with Smooth Opening Motion & Wheel Isolation */}
           {showComments && (
             <div
-              className="mt-3 pt-3 border-t border-white/20 flex flex-col gap-2.5 max-h-52 overflow-y-auto"
+              className="mt-3.5 pt-3.5 border-t border-white/20 flex flex-col gap-3 max-h-80 sm:max-h-96 overflow-y-auto animate-in fade-in-0 slide-in-from-top-3 duration-300 pr-1"
               onClick={(e) => e.stopPropagation()}
               onPointerDown={(e) => e.stopPropagation()}
+              onWheel={(e) => e.stopPropagation()}
             >
-              <form onSubmit={handleAddComment} className="flex gap-1.5 items-center">
+              <form onSubmit={handleAddComment} className="flex gap-1.5 items-center shrink-0">
                 <input
                   type="text"
                   value={newCommentText}
                   onChange={(e) => setNewCommentText(e.target.value)}
-                  placeholder="نظر خود را بنویسید..."
+                  placeholder="نظر خود را درباره این رویداد بنویسید..."
                   className="input !h-9 !py-1 !px-2.5 tb-text-sm flex-1 !bg-slate-900/90 !text-white !border-slate-700"
                 />
                 <button
@@ -144,7 +148,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                 {comments.map((commentText, idx) => (
                   <li
                     key={idx}
-                    className="rounded-[var(--tb-radius-sm)] bg-slate-900/80 p-2 tb-text-sm text-slate-200 border border-slate-700/60 leading-5"
+                    className="rounded-[var(--tb-radius-sm)] bg-slate-900/90 p-2.5 tb-text-sm text-slate-200 border border-slate-700/60 leading-5"
                   >
                     <div className="flex items-center justify-between text-[11px] text-cyan-400 mb-1">
                       <span className="font-bold">کاربر انجمن تکباکس</span>
