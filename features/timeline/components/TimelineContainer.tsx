@@ -9,12 +9,13 @@ interface TimelineContainerProps {
   events: TimelineEvent[];
   zoom: number;
   pan: { x: number; y: number };
-  onPanStart: (e: React.MouseEvent) => void;
-  onPanMove: (e: React.MouseEvent) => void;
+  onPanStart: (e: React.MouseEvent | React.PointerEvent) => void;
+  onPanMove: (e: React.MouseEvent | React.PointerEvent) => void;
   onPanEnd: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetView: () => void;
+  onWheel?: (e: React.WheelEvent) => void;
 }
 
 export function TimelineContainer({
@@ -27,68 +28,84 @@ export function TimelineContainer({
   onZoomIn,
   onZoomOut,
   onResetView,
+  onWheel,
 }: TimelineContainerProps) {
-  const minDate = new Date(Math.min(...events.map((e) => new Date(e.dateGr).getTime())));
-  const maxDate = new Date(Math.max(...events.map((e) => new Date(e.dateGr).getTime())));
-  const totalYears = maxDate.getFullYear() - minDate.getFullYear();
-  const pixelsPerYear = 100;
-  const totalWidth = totalYears * pixelsPerYear;
+  const minTime = events.length > 0 ? Math.min(...events.map((e) => new Date(e.dateGr).getTime())) : new Date('1940-01-01').getTime();
+  const maxTime = events.length > 0 ? Math.max(...events.map((e) => new Date(e.dateGr).getTime())) : new Date('2030-01-01').getTime();
+  const minDate = new Date(minTime);
+  const maxDate = new Date(maxTime);
+  const totalYears = Math.max(10, maxDate.getFullYear() - minDate.getFullYear() + 10);
+  const pixelsPerYear = 140;
+  const totalWidth = totalYears * pixelsPerYear * zoom;
 
   return (
-    <div className="relative w-full h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden">
-      <div className="absolute inset-0 opacity-5">
+    <div
+      className="relative w-full h-[calc(100vh-64px)] min-h-[600px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden select-none"
+      onWheel={onWheel}
+    >
+      {/* Background Grid */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div
           className="w-full h-full"
           style={{
-            backgroundImage: 'linear-gradient(90deg, #64748b 1px, transparent 1px)',
-            backgroundSize: '50px 100%',
+            backgroundImage: 'linear-gradient(90deg, #38bdf8 1px, transparent 1px), linear-gradient(#38bdf8 1px, transparent 1px)',
+            backgroundSize: `${50 * zoom}px 50px`,
+            backgroundPosition: `${pan.x}px ${pan.y}px`,
           }}
         />
       </div>
 
+      {/* Draggable Track Canvas */}
       <div
         className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing"
-        onMouseDown={onPanStart}
-        onMouseMove={onPanMove}
-        onMouseUp={onPanEnd}
-        onMouseLeave={onPanEnd}
+        onPointerDown={onPanStart}
+        onPointerMove={onPanMove}
+        onPointerUp={onPanEnd}
+        onPointerCancel={onPanEnd}
       >
+        {/* Horizontal Timeline Axis */}
         <div
-          className="absolute top-1/2 transform -translate-y-1/2 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent"
+          className="absolute top-1/2 h-1 bg-gradient-to-r from-cyan-500/10 via-cyan-400 to-cyan-500/10 shadow-lg shadow-cyan-500/50"
           style={{
             left: `${pan.x}px`,
-            width: `${totalWidth * zoom}px`,
+            top: `calc(50% + ${pan.y}px)`,
+            width: `${Math.max(totalWidth, 2000)}px`,
             transform: 'translateY(-50%)',
           }}
         />
 
+        {/* Timeline Cards Container */}
         <div
-          className="absolute top-1/2 transform -translate-y-1/2 flex gap-8 transition-none"
+          className="absolute top-1/2 left-0"
           style={{
             left: `${pan.x}px`,
-            transform: `translateY(-50%) scaleX(${zoom})`,
-            transformOrigin: 'left center',
+            top: `calc(50% + ${pan.y}px)`,
           }}
         >
           {events.map((event, idx) => {
             const eventDate = new Date(event.dateGr);
             const yearsSinceMin = eventDate.getFullYear() - minDate.getFullYear();
-            const xPosition = yearsSinceMin * pixelsPerYear;
+            const xPosition = yearsSinceMin * pixelsPerYear * zoom;
 
             return (
               <div
                 key={event.id}
-                className="absolute top-0 transform -translate-y-1/2"
+                className="absolute top-0 transform -translate-x-1/2 transition-all duration-75"
                 style={{
                   left: `${xPosition}px`,
-                  width: '100%',
                 }}
               >
-                <div className="absolute -top-2 left-40 w-4 h-4 bg-blue-500 rounded-full shadow-lg shadow-blue-500/50 transform -translate-x-1/2" />
+                {/* Timeline Dot & Connector */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+                  <div className="w-5 h-5 bg-cyan-400 rounded-full border-4 border-slate-950 shadow-md shadow-cyan-400/80 transition-transform hover:scale-125" />
+                  <div className={`w-0.5 bg-gradient-to-b from-cyan-400/80 to-transparent ${idx % 2 === 0 ? 'h-10 -mt-12 order-first' : 'h-10'}`} />
+                </div>
 
+                {/* Card placement alternating above and below axis without scale distortion */}
                 <div
+                  className="flex justify-center"
                   style={{
-                    marginTop: idx % 2 === 0 ? '-380px' : '40px',
+                    marginTop: idx % 2 === 0 ? '-420px' : '60px',
                   }}
                 >
                   <TimelineCard event={event} importance={event.importance} />

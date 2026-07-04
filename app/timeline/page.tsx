@@ -7,12 +7,24 @@ import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/
 export default function TimelinePage() {
   const { events, isLoading, error } = useTimelineEvents();
   const { zoom, zoomIn, zoomOut, resetZoom } = useTimelineZoom(1);
-  const { pan, startPanning, stopPanning, handlePan, resetPan } = usePan({ x: 200, y: 0 });
+  const { pan, startPanning, stopPanning, handlePan, resetPan, setPan } = usePan({ x: 150, y: 0 });
 
   const handleResetView = useCallback(() => {
     resetZoom();
     resetPan();
   }, [resetZoom, resetPan]);
+
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (e.ctrlKey) {
+        if (e.deltaY < 0) zoomIn();
+        else if (e.deltaY > 0) zoomOut();
+      } else {
+        setPan((current) => ({ ...current, x: current.x - e.deltaY * 1.2 }));
+      }
+    },
+    [zoomIn, zoomOut, setPan]
+  );
 
   if (isLoading) return <TimelineLoading />;
   if (error) return <TimelineError error={error} />;
@@ -29,6 +41,7 @@ export default function TimelinePage() {
       onZoomIn={zoomIn}
       onZoomOut={zoomOut}
       onResetView={handleResetView}
+      onWheel={handleWheel}
     />
   );
 }
