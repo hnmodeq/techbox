@@ -91,43 +91,33 @@ export default function SidebarShell({
 
  return (
  <>
- <button
- ref={btnRef}
- type="button"
- onClick={handleClick}
- onPointerDown={handlePointerDown}
- onPointerMove={handlePointerMove}
- onPointerUp={endDrag}
- onPointerCancel={endDrag}
- style={{ top: `${btnTop}px`, touchAction: "none", zIndex: zIndex.mobileFab }}
- className={`fixed select-none rounded-full sm:hidden
- transition-[right] duration-[var(--tb-motion-lg)] translate-x-1/2
- ${mobileOpen ? MOBILE_FAB_OPEN_RIGHT : "right-0"}
- ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
- aria-label={mobileOpen ? "بستن منو" : "باز کردن منو"}
- >
- <div className="relative flex h-[72px] w-[72px] items-center justify-center rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/90 shadow-[var(--tb-shadow-lg)] backdrop-blur-[var(--tb-blur-md)]">
- <Image
- src="/logo.png"
- alt="لوگو تکباکس"
- fill
- priority
- sizes="72px"
- draggable={false}
- onDragStart={(e) => e.preventDefault()}
- className="pointer-events-none rounded-full object-contain p-2"
- />
- </div>
- </button>
+ {!mobileOpen && (
+   <button
+     ref={btnRef}
+     type="button"
+     onClick={() => onToggleMobile()}
+     style={{ top: `${btnTop}px`, zIndex: zIndex.mobileFab }}
+     className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[var(--tb-motion-lg)] shadow-[var(--tb-shadow-lg)] cursor-pointer"
+     aria-label="باز کردن منو"
+   >
+     <div className="relative flex h-16 w-16 items-center justify-center rounded-l-full border border-r-0 border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/95 shadow-xl backdrop-blur-md p-2">
+       <Image
+         src="/logo.png"
+         alt="لوگو تکباکس"
+         width={48}
+         height={48}
+         priority
+         className="object-contain"
+       />
+     </div>
+   </button>
+ )}
 
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm sm:hidden"
           style={{ zIndex: zIndex.sidebarBackdrop }}
-          onClick={() => {
-            if (Date.now() - lastOpenRef.current < 500) return;
-            onCloseMobile();
-          }}
+          onClick={() => onCloseMobile()}
         />
       )}
 
