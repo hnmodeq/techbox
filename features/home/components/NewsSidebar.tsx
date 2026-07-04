@@ -33,19 +33,19 @@ export default function NewsSidebar() {
 
   return (
     <>
-      {/* Floating Left Edge Toggle Button (styled like main sidebar button) */}
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        style={{ zIndex: zIndex.mobileFab }}
-        className={`fixed left-0 top-6 select-none rounded-r-[var(--tb-radius-lg)] bg-[var(--tb-bg-secondary)] border border-l-0 border-[var(--tb-border)] p-2.5 text-[var(--tb-news)] shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--tb-bg-muted)] cursor-pointer ${
-          open ? 'left-80' : 'left-0'
-        }`}
-        title={open ? 'بستن اخبار فوری' : 'باز کردن اخبار فوری'}
-        aria-label="اخبار فوری"
-      >
-        <Icon name="news" className="h-6 w-6" />
-      </button>
+      {/* Floating Left Edge Toggle Button */}
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          style={{ zIndex: zIndex.mobileFab }}
+          className="fixed left-0 top-6 select-none rounded-r-[var(--tb-radius-lg)] bg-[var(--tb-bg-secondary)] border border-l-0 border-[var(--tb-border)] p-2.5 text-[var(--tb-news)] shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--tb-bg-muted)] cursor-pointer"
+          title="اخبار زنده تکباکس"
+          aria-label="اخبار زنده تکباکس"
+        >
+          <Icon name="news" className="h-6 w-6" />
+        </button>
+      )}
 
       {/* Mobile Backdrop */}
       {open && (
@@ -90,15 +90,15 @@ export default function NewsSidebar() {
         </div>
 
         {/* Scrollable News List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-5 divide-y divide-[var(--tb-border)]/40">
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {newsItems.map((n) => (
             <Link
               key={n.slug}
               href={`/news/${n.slug}`}
               onClick={() => setOpen(false)}
-              className="group block pt-4 first:pt-0"
+              className="group block px-2 sm:px-3"
             >
-              {/* Wide Banner Image (less height, full width aspect-[3/1]) */}
+              {/* Wide Banner Image */}
               <div className="relative aspect-[3/1] w-full rounded-[var(--tb-radius-md)] overflow-hidden bg-[var(--tb-bg-muted)] mb-3 border border-[var(--tb-border)]/50">
                 <Image
                   src={n.image || '/assets/blog-1.jpg'}
@@ -109,9 +109,8 @@ export default function NewsSidebar() {
                 />
               </div>
 
-              {/* Date & Time (Tags & Views Counter hidden per request) */}
-              <div className="flex items-center gap-1.5 text-[11px] text-[var(--tb-fg-muted)] mb-1">
-                <Icon name="clock" className="h-3 w-3 text-[var(--tb-news)]" />
+              {/* Date & Time */}
+              <div className="text-[11px] text-[var(--tb-fg-muted)] mb-1 font-bold">
                 <span>{n.date_fa} {n.time || ''}</span>
               </div>
 

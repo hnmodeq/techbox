@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getLatest } from '@/lib/content';
+import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -43,8 +43,7 @@ export default function MagazineRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1.5 flex items-center gap-1.5 font-bold">
-                    <Icon name="clock" size={16} strokeWidth={2} className="text-[var(--tb-blog)]" />
+                  <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1.5 font-bold">
                     <span>{art.date_fa}</span>
                   </div>
                   <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
@@ -66,7 +65,7 @@ export default function MagazineRow() {
                     />
                     <span className="font-extrabold text-[var(--tb-fg-primary)]">{art.author?.name || 'تحریریه'}</span>
                   </div>
-                  <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} />
+                  <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
                 </div>
               </div>
             </Link>
