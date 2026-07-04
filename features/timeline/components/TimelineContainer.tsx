@@ -32,10 +32,30 @@ export function TimelineContainer({
 }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Sequential item spacing along the horizontal track (prevents 10,000px voids between years)
-  const cardSpacing = 340 * zoom;
-  const startOffset = 220;
-  const totalWidth = Math.max(events.length * cardSpacing + startOffset * 2, 2000);
+  // Proportional time spacing calculated from edge of cards to eliminate any overlapping
+  const xPositions = React.useMemo(() => {
+    let currX = 220;
+    return events.map((ev, idx) => {
+      if (idx === 0) return currX;
+      const prevDate = new Date(events[idx - 1].dateGr).getTime();
+      const currDate = new Date(ev.dateGr).getTime();
+      const diffYears = Math.max(0, (currDate - prevDate) / (1000 * 60 * 60 * 24 * 365.2425));
+
+      const prevCardWidth =
+        events[idx - 1].importance >= 8
+          ? 320
+          : events[idx - 1].importance >= 6
+            ? 288
+            : 256;
+
+      // Proportional gap based on date distance (with safe min buffer so edges never collide)
+      const timeGap = Math.min(Math.max(diffYears * 18 * zoom, 50 * zoom), 600 * zoom);
+      currX += prevCardWidth + timeGap;
+      return currX;
+    });
+  }, [events, zoom]);
+
+  const totalWidth = Math.max((xPositions[xPositions.length - 1] || 1000) + 600, 2000);
 
   // Native non-passive wheel listener to strictly block vertical webpage scrolling
   useEffect(() => {
@@ -79,9 +99,9 @@ export function TimelineContainer({
         onPointerUp={onPanEnd}
         onPointerCancel={onPanEnd}
       >
-        {/* Horizontal Timeline Axis Line */}
+        {/* Prominent Horizontal Timeline Axis Line */}
         <div
-          className="absolute top-1/2 h-1 bg-gradient-to-r from-[var(--tb-timeline)]/10 via-[var(--tb-timeline)] to-[var(--tb-timeline)]/10 shadow-lg"
+          className="absolute top-1/2 h-2 bg-[var(--tb-timeline)] shadow-lg shadow-[var(--tb-timeline)]/50 rounded-full"
           style={{
             left: `${pan.x}px`,
             top: `calc(50% + ${pan.y}px)`,
@@ -99,20 +119,20 @@ export function TimelineContainer({
           }}
         >
           {events.map((event, idx) => {
-            const xPosition = idx * cardSpacing + startOffset;
+            const xPos = xPositions[idx] || 220;
 
             return (
               <div
                 key={event.id}
                 className="absolute top-0 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-75 flex flex-col items-center"
                 style={{
-                  left: `${xPosition}px`,
+                  left: `${xPos}px`,
                 }}
               >
                 {/* Timeline Milestone Dot on Axis */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-lg transition-transform hover:scale-125" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-xl transition-transform hover:scale-125" />
 
-                {/* Card centered directly on the horizontal line */}
+                {/* Card centered directly along the horizontal line */}
                 <div className="flex justify-center">
                   <TimelineCard event={event} importance={event.importance} />
                 </div>
