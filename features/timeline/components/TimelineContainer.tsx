@@ -15,6 +15,7 @@ interface TimelineContainerProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetView: () => void;
+  onZoomChange?: (nextZoom: number) => void;
   onWheel?: (e: React.WheelEvent | WheelEvent) => void;
 }
 
@@ -28,13 +29,14 @@ export function TimelineContainer({
   onZoomIn,
   onZoomOut,
   onResetView,
+  onZoomChange,
   onWheel,
 }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Proportional time spacing calculated from edge of cards to eliminate any overlapping
+  // Proportional time spacing calculated from edge of previous cards to prevent overlapping
   const xPositions = React.useMemo(() => {
-    let currX = 220;
+    let currX = 180;
     return events.map((ev, idx) => {
       if (idx === 0) return currX;
       const prevDate = new Date(events[idx - 1].dateGr).getTime();
@@ -48,14 +50,14 @@ export function TimelineContainer({
             ? 288
             : 256;
 
-      // Proportional gap based on date distance (with safe min buffer so edges never collide)
-      const timeGap = Math.min(Math.max(diffYears * 18 * zoom, 50 * zoom), 600 * zoom);
+      // Distance strictly added AFTER previous card edge (proportional to elapsed years)
+      const timeGap = Math.min(Math.max(diffYears * 16 * zoom, 40 * zoom), 600 * zoom);
       currX += prevCardWidth + timeGap;
       return currX;
     });
   }, [events, zoom]);
 
-  const totalWidth = Math.max((xPositions[xPositions.length - 1] || 1000) + 600, 2000);
+  const totalWidth = Math.max((xPositions[xPositions.length - 1] || 1000) + 800, 2000);
 
   // Native non-passive wheel listener to strictly block vertical webpage scrolling
   useEffect(() => {
@@ -99,40 +101,40 @@ export function TimelineContainer({
         onPointerUp={onPanEnd}
         onPointerCancel={onPanEnd}
       >
-        {/* Prominent Horizontal Timeline Axis Line */}
+        {/* Continuous, Thick Glowing Horizontal Timeline Axis Line */}
         <div
-          className="absolute top-1/2 h-2 bg-[var(--tb-timeline)] shadow-lg shadow-[var(--tb-timeline)]/50 rounded-full"
+          className="absolute h-2.5 bg-[var(--tb-timeline)] shadow-[0_0_16px_rgba(6,182,212,0.8)] rounded-full z-10"
           style={{
-            left: `${pan.x}px`,
-            top: `calc(50% + ${pan.y}px)`,
-            width: `${totalWidth}px`,
+            left: `${pan.x - 500}px`,
+            top: `calc(62% + ${pan.y}px)`,
+            width: `${totalWidth + 1000}px`,
             transform: 'translateY(-50%)',
           }}
         />
 
         {/* Timeline Cards Container */}
         <div
-          className="absolute top-1/2 left-0"
+          className="absolute top-0 left-0 h-full"
           style={{
             left: `${pan.x}px`,
-            top: `calc(50% + ${pan.y}px)`,
+            top: `${pan.y}px`,
           }}
         >
           {events.map((event, idx) => {
-            const xPos = xPositions[idx] || 220;
+            const xPos = xPositions[idx] || 180;
 
             return (
               <div
                 key={event.id}
-                className="absolute top-0 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-75 flex flex-col items-center"
+                className="absolute top-[62%] transform -translate-x-1/2 -translate-y-[calc(100%+14px)] transition-all duration-75 flex flex-col items-center"
                 style={{
                   left: `${xPos}px`,
                 }}
               >
-                {/* Timeline Milestone Dot on Axis */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-xl transition-transform hover:scale-125" />
+                {/* Timeline Milestone Dot right on the axis line (NOT on the card) */}
+                <div className="absolute -bottom-[14px] left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-lg transition-transform hover:scale-125" />
 
-                {/* Card centered directly along the horizontal line */}
+                {/* Card placement aligned directly along the line */}
                 <div className="flex justify-center">
                   <TimelineCard event={event} importance={event.importance} />
                 </div>
@@ -142,7 +144,7 @@ export function TimelineContainer({
         </div>
       </div>
 
-      <ZoomControls zoom={zoom} onZoomIn={onZoomIn} onZoomOut={onZoomOut} onReset={onResetView} />
+      <ZoomControls zoom={zoom} onReset={onResetView} onZoomChange={onZoomChange} />
     </div>
   );
 }
