@@ -17,7 +17,7 @@
     "**/.env.local": false,
     "**.env.example": false,
     "**/.gitattributes": true,
-    "**/.gitignore": true,
+    "**/.gitignore": false,
     "**/next-env.d.ts": true,
     "**/tailwind.config.ts": true,
     "**/tsconfig.json": true,
