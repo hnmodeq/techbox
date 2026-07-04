@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { moduleColors } from "@/config/module-colors";
+import { HOME_ROW_SIZES } from "./HomeRowConfig";
 
 const items: { text: string; href: string; module: keyof typeof moduleColors }[] = [
  { text: "اخبار تکنولوژی رو با تکباکس دنبال کن", href: "/news", module: "news" },
@@ -28,7 +29,7 @@ export default function HeroSection() {
  const item = items[index];
 
  return (
-    <section className="relative flex min-h-[260px] w-full max-w-full overflow-x-hidden flex-col items-center px-4 pb-10 pt-14 text-center md:min-h-[300px] md:pt-20" dir="rtl">
+    <section className={`relative flex ${HOME_ROW_SIZES.heroMinHeight} w-full max-w-full overflow-x-hidden flex-col justify-center items-center px-4 py-16 text-center`} dir="rtl">
       <div className="relative z-10 flex flex-col items-center w-full max-w-full">
         <h1 className="tb-hero">تکباکس</h1>
         <div className="hero-rotator mt-3 w-full max-w-2xl">
