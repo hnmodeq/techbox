@@ -1,11 +1,47 @@
 'use client';
 
-import React from 'react';
-import { getLatest } from '@/lib/content';
+import React, { useState, useEffect } from 'react';
+import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/CardStats';
+
+function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { slug: string; initialViews: number; initialLikes: number; initialComments: number }) {
+  const [fileSize, setFileSize] = useState('۶۸۰ مگابایت');
+
+  useEffect(() => {
+    let mounted = true;
+    fetch(`/api/stats?module=download&slug=${encodeURIComponent(slug)}`)
+      .then(r => r.json())
+      .then(d => {
+        if (mounted && d && typeof d.fileSize === 'string') {
+          setFileSize(d.fileSize);
+        }
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, [slug]);
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 w-full mt-3">
+      <span className="text-xs font-extrabold text-[var(--tb-download)] group-hover:underline flex items-center gap-1 shrink-0">
+        <span>دانلود مستقیم</span>
+        <span>↓</span>
+      </span>
+      <div className="flex items-center gap-3">
+        <span className="inline-flex items-center gap-1 text-xs text-[var(--tb-fg-muted)] font-bold" title="حجم فایل">
+          <svg className="w-3.5 h-3.5 text-[var(--tb-warning)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span className="text-[var(--tb-fg-primary)]">{fileSize}</span>
+        </span>
+        <CardStats module="download" slug={slug} initialViews={initialViews} initialLikes={initialLikes} initialComments={initialComments} showComments={true} />
+      </div>
+    </div>
+  );
+}
 
 export default function DownloadRow() {
   const files = getLatest('download', 8);
@@ -15,11 +51,6 @@ export default function DownloadRow() {
     if (title.toLowerCase().includes('driver') || title.toLowerCase().includes('exe')) return '.EXE';
     if (title.toLowerCase().includes('firmware') || title.toLowerCase().includes('bin')) return '.BIN';
     return '.ZIP';
-  };
-
-  const getSize = (idx: number) => {
-    const sizes = ['۴.۲ گیگابایت', '۶۸۰ مگابایت', '۱.۸ گیگابایت', '۲۴۰ مگابایت', '۵.۱ گیگابایت'];
-    return sizes[idx % sizes.length];
   };
 
   return (
@@ -35,20 +66,23 @@ export default function DownloadRow() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {files.map((file, idx) => {
+          {files.map((file) => {
             const ext = getExtension(file.title, file.category);
-            const fileSize = getSize(idx);
+            const commentsCount = getCommentCount('download', file.slug);
 
             return (
               <Link
                 key={file.slug}
                 href={`/download/${file.slug}`}
-                className="group card p-4 hover:bg-[var(--tb-bg-muted)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] flex flex-col justify-between gap-4 bg-[var(--tb-bg-secondary)]"
+                className="group card p-4 hover:bg-[var(--tb-bg-muted)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] flex flex-col justify-between gap-3 bg-[var(--tb-bg-secondary)]"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
-                  {/* Software File Box with Extension Badge */}
-                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-xl bg-[color-mix(in_oklch,var(--tb-download)_12%,var(--tb-bg-muted))] text-[var(--tb-download)] border border-[color-mix(in_oklch,var(--tb-download)_30%,transparent)] group-hover:scale-105 transition-transform shadow-sm">
-                    <Icon name="downloadModule" size={22} strokeWidth={2} />
+                  {/* Yellow Special File Icon Box */}
+                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-xl bg-[var(--tb-warning)]/15 text-[var(--tb-warning)] border border-[var(--tb-warning)]/35 group-hover:scale-105 transition-transform shadow-sm">
+                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
                     <span className="text-[9px] font-mono font-black tracking-tight mt-0.5">{ext}</span>
                   </div>
 
@@ -57,7 +91,6 @@ export default function DownloadRow() {
                       <span className="text-[10px] font-bold text-[var(--tb-download)] bg-[var(--tb-download)]/10 px-2 py-0.5 rounded">
                         {file.category || 'سیستم‌عامل'}
                       </span>
-                      <span className="text-[11px] text-[var(--tb-fg-muted)] font-bold">حجم: {fileSize}</span>
                     </div>
 
                     <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
@@ -69,14 +102,8 @@ export default function DownloadRow() {
                   </div>
                 </div>
 
-                {/* Direct Download Action Footer */}
-                <div className="pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between">
-                  <span className="text-xs font-extrabold text-[var(--tb-download)] group-hover:underline flex items-center gap-1">
-                    <span>دانلود مستقیم</span>
-                    <span>↓</span>
-                  </span>
-                  <CardStats module="download" slug={file.slug} initialViews={file.views ?? 0} initialLikes={file.likes ?? 0} />
-                </div>
+                {/* Bottom Footer without visible separator line */}
+                <DownloadMeta slug={file.slug} initialViews={file.views ?? 0} initialLikes={file.likes ?? 0} initialComments={commentsCount} />
               </Link>
             );
           })}

@@ -82,7 +82,7 @@ export default function DownloadTable() {
             </div>
 
             <div className="col-span-2 text-left md:text-left flex justify-end">
-              <CardStats module="download" slug={f.slug} initialViews={f.views ?? 0} initialLikes={f.likes ?? 0} />
+              <CardStats module="download" slug={f.slug} initialViews={f.views ?? 0} initialLikes={f.likes ?? 0} showComments={true} />
             </div>
           </Link>
         ))}

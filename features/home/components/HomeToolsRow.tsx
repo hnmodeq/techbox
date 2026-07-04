@@ -32,24 +32,27 @@ export default function HomeToolsRow() {
           <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-3xl">
             <Link
               href="/tools/nas-selector"
-              className="btn btn-outline !h-11 px-6 border-[var(--tb-nas)] text-[var(--tb-nas)] hover:bg-[var(--tb-nas)]/10 font-bold flex items-center justify-center gap-2 tb-text-sm flex-1 sm:flex-none shadow-sm"
+              className="group relative overflow-hidden btn btn-outline !h-11 px-6 border-[var(--tb-nas)] text-[var(--tb-nas)] hover:bg-[var(--tb-nas)]/15 font-extrabold flex items-center justify-center gap-2 tb-text-sm flex-1 sm:flex-none shadow-[0_0_15px_color-mix(in_oklch,var(--tb-nas)_25%,transparent)] hover:shadow-[0_0_25px_var(--tb-nas)] hover:-translate-y-1 transition-all duration-300"
             >
+              <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out pointer-events-none" />
               <Icon name="nas" className="h-4.5 w-4.5" />
               <span>انتخاب‌گر هوشمند NAS</span>
             </Link>
 
             <Link
               href="/tools/nvr-selector"
-              className="btn btn-outline !h-11 px-6 border-[var(--tb-nvr)] text-[var(--tb-nvr)] hover:bg-[var(--tb-nvr)]/10 font-bold flex items-center justify-center gap-2 tb-text-sm flex-1 sm:flex-none shadow-sm"
+              className="group relative overflow-hidden btn btn-outline !h-11 px-6 border-[var(--tb-nvr)] text-[var(--tb-nvr)] hover:bg-[var(--tb-nvr)]/15 font-extrabold flex items-center justify-center gap-2 tb-text-sm flex-1 sm:flex-none shadow-[0_0_15px_color-mix(in_oklch,var(--tb-nvr)_25%,transparent)] hover:shadow-[0_0_25px_var(--tb-nvr)] hover:-translate-y-1 transition-all duration-300"
             >
+              <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out pointer-events-none" />
               <Icon name="nvr" className="h-4.5 w-4.5" />
               <span>انتخاب‌گر دستگاه NVR</span>
             </Link>
 
             <Link
               href="/tools/subnet-calculator"
-              className="btn btn-outline !h-11 px-6 border-[var(--tb-subnet)] text-[var(--tb-subnet)] hover:bg-[var(--tb-subnet)]/10 font-bold flex items-center justify-center gap-2 tb-text-sm flex-1 sm:flex-none shadow-sm"
+              className="group relative overflow-hidden btn btn-outline !h-11 px-6 border-[var(--tb-subnet)] text-[var(--tb-subnet)] hover:bg-[var(--tb-subnet)]/15 font-extrabold flex items-center justify-center gap-2 tb-text-sm flex-1 sm:flex-none shadow-[0_0_15px_color-mix(in_oklch,var(--tb-subnet)_25%,transparent)] hover:shadow-[0_0_25px_var(--tb-subnet)] hover:-translate-y-1 transition-all duration-300"
             >
+              <span className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-in-out pointer-events-none" />
               <Icon name="tools" className="h-4.5 w-4.5" />
               <span>ماشین حساب Subnet</span>
             </Link>

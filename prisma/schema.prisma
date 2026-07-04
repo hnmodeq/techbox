@@ -42,6 +42,7 @@ model Post {
   likes      Int      @default(0)
   views      Int      @default(0)
   solved     Boolean? @default(false)
+  fileSize   String?
   published  Boolean  @default(true)
 
   author   User?     @relation(fields: [authorId], references: [id])

@@ -316,31 +316,18 @@ export default function RaidCalculator() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h3 className="tb-text-lg font-black">انتخاب دیسک‌ها</h3>
-                  <p className="tb-text-sm text-[var(--tb-fg-muted)]">برای افزودن هارد دیسک، یکی از ظرفیت‌های سریع زیر را کلیک کنید.</p>
+                  <p className="tb-text-sm text-[var(--tb-fg-muted)]">برای افزودن دیسک جدید روی دکمه + کلیک کنید و ظرفیت مورد نظر را از منو انتخاب نمایید.</p>
                 </div>
                 <div className="badge">{nf.format(drives.length)} دیسک فعال</div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-7 xl:grid-cols-13">
-                {QUICK_SIZES.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => addDrive(size)}
-                    className="rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-muted)] px-3 py-2.5 tb-text-sm font-bold transition hover:-translate-y-0.5 hover:border-[color-mix(in_oklch,var(--tb-raid)_48%,var(--tb-border))] hover:bg-[color-mix(in_oklch,var(--tb-raid)_10%,var(--tb-bg-muted))]"
-                  >
-                    + {nf.format(size)} ترابایت
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center">
                 {drives.map((drive, index) => (
-                  <div key={drive.id} className="group rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-3 transition hover:border-[color-mix(in_oklch,var(--tb-raid)_42%,var(--tb-border))]">
+                  <div key={drive.id} className="group rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-3.5 transition hover:border-[color-mix(in_oklch,var(--tb-raid)_42%,var(--tb-border))]">
                     <div className="mb-3 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 font-black">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-[var(--tb-radius-md)] bg-[color-mix(in_oklch,var(--tb-raid)_13%,var(--tb-bg-muted))] text-[var(--tb-raid)]">
-                          <Icon name="disk" className="h-5 w-5" />
+                        <span className="flex h-8 w-8 items-center justify-center rounded-[var(--tb-radius-md)] bg-[color-mix(in_oklch,var(--tb-raid)_15%,var(--tb-bg-muted))] text-[var(--tb-raid)]">
+                          <Icon name="disk" className="h-4.5 w-4.5" />
                         </span>
                         دیسک {nf.format(index + 1)}
                       </div>
@@ -348,27 +335,36 @@ export default function RaidCalculator() {
                         type="button"
                         disabled={!canRemove}
                         onClick={() => removeDrive(drive.id)}
-                        className="icon-rail-btn h-8 w-8 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="icon-rail-btn h-7 w-7 disabled:cursor-not-allowed disabled:opacity-40"
                         aria-label="حذف دیسک"
                       >
-                        <Icon name="close" className="h-4 w-4" />
+                        <Icon name="close" className="h-3.5 w-3.5" />
                       </button>
                     </div>
                     <div className="flex items-center gap-2">
-                      <input
-                        className="input text-left font-black [direction:ltr]"
-                        type="number"
-                        min="0.1"
-                        max="100"
-                        step="0.1"
+                      <select
+                        className="input w-full font-black [direction:ltr]"
                         value={drive.sizeTb}
                         onChange={(event) => updateDrive(drive.id, Number(event.target.value))}
                         aria-label={`ظرفیت دیسک ${index + 1}`}
-                      />
-                      <span className="tb-text-sm font-bold text-[var(--tb-fg-muted)] shrink-0">ترابایت</span>
+                      >
+                        {[2, 4, 8, 12, 16, 24, 32].map(sz => (
+                          <option key={sz} value={sz}>{sz} TB</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 ))}
+
+                {/* Big Plus Button to Add Disk */}
+                <button
+                  type="button"
+                  onClick={() => addDrive(8)}
+                  className="h-full min-h-[110px] rounded-[var(--tb-radius-md)] border-2 border-dashed border-[var(--tb-raid)]/50 bg-[var(--tb-raid)]/5 hover:bg-[var(--tb-raid)]/15 transition-all flex flex-col items-center justify-center gap-2 text-[var(--tb-raid)] font-black p-4 cursor-pointer hover:scale-[1.02]"
+                >
+                  <Icon name="plus" className="h-8 w-8 stroke-[3]" />
+                  <span className="text-sm">افزودن دیسک جدید</span>
+                </button>
               </div>
             </div>
 
@@ -376,32 +372,29 @@ export default function RaidCalculator() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h3 className="tb-text-lg font-black">انتخاب نوع RAID</h3>
-                  <p className="tb-text-sm text-[var(--tb-fg-muted)]">یکی از گزینه‌ها را برای محاسبه نهایی و مشاهده نقشه ظرفیت انتخاب کنید.</p>
+                  <p className="tb-text-sm text-[var(--tb-fg-muted)]">معماری و نوع آرایه دیسک را از منوی کشویی انتخاب کنید.</p>
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                {RAID_OPTIONS.map((option) => {
-                  const active = raid === option.key;
-                  return (
-                    <button
-                      key={option.key}
-                      type="button"
-                      onClick={() => setRaid(option.key)}
-                      className={`text-right rounded-[var(--tb-radius-md)] border p-4 transition ${
-                        active
-                          ? "border-[color-mix(in_oklch,var(--tb-raid)_70%,var(--tb-border))] bg-[color-mix(in_oklch,var(--tb-raid)_13%,var(--tb-bg-secondary))] shadow-[var(--tb-shadow-sm)]"
-                          : "border-[var(--tb-border)] bg-[var(--tb-bg-muted)]/65 hover:-translate-y-0.5 hover:border-[color-mix(in_oklch,var(--tb-raid)_45%,var(--tb-border))]"
-                      }`}
-                    >
-                      <span className="flex items-center justify-between gap-3">
-                        <span className="text-base font-black">{option.label}</span>
-                        <span className={`badge ${active ? "bg-[var(--tb-raid)] text-[var(--tb-on-accent)]" : ""}`}>{option.short}</span>
-                      </span>
-                      <span className="mt-2 block tb-text-sm text-[var(--tb-fg-muted)]">حداقل {nf.format(option.minDisks)} دیسک · {option.faultTolerance}</span>
-                    </button>
-                  );
-                })}
+              <div className="max-w-xl">
+                <select
+                  value={raid}
+                  onChange={(e) => setRaid(e.target.value as RaidKey)}
+                  className="input w-full !h-12 font-bold text-base"
+                >
+                  <option value="">-- انتخاب نوع آرایه RAID یا SHR --</option>
+                  {RAID_OPTIONS.map((option) => (
+                    <option key={option.key} value={option.key}>
+                      {option.label} — حداقل {nf.format(option.minDisks)} دیسک · {option.faultTolerance}
+                    </option>
+                  ))}
+                </select>
+                {selectedOption && (
+                  <div className="mt-3.5 p-3.5 rounded-lg bg-[var(--tb-bg-muted)] border border-[var(--tb-border)] text-sm leading-6 text-[var(--tb-fg-primary)]">
+                    <span className="font-extrabold text-[var(--tb-raid)]">{selectedOption.label}: </span>
+                    {selectedOption.description}
+                  </div>
+                )}
               </div>
 
               <div className="mt-5 rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-muted)]/60 p-4">
