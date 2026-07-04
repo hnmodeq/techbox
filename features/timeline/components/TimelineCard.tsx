@@ -68,9 +68,6 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, 320px"
           />
-          <span className="absolute top-3 right-3 rounded-full border border-white/30 bg-black/60 px-2.5 py-0.5 tb-text-sm text-white backdrop-blur-md">
-            {event.yearFa ? `${event.yearFa} شمسی` : ''}
-          </span>
         </div>
 
         <div className="flex-1 p-4 flex flex-col overflow-hidden">
@@ -80,16 +77,6 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
           <p className="tb-text-sm text-[var(--tb-fg-muted)] mb-3 line-clamp-3 flex-1 leading-6">
             {event.description}
           </p>
-
-          {event.tags && Array.isArray(event.tags) && event.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {(event.tags as string[]).slice(0, 2).map((tag, idx) => (
-                <span key={idx} className="tb-text-sm rounded-full bg-[color-mix(in_oklch,var(--tb-timeline)_14%,var(--tb-bg-muted))] text-[var(--tb-timeline)] border border-[color-mix(in_oklch,var(--tb-timeline)_28%,var(--tb-border))] px-2.5 py-0.5">
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="border-t border-[var(--tb-border)] px-4 py-2.5 flex items-center justify-between bg-[var(--tb-bg-muted)]/50 gap-2 shrink-0">
