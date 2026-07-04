@@ -3,7 +3,6 @@
 import React, { useEffect, useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
-import { ZoomControls } from './ZoomControls';
 
 interface TimelineContainerProps {
   events: TimelineEvent[];
@@ -12,9 +11,9 @@ interface TimelineContainerProps {
   onPanStart: (e: React.MouseEvent | React.PointerEvent) => void;
   onPanMove: (e: React.MouseEvent | React.PointerEvent) => void;
   onPanEnd: () => void;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
   onResetView: () => void;
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
   onZoomChange?: (nextZoom: number) => void;
   onWheel?: (e: React.WheelEvent | WheelEvent) => void;
 }
@@ -26,14 +25,20 @@ export function TimelineContainer({
   onPanStart,
   onPanMove,
   onPanEnd,
-  onResetView,
-  onZoomChange,
   onWheel,
 }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Exact Edge-to-Edge math: xPos[idx] = xPos[idx - 1] + (W[idx-1]/2) + (W[idx]/2) + timeGap
-  // Minimum physical gap strictly maintained at Math.max(36, 64 * zoom) + historical time diff
+  // ============================================================================
+  // ⚙️ تنظیم فاصله بین کارت‌های تایم‌لاین (How to configure spacing yourself):
+  // ============================================================================
+  // 1. PIXELS_PER_YEAR: تعداد پیکسل فاصله به ازای هر ۱ سال اختلاف تاریخی
+  //    (مثلاً اگر ۱۴۰ باشد، برای ۵ سال اختلاف، ۷۰۰ پیکسل فاصله ایجاد می‌شود)
+  // 2. MIN_EDGE_GAP: حداقل فاصله ثابت بین لبه‌های دو کارت مجاور (به پیکسل)
+  // ============================================================================
+  const PIXELS_PER_YEAR = 160;
+  const MIN_EDGE_GAP = 90;
+
   const xPositions = React.useMemo(() => {
     let currX = 240;
     return events.map((ev, idx) => {
@@ -45,15 +50,14 @@ export function TimelineContainer({
       const prevWidth = events[idx - 1].importance >= 8 ? 320 : events[idx - 1].importance >= 6 ? 288 : 256;
       const currWidth = ev.importance >= 8 ? 320 : ev.importance >= 6 ? 288 : 256;
 
-      // Generous physical edge buffer so cards never overlap at any zoom level
-      const minEdgeBuffer = Math.max(36, 64 * zoom);
-      const timeGap = Math.min(Math.max(diffYears * 28 * zoom, minEdgeBuffer), 800 * zoom);
+      // Calculate time gap between card edges
+      const timeGap = Math.min(Math.max(diffYears * PIXELS_PER_YEAR * zoom, MIN_EDGE_GAP * zoom), 3000 * zoom);
       currX += prevWidth / 2 + currWidth / 2 + timeGap;
       return currX;
     });
   }, [events, zoom]);
 
-  const totalWidth = Math.max((xPositions[xPositions.length - 1] || 1000) + 800, 2000);
+  const totalWidth = Math.max((xPositions[xPositions.length - 1] || 1000) + 1000, 2500);
 
   // Native non-passive wheel listener to strictly block vertical webpage scrolling
   useEffect(() => {
@@ -140,7 +144,7 @@ export function TimelineContainer({
         </div>
       </div>
 
-      <ZoomControls zoom={zoom} onReset={onResetView} onZoomChange={onZoomChange} />
+      {/* ZoomControls hidden per request */}
     </div>
   );
 }
