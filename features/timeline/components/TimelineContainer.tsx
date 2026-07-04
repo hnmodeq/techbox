@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
 import { ZoomControls } from './ZoomControls';
@@ -15,7 +15,7 @@ interface TimelineContainerProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetView: () => void;
-  onWheel?: (e: React.WheelEvent) => void;
+  onWheel?: (e: any) => void;
 }
 
 export function TimelineContainer({
@@ -30,6 +30,7 @@ export function TimelineContainer({
   onResetView,
   onWheel,
 }: TimelineContainerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const minTime = events.length > 0 ? Math.min(...events.map((e) => new Date(e.dateGr).getTime())) : new Date('1940-01-01').getTime();
   const maxTime = events.length > 0 ? Math.max(...events.map((e) => new Date(e.dateGr).getTime())) : new Date('2030-01-01').getTime();
   const minDate = new Date(minTime);
@@ -38,10 +39,27 @@ export function TimelineContainer({
   const pixelsPerYear = 140;
   const totalWidth = totalYears * pixelsPerYear * zoom;
 
+  // Native non-passive wheel listener to strictly block vertical webpage scrolling
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !onWheel) return;
+
+    const nativeWheelHandler = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onWheel(e);
+    };
+
+    el.addEventListener('wheel', nativeWheelHandler, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', nativeWheelHandler);
+    };
+  }, [onWheel]);
+
   return (
     <div
+      ref={containerRef}
       className="relative w-full h-[calc(100vh-64px)] min-h-[600px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden select-none"
-      onWheel={onWheel}
     >
       {/* Background Grid */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -105,7 +123,7 @@ export function TimelineContainer({
                 <div
                   className="flex justify-center"
                   style={{
-                    marginTop: idx % 2 === 0 ? '-420px' : '60px',
+                    marginTop: idx % 2 === 0 ? '-480px' : '60px',
                   }}
                 >
                   <TimelineCard event={event} importance={event.importance} />

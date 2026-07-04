@@ -15,12 +15,12 @@ export default function TimelinePage() {
   }, [resetZoom, resetPan]);
 
   const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
+    (e: any) => {
       if (e.ctrlKey) {
         if (e.deltaY < 0) zoomIn();
         else if (e.deltaY > 0) zoomOut();
       } else {
-        setPan((current) => ({ ...current, x: current.x - e.deltaY * 1.2 }));
+        setPan((current: any) => ({ ...current, x: current.x - e.deltaY * 1.2 }));
       }
     },
     [zoomIn, zoomOut, setPan]
