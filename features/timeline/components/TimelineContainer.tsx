@@ -15,7 +15,7 @@ interface TimelineContainerProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetView: () => void;
-  onWheel?: (e: any) => void;
+  onWheel?: (e: React.WheelEvent | WheelEvent) => void;
 }
 
 export function TimelineContainer({
@@ -31,13 +31,11 @@ export function TimelineContainer({
   onWheel,
 }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const minTime = events.length > 0 ? Math.min(...events.map((e) => new Date(e.dateGr).getTime())) : new Date('1940-01-01').getTime();
-  const maxTime = events.length > 0 ? Math.max(...events.map((e) => new Date(e.dateGr).getTime())) : new Date('2030-01-01').getTime();
-  const minDate = new Date(minTime);
-  const maxDate = new Date(maxTime);
-  const totalYears = Math.max(10, maxDate.getFullYear() - minDate.getFullYear() + 10);
-  const pixelsPerYear = 350;
-  const totalWidth = totalYears * pixelsPerYear * zoom;
+
+  // Sequential item spacing along the horizontal track (prevents 10,000px voids between years)
+  const cardSpacing = 340 * zoom;
+  const startOffset = 220;
+  const totalWidth = Math.max(events.length * cardSpacing + startOffset * 2, 2000);
 
   // Native non-passive wheel listener to strictly block vertical webpage scrolling
   useEffect(() => {
@@ -59,14 +57,14 @@ export function TimelineContainer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[calc(100vh-64px)] min-h-[600px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden select-none"
+      className="relative w-full h-[calc(100vh-64px)] min-h-[640px] bg-[var(--tb-bg-primary)] overflow-hidden select-none transition-colors duration-[var(--tb-motion-md)]"
     >
-      {/* Background Grid */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
+      {/* Background Grid synced with tokens */}
+      <div className="absolute inset-0 opacity-[0.14] pointer-events-none">
         <div
           className="w-full h-full"
           style={{
-            backgroundImage: 'linear-gradient(90deg, #38bdf8 1px, transparent 1px), linear-gradient(#38bdf8 1px, transparent 1px)',
+            backgroundImage: 'linear-gradient(90deg, var(--tb-timeline) 1px, transparent 1px), linear-gradient(var(--tb-timeline) 1px, transparent 1px)',
             backgroundSize: `${50 * zoom}px 50px`,
             backgroundPosition: `${pan.x}px ${pan.y}px`,
           }}
@@ -81,13 +79,13 @@ export function TimelineContainer({
         onPointerUp={onPanEnd}
         onPointerCancel={onPanEnd}
       >
-        {/* Horizontal Timeline Axis */}
+        {/* Horizontal Timeline Axis Line */}
         <div
-          className="absolute top-1/2 h-1 bg-gradient-to-r from-cyan-500/10 via-cyan-400 to-cyan-500/10 shadow-lg shadow-cyan-500/50"
+          className="absolute top-1/2 h-1 bg-gradient-to-r from-[var(--tb-timeline)]/10 via-[var(--tb-timeline)] to-[var(--tb-timeline)]/10 shadow-lg"
           style={{
             left: `${pan.x}px`,
             top: `calc(50% + ${pan.y}px)`,
-            width: `${Math.max(totalWidth, 2000)}px`,
+            width: `${totalWidth}px`,
             transform: 'translateY(-50%)',
           }}
         />
@@ -101,9 +99,7 @@ export function TimelineContainer({
           }}
         >
           {events.map((event, idx) => {
-            const eventDate = new Date(event.dateGr);
-            const yearsSinceMin = eventDate.getFullYear() - minDate.getFullYear();
-            const xPosition = yearsSinceMin * pixelsPerYear * zoom;
+            const xPosition = idx * cardSpacing + startOffset;
 
             return (
               <div
@@ -113,10 +109,10 @@ export function TimelineContainer({
                   left: `${xPosition}px`,
                 }}
               >
-                {/* Timeline Dot on Axis */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-cyan-400 rounded-full border-4 border-slate-950 shadow-lg shadow-cyan-400/80 transition-transform hover:scale-125" />
+                {/* Timeline Milestone Dot on Axis */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-lg transition-transform hover:scale-125" />
 
-                {/* Card centered right on the line */}
+                {/* Card centered directly on the horizontal line */}
                 <div className="flex justify-center">
                   <TimelineCard event={event} importance={event.importance} />
                 </div>
