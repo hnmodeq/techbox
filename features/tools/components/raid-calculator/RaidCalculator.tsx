@@ -293,8 +293,8 @@ export default function RaidCalculator() {
       <div className="relative overflow-hidden rounded-[calc(var(--tb-radius-lg)+8px)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] shadow-[var(--tb-shadow-lg)]">
         <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_12%_8%,color-mix(in_oklch,var(--tb-raid)_22%,transparent),transparent_32%),radial-gradient(circle_at_88%_0%,color-mix(in_oklch,var(--tb-primary)_18%,transparent),transparent_34%)]" />
 
-        {/* Vertical stack: Top panel for tool options, bottom panel for results */}
-        <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
+        {/* Vertical stack or wide split: Top panel for tool options, bottom panel for results */}
+        <div className="relative grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(420px,0.85fr)] lg:p-8">
           <div className="space-y-6">
             <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>

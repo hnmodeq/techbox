@@ -10,11 +10,15 @@ export default function ForumRow() {
   const topics = getLatest('forum', 6);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-forum)_4%,var(--tb-bg-primary))] ${HOME_ROW_SIZES.forumMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.forumMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
-        {/* Title without colorful badge and without separator border */}
-        <div className="mb-6">
+        {/* Simple Text More Button positioned ABOVE items inside the header */}
+        <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">داغ‌ترین بحث‌ها و چالش‌های شبکه و دیتاسنتر</h2>
+          <Link href="/forum" className="text-sm font-bold text-[var(--tb-forum)] hover:underline flex items-center gap-1 shrink-0">
+            <span>ورود به انجمن و ثبت پرسش</span>
+            <span>←</span>
+          </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -65,13 +69,6 @@ export default function ForumRow() {
               </Link>
             );
           })}
-        </div>
-
-        {/* Full-width More Button at bottom center */}
-        <div className="mt-8 w-full">
-          <Link href="/forum" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
-            ورود به انجمن و ثبت پرسش ←
-          </Link>
         </div>
       </div>
     </section>

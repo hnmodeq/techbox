@@ -11,14 +11,18 @@ export default function MagazineRow() {
   const articles = getLatest('blog', 5);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
-        {/* Title without colorful badge and without separator border */}
-        <div className="mb-6">
+        {/* Simple Text More Button positioned ABOVE items inside the header */}
+        <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">آخرین مقالات و تحلیل‌های زیرساخت</h2>
+          <Link href="/blog" className="text-sm font-bold text-[var(--tb-blog)] hover:underline flex items-center gap-1 shrink-0">
+            <span>مشاهده همه مقالات</span>
+            <span>←</span>
+          </Link>
         </div>
 
-        {/* Expanded grid showing more items edge-to-edge */}
+        {/* Expanded grid showing items edge-to-edge */}
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {articles.map((art) => (
             <Link
@@ -63,13 +67,6 @@ export default function MagazineRow() {
               </div>
             </Link>
           ))}
-        </div>
-
-        {/* Full-width More Button at bottom center */}
-        <div className="mt-8 w-full">
-          <Link href="/blog" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
-            مشاهده تمام مقالات مجله ←
-          </Link>
         </div>
       </div>
     </section>
