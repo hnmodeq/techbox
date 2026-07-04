@@ -78,10 +78,6 @@ export default function SidebarShell({
  try {
  e.currentTarget.releasePointerCapture(e.pointerId);
  } catch {}
- if (!movedRef.current) {
-   lastOpenRef.current = Date.now();
-   onToggleMobile();
- }
  };
 
  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
