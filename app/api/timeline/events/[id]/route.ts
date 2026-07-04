@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const event = await prisma.timelineEvent.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { comments: { include: { replies: true } }, likes: true },
     });
 
@@ -19,13 +20,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const body = await req.json();
     const { title, description, image, dateGr, dateFa, year, yearFa, importance, tags } = body;
 
     const event = await prisma.timelineEvent.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         description,
@@ -45,9 +47,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await prisma.timelineEvent.delete({ where: { id: params.id } });
+    const { id } = await params;
+    await prisma.timelineEvent.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });

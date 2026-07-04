@@ -12,7 +12,7 @@ import {
  Calculator,
  Network,
 } from "lucide-react";
-import { NasIcon, NvrIcon } from "@/design/icons";
+import { NasIcon, NvrIcon, TimelineIcon } from "@/design/icons";
 import { NavItem } from "@/types/sidebar.types";
 import { moduleColors } from "@/config/module-colors";
 
@@ -113,6 +113,15 @@ export const navItems: NavItem[] = [
  iconClassName: moduleColors.review.base,
  iconHoverClassName: moduleColors.review.hover,
  iconActiveClassName: moduleColors.review.active,
+ },
+ {
+ title: "تایم‌لاین فناوری",
+ href: "/timeline",
+ icon: TimelineIcon,
+ iconClassName: moduleColors.timeline.base,
+ iconHoverClassName: moduleColors.timeline.hover,
+ iconActiveClassName: moduleColors.timeline.active,
+ tooltipClassName: "text-[var(--tb-timeline)]",
  },
  {
  title: "دانلود",

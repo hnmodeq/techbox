@@ -13,6 +13,7 @@ const feedVariant: Record<ModuleSlug, "image"|"video"|"forum"|"product"|"downloa
  download: "download",
  shop: "product",
  forum: "forum",
+ timeline: "compact",
 };
 
 export default function HomeModulesSection() {

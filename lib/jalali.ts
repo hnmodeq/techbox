@@ -244,7 +244,7 @@ export function isJalaliLeapYear(year: number): boolean {
     jp = jm;
   }
 
-  const n = year - jp;
+  let n = year - jp;
 
   if (jump - n < 6) n = n + ((jump - n - 4) / 33) * 33;
 

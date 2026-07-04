@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 type Variant = "default" | "secondary" | "outline" | "brand" |
- "home" | "blog" | "news" | "media" | "shop" | "tools" | "raid" | "subnet" | "vip" | "forum" | "review" | "download" | "success" | "warning" | "danger" | "info";
+ "home" | "blog" | "news" | "media" | "shop" | "tools" | "raid" | "subnet" | "vip" | "forum" | "review" | "download" | "timeline" | "success" | "warning" | "danger" | "info";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
  variant?: Variant;
@@ -30,6 +30,7 @@ const variants: Record<Variant, string> = {
  forum: "",
  review: "",
  download: "",
+ timeline: "",
  success: "",
  warning: "",
  danger: "",
@@ -41,7 +42,7 @@ const variants: Record<Variant, string> = {
 // only colors in the UI come from intentional module headers/feeds, not tags.
 const neutralVariants = new Set<Variant>([
  "home", "blog", "news", "media", "shop", "tools", "raid", "subnet", "vip",
- "forum", "review", "download", "success", "warning", "danger", "info",
+ "forum", "review", "download", "timeline", "success", "warning", "danger", "info",
 ]);
 
 const neutralClass =

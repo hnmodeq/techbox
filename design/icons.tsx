@@ -55,6 +55,7 @@ import {
   Server,
   Database,
   Cctv,
+  History,
   type LucideIcon,
   type LucideProps,
 } from "lucide-react";
@@ -107,6 +108,7 @@ export const icons = {
   server: Server,
   nas: Database,
   nvr: Cctv,
+  timeline: History,
 } as const;
 
 export type IconName = keyof typeof icons;
@@ -137,5 +139,6 @@ export const DiskIcon = HardDrive;
 export const ServerIcon = Server;
 export const NasIcon = Database;
 export const NvrIcon = Cctv;
+export const TimelineIcon = History;
 
 export type { LucideProps };

@@ -49,6 +49,11 @@ export const moduleColors = {
  hover: "group-hover:text-[var(--tb-nvr)]",
  active: "text-[var(--tb-nvr)]",
  },
+ timeline: {
+ base: "text-[var(--tb-fg-primary)]",
+ hover: "group-hover:text-[var(--tb-timeline)]",
+ active: "text-[var(--tb-timeline)]",
+ },
  vip: {
  base: "text-[var(--tb-fg-primary)]",
  hover: "group-hover:text-[var(--tb-vip)]",

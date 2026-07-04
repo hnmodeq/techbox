@@ -68,12 +68,20 @@ export const modules: ModuleItem[] = [
  order: 7,
  },
  {
+ title: "تایم‌لاین فناوری",
+ slug: "timeline",
+ description: "تاریخچه تحولات، رویدادها و نقاط عطف فناوری اطلاعات.",
+ color: moduleColors.timeline.active,
+ cols: "md:col-span-4",
+ order: 8,
+ },
+ {
  title: "فروشگاه",
  slug: "shop",
  description: "سرور، استوریج و تجهیزات تخصصی زیرساخت.",
  color: moduleColors.shop.active,
- cols: "md:col-span-7",
- order: 8,
+ cols: "md:col-span-3",
+ order: 9,
  },
 ];
 

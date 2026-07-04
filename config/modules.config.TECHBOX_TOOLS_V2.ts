@@ -23,6 +23,7 @@ export type ModuleKey =
   | "consultation"
   | "workwithus"
   | "search"
+  | "timeline"
   | "nas-selector"
   | "nvr-selector"
   | "raid-calculator"
@@ -39,7 +40,7 @@ export type ModuleMeta = {
     | "home" | "blog" | "news" | "media" | "shop" | "tools"
     | "downloadModule" | "forum" | "review" | "server" | "disk"
     | "user" | "users" | "shield" | "chat"
-    | "nas" | "nvr";
+    | "nas" | "nvr" | "timeline";
   descriptionFa?: string;
 };
 
@@ -51,6 +52,7 @@ const moduleList: ModuleMeta[] = [
   { key: "shop", slug: "shop", title: "Shop", titleFa: "فروشگاه", href: "/shop", color: "var(--tb-shop)", icon: "shop", descriptionFa: "خرید تجهیزات" },
   { key: "tools", slug: "tools", title: "Tools", titleFa: "ابزارها", href: "/tools", color: "var(--tb-tools)", icon: "tools", descriptionFa: "ابزارهای محاسباتی" },
   { key: "download", slug: "download", title: "Download", titleFa: "دانلود", href: "/download", color: "var(--tb-download)", icon: "downloadModule", descriptionFa: "مرکز دانلود" },
+  { key: "timeline", slug: "timeline", title: "Timeline", titleFa: "تایم‌لاین فناوری", href: "/timeline", color: "var(--tb-timeline)", icon: "timeline", descriptionFa: "تاریخچه و رویدادهای فناوری" },
   { key: "forum", slug: "forum", title: "Forum", titleFa: "انجمن", href: "/forum", color: "var(--tb-forum)", icon: "forum", descriptionFa: "پرسش و پاسخ" },
   { key: "review", slug: "review", title: "Review", titleFa: "بررسی", href: "/review", color: "var(--tb-review)", icon: "review", descriptionFa: "نقد و بررسی" },
 

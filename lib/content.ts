@@ -6,7 +6,8 @@ export type ModuleSlug =
   | "tools"
   | "download"
   | "shop"
-  | "forum";
+  | "forum"
+  | "timeline";
 
 export type ContentItem = {
   slug: string;
@@ -45,6 +46,7 @@ const all: Record<ModuleSlug, ContentItem[]> = {
   download: downloadData as unknown as ContentItem[],
   shop: shopData as unknown as ContentItem[],
   forum: forumData as unknown as ContentItem[],
+  timeline: [],
 };
 
 export function getModuleItems(module: ModuleSlug): ContentItem[] {
@@ -110,4 +112,5 @@ export const moduleMeta: Record<ModuleSlug, { title: string; titleFa: string; co
   download: { title: "download", titleFa: "دانلود", color: moduleColors.download.active, href: "/download" },
   shop: { title: "shop", titleFa: "فروشگاه", color: moduleColors.shop.active, href: "/shop" },
   forum: { title: "forum", titleFa: "انجمن", color: moduleColors.forum.active, href: "/forum" },
+  timeline: { title: "timeline", titleFa: "تایم‌لاین فناوری", color: moduleColors.timeline.active, href: "/timeline" },
 };
