@@ -22,3 +22,4 @@ next-env.d.ts
 *.sqlite3
 dev.db
 prisma/dev.db
+.vscode/settings.json
