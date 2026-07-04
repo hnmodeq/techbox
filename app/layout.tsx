@@ -4,6 +4,7 @@ import "@/design/foundation/globals.css";
 import { kalameh } from "@/lib/fonts";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
  title: "رسانه تکنولوژی تکباکس",
@@ -23,6 +24,7 @@ export default function RootLayout({
  <body className="font-sans antialiased text-foreground">
  <LayoutShell>{children}</LayoutShell>
   <Analytics />
+  <SpeedInsights />
  </body>
  </html>
  );
