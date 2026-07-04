@@ -364,7 +364,7 @@ export default function SidebarContent({
  {user ? (
  <Link href="/account" onClick={onLinkClick} className={`${linkBase} tb-text-sm ${isActive(pathname, "/account") ? "bg-[var(--tb-bg-muted)] text-[var(--tb-fg-primary)]" : linkInactive}`}>
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
- {user.avatar ? (
+ {user.avatar && user.avatar !== "/assets/hooman.png" ? (
    <Image src={user.avatar} alt={user.name || "کاربر"} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
  ) : (
    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)]"><Icon name="user" size={15} /></span>

@@ -5,6 +5,7 @@ import { getCommentsAction, createCommentAction } from "@/features/comment/actio
 import { CommentVote } from "@/components/ui/LikeButton";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Icon } from "@/design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -138,7 +139,13 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="parentId" value="" />
           <div className="flex items-center gap-3 border-b border-[var(--tb-border)] pb-3">
-            <Image src={user.avatar || "/assets/hooman.png"} width={36} height={36} alt={user.name} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
+            {user.avatar && user.avatar !== "/assets/hooman.png" ? (
+              <Image src={user.avatar} width={36} height={36} alt={user.name || "کاربر"} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
+            ) : (
+              <div className="h-9 w-9 rounded-full bg-[var(--tb-bg-muted)] border border-[var(--tb-border)] flex items-center justify-center text-[var(--tb-fg-muted)] shrink-0">
+                <Icon name="user" size={18} />
+              </div>
+            )}
             <div>
               <div className="tb-text-sm font-semibold">{user.name}</div>
               <div className="text-xs text-[var(--tb-fg-muted)] font-mono" dir="ltr">@{user.username}</div>

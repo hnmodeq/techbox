@@ -26,7 +26,7 @@ export default function AccountPage() {
   const [email, setEmail] = useState("");
   const [job, setJob] = useState("");
   const [birthday, setBirthday] = useState("");
-  const [avatar, setAvatar] = useState<string>("/assets/hooman.png");
+  const [avatar, setAvatar] = useState<string>("");
   const [saveStatus, setSaveStatus] = useState<{ ok: boolean; msg: string } | null>(null);
 
   // Password change state
@@ -46,7 +46,7 @@ export default function AccountPage() {
           setEmail(data.user.email || "");
           setJob(data.user.job || "");
           setBirthday(data.user.birthday || "");
-          setAvatar(data.user.avatar || "/assets/hooman.png");
+          setAvatar(data.user.avatar ?? "");
           localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
           setLoading(false);
           return;
@@ -342,7 +342,7 @@ export default function AccountPage() {
         {/* avatar card */}
         <div className="card p-6 text-center space-y-4 h-fit">
           <div className="relative w-32 h-32 mx-auto">
-            {avatar ? (
+            {avatar && avatar !== "/assets/hooman.png" ? (
               <Image
                 src={avatar}
                 width={128}
