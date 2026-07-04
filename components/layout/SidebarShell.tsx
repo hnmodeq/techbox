@@ -33,6 +33,7 @@ export default function SidebarShell({
  const pointerStartYRef = useRef(0);
  const topStartRef = useRef(0);
  const movedRef = useRef(false);
+ const lastOpenRef = useRef(0);
 
  const storedTop = useFabTop();
  const [dragTop, setDragTop] = useState<number | null>(null);
@@ -85,6 +86,7 @@ export default function SidebarShell({
  e.stopPropagation();
  return;
  }
+ lastOpenRef.current = Date.now();
  onToggleMobile();
  };
 
@@ -119,28 +121,33 @@ export default function SidebarShell({
  </div>
  </button>
 
- {mobileOpen && (
- <Overlay
- layer="sidebarBackdrop"
- className="sm:hidden"
- onClick={onCloseMobile}
- />
- )}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm sm:hidden"
+          style={{ zIndex: zIndex.sidebarBackdrop }}
+          onClick={() => {
+            if (Date.now() - lastOpenRef.current < 300) return;
+            onCloseMobile();
+          }}
+        />
+      )}
 
- <aside
- className={`fixed right-0 top-0 h-full transform transition-transform duration-[var(--tb-motion-lg)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
- mobileOpen ? "translate-x-0" : "translate-x-full"
- }`}
- aria-hidden={!mobileOpen}
- style={{ zIndex: zIndex.sidebar }}
- >
- <SidebarContent
- expanded
- theme={theme}
- onToggleTheme={onToggleTheme}
- onLinkClick={onCloseMobile}
- />
- </aside>
+      <aside
+        className={`fixed right-0 top-0 h-full transform transition-transform duration-[var(--tb-motion-lg)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase} ${
+          mobileOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        aria-hidden={!mobileOpen}
+        style={{ zIndex: zIndex.sidebar }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <SidebarContent
+          expanded
+          theme={theme}
+          onToggleTheme={onToggleTheme}
+          onLogoClick={onCloseMobile}
+          onLinkClick={onCloseMobile}
+        />
+      </aside>
 
  <div
  className={`hidden shrink-0 sm:block transition-[width] duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${

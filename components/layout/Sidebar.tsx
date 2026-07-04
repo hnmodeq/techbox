@@ -7,23 +7,16 @@ import { themeStore } from "@/stores/theme.store";
 import SidebarShell from "@/components/layout/SidebarShell";
 
 export default function SidebarMain({ onMobileOpenChange }: SidebarMainProps) {
- const desktopOpen = React.useSyncExternalStore(
- desktopStore.subscribe,
- desktopStore.getSnapshot,
- () => true
- );
+ const [desktopOpen, setDesktopOpen] = React.useState(() => desktopStore.getSnapshot());
+ const [mobileOpen, setMobileOpen] = React.useState(() => mobileStore.getSnapshot());
+ const [theme, setTheme] = React.useState(() => themeStore.getClientSnapshot());
 
- const mobileOpen = React.useSyncExternalStore(
- mobileStore.subscribe,
- mobileStore.getSnapshot,
- () => false
- );
-
- const theme = React.useSyncExternalStore(
- themeStore.subscribe,
- themeStore.getClientSnapshot,
- themeStore.getServerSnapshot
- );
+ React.useEffect(() => {
+   const u1 = desktopStore.subscribe(() => setDesktopOpen(desktopStore.getSnapshot()));
+   const u2 = mobileStore.subscribe(() => setMobileOpen(mobileStore.getSnapshot()));
+   const u3 = themeStore.subscribe(() => setTheme(themeStore.getClientSnapshot()));
+   return () => { u1(); u2(); u3(); };
+ }, []);
 
  React.useEffect(() => {
  document.documentElement.classList.toggle("dark", theme === "dark");

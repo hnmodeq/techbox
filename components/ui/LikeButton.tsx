@@ -29,6 +29,13 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
     if (busy) return;
     setBusy(true);
     setShowLoginPrompt(false);
+
+    const prevLiked = liked;
+    const prevCount = count;
+    const nextLiked = !liked;
+    setLiked(nextLiked);
+    setCount(c => nextLiked ? c + 1 : Math.max(0, c - 1));
+
     try {
       const res = await fetch("/api/like", {
         method: "POST",
@@ -37,6 +44,8 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
       });
 
       if (res.status === 401) {
+        setLiked(prevLiked);
+        setCount(prevCount);
         setShowLoginPrompt(true);
         setBusy(false);
         return;
@@ -49,12 +58,17 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("tb_stats_update", { detail: { module: contentType, slug, likes: data.likes } }));
         }
+      } else {
+        setLiked(prevLiked);
+        setCount(prevCount);
       }
     } catch {
+      setLiked(prevLiked);
+      setCount(prevCount);
     } finally {
       setBusy(false);
     }
-  }, [busy, contentType, slug]);
+  }, [busy, liked, count, contentType, slug]);
 
   return (
     <div className="relative inline-flex items-center">

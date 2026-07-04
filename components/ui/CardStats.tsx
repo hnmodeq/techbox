@@ -90,7 +90,7 @@ export function CardStats({
         {showLabel && <span className="font-normal ms-0.5">بازدید</span>}
       </span>
       <span className="inline-flex items-center gap-1" title="پسند">
-        <Icon name="like" size={16} strokeWidth={2} className="text-red-400" />
+        <Icon name="like" size={16} strokeWidth={2} className="text-red-400 fill-current" />
         <span className="text-[var(--tb-fg-primary)]">{likes.toLocaleString("fa-IR")}</span>
       </span>
       {showComments && (
