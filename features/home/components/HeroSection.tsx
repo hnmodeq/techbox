@@ -35,7 +35,7 @@ export default function HeroSection() {
       <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         
         {/* RIGHT SIDE: Title + Rotating Text with Strands colorful background */}
-        <div className="relative order-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-right min-h-[380px] p-6 rounded-3xl overflow-hidden border border-[var(--tb-border)]/50 bg-[var(--tb-bg-secondary)]/30">
+        <div className="relative order-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-right min-h-[380px] p-6 rounded-3xl overflow-hidden border-0 bg-transparent">
           {/* Strands OGL Shader sitting behind title */}
           <div className="absolute inset-0 z-0 pointer-events-none opacity-85">
             <Strands
@@ -70,10 +70,10 @@ export default function HeroSection() {
         </div>
 
         {/* LEFT SIDE: Three.js 3D Floating Hero Logo */}
-        <div className="relative order-2 h-[420px] sm:h-[480px] lg:h-[520px] w-full flex items-center justify-center rounded-3xl overflow-hidden border border-[var(--tb-border)]/50 bg-[#08081a]">
+        <div className="relative order-2 h-[420px] sm:h-[480px] lg:h-[520px] w-full flex items-center justify-center rounded-3xl overflow-hidden border-0 bg-transparent">
           <HeroLogo
             logoTexturePath="/images/logo.png"
-            backgroundColor="#08081a"
+            backgroundColor="transparent"
             brandName="TECHBOX"
             tagline="پلتفرم جامع زیرساخت و فناوری"
           />

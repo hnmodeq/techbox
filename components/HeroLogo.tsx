@@ -50,7 +50,7 @@ const LOGO_PATH: [number, number][] = [
 interface HeroLogoProps {
   /** Path to your logo PNG (default: './logo.png') */
   logoTexturePath?: string;
-  /** Background color (default: '#08081a') */
+  /** Background color (default: 'transparent') */
   backgroundColor?: string;
   /** Replace "WEBSITE NAME" text */
   brandName?: string;
@@ -60,11 +60,18 @@ interface HeroLogoProps {
 
 export default function HeroLogo({
   logoTexturePath = '/images/logo.png',
-  backgroundColor = '#08081a',
-  brandName = 'WEBSITE NAME',
-  tagline = 'Coming Soon',
+  backgroundColor = 'transparent',
+  brandName = '',
+  tagline = '',
 }: HeroLogoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const prevXRef = useRef(0);
+  const prevYRef = useRef(0);
+  const targetRotXRef = useRef(0);
+  const targetRotYRef = useRef(0);
+  const curRotXRef = useRef(0);
+  const curRotYRef = useRef(0);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -72,7 +79,11 @@ export default function HeroLogo({
 
     // ── Scene ──
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(backgroundColor);
+    if (backgroundColor && backgroundColor !== 'transparent') {
+      scene.background = new THREE.Color(backgroundColor);
+    } else {
+      scene.background = null;
+    }
 
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 0.15, 4.2);
@@ -158,23 +169,6 @@ export default function HeroLogo({
     back.position.set(0, 0, -5);
     scene.add(back);
 
-    // ── Decorative rings ──
-    const r1 = new THREE.Mesh(
-      new THREE.RingGeometry(1.0, 1.6, 48),
-      new THREE.MeshBasicMaterial({ color: 0x5577ff, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false })
-    );
-    r1.rotation.x = -Math.PI / 2;
-    r1.position.y = -0.75;
-    scene.add(r1);
-
-    const r2 = new THREE.Mesh(
-      new THREE.RingGeometry(0.85, 1.1, 48),
-      new THREE.MeshBasicMaterial({ color: 0x7799ff, transparent: true, opacity: 0.04, side: THREE.DoubleSide, depthWrite: false })
-    );
-    r2.rotation.x = -Math.PI / 2;
-    r2.position.y = -0.70;
-    scene.add(r2);
-
     // ── Particles ──
     const pGeo = new THREE.BufferGeometry();
     const pos = new Float32Array(600);
@@ -193,6 +187,41 @@ export default function HeroLogo({
     );
     scene.add(pts);
 
+    // ── Mouse / Touch Interactive Rotation ──
+    const onPointerDown = (e: PointerEvent) => {
+      isDraggingRef.current = true;
+      prevXRef.current = e.clientX;
+      prevYRef.current = e.clientY;
+      container.style.cursor = 'grabbing';
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (isDraggingRef.current) {
+        const dx = e.clientX - prevXRef.current;
+        const dy = e.clientY - prevYRef.current;
+        targetRotYRef.current += dx * 0.012;
+        targetRotXRef.current += dy * 0.012;
+        prevXRef.current = e.clientX;
+        prevYRef.current = e.clientY;
+      } else {
+        const rect = container.getBoundingClientRect();
+        const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 0.8;
+        const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 0.5;
+        targetRotYRef.current = nx;
+        targetRotXRef.current = ny;
+      }
+    };
+
+    const onPointerUp = () => {
+      isDraggingRef.current = false;
+      if (container) container.style.cursor = 'grab';
+    };
+
+    container.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    container.style.cursor = 'grab';
+
     // ── Animation ──
     let animationId: number;
     const clock = new THREE.Clock();
@@ -202,13 +231,15 @@ export default function HeroLogo({
       const fy = Math.sin(t * 0.5) * 0.14;
       mesh.position.y = fy;
       gMesh.position.y = fy;
-      const ry = Math.sin(t * 0.055) * 0.04;
-      mesh.rotation.y = ry;
-      gMesh.rotation.y = ry;
-      const sc = 1 + Math.sin(t * 0.4) * 0.03;
-      r1.scale.setScalar(sc);
-      r1.material.opacity = 0.06 + Math.sin(t * 0.4) * 0.02;
-      r2.scale.setScalar(1 + Math.sin(t * 0.4 + 1.5) * 0.035);
+
+      curRotYRef.current += (targetRotYRef.current - curRotYRef.current) * 0.08;
+      curRotXRef.current += (targetRotXRef.current - curRotXRef.current) * 0.08;
+
+      mesh.rotation.y = curRotYRef.current + Math.sin(t * 0.055) * 0.04;
+      mesh.rotation.x = curRotXRef.current;
+      gMesh.rotation.y = mesh.rotation.y;
+      gMesh.rotation.x = mesh.rotation.x;
+
       pts.rotation.y = t * 0.006;
       camera.position.x = Math.sin(t * 0.035) * 0.2;
       camera.position.z = 4.2 + Math.sin(t * 0.02) * 0.08;
@@ -231,6 +262,9 @@ export default function HeroLogo({
     return () => {
       cancelAnimationFrame(animationId);
       removeEventListener('resize', onResize);
+      container.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
       renderer.dispose();
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
