@@ -7,9 +7,11 @@ export type AppUser = {
   name: string;
   email: string;
   username: string;
-  role: "super_admin" | "editor";
+  role: string;
   modules: string[];
   avatar?: string;
+  roleFa?: string;
+  job?: string;
 };
 
 const KEY = "tb_auth_user";

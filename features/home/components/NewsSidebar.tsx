@@ -15,10 +15,11 @@ export default function NewsSidebar() {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const newsItems = getModuleItems('news').slice(0, 15);
 
-  // Close when clicking anywhere outside
+  // Close when clicking outside ONLY on mobile devices (sm: hidden)
   useEffect(() => {
     if (!open) return;
     const handleOutsideClick = (e: MouseEvent) => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 640) return;
       if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
         setOpen(false);
       }

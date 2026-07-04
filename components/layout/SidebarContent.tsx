@@ -78,7 +78,6 @@ export default function SidebarContent({
  const [q, setQ] = useState("");
  const [now, setNow] = useState<Date | null>(null);
  const [notifOpen, setNotifOpen] = useState(false);
- const [loginOpen, setLoginOpen] = useState(false);
  const [consultOpen, setConsultOpen] = useState(false);
  const [searchOpen, setSearchOpen] = useState(false);
  const collapsedSearchRef = useRef<HTMLInputElement | null>(null);
@@ -87,7 +86,13 @@ export default function SidebarContent({
 
  useEffect(() => {
  setMounted(true);
- setUser(getCurrentUserClient());
+ fetch("/api/auth/me")
+   .then((r) => r.json())
+   .then((d) => {
+     if (d?.user) setUser(d.user);
+     else setUser(getCurrentUserClient());
+   })
+   .catch(() => setUser(getCurrentUserClient()));
  setNow(new Date());
  const t = setInterval(() => setNow(new Date()), 1000);
  return () => clearInterval(t);
@@ -95,8 +100,16 @@ export default function SidebarContent({
 
  useEffect(() => {
  const h = () => setUser(getCurrentUserClient());
+ const onCustomAuth = (e: any) => {
+   if (e.detail) setUser(e.detail);
+   else fetch("/api/auth/me").then(r=>r.json()).then(d=>setUser(d?.user||null)).catch(()=>{});
+ };
  window.addEventListener("storage", h);
- return () => window.removeEventListener("storage", h);
+ window.addEventListener("tb_auth_changed", onCustomAuth);
+ return () => {
+   window.removeEventListener("storage", h);
+   window.removeEventListener("tb_auth_changed", onCustomAuth);
+ };
  }, []);
 
  useEffect(() => {
@@ -351,41 +364,28 @@ export default function SidebarContent({
  {user ? (
  <Link href="/account" onClick={onLinkClick} className={`${linkBase} tb-text-sm ${isActive(pathname, "/account") ? "bg-[var(--tb-bg-muted)] text-[var(--tb-fg-primary)]" : linkInactive}`}>
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
- <Image src={user.avatar || "/assets/hooman.png"} alt={user.name} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
+ {user.avatar ? (
+   <Image src={user.avatar} alt={user.name || "کاربر"} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
+ ) : (
+   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)]"><Icon name="user" size={15} /></span>
+ )}
  </span>
  <span className={`truncate ${expanded ? "w-[140px] opacity-100" : "w-0 opacity-0"} overflow-hidden transition-all`}>
- <span className="block tb-text-sm ">{user.name}</span>
- <span className="block tb-text-sm text-[var(--tb-fg-muted)]">{user.role === "super_admin" ? "مدیر کل" : "ویراستار"}</span>
+ <span className="block tb-text-sm font-bold">{user.name || user.username}</span>
+ <span className="block text-xs text-[var(--tb-fg-muted)]">{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر تکباکس")}</span>
  </span>
  </Link>
  ) : (
  <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--tb-account)]">
- <Button variant="link" size="md" onClick={() => setLoginOpen(true)} className={`${linkBase} ${linkInactive} w-full justify-start p-0 tb-text-sm no-underline hover:no-underline`}>
+ <Button variant="link" size="md" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} className={`${linkBase} ${linkInactive} w-full justify-start p-0 tb-text-sm no-underline hover:no-underline`}>
  <span className="flex h-10 w-10 items-center justify-center">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--tb-bg-muted)]"><Icon name="user" size={15} /></span>
  </span>
- <span className={`${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"} truncate transition-all`}>ورود</span>
+ <span className={`${expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"} truncate transition-all font-bold`}>ورود / عضویت</span>
  </Button>
  </SidebarTooltip>
  )}
  </div>
-
- {loginOpen && (
- <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
- <OverlayBackdrop onClick={() => setLoginOpen(false)} />
- <Panel className="relative w-full max-w-sm space-y-3" style={{ zIndex: zIndex.modalContent }}>
- <div className="flex items-center justify-between">
- <h3 className="tb-text-md ">ورود به تکباکس</h3>
- <CloseButton onClick={() => setLoginOpen(false)} />
- </div>
- <p className="tb-text-sm text-[var(--tb-fg-muted)]">
- حساب تست: <b>sara</b> / <b>nima</b> / <b>rojina</b> / <b>admin</b><br />رمز همه: <code>techbox123</code>
- </p>
- <ButtonLink href="/admin/login" onClick={() => setLoginOpen(false)} className="w-full tb-text-sm">رفتن به ورود کامل →</ButtonLink>
- <Button variant="ghost" size="xs" onClick={() => setLoginOpen(false)} className="w-full tb-text-sm">بستن</Button>
- </Panel>
- </div>
- )}
 
  <ConsultationModal open={consultOpen} onClose={() => setConsultOpen(false)} />
 
