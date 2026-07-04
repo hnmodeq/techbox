@@ -2,9 +2,9 @@
 
 import { useState, useCallback } from 'react';
 
-const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 3;
-const ZOOM_STEP = 0.1;
+const MIN_ZOOM = 0.1;
+const MAX_ZOOM = 6.0;
+const ZOOM_STEP = 0.15;
 
 export function useTimelineZoom(initialZoom = 1) {
   const [zoom, setZoom] = useState(initialZoom);
