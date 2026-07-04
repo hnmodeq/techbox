@@ -83,30 +83,6 @@ export default function AdminLogin() {
         )}
 
         {err && <p className="tb-text-sm text-[var(--tb-danger)]">{err}</p>}
-
-        <div className="border-t border-[var(--tb-border)] pt-4">
-          <div className="mb-2 tb-text-sm ">ورود سریع تست</div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {allUsers.map(x => (
-              <Button key={x.username} disabled={busy} type="button" variant={x.username === u ? "primary" : "ghost"} size="xs" onClick={() => quickLogin(x.username)} className="justify-start text-right">
-                <span className="font-mono">{x.username}</span>
-                <span className="truncate tb-text-sm opacity-80">{x.name}</span>
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2 border-t border-[var(--tb-border)] pt-4 tb-text-sm text-[var(--tb-fg-muted)]">
-          <div className="text-[var(--tb-fg-primary)]">کاربران تست و دسترسی‌ها</div>
-          {allUsers.map(x => (
-            <div key={x.username} className="rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] p-2">
-              <span className="font-mono tb-text-sm text-[var(--tb-fg-primary)]">{x.username}</span> – {x.name}
-              <span className="mt-1 flex flex-wrap gap-1">
-                {x.modules.map(m => <ModuleBadge key={m} module={m as ModuleSlug}>{moduleMeta[m as ModuleSlug]?.titleFa || m}</ModuleBadge>)}
-              </span>
-            </div>
-          ))}
-        </div>
       </form>
     </main>
   );

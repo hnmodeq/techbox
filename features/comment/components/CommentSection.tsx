@@ -65,7 +65,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const handleReplyClick = (commentId: string) => {
     if (!user) {
-      router.push("/account");
+      window.dispatchEvent(new CustomEvent("tb_open_auth"));
       return;
     }
     setReplyOpen(replyOpen === commentId ? null : commentId);
@@ -162,7 +162,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
             برای ثبت دیدگاه، پاسخ به نظرات دیگران و پسندیدن مطالب، ابتدا باید وارد حساب کاربری خود شوید یا در کمتر از یک دقیقه ثبت‌نام کنید.
           </p>
           <div className="pt-2">
-            <Button onClick={() => router.push("/account")} size="sm">ورود یا ثبت‌نام در تکباکس</Button>
+            <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} size="sm">ورود یا ثبت‌نام در تکباکس</Button>
           </div>
         </div>
       )}

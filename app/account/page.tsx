@@ -265,30 +265,6 @@ export default function AccountPage() {
               <Button disabled={authBusy} className="w-full justify-center">
                 {authBusy ? "در حال ورود..." : "ورود به حساب تکباکس"}
               </Button>
-
-              <div className="border-t border-[var(--tb-border)] pt-4 mt-4">
-                <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-2 text-center">ورود سریع آزمایشی (متصل به Neon PostgreSQL)</div>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { u: "admin", name: "مدیر کل" },
-                    { u: "sara", name: "سارا احمدی" },
-                    { u: "nima", name: "نیما" },
-                    { u: "rojina", name: "روژینا باقری" },
-                  ].map(x => (
-                    <Button
-                      key={x.u}
-                      type="button"
-                      variant="ghost"
-                      size="xs"
-                      onClick={() => handleQuickLogin(x.u)}
-                      className="justify-between border border-[var(--tb-border)] px-3 py-2 text-right"
-                    >
-                      <span className="truncate tb-text-sm opacity-90">{x.name}</span>
-                      <span className="font-mono text-xs text-[var(--tb-fg-muted)]" dir="ltr">{x.u}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
             </form>
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
@@ -366,13 +342,19 @@ export default function AccountPage() {
         {/* avatar card */}
         <div className="card p-6 text-center space-y-4 h-fit">
           <div className="relative w-32 h-32 mx-auto">
-            <Image
-              src={avatar}
-              width={128}
-              height={128}
-              className="h-32 w-32 rounded-[var(--tb-radius-full)] object-cover ring-2 ring-[var(--tb-border)] shadow-[var(--tb-shadow-md)]"
-              alt={user.name}
-            />
+            {avatar ? (
+              <Image
+                src={avatar}
+                width={128}
+                height={128}
+                className="h-32 w-32 rounded-[var(--tb-radius-full)] object-cover ring-2 ring-[var(--tb-border)] shadow-[var(--tb-shadow-md)]"
+                alt={user?.name || "کاربر"}
+              />
+            ) : (
+              <div className="h-32 w-32 rounded-[var(--tb-radius-full)] bg-[var(--tb-bg-secondary)] border-2 border-[var(--tb-border)] flex items-center justify-center text-[var(--tb-fg-muted)] shadow-[var(--tb-shadow-md)]">
+                <Icon name="user" size={48} />
+              </div>
+            )}
             <label className="absolute bottom-1 left-1 cursor-pointer rounded-[var(--tb-radius-full)] bg-[var(--tb-primary)] px-2.5 py-1 tb-text-sm text-white shadow-[var(--tb-shadow-sm)] hover:opacity-90">
               تغییر تصویر
               <input type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />

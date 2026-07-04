@@ -96,7 +96,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [commentError, setCommentError] = useState('');
 
-  const defaultCommentsList = (milestoneCommentsMap[event.id] || defaultGeneralComments).map((text, i) => ({
+  const defaultCommentsList = (milestoneCommentsMap[event.id] || []).map((text, i) => ({
     authorName: 'کاربر انجمن تکباکس',
     text,
     createdAt: 'لحظاتی پیش'
@@ -165,7 +165,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       });
 
       if (res.status === 401) {
-        setShowLoginPrompt(true);
+        window.dispatchEvent(new CustomEvent("tb_open_auth"));
         return;
       }
 
@@ -193,7 +193,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       });
 
       if (res.status === 401) {
-        setCommentError('برای ارسال نظر باید ابتدا وارد حساب کاربری خود شوید.');
+        window.dispatchEvent(new CustomEvent("tb_open_auth"));
         return;
       }
 
