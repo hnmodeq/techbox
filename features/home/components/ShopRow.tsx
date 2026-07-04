@@ -42,22 +42,13 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <div className="text-[11px] font-bold text-[var(--tb-shop)] mb-1">{prod.category || 'تجهیزات سازمانی'}</div>
                   <h3 className="tb-text-md font-black text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   
-                  {/* Authentic Product Feature Bullets */}
-                  <ul className="mt-2.5 space-y-1 text-xs text-[var(--tb-fg-muted)] leading-5">
-                    <li className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--tb-shop)]" />
-                      <span>گارانتی طلایی اصالت سخت‌افزار تکباکس</span>
-                    </li>
-                    <li className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--tb-shop)]" />
-                      <span>آماده تحویل و کانفینگ سفارشی دیتاسنتر</span>
-                    </li>
-                  </ul>
+                  <p className="mt-2.5 text-xs text-[var(--tb-fg-muted)] leading-5 line-clamp-3">
+                    {prod.excerpt}
+                  </p>
                 </div>
 
                 <div className="mt-4 space-y-3">

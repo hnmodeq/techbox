@@ -31,11 +31,11 @@ export default function HeroSection() {
   const item = items[index];
 
   return (
-    <section className={`relative w-full max-w-full overflow-hidden bg-[var(--tb-bg-primary)] border-b border-[var(--tb-border)] ${HOME_ROW_SIZES.heroMinHeight} flex items-center`} dir="rtl">
+    <section className={`relative w-full max-w-full overflow-hidden bg-[var(--tb-bg-primary)] border-0 ${HOME_ROW_SIZES.heroMinHeight} flex items-center`} dir="rtl">
       <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         
         {/* RIGHT SIDE: Title + Rotating Text with Strands colorful background */}
-        <div className="relative order-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-right min-h-[380px] p-6 rounded-3xl overflow-hidden border-0 bg-transparent">
+        <div className="relative order-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-right min-h-[460px] sm:min-h-[520px] p-6 rounded-3xl overflow-hidden border-0 bg-transparent">
           {/* Strands OGL Shader sitting behind title */}
           <div className="absolute inset-0 z-0 pointer-events-none opacity-85">
             <Strands
@@ -74,8 +74,8 @@ export default function HeroSection() {
           <HeroLogo
             logoTexturePath="/images/logo.png"
             backgroundColor="transparent"
-            brandName="TECHBOX"
-            tagline="پلتفرم جامع زیرساخت و فناوری"
+            brandName=""
+            tagline=""
           />
         </div>
 

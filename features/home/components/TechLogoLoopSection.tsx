@@ -12,13 +12,13 @@ import {
 } from "react-icons/si";
 
 const techLogos = [
- { node: <SiReact />, title: "React", href: "https://react.dev" },
- { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
- { node: <SiTypescript />, title: "TypeScript", href: "https://www.typescriptlang.org" },
- { node: <SiTailwindcss />, title: "Tailwind CSS", href: "https://tailwindcss.com" },
- { node: <SiPrisma />, title: "Prisma", href: "https://www.prisma.io" },
- { node: <SiVercel />, title: "Vercel", href: "https://vercel.com" },
- { node: <SiFramer />, title: "Framer Motion", href: "https://www.framer.com/motion" },
+ { node: <SiReact className="w-14 h-14 sm:w-16 sm:h-16" />, title: "React", href: "https://react.dev" },
+ { node: <SiNextdotjs className="w-14 h-14 sm:w-16 sm:h-16" />, title: "Next.js", href: "https://nextjs.org" },
+ { node: <SiTypescript className="w-14 h-14 sm:w-16 sm:h-16" />, title: "TypeScript", href: "https://www.typescriptlang.org" },
+ { node: <SiTailwindcss className="w-14 h-14 sm:w-16 sm:h-16" />, title: "Tailwind CSS", href: "https://tailwindcss.com" },
+ { node: <SiPrisma className="w-14 h-14 sm:w-16 sm:h-16" />, title: "Prisma", href: "https://www.prisma.io" },
+ { node: <SiVercel className="w-14 h-14 sm:w-16 sm:h-16" />, title: "Vercel", href: "https://vercel.com" },
+ { node: <SiFramer className="w-14 h-14 sm:w-16 sm:h-16" />, title: "Framer Motion", href: "https://www.framer.com/motion" },
 ];
 
 export default function TechLogoLoopSection() {
@@ -32,8 +32,8 @@ export default function TechLogoLoopSection() {
  logos={techLogos}
  speed={120}
  direction="left"
-          logoHeight={130}
-          gap={110}
+          logoHeight={180}
+          gap={130}
  pauseOnHover
  scaleOnHover
  fadeOut

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/design/icons";
 import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
+import { ForumBadge } from "@/components/ui/ForumBadge";
 import { LikeButton } from "@/components/ui/LikeButton";
 import commentsData from "@/data/comments.json";
 import { Button } from "@/components/ui/Button";
@@ -107,15 +108,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">{item.title}</h1>
-                {solved ? (
-                  <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-success)_30%,transparent)] px-3 py-1 text-xs font-bold text-[var(--tb-success)]">
-                    حل‌شده ✓
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-warning)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-warning)_30%,transparent)] px-3 py-1 text-xs font-bold text-[var(--tb-warning)]">
-                    باز
-                  </span>
-                )}
+                <ForumBadge slug={item.slug} fallback={item.solved ?? false} />
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
                 <span>ارسال‌شده توسط <b className="text-[var(--tb-fg-primary)]">{item.author?.name || "کاربر انجمن"}</b></span>

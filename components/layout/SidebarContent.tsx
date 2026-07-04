@@ -286,7 +286,7 @@ export default function SidebarContent({
  )}
  </div>
 
- <div className="h-10 shrink-0">
+ <div className="hidden">
  {expanded ? (
  <Button
  type="button"

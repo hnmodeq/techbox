@@ -10,6 +10,7 @@ import { ChipButton } from "@/components/ui/ChipButton";
 import { CloseButton } from "@/components/ui/CloseButton";
 import { OverlayBackdrop } from "@/components/ui/Overlay";
 import { CardStats } from "@/components/ui/CardStats";
+import { ForumBadge } from "@/components/ui/ForumBadge";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 
@@ -17,7 +18,7 @@ export default function ForumList() {
   const items = getModuleItems("forum").map((t) => ({
     ...t,
     answers: (t.likes % 9) + 2,
-    solved: !t.slug.includes("proxmox"),
+    solved: (t as any).solved ?? (t.likes % 2 === 0),
     avatar: t.author?.avatar || "/assets/hooman.png",
   })) as (ForumPost & { avatar: string })[];
 
@@ -105,15 +106,7 @@ export default function ForumList() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="tb-text-md font-bold transition-colors group-hover:text-[var(--tb-forum)]">{t.title}</span>
-                  {t.solved ? (
-                    <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-success)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--tb-success)]">
-                      حل‌شده ✓
-                    </span>
-                  ) : (
-                    <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-warning)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-warning)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--tb-warning)]">
-                      باز
-                    </span>
-                  )}
+                  <ForumBadge slug={t.slug} fallback={t.solved} />
                 </div>
                 <div className="tb-text-sm text-[var(--tb-fg-muted)] mt-1">
                   ارسال‌شده توسط <b className="text-[var(--tb-fg-primary)]">{t.author?.name || "کاربر تکباکس"}</b> • {t.date_fa}

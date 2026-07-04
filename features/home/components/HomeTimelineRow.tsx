@@ -41,7 +41,7 @@ export default function HomeTimelineRow() {
         </div>
 
         {/* Full Interactive Timeline Container with Mouse Wheel Scrolling Isolated (onWheel={undefined}) */}
-        <div className="w-full rounded-2xl border border-[var(--tb-border)] overflow-hidden shadow-2xl">
+        <div className="w-full rounded-2xl border-0 overflow-hidden shadow-none">
           {isLoading ? (
             <TimelineLoading />
           ) : error || !events || events.length === 0 ? (

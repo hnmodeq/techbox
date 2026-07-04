@@ -107,6 +107,16 @@ export default function HeroLogo({
       bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.03, bevelSegments: 8,
     });
     geo.center();
+    geo.computeBoundingBox();
+    if (geo.boundingBox && geo.attributes.uv) {
+      const bb = geo.boundingBox;
+      const uvAttr = geo.attributes.uv;
+      for (let i = 0; i < uvAttr.count; i++) {
+        const u = (uvAttr.getX(i) - bb.min.x) / (bb.max.x - bb.min.x);
+        const v = (uvAttr.getY(i) - bb.min.y) / (bb.max.y - bb.min.y);
+        uvAttr.setXY(i, u, v);
+      }
+    }
 
     // ── White material — texture loads onto this ──
     const mat = new THREE.MeshPhysicalMaterial({
@@ -144,6 +154,9 @@ export default function HeroLogo({
       logoTexturePath,
       (tex) => {
         tex.colorSpace = THREE.SRGBColorSpace;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.repeat.set(1, 1);
         mat.map = tex;
         mat.needsUpdate = true;
       },
@@ -203,12 +216,6 @@ export default function HeroLogo({
         targetRotXRef.current += dy * 0.012;
         prevXRef.current = e.clientX;
         prevYRef.current = e.clientY;
-      } else {
-        const rect = container.getBoundingClientRect();
-        const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 0.8;
-        const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 0.5;
-        targetRotYRef.current = nx;
-        targetRotXRef.current = ny;
       }
     };
 
@@ -231,6 +238,11 @@ export default function HeroLogo({
       const fy = Math.sin(t * 0.5) * 0.14;
       mesh.position.y = fy;
       gMesh.position.y = fy;
+
+      if (!isDraggingRef.current) {
+        targetRotYRef.current += (0 - targetRotYRef.current) * 0.05;
+        targetRotXRef.current += (0 - targetRotXRef.current) * 0.05;
+      }
 
       curRotYRef.current += (targetRotYRef.current - curRotYRef.current) * 0.08;
       curRotXRef.current += (targetRotXRef.current - curRotXRef.current) * 0.08;
