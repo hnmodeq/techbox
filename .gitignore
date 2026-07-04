@@ -12,6 +12,8 @@ coverage
 .DS_Store
 .npm
 uploads/
+.vscode/settings.json
+next-env.d.ts
 
 # Local SQLite databases
 *.db
