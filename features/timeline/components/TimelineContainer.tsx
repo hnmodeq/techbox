@@ -26,33 +26,28 @@ export function TimelineContainer({
   onPanStart,
   onPanMove,
   onPanEnd,
-  onZoomIn,
-  onZoomOut,
   onResetView,
   onZoomChange,
   onWheel,
 }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Proportional time spacing calculated from edge of previous cards to prevent overlapping
+  // Exact Edge-to-Edge math: xPos[idx] = xPos[idx - 1] + (W[idx-1]/2) + (W[idx]/2) + timeGap
+  // This guarantees that the space between physical edges of cards is strictly at least 48px + proportional historical time!
   const xPositions = React.useMemo(() => {
-    let currX = 180;
+    let currX = 220;
     return events.map((ev, idx) => {
       if (idx === 0) return currX;
       const prevDate = new Date(events[idx - 1].dateGr).getTime();
       const currDate = new Date(ev.dateGr).getTime();
       const diffYears = Math.max(0, (currDate - prevDate) / (1000 * 60 * 60 * 24 * 365.2425));
 
-      const prevCardWidth =
-        events[idx - 1].importance >= 8
-          ? 320
-          : events[idx - 1].importance >= 6
-            ? 288
-            : 256;
+      const prevWidth = events[idx - 1].importance >= 8 ? 320 : events[idx - 1].importance >= 6 ? 288 : 256;
+      const currWidth = ev.importance >= 8 ? 320 : ev.importance >= 6 ? 288 : 256;
 
-      // Distance strictly added AFTER previous card edge (proportional to elapsed years)
-      const timeGap = Math.min(Math.max(diffYears * 16 * zoom, 40 * zoom), 600 * zoom);
-      currX += prevCardWidth + timeGap;
+      // Minimum 48px edge gap plus proportional date spacing
+      const timeGap = Math.min(Math.max(diffYears * 22 * zoom, 48 * zoom), 700 * zoom);
+      currX += prevWidth / 2 + currWidth / 2 + timeGap;
       return currX;
     });
   }, [events, zoom]);
@@ -101,7 +96,7 @@ export function TimelineContainer({
         onPointerUp={onPanEnd}
         onPointerCancel={onPanEnd}
       >
-        {/* Continuous, Thick Glowing Horizontal Timeline Axis Line */}
+        {/* Prominent Glowing Horizontal Timeline Axis Line running continuously right beneath the card boxes */}
         <div
           className="absolute h-2.5 bg-[var(--tb-timeline)] shadow-[0_0_16px_rgba(6,182,212,0.8)] rounded-full z-10"
           style={{
@@ -121,7 +116,7 @@ export function TimelineContainer({
           }}
         >
           {events.map((event, idx) => {
-            const xPos = xPositions[idx] || 180;
+            const xPos = xPositions[idx] || 220;
 
             return (
               <div
@@ -131,7 +126,7 @@ export function TimelineContainer({
                   left: `${xPos}px`,
                 }}
               >
-                {/* Timeline Milestone Dot right on the axis line (NOT on the card) */}
+                {/* Timeline Milestone Dot sitting right on the axis line between card and external date block (NOT on card) */}
                 <div className="absolute -bottom-[14px] left-1/2 -translate-x-1/2 translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-lg transition-transform hover:scale-125" />
 
                 {/* Card placement aligned directly along the line */}

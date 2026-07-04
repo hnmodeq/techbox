@@ -1,12 +1,10 @@
 'use client';
 
 import React from 'react';
-import { RotateCcw, Search } from 'lucide-react';
+import { RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface ZoomControlsProps {
   zoom: number;
-  onZoomIn?: () => void;
-  onZoomOut?: () => void;
   onReset: () => void;
   onZoomChange?: (nextZoom: number) => void;
 }
@@ -14,16 +12,23 @@ interface ZoomControlsProps {
 export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps) {
   return (
     <div
-      className="absolute bottom-8 right-8 flex flex-col items-center gap-3 z-50 bg-[var(--tb-bg-secondary)]/90 backdrop-blur border border-[var(--tb-border)] rounded-[var(--tb-radius-lg)] p-3 shadow-[var(--tb-shadow-lg)]"
+      className="absolute bottom-8 right-8 flex items-center gap-3 z-50 bg-[var(--tb-bg-secondary)]/95 backdrop-blur-md border border-[var(--tb-border)] rounded-[var(--tb-radius-lg)] px-4 py-2.5 shadow-[var(--tb-shadow-lg)] select-none"
       onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
+      dir="ltr"
     >
-      <div className="tb-text-sm text-[var(--tb-timeline)] font-mono text-center font-bold">
-        {(zoom * 100).toFixed(0)}%
-      </div>
+      <button
+        type="button"
+        onClick={() => onZoomChange?.(Math.max(0.1, zoom - 0.2))}
+        className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        title="کوچک‌نمایی (-)"
+        aria-label="Zoom Out"
+      >
+        <ZoomOut size={18} />
+      </button>
 
-      {/* Vertical Range Slider for smooth, deep Zoom-In / Zoom-Out */}
-      <div className="h-40 flex items-center justify-center py-2">
+      {/* Horizontal Range Slider for smooth, deep Zoom-In / Zoom-Out (0.1x to 6.0x) */}
+      <div className="flex items-center gap-2">
         <input
           type="range"
           min="0.1"
@@ -31,11 +36,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           step="0.05"
           value={zoom}
           onChange={(e) => onZoomChange?.(parseFloat(e.target.value))}
-          className="h-32 w-2 cursor-pointer appearance-none rounded-full bg-[var(--tb-bg-muted)] accent-[var(--tb-timeline)] [writing-mode:bt-lr] [-webkit-appearance:slider-vertical]"
-          style={{
-            writingMode: 'vertical-lr',
-            direction: 'rtl',
-          }}
+          className="w-32 sm:w-44 h-2 cursor-pointer appearance-none rounded-full bg-[var(--tb-bg-muted)] accent-[var(--tb-timeline)]"
           title="تنظیم بزرگ‌نمایی"
           aria-label="تنظیم بزرگ‌نمایی"
         />
@@ -43,15 +44,26 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
 
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onReset();
-        }}
-        className="bg-[var(--tb-bg-muted)] hover:bg-[var(--tb-bg-primary)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] border border-[var(--tb-border)] p-2.5 rounded-[var(--tb-radius-md)] shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer mt-1"
-        title="بازنشانی دید (100%)"
-        aria-label="بازنشانی دید"
+        onClick={() => onZoomChange?.(Math.min(6.0, zoom + 0.2))}
+        className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        title="بزرگ‌نمایی (+)"
+        aria-label="Zoom In"
       >
-        <RotateCcw size={18} />
+        <ZoomIn size={18} />
+      </button>
+
+      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--tb-timeline)] text-center border-l border-[var(--tb-border)] pl-2">
+        {(zoom * 100).toFixed(0)}%
+      </div>
+
+      <button
+        type="button"
+        onClick={onReset}
+        className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors cursor-pointer"
+        title="بازنشانی دید (100%)"
+        aria-label="Reset View"
+      >
+        <RotateCcw size={17} />
       </button>
     </div>
   );
