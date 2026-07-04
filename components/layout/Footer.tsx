@@ -65,16 +65,19 @@ export default function FooterSection() {
  <div className="mt-4 flex gap-4">
  {navigation.social.map((item) => (
  <Link key={item.name} href={item.href} target="_blank" className="text-muted-foreground hover:text-foreground">
- <item.icon className="size-6" />
+ <item.icon className="w-8 h-8 sm:w-9 sm:h-9 transition-transform hover:scale-110" />
  </Link>
  ))}
  </div>
  </div>
  </div>
  {/* کپی‌رایت */}
- <div className="mt-12 border-t border-[var(--tb-border)] pt-6 text-center">
+ <div className="mt-12 border-t border-[var(--tb-border)] pt-6 text-center space-y-2">
  <p className="tb-text-md text-muted-foreground">
  © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «هونامیک ارتباط رستاک» میباشد.
+ </p>
+ <p className="tb-text-sm text-muted-foreground">
+ طراحی شده توسط <a href="https://www.bumimstudio.ir/" target="_blank" rel="noopener noreferrer" className="font-bold text-[var(--tb-warning)] hover:underline">بومیم</a>
  </p>
  </div>
  </div>

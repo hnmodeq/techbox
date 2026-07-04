@@ -56,16 +56,18 @@ export default function Chatbot(){
  return (
  <>
  {/* FAB */}
- <FloatingActionButton
- onClick={()=>setOpen(true)}
- hidden={open}
- className="bottom-5 left-5"
- style={{ zIndex: zIndex.popover }}
- aria-label="چت با تکباکس"
- >
-        <Icon name="chat" size={20} strokeWidth={1.75} />
-        <span className="hidden sm:inline">پرسش از تکباکس</span>
- </FloatingActionButton>
+ {!open && (
+   <button
+     type="button"
+     onClick={() => setOpen(true)}
+     style={{ zIndex: zIndex.popover }}
+     className="fixed bottom-5 left-5 rounded-full bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] px-4.5 py-2.5 text-[var(--tb-fg-primary)] shadow-lg hover:bg-[var(--tb-bg-muted)] transition-all flex items-center gap-2 cursor-pointer font-normal text-xs sm:text-sm"
+     aria-label="پشتیبانی تکباکس"
+   >
+     <Icon name="chat" size={18} className="sm:hidden text-[var(--tb-primary)]" />
+     <span>پشتیبانی</span>
+   </button>
+ )}
 
  {/* panel */}
  {open && (

@@ -26,9 +26,7 @@ export default function TechLogoLoopSection() {
  <section className="relative w-full max-w-full overflow-x-hidden overflow-hidden px-4 py-20 md:py-24 border-t border-[var(--tb-border)] bg-[var(--tb-bg-primary)]" aria-labelledby="tech-stack-title">
  <div className="mx-auto max-w-7xl w-full max-w-full overflow-x-hidden">
  <div className="mb-10 text-center">
- <span className="badge mb-2">اکوسیستم فناوری</span>
- <h2 id="tech-stack-title" className="tb-text-big-title text-[var(--tb-fg-primary)]">زیرساخت و فناوری‌های سازنده تکباکس</h2>
- <p className="mt-2 tb-text-md text-[var(--tb-fg-muted)]">قدرت‌گرفته از مدرن‌ترین ابزارهای توسعه، کلاود و پایگاه داده</p>
+ <h2 id="tech-stack-title" className="tb-text-big-title text-[var(--tb-fg-primary)]">شرکت‌های همکار</h2>
  </div>
  <LogoLoop
  logos={techLogos}
