@@ -12,7 +12,10 @@ export interface ThemeToggleButtonProps extends React.ButtonHTMLAttributes<HTMLB
 
 export const ThemeToggleButton = React.forwardRef<HTMLButtonElement, ThemeToggleButtonProps>(
  ({ theme, expanded = true, className, labelDark = "حالت روز", labelLight = "حالت شب", ...props }, ref) => {
- const label = theme === "dark" ? labelDark : labelLight;
+ const [mounted, setMounted] = React.useState(false);
+ React.useEffect(() => setMounted(true), []);
+ const currentTheme = mounted ? theme : "dark";
+ const label = currentTheme === "dark" ? labelDark : labelLight;
  return (
  <button
  ref={ref}
@@ -28,11 +31,11 @@ export const ThemeToggleButton = React.forwardRef<HTMLButtonElement, ThemeToggle
  <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
  <Sun className={cn(
  "absolute h-[18px] w-[18px] transition-all duration-[var(--tb-motion-md)]",
- theme === "dark" ? "scale-100 text-[var(--tb-warning)] opacity-100" : "scale-0 opacity-0"
+ currentTheme === "dark" ? "scale-100 text-[var(--tb-warning)] opacity-100" : "scale-0 opacity-0"
  )} />
  <Moon className={cn(
  "absolute h-[18px] w-[18px] transition-all duration-[var(--tb-motion-md)]",
- theme === "dark" ? "scale-0 opacity-0" : "scale-100 opacity-100"
+ currentTheme === "dark" ? "scale-0 opacity-0" : "scale-100 opacity-100"
  )} />
  </span>
  <span className={cn(

@@ -27,23 +27,22 @@ export default function MagazineRow() {
         {/* Expanded grid showing items edge-to-edge */}
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {articles.map((art) => (
-            <Link
+            <div
               key={art.slug}
-              href={`/blog/${art.slug}`}
               className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)]"
             >
-              <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
-                <Image
-                  src={art.image || '/assets/blog-1.jpg'}
-                  alt={art.title}
-                  fill
-                  className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, 300px"
-                />
-              </div>
+              <Link href={`/blog/${art.slug}`} className="block flex-1">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
+                  <Image
+                    src={art.image || '/assets/blog-1.jpg'}
+                    alt={art.title}
+                    fill
+                    className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 300px"
+                  />
+                </div>
 
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div>
+                <div className="p-4">
                   <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1.5 font-bold">
                     <span>{art.date_fa}</span>
                   </div>
@@ -54,13 +53,13 @@ export default function MagazineRow() {
                     {art.excerpt}
                   </p>
                 </div>
+              </Link>
 
-                <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
-                  <AuthorLink name={art.author?.name} avatar={art.author?.avatar} />
-                  <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
-                </div>
+              <div className="px-4 pb-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
+                <AuthorLink name={art.author?.name} avatar={art.author?.avatar} />
+                <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

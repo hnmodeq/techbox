@@ -40,23 +40,22 @@ export default function ReviewRow() {
           {reviews.map((rev, idx) => {
             const rating = 4.8 - idx * 0.15;
             return (
-              <Link
+              <div
                 key={rev.slug}
-                href={`/review/${rev.slug}`}
                 className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)]"
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
-                  <Image
-                    src={rev.image || '/assets/blog-1.jpg'}
-                    alt={rev.title}
-                    fill
-                    className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 300px"
-                  />
-                </div>
+                <Link href={`/review/${rev.slug}`} className="block flex-1">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
+                    <Image
+                      src={rev.image || '/assets/blog-1.jpg'}
+                      alt={rev.title}
+                      fill
+                      className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 300px"
+                    />
+                  </div>
 
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <div>
+                  <div className="p-4">
                     <div className="mb-2">
                       <Stars rating={rating} />
                     </div>
@@ -67,13 +66,13 @@ export default function ReviewRow() {
                       {rev.excerpt}
                     </p>
                   </div>
+                </Link>
 
-                  <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
-                    <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
-                    <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} initialComments={getCommentCount("review", rev.slug)} showComments={true} />
-                  </div>
+                <div className="px-4 pb-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
+                  <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
+                  <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} initialComments={getCommentCount("review", rev.slug)} showComments={true} />
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
