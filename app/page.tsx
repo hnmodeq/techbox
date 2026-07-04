@@ -20,9 +20,6 @@ export default function Page() {
 
   return (
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
-      {/* Left Collapsible News Sidebar */}
-      <NewsSidebar />
-
       {/* 1. Ticker Bar right at the top of the page */}
       <NewsTicker items={tickerItems} className="border-b border-[var(--tb-border)]/60 bg-[var(--tb-bg-secondary)]/40" />
 

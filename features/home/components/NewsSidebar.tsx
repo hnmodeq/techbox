@@ -1,98 +1,139 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { getModuleItems } from '@/lib/content';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { zIndex } from '@/design';
+import { sidebarBase } from '@/config/sidebar.config';
 
 export default function NewsSidebar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const newsItems = getModuleItems('news').slice(0, 15);
+
+  // Close when clicking anywhere outside
+  useEffect(() => {
+    if (!open) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [open]);
+
+  // Only active on homepage per user request
+  if (pathname !== '/') return null;
 
   return (
     <>
-      {/* Floating Toggle Button on the Left Edge */}
+      {/* Floating Left Edge Toggle Button (styled like main sidebar button) */}
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="fixed left-0 top-24 z-40 flex items-center gap-2 rounded-r-[var(--tb-radius-lg)] bg-[var(--tb-news)] px-3 py-2 text-slate-950 font-black shadow-[var(--tb-shadow-lg)] transition-transform hover:translate-x-1 cursor-pointer"
-        title="اخبار زنده تکباکس"
+        style={{ zIndex: zIndex.mobileFab }}
+        className={`fixed left-0 top-6 select-none rounded-r-[var(--tb-radius-lg)] bg-[var(--tb-bg-secondary)] border border-l-0 border-[var(--tb-border)] p-2.5 text-[var(--tb-news)] shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--tb-bg-muted)] cursor-pointer ${
+          open ? 'left-80' : 'left-0'
+        }`}
+        title={open ? 'بستن اخبار فوری' : 'باز کردن اخبار فوری'}
+        aria-label="اخبار فوری"
       >
-        <Icon name="news" className="h-5 w-5" />
-        <span className="tb-text-sm hidden sm:inline">اخبار فوری</span>
+        <Icon name="news" className="h-6 w-6" />
       </button>
 
-      {/* Backdrop for Mobile */}
+      {/* Mobile Backdrop */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
+          style={{ zIndex: zIndex.sidebarBackdrop }}
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* Left Sidebar Drawer */}
+      {/* Desktop Layout Width Spacer (Compresses <main> width smoothly when open) */}
+      <div
+        className={`hidden shrink-0 sm:block transition-[width] duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${
+          open ? 'w-80' : 'w-0'
+        }`}
+        aria-hidden="true"
+      />
+
+      {/* Fixed Left Sidebar Panel */}
       <aside
-        className={`fixed left-0 top-0 h-screen w-72 sm:w-80 bg-[var(--tb-bg-primary)] border-r border-[var(--tb-border)] shadow-2xl z-50 flex flex-col transition-transform duration-[var(--tb-motion-lg)] ${
+        ref={sidebarRef}
+        className={`fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden transition-transform duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${sidebarBase} ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ zIndex: zIndex.sidebar }}
         dir="rtl"
       >
-        {/* Sidebar Header */}
-        <div className="p-4 border-b border-[var(--tb-border)] flex items-center justify-between bg-[color-mix(in_oklch,var(--tb-news)_10%,var(--tb-bg-secondary))] shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-[var(--tb-news)] animate-pulse" />
-            <h3 className="tb-text-md font-black text-[var(--tb-news)]">اخبار زنده تکباکس</h3>
+        {/* Clean Header WITHOUT background fill and WITHOUT X button */}
+        <div className="p-5 border-b border-[var(--tb-border)] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <Icon name="news" className="h-5 w-5 text-[var(--tb-news)]" />
+            <h3 className="tb-text-lg font-black text-[var(--tb-fg-primary)]">اخبار زنده تکباکس</h3>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="p-1 text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors cursor-pointer"
-            title="بستن سایدبار اخبار"
+            className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-news)] transition-colors cursor-pointer"
+            title="بستن"
           >
-            <Icon name="close" className="h-5 w-5" />
+            <Icon name="chevronLeft" className="h-5 w-5 rtl:rotate-180" />
           </button>
         </div>
 
         {/* Scrollable News List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 divide-y divide-[var(--tb-border)]/50">
+        <div className="flex-1 overflow-y-auto p-4 space-y-5 divide-y divide-[var(--tb-border)]/40">
           {newsItems.map((n) => (
             <Link
               key={n.slug}
               href={`/news/${n.slug}`}
               onClick={() => setOpen(false)}
-              className="group block pt-3 first:pt-0"
+              className="group block pt-4 first:pt-0"
             >
-              <div className="flex items-center justify-between gap-2 text-[11px] text-[var(--tb-fg-muted)] mb-1.5">
-                <span className="badge !bg-[color-mix(in_oklch,var(--tb-news)_15%,transparent)] !text-[var(--tb-news)] !px-2 !py-0.5">
-                  {n.category || 'خبر'}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Icon name="clock" className="h-3 w-3" />
-                  {n.date_fa} {n.time || ''}
-                </span>
+              {/* Wide Banner Image (less height, full width aspect-[3/1]) */}
+              <div className="relative aspect-[3/1] w-full rounded-[var(--tb-radius-md)] overflow-hidden bg-[var(--tb-bg-muted)] mb-3 border border-[var(--tb-border)]/50">
+                <Image
+                  src={n.image || '/assets/blog-1.jpg'}
+                  alt={n.title}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="320px"
+                />
               </div>
 
-              <h4 className="tb-text-sm font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
+              {/* Date & Time (Tags & Views Counter hidden per request) */}
+              <div className="flex items-center gap-1.5 text-[11px] text-[var(--tb-fg-muted)] mb-1">
+                <Icon name="clock" className="h-3 w-3 text-[var(--tb-news)]" />
+                <span>{n.date_fa} {n.time || ''}</span>
+              </div>
+
+              <h4 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
                 {n.title}
               </h4>
 
-              <div className="mt-2 flex items-center justify-between text-[11px] text-[var(--tb-fg-muted)]">
-                <span>منبع: {n.source || 'تحریریه تکباکس'}</span>
-                <span>👁 {(n.views ?? 0).toLocaleString('fa-IR')}</span>
-              </div>
+              {/* News Description */}
+              <p className="tb-text-sm text-[var(--tb-fg-muted)] mt-1.5 line-clamp-2 leading-5">
+                {n.excerpt}
+              </p>
             </Link>
           ))}
         </div>
 
         {/* Footer Link */}
-        <div className="p-3 border-t border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] text-center shrink-0">
+        <div className="p-3.5 border-t border-[var(--tb-border)] text-center shrink-0">
           <Link
             href="/news"
             onClick={() => setOpen(false)}
             className="btn btn-ghost w-full tb-text-sm text-[var(--tb-news)] font-bold"
           >
-            مشاهده آرشیو کامل اخبار →
+            مشاهده آرشیو کامل اخبار ←
           </Link>
         </div>
       </aside>
