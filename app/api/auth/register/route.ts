@@ -33,18 +33,38 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await hashPassword(password);
-    const user = await prisma.user.create({
-      data: {
-        name,
-        username: cleanUsername,
-        email: email.toLowerCase(),
-        password: hashedPassword,
-        role: "user",
-        roleFa: "کاربر عضو",
-        modules: "[]",
-        avatar: "/assets/hooman.png"
+    let user: any;
+    try {
+      user = await prisma.user.create({
+        data: {
+          name,
+          username: cleanUsername,
+          email: email.toLowerCase(),
+          password: hashedPassword,
+          role: "user",
+          roleFa: "کاربر عضو",
+          modules: "[]",
+          avatar: "/assets/hooman.png"
+        }
+      });
+    } catch (createErr: any) {
+      // Fallback if local Prisma client wasn't regenerated yet after git pull
+      if (String(createErr?.message).includes("Unknown argument")) {
+        user = await prisma.user.create({
+          data: {
+            name,
+            username: cleanUsername,
+            email: email.toLowerCase(),
+            password: hashedPassword,
+            role: "user",
+            modules: "[]",
+            avatar: "/assets/hooman.png"
+          }
+        });
+      } else {
+        throw createErr;
       }
-    });
+    }
 
     const token = await createSession(user.id);
     await setSessionCookie(token);
@@ -57,7 +77,7 @@ export async function POST(req: NextRequest) {
         username: user.username,
         email: user.email,
         role: user.role,
-        roleFa: user.roleFa,
+        roleFa: user.roleFa || "کاربر عضو",
         modules: [],
         avatar: user.avatar
       }

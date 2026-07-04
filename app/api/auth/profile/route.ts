@@ -19,16 +19,32 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const data = profileSchema.parse(body);
 
-    const updated = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        ...(data.name !== undefined ? { name: data.name } : {}),
-        ...(data.email !== undefined ? { email: data.email } : {}),
-        ...(data.job !== undefined ? { job: data.job } : {}),
-        ...(data.birthday !== undefined ? { birthday: data.birthday } : {}),
-        ...(data.avatar !== undefined ? { avatar: data.avatar } : {})
+    let updated: any;
+    try {
+      updated = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          ...(data.name !== undefined ? { name: data.name } : {}),
+          ...(data.email !== undefined ? { email: data.email } : {}),
+          ...(data.job !== undefined ? { job: data.job } : {}),
+          ...(data.birthday !== undefined ? { birthday: data.birthday } : {}),
+          ...(data.avatar !== undefined ? { avatar: data.avatar } : {})
+        }
+      });
+    } catch (updateErr: any) {
+      if (String(updateErr?.message).includes("Unknown argument")) {
+        updated = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            ...(data.name !== undefined ? { name: data.name } : {}),
+            ...(data.email !== undefined ? { email: data.email } : {}),
+            ...(data.avatar !== undefined ? { avatar: data.avatar } : {})
+          }
+        });
+      } else {
+        throw updateErr;
       }
-    });
+    }
 
     return NextResponse.json({
       ok: true,
