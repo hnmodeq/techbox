@@ -1,15 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/CardStats';
+import { createPortal } from 'react-dom';
+import { zIndex } from '@/design';
+
+const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 export default function VideoReelsRow() {
   const videos = getLatest('media', 5);
+  const [activeVideo, setActiveVideo] = useState<any | null>(null);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
@@ -28,10 +33,11 @@ export default function VideoReelsRow() {
           {videos.map((vid) => {
             const commentsCount = getCommentCount('media', vid.slug);
             return (
-              <Link
+              <button
+                type="button"
                 key={vid.slug}
-                href={`/media/${vid.slug}`}
-                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:-translate-y-1.5 transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end"
+                onClick={() => setActiveVideo(vid)}
+                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:-translate-y-1.5 transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end text-right cursor-pointer"
               >
                 <Image
                   src={vid.image || '/assets/blog-1.jpg'}
@@ -48,20 +54,64 @@ export default function VideoReelsRow() {
                   </div>
                 </div>
 
-                <div className="relative z-30 p-3.5 text-white">
+                <div className="relative z-30 p-3.5 text-white w-full">
                   <h3 className="text-xs sm:text-sm font-bold leading-5 line-clamp-2 text-white group-hover:text-[var(--tb-media)] transition-colors">
                     {vid.title}
                   </h3>
                   
-                  {/* Clean, distinct icons for views, likes, comments */}
-                  <div className="mt-3 pt-2.5 border-t border-white/20">
+                  {/* Clean, distinct icons for views, likes, comments without line separator */}
+                  <div className="mt-2.5">
                     <CardStats module="media" slug={vid.slug} initialViews={vid.views ?? 0} initialLikes={vid.likes ?? 0} initialComments={commentsCount} showComments={true} />
                   </div>
                 </div>
-              </Link>
+              </button>
             );
           })}
         </div>
+
+        {/* Pop-up Modal Video Player */}
+        {activeVideo && typeof window !== "undefined" && createPortal(
+          <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
+            
+            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
+              <div className="flex items-center justify-between p-4 border-b border-[var(--tb-border)]">
+                <h3 className="tb-text-lg font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
+                <button
+                  type="button"
+                  onClick={() => setActiveVideo(null)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors cursor-pointer"
+                  aria-label="بستن"
+                >
+                  <Icon name="close" size={18} />
+                </button>
+              </div>
+
+              <div className="relative aspect-video bg-black shrink-0">
+                <video
+                  key={activeVideo.slug}
+                  controls
+                  autoPlay
+                  playsInline
+                  poster={activeVideo.image}
+                  className="w-full h-full object-contain bg-black"
+                  src={SAMPLE_VIDEO}
+                />
+              </div>
+
+              <div className="p-5 flex flex-wrap items-center justify-between gap-4">
+                <div className="tb-text-sm text-[var(--tb-fg-muted)]">
+                  <span>منتشرشده توسط: <b className="text-[var(--tb-fg-primary)]">{activeVideo.author?.name || "تکباکس"}</b></span>
+                  <span> • {activeVideo.date_fa}</span>
+                </div>
+                <Link href={`/media/${activeVideo.slug}`} className="btn btn-primary px-5 py-2 text-xs font-bold">
+                  مشاهده صفحه اختصاصی ویدیو و دیدگاه‌ها ←
+                </Link>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
       </div>
     </section>
   );
