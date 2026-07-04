@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getLatest } from '@/lib/content';
+import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -67,9 +67,18 @@ export default function ReviewRow() {
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-[11px] text-[var(--tb-fg-muted)]">
-                    <span className="truncate font-bold">✍️ {rev.author?.name || 'تحلیلگر سخت‌افزار'}</span>
-                    <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} />
+                  <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Image
+                        src={rev.author?.avatar || '/assets/hooman.png'}
+                        alt={rev.author?.name || 'نویسنده'}
+                        width={28}
+                        height={28}
+                        className="h-7 w-7 rounded-full object-cover ring-1 ring-[var(--tb-border)] shrink-0"
+                      />
+                      <span className="truncate font-extrabold text-[var(--tb-fg-primary)]">{rev.author?.name || 'تحلیلگر سخت‌افزار'}</span>
+                    </div>
+                    <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} initialComments={getCommentCount("review", rev.slug)} showComments={true} />
                   </div>
                 </div>
               </Link>
