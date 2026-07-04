@@ -36,7 +36,7 @@ export function TimelineContainer({
   const minDate = new Date(minTime);
   const maxDate = new Date(maxTime);
   const totalYears = Math.max(10, maxDate.getFullYear() - minDate.getFullYear() + 10);
-  const pixelsPerYear = 140;
+  const pixelsPerYear = 350;
   const totalWidth = totalYears * pixelsPerYear * zoom;
 
   // Native non-passive wheel listener to strictly block vertical webpage scrolling
@@ -108,24 +108,16 @@ export function TimelineContainer({
             return (
               <div
                 key={event.id}
-                className="absolute top-0 transform -translate-x-1/2 transition-all duration-75"
+                className="absolute top-0 transform -translate-x-1/2 -translate-y-1/2 transition-all duration-75 flex flex-col items-center"
                 style={{
                   left: `${xPosition}px`,
                 }}
               >
-                {/* Timeline Dot & Connector */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
-                  <div className="w-5 h-5 bg-cyan-400 rounded-full border-4 border-slate-950 shadow-md shadow-cyan-400/80 transition-transform hover:scale-125" />
-                  <div className={`w-0.5 bg-gradient-to-b from-cyan-400/80 to-transparent ${idx % 2 === 0 ? 'h-10 -mt-12 order-first' : 'h-10'}`} />
-                </div>
+                {/* Timeline Dot on Axis */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-cyan-400 rounded-full border-4 border-slate-950 shadow-lg shadow-cyan-400/80 transition-transform hover:scale-125" />
 
-                {/* Card placement alternating above and below axis without scale distortion */}
-                <div
-                  className="flex justify-center"
-                  style={{
-                    marginTop: idx % 2 === 0 ? '-480px' : '60px',
-                  }}
-                >
+                {/* Card centered right on the line */}
+                <div className="flex justify-center">
                   <TimelineCard event={event} importance={event.importance} />
                 </div>
               </div>

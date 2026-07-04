@@ -123,11 +123,11 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         )}
       </div>
 
-      {/* Date & Time Ago Box OUTSIDE Below Card Frame */}
-      <div className="w-full bg-slate-900/90 border border-slate-800 rounded-lg p-2.5 shadow-md flex flex-col items-center text-center gap-1">
-        <div className="text-xs font-black text-cyan-400 font-sans">{persianDate}</div>
-        <div className="text-[11px] font-bold text-slate-400 font-sans tracking-wide" dir="ltr">{globalDate}</div>
-        <div className="text-[11px] font-extrabold text-amber-400/90 bg-amber-950/40 px-2 py-0.5 rounded-full mt-0.5">
+      {/* Date & Time Ago Box OUTSIDE Below Card Frame with NO BG/Border and Larger Typography */}
+      <div className="w-full bg-transparent border-0 shadow-none p-1 flex flex-col items-center text-center gap-1.5">
+        <div className="text-sm sm:text-base font-black text-cyan-400 font-sans">{persianDate}</div>
+        <div className="text-xs sm:text-sm font-bold text-slate-300 font-sans tracking-wide" dir="ltr">{globalDate}</div>
+        <div className="text-xs sm:text-sm font-extrabold text-amber-400">
           {timeAgo}
         </div>
       </div>

@@ -12,7 +12,11 @@ interface ZoomControlsProps {
 
 export function ZoomControls({ zoom, onZoomIn, onZoomOut, onReset }: ZoomControlsProps) {
   return (
-    <div className="absolute bottom-8 right-8 flex flex-col gap-3 z-50">
+    <div
+      className="absolute bottom-8 right-8 flex flex-col gap-3 z-50"
+      onPointerDown={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <div className="bg-slate-800/80 backdrop-blur border border-slate-700 rounded-lg px-3 py-2 text-sm text-blue-400 font-mono text-center min-w-max">
         {(zoom * 100).toFixed(0)}%
       </div>

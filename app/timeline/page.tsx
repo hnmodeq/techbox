@@ -16,14 +16,10 @@ export default function TimelinePage() {
 
   const handleWheel = useCallback(
     (e: any) => {
-      if (e.ctrlKey) {
-        if (e.deltaY < 0) zoomIn();
-        else if (e.deltaY > 0) zoomOut();
-      } else {
-        setPan((current: any) => ({ ...current, x: current.x - e.deltaY * 1.2 }));
-      }
+      if (e.deltaY < 0) zoomIn();
+      else if (e.deltaY > 0) zoomOut();
     },
-    [zoomIn, zoomOut, setPan]
+    [zoomIn, zoomOut]
   );
 
   if (isLoading) return <TimelineLoading />;
