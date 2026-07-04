@@ -10,11 +10,15 @@ export default function VideoReelsRow() {
   const videos = getModuleItems('media').slice(0, 10);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 border-t border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-media)_4%,var(--tb-bg-primary))] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center overflow-hidden`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center overflow-hidden`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
-        {/* Title without colorful badge and without separator border */}
-        <div className="mb-6">
+        {/* Simple Text More Button positioned ABOVE items inside the header */}
+        <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">ریلزها و ویدیوهای کوتاه زیرساخت</h2>
+          <Link href="/media" className="text-sm font-bold text-[var(--tb-media)] hover:underline flex items-center gap-1 shrink-0">
+            <span>مشاهده همه ویدیوها</span>
+            <span>←</span>
+          </Link>
         </div>
 
         {/* Horizontal Scrolling Strip for Vertical Reel Thumbnails (aspect-[9/16]) */}
@@ -51,13 +55,6 @@ export default function VideoReelsRow() {
               </div>
             </Link>
           ))}
-        </div>
-
-        {/* Full-width More Button at bottom center */}
-        <div className="mt-6 w-full">
-          <Link href="/media" className="btn btn-ghost w-full py-3.5 font-bold text-center border border-[var(--tb-border)] hover:bg-[var(--tb-bg-muted)]">
-            مشاهده تمام ویدیوهای ریلز ←
-          </Link>
         </div>
       </div>
     </section>
