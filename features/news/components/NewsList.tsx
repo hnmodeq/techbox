@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems } from "@/lib/content";
+import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
@@ -32,7 +32,7 @@ export default function NewsList() {
                     <div className="tb-text-sm mt-3 flex items-center gap-3 text-[var(--tb-fg-muted)]">
                       <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(n.views ?? 0).toLocaleString("fa-IR")}</span>
                       <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(n.likes ?? 0).toLocaleString("fa-IR")}</span>
-                      <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{(((n.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{getCommentCount("news", n.slug).toLocaleString("fa-IR")}</span>
                     </div>
                   </div>
                 </Link>

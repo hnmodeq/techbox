@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getLatest } from '@/lib/content';
+import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,7 +25,7 @@ export default function VideoReelsRow() {
         {/* Clean Grid Layout without scrollbars */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {videos.map((vid) => {
-            const commentsCount = ((vid.likes ?? 0) % 9) + 4;
+            const commentsCount = getCommentCount('media', vid.slug);
             return (
               <Link
                 key={vid.slug}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { getModuleItems } from "@/lib/content";
+import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
@@ -67,7 +67,7 @@ export default function ReviewGrid() {
                   <div className="flex items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
                     <span className="inline-flex items-center gap-1"><Icon name="view" size={15} />{r.views?.toLocaleString("fa-IR") || "۱,۲۰۰"}</span>
                     <span className="inline-flex items-center gap-1"><Icon name="like" size={15} />{r.likes?.toLocaleString("fa-IR") || "۴۵"}</span>
-                    <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} />{comments.toLocaleString("fa-IR")}</span>
+                    <span className="inline-flex items-center gap-1"><Icon name="comment" size={15} />{getCommentCount("review", r.slug).toLocaleString("fa-IR")}</span>
                   </div>
                 </div>
               </div>

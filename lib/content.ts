@@ -35,6 +35,7 @@ import toolsData from "@/data/tools.json";
 import downloadData from "@/data/download.json";
 import shopData from "@/data/shop.json";
 import forumData from "@/data/forum.json";
+import commentsData from "@/data/comments.json";
 import { moduleColors } from "@/config/module-colors";
 
 const all: Record<ModuleSlug, ContentItem[]> = {
@@ -101,6 +102,11 @@ export function searchAcross(q: string) {
       c.excerpt.toLowerCase().includes(s) ||
       c.tags.some(t => t.toLowerCase().includes(s))
   );
+}
+
+export function getCommentCount(module: string, slug: string): number {
+  const count = (commentsData as any[]).filter(c => c.content_type === module && c.content_slug === slug).length;
+  return count > 0 ? count : 0;
 }
 
 export const moduleMeta: Record<ModuleSlug, { title: string; titleFa: string; color: string; href: string }> = {

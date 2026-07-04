@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems } from "@/lib/content";
+import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
@@ -34,7 +34,7 @@ export default function BlogGrid(){
                 <div className="flex items-center gap-3">
                   <span className="inline-flex items-center gap-1"><Icon name="like" size={14} strokeWidth={1.75} />{(p.likes ?? 0).toLocaleString("fa-IR")}</span>
                   <span className="inline-flex items-center gap-1"><Icon name="view" size={14} strokeWidth={1.75} />{(p.views ?? 0).toLocaleString("fa-IR")}</span>
-                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{(((p.likes ?? 0) % 9) + 1).toLocaleString("fa-IR")}</span>
+                  <span className="inline-flex items-center gap-1"><Icon name="comment" size={14} strokeWidth={1.75} />{getCommentCount("blog", p.slug).toLocaleString("fa-IR")}</span>
                 </div>
               </div>
             </div>
