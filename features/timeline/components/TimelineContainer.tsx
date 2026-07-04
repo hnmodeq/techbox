@@ -36,8 +36,8 @@ export function TimelineContainer({
   //    (مثلاً اگر ۱۴۰ باشد، برای ۵ سال اختلاف، ۷۰۰ پیکسل فاصله ایجاد می‌شود)
   // 2. MIN_EDGE_GAP: حداقل فاصله ثابت بین لبه‌های دو کارت مجاور (به پیکسل)
   // ============================================================================
-  const PIXELS_PER_YEAR = 160;
-  const MIN_EDGE_GAP = 90;
+  const PIXELS_PER_YEAR = 270;
+  const MIN_EDGE_GAP = 270;
 
   const xPositions = React.useMemo(() => {
     let currX = 240;
