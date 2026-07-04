@@ -377,11 +377,6 @@ export default function AccountPage() {
 
         {/* profile form */}
         <div className="lg:col-span-2 card p-6 space-y-6">
-          <div className="flex items-center justify-between border-b border-[var(--tb-border)] pb-3">
-            <h3 className="tb-text-lg ">ویرایش مشخصات در Neon PostgreSQL</h3>
-            <Badge variant="secondary">ذخیره مستقیم در دیتابیس</Badge>
-          </div>
-
           {saveStatus && (
             <div className={`rounded-[var(--tb-radius-md)] p-3 text-center tb-text-sm ${saveStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)] border border-[var(--tb-success)]/30" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)] border border-[var(--tb-danger)]/30"}`}>
               {saveStatus.msg}
@@ -405,14 +400,10 @@ export default function AccountPage() {
               <label className="block tb-text-sm text-[var(--tb-fg-muted)] mb-1.5">سمت شغلی یا تخصص</label>
               <input value={job} onChange={e => setJob(e.target.value)} placeholder="مثلا: کارشناس زیرساخت شبکه" className="input w-full" />
             </div>
-            <div className="sm:col-span-2">
-              <label className="block tb-text-sm text-[var(--tb-fg-muted)] mb-1.5">تاریخ تولد</label>
-              <input type="date" value={birthday} onChange={e => setBirthday(e.target.value)} className="input sm:w-1/2" />
-            </div>
           </div>
 
           <div className="flex justify-end pt-2">
-            <Button type="submit">ذخیره تغییرات در دیتابیس</Button>
+            <Button type="submit">ذخیره</Button>
           </div>
 
           {/* password section */}

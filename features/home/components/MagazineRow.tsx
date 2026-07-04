@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/CardStats';
+import { AuthorLink } from '@/components/ui/AuthorLink';
 
 export default function MagazineRow() {
   const articles = getLatest('blog', 5);
@@ -55,16 +56,7 @@ export default function MagazineRow() {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between text-xs text-[var(--tb-fg-muted)] font-bold">
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={art.author?.avatar || '/assets/hooman.png'}
-                      alt={art.author?.name || 'نویسنده'}
-                      width={32}
-                      height={32}
-                      className="h-8 w-8 rounded-full object-cover ring-1 ring-[var(--tb-border)]"
-                    />
-                    <span className="font-extrabold text-[var(--tb-fg-primary)]">{art.author?.name || 'تحریریه'}</span>
-                  </div>
+                  <AuthorLink name={art.author?.name} avatar={art.author?.avatar} />
                   <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
                 </div>
               </div>
