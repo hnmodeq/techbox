@@ -13,9 +13,9 @@
 
   "files.exclude": {
     "**/.git": true,
-    "**/.env": true,
-    "**/.env.local": true,
-    "**.env.example": true,
+    "**/.env": false,
+    "**/.env.local": false,
+    "**.env.example": false,
     "**/.gitattributes": true,
     "**/.gitignore": true,
     "**/next-env.d.ts": true,
@@ -41,6 +41,7 @@
     "**/.config" : true,
     "**/.continue" : true,
     "**/.vercel" : true,
+    "**/TIMELINE_ARCHITECTURE.md": true,
   },
   "prisma.pinToPrisma6": true,
   "js/ts.tsdk.path": "node_modules\\typescript\\lib"
