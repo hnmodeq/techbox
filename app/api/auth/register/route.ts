@@ -70,6 +70,8 @@ export async function POST(req: NextRequest) {
           }
         });
       } else {
+        const gUsers = globalThis as unknown as { __local_users__?: Record<string, any> };
+        if (!gUsers.__local_users__) gUsers.__local_users__ = {};
         user = {
           id: `local_${Date.now()}`,
           name,
@@ -77,9 +79,10 @@ export async function POST(req: NextRequest) {
           email: email.toLowerCase(),
           role: "user",
           roleFa: "کاربر عضو",
-          modules: [],
+          modules: "[]",
           avatar: ""
         };
+        gUsers.__local_users__[user.id] = user;
       }
     }
 
