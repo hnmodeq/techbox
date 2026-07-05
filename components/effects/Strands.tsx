@@ -242,12 +242,10 @@ export default function Strands({
     const ctn = ctnDom.current;
     if (!ctn) return;
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
     const renderer = new Renderer({
       alpha: true,
       premultipliedAlpha: true,
-      antialias: !isMobile,
-      dpr: Math.min(window.devicePixelRatio, isMobile ? 1 : 1.25)
+      antialias: true
     });
 
     const gl = renderer.gl;
@@ -321,16 +319,10 @@ export default function Strands({
     window.addEventListener('resize', resize);
     resize();
 
-    let animationId = 0;
-    let isVisible = true;
-    const observer = new IntersectionObserver((entries) => {
-      isVisible = entries[0]?.isIntersecting ?? true;
-    }, { threshold: 0.05 });
-    observer.observe(ctn);
+    let animateId = 0;
 
     const update = (t: number) => {
-      animationId = requestAnimationFrame(update);
-      if (!isVisible || (typeof document !== 'undefined' && document.hidden)) return;
+      animateId = requestAnimationFrame(update);
       const current = propsRef.current;
       program.uniforms.uTime.value = t * 0.001;
       program.uniforms.uColors.value = buildPalette(current.colors);
@@ -361,11 +353,10 @@ export default function Strands({
       }
     };
 
-    animationId = requestAnimationFrame(update);
+    animateId = requestAnimationFrame(update);
 
     return () => {
-      cancelAnimationFrame(animationId);
-      observer.disconnect();
+      cancelAnimationFrame(animateId);
       window.removeEventListener('resize', resize);
       if (ctn && gl.canvas.parentNode === ctn) {
         ctn.removeChild(gl.canvas);
