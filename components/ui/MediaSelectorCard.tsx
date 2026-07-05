@@ -55,7 +55,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10 transition-opacity group-hover:opacity-95" />
 
  <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
- <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white transition-transform group-hover:scale-110 shadow-lg">
+ <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-md text-white transition-transform group-hover:scale-110 shadow-[var(--shadow-size)]">
  ▶
  </span>
  </span>

@@ -9,7 +9,7 @@ export function Modal({ open, onClose, children, className }: { open: boolean; o
  return (
  <div className="fixed inset-0 flex items-center justify-center p-4" dir="rtl" style={{zIndex:zIndex.modal}}>
  <OverlayBackdrop onClick={onClose} />
- <Panel className={cn("relative w-full max-w-lg max-h-[85vh] overflow-auto", className)} style={{zIndex:zIndex.modalContent}}>{children}</Panel>
+ <Panel className={cn("relative w-full max-w-lg max-h-[85vh] overflow-auto !bg-[var(--modal-background)]", className)} style={{zIndex:zIndex.modalContent}}>{children}</Panel>
  </div>
  );
 }

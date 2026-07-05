@@ -24,13 +24,13 @@ const base =
  "disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<Variant,string> = {
- primary: "text-[#ffffff] bg-[var(--home)] hover:brightness-[1.06] active:scale-[0.985] shadow-[var(--shadow-size)]",
- secondary: "text-[var(--primary-text)] bg-[var(--muted-background)] hover:brightness-[1.03]",
- ghost: "bg-transparent text-[var(--primary-text)] hover:bg-[var(--muted-background)] border-[length:var(--border-size)] border-[var(--border-color)]",
- outline: "bg-transparent border-[length:var(--border-size)] border-[var(--border-color)] text-[var(--primary-text)] hover:bg-[var(--muted-background)]",
- danger: "text-[#ffffff] bg-[var(--tb-danger)] border-transparent hover:brightness-[1.05] active:scale-[0.985]",
- vip: "tb-cta tb-cta-vip px-4",
- link: "bg-transparent underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none"
+ primary: "text-[var(--primary-text)] bg-[var(--button-background)] hover:brightness-[1.06] active:scale-[0.985] shadow-[var(--shadow-size)] border-[length:var(--border-size)] border-[var(--border-color)]",
+ secondary: "text-[var(--primary-text)] bg-[var(--button-background)]/80 hover:brightness-[1.03] border-[length:var(--border-size)] border-[var(--border-color)]",
+ ghost: "bg-transparent text-[var(--primary-text)] hover:bg-[var(--button-background)]/40 border-[length:var(--border-size)] border-[var(--border-color)]",
+ outline: "bg-transparent border-[length:var(--border-size)] border-[var(--border-color)] text-[var(--primary-text)] hover:bg-[var(--button-background)]/40",
+ danger: "text-[#ffffff] bg-[var(--danger)] border-transparent hover:brightness-[1.05] active:scale-[0.985]",
+ vip: "tb-cta tb-cta-vip px-4 bg-[var(--button-background)] text-[var(--primary-text)]",
+ link: "bg-transparent underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none text-[var(--primary-text)]"
 };
 
 const sizes: Record<Size,string> = {

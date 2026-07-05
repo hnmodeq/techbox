@@ -61,7 +61,7 @@ export default function Chatbot(){
      type="button"
      onClick={() => setOpen(true)}
      style={{ zIndex: zIndex.popover }}
-     className="fixed bottom-5 left-5 rounded-full bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] px-4.5 py-2.5 text-[var(--primary-text)] shadow-lg hover:bg-[var(--muted-background)] transition-all flex items-center gap-2 cursor-pointer font-normal text-xs sm:text-sm"
+     className="fixed bottom-5 left-5 rounded-full bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] px-4.5 py-2.5 text-[var(--primary-text)] shadow-[var(--shadow-size)] hover:bg-[var(--muted-background)] transition-all flex items-center gap-2 cursor-pointer font-normal text-xs sm:text-sm"
      aria-label="پشتیبانی تکباکس"
    >
      <Icon name="chat" size={18} className="sm:hidden text-[var(--home)]" />

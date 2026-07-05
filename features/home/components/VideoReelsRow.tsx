@@ -37,7 +37,7 @@ export default function VideoReelsRow() {
                 type="button"
                 key={vid.slug}
                 onClick={() => setActiveVideo(vid)}
-                className="group relative w-full aspect-[9/16] rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)] shadow-xl hover:shadow-2xl transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end text-right cursor-pointer"
+                className="group relative w-full aspect-[9/16] rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] bg-[var(--card-background)] flex flex-col justify-end text-right cursor-pointer"
               >
                 <Image
                   src={vid.image || '/assets/blog-1.jpg'}
@@ -49,7 +49,7 @@ export default function VideoReelsRow() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
 
                 <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                  <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-transform group-hover:scale-125 shadow-lg">
+                  <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-transform group-hover:scale-125 shadow-[var(--shadow-size)]">
                     ▶
                   </div>
                 </div>
@@ -74,7 +74,7 @@ export default function VideoReelsRow() {
           <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
             
-            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
+            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--modal-background)] shadow-[var(--shadow-size)] flex flex-col" style={{ zIndex: zIndex.modalContent }}>
               <div className="flex items-center justify-between p-4 border-b-[length:var(--border-size)] border-[var(--border-color)]">
                 <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
                 <button

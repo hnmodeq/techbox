@@ -38,7 +38,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         <span className="truncate text-[var(--primary-text)] max-w-xs">{item.title}</span>
       </nav>
 
-      <article className="card p-6 sm:p-8 space-y-8 shadow-lg border-[var(--border-color)]">
+      <article className="card p-6 sm:p-8 space-y-8 shadow-[var(--shadow-size)] border-[var(--border-color)]">
         {/* Header */}
         <header className="border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6 space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -75,7 +75,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         </header>
 
         {/* Featured Image */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)] shadow-md">
+        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)] shadow-[var(--shadow-size)]">
           <Image src={item.image || "/assets/blog-1.jpg"} alt={item.title} fill sizes="800px" className="object-cover" />
         </div>
 
@@ -87,7 +87,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         {/* Strengths & Weaknesses Boxes */}
         <div className="grid md:grid-cols-2 gap-6 my-8">
           {/* Strengths */}
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_8%,var(--card-background))] p-5 space-y-4 shadow-sm">
+          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_8%,var(--card-background))] p-5 space-y-4 shadow-[var(--shadow-size)]">
             <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-success)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_25%,transparent)] pb-3">
               <Icon name="check" size={20} className="stroke-[2.5]" />
               <span>نقاط قوت</span>
@@ -103,7 +103,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           </div>
 
           {/* Weaknesses */}
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-warning)_8%,var(--card-background))] p-5 space-y-4 shadow-sm">
+          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-warning)_8%,var(--card-background))] p-5 space-y-4 shadow-[var(--shadow-size)]">
             <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-warning)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_25%,transparent)] pb-3">
               <Icon name="shield" size={20} className="stroke-[2.5]" />
               <span>نقاط ضعف</span>

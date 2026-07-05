@@ -85,7 +85,7 @@ export default function MediaGallery() {
               onClick={() => setPage(p)}
               className={`h-10 w-10 rounded-[var(--corner-radius)] border font-bold transition-all ${
                 page === p
-                  ? "bg-[var(--media)] text-[#ffffff] border-[var(--media)] shadow-md scale-105"
+                  ? "bg-[var(--media)] text-[#ffffff] border-[var(--media)] shadow-[var(--shadow-size)] scale-105"
                   : "border-[var(--border-color)] bg-[var(--card-background)] text-[var(--primary-text)] hover:border-[var(--media)] hover:text-[var(--media)]"
               }`}
             >
@@ -100,7 +100,7 @@ export default function MediaGallery() {
         <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
           
-          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
+          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--modal-background)] shadow-[var(--shadow-size)] flex flex-col" style={{ zIndex: zIndex.modalContent }}>
             <div className="flex items-center justify-between p-4 border-b-[length:var(--border-size)] border-[var(--border-color)]">
               <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
               <button
@@ -141,7 +141,7 @@ export default function MediaGallery() {
                     onClick={() => handleLike(activeVideo.slug, activeVideo.likes)}
                     className={`inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] px-4 py-1.5 rounded-[var(--corner-radius)] border transition-all ${
                       likedList[activeVideo.slug]
-                        ? "bg-[var(--tb-danger)]/15 border-[var(--tb-danger)] text-[var(--tb-danger)] shadow-sm"
+                        ? "bg-[var(--tb-danger)]/15 border-[var(--tb-danger)] text-[var(--tb-danger)] shadow-[var(--shadow-size)]"
                         : "bg-[var(--card-background)] border-[var(--border-color)] text-[var(--primary-text)] hover:border-[var(--tb-danger)]"
                     }`}
                   >

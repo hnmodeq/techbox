@@ -296,7 +296,7 @@ function ProductCard({
             </div>
           </div>
           {rank === 0 ? (
-            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--home),var(--vip))] px-3 py-1 text-[11px] font-black text-[#ffffff] shadow-sm">
+            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--home),var(--vip))] px-3 py-1 text-[11px] font-black text-[#ffffff] shadow-[var(--shadow-size)]">
               بهترین پیشنهاد
             </span>
           ) : null}

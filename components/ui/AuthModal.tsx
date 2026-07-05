@@ -92,7 +92,7 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in-0 duration-200" dir="rtl">
-      <div className="relative w-full max-w-[440px] rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] p-6 sm:p-8 shadow-2xl text-[var(--primary-text)]">
+      <div className="relative w-full max-w-[440px] rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--modal-background)] p-6 sm:p-8 shadow-[var(--shadow-size)] text-[var(--primary-text)]">
         {/* Close Button */}
         <button
           type="button"
@@ -104,7 +104,7 @@ export function AuthModal() {
 
         {/* Logo & Header */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--home)]/10 border-[length:var(--border-size)] border-[var(--home)]/30 text-[var(--home)] font-black text-2xl shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--home)]/10 border-[length:var(--border-size)] border-[var(--home)]/30 text-[var(--home)] font-black text-2xl shadow-[var(--shadow-size)]">
             TB
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
@@ -191,7 +191,7 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full !h-11 rounded-[var(--corner-radius)] bg-[var(--home)] text-white font-black text-sm shadow-lg hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full !h-11 rounded-[var(--corner-radius)] bg-[var(--home)] text-white font-black text-sm shadow-[var(--shadow-size)] hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
             >
               {busy ? "در حال پردازش..." : "ورود یا شروع عضویت"}
             </button>

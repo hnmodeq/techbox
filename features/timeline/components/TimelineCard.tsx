@@ -250,7 +250,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               </button>
 
               {showLoginPrompt && (
-                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-900 p-2.5 shadow-2xl text-center">
+                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-900 p-2.5 shadow-[var(--shadow-size)] text-center">
                   <p className="text-xs text-white mb-2">برای پسندیدن رویداد ابتدا وارد شوید.</p>
                   <div className="flex justify-center gap-1.5">
                     <Button size="xs" onClick={() => router.push('/account')}>ورود / عضویت</Button>
@@ -278,7 +278,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       {/* TIER 2: EXPANDING COMMENT DRAWER */}
       {showComments && (
         <div
-          className="w-full mt-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-950/95 p-3.5 shadow-2xl flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
+          className="w-full mt-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-950/95 p-3.5 shadow-[var(--shadow-size)] flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onWheel={(e) => e.stopPropagation()}
