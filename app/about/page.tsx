@@ -23,13 +23,13 @@ export default function About(){
  ["۱۴۰۵", "هونامیک ارتباط رستاک"],
  ].map(([k,v])=>(
  <div key={k as string} className="card p-5 text-center">
- <div className="tb-text-big-title text-[var(--tb-primary)]">{k}</div>
- <div className="tb-text-sm text-muted-foreground mt-1">{v}</div>
+ <div className="text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] text-[var(--tb-primary)]">{k}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-1">{v}</div>
  </div>
  ))}
  </div>
 
- <h2 className="tb-text-lg mb-4">تیم تحریریه</h2>
+ <h2 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] mb-4">تیم تحریریه</h2>
  <div className="mb-14">
  <TeamChromaSection team={team} />
  </div>
@@ -38,7 +38,7 @@ export default function About(){
  <div className="lg:col-span-3 card p-0 overflow-hidden">
  <div className="p-4 border-b border-[var(--tb-border)]">
  <h3 className="">دفتر تهران</h3>
- <p className="tb-text-sm text-muted-foreground mt-1">میرداماد، هونامیک ارتباط رستاک</p>
+ <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-1">میرداماد، هونامیک ارتباط رستاک</p>
  </div>
  {/* OSM embed – works offline preview degraded, live works */}
  <iframe
@@ -48,12 +48,12 @@ export default function About(){
  loading="lazy"
  />
  </div>
- <div className="lg:col-span-2 space-y-3 tb-text-md text-muted-foreground card p-5">
+ <div className="lg:col-span-2 space-y-3 text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-muted-foreground card p-5">
  <p>تماس: <span dir="ltr">021-9100xxxx</span></p>
  <p>ایمیل: info@techbox.ir</p>
  <p>ساعت کاری: شنبه–چهارشنبه ۹–۱۷</p>
- <ButtonLink href="/contact" className="mt-2 w-full tb-text-md">ارتباط با ما</ButtonLink>
- <ButtonLink href="/consultation" variant="ghost" className="w-full tb-text-md">درخواست مشاوره VIP</ButtonLink>
+ <ButtonLink href="/contact" className="mt-2 w-full text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">ارتباط با ما</ButtonLink>
+ <ButtonLink href="/consultation" variant="ghost" className="w-full text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">درخواست مشاوره VIP</ButtonLink>
  </div>
  </div>
  </main>

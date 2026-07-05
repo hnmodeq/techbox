@@ -21,7 +21,7 @@ export function TabsTrigger({value, children, __tb_active, __tb_onSelect, classN
  <button
  onClick={()=>__tb_onSelect?.(value)}
  className={cn(
- "px-3 py-1.5 tb-text-sm rounded-[var(--tb-radius-md)] transition-all",
+ "px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--tb-radius-md)] transition-all",
  __tb_active ? "bg-[var(--tb-bg-secondary)] shadow-[var(--tb-shadow-sm)] text-[var(--tb-fg-primary)]" : "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]",
  className
  )}

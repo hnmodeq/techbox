@@ -59,7 +59,7 @@ export default function DownloadRow() {
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
-          <Link href="/download" className="text-sm font-bold text-[var(--tb-download)] hover:underline flex items-center gap-1 shrink-0">
+          <Link href="/download" className="text-sm font-bold text-[var(--download)] hover:underline flex items-center gap-1 shrink-0">
             <span>ورود به مرکز دانلود</span>
             <span>←</span>
           </Link>
@@ -93,7 +93,7 @@ export default function DownloadRow() {
                       </span>
                     </div>
 
-                    <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
                       {file.title}
                     </h3>
                     <div className="text-xs text-[var(--tb-fg-muted)] mt-1 line-clamp-1">

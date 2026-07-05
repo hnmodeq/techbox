@@ -49,10 +49,10 @@ export default function FooterSection() {
  <div className="flex flex-row md:flex-row justify-around gap-12 md:gap-24">
  {/* ستون دوم: لینک‌ها */}
  <div className="text-right">
- <h4 className="tb-text-md text-foreground">لینک‌های سریع</h4>
+ <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-foreground">لینک‌های سریع</h4>
  <div className="mt-4 flex flex-col gap-3">
  {navigation.main.map((item) => (
- <Link key={item.name} href={item.href} className={`tb-text-md text-muted-foreground transition-colors ${item.hover}`}>
+ <Link key={item.name} href={item.href} className={`text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-muted-foreground transition-colors ${item.hover}`}>
  {item.name}
  </Link>
  ))}
@@ -61,7 +61,7 @@ export default function FooterSection() {
 
  {/* ستون سوم: اجتماعی */}
  <div className="text-right">
- <h4 className="tb-text-md text-foreground">شبکه‌های اجتماعی</h4>
+ <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-foreground">شبکه‌های اجتماعی</h4>
  <div className="mt-4 flex gap-4">
  {navigation.social.map((item) => (
  <Link key={item.name} href={item.href} target="_blank" className="text-muted-foreground hover:text-foreground">
@@ -73,10 +73,10 @@ export default function FooterSection() {
  </div>
  {/* کپی‌رایت */}
  <div className="mt-12 border-t border-[var(--tb-border)] pt-6 text-center space-y-2">
- <p className="tb-text-md text-muted-foreground">
+ <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-muted-foreground">
  © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «هونامیک ارتباط رستاک» میباشد.
  </p>
- <p className="tb-text-sm text-muted-foreground">
+ <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">
  طراحی شده توسط <a href="https://www.bumimstudio.ir/" target="_blank" rel="noopener noreferrer" className="font-bold text-[var(--tb-warning)] hover:underline">بومیم</a>
  </p>
  </div>

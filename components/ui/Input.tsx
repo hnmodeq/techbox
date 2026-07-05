@@ -13,7 +13,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
  "w-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-primary)]",
  "border border-[var(--tb-border)]",
  "rounded-[var(--tb-radius-md)] px-[14px] py-[10px]",
- "tb-text-sm ",
+ "text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ",
  "transition-all duration-[var(--tb-motion-sm)] ease-[var(--tb-ease)]",
  "placeholder:text-[var(--tb-fg-muted)]/80",
  "focus:outline-none focus:border-[var(--tb-ring-1)] focus:shadow-[var(--tb-ring-3)]",

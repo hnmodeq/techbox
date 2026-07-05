@@ -47,7 +47,7 @@ export default function HomeTimelineRow() {
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">تاریخچه تحولات، رویدادها و نقاط عطف دیتاسنتر</h2>
           <Link
             href="/timeline"
-            className="text-sm font-bold text-[var(--tb-timeline)] hover:underline flex items-center gap-1 shrink-0"
+            className="text-sm font-bold text-[var(--timeline)] hover:underline flex items-center gap-1 shrink-0"
           >
             <span>ورود به تایم‌لاین کامل</span>
             <span>←</span>
@@ -57,7 +57,7 @@ export default function HomeTimelineRow() {
         {/* Helper Awareness Banner */}
         {active && (
           <div className="text-center">
-            <span className="badge bg-[var(--tb-bg-secondary)] text-[var(--tb-timeline)] font-bold border border-[var(--tb-border)] shadow-sm px-4 py-1.5 tb-text-sm">
+            <span className="badge bg-[var(--tb-bg-secondary)] text-[var(--tb-timeline)] font-bold border border-[var(--tb-border)] shadow-sm px-4 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
             </span>
           </div>

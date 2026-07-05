@@ -102,7 +102,7 @@ export default function MediaGallery() {
           
           <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
             <div className="flex items-center justify-between p-4 border-b border-[var(--tb-border)]">
-              <h3 className="tb-text-lg font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
+              <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
               <button
                 onClick={() => setActiveVideo(null)}
                 className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors"
@@ -126,20 +126,20 @@ export default function MediaGallery() {
 
             <div className="p-5 space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--tb-border)] pb-4">
-                <div className="tb-text-sm text-[var(--tb-fg-muted)] flex items-center gap-3">
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] flex items-center gap-3">
                   <span>منتشرشده توسط: <b className="text-[var(--tb-fg-primary)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span>•</span>
                   <span>{activeVideo.date_fa}</span>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="inline-flex items-center gap-1.5 tb-text-sm text-[var(--tb-fg-muted)] bg-[var(--tb-bg-secondary)] px-3 py-1.5 rounded-[var(--tb-radius-full)] border border-[var(--tb-border)]">
+                  <span className="inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] bg-[var(--tb-bg-secondary)] px-3 py-1.5 rounded-[var(--tb-radius-full)] border border-[var(--tb-border)]">
                     <CardStats module="media" slug={activeVideo.slug} initialViews={activeVideo.views ?? 0} initialLikes={activeVideo.likes ?? 0} showLabel={true} />
                   </span>
 
                   <button
                     onClick={() => handleLike(activeVideo.slug, activeVideo.likes)}
-                    className={`inline-flex items-center gap-1.5 tb-text-sm px-4 py-1.5 rounded-[var(--tb-radius-full)] border transition-all ${
+                    className={`inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] px-4 py-1.5 rounded-[var(--tb-radius-full)] border transition-all ${
                       likedList[activeVideo.slug]
                         ? "bg-[var(--tb-danger)]/15 border-[var(--tb-danger)] text-[var(--tb-danger)] shadow-sm"
                         : "bg-[var(--tb-bg-secondary)] border-[var(--tb-border)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-danger)]"
@@ -153,7 +153,7 @@ export default function MediaGallery() {
 
               {/* Comments Section */}
               <div className="space-y-4">
-                <h4 className="tb-text-md font-bold">نظرات کاربران ({getComments(activeVideo.slug).length.toLocaleString("fa-IR")})</h4>
+                <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold">نظرات کاربران ({getComments(activeVideo.slug).length.toLocaleString("fa-IR")})</h4>
 
                 <form onSubmit={(e) => handleAddComment(e, activeVideo.slug)} className="flex gap-2">
                   <input
@@ -161,16 +161,16 @@ export default function MediaGallery() {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="نظر خود را درباره این ویدیو بنویسید..."
-                    className="input flex-1 !h-11 tb-text-sm"
+                    className="input flex-1 !h-11 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
                   />
-                  <button type="submit" className="btn btn-primary !h-11 px-6 tb-text-sm shrink-0">
+                  <button type="submit" className="btn btn-primary !h-11 px-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] shrink-0">
                     ارسال نظر
                   </button>
                 </form>
 
                 <ul className="space-y-3 max-h-60 overflow-y-auto pr-1">
                   {getComments(activeVideo.slug).map((c, i) => (
-                    <li key={i} className="p-3 rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] tb-text-sm">
+                    <li key={i} className="p-3 rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
                       <div className="flex items-center justify-between mb-1 text-[12px] text-[var(--tb-fg-muted)]">
                         <b>کاربر تکباکس</b>
                         <span>لحظاتی پیش</span>

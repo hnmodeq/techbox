@@ -80,7 +80,7 @@ export default function SidebarTooltip({
  {mounted && visible && pos && createPortal(
  <span
  role="tooltip"
- className={`pointer-events-none fixed whitespace-nowrap rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] px-2.5 py-1.5 tb-text-sm shadow-[var(--tb-shadow-md)] animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)] ${tooltipClassName}`}
+ className={`pointer-events-none fixed whitespace-nowrap rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] px-2.5 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] shadow-[var(--tb-shadow-md)] animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)] ${tooltipClassName}`}
  style={{
  right: pos.right,
  top: pos.top,

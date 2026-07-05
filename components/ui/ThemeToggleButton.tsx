@@ -21,7 +21,7 @@ export const ThemeToggleButton = React.forwardRef<HTMLButtonElement, ThemeToggle
  ref={ref}
  type="button"
  className={cn(
- "group flex h-10 w-full items-center rounded-[var(--tb-radius-lg)] tb-text-sm text-[var(--tb-fg-muted)]",
+ "group flex h-10 w-full items-center rounded-[var(--tb-radius-lg)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]",
  "transition-colors duration-[var(--tb-motion-md)] hover:bg-[var(--tb-bg-muted)] hover:text-[var(--tb-fg-primary)]",
  className
  )}
@@ -39,7 +39,7 @@ export const ThemeToggleButton = React.forwardRef<HTMLButtonElement, ThemeToggle
  )} />
  </span>
  <span className={cn(
- "overflow-hidden whitespace-nowrap tb-text-sm transition-all duration-[var(--tb-motion-md)]",
+ "overflow-hidden whitespace-nowrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-all duration-[var(--tb-motion-md)]",
  expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"
  )}>
  {label}

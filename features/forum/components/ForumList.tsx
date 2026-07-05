@@ -71,12 +71,12 @@ export default function ForumList() {
     <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
       <ModuleHeader module="forum" title="انجمن تکباکس" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={`${all.length.toLocaleString("fa-IR")} موضوع`}>
         <div className="flex gap-2">
-          <input placeholder="جستجو در انجمن…" className="input w-56 tb-text-md" />
-          <Button onClick={() => setShowNew(true)} className="tb-text-md">+ موضوع جدید</Button>
+          <input placeholder="جستجو در انجمن…" className="input w-56 text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]" />
+          <Button onClick={() => setShowNew(true)} className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">+ موضوع جدید</Button>
         </div>
       </ModuleHeader>
 
-      <div className="flex gap-2 tb-text-sm mb-4">
+      <div className="flex gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mb-4">
         {(["داغ", "جدید", "برتر", "حل‌شده"] as const).map((t) => (
           <ChipButton key={t} tone="forum" aria-pressed={filter === t} onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--tb-forum)] text-[var(--tb-forum)]" : ""}>
             {t}
@@ -85,7 +85,7 @@ export default function ForumList() {
       </div>
 
       <div className="card divide-y divide-[var(--tb-border)]/60 overflow-hidden">
-        <div className="hidden sm:grid grid-cols-12 tb-text-sm text-[var(--tb-fg-muted)] px-4 py-2.5 bg-[var(--tb-bg-muted)]/30 font-bold">
+        <div className="hidden sm:grid grid-cols-12 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] px-4 py-2.5 bg-[var(--tb-bg-muted)]/30 font-bold">
           <div className="col-span-7">عنوان موضوع و نویسنده</div>
           <div className="col-span-1 text-center">امتیاز</div>
           <div className="col-span-2 text-center">پاسخ / بازدید</div>
@@ -94,7 +94,7 @@ export default function ForumList() {
         {all.map((t) => (
           <Link key={t.slug} href={`/forum/${t.slug}`} className="group grid grid-cols-12 px-3 sm:px-4 py-3.5 hover:bg-[var(--tb-bg-muted)]/20 gap-2 items-center transition-colors">
             {/* vote column */}
-            <div className="hidden sm:flex col-span-1 flex-col items-center text-[var(--tb-fg-muted)] tb-text-sm">
+            <div className="hidden sm:flex col-span-1 flex-col items-center text-[var(--tb-fg-muted)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               <Button type="button" variant="link" size="xs" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="text-[var(--tb-fg-muted)] hover:text-[var(--tb-success)] font-bold">▲</Button>
               <span className="font-bold text-[var(--tb-fg-primary)]">{t.likes.toLocaleString("fa-IR")}</span>
               <Button type="button" variant="link" size="xs" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); }} className="text-[var(--tb-fg-muted)] hover:text-[var(--tb-warning)] font-bold">▼</Button>
@@ -105,10 +105,10 @@ export default function ForumList() {
               <Image src={t.avatar} alt={t.author?.name || "کاربر"} width={40} height={40} className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="tb-text-md font-bold transition-colors group-hover:text-[var(--tb-forum)]">{t.title}</span>
+                  <span className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold transition-colors group-hover:text-[var(--tb-forum)]">{t.title}</span>
                   <ForumBadge slug={t.slug} fallback={t.solved} />
                 </div>
-                <div className="tb-text-sm text-[var(--tb-fg-muted)] mt-1">
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-1">
                   ارسال‌شده توسط <b className="text-[var(--tb-fg-primary)]">{t.author?.name || "کاربر تکباکس"}</b> • {t.date_fa}
                 </div>
               </div>
@@ -118,7 +118,7 @@ export default function ForumList() {
             <div className="col-span-12 sm:col-span-4 flex items-center justify-end px-2">
               <CardStats module="forum" slug={t.slug} initialViews={t.views ?? 0} initialLikes={t.likes ?? 0} showComments={true} />
             </div>
-            <div className="hidden sm:block col-span-1 text-left tb-text-sm text-[var(--tb-fg-muted)]">
+            <div className="hidden sm:block col-span-1 text-left text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
               {t.date_fa.split(" ")[0]}<br />{t.author?.name.split(" ")[0]}
             </div>
           </Link>
@@ -130,12 +130,12 @@ export default function ForumList() {
           <OverlayBackdrop onClick={() => setShowNew(false)} />
           <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-6 space-y-4 z-10 shadow-2xl">
             <div className="flex justify-between items-center border-b border-[var(--tb-border)] pb-3">
-              <h3 className="tb-text-lg font-bold">موضوع جدید در انجمن تکباکس</h3>
+              <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-bold">موضوع جدید در انجمن تکباکس</h3>
               <CloseButton onClick={() => setShowNew(false)} />
             </div>
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان واضح و دقیق بپرسید…" className="input w-full" required />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="جزئیات کامل مشکل، توپولوژی، لاگ‌ها یا چیزی که تا الان امتحان کردید..." className="input w-full min-h-[160px]" required />
-            <div className="tb-text-sm text-[var(--tb-fg-muted)]">پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.</div>
+            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.</div>
             <div className="flex justify-end gap-2 pt-2 border-t border-[var(--tb-border)]">
               <Button type="button" variant="ghost" onClick={() => setShowNew(false)}>انصراف</Button>
               <Button type="submit">ارسال موضوع</Button>

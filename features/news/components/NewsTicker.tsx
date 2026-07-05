@@ -63,14 +63,14 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
  <Link
  key={`${item.module || "news"}-${item.slug}-${index}`}
  href={`/${itemModule}/${item.slug}`}
- className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap tb-text-md text-[var(--tb-fg-muted)] transition-colors duration-[var(--tb-motion-sm)] ${hoverTone}`}
+ className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)] transition-colors duration-[var(--tb-motion-sm)] ${hoverTone}`}
  >
                 <span className="h-1.5 w-1.5 rounded-[var(--tb-radius-full)] bg-[var(--tb-fg-muted)] opacity-70 transition-transform group-hover:scale-125" />
-                <span className={`rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] px-2 py-0.5 tb-text-sm ${tone}`}>
+                <span className={`px-2 py-0.5 font-bold ${tone}`}>
                   {moduleMeta[itemModule]?.titleFa ?? kind}
                 </span>
  <span className="text-[var(--tb-fg-primary)]">{item.title}</span>
- {when && <span className="tb-text-sm text-[var(--tb-fg-muted)]">• {when}</span>}
+ {when && <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">• {when}</span>}
  </Link>
  );
  })}

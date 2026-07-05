@@ -77,7 +77,7 @@ export default function NewsSidebar() {
         <div className="p-5 border-b border-[var(--tb-border)] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <Icon name="news" className="h-5 w-5 text-[var(--tb-news)]" />
-            <h3 className="tb-text-lg font-black text-[var(--tb-fg-primary)]">اخبار زنده تکباکس</h3>
+            <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-black text-[var(--tb-fg-primary)]">اخبار زنده تکباکس</h3>
           </div>
           <button
             type="button"
@@ -114,12 +114,12 @@ export default function NewsSidebar() {
                 <span>{n.date_fa} {n.time || ''}</span>
               </div>
 
-              <h4 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
+              <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
                 {n.title}
               </h4>
 
               {/* News Description */}
-              <p className="tb-text-sm text-[var(--tb-fg-muted)] mt-1.5 line-clamp-2 leading-5">
+              <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-1.5 line-clamp-2 leading-5">
                 {n.excerpt}
               </p>
             </Link>
@@ -131,7 +131,7 @@ export default function NewsSidebar() {
           <Link
             href="/news"
             onClick={() => setOpen(false)}
-            className="btn btn-ghost w-full tb-text-sm text-[var(--tb-news)] font-bold"
+            className="btn btn-ghost w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-news)] font-bold"
           >
             مشاهده آرشیو کامل اخبار ←
           </Link>

@@ -30,7 +30,7 @@ export default function DownloadTable() {
       <ModuleHeader module="download" title="مرکز دانلود تکباکس" description="ISO • Firmware • Driver – لینک مستقیم داخل ایران" count={`${filtered.length.toLocaleString("fa-IR")} فایل`} />
 
       {/* filters */}
-      <div className="card p-4 mb-6 grid md:grid-cols-4 gap-3 tb-text-md">
+      <div className="card p-4 mb-6 grid md:grid-cols-4 gap-3 text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو فایل…" className="input md:col-span-1" />
         <select value={brand} onChange={(e) => setBrand(e.target.value)} className="input">
           <option value="all">همه برندها</option>
@@ -59,7 +59,7 @@ export default function DownloadTable() {
       </div>
 
       <div className="card overflow-hidden divide-y divide-[var(--tb-border)]/60">
-        <div className="hidden md:grid grid-cols-12 bg-[var(--tb-bg-muted)]/30 px-5 py-3 tb-text-sm text-[var(--tb-fg-muted)] font-bold">
+        <div className="hidden md:grid grid-cols-12 bg-[var(--tb-bg-muted)]/30 px-5 py-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] font-bold">
           <div className="col-span-7">نام فایل و توضیحات</div>
           <div className="col-span-3 text-right">تاریخ انتشار</div>
           <div className="col-span-2 text-left">دفعات دانلود</div>
@@ -72,11 +72,11 @@ export default function DownloadTable() {
             className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-4 sm:px-5 py-4 hover:bg-[var(--tb-bg-muted)]/25 transition-all items-center cursor-pointer"
           >
             <div className="col-span-7">
-              <div className="tb-text-md font-bold transition-colors group-hover:text-[var(--tb-download)]">{f.title}</div>
-              <div className="tb-text-sm text-[var(--tb-fg-muted)] mt-1 line-clamp-2">{f.excerpt}</div>
+              <div className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold transition-colors group-hover:text-[var(--tb-download)]">{f.title}</div>
+              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-1 line-clamp-2">{f.excerpt}</div>
             </div>
 
-            <div className="col-span-3 tb-text-sm text-[var(--tb-fg-muted)]">
+            <div className="col-span-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
               <span className="md:hidden font-bold">تاریخ انتشار: </span>
               {f.date_fa}
             </div>
@@ -87,7 +87,7 @@ export default function DownloadTable() {
           </Link>
         ))}
 
-        {filtered.length === 0 && <div className="p-10 text-center text-muted-foreground tb-text-md">فایلی یافت نشد – فیلتر را تغییر دهید</div>}
+        {filtered.length === 0 && <div className="p-10 text-center text-muted-foreground text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">فایلی یافت نشد – فیلتر را تغییر دهید</div>}
       </div>
     </main>
   );

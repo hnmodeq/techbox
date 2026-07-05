@@ -20,7 +20,7 @@ export function Tooltip({ content, children, side="top" }:{
  {open && (
  <span role="tooltip"
  className={cn(
- "absolute whitespace-nowrap tb-text-sm px-2 py-1 rounded-[var(--tb-radius-md)] shadow-[var(--tb-shadow-md)] pointer-events-none",
+ "absolute whitespace-nowrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] px-2 py-1 rounded-[var(--tb-radius-md)] shadow-[var(--tb-shadow-md)] pointer-events-none",
  "bg-[var(--tb-bg-secondary)] text-[var(--tb-fg-primary)] border border-[var(--tb-border)]",
  side==="top" && "bottom-full mb-2 left-1/2 -translate-x-1/2",
  side==="bottom" && "top-full mt-2 left-1/2 -translate-x-1/2",

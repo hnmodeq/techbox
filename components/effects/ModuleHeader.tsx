@@ -23,11 +23,11 @@ export default function ModuleHeader({ module, title, description, eyebrow, coun
   return (
     <header className={cn("mb-6 flex flex-wrap items-end justify-between gap-3", className)}>
       <div>
-        {eyebrow && <div className="mb-2 tb-text-sm text-[var(--tb-fg-muted)]">{eyebrow}</div>}
-        <h1 className={cn("tb-text-big-title", meta.color)}>{title}</h1>
-        {description && <p className="mt-2 tb-text-md text-[var(--tb-fg-muted)]">{description}</p>}
+        {eyebrow && <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{eyebrow}</div>}
+        <h1 className={cn("text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)]", meta.color)}>{title}</h1>
+        {description && <p className="mt-2 text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)]">{description}</p>}
       </div>
-      {count && <div className="tb-text-sm text-[var(--tb-fg-muted)]">{count}</div>}
+      {count && <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{count}</div>}
       {children}
     </header>
   );

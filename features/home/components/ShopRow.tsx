@@ -16,7 +16,7 @@ export default function ShopRow() {
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">جدیدترین تجهیزات سرور، استوریج و شبکه</h2>
-          <Link href="/shop" className="text-sm font-bold text-[var(--tb-shop)] hover:underline flex items-center gap-1 shrink-0">
+          <Link href="/shop" className="text-sm font-bold text-[var(--shop)] hover:underline flex items-center gap-1 shrink-0">
             <span>مشاهده کل فروشگاه</span>
             <span>←</span>
           </Link>
@@ -42,7 +42,7 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="tb-text-md font-black text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                  <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-black text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   

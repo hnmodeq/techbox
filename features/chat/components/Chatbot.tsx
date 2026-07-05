@@ -74,21 +74,21 @@ export default function Chatbot(){
  <div dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{zIndex:zIndex.chatbot}}>
  <div className="tb-overlay-panel flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0">
  <div className="flex items-center justify-between border-b border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] px-3 py-2.5">
- <div className="tb-text-sm ">دستیار تکباکس <span className="tb-text-sm text-[var(--tb-fg-muted)]">AI Beta</span></div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">دستیار تکباکس <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">AI Beta</span></div>
  <div className="flex items-center gap-2">
- <Button variant="link" size="xs" onClick={()=>{setMsgs([]); localStorage.removeItem(STORAGE_KEY)}} className="tb-text-sm text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]">پاک‌سازی</Button>
+ <Button variant="link" size="xs" onClick={()=>{setMsgs([]); localStorage.removeItem(STORAGE_KEY)}} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]">پاک‌سازی</Button>
  <CloseButton onClick={()=>setOpen(false)} label="بستن چت" />
  </div>
  </div>
 
- <div className="flex-1 space-y-3 overflow-y-auto bg-[var(--tb-bg-primary)] p-3 tb-text-sm">
+ <div className="flex-1 space-y-3 overflow-y-auto bg-[var(--tb-bg-primary)] p-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {msgs.length===0 && (
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
  سلام! من دستیار هوشمند تکباکس هستم.<br/>
  درباره محصولات (مثلا <b>QNAP-2277</b>)، مشکلات شبکه، یا مقالات بپرسید.<br/>
  <div className="flex flex-wrap gap-1.5 mt-2">
  {["قیمت QNAP-2277؟","RAID مناسب سرور HP؟","فرق NAS و SAN؟","مشکل iSCSI؟"].map(s=>(
- <ChipButton key={s} tone="brand" onClick={()=>setInput(s)} className="px-2 py-1 tb-text-sm">{s}</ChipButton>
+ <ChipButton key={s} tone="brand" onClick={()=>setInput(s)} className="px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{s}</ChipButton>
  ))}
  </div>
  </div>
@@ -101,7 +101,7 @@ export default function Chatbot(){
  </div>
  </div>
  ))}
- {loading && <div className="tb-text-sm text-[var(--tb-fg-muted)]">در حال فکر کردن…</div>}
+ {loading && <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">در حال فکر کردن…</div>}
  <div ref={endRef} />
  </div>
 
@@ -110,14 +110,14 @@ export default function Chatbot(){
  value={input}
  onChange={e=>setInput(e.target.value)}
  placeholder="سوال فنی / محصول خود را بپرسید…"
- className="input flex-1 !py-2 tb-text-sm"
+ className="input flex-1 !py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
  disabled={loading}
  />
- <Button disabled={loading || !input.trim()} size="sm" className="px-4 tb-text-sm disabled:opacity-50">
+ <Button disabled={loading || !input.trim()} size="sm" className="px-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] disabled:opacity-50">
  {loading ? "…" : "ارسال"}
  </Button>
  </form>
- <div className="px-3 pb-2 text-center tb-text-sm text-[var(--tb-fg-muted)]">
+ <div className="px-3 pb-2 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
  پاسخ‌ها ممکن است نادرست باشند – همیشه مستندات رسمی را چک کنید • API: <code>/api/chat</code>
  </div>
  </div>

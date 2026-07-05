@@ -7,7 +7,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
  className={cn(
  "w-full min-h-[110px] bg-[var(--tb-bg-muted)] text-[var(--tb-fg-primary)]",
  "border border-[var(--tb-border)] rounded-[var(--tb-radius-md)]",
- "px-[14px] py-[10px] tb-text-sm ",
+ "px-[14px] py-[10px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ",
  "placeholder:text-[var(--tb-fg-muted)]/75",
  "focus:outline-none focus:border-[var(--tb-ring-1)] focus:shadow-[var(--tb-ring-3)]",
  "transition-[border-color,box-shadow] duration-[var(--tb-motion-sm)]",

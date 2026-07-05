@@ -30,7 +30,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
+      <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
         <Link href="/" className="hover:text-[var(--tb-fg-primary)]">خانه</Link>
         <span>/</span>
         <Link href="/review" className="hover:text-[var(--tb-fg-primary)]">نقد و بررسی</Link>
@@ -45,7 +45,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
             <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-review)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-review)_30%,transparent)] px-3.5 py-1 text-xs font-bold text-[var(--tb-review)]">
               {item.category || "بررسی تخصصی"}
             </span>
-            <span className="tb-text-sm text-[var(--tb-fg-muted)]">{item.date_fa}</span>
+            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{item.date_fa}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-[var(--tb-fg-primary)] leading-10">
@@ -63,7 +63,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
               />
               <div>
                 <div className="font-bold text-[var(--tb-fg-primary)]">{item.author?.name || "نویسنده تکباکس"}</div>
-                <div className="tb-text-sm text-[var(--tb-fg-muted)]">{item.author?.role || "تحلیلگر سخت‌افزار"}</div>
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{item.author?.role || "تحلیلگر سخت‌افزار"}</div>
               </div>
             </div>
 

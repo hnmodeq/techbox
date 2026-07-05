@@ -75,14 +75,14 @@ function AdminPostsInner() {
  }
 
  if (!canEdit(user, module)) {
- return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--tb-danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="mt-3 tb-text-sm text-[var(--tb-fg-muted)]">دسترسی شما: {user.modules.join(", ")}</p></main>;
+ return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--tb-danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">دسترسی شما: {user.modules.join(", ")}</p></main>;
  }
 
  return (
  <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
  <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
  <div>
- <h1 className="tb-text-big-title ">مدیریت محتوا</h1>
+ <h1 className="text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">مدیریت محتوا</h1>
  <div className="mt-2 flex flex-wrap items-center gap-2">
  <ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>
  <Badge variant="secondary">{items.length.toLocaleString("fa-IR")} آیتم منبع</Badge>
@@ -107,20 +107,20 @@ function AdminPostsInner() {
 
  <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
  <div className="card p-3">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">نتیجه فعلی</div>
- <div className="mt-1 tb-text-lg ">{filteredItems.length.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">نتیجه فعلی</div>
+ <div className="mt-1 text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] ">{filteredItems.length.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-3">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">بازدیدها</div>
- <div className="mt-1 tb-text-lg ">{stats.views.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">بازدیدها</div>
+ <div className="mt-1 text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] ">{stats.views.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-3">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">پسندها</div>
- <div className="mt-1 tb-text-lg ">{stats.likes.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">پسندها</div>
+ <div className="mt-1 text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] ">{stats.likes.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-3">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">برچسب یکتا</div>
- <div className="mt-1 tb-text-lg ">{stats.tagCount.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">برچسب یکتا</div>
+ <div className="mt-1 text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] ">{stats.tagCount.toLocaleString("fa-IR")}</div>
  </div>
  </div>
 
@@ -139,8 +139,8 @@ function AdminPostsInner() {
 
  <div className="card overflow-hidden">
  <div className="overflow-x-auto">
- <table className="w-full min-w-[760px] tb-text-md">
- <thead className="bg-[var(--tb-bg-muted)]/40 tb-text-sm text-[var(--tb-fg-muted)]">
+ <table className="w-full min-w-[760px] text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">
+ <thead className="bg-[var(--tb-bg-muted)]/40 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
  <tr>
  <th className="p-3 text-right">عنوان</th>
  <th className="hidden p-3 text-right md:table-cell">دسته</th>
@@ -154,19 +154,19 @@ function AdminPostsInner() {
  <tr key={it.slug} className="border-t border-[color-mix(in_oklch,var(--tb-border)_60%,transparent)] hover:bg-[var(--tb-bg-muted)]/20">
  <td className="p-3 align-top">
  <div className=" ">{it.title}</div>
- <div className="mt-1 font-mono tb-text-sm text-[var(--tb-fg-muted)]" dir="ltr">/{module}/{it.slug}</div>
+ <div className="mt-1 font-mono text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]" dir="ltr">/{module}/{it.slug}</div>
  <div className="mt-2 flex flex-wrap gap-1 lg:hidden">
- {it.tags.slice(0, 3).map(t => <span key={t} className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 tb-text-sm text-[var(--tb-fg-muted)]">{t}</span>)}
+ {it.tags.slice(0, 3).map(t => <span key={t} className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] bg-transparent px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{t}</span>)}
  </div>
  </td>
  <td className="hidden p-3 align-top md:table-cell">
  {it.category ? <Badge variant={module}>{it.category}</Badge> : <Badge variant="secondary">بدون دسته</Badge>}
  </td>
- <td className="hidden p-3 align-top tb-text-sm lg:table-cell">
+ <td className="hidden p-3 align-top text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] lg:table-cell">
  <div>{it.date_fa}</div>
  <div className="mt-1 text-[var(--tb-fg-muted)]">{it.author.name}</div>
  </td>
- <td className="p-3 align-top tb-text-sm">
+ <td className="p-3 align-top text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <div>👁 {it.views.toLocaleString("fa-IR")}</div>
  <div className="mt-1 text-[var(--tb-fg-muted)]">♥ {it.likes.toLocaleString("fa-IR")}</div>
  </td>
@@ -182,14 +182,14 @@ function AdminPostsInner() {
  </table>
  </div>
  {filteredItems.length===0 && (
- <div className="p-8 text-center tb-text-md text-[var(--tb-fg-muted)]">
+ <div className="p-8 text-center text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)]">
  نتیجه‌ای برای فیلتر فعلی پیدا نشد.
  <div className="mt-3"><Button variant="ghost" size="xs" onClick={()=>{setQuery(""); setCategory("all");}}>پاک کردن فیلترها</Button></div>
  </div>
  )}
  </div>
 
- <p className="mt-4 tb-text-sm text-[var(--tb-fg-muted)]">
+ <p className="mt-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
  کاربر فعلی: <b>{user.name}</b> ({user.role}) – قابل ویرایش:
  <span className="mr-2 inline-flex flex-wrap gap-1 align-middle">{allowedModules.map(m=><ModuleBadge key={m} module={m}>{moduleMeta[m].titleFa}</ModuleBadge>)}</span>
  {draftSummary.latest && <span className="block mt-2">آخرین پیش‌نویس لوکال این ماژول: {draftSummary.latest}</span>}

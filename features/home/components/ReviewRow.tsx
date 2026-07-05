@@ -16,7 +16,7 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Icon key={i} name="star" size={14} className={i < full ? 'fill-current' : 'opacity-35'} strokeWidth={1.5} />
       ))}
-      <span className="ms-1.5 tb-text-sm font-bold text-[var(--tb-fg-primary)]">{rating.toFixed(1)}</span>
+      <span className="ms-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--tb-fg-primary)]">{rating.toFixed(1)}</span>
     </span>
   );
 }
@@ -30,7 +30,7 @@ export default function ReviewRow() {
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">بنچمارک‌ها و تست‌های عملی سخت‌افزار</h2>
-          <Link href="/review" className="text-sm font-bold text-[var(--tb-review)] hover:underline flex items-center gap-1 shrink-0">
+          <Link href="/review" className="text-sm font-bold text-[var(--review)] hover:underline flex items-center gap-1 shrink-0">
             <span>مشاهده تمام بررسی‌ها</span>
             <span>←</span>
           </Link>
@@ -59,10 +59,10 @@ export default function ReviewRow() {
                     <div className="mb-2">
                       <Stars rating={rating} />
                     </div>
-                    <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-review)] transition-colors line-clamp-2 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-review)] transition-colors line-clamp-2 leading-6">
                       {rev.title}
                     </h3>
-                    <p className="tb-text-sm text-[var(--tb-fg-muted)] mt-2 line-clamp-2 leading-5">
+                    <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-2 line-clamp-2 leading-5">
                       {rev.excerpt}
                     </p>
                   </div>

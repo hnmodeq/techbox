@@ -86,7 +86,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
   return (
     <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
+      <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
         <Link href="/" className="hover:text-[var(--tb-fg-primary)]">خانه</Link>
         <span>/</span>
         <Link href="/forum" className="hover:text-[var(--tb-fg-primary)]">انجمن تکباکس</Link>
@@ -110,7 +110,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">{item.title}</h1>
                 <ForumBadge slug={item.slug} fallback={item.solved ?? false} />
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3 tb-text-sm text-[var(--tb-fg-muted)]">
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
                 <span>ارسال‌شده توسط <b className="text-[var(--tb-fg-primary)]">{item.author?.name || "کاربر انجمن"}</b></span>
                 <span>•</span>
                 <span>{item.date_fa}</span>
@@ -139,17 +139,17 @@ export default function ForumDetail({ item }: ForumDetailProps) {
           <h2 className="text-lg font-black text-[var(--tb-fg-primary)]">
             پاسخ‌ها و راه‌حل‌ها ({replies.length.toLocaleString("fa-IR")})
           </h2>
-          <span className="tb-text-sm text-[var(--tb-fg-muted)]">مرتب‌شده بر اساس بهترین پاسخ</span>
+          <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">مرتب‌شده بر اساس بهترین پاسخ</span>
         </div>
 
         {/* New Reply Form */}
         <form onSubmit={handleAddReply} className="card p-5 space-y-3 bg-[var(--tb-bg-secondary)]/60">
-          <h3 className="tb-text-md font-bold">ارسال پاسخ یا راه‌حل شما</h3>
+          <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold">ارسال پاسخ یا راه‌حل شما</h3>
           <textarea
             value={newReply}
             onChange={(e) => setNewReply(e.target.value)}
             placeholder="اگر تجربه، راهکار یا پیشنهادی برای حل این موضوع دارید بنویسید..."
-            className="input w-full min-h-[110px] tb-text-sm"
+            className="input w-full min-h-[110px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
             required
           />
           <div className="flex justify-end">
@@ -180,11 +180,11 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                   <Image src={reply.avatar} alt={reply.author} width={44} height={44} className="h-11 w-11 rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
                   <div>
                     <div className="font-bold text-[var(--tb-fg-primary)]">{reply.author}</div>
-                    <div className="tb-text-sm text-[var(--tb-fg-muted)] mt-0.5">{reply.date}</div>
+                    <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-0.5">{reply.date}</div>
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--tb-bg-muted)] border border-[var(--tb-border)] tb-text-sm text-[var(--tb-fg-muted)] font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--tb-bg-muted)] border border-[var(--tb-border)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] font-bold">
                   <span>▲</span>
                   <span>{reply.likes.toLocaleString("fa-IR")}</span>
                 </div>

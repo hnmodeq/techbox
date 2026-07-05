@@ -22,7 +22,7 @@ export default function VideoReelsRow() {
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">ریلزها و ویدیوهای کوتاه زیرساخت</h2>
-          <Link href="/media" className="text-sm font-bold text-[var(--tb-media)] hover:underline flex items-center gap-1 shrink-0">
+          <Link href="/media" className="text-sm font-bold text-[var(--media)] hover:underline flex items-center gap-1 shrink-0">
             <span>مشاهده همه ویدیوها</span>
             <span>←</span>
           </Link>
@@ -76,7 +76,7 @@ export default function VideoReelsRow() {
             
             <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
               <div className="flex items-center justify-between p-4 border-b border-[var(--tb-border)]">
-                <h3 className="tb-text-lg font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
+                <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
                 <button
                   type="button"
                   onClick={() => setActiveVideo(null)}
@@ -100,7 +100,7 @@ export default function VideoReelsRow() {
               </div>
 
               <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-                <div className="tb-text-sm text-[var(--tb-fg-muted)]">
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
                   <span>منتشرشده توسط: <b className="text-[var(--tb-fg-primary)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span> • {activeVideo.date_fa}</span>
                 </div>

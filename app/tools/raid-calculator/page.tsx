@@ -25,8 +25,8 @@ export default function RaidCalculatorPage() {
       </div>
 
       <section className="mt-10 card p-5">
-        <h2 className="tb-text-lg mb-3">پیشنهاد محصول مرتبط</h2>
-        <p className="tb-text-md text-[var(--tb-fg-muted)]">
+        <h2 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] mb-3">پیشنهاد محصول مرتبط</h2>
+        <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)]">
           بعد از محاسبه RAID، مدل NAS پیشنهادی خود را در <a className="text-[var(--tb-primary)] font-bold hover:underline" href="/tools/nas-selector">انتخاب‌گر NAS</a> ببینید یا مستقیم از فروشگاه هارد مناسب تهیه کنید.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">

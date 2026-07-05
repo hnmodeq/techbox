@@ -18,7 +18,7 @@ export default function MagazineRow() {
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">آخرین مقالات و تحلیل‌های زیرساخت</h2>
-          <Link href="/blog" className="text-sm font-bold text-[var(--tb-blog)] hover:underline flex items-center gap-1 shrink-0">
+          <Link href="/blog" className="text-sm font-bold text-[var(--blog)] hover:underline flex items-center gap-1 shrink-0">
             <span>مشاهده همه مقالات</span>
             <span>←</span>
           </Link>
@@ -43,13 +43,13 @@ export default function MagazineRow() {
                 </div>
 
                 <div className="p-4">
-                  <div className="tb-text-sm text-[var(--tb-fg-muted)] mb-1.5 font-bold">
+                  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mb-1.5 font-bold">
                     <span>{art.date_fa}</span>
                   </div>
-                  <h3 className="tb-text-md font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
+                  <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
                     {art.title}
                   </h3>
-                  <p className="tb-text-sm text-[var(--tb-fg-muted)] mt-2 line-clamp-2 leading-6">
+                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-2 line-clamp-2 leading-6">
                     {art.excerpt}
                   </p>
                 </div>

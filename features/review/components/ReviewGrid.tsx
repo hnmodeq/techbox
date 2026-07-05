@@ -15,7 +15,7 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Icon key={i} name="star" size={15} className={i < full ? "fill-current" : "opacity-35"} strokeWidth={1.5} />
       ))}
-      <span className="ms-1.5 tb-text-sm font-bold text-[var(--tb-fg-primary)]">{rating.toFixed(1)}</span>
+      <span className="ms-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--tb-fg-primary)]">{rating.toFixed(1)}</span>
     </span>
   );
 }
@@ -43,7 +43,7 @@ export default function ReviewGrid() {
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
                     <Stars rating={rating} />
-                    <span className="tb-text-sm text-[var(--tb-fg-muted)]">{r.date_fa}</span>
+                    <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{r.date_fa}</span>
                   </div>
 
                   <h3 className="text-lg sm:text-xl font-black text-[var(--tb-fg-primary)] transition-colors group-hover:text-[var(--tb-review)] leading-8">
@@ -60,7 +60,7 @@ export default function ReviewGrid() {
                   <div className="flex items-center gap-3">
                     <Image src={r.author?.avatar || "/assets/hooman.png"} width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--tb-border)]" alt={r.author?.name || "نویسنده"} />
                     <div>
-                      <div className="tb-text-sm font-bold text-[var(--tb-fg-primary)]">{r.author?.name || "نویسنده تکباکس"}</div>
+                      <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--tb-fg-primary)]">{r.author?.name || "نویسنده تکباکس"}</div>
                       <div className="text-[11px] text-[var(--tb-fg-muted)]">{r.author?.role || "تحلیلگر سخت‌افزار"}</div>
                     </div>
                   </div>

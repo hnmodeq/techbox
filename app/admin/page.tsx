@@ -62,10 +62,10 @@ export default function AdminPage() {
  return (
  <main className="min-h-dvh px-4 py-16" dir="rtl">
  <div className="mx-auto max-w-md card space-y-4 p-7 text-center">
- <h1 className="tb-text-big-title ">ورود ادمین</h1>
- <p className="tb-text-md text-[var(--tb-fg-muted)]">برای مدیریت محتوا ابتدا وارد شوید.</p>
+ <h1 className="text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">ورود ادمین</h1>
+ <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)]">برای مدیریت محتوا ابتدا وارد شوید.</p>
  <ButtonLink href="/admin/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
- <div className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3 text-right tb-text-sm text-[var(--tb-fg-muted)]">
+ <div className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3 text-right text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
  <b className="text-[var(--tb-fg-primary)]">کاربران تست:</b><br/>
  {allUsers.slice(0, 6).map(u => <span key={u.id} className="block"><code>{u.username}</code> – {u.name}</span>)}
  </div>
@@ -81,7 +81,7 @@ export default function AdminPage() {
  <div className="flex flex-wrap gap-2">
  <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
  {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
- <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="tb-text-sm">خروج</Button>
+ <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">خروج</Button>
  </div>
  </PageHeader>
  <div className="flex flex-wrap gap-1">
@@ -92,35 +92,35 @@ export default function AdminPage() {
 
  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
  <div className="card p-4">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">ماژول قابل مدیریت</div>
- <div className="mt-1 tb-text-big-title ">{modules.length.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">ماژول قابل مدیریت</div>
+ <div className="mt-1 text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">{modules.length.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">محتوای قابل مدیریت</div>
- <div className="mt-1 tb-text-big-title ">{totals.count.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">محتوای قابل مدیریت</div>
+ <div className="mt-1 text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">{totals.count.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">بازدید منبع‌ها</div>
- <div className="mt-1 tb-text-big-title ">{totals.views.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">بازدید منبع‌ها</div>
+ <div className="mt-1 text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">{totals.views.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
- <div className="tb-text-sm text-[var(--tb-fg-muted)]">پیش‌نویس لوکال</div>
- <div className="mt-1 tb-text-big-title ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">پیش‌نویس لوکال</div>
+ <div className="mt-1 text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
  </div>
  </div>
 
  {drafts.length > 0 && (
  <div className="card p-4">
  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
- <h2 className="tb-text-md ">پیش‌نویس‌های لوکال</h2>
+ <h2 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] ">پیش‌نویس‌های لوکال</h2>
  <Badge variant="warning">ذخیره‌شده در مرورگر</Badge>
  </div>
- <div className="flex flex-wrap gap-2 tb-text-sm">
+ <div className="flex flex-wrap gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {drafts.map(d => (
  <div key={d.module} className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3">
  <ModuleBadge module={d.module}>{moduleMeta[d.module].titleFa}</ModuleBadge>
  <div className="mt-2 text-[var(--tb-fg-muted)]">{d.count.toLocaleString("fa-IR")} پیش‌نویس</div>
- {d.latest && <div className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">آخرین: {d.latest}</div>}
+ {d.latest && <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">آخرین: {d.latest}</div>}
  </div>
  ))}
  </div>
@@ -134,12 +134,12 @@ export default function AdminPage() {
  <div key={module} className="card p-5">
  <div className="flex items-start justify-between gap-2">
  <div>
- <div className={`tb-text-lg ${meta.color}`}>{meta.titleFa}</div>
- <div className="mt-1 tb-text-sm text-[var(--tb-fg-muted)]">/{module}</div>
+ <div className={`text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] ${meta.color}`}>{meta.titleFa}</div>
+ <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">/{module}</div>
  </div>
  <ModuleBadge module={module}>{count.toLocaleString("fa-IR")} آیتم</ModuleBadge>
  </div>
- <div className="mt-4 grid grid-cols-2 gap-2 tb-text-sm text-[var(--tb-fg-muted)]">
+ <div className="mt-4 grid grid-cols-2 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
  <div className="rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-secondary)] p-2">بازدید: <b className="text-[var(--tb-fg-primary)]">{views.toLocaleString("fa-IR")}</b></div>
  <div className="rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-secondary)] p-2">آخرین: <b className="text-[var(--tb-fg-primary)]">{latest || "—"}</b></div>
  </div>
@@ -158,13 +158,13 @@ export default function AdminPage() {
  <h3 className="">مدیریت کاربران (مدیر کل)</h3>
  <Badge variant="info">{allUsers.length.toLocaleString("fa-IR")} کاربر</Badge>
  </div>
- <div className="grid gap-2 tb-text-sm sm:grid-cols-2">
+ <div className="grid gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] sm:grid-cols-2">
  {allUsers.map(u => (
  <div key={u.id} className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3">
  <div className="flex flex-wrap items-center justify-between gap-2">
  <div>
  <div className=" text-[var(--tb-fg-primary)]">{u.name}</div>
- <div className="mt-0.5 font-mono tb-text-sm text-[var(--tb-fg-muted)]">@{u.username} • {u.email}</div>
+ <div className="mt-0.5 font-mono text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">@{u.username} • {u.email}</div>
  </div>
  <ModuleBadge module={u.role === "super_admin" ? "vip" : "info"}>{u.role === "super_admin" ? "مدیر کل" : "ویراستار"}</ModuleBadge>
  </div>
