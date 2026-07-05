@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@fontsource/vazirmatn/index.css";
-import "@/design/foundation/globals.css";
+import "@/design/globals.css";
 import { kalameh } from "@/lib/fonts";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Analytics } from "@vercel/analytics/next"

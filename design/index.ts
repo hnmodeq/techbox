@@ -1,1 +1,1 @@
-export * from "./tokens/z-index";
+export * from "./z-index";
