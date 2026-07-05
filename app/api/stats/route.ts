@@ -14,8 +14,10 @@ export async function GET(req: NextRequest) {
           where: { module_slug: { module, slug } },
           select: { id: true, views: true, likes: true, solved: true, fileSize: true }
         });
-      } catch (clientErr) {
-        // Fallback if local Prisma client wasn't regenerated yet with solved/fileSize columns
+      } catch (clientErr: any) {
+        if (String(clientErr?.message).includes("Can't reach database") || String(clientErr?.message).includes("Authentication failed") || String(clientErr?.message).includes("InitializationError")) {
+          throw clientErr;
+        }
         post = await prisma.post.findUnique({
           where: { module_slug: { module, slug } },
           select: { id: true, views: true, likes: true }
@@ -50,7 +52,10 @@ export async function GET(req: NextRequest) {
       posts = await prisma.post.findMany({
         select: { id: true, module: true, slug: true, views: true, likes: true, solved: true, fileSize: true }
       });
-    } catch (clientErr) {
+    } catch (clientErr: any) {
+      if (String(clientErr?.message).includes("Can't reach database") || String(clientErr?.message).includes("Authentication failed") || String(clientErr?.message).includes("InitializationError")) {
+        throw clientErr;
+      }
       posts = await prisma.post.findMany({
         select: { id: true, module: true, slug: true, views: true, likes: true }
       });
