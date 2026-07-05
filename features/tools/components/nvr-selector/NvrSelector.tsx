@@ -137,7 +137,7 @@ export function NvrSelector({
                     onClick={() => handleFilterChange("resolution", res)}
                     className={`px-5 py-2 text-sm rounded-[var(--corner-radius)] border transition-all font-bold ${
                       filters.resolution === res
-                        ? "bg-[var(--home)] text-[#ffffff] border-[var(--home)] shadow-sm"
+                        ? "bg-[var(--home)] text-[#ffffff] border-[var(--home)] shadow-[var(--shadow-size)]"
                         : "border-[var(--border-color)] hover:bg-[var(--muted-background)]"
                     }`}
                   >

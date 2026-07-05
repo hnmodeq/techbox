@@ -59,7 +59,7 @@ export default function ShopGrid(){
 
    {/* Dropdown Menu Filter */}
    {filterOpen && (
-     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] p-4 shadow-xl space-y-4 animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)]">
+     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] p-4 shadow-[var(--shadow-size)] space-y-4 animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)]">
        <div className="space-y-3">
          <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسته‌بندی
            <select value={cat} onChange={e=>setCat(e.target.value)} className="input mt-1 w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">

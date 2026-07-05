@@ -57,7 +57,7 @@ export default function HomeTimelineRow() {
         {/* Helper Awareness Banner */}
         {active && (
           <div className="text-center">
-            <span className="badge bg-[var(--card-background)] text-[var(--timeline)] font-bold border-[length:var(--border-size)] border-[var(--border-color)] shadow-sm px-4 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+            <span className="badge bg-[var(--card-background)] text-[var(--timeline)] font-bold border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-4 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
             </span>
           </div>
@@ -75,7 +75,7 @@ export default function HomeTimelineRow() {
               <button
                 type="button"
                 onClick={() => setActive(true)}
-                className="btn btn-primary bg-[var(--timeline)] text-slate-950 px-8 py-3 text-sm font-black shadow-lg hover:opacity-90 transition-opacity cursor-pointer"
+                className="btn btn-primary bg-[var(--timeline)] text-slate-950 px-8 py-3 text-sm font-black shadow-[var(--shadow-size)] hover:opacity-90 transition-opacity cursor-pointer"
               >
                 بارگذاری و اجرای تایم‌لاین تعاملی ←
               </button>

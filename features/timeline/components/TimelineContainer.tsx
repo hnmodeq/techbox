@@ -130,7 +130,7 @@ export function TimelineContainer({
       >
         {/* Prominent Glowing Horizontal Timeline Axis Line running continuously across the track */}
         <div
-          className="absolute h-2.5 bg-[var(--timeline)] shadow-[0_0_16px_rgba(6,182,212,0.8)] rounded-full z-10"
+          className="absolute h-2.5 bg-[var(--timeline)] rounded-full z-10"
           style={{
             left: `${clampedPanX - 100}px`,
             top: `calc(35% + ${pan.y}px)`,
@@ -156,7 +156,7 @@ export function TimelineContainer({
           >
             {/* Title Above Line */}
             <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 w-64 text-center">
-              <span className="badge !bg-[var(--timeline)] !text-slate-950 font-black mb-1.5 shadow-md">
+              <span className="badge !bg-[var(--timeline)] !text-slate-950 font-black mb-1.5 shadow-[var(--shadow-size)]">
                 آغاز خط تایم‌لاین تکباکس
               </span>
               <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] leading-6">
@@ -165,11 +165,11 @@ export function TimelineContainer({
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-xl" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)]" />
 
             {/* Comment Box Below Line with more distance */}
             <div
-              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-xl border-[var(--border-color)] flex flex-col gap-2.5 z-20"
+              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-[var(--shadow-size)] border-[var(--border-color)] flex flex-col gap-2.5 z-20"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <form onSubmit={handleAddEarlyComment} className="flex gap-1.5 items-center">
@@ -228,7 +228,7 @@ export function TimelineContainer({
                 </div>
 
                 {/* 2. Milestone Dot sitting directly on the axis line */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--timeline)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-lg transition-transform hover:scale-125" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--timeline)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)] transition-transform hover:scale-125" />
 
                 {/* 3. Card hanging BELOW THE LINE top-aligned (top: 32px) with generous padding beneath line */}
                 <div className="absolute top-[32px] left-1/2 -translate-x-1/2 flex justify-center z-10">
@@ -247,7 +247,7 @@ export function TimelineContainer({
           >
             {/* Title Above Line */}
             <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 w-64 text-center">
-              <span className="badge !bg-[var(--tb-success)] !text-slate-950 font-black mb-1.5 shadow-md">
+              <span className="badge !bg-[var(--tb-success)] !text-slate-950 font-black mb-1.5 shadow-[var(--shadow-size)]">
                 نقطه کنونی
               </span>
               <h3 className="text-xl font-black text-[var(--primary-text)]">
@@ -256,10 +256,10 @@ export function TimelineContainer({
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-xl animate-pulse" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)] animate-pulse" />
 
             {/* Info Card Below Line with more padding */}
-            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--border-color)] space-y-2 z-20">
+            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-[var(--shadow-size)] border-[var(--border-color)] space-y-2 z-20">
               <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--tb-success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>

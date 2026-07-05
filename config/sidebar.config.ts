@@ -157,8 +157,8 @@ export const themeIconClass = {
 };
 
 export const sidebarBase = [
- "bg-[var(--tb-bg-primary)] text-[var(--tb-fg-primary)]",
- "shadow-[var(--tb-shadow-lg)]",
+ "bg-[var(--sidebar-background)] text-[var(--primary-text)]",
+ "shadow-[var(--shadow-size)] border-l-[length:var(--border-size)] border-[var(--border-color)]",
 ].join(" ");
 
 export const linkBase =

@@ -95,7 +95,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
       </nav>
 
       {/* Main Topic Question Card - NO generic top image */}
-      <article className="card p-6 sm:p-8 space-y-6 shadow-md border-[var(--border-color)]">
+      <article className="card p-6 sm:p-8 space-y-6 shadow-[var(--shadow-size)] border-[var(--border-color)]">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6">
           <div className="flex items-center gap-4">
             <Image
@@ -164,7 +164,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
               key={reply.id}
               className={`card p-6 transition-all ${
                 reply.isBestAnswer
-                  ? "border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_60%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_7%,var(--card-background))] shadow-md"
+                  ? "border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_60%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_7%,var(--card-background))] shadow-[var(--shadow-size)]"
                   : "bg-[var(--card-background)] border-[var(--border-color)]"
               }`}
             >

@@ -128,7 +128,7 @@ export default function ForumList() {
       {showNew && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
           <OverlayBackdrop onClick={() => setShowNew(false)} />
-          <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-6 space-y-4 z-10 shadow-2xl">
+          <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-6 space-y-4 z-10 shadow-[var(--shadow-size)]">
             <div className="flex justify-between items-center border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3">
               <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold">موضوع جدید در انجمن تکباکس</h3>
               <CloseButton onClick={() => setShowNew(false)} />

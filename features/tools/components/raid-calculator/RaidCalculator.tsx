@@ -290,8 +290,7 @@ export default function RaidCalculator() {
 
   return (
     <section dir="rtl" className="w-full font-sans text-[var(--primary-text)]">
-      <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
-        <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_12%_8%,color-mix(in_oklch,var(--raid)_22%,transparent),transparent_32%),radial-gradient(circle_at_88%_0%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_34%)]" />
+      <div className="relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
 
         {/* Vertical stack or wide split: Top panel for tool options, bottom panel for results */}
         <div className="relative grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(420px,0.85fr)] lg:p-8">
@@ -462,7 +461,7 @@ export default function RaidCalculator() {
                       <span>نقشه توزیع ظرفیت</span>
                       <span className="paragraph-color">ظرفیت خام کل: {formatTb(result.rawTb)}</span>
                     </div>
-                    <div className="flex h-6 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)] shadow-inner" aria-label="نمودار ظرفیت RAID">
+                    <div className="flex h-6 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)] shadow-[var(--shadow-size)]" aria-label="نمودار ظرفیت RAID">
                       <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--raid)]" />
                       <Segment label="حفاظت" value={result.protectionTb} total={barTotal} className="bg-[var(--tb-success)]" />
                       <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--tb-warning)]" />
