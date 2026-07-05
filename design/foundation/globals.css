@@ -10,18 +10,8 @@
 @font-face { font-family: 'KalamehWebFaNum'; font-style: normal; font-weight: 800; font-display: swap; src: url('/fonts/KalamehWebFaNum-ExtraBold.woff2') format('woff2'); }
 @font-face { font-family: 'KalamehWebFaNum'; font-style: normal; font-weight: 900; font-display: swap; src: url('/fonts/KalamehWebFaNum-Black.woff2') format('woff2'); }
 
-/* Design tokens — one file per family (the single source of truth) */
-@import "../tokens/colors.css";
-@import "../tokens/modules.css";
-@import "../tokens/gradient.css";
-@import "../tokens/ring.css";
-@import "../tokens/radius.css";
-@import "../tokens/shadow.css";
-@import "../tokens/blur.css";
-@import "../tokens/opacity.css";
-@import "../tokens/border.css";
-@import "../tokens/motion.css";
-@import "../tokens/typography.css";
+/* Design tokens — single master file controlling the entire project */
+@import "../tokens/theme.css";
 
 @import "./primitives.css";
 
