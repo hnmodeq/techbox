@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Button, type ButtonProps } from "./Button";
+import { Button, type ButtonProps } from "./button";
 import { cn } from "@/lib/utils";
 
 export function IconButton({ size="icon", variant="ghost", className, ...props }: ButtonProps){

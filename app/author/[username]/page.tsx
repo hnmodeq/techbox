@@ -2,10 +2,10 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllAcross } from "@/lib/content";
-import usersData from "@/data/users.json";
+import usersData from "@/prisma/mock-data/users.json";
 import PageHeader from "@/components/effects/PageHeader";
 import { Icon } from "@/design/icons";
-import { CardStats } from "@/components/ui/CardStats";
+import { CardStats } from "@/components/ui/card-stats";
 
 const authorBios: Record<string, string> = {
   admin: "مدیر کل و معمار ارشد پلتفرم تکباکس با بیش از ۱۵ سال سابقه در طراحی و پیاده‌سازی زیرساخت‌های کلان دیتاسنتر، شبکه‌های سازمانی و سیستم‌های رایانش ابری.",

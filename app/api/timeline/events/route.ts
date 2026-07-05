@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { gregorianToJalali, formatJalaliDate } from '@/lib/jalali';
-import timelineData from '@/data/timeline.json';
+import timelineData from '@/prisma/mock-data/timeline.json';
 
 export async function GET() {
   try {

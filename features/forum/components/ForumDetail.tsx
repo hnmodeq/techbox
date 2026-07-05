@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/design/icons";
-import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
-import { ForumBadge } from "@/components/ui/ForumBadge";
-import { LikeButton } from "@/components/ui/LikeButton";
-import commentsData from "@/data/comments.json";
-import { Button } from "@/components/ui/Button";
+import { LiveViewCounter } from "@/components/ui/live-view-counter";
+import { ForumBadge } from "@/components/ui/forum-badge";
+import { LikeButton } from "@/components/ui/like-button";
+import commentsData from "@/prisma/mock-data/comments.json";
+import { Button } from "@/components/ui/button";
 
 type ForumDetailProps = {
   item: any;

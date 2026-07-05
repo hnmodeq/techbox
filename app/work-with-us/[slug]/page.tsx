@@ -1,9 +1,9 @@
 "use client";
-import jobs from "@/data/jobs.json";
+import jobs from "@/prisma/mock-data/jobs.json";
 import Link from "next/link";
 import { use } from "react";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function JobPage({ params }: { params: Promise<{slug:string}> }){
  const { slug } = use(params);
@@ -12,7 +12,7 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
 
  return (
  <main className="max-w-3xl mx-auto px-4 py-12" dir="rtl">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mb-2"><Link href="/workwithus" className="hover:text-foreground">فرصت‌های شغلی</Link> / {job.title}</div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mb-2"><Link href="/work-with-us" className="hover:text-foreground">فرصت‌های شغلی</Link> / {job.title}</div>
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{job.title}</h1>
  <div className="flex flex-wrap gap-2 mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <Badge variant="brand">{job.type}</Badge>
@@ -42,7 +42,7 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
  <input type="file" accept=".pdf,.doc,.docx" className="block mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
  </label>
  <div className="flex justify-end gap-2">
- <ButtonLink href="/workwithus" variant="ghost">بازگشت</ButtonLink>
+ <ButtonLink href="/work-with-us" variant="ghost">بازگشت</ButtonLink>
  <Button type="submit">ارسال درخواست</Button>
  </div>
  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">با استفاده از اطلاعات پروفایل شما پر می‌شود – می‌توانید در <Link href="/account" className="text-[var(--home)] underline">حساب کاربری</Link> تکمیل کنید.</p>

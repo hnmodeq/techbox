@@ -5,7 +5,7 @@ import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CardStats } from '@/components/ui/CardStats';
+import { CardStats } from '@/components/ui/card-stats';
 
 export default function ShopRow() {
   const products = getLatest('shop', 5);

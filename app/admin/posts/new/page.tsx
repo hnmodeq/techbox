@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button, ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { getCurrentUserClient } from "@/lib/auth";
-import { ModuleBadge } from "@/components/ui/ModuleBadge";
+import { ModuleBadge } from "@/components/ui/module-badge";
 
 export const dynamic = "force-dynamic";
 

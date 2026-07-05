@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Badge, type BadgeProps } from "./Badge";
+import { Badge, type BadgeProps } from "./badge";
 import type { ModuleSlug } from "@/lib/content";
 
 type ModuleBadgeVariant = ModuleSlug | "home" | "raid" | "subnet" | "vip" | "success" | "warning" | "danger" | "info";

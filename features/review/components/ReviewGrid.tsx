@@ -5,7 +5,7 @@ import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
-import { CardStats } from "@/components/ui/CardStats";
+import { CardStats } from "@/components/ui/card-stats";
 
 /** Star rating rendered with central-system icons (filled + outline). */
 function Stars({ rating }: { rating: number }) {

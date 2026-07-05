@@ -2,13 +2,13 @@ import Image from "next/image";
 import { type ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { Icon } from "@/design/icons";
-import { LikeButton } from "@/components/ui/LikeButton";
-import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
+import { LikeButton } from "@/components/ui/like-button";
+import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
  const meta = moduleMeta[item.module];

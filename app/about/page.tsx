@@ -1,5 +1,5 @@
-import users from "@/data/users.json";
-import { ButtonLink } from "@/components/ui/Button";
+import users from "@/prisma/mock-data/users.json";
+import { ButtonLink } from "@/components/ui/button";
 import TeamChromaSection, { type TeamMember } from "@/features/home/components/TeamChromaSection";
 import PageHeader from "@/components/effects/PageHeader";
 

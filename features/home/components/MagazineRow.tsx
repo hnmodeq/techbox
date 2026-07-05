@@ -6,8 +6,8 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
-import { CardStats } from '@/components/ui/CardStats';
-import { AuthorLink } from '@/components/ui/AuthorLink';
+import { CardStats } from '@/components/ui/card-stats';
+import { AuthorLink } from '@/components/ui/author-link';
 
 export default function MagazineRow() {
   const articles = getLatest('blog', 5);

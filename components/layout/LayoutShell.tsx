@@ -6,7 +6,7 @@ import NewsSidebar from "@/features/home/components/NewsSidebar";
 import FooterSection from "@/components/layout/Footer";
 import { CartProvider } from "@/providers/cart.provider";
 import Chatbot from "@/features/chat/components/Chatbot";
-import { AuthModal } from "@/components/ui/AuthModal";
+import { AuthModal } from "@/features/auth/components/auth-modal";
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
  return (

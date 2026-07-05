@@ -5,7 +5,7 @@ import { getLatest, getCommentCount } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
-import { CardStats } from '@/components/ui/CardStats';
+import { CardStats } from '@/components/ui/card-stats';
 
 function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { slug: string; initialViews: number; initialLikes: number; initialComments: number }) {
   const [fileSize, setFileSize] = useState('۶۸۰ مگابایت');

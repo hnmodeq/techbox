@@ -4,13 +4,13 @@ import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import { useState } from "react";
 import { zIndex } from "@/design";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import ModuleHeader from "@/components/effects/ModuleHeader";
-import { ChipButton } from "@/components/ui/ChipButton";
-import { CloseButton } from "@/components/ui/CloseButton";
-import { OverlayBackdrop } from "@/components/ui/Overlay";
-import { CardStats } from "@/components/ui/CardStats";
-import { ForumBadge } from "@/components/ui/ForumBadge";
+import { ChipButton } from "@/components/ui/chip-button";
+import { CloseButton } from "@/components/ui/close-button";
+import { OverlayBackdrop } from "@/components/ui/overlay";
+import { CardStats } from "@/components/ui/card-stats";
+import { ForumBadge } from "@/components/ui/forum-badge";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
 

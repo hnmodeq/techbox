@@ -5,7 +5,7 @@ const navigation = {
  main: [
  { name: "ارتباط با ما", href: "/contact", hover: "hover:text-[var(--contact)]" },
  { name: "درباره ما", href: "/about", hover: "hover:text-[var(--about)]" },
- { name: "فرصت‌های شغلی", href: "/workwithus", hover: "hover:text-[var(--workwithus)]" },
+ { name: "فرصت‌های شغلی", href: "/work-with-us", hover: "hover:text-[var(--workwithus)]" },
  ],
  social: [
  {

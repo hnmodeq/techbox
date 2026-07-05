@@ -1,5 +1,5 @@
 import { toolRoutes } from "@/config/modules.config";
-import toolsJson from "@/data/tools.json";
+import toolsJson from "@/prisma/mock-data/tools.json";
 
 export type ToolMeta = {
   slug: string;

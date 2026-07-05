@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/effects/PageHeader";
 export const metadata = { title: "ارتباط با ما | تکباکس" };
 export default function Contact() {

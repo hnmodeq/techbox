@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@/design/icons";
-import { LiveViewCounter } from "@/components/ui/LiveViewCounter";
-import { LikeButton } from "@/components/ui/LikeButton";
+import { LiveViewCounter } from "@/components/ui/live-view-counter";
+import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 
 type ReviewDetailProps = {

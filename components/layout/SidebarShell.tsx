@@ -7,7 +7,7 @@ import { sidebarBase } from "@/config/sidebar.config";
 import { SidebarShellProps } from "@/types/sidebar.types";
 import { useFabTop, saveFabTop } from "@/hooks/useFabTop";
 import { zIndex } from "@/design";
-import { Overlay } from "@/components/ui/Overlay";
+import { Overlay } from "@/components/ui/overlay";
 
 const DRAG_THRESHOLD = 15;
 const BTN_SIZE = 72;

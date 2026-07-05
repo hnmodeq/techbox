@@ -1,6 +1,6 @@
 import { prisma } from '../lib/db';
 import { gregorianToJalali, formatJalaliDate } from '../lib/jalali';
-import timelineData from '../data/timeline.json';
+import timelineData from './mock-data/timeline.json';
 
 async function seedTimeline() {
   console.log('شروع بذرپاشی Timeline با داده‌های تخصصی دیتاسنتر');

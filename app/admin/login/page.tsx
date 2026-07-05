@@ -2,10 +2,10 @@
 import { useMemo, useState } from "react";
 import { login, allUsers } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { ModuleBadge } from "@/components/ui/ModuleBadge";
+import { Button } from "@/components/ui/button";
+import { ModuleBadge } from "@/components/ui/module-badge";
 import { type ModuleSlug, moduleMeta } from "@/lib/content";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminLogin() {
   const [u, setU] = useState("sara");

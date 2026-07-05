@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Icon } from "@/design/icons";
-import ConsultationModal from "@/features/consultation/components/ConsultationModal";
+import ConsultationModal from "@/features/consultation/components/consultation-modal";
 import { createPortal } from "react-dom";
 import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
 import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
@@ -15,12 +15,12 @@ import { useCart } from "@/providers/cart.provider";
 import { getAllAcross, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
 import { zIndex } from "@/design";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { IconRailButton } from "@/components/ui/IconRailButton";
-import { CloseButton } from "@/components/ui/CloseButton";
-import { OverlayBackdrop } from "@/components/ui/Overlay";
-import { Panel } from "@/components/ui/Panel";
-import { ThemeToggleButton } from "@/components/ui/ThemeToggleButton";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { IconRailButton } from "@/components/ui/icon-rail-button";
+import { CloseButton } from "@/components/ui/close-button";
+import { OverlayBackdrop } from "@/components/ui/overlay";
+import { Panel } from "@/components/ui/panel";
+import { ThemeToggleButton } from "@/components/ui/theme-toggle-button";
 
 type AnchorRect = { top: number; right: number };
 

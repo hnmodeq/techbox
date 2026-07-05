@@ -1,6 +1,6 @@
 "use client";
 
-import users from "@/data/users.json";
+import users from "@/prisma/mock-data/users.json";
 
 export type AppUser = {
   id: string;

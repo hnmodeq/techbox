@@ -3,10 +3,10 @@ import Image from "next/image";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import Link from "next/link";
 import { zIndex } from "@/design";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { CloseButton } from "@/components/ui/CloseButton";
-import { IconRailButton } from "@/components/ui/IconRailButton";
-import { OverlayBackdrop } from "@/components/ui/Overlay";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { CloseButton } from "@/components/ui/close-button";
+import { IconRailButton } from "@/components/ui/icon-rail-button";
+import { OverlayBackdrop } from "@/components/ui/overlay";
 
 export type CartItem = { slug: string; title: string; price: string; image?: string; qty: number };
 type CartCtx = {

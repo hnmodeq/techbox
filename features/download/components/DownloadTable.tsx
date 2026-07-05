@@ -3,7 +3,7 @@ import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
-import { CardStats } from "@/components/ui/CardStats";
+import { CardStats } from "@/components/ui/card-stats";
 
 export default function DownloadTable() {
   const items = getModuleItems("download");
