@@ -110,7 +110,7 @@ export function ToolsGrid({ className }: { className?: string }) {
           </div>
 
           <h3 className="mt-4 text-[16px] font-black text-[var(--primary-text)]">{tool.titleFa}</h3>
-          <p className="mt-2 text-[12px] leading-7 text-[var(--paragraph-color)] min-h-[84px]">{tool.descFa}</p>
+          <p className="mt-2 text-[12px] leading-7 paragraph-color min-h-[84px]">{tool.descFa}</p>
 
           {tool.stats && (
             <div className="mt-4 flex gap-2 flex-wrap">
@@ -123,7 +123,7 @@ export function ToolsGrid({ className }: { className?: string }) {
           )}
 
           <div className="mt-5 flex items-center justify-between text-[12px] font-bold">
-            <span className="text-[var(--paragraph-color)] group-hover:text-[var(--primary-text)] transition-colors">
+            <span className="paragraph-color group-hover:text-[var(--primary-text)] transition-colors">
               {tool.title}
             </span>
             <span style={{ color: tool.accent }} className="flex items-center gap-1">

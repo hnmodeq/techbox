@@ -53,7 +53,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         title={`پروفایل نویسنده: ${userRecord.name}`}
         titleClassName="text-[var(--primary-text)]"
       >
-        <div className="flex items-center gap-2 text-sm text-[var(--paragraph-color)]">
+        <div className="flex items-center gap-2 text-sm paragraph-color">
           <span>آرشیو مطالب و نقد و بررسی‌های تخصصی</span>
         </div>
       </PageHeader>
@@ -82,11 +82,11 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
             </h1>
           </div>
 
-          <p className="text-sm sm:text-base leading-7 text-[var(--paragraph-color)] max-w-3xl">
+          <p className="text-sm sm:text-base leading-7 paragraph-color max-w-3xl">
             {bio}
           </p>
 
-          <div className="pt-3 border-t border-[var(--border-color)] flex flex-wrap items-center gap-6 text-xs sm:text-sm font-bold text-[var(--paragraph-color)]">
+          <div className="pt-3 border-t border-[var(--border-color)] flex flex-wrap items-center gap-6 text-xs sm:text-sm font-bold paragraph-color">
             <span className="flex items-center gap-1.5 text-[var(--primary-text)]">
               <Icon name="blog" size={18} className="text-[var(--home)]" />
               <span>تعداد مطالب: <b>{authorPosts.length.toLocaleString("fa-IR")}</b></span>
@@ -110,7 +110,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         </h2>
 
         {authorPosts.length === 0 ? (
-          <div className="card p-12 text-center text-[var(--paragraph-color)]">
+          <div className="card p-12 text-center paragraph-color">
             هنوز مطلبی به نام این نویسنده در آرشیو ثبت نشده است.
           </div>
         ) : (
@@ -136,13 +136,13 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <div className="text-xs text-[var(--paragraph-color)] font-bold mb-1">
+                    <div className="text-xs paragraph-color font-bold mb-1">
                       <span>{post.date_fa}</span>
                     </div>
                     <h3 className="text-base font-bold text-[var(--primary-text)] group-hover:text-[var(--home)] transition-colors line-clamp-2 leading-7">
                       {post.title}
                     </h3>
-                    <p className="text-xs text-[var(--paragraph-color)] mt-2 line-clamp-2 leading-5">
+                    <p className="text-xs paragraph-color mt-2 line-clamp-2 leading-5">
                       {post.excerpt}
                     </p>
                   </div>

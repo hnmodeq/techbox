@@ -95,21 +95,6 @@ body {
   max-width: 100vw;
 }
 
-.hero-font-size { font-size: var(--hero-font-size); }
-.hero-font-color { color: var(--hero-font-color); }
-
-.h1-font-size { font-size: var(--h1-font-size); }
-.h1-font-color { color: var(--h1-font-color); }
-
-.h2-font-size { font-size: var(--h2-font-size); }
-.h2-font-color { color: var(--h2-font-color); }
-
-.h3-font-size { font-size: var(--h3-font-size); }
-.h3-font-color { color: var(--h3-font-color); }
-
-.paragraph-font-size { font-size: var(--paragraph-font-size); }
-.paragraph-color { color: var(--paragraph-color); }
-
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

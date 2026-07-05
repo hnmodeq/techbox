@@ -77,12 +77,12 @@ export default function NewsSidebar() {
         <div className="p-5 border-b border-[var(--border-color)] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <Icon name="news" className="h-5 w-5 text-[var(--tb-news)]" />
-            <h3 className="h2-font-size h2-font-color font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
+            <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--tb-news)] transition-colors cursor-pointer"
+            className="p-1.5 paragraph-color hover:text-[var(--tb-news)] transition-colors cursor-pointer"
             title="بستن"
           >
             <Icon name="chevronLeft" className="h-5 w-5 rtl:rotate-180" />
@@ -110,16 +110,16 @@ export default function NewsSidebar() {
               </div>
 
               {/* Date & Time */}
-              <div className="text-[11px] text-[var(--paragraph-color)] mb-1 font-bold">
+              <div className="text-[11px] paragraph-color mb-1 font-bold">
                 <span>{n.date_fa} {n.time || ''}</span>
               </div>
 
-              <h4 className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
+              <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
                 {n.title}
               </h4>
 
               {/* News Description */}
-              <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] mt-1.5 line-clamp-2 leading-5">
+              <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1.5 line-clamp-2 leading-5">
                 {n.excerpt}
               </p>
             </Link>
@@ -131,7 +131,7 @@ export default function NewsSidebar() {
           <Link
             href="/news"
             onClick={() => setOpen(false)}
-            className="btn btn-ghost w-full paragraph-font-size paragraph-color text-[var(--tb-news)] font-bold"
+            className="btn btn-ghost w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-news)] font-bold"
           >
             مشاهده آرشیو کامل اخبار ←
           </Link>

@@ -71,12 +71,12 @@ export default function ForumList() {
     <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
       <ModuleHeader module="forum" title="انجمن تکباکس" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={`${all.length.toLocaleString("fa-IR")} موضوع`}>
         <div className="flex gap-2">
-          <input placeholder="جستجو در انجمن…" className="input w-56 h3-font-size h3-font-color font-semibold" />
-          <Button onClick={() => setShowNew(true)} className="h3-font-size h3-font-color font-semibold">+ موضوع جدید</Button>
+          <input placeholder="جستجو در انجمن…" className="input w-56 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" />
+          <Button onClick={() => setShowNew(true)} className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">+ موضوع جدید</Button>
         </div>
       </ModuleHeader>
 
-      <div className="flex gap-2 paragraph-font-size paragraph-color mb-4">
+      <div className="flex gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mb-4">
         {(["داغ", "جدید", "برتر", "حل‌شده"] as const).map((t) => (
           <ChipButton key={t} tone="forum" aria-pressed={filter === t} onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--tb-forum)] text-[var(--tb-forum)]" : ""}>
             {t}
@@ -85,7 +85,7 @@ export default function ForumList() {
       </div>
 
       <div className="card divide-y divide-[var(--border-color)]/60 overflow-hidden">
-        <div className="hidden sm:grid grid-cols-12 paragraph-font-size paragraph-color text-[var(--paragraph-color)] px-4 py-2.5 bg-[var(--muted-background)]/30 font-bold">
+        <div className="hidden sm:grid grid-cols-12 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color px-4 py-2.5 bg-[var(--muted-background)]/30 font-bold">
           <div className="col-span-7">عنوان موضوع و نویسنده</div>
           <div className="col-span-1 text-center">امتیاز</div>
           <div className="col-span-2 text-center">پاسخ / بازدید</div>
@@ -94,10 +94,10 @@ export default function ForumList() {
         {all.map((t) => (
           <Link key={t.slug} href={`/forum/${t.slug}`} className="group grid grid-cols-12 px-3 sm:px-4 py-3.5 hover:bg-[var(--muted-background)]/20 gap-2 items-center transition-colors">
             {/* vote column */}
-            <div className="hidden sm:flex col-span-1 flex-col items-center text-[var(--paragraph-color)] paragraph-font-size paragraph-color">
-              <Button type="button" variant="link" size="xs" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="text-[var(--paragraph-color)] hover:text-[var(--tb-success)] font-bold">▲</Button>
+            <div className="hidden sm:flex col-span-1 flex-col items-center paragraph-color text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+              <Button type="button" variant="link" size="xs" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--tb-success)] font-bold">▲</Button>
               <span className="font-bold text-[var(--primary-text)]">{t.likes.toLocaleString("fa-IR")}</span>
-              <Button type="button" variant="link" size="xs" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); }} className="text-[var(--paragraph-color)] hover:text-[var(--tb-warning)] font-bold">▼</Button>
+              <Button type="button" variant="link" size="xs" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--tb-warning)] font-bold">▼</Button>
             </div>
 
             {/* main */}
@@ -105,10 +105,10 @@ export default function ForumList() {
               <Image src={t.avatar} alt={t.author?.name || "کاربر"} width={40} height={40} className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="h3-font-size h3-font-color font-semibold font-bold transition-colors group-hover:text-[var(--tb-forum)]">{t.title}</span>
+                  <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--tb-forum)]">{t.title}</span>
                   <ForumBadge slug={t.slug} fallback={t.solved} />
                 </div>
-                <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] mt-1">
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1">
                   ارسال‌شده توسط <b className="text-[var(--primary-text)]">{t.author?.name || "کاربر تکباکس"}</b> • {t.date_fa}
                 </div>
               </div>
@@ -118,7 +118,7 @@ export default function ForumList() {
             <div className="col-span-12 sm:col-span-4 flex items-center justify-end px-2">
               <CardStats module="forum" slug={t.slug} initialViews={t.views ?? 0} initialLikes={t.likes ?? 0} showComments={true} />
             </div>
-            <div className="hidden sm:block col-span-1 text-left paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+            <div className="hidden sm:block col-span-1 text-left text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
               {t.date_fa.split(" ")[0]}<br />{t.author?.name.split(" ")[0]}
             </div>
           </Link>
@@ -130,12 +130,12 @@ export default function ForumList() {
           <OverlayBackdrop onClick={() => setShowNew(false)} />
           <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-6 space-y-4 z-10 shadow-2xl">
             <div className="flex justify-between items-center border-b border-[var(--border-color)] pb-3">
-              <h3 className="h2-font-size h2-font-color font-bold font-bold">موضوع جدید در انجمن تکباکس</h3>
+              <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold">موضوع جدید در انجمن تکباکس</h3>
               <CloseButton onClick={() => setShowNew(false)} />
             </div>
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان واضح و دقیق بپرسید…" className="input w-full" required />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="جزئیات کامل مشکل، توپولوژی، لاگ‌ها یا چیزی که تا الان امتحان کردید..." className="input w-full min-h-[160px]" required />
-            <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.</div>
+            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.</div>
             <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-color)]">
               <Button type="button" variant="ghost" onClick={() => setShowNew(false)}>انصراف</Button>
               <Button type="submit">ارسال موضوع</Button>

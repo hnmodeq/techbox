@@ -63,8 +63,8 @@ export function NvrSelector({
             ماژول انتخاب ان‌وی‌آر
           </div>
         </div>
-        <h2 className="h1-font-size h1-font-color font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
-        <p className="text-[var(--paragraph-color)] max-w-md mx-auto h3-font-size h3-font-color font-semibold">
+        <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
+        <p className="paragraph-color max-w-md mx-auto text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
           تعداد دوربین، رزولوشن و مدت زمان ضبط را مشخص کنید تا بهترین مدل‌های موجود در فروشگاه را پیدا کنید
         </p>
       </div>
@@ -96,7 +96,7 @@ export function NvrSelector({
                 onChange={(e) => handleFilterChange("cameras", parseInt(e.target.value))}
                 className="w-full accent-[var(--home)]"
               />
-              <div className="flex justify-between text-[10px] text-[var(--paragraph-color)] mt-1">
+              <div className="flex justify-between text-[10px] paragraph-color mt-1">
                 <span>۱ دوربین</span>
                 <span>۶۴ دوربین</span>
               </div>
@@ -119,7 +119,7 @@ export function NvrSelector({
                 onChange={(e) => handleFilterChange("days", parseInt(e.target.value))}
                 className="w-full accent-[var(--home)]"
               />
-              <div className="flex justify-between text-[10px] text-[var(--paragraph-color)] mt-1">
+              <div className="flex justify-between text-[10px] paragraph-color mt-1">
                 <span>۷ روز</span>
                 <span>۹۰ روز</span>
               </div>
@@ -151,7 +151,7 @@ export function NvrSelector({
             <div className="flex items-center justify-between bg-[var(--muted-background)] px-5 py-4 rounded-[var(--corner-radius)] border border-[var(--border-color)]">
               <div>
                 <div className="font-extrabold text-[14px]">تحلیل هوش مصنوعی و آنالیتیک</div>
-                <div className="text-[12px] text-[var(--paragraph-color)] mt-0.5">تشخیص چهره، پلاک و رویدادهای هوشمند</div>
+                <div className="text-[12px] paragraph-color mt-0.5">تشخیص چهره، پلاک و رویدادهای هوشمند</div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -168,9 +168,9 @@ export function NvrSelector({
           {/* Storage Estimate Footer inside filter card */}
           <div className="mt-6 pt-6 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-[var(--paragraph-color)] text-[13px]">حجم ذخیره‌سازی تخمینی پروژه:</span>
+              <span className="paragraph-color text-[13px]">حجم ذخیره‌سازی تخمینی پروژه:</span>
               <span className="font-black tabular-nums text-[20px] text-[var(--tb-nvr)]">
-                {fa.format(storageTB)} <span className="text-[12px] font-semibold text-[var(--paragraph-color)]">ترابایت</span>
+                {fa.format(storageTB)} <span className="text-[12px] font-semibold paragraph-color">ترابایت</span>
               </span>
             </div>
             <a href={consultationHref} className="btn btn-ghost">مشاوره تخصصی زیرساخت نظارت تصویری</a>
@@ -182,7 +182,7 @@ export function NvrSelector({
           <div className="flex items-center justify-between mb-4 px-1">
             <div>
               <span className="font-black text-[18px]">مدل‌های NVR پیشنهادی فروشگاه</span>
-              <span className="text-[13px] text-[var(--paragraph-color)] mr-2">({fa.format(filteredModels.length)} مدل موجود)</span>
+              <span className="text-[13px] paragraph-color mr-2">({fa.format(filteredModels.length)} مدل موجود)</span>
             </div>
             {recommendedModel && (
               <div className="text-[12px] px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-success)_14%,transparent)] text-[var(--tb-success)] border border-[color-mix(in_oklch,var(--tb-success)_24%,transparent)] flex items-center gap-1 font-bold">
@@ -210,7 +210,7 @@ export function NvrSelector({
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <div className="font-black text-[17px] text-[var(--primary-text)]">{model.nameFa}</div>
-                          <div className="text-[12px] text-[var(--paragraph-color)] mt-0.5">{model.name}</div>
+                          <div className="text-[12px] paragraph-color mt-0.5">{model.name}</div>
                         </div>
                         {isRecommended && (
                           <div className="badge !bg-[color-mix(in_oklch,var(--tb-success)_12%,transparent)] !text-[var(--tb-success)] !border-[color-mix(in_oklch,var(--tb-success)_22%,transparent)]">پیشنهادی</div>
@@ -219,24 +219,24 @@ export function NvrSelector({
 
                       <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[12px]">
                         <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
-                          <div className="text-[var(--paragraph-color)] text-[11px]">حداکثر دوربین</div>
+                          <div className="paragraph-color text-[11px]">حداکثر دوربین</div>
                           <div className="font-extrabold tabular-nums mt-0.5">{fa.format(model.maxCameras)} کانال</div>
                         </div>
                         <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
-                          <div className="text-[var(--paragraph-color)] text-[11px]">بِی هارد دیسک</div>
+                          <div className="paragraph-color text-[11px]">بِی هارد دیسک</div>
                           <div className="font-extrabold mt-0.5">{fa.format(model.storageBays)} بِی</div>
                         </div>
                         <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
-                          <div className="text-[var(--paragraph-color)] text-[11px]">رزولوشن</div>
+                          <div className="paragraph-color text-[11px]">رزولوشن</div>
                           <div className="font-extrabold mt-0.5">{model.maxResolution}</div>
                         </div>
                         <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
-                          <div className="text-[var(--paragraph-color)] text-[11px]">پشتیبانی RAID</div>
+                          <div className="paragraph-color text-[11px]">پشتیبانی RAID</div>
                           <div className="font-extrabold mt-0.5">{model.raidSupport}</div>
                         </div>
                       </div>
 
-                      <p className="mt-4 text-[13px] text-[var(--paragraph-color)] leading-6">{model.descriptionFa}</p>
+                      <p className="mt-4 text-[13px] paragraph-color leading-6">{model.descriptionFa}</p>
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
@@ -257,8 +257,8 @@ export function NvrSelector({
               })
             ) : (
               <div className="card p-8 text-center md:col-span-2">
-                <p className="text-[var(--paragraph-color)] font-bold">مدلی با این مشخصات پیدا نشد.</p>
-                <p className="text-[12px] mt-1 text-[var(--paragraph-color)]">لطفاً تعداد دوربین‌ها یا الزامات هوش مصنوعی را تغییر دهید.</p>
+                <p className="paragraph-color font-bold">مدلی با این مشخصات پیدا نشد.</p>
+                <p className="text-[12px] mt-1 paragraph-color">لطفاً تعداد دوربین‌ها یا الزامات هوش مصنوعی را تغییر دهید.</p>
               </div>
             )}
           </div>

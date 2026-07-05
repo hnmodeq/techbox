@@ -230,10 +230,10 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
         <div className="relative z-10 p-4.5 flex flex-col justify-end h-full text-white">
           <div className="flex-1 flex flex-col justify-end overflow-hidden mb-4">
-            <h3 className="h3-font-size h3-font-color font-semibold font-bold text-white mb-2 line-clamp-2 leading-7">
+            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-white mb-2 line-clamp-2 leading-7">
               {event.title}
             </h3>
-            <p className="paragraph-font-size paragraph-color text-slate-300 line-clamp-4 leading-6">
+            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 line-clamp-4 leading-6">
               {event.description}
             </p>
           </div>
@@ -243,7 +243,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               <button
                 type="button"
                 onClick={handleLikeToggle}
-                className="flex items-center gap-1.5 paragraph-font-size paragraph-color text-slate-300 hover:text-red-400 transition-colors cursor-pointer font-bold"
+                className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 hover:text-red-400 transition-colors cursor-pointer font-bold"
               >
                 <Heart size={16} className={liked ? 'fill-current text-red-500' : ''} />
                 <span>{likesCount.toLocaleString('fa-IR')}</span>
@@ -266,7 +266,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                 e.stopPropagation();
                 setShowComments(!showComments);
               }}
-              className="flex items-center gap-1.5 paragraph-font-size paragraph-color text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer font-bold"
+              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer font-bold"
             >
               <MessageCircle size={16} />
               <span>{comments.length.toLocaleString('fa-IR')} نظر</span>
@@ -293,7 +293,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   setCommentError('');
                 }}
                 placeholder="نظر یا تجربه خود را بنویسید..."
-                className="input !h-9 !py-1 !px-2.5 paragraph-font-size paragraph-color flex-1 !bg-slate-900 !text-white !border-slate-700"
+                className="input !h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-slate-900 !text-white !border-slate-700"
               />
               <button
                 type="submit"
@@ -315,7 +315,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             {comments.map((comment, idx) => (
               <li
                 key={idx}
-                className="rounded-[var(--corner-radius)] bg-slate-900/90 p-2.5 paragraph-font-size paragraph-color text-slate-200 border border-slate-700/60 leading-5"
+                className="rounded-[var(--corner-radius)] bg-slate-900/90 p-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-200 border border-slate-700/60 leading-5"
               >
                 <div className="flex items-center justify-between text-[11px] text-cyan-400 mb-1">
                   <span className="font-bold">{comment.authorName}</span>

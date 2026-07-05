@@ -51,10 +51,10 @@ export function LiveViewCounter({
   const iconColor = moduleIconColors[module] || "text-[var(--home)]";
 
   return (
-    <span className="inline-flex items-center gap-1.5 font-bold text-xs sm:text-sm text-[var(--paragraph-color)]" style={{ fontVariantNumeric: "tabular-nums" }}>
+    <span className="inline-flex items-center gap-1.5 font-bold text-xs sm:text-sm paragraph-color" style={{ fontVariantNumeric: "tabular-nums" }}>
       <Icon name="view" size={16} strokeWidth={2} className={iconColor} />
       <span className="font-extrabold text-[var(--primary-text)]">{views.toLocaleString("fa-IR")}</span>
-      {showLabel && <span className="font-sans ms-1 font-normal text-[var(--paragraph-color)]">بازدید</span>}
+      {showLabel && <span className="font-sans ms-1 font-normal paragraph-color">بازدید</span>}
     </span>
   );
 }

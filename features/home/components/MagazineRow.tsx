@@ -43,19 +43,19 @@ export default function MagazineRow() {
                 </div>
 
                 <div className="p-4">
-                  <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1.5 font-bold">
+                  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5 font-bold">
                     <span>{art.date_fa}</span>
                   </div>
-                  <h3 className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
+                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
                     {art.title}
                   </h3>
-                  <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] mt-2 line-clamp-2 leading-6">
+                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-6">
                     {art.excerpt}
                   </p>
                 </div>
               </Link>
 
-              <div className="px-4 pb-4 pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between text-xs text-[var(--paragraph-color)] font-bold">
+              <div className="px-4 pb-4 pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
                 <AuthorLink name={art.author?.name} avatar={art.author?.avatar} />
                 <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
               </div>

@@ -141,7 +141,7 @@ function DockLabel({ children, className = "", isHovered, orientation = "horizon
  animate={{ opacity: 1, x: 0, y: orientation === "vertical" ? 0 : -10 }}
  exit={{ opacity: 0, x: orientation === "vertical" ? 8 : 0 }}
  transition={{ duration: 0.2 }}
- className={`${className} ${positionClasses} absolute z-50 w-fit whitespace-pre rounded-md border border-[var(--border-color)] bg-[var(--card-background)] px-2 py-0.5 paragraph-font-size paragraph-color text-[var(--primary-text)] shadow-[var(--shadow-size)]`}
+ className={`${className} ${positionClasses} absolute z-50 w-fit whitespace-pre rounded-md border border-[var(--border-color)] bg-[var(--card-background)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] shadow-[var(--shadow-size)]`}
  role="tooltip"
  >
  {children}

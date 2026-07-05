@@ -42,11 +42,11 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="h3-font-size h3-font-color font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   
-                  <p className="mt-2.5 text-xs text-[var(--paragraph-color)] leading-5 line-clamp-3">
+                  <p className="mt-2.5 text-xs paragraph-color leading-5 line-clamp-3">
                     {prod.excerpt}
                   </p>
                 </div>

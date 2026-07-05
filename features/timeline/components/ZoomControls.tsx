@@ -23,7 +23,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onZoomChange?.(Math.max(0.1, zoom - 0.2));
         }}
-        className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        className="p-1.5 paragraph-color hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
         title="کوچک‌نمایی (-)"
         aria-label="Zoom Out"
       >
@@ -55,7 +55,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onZoomChange?.(Math.min(6.0, zoom + 0.2));
         }}
-        className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        className="p-1.5 paragraph-color hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
         title="بزرگ‌نمایی (+)"
         aria-label="Zoom In"
       >
@@ -72,7 +72,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onReset();
         }}
-        className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
+        className="p-1.5 paragraph-color hover:text-[var(--primary-text)] transition-colors cursor-pointer"
         title="بازنشانی دید (100%)"
         aria-label="Reset View"
       >

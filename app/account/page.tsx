@@ -198,7 +198,7 @@ export default function AccountPage() {
     return (
       <main className="max-w-md mx-auto px-5 py-20 text-center" dir="rtl">
         <div className="card p-8 space-y-4 animate-pulse">
-          <p className="h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)]">در حال بررسی اطلاعات حساب در Neon...</p>
+          <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">در حال بررسی اطلاعات حساب در Neon...</p>
         </div>
       </main>
     );
@@ -209,8 +209,8 @@ export default function AccountPage() {
       <main className="max-w-xl mx-auto px-4 py-12" dir="rtl">
         <div className="card p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="h1-font-size h1-font-color font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
-            <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+            <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
+            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
               برای ثبت دیدگاه، پسندیدن مطالب (لایک) و مدیریت پروفایل وارد حساب خود شوید.
             </p>
           </div>
@@ -219,21 +219,21 @@ export default function AccountPage() {
             <button
               type="button"
               onClick={() => { setTab("login"); setAuthError(""); }}
-              className={`flex-1 py-2 text-center rounded-[var(--corner-radius)] transition-colors paragraph-font-size paragraph-color ${tab === "login" ? "bg-[var(--home)] text-white shadow-[var(--shadow-size)]" : "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]"}`}
+              className={`flex-1 py-2 text-center rounded-[var(--corner-radius)] transition-colors text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${tab === "login" ? "bg-[var(--home)] text-white shadow-[var(--shadow-size)]" : "paragraph-color hover:text-[var(--primary-text)]"}`}
             >
               ورود به حساب
             </button>
             <button
               type="button"
               onClick={() => { setTab("register"); setAuthError(""); }}
-              className={`flex-1 py-2 text-center rounded-[var(--corner-radius)] transition-colors paragraph-font-size paragraph-color ${tab === "register" ? "bg-[var(--home)] text-white shadow-[var(--shadow-size)]" : "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]"}`}
+              className={`flex-1 py-2 text-center rounded-[var(--corner-radius)] transition-colors text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${tab === "register" ? "bg-[var(--home)] text-white shadow-[var(--shadow-size)]" : "paragraph-color hover:text-[var(--primary-text)]"}`}
             >
               ثبت‌نام جدید
             </button>
           </div>
 
           {authError && (
-            <div className="rounded-[var(--corner-radius)] bg-[var(--tb-danger)]/10 border border-[var(--tb-danger)]/30 p-3 text-center paragraph-font-size paragraph-color text-[var(--tb-danger)]">
+            <div className="rounded-[var(--corner-radius)] bg-[var(--tb-danger)]/10 border border-[var(--tb-danger)]/30 p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">
               {authError}
             </div>
           )}
@@ -241,7 +241,7 @@ export default function AccountPage() {
           {tab === "login" ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1">نام کاربری</label>
+                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">نام کاربری</label>
                 <input
                   required
                   value={loginUsername}
@@ -252,7 +252,7 @@ export default function AccountPage() {
                 />
               </div>
               <div>
-                <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1">رمز عبور</label>
+                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">رمز عبور</label>
                 <input
                   type="password"
                   value={loginPassword}
@@ -269,7 +269,7 @@ export default function AccountPage() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
-                <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1">نام و نام خانوادگی</label>
+                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">نام و نام خانوادگی</label>
                 <input
                   required
                   value={regName}
@@ -279,7 +279,7 @@ export default function AccountPage() {
                 />
               </div>
               <div>
-                <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1">نام کاربری انگلیسی</label>
+                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">نام کاربری انگلیسی</label>
                 <input
                   required
                   value={regUsername}
@@ -290,7 +290,7 @@ export default function AccountPage() {
                 />
               </div>
               <div>
-                <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1">ایمیل معتبر</label>
+                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">ایمیل معتبر</label>
                 <input
                   required
                   type="email"
@@ -302,7 +302,7 @@ export default function AccountPage() {
                 />
               </div>
               <div>
-                <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1">رمز عبور انتخابی</label>
+                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">رمز عبور انتخابی</label>
                 <input
                   required
                   type="password"
@@ -331,7 +331,7 @@ export default function AccountPage() {
         title="پروفایل و حساب کاربری واقعی"
         titleClassName="text-[var(--tb-account)]"
       >
-        <div className="flex items-center gap-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+        <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
           <Badge variant="info">{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>
           <span>•</span>
           <span>شناسه Neon: <span className="font-mono text-xs">{user.id}</span></span>
@@ -351,25 +351,25 @@ export default function AccountPage() {
                 alt={user?.name || "کاربر"}
               />
             ) : (
-              <div className="h-32 w-32 rounded-[var(--corner-radius)] bg-[var(--card-background)] border-2 border-[var(--border-color)] flex items-center justify-center text-[var(--paragraph-color)] shadow-[var(--shadow-size)]">
+              <div className="h-32 w-32 rounded-[var(--corner-radius)] bg-[var(--card-background)] border-2 border-[var(--border-color)] flex items-center justify-center paragraph-color shadow-[var(--shadow-size)]">
                 <Icon name="user" size={48} />
               </div>
             )}
-            <label className="absolute bottom-1 left-1 cursor-pointer rounded-[var(--corner-radius)] bg-[var(--home)] px-2.5 py-1 paragraph-font-size paragraph-color text-white shadow-[var(--shadow-size)] hover:opacity-90">
+            <label className="absolute bottom-1 left-1 cursor-pointer rounded-[var(--corner-radius)] bg-[var(--home)] px-2.5 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white shadow-[var(--shadow-size)] hover:opacity-90">
               تغییر تصویر
               <input type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </label>
           </div>
           <div>
-            <div className="h2-font-size h2-font-color font-bold ">{name}</div>
-            <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] font-mono" dir="ltr">@{user.username}</div>
+            <div className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{name}</div>
+            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-mono" dir="ltr">@{user.username}</div>
           </div>
-          {job && <div className="paragraph-font-size paragraph-color rounded-[var(--corner-radius)] bg-[var(--card-background)] py-1.5 px-3">{job}</div>}
+          {job && <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)] bg-[var(--card-background)] py-1.5 px-3">{job}</div>}
           <Button
             type="button"
             variant="ghost"
             onClick={handleLogout}
-            className="w-full text-[var(--tb-danger)] hover:bg-[var(--tb-danger)]/10 paragraph-font-size paragraph-color mt-4"
+            className="w-full text-[var(--tb-danger)] hover:bg-[var(--tb-danger)]/10 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mt-4"
           >
             خروج از حساب کاربری
           </Button>
@@ -378,26 +378,26 @@ export default function AccountPage() {
         {/* profile form */}
         <div className="lg:col-span-2 card p-6 space-y-6">
           {saveStatus && (
-            <div className={`rounded-[var(--corner-radius)] p-3 text-center paragraph-font-size paragraph-color ${saveStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)] border border-[var(--tb-success)]/30" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)] border border-[var(--tb-danger)]/30"}`}>
+            <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${saveStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)] border border-[var(--tb-success)]/30" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)] border border-[var(--tb-danger)]/30"}`}>
               {saveStatus.msg}
             </div>
           )}
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1.5">نام و نام خانوادگی</label>
+              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">نام و نام خانوادگی</label>
               <input value={name} onChange={e => setName(e.target.value)} className="input w-full" />
             </div>
             <div>
-              <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1.5">نام کاربری (غیرقابل تغییر)</label>
+              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">نام کاربری (غیرقابل تغییر)</label>
               <input value={user.username} disabled className="input w-full bg-[var(--card-background)] opacity-70 cursor-not-allowed" dir="ltr" />
             </div>
             <div>
-              <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1.5">ایمیل</label>
+              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">ایمیل</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input w-full" dir="ltr" />
             </div>
             <div>
-              <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)] mb-1.5">سمت شغلی یا تخصص</label>
+              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">سمت شغلی یا تخصص</label>
               <input value={job} onChange={e => setJob(e.target.value)} placeholder="مثلا: کارشناس زیرساخت شبکه" className="input w-full" />
             </div>
           </div>
@@ -408,9 +408,9 @@ export default function AccountPage() {
 
           {/* password section */}
           <div className="border-t border-[var(--border-color)] pt-6 space-y-4">
-            <h4 className="h3-font-size h3-font-color font-semibold ">تغییر رمز عبور واقعی</h4>
+            <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">تغییر رمز عبور واقعی</h4>
             {pwdStatus && (
-              <div className={`rounded-[var(--corner-radius)] p-3 text-center paragraph-font-size paragraph-color ${pwdStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)]" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)]"}`}>
+              <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${pwdStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)]" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)]"}`}>
                 {pwdStatus.msg}
               </div>
             )}

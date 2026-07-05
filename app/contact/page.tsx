@@ -18,7 +18,7 @@ export default function Contact() {
  <input className="input" placeholder="موضوع" />
  <textarea className="input min-h-[140px]" placeholder="پیام شما…" />
  <Button>ارسال</Button>
- <p className="paragraph-font-size paragraph-color text-muted-foreground">پاسخ ظرف 24 ساعت – info@techbox.ir</p>
+ <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">پاسخ ظرف 24 ساعت – info@techbox.ir</p>
  </div>
  </main>
  );
