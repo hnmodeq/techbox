@@ -35,16 +35,16 @@ export default function HeroSection() {
       <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         
         {/* RIGHT SIDE: Title + Rotating Text with Strands colorful background */}
-        <div className="relative order-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-right min-h-[500px] sm:min-h-[520px] p-6 rounded-3xl overflow-hidden border-0 bg-transparent">
+        <div className="relative order-1 flex flex-col justify-center items-center lg:items-start text-center lg:text-right min-h-[460px] sm:min-h-[520px] p-6 rounded-3xl overflow-hidden border-0 bg-transparent">
           {/* Strands OGL Shader sitting behind title */}
-          <div className="absolute inset-0 z-0 pointer-events-none opacity-100">
+          <div className="absolute inset-0 z-0 pointer-events-none opacity-85">
             <Strands
               colors={['#ffffff', '#1100ff', '#06B6D4', '#ffffff']}
               count={5}
               speed={0.4}
               glow={2.2}
               intensity={0.7}
-              opacity={1}
+              opacity={0.9}
             />
           </div>
 
