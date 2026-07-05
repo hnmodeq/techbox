@@ -35,7 +35,8 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
     modules: ["blog", "review"]
   };
 
-  const allPosts = getAllAcross();
+  // FIX: await the async getAllAcross()
+  const allPosts = await getAllAcross();
   const authorPosts = allPosts.filter(p => {
     const pAuthor = p.author?.name || "";
     return pAuthor.toLowerCase() === userRecord.name.toLowerCase() ||

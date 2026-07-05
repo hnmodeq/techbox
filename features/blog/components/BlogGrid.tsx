@@ -7,7 +7,7 @@ import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
 
 export default function BlogGrid(){
-  const items = getModuleItems("blog");
+  const items = (await getModuleItems("blog")) || [] as any;
   return (
     <main className="mx-auto max-w-7xl px-4 md:px-8 py-14" dir="rtl">
       <ModuleHeader module="blog" title="مجله تکباکس" description={`مقالات تخصصی زیرساخت • ${items.length.toLocaleString("fa-IR")} مطلب`} />

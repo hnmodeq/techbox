@@ -17,65 +17,81 @@ function AdminPostsInner() {
  const [query, setQuery] = useState("");
  const [category, setCategory] = useState("all");
  const [draftSummary, setDraftSummary] = useState<DraftSummary>({ count: 0 });
+ const [items, setItems] = useState<ContentItem[]>([]);
+ const [loading, setLoading] = useState(true);
  const sp = useSearchParams();
  const router = useRouter();
  const initialModule = (sp.get("module") as ModuleSlug) || "blog";
  const [module, setModule] = useState<ModuleSlug>(initialModule);
 
  useEffect(() => { setUser(getCurrentUserClient()); }, []);
- useEffect(() => {
- const m = sp.get("module") as ModuleSlug | null;
- if (m) {
- setModule(m);
- setCategory("all");
- setQuery("");
- }
- }, [sp]);
 
  useEffect(() => {
- try {
- const drafts = JSON.parse(localStorage.getItem(`tb_drafts_${module}`) || "[]") as Array<{ savedAtFa?: string }>;
- setDraftSummary({ count: drafts.length, latest: drafts[0]?.savedAtFa });
- } catch {
- setDraftSummary({ count: 0 });
- }
+   const m = sp.get("module") as ModuleSlug | null;
+   if (m) {
+     setModule(m);
+     setCategory("all");
+     setQuery("");
+   }
+ }, [sp]);
+
+ // Load items when module changes
+ useEffect(() => {
+   let cancelled = false;
+   setLoading(true);
+   (async () => {
+     try {
+       const data = await getModuleItems(module);
+       if (!cancelled) setItems(data);
+     } catch {
+       if (!cancelled) setItems([]);
+     } finally {
+       if (!cancelled) setLoading(false);
+     }
+   })();
+   return () => { cancelled = true; };
+ }, [module]);
+
+ useEffect(() => {
+   try {
+     const drafts = JSON.parse(localStorage.getItem(`tb_drafts_${module}`) || "[]") as Array<{ savedAtFa?: string }>;
+     setDraftSummary({ count: drafts.length, latest: drafts[0]?.savedAtFa });
+   } catch {
+     setDraftSummary({ count: 0 });
+   }
  }, [module]);
 
  const allowedModules = useMemo(() => {
- if (!user) return [];
- return (Object.keys(moduleMeta) as ModuleSlug[]).filter(m => canEdit(user, m));
+   if (!user) return [];
+   return (Object.keys(moduleMeta) as ModuleSlug[]).filter(m => canEdit(user, m));
  }, [user]);
 
- const items: ContentItem[] = useMemo(() => {
- try { return getModuleItems(module); } catch { return []; }
- }, [module]);
-
  const categories = useMemo(() => {
- return Array.from(new Set(items.map(i => i.category).filter(Boolean))) as string[];
+   return Array.from(new Set(items.map(i => i.category).filter(Boolean))) as string[];
  }, [items]);
 
  const filteredItems = useMemo(() => {
- const q = query.trim().toLowerCase();
- return items.filter(it => {
- if (category !== "all" && it.category !== category) return false;
- if (!q) return true;
- return `${it.title} ${it.excerpt} ${it.slug} ${it.category || ""} ${it.tags.join(" ")}`.toLowerCase().includes(q);
- });
+   const q = query.trim().toLowerCase();
+   return items.filter(it => {
+     if (category !== "all" && it.category !== category) return false;
+     if (!q) return true;
+     return `${it.title} ${it.excerpt} ${it.slug} ${it.category || ""} ${it.tags.join(" ")}`.toLowerCase().includes(q);
+   });
  }, [items, query, category]);
 
  const stats = useMemo(() => {
- const views = filteredItems.reduce((s, it) => s + it.views, 0);
- const likes = filteredItems.reduce((s, it) => s + it.likes, 0);
- const tagCount = new Set(filteredItems.flatMap(it => it.tags)).size;
- return { views, likes, tagCount };
+   const views = filteredItems.reduce((s, it) => s + it.views, 0);
+   const likes = filteredItems.reduce((s, it) => s + it.likes, 0);
+   const tagCount = new Set(filteredItems.flatMap(it => it.tags)).size;
+   return { views, likes, tagCount };
  }, [filteredItems]);
 
  if (!user) {
- return <main className="p-10 text-center" dir="rtl"><p>لطفا ابتدا <Link href="/admin/login" className="text-[var(--home)] underline">وارد شوید</Link>.</p></main>;
+   return <main className="p-10 text-center" dir="rtl"><p>لطفا ابتدا <Link href="/admin/login" className="text-[var(--home)] underline">وارد شوید</Link>.</p></main>;
  }
 
  if (!canEdit(user, module)) {
- return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسترسی شما: {user.modules.join(", ")}</p></main>;
+   return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسترسی شما: {user.modules.join(", ")}</p></main>;
  }
 
  return (
@@ -162,11 +178,11 @@ function AdminPostsInner() {
  <td className="hidden p-3 align-top md:table-cell">
  {it.category ? <Badge variant={module}>{it.category}</Badge> : <Badge variant="secondary">بدون دسته</Badge>}
  </td>
- <td className="hidden p-3 align-top text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] lg:table-cell">
+ <td className="hidden p-3 align-top text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color lg:table-cell">
  <div>{it.date_fa}</div>
  <div className="mt-1 paragraph-color">{it.author.name}</div>
  </td>
- <td className="p-3 align-top text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+ <td className="p-3 align-top text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <div>👁 {it.views.toLocaleString("fa-IR")}</div>
  <div className="mt-1 paragraph-color">♥ {it.likes.toLocaleString("fa-IR")}</div>
  </td>
@@ -181,7 +197,7 @@ function AdminPostsInner() {
  </tbody>
  </table>
  </div>
- {filteredItems.length===0 && (
+ {filteredItems.length===0 && !loading && (
  <div className="p-8 text-center text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
  نتیجه‌ای برای فیلتر فعلی پیدا نشد.
  <div className="mt-3"><Button variant="ghost" size="xs" onClick={()=>{setQuery(""); setCategory("all");}}>پاک کردن فیلترها</Button></div>
