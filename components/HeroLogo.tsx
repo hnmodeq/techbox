@@ -88,10 +88,11 @@ export default function HeroLogo({
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 0.15, 4.2);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const renderer = new THREE.WebGLRenderer({ antialias: !isMobile, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.shadowMap.enabled = true;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.5));
+    renderer.shadowMap.enabled = !isMobile;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
     container.appendChild(renderer.domElement);
@@ -183,9 +184,10 @@ export default function HeroLogo({
     scene.add(back);
 
     // ── Particles ──
+    const pCount = isMobile ? 180 : 400;
     const pGeo = new THREE.BufferGeometry();
-    const pos = new Float32Array(600);
-    for (let i = 0; i < 600; i++) pos[i] = (Math.random() - 0.5) * 12;
+    const pos = new Float32Array(pCount * 3);
+    for (let i = 0; i < pCount * 3; i++) pos[i] = (Math.random() - 0.5) * 12;
     pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     const pts = new THREE.Points(
       pGeo,
@@ -231,9 +233,17 @@ export default function HeroLogo({
 
     // ── Animation ──
     let animationId: number;
+    let isVisible = true;
+    const observer = new IntersectionObserver((entries) => {
+      isVisible = entries[0]?.isIntersecting ?? true;
+    }, { threshold: 0.05 });
+    observer.observe(container);
+
     const clock = new THREE.Clock();
 
     function animate() {
+      animationId = requestAnimationFrame(animate);
+      if (!isVisible || (typeof document !== 'undefined' && document.hidden)) return;
       const t = clock.getElapsedTime();
       const fy = Math.sin(t * 0.5) * 0.14;
       mesh.position.y = fy;
@@ -273,6 +283,7 @@ export default function HeroLogo({
     // ── Cleanup ──
     return () => {
       cancelAnimationFrame(animationId);
+      observer.disconnect();
       removeEventListener('resize', onResize);
       container.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointermove', onPointerMove);
