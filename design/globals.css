@@ -97,11 +97,11 @@
   --paragraph-font-size: 0.9375rem;
   --paragraph-color: light-dark(oklch(0.48 0 0), oklch(0.68 0 0));
 
-  --main-background: light-dark(oklch(100% 0.00011 271.152), oklch(0.13 0 0));
-  --card-background: light-dark(oklch(100% 0.00011 271.152), oklch(0.17 0 0));
-  --button-background: light-dark(oklch(100% 0.00011 271.152), oklch(0.22 0 0));
-  --modal-background: light-dark(oklch(100% 0.00011 271.152), oklch(0.18 0 0));
-  --sidebar-background: light-dark(oklch(100% 0.00011 271.152), oklch(0.15 0 0));
+  --main-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
+  --card-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
+  --button-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
+  --modal-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
+  --sidebar-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
 
   --blog: light-dark(oklch(0.7 0.17 52), #fb923c);
   --news: light-dark(oklch(0.64 0.22 25), #fb7185);
