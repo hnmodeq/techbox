@@ -10,7 +10,7 @@ export default function About(){
  return (
  <main className="max-w-6xl mx-auto px-4 py-14" dir="rtl">
  <PageHeader
- colorVar="--tb-about"
+ colorVar="--about"
  title="درباره تکباکس"
  titleClassName="text-[var(--about)]"
  description="تکباکس – پاتوق بچه‌های فناوری اطلاعات ایران. مجله، اخبار فوری، رسانه ویدیویی، نقد تخصصی، ابزارهای مهندسی، دانلود، فروشگاه زیرساخت و انجمن – همه در یک Bento feed زنده، با CMS نقش‌محور."

@@ -31,7 +31,7 @@ function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { s
       </span>
       <div className="flex items-center gap-3">
         <span className="inline-flex items-center gap-1 text-xs paragraph-color font-bold" title="حجم فایل">
-          <svg className="w-3.5 h-3.5 text-[var(--tb-warning)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-3.5 h-3.5 text-[var(--warning)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
@@ -74,11 +74,11 @@ export default function DownloadRow() {
               <Link
                 key={file.slug}
                 href={`/download/${file.slug}`}
-                className="group card p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[var(--tb-motion-md)] border-[length:var(--border-size)] border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
+                className="group card p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   {/* Yellow Special File Icon Box */}
-                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-[var(--corner-radius)] bg-[var(--tb-warning)]/15 text-[var(--tb-warning)] border-[length:var(--border-size)] border-[var(--tb-warning)]/35 shadow-[var(--shadow-size)]">
+                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-[var(--corner-radius)] bg-[var(--warning)]/15 text-[var(--warning)] border-[length:var(--border-size)] border-[var(--warning)]/35 shadow-[var(--shadow-size)]">
                     <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                       <polyline points="14 2 14 8 20 8" />

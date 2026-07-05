@@ -49,7 +49,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
       <PageHeader
-        colorVar="--tb-primary"
+        colorVar="--home"
         title={`پروفایل نویسنده: ${userRecord.name}`}
         titleClassName="text-[var(--primary-text)]"
       >

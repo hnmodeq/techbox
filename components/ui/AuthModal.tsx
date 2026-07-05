@@ -104,8 +104,8 @@ export function AuthModal() {
 
         {/* Logo & Header */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--home)]/10 border-[length:var(--border-size)] border-[var(--home)]/30 text-[var(--home)] font-black text-2xl shadow-[var(--shadow-size)]">
-            TB
+          <div className="mx-auto relative flex h-14 w-14 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--home)]/10 border-[length:var(--border-size)] border-[var(--home)]/30 p-2 shadow-[var(--shadow-size)]">
+            <Image src="/logo.png" alt="لوگو تکباکس" width={44} height={44} className="object-contain" />
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
             ورود و عضویت در تکباکس
@@ -123,7 +123,7 @@ export function AuthModal() {
 
         {forgotOpen ? (
           <div className="mt-6 space-y-4 rounded-[var(--corner-radius)] bg-[var(--card-background)] p-4 border-[length:var(--border-size)] border-[var(--border-color)] text-center">
-            <h4 className="font-bold text-sm text-[var(--tb-warning)]">بازیابی رمز عبور</h4>
+            <h4 className="font-bold text-sm text-[var(--warning)]">بازیابی رمز عبور</h4>
             <p className="text-xs paragraph-color leading-5">
               برای تغییر یا بازیابی رمز عبور حساب کاربری خود، لطفاً با ایمیل پشتیبانی یا ادمین سیستم تماس بگیرید.
             </p>

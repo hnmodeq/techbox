@@ -26,7 +26,7 @@ export default function BentoCard({
  footerLabel = "مشاهده همه →",
 }: Props) {
  return (
- <div className={`group relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/80 p-5 transition-colors duration-[var(--tb-motion-md)] md:p-6 ${className}`} >
+ <div className={`group relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/80 p-5 transition-colors duration-[200ms] md:p-6 ${className}`} >
  <div className="flex h-full flex-col gap-3">
  <div className="flex items-start justify-between gap-3">
  <div>

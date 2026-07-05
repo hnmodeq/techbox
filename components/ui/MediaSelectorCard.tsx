@@ -39,7 +39,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  ref={ref}
  type="button"
  className={cn(
- "group relative block w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] text-right transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]",
+ "group relative block w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] text-right transition-all duration-[200ms] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]",
  active ? "ring-2 ring-[var(--media)]" : "",
  className
  )}
@@ -50,7 +50,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  alt={title}
  fill
  sizes="(min-width:1024px) 33vw, 100vw"
- className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+ className="object-cover transition-transform duration-[300ms] group-hover:scale-105"
  />
  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10 transition-opacity group-hover:opacity-95" />
 
@@ -70,7 +70,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  </span>
 
  <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
- <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--media)]">
+ <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[150ms] group-hover:text-[var(--media)]">
  {title}
  </h4>
  <div className="mt-2 flex items-center justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">

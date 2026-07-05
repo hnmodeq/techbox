@@ -72,7 +72,7 @@ export default function Chatbot(){
  {/* panel */}
  {open && (
  <div dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{zIndex:zIndex.chatbot}}>
- <div className="tb-overlay-panel flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0">
+ <div className="card !bg-[var(--modal-background)] flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0">
  <div className="flex items-center justify-between border-b-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] px-3 py-2.5">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">دستیار تکباکس <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">AI Beta</span></div>
  <div className="flex items-center gap-2">

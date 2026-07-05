@@ -19,8 +19,8 @@ export interface ButtonLinkProps extends LinkProps, Omit<React.AnchorHTMLAttribu
 
 const base =
  "inline-flex items-center justify-center gap-2 select-none " +
- "transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)] " +
- "focus-visible:outline-none focus-visible:shadow-[var(--tb-ring-3)] " +
+ "transition-all duration-[200ms] ease-[ease] " +
+ "focus-visible:outline-none focus-visible:shadow-[var(--shadow-size)] " +
  "disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<Variant,string> = {
@@ -29,7 +29,7 @@ const variants: Record<Variant,string> = {
  ghost: "bg-transparent text-[var(--primary-text)] hover:bg-[var(--button-background)]/40 border-[length:var(--border-size)] border-[var(--border-color)]",
  outline: "bg-transparent border-[length:var(--border-size)] border-[var(--border-color)] text-[var(--primary-text)] hover:bg-[var(--button-background)]/40",
  danger: "text-[#ffffff] bg-[var(--danger)] border-transparent hover:brightness-[1.05] active:scale-[0.985]",
- vip: "tb-cta tb-cta-vip px-4 bg-[var(--button-background)] text-[var(--primary-text)]",
+ vip: "px-4 py-2 font-bold rounded-[var(--corner-radius)] bg-[linear-gradient(135deg,var(--home),var(--vip))] text-white shadow-[var(--shadow-size)] transition-transform hover:scale-[1.02]",
  link: "bg-transparent underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none text-[var(--primary-text)]"
 };
 

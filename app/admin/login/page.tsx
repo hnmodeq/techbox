@@ -82,7 +82,7 @@ export default function AdminLogin() {
           </div>
         )}
 
-        {err && <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">{err}</p>}
+        {err && <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--danger)]">{err}</p>}
       </form>
     </main>
   );

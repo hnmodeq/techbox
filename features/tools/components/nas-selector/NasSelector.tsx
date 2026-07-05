@@ -68,7 +68,7 @@ function ToggleCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "group relative flex min-h-[92px] w-full items-start gap-3 rounded-[var(--corner-radius)] border p-4 text-right transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)]",
+        "group relative flex min-h-[92px] w-full items-start gap-3 rounded-[var(--corner-radius)] border p-4 text-right transition-all duration-[200ms] ease-[ease]",
         selected
           ? "border-[color-mix(in_oklch,var(--home)_48%,var(--border-color))] bg-[color-mix(in_oklch,var(--home)_10%,var(--card-background))] shadow-[var(--shadow-size)]"
           : "border-[var(--border-color)] bg-[var(--card-background)] hover:-translate-y-0.5 hover:bg-[var(--muted-background)]",
@@ -243,7 +243,7 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
                   const value = estimateUsableCapacity(bays, state.driveTb, raid);
                   const active = state.raid === raid && value >= state.usableTb;
                   return (
-                    <td key={raid} className={cn("p-3", active && "bg-[color-mix(in_oklch,var(--tb-success)_16%,transparent)] font-black text-[var(--primary-text)]")}>
+                    <td key={raid} className={cn("p-3", active && "bg-[color-mix(in_oklch,var(--success)_16%,transparent)] font-black text-[var(--primary-text)]")}>
                       {value > 0 ? `${persianNumber(value)} TB` : "—"}
                     </td>
                   );
@@ -283,7 +283,7 @@ function ProductCard({
   };
 
   return (
-    <article className="relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)] flex flex-col justify-between">
+    <article className="relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[200ms] hover:-translate-y-1 hover:shadow-[var(--shadow-size)] flex flex-col justify-between">
       <div>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
@@ -322,21 +322,21 @@ function ProductCard({
 
         <div className="mt-4 flex items-center gap-3">
           <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[var(--muted-background)]">
-            <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--tb-success),var(--home))]" style={{ width: `${product.match}%` }} />
+            <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--success),var(--home))]" style={{ width: `${product.match}%` }} />
           </div>
           <span className="text-[13px] font-black text-[var(--primary-text)]">{persianNumber(product.match)}٪ تطابق</span>
         </div>
 
         <div className="mt-4 space-y-2">
           {product.reasons.map((reason) => (
-            <div key={reason} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--tb-fg-secondary)]">
-              <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-success)]" />
+            <div key={reason} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--paragraph-color)]">
+              <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-[var(--success)]" />
               <span>{reason}</span>
             </div>
           ))}
           {product.warnings.map((warning) => (
             <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 paragraph-color">
-              <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-warning)]" />
+              <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--warning)]" />
               <span>{warning}</span>
             </div>
           ))}
@@ -500,7 +500,7 @@ export function NasSelector({
 
           {/* Results section positioned BELOW the tool */}
           <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-8">
-            <div className="rounded-[calc(var(--corner-radius)+6px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[color-mix(in_oklch,var(--card-background)_88%,transparent)] p-6 shadow-[var(--shadow-size)] backdrop-blur-[var(--tb-blur-md)]">
+            <div className="rounded-[calc(var(--corner-radius)+6px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[color-mix(in_oklch,var(--card-background)_88%,transparent)] p-6 shadow-[var(--shadow-size)] backdrop-blur-[0px]">
               <div className="flex flex-wrap items-center justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-4">
                 <div>
                   <h2 className="text-[20px] font-black">نتایج و مدل‌های پیشنهادی فروشگاه</h2>

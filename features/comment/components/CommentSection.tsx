@@ -155,7 +155,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           <textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="input min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
           <div className="flex justify-between items-center">
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              {state?.ok ? <span className="text-[var(--tb-success)] font-semibold">✓ دیدگاه شما با موفقیت در پایگاه داده ثبت شد</span> : (state as any)?.error ? <span className="text-[var(--tb-danger)]">{(state as any).error}</span> : ""}
+              {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ دیدگاه شما با موفقیت در پایگاه داده ثبت شد</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}
             </span>
             <Button disabled={isSubmitting || isPending} size="sm">
               {isSubmitting ? "در حال ثبت..." : "ارسال دیدگاه"}

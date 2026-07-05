@@ -84,8 +84,10 @@ export default function SidebarContent({
  const notifPanelRef = useRef<HTMLDivElement | null>(null);
  const { count: cartCount, setOpen: setCartOpen } = useCart();
 
- useEffect(() => {
- setMounted(true);
+  const [toolsExpanded, setToolsExpanded] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
  fetch("/api/auth/me")
    .then((r) => r.json())
    .then((d) => {
@@ -215,7 +217,7 @@ export default function SidebarContent({
  )}
  </div>
 
-          <div className={`overflow-hidden transition-all duration-[var(--tb-motion-md)] ${expanded ? "w-[170px] opacity-100" : "w-0 opacity-0"}`}>
+          <div className={`overflow-hidden transition-all duration-[200ms] ${expanded ? "w-[170px] opacity-100" : "w-0 opacity-0"}`}>
             <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">تکباکس</div>
             <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پاتوق بچه‌های فناوری اطلاعات</div>
           </div>
@@ -226,7 +228,7 @@ export default function SidebarContent({
           <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--news)]">
             <IconRailButton ref={notifButtonRef} tone="news" onClick={() => setNotifOpen((o) => !o)} aria-label="notifications">
               <Icon name="bell" size={18} />
-              <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--tb-danger)]" />
+              <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--danger)]" />
             </IconRailButton>
           </SidebarTooltip>
 
@@ -307,7 +309,7 @@ export default function SidebarContent({
  </div>
 
  <div className="h-10 shrink-0">
- <SidebarTooltip label={theme === "dark" ? "حالت روز" : "حالت شب"} enabled={!expanded} tooltipClassName="text-[var(--tb-warning)]">
+ <SidebarTooltip label={theme === "dark" ? "حالت روز" : "حالت شب"} enabled={!expanded} tooltipClassName="text-[var(--warning)]">
  <ThemeToggleButton theme={theme} expanded={expanded} onClick={onToggleTheme} />
  </SidebarTooltip>
  </div>
@@ -315,29 +317,82 @@ export default function SidebarContent({
  <div className="border-t-[length:var(--border-size)] border-[var(--border-color)]" />
  </header>
 
- <nav className="flex-1 overflow-y-auto px-2 py-1">
- <div className="flex flex-col gap-[2px]">
- {navItems.map((item) => {
- const Icon = item.icon as any;
- const active = isActive(pathname, item.href);
- const iconClass = active ? item.iconActiveClassName || "text-primary" : item.iconClassName || "paragraph-color";
- const hoverClass = item.iconHoverClassName || item.iconActiveClassName || "group-hover:text-[var(--home)]";
- return (
- <SidebarTooltip key={item.href} label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
- <Link
- href={item.href}
- onClick={onLinkClick}
- className={`${linkBase} paragraph-font-size ${active ? `bg-[var(--muted-background)] font-bold ${item.iconActiveClassName || ""}` : `${linkInactive} ${item.iconHoverClassName || ""}`}`}
- >
- {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--home)]" />}
- <span className="flex h-10 w-10 shrink-0 items-center justify-center">
- <Icon size={19} className={`${iconClass} ${hoverClass} transition-colors duration-[var(--tb-motion-md)]`} strokeWidth={1.75} />
- </span>
- <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>{item.title}</span>
- </Link>
- </SidebarTooltip>
- );
- })}
+      <nav className="flex-1 overflow-y-auto px-2 py-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex flex-col gap-[2px]">
+          {navItems.map((item) => {
+            const Icon = item.icon as any;
+            const active = isActive(pathname, item.href);
+            const iconClass = active ? item.iconActiveClassName || "text-[var(--home)]" : item.iconClassName || "paragraph-color";
+            const hoverClass = item.iconHoverClassName || item.iconActiveClassName || "group-hover:text-[var(--home)]";
+
+            if (item.children && item.children.length > 0) {
+              return (
+                <div key={item.href} className="flex flex-col">
+                  <SidebarTooltip label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
+                    <div className="flex items-center">
+                      <Link
+                        href={item.href}
+                        onClick={onLinkClick}
+                        className={`${linkBase} flex-1 paragraph-font-size ${active ? `bg-[var(--muted-background)] font-bold ${item.iconActiveClassName || ""}` : `${linkInactive} ${item.iconHoverClassName || ""}`}`}
+                      >
+                        {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tools)]" />}
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                          <Icon size={19} className={`${iconClass} ${hoverClass} transition-colors duration-[200ms]`} strokeWidth={1.75} />
+                        </span>
+                        <span className={`truncate transition-all ${expanded ? "w-[130px] opacity-100" : "w-0 opacity-0"}`}>{item.title}</span>
+                      </Link>
+                      {expanded && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setToolsExpanded((o) => !o); }}
+                          className="flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] paragraph-color hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] cursor-pointer shrink-0"
+                          aria-label="زیرمنو ابزارها"
+                        >
+                          <span className={`transition-transform duration-200 ${toolsExpanded ? "rotate-90" : "-rotate-90 rtl:rotate-90"}`}>▼</span>
+                        </button>
+                      )}
+                    </div>
+                  </SidebarTooltip>
+
+                  {expanded && toolsExpanded && (
+                    <div className="flex flex-col gap-0.5 pr-8 pl-2 pt-1 pb-2 border-r border-[var(--border-color)] mr-5 mt-1">
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon as any;
+                        const childActive = isActive(pathname, child.href);
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            onClick={onLinkClick}
+                            className={`flex items-center gap-2.5 py-2 px-3 rounded-[var(--corner-radius)] text-xs transition-colors ${childActive ? "bg-[var(--muted-background)] font-bold text-[var(--tools)]" : "paragraph-color hover:bg-[var(--muted-background)]/50 hover:text-[var(--primary-text)]"}`}
+                          >
+                            <ChildIcon size={16} className={child.iconClassName || "paragraph-color"} />
+                            <span className="truncate">{child.title}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            return (
+              <SidebarTooltip key={item.href} label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
+                <Link
+                  href={item.href}
+                  onClick={onLinkClick}
+                  className={`${linkBase} paragraph-font-size ${active ? `bg-[var(--muted-background)] font-bold ${item.iconActiveClassName || ""}` : `${linkInactive} ${item.iconHoverClassName || ""}`}`}
+                >
+                  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--home)]" />}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
+                    <Icon size={19} className={`${iconClass} ${hoverClass} transition-colors duration-[200ms]`} strokeWidth={1.75} />
+                  </span>
+                  <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>{item.title}</span>
+                </Link>
+              </SidebarTooltip>
+            );
+          })}
  {(user?.role === "super_admin" || (user?.role as string) === "admin") && (() => {
  const active = isActive(pathname, "/admin");
  return (

@@ -95,9 +95,9 @@ export default function ForumList() {
           <Link key={t.slug} href={`/forum/${t.slug}`} className="group grid grid-cols-12 px-3 sm:px-4 py-3.5 hover:bg-[var(--muted-background)]/20 gap-2 items-center transition-colors">
             {/* vote column */}
             <div className="hidden sm:flex col-span-1 flex-col items-center paragraph-color text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
-              <Button type="button" variant="link" size="xs" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--tb-success)] font-bold">▲</Button>
+              <Button type="button" variant="link" size="xs" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--success)] font-bold">▲</Button>
               <span className="font-bold text-[var(--primary-text)]">{t.likes.toLocaleString("fa-IR")}</span>
-              <Button type="button" variant="link" size="xs" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--tb-warning)] font-bold">▼</Button>
+              <Button type="button" variant="link" size="xs" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--warning)] font-bold">▼</Button>
             </div>
 
             {/* main */}

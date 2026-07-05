@@ -39,7 +39,7 @@ export default function NewsSidebar() {
           type="button"
           onClick={() => setOpen(true)}
           style={{ zIndex: zIndex.mobileFab }}
-          className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--muted-background)] cursor-pointer"
+          className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[300ms] hover:bg-[var(--muted-background)] cursor-pointer"
           title="اخبار زنده تکباکس"
           aria-label="اخبار زنده تکباکس"
         >
@@ -58,7 +58,7 @@ export default function NewsSidebar() {
 
       {/* Desktop Layout Width Spacer (Compresses <main> width smoothly when open) */}
       <div
-        className={`hidden shrink-0 sm:block transition-[width] duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${
+        className={`hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
           open ? 'w-80' : 'w-0'
         }`}
         aria-hidden="true"
@@ -67,7 +67,7 @@ export default function NewsSidebar() {
       {/* Fixed Left Sidebar Panel */}
       <aside
         ref={sidebarRef}
-        className={`fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden transition-transform duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${sidebarBase} ${
+        className={`fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden transition-transform duration-[300ms] ease-[ease] ${sidebarBase} ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ zIndex: zIndex.sidebar }}

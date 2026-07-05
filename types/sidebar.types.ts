@@ -9,11 +9,12 @@ export type SidebarMainProps = {
 export type NavItem = {
   title: string;
   href: string;
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number; size?: number }>;
   iconClassName?: string;        // رنگ عادی آیکون
   iconHoverClassName?: string;   // رنگ hover آیکون
   iconActiveClassName?: string;  // رنگ active آیکون
   tooltipClassName?: string;     // رنگ tooltip در حالت بسته
+  children?: NavItem[];
 };
 
 export type SidebarContentProps = {

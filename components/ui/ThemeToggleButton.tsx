@@ -22,7 +22,7 @@ export const ThemeToggleButton = React.forwardRef<HTMLButtonElement, ThemeToggle
  type="button"
  className={cn(
  "group flex h-10 w-full items-center rounded-[var(--corner-radius)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color",
- "transition-colors duration-[var(--tb-motion-md)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)]",
+ "transition-colors duration-[200ms] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)]",
  className
  )}
  aria-label={label}
@@ -30,16 +30,16 @@ export const ThemeToggleButton = React.forwardRef<HTMLButtonElement, ThemeToggle
  >
  <span className="relative flex h-10 w-10 shrink-0 items-center justify-center">
  <Sun className={cn(
- "absolute h-[18px] w-[18px] transition-all duration-[var(--tb-motion-md)]",
- currentTheme === "dark" ? "scale-100 text-[var(--tb-warning)] opacity-100" : "scale-0 opacity-0"
+ "absolute h-[18px] w-[18px] transition-all duration-[200ms]",
+ currentTheme === "dark" ? "scale-100 text-[var(--warning)] opacity-100" : "scale-0 opacity-0"
  )} />
  <Moon className={cn(
- "absolute h-[18px] w-[18px] transition-all duration-[var(--tb-motion-md)]",
+ "absolute h-[18px] w-[18px] transition-all duration-[200ms]",
  currentTheme === "dark" ? "scale-0 opacity-0" : "scale-100 opacity-100"
  )} />
  </span>
  <span className={cn(
- "overflow-hidden whitespace-nowrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-all duration-[var(--tb-motion-md)]",
+ "overflow-hidden whitespace-nowrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-all duration-[200ms]",
  expanded ? "w-[120px] opacity-100" : "w-0 opacity-0"
  )}>
  {label}

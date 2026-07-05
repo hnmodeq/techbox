@@ -130,7 +130,7 @@ export default function RolesPage(){
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسترسی ماژول‌ها *</div>
  <div className="flex gap-1">
  <Button type="button" variant="link" size="xs" onClick={selectAllModules} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">همه</Button>
- <Button type="button" variant="link" size="xs" onClick={clearModules} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">پاک</Button>
+ <Button type="button" variant="link" size="xs" onClick={clearModules} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--danger)]">پاک</Button>
  </div>
  </div>
  <div className="grid grid-cols-2 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
@@ -146,7 +146,7 @@ export default function RolesPage(){
  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  ذخیره در: <code>{STORAGE_KEY}</code> + آماده POST <code>/api/roles</code> – در پروداکشن به Prisma Role table متصل می‌شود.
  </p>
- {msg && <p className={`text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${msg.includes("الزامی") || msg.includes("قبلاً") || msg.includes("قابل") ? "text-[var(--tb-warning)]" : "text-[var(--tb-success)]"}`}>{msg}</p>}
+ {msg && <p className={`text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${msg.includes("الزامی") || msg.includes("قبلاً") || msg.includes("قابل") ? "text-[var(--warning)]" : "text-[var(--success)]"}`}>{msg}</p>}
  </form>
 
  <div className="card overflow-hidden p-0 lg:col-span-2">
@@ -184,7 +184,7 @@ export default function RolesPage(){
  <td className="p-3 align-top text-right text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <div className="flex flex-wrap gap-2">
  <Button variant="link" size="xs" className="text-[var(--home)]" disabled>ویرایش</Button>
- <Button variant="link" size="xs" className="text-[var(--tb-danger)]" disabled={protectedRole || r.users > 0} onClick={()=>deleteRole(r)}>حذف</Button>
+ <Button variant="link" size="xs" className="text-[var(--danger)]" disabled={protectedRole || r.users > 0} onClick={()=>deleteRole(r)}>حذف</Button>
  </div>
  </td>
  </tr>

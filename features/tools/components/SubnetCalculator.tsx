@@ -65,11 +65,11 @@ export default function SubnetCalculator() {
             <input
               value={ip}
               onChange={(e) => setIp(e.target.value)}
-              className={`input font-mono text-left ${!valid ? "border-[var(--tb-danger)]" : ""}`}
+              className={`input font-mono text-left ${!valid ? "border-[var(--danger)]" : ""}`}
               dir="ltr"
               placeholder="192.168.1.0"
             />
-            {!valid && <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">آدرس IP معتبر نیست (مثال: 192.168.1.0)</span>}
+            {!valid && <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--danger)]">آدرس IP معتبر نیست (مثال: 192.168.1.0)</span>}
           </label>
           <label className="space-y-2 block">
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">

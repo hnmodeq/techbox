@@ -59,7 +59,7 @@ export default function ShopGrid(){
 
    {/* Dropdown Menu Filter */}
    {filterOpen && (
-     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] p-4 shadow-[var(--shadow-size)] space-y-4 animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)]">
+     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] p-4 shadow-[var(--shadow-size)] space-y-4 animate-in fade-in-0 zoom-in-95 duration-[150ms]">
        <div className="space-y-3">
          <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسته‌بندی
            <select value={cat} onChange={e=>setCat(e.target.value)} className="input mt-1 w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
@@ -89,9 +89,9 @@ export default function ShopGrid(){
  return (
         <Link key={p.slug} href={`/shop/${p.slug}`} className="card overflow-hidden group flex flex-col rounded-[var(--corner-radius)] !p-0">
               <div className="block relative aspect-[4/3] bg-[var(--muted-background)] overflow-hidden">
-                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
-                <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
-                {pr.old && <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
+                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
+                <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">موجود</span>
+                {pr.old && <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">تخفیف</span>}
               </div>
               <div className="p-4 flex-1 flex flex-col">
                 <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold mt-1 transition-colors group-hover:text-[var(--shop)] line-clamp-2 min-h-[48px]">{p.title}</div>

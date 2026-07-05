@@ -233,7 +233,7 @@ export default function AccountPage() {
           </div>
 
           {authError && (
-            <div className="rounded-[var(--corner-radius)] bg-[var(--tb-danger)]/10 border-[length:var(--border-size)] border-[var(--tb-danger)]/30 p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">
+            <div className="rounded-[var(--corner-radius)] bg-[var(--danger)]/10 border-[length:var(--border-size)] border-[var(--danger)]/30 p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--danger)]">
               {authError}
             </div>
           )}
@@ -327,7 +327,7 @@ export default function AccountPage() {
   return (
     <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
       <PageHeader
-        colorVar="--tb-account"
+        colorVar="--account"
         title="پروفایل و حساب کاربری واقعی"
         titleClassName="text-[var(--account)]"
       >
@@ -369,7 +369,7 @@ export default function AccountPage() {
             type="button"
             variant="ghost"
             onClick={handleLogout}
-            className="w-full text-[var(--tb-danger)] hover:bg-[var(--tb-danger)]/10 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mt-4"
+            className="w-full text-[var(--danger)] hover:bg-[var(--danger)]/10 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mt-4"
           >
             خروج از حساب کاربری
           </Button>
@@ -378,7 +378,7 @@ export default function AccountPage() {
         {/* profile form */}
         <div className="lg:col-span-2 card p-6 space-y-6">
           {saveStatus && (
-            <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${saveStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)] border-[length:var(--border-size)] border-[var(--tb-success)]/30" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)] border-[length:var(--border-size)] border-[var(--tb-danger)]/30"}`}>
+            <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${saveStatus.ok ? "bg-[var(--success)]/15 text-[var(--success)] border-[length:var(--border-size)] border-[var(--success)]/30" : "bg-[var(--danger)]/15 text-[var(--danger)] border-[length:var(--border-size)] border-[var(--danger)]/30"}`}>
               {saveStatus.msg}
             </div>
           )}
@@ -410,7 +410,7 @@ export default function AccountPage() {
           <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-6 space-y-4">
             <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">تغییر رمز عبور واقعی</h4>
             {pwdStatus && (
-              <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${pwdStatus.ok ? "bg-[var(--tb-success)]/15 text-[var(--tb-success)]" : "bg-[var(--tb-danger)]/15 text-[var(--tb-danger)]"}`}>
+              <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${pwdStatus.ok ? "bg-[var(--success)]/15 text-[var(--success)]" : "bg-[var(--danger)]/15 text-[var(--danger)]"}`}>
                 {pwdStatus.msg}
               </div>
             )}

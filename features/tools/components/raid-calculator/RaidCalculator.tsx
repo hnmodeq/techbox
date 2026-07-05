@@ -250,8 +250,8 @@ function Segment({ label, value, total, className }: { label: string; value: num
 function StatCard({ label, value, hint, tone = "default" }: { label: string; value: string; hint: string; tone?: "default" | "accent" | "success" | "warning" }) {
   const toneClass =
     tone === "accent" ? "text-[var(--raid)]"
-    : tone === "success" ? "text-[var(--tb-success)]"
-    : tone === "warning" ? "text-[var(--tb-warning)]"
+    : tone === "success" ? "text-[var(--success)]"
+    : tone === "warning" ? "text-[var(--warning)]"
     : "text-[var(--primary-text)]";
   return (
     <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)]/70 p-4">
@@ -441,7 +441,7 @@ export default function RaidCalculator() {
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">نتیجه نهایی محاسبه برای</div>
                       <div className="mt-1 text-3xl font-black text-[var(--raid)]">{selectedOption.label}</div>
                     </div>
-                    <div className={`badge ${result.valid ? "border-[color-mix(in_oklch,var(--tb-success)_40%,var(--border-color))] text-[var(--tb-success)]" : "border-[color-mix(in_oklch,var(--tb-danger)_40%,var(--border-color))] text-[var(--tb-danger)]"}`}>
+                    <div className={`badge ${result.valid ? "border-[color-mix(in_oklch,var(--success)_40%,var(--border-color))] text-[var(--success)]" : "border-[color-mix(in_oklch,var(--danger)_40%,var(--border-color))] text-[var(--danger)]"}`}>
                       {result.valid ? "پیکربندی معتبر" : "نیازمند اصلاح دیسک‌ها"}
                     </div>
                   </div>
@@ -463,14 +463,14 @@ export default function RaidCalculator() {
                     </div>
                     <div className="flex h-6 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)] shadow-[var(--shadow-size)]" aria-label="نمودار ظرفیت RAID">
                       <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--raid)]" />
-                      <Segment label="حفاظت" value={result.protectionTb} total={barTotal} className="bg-[var(--tb-success)]" />
-                      <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--tb-warning)]" />
+                      <Segment label="حفاظت" value={result.protectionTb} total={barTotal} className="bg-[var(--success)]" />
+                      <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--warning)]" />
                       <Segment label="Hot Spare" value={result.spareTb} total={barTotal} className="bg-[var(--paragraph-color)]" />
                     </div>
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--raid)]" /> قابل استفاده</span>
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-success)]" /> حفاظت</span>
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-warning)]" /> بلااستفاده</span>
+                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--success)]" /> حفاظت</span>
+                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--warning)]" /> بلااستفاده</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--paragraph-color)]" /> Spare</span>
                     </div>
                   </div>
@@ -503,13 +503,13 @@ export default function RaidCalculator() {
                   {result.warnings.length > 0 ? (
                     <div className="space-y-2">
                       {result.warnings.map((warning) => (
-                        <div key={warning} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-warning)_11%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)]">
+                        <div key={warning} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--warning)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--warning)_11%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)]">
                           {warning}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-success)_10%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] font-bold">
+                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--success)_10%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] font-bold">
                       این چیدمان از نظر تعداد دیسک معتبر است و ظرفیت بدون هیچ هشداری محاسبه شد.
                     </div>
                   )}

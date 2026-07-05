@@ -45,36 +45,36 @@ export type ModuleMeta = {
 };
 
 const moduleList: ModuleMeta[] = [
-  { key: "home", slug: "home", title: "Home", titleFa: "خانه", href: "/", color: "var(--tb-home)", icon: "home", descriptionFa: "صفحه اصلی" },
-  { key: "blog", slug: "blog", title: "Blog", titleFa: "بلاگ", href: "/blog", color: "var(--tb-blog)", icon: "blog", descriptionFa: "مقالات تخصصی" },
-  { key: "news", slug: "news", title: "News", titleFa: "اخبار", href: "/news", color: "var(--tb-news)", icon: "news", descriptionFa: "اخبار دنیای تکنولوژی" },
-  { key: "media", slug: "media", title: "Media", titleFa: "مدیا", href: "/media", color: "var(--tb-media)", icon: "media", descriptionFa: "ویدئو و پادکست" },
-  { key: "shop", slug: "shop", title: "Shop", titleFa: "فروشگاه", href: "/shop", color: "var(--tb-shop)", icon: "shop", descriptionFa: "خرید تجهیزات" },
-  { key: "tools", slug: "tools", title: "Tools", titleFa: "ابزارها", href: "/tools", color: "var(--tb-tools)", icon: "tools", descriptionFa: "ابزارهای محاسباتی" },
-  { key: "download", slug: "download", title: "Download", titleFa: "دانلود", href: "/download", color: "var(--tb-download)", icon: "downloadModule", descriptionFa: "مرکز دانلود" },
-  { key: "timeline", slug: "timeline", title: "Timeline", titleFa: "تایم‌لاین فناوری", href: "/timeline", color: "var(--tb-timeline)", icon: "timeline", descriptionFa: "تاریخچه و رویدادهای فناوری" },
-  { key: "forum", slug: "forum", title: "Forum", titleFa: "انجمن", href: "/forum", color: "var(--tb-forum)", icon: "forum", descriptionFa: "پرسش و پاسخ" },
-  { key: "review", slug: "review", title: "Review", titleFa: "بررسی", href: "/review", color: "var(--tb-review)", icon: "review", descriptionFa: "نقد و بررسی" },
+  { key: "home", slug: "home", title: "Home", titleFa: "خانه", href: "/", color: "var(--home)", icon: "home", descriptionFa: "صفحه اصلی" },
+  { key: "blog", slug: "blog", title: "Blog", titleFa: "بلاگ", href: "/blog", color: "var(--blog)", icon: "blog", descriptionFa: "مقالات تخصصی" },
+  { key: "news", slug: "news", title: "News", titleFa: "اخبار", href: "/news", color: "var(--news)", icon: "news", descriptionFa: "اخبار دنیای تکنولوژی" },
+  { key: "media", slug: "media", title: "Media", titleFa: "مدیا", href: "/media", color: "var(--media)", icon: "media", descriptionFa: "ویدئو و پادکست" },
+  { key: "shop", slug: "shop", title: "Shop", titleFa: "فروشگاه", href: "/shop", color: "var(--shop)", icon: "shop", descriptionFa: "خرید تجهیزات" },
+  { key: "tools", slug: "tools", title: "Tools", titleFa: "ابزارها", href: "/tools", color: "var(--tools)", icon: "tools", descriptionFa: "ابزارهای محاسباتی" },
+  { key: "download", slug: "download", title: "Download", titleFa: "دانلود", href: "/download", color: "var(--download)", icon: "downloadModule", descriptionFa: "مرکز دانلود" },
+  { key: "timeline", slug: "timeline", title: "Timeline", titleFa: "تایم‌لاین فناوری", href: "/timeline", color: "var(--timeline)", icon: "timeline", descriptionFa: "تاریخچه و رویدادهای فناوری" },
+  { key: "forum", slug: "forum", title: "Forum", titleFa: "انجمن", href: "/forum", color: "var(--forum)", icon: "forum", descriptionFa: "پرسش و پاسخ" },
+  { key: "review", slug: "review", title: "Review", titleFa: "بررسی", href: "/review", color: "var(--review)", icon: "review", descriptionFa: "نقد و بررسی" },
 
   // calculators / sub-modules – keep color tokens consistent
-  { key: "raid", slug: "raid", title: "RAID", titleFa: "رید", href: "/tools/raid-calculator", color: "var(--tb-raid)", icon: "disk", descriptionFa: "ماشین حساب RAID" },
-  { key: "subnet", slug: "subnet", title: "Subnet", titleFa: "ساب‌نت", href: "/tools/subnet-calculator", color: "var(--tb-subnet)", icon: "tools", descriptionFa: "ماشین حساب ساب‌نت" },
-  { key: "vip", slug: "vip", title: "VIP", titleFa: "ویژه", href: "/vip", color: "var(--tb-vip)", icon: "shield", descriptionFa: "بخش ویژه" },
+  { key: "raid", slug: "raid", title: "RAID", titleFa: "رید", href: "/tools/raid-calculator", color: "var(--raid)", icon: "disk", descriptionFa: "ماشین حساب RAID" },
+  { key: "subnet", slug: "subnet", title: "Subnet", titleFa: "ساب‌نت", href: "/tools/subnet-calculator", color: "var(--subnet)", icon: "tools", descriptionFa: "ماشین حساب ساب‌نت" },
+  { key: "vip", slug: "vip", title: "VIP", titleFa: "ویژه", href: "/vip", color: "var(--vip)", icon: "shield", descriptionFa: "بخش ویژه" },
 
   // system pages
-  { key: "account", slug: "account", title: "Account", titleFa: "حساب کاربری", href: "/account", color: "var(--tb-account)", icon: "user", descriptionFa: "پنل کاربری" },
-  { key: "admin", slug: "admin", title: "Admin", titleFa: "مدیریت", href: "/admin", color: "var(--tb-admin)", icon: "shield", descriptionFa: "پنل مدیریت" },
-  { key: "about", slug: "about", title: "About", titleFa: "درباره ما", href: "/about", color: "var(--tb-about)", icon: "users", descriptionFa: "درباره تک‌باکس" },
-  { key: "contact", slug: "contact", title: "Contact", titleFa: "تماس", href: "/contact", color: "var(--tb-contact)", icon: "chat", descriptionFa: "تماس با ما" },
-  { key: "consultation", slug: "consultation", title: "Consultation", titleFa: "مشاوره", href: "/consultation", color: "var(--tb-consultation)", icon: "chat", descriptionFa: "درخواست مشاوره" },
-  { key: "workwithus", slug: "workwithus", title: "Work With Us", titleFa: "همکاری", href: "/workwithus", color: "var(--tb-workwithus)", icon: "users", descriptionFa: "همکاری با ما" },
-  { key: "search", slug: "search", title: "Search", titleFa: "جستجو", href: "/search", color: "var(--tb-primary)", icon: "home", descriptionFa: "جستجو" },
+  { key: "account", slug: "account", title: "Account", titleFa: "حساب کاربری", href: "/account", color: "var(--account)", icon: "user", descriptionFa: "پنل کاربری" },
+  { key: "admin", slug: "admin", title: "Admin", titleFa: "مدیریت", href: "/admin", color: "var(--admin)", icon: "shield", descriptionFa: "پنل مدیریت" },
+  { key: "about", slug: "about", title: "About", titleFa: "درباره ما", href: "/about", color: "var(--about)", icon: "users", descriptionFa: "درباره تک‌باکس" },
+  { key: "contact", slug: "contact", title: "Contact", titleFa: "تماس", href: "/contact", color: "var(--contact)", icon: "chat", descriptionFa: "تماس با ما" },
+  { key: "consultation", slug: "consultation", title: "Consultation", titleFa: "مشاوره", href: "/consultation", color: "var(--consultation)", icon: "chat", descriptionFa: "درخواست مشاوره" },
+  { key: "workwithus", slug: "workwithus", title: "Work With Us", titleFa: "همکاری", href: "/workwithus", color: "var(--workwithus)", icon: "users", descriptionFa: "همکاری با ما" },
+  { key: "search", slug: "search", title: "Search", titleFa: "جستجو", href: "/search", color: "var(--home)", icon: "home", descriptionFa: "جستجو" },
 
   // tools – explicit slugs (so HomeModulesSection / feed never gets undefined)
-  { key: "nas-selector", slug: "nas-selector", title: "NAS Selector", titleFa: "انتخاب‌گر NAS", href: "/tools/nas-selector", color: "var(--tb-nas)", icon: "nas", descriptionFa: "انتخاب NAS" },
-  { key: "nvr-selector", slug: "nvr-selector", title: "NVR Selector", titleFa: "انتخاب‌گر NVR", href: "/tools/nvr-selector", color: "var(--tb-nvr)", icon: "nvr", descriptionFa: "انتخاب NVR" },
-  { key: "raid-calculator", slug: "raid-calculator", title: "RAID Calculator", titleFa: "ماشین حساب RAID", href: "/tools/raid-calculator", color: "var(--tb-raid)", icon: "disk", descriptionFa: "RAID / SHR" },
-  { key: "subnet-calculator", slug: "subnet-calculator", title: "Subnet Calculator", titleFa: "ماشین حساب ساب‌نت", href: "/tools/subnet-calculator", color: "var(--tb-subnet)", icon: "tools", descriptionFa: "ساب‌نت" },
+  { key: "nas-selector", slug: "nas-selector", title: "NAS Selector", titleFa: "انتخاب‌گر NAS", href: "/tools/nas-selector", color: "var(--nas)", icon: "nas", descriptionFa: "انتخاب NAS" },
+  { key: "nvr-selector", slug: "nvr-selector", title: "NVR Selector", titleFa: "انتخاب‌گر NVR", href: "/tools/nvr-selector", color: "var(--nvr)", icon: "nvr", descriptionFa: "انتخاب NVR" },
+  { key: "raid-calculator", slug: "raid-calculator", title: "RAID Calculator", titleFa: "ماشین حساب RAID", href: "/tools/raid-calculator", color: "var(--raid)", icon: "disk", descriptionFa: "RAID / SHR" },
+  { key: "subnet-calculator", slug: "subnet-calculator", title: "Subnet Calculator", titleFa: "ماشین حساب ساب‌نت", href: "/tools/subnet-calculator", color: "var(--subnet)", icon: "tools", descriptionFa: "ساب‌نت" },
 ];
 
 const fallbackMeta: ModuleMeta = {
@@ -83,7 +83,7 @@ const fallbackMeta: ModuleMeta = {
   title: "Tools",
   titleFa: "ابزارها",
   href: "/tools",
-  color: "var(--tb-primary)",
+  color: "var(--home)",
   icon: "tools",
   descriptionFa: "",
 };
@@ -117,7 +117,7 @@ export const toolRoutes = [
     href: "/tools/nas-selector",
     descriptionFa: "پیشنهاد NAS بر اساس ظرفیت، RAID، کاربران و بودجه",
     icon: "nas" as const,
-    color: "var(--tb-nas)",
+    color: "var(--nas)",
     new: true,
   },
   {
@@ -128,7 +128,7 @@ export const toolRoutes = [
     href: "/tools/nvr-selector",
     descriptionFa: "انتخاب NVR بر اساس دوربین، رزولوشن و روز ضبط",
     icon: "nvr" as const,
-    color: "var(--tb-nvr)",
+    color: "var(--nvr)",
     new: true,
   },
   {
@@ -139,7 +139,7 @@ export const toolRoutes = [
     href: "/tools/raid-calculator",
     descriptionFa: "RAID 0/1/5/6/10 + SHR-1/2",
     icon: "disk" as const,
-    color: "var(--tb-raid)",
+    color: "var(--raid)",
     version: "v2",
   },
   {
@@ -150,7 +150,7 @@ export const toolRoutes = [
     href: "/tools/subnet-calculator",
     descriptionFa: "محاسبه IP / CIDR – بدون تغییر",
     icon: "tools" as const,
-    color: "var(--tb-subnet)",
+    color: "var(--subnet)",
   },
 ] as const;
 

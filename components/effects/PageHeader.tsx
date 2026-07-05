@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 type PageHeaderProps = {
-  /** CSS var name for the synced color, e.g. "--tb-admin". Kept for API compatibility. */
+  /** CSS var name for the synced color, e.g. "--admin". Kept for API compatibility. */
   colorVar?: string;
   title: string;
   description?: string;

@@ -28,24 +28,24 @@ export interface ChipButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEl
 }
 
 const toneVar: Record<Tone, string> = {
- default: "--tb-fg-muted",
- brand: "--tb-primary",
- home: "--tb-home",
- blog: "--tb-blog",
- news: "--tb-news",
- media: "--tb-media",
- shop: "--tb-shop",
- tools: "--tb-tools",
- raid: "--tb-raid",
- subnet: "--tb-subnet",
- vip: "--tb-vip",
- forum: "--tb-forum",
- review: "--tb-review",
- download: "--tb-download",
- success: "--tb-success",
- warning: "--tb-warning",
- danger: "--tb-danger",
- info: "--tb-info",
+ default: "--paragraph-color",
+ brand: "--home",
+ home: "--home",
+ blog: "--blog",
+ news: "--news",
+ media: "--media",
+ shop: "--shop",
+ tools: "--tools",
+ raid: "--raid",
+ subnet: "--subnet",
+ vip: "--vip",
+ forum: "--forum",
+ review: "--review",
+ download: "--download",
+ success: "--success",
+ warning: "--warning",
+ danger: "--danger",
+ info: "--info",
 };
 
 export const ChipButton = React.forwardRef<HTMLButtonElement, ChipButtonProps>(
@@ -57,8 +57,8 @@ export const ChipButton = React.forwardRef<HTMLButtonElement, ChipButtonProps>(
  type="button"
  className={cn(
  "inline-flex items-center justify-center gap-1 rounded-[var(--corner-radius)] border px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ",
- "transition-colors duration-[var(--tb-motion-sm)] ease-[var(--tb-ease)]",
- "focus-visible:outline-none focus-visible:shadow-[var(--tb-ring-3)] disabled:pointer-events-none disabled:opacity-50",
+ "transition-colors duration-[150ms] ease-[ease]",
+ "focus-visible:outline-none focus-visible:shadow-[var(--shadow-size)] disabled:pointer-events-none disabled:opacity-50",
  className
  )}
  style={{

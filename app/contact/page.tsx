@@ -5,7 +5,7 @@ export default function Contact() {
  return (
  <main className="max-w-3xl mx-auto px-5 py-16" dir="rtl">
  <PageHeader
- colorVar="--tb-contact"
+ colorVar="--contact"
  title="ارتباط با ما"
  titleClassName="text-[var(--contact)]"
  description="پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک"

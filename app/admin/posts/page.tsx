@@ -75,7 +75,7 @@ function AdminPostsInner() {
  }
 
  if (!canEdit(user, module)) {
- return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--tb-danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسترسی شما: {user.modules.join(", ")}</p></main>;
+ return <main className="p-10 text-center" dir="rtl"><p className="text-[var(--danger)]">شما دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</p><p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسترسی شما: {user.modules.join(", ")}</p></main>;
  }
 
  return (

@@ -164,12 +164,12 @@ export default function ForumDetail({ item }: ForumDetailProps) {
               key={reply.id}
               className={`card p-6 transition-all ${
                 reply.isBestAnswer
-                  ? "border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_60%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_7%,var(--card-background))] shadow-[var(--shadow-size)]"
+                  ? "border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_60%,transparent)] bg-[color-mix(in_oklch,var(--success)_7%,var(--card-background))] shadow-[var(--shadow-size)]"
                   : "bg-[var(--card-background)] border-[var(--border-color)]"
               }`}
             >
               {reply.isBestAnswer && (
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--tb-success)]/15 border-[length:var(--border-size)] border-[var(--tb-success)]/30 px-3.5 py-1 text-xs font-bold text-[var(--tb-success)]">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--success)]/15 border-[length:var(--border-size)] border-[var(--success)]/30 px-3.5 py-1 text-xs font-bold text-[var(--success)]">
                   <Icon name="check" size={14} className="stroke-[2.5]" />
                   <span>پاسخ انتخابی توسط ایجادکننده موضوع</span>
                 </div>

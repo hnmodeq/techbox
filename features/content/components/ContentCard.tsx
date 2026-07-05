@@ -142,7 +142,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
  <div className="mt-1 flex flex-wrap items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <span>{item.author?.name || "کاربر"}</span>
  <span>• {answers} پاسخ</span>
-            <span className={`rounded-[var(--corner-radius)] border px-1.5 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${solved ? "border-[color-mix(in_oklch,var(--tb-success)_45%,transparent)] text-[var(--tb-success)]" : "border-[color-mix(in_oklch,var(--tb-warning)_45%,transparent)] text-[var(--tb-warning)]"}`}>{solved ? "حل‌شده" : "باز"}</span>
+            <span className={`rounded-[var(--corner-radius)] border px-1.5 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${solved ? "border-[color-mix(in_oklch,var(--success)_45%,transparent)] text-[var(--success)]" : "border-[color-mix(in_oklch,var(--warning)_45%,transparent)] text-[var(--warning)]"}`}>{solved ? "حل‌شده" : "باز"}</span>
  </div>
  </div>
  </Link>
@@ -154,7 +154,7 @@ function ProductFeedCard({item}:{item:ContentItem}){
  <Link href={`/${item.module}/${item.slug}`} className="group/card block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
  <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:1024px) 180px, 50vw" />
- <span className="absolute left-2 top-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
+ <span className="absolute left-2 top-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">موجود</span>
  </div>
  <div className="px-1 pt-2">
  <div className={`line-clamp-2 min-h-[34px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>

@@ -32,7 +32,7 @@ export function ToolPageHeader({
                   {c.label}
                 </Link>
               ) : (
-                <span className="text-[var(--tb-fg-secondary)] font-bold">{c.label}</span>
+                <span className="text-[var(--paragraph-color)] font-bold">{c.label}</span>
               )}
             </span>
           ))}

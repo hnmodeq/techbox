@@ -8,8 +8,8 @@ export interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
 
 const variants = {
  card: "card",
- overlay: "tb-overlay-panel",
- soft: "tb-soft-panel",
+ overlay: "card !bg-[var(--modal-background)]",
+ soft: "card !bg-[var(--card-background)]",
 } as const;
 
 export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(

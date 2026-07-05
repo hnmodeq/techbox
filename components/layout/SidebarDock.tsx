@@ -37,7 +37,7 @@ export default function SidebarDock({ className }: { className?: string }) {
  icon: (
  <Icon
  strokeWidth={ICON_STROKE}
- className={cn("h-5 w-5 transition-colors duration-[var(--tb-motion-md)]", active ? item.iconActiveClassName : `${item.iconClassName} ${item.iconHoverClassName}`)}
+ className={cn("h-5 w-5 transition-colors duration-[200ms]", active ? item.iconActiveClassName : `${item.iconClassName} ${item.iconHoverClassName}`)}
  />
  ),
  };

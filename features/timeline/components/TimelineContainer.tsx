@@ -106,7 +106,7 @@ export function TimelineContainer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[calc(100vh-64px)] min-h-[680px] bg-[var(--main-background)] overflow-hidden select-none transition-colors duration-[var(--tb-motion-md)]"
+      className="relative w-full h-[calc(100vh-64px)] min-h-[680px] bg-[var(--main-background)] overflow-hidden select-none transition-colors duration-[200ms]"
     >
       {/* Background Grid synced with tokens */}
       <div className="absolute inset-0 opacity-[0.14] pointer-events-none">
@@ -165,7 +165,7 @@ export function TimelineContainer({
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)]" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--warning)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)]" />
 
             {/* Comment Box Below Line with more distance */}
             <div
@@ -182,7 +182,7 @@ export function TimelineContainer({
                 />
                 <button
                   type="submit"
-                  className="h-9 px-3 rounded-[var(--corner-radius)] bg-[var(--tb-warning)] text-slate-950 font-bold flex items-center justify-center cursor-pointer shrink-0"
+                  className="h-9 px-3 rounded-[var(--corner-radius)] bg-[var(--warning)] text-slate-950 font-bold flex items-center justify-center cursor-pointer shrink-0"
                 >
                   <Send size={14} className="rtl:rotate-180" />
                 </button>
@@ -221,8 +221,8 @@ export function TimelineContainer({
                 {/* 1. Title & Date Section STRICTLY ABOVE THE LINE */}
                 <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 w-64 sm:w-72 text-center flex flex-col items-center gap-1">
                   <div className="text-sm sm:text-base font-black text-[var(--timeline)] font-sans">{persianDate}</div>
-                  <div className="text-xs sm:text-sm font-bold text-[var(--tb-fg-secondary)] font-sans tracking-wide" dir="ltr">{globalDate}</div>
-                  <div className="text-xs font-extrabold text-[var(--tb-warning)] mt-0.5">
+                  <div className="text-xs sm:text-sm font-bold text-[var(--paragraph-color)] font-sans tracking-wide" dir="ltr">{globalDate}</div>
+                  <div className="text-xs font-extrabold text-[var(--warning)] mt-0.5">
                     {timeAgo}
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export function TimelineContainer({
           >
             {/* Title Above Line */}
             <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 w-64 text-center">
-              <span className="badge !bg-[var(--tb-success)] !text-slate-950 font-black mb-1.5 shadow-[var(--shadow-size)]">
+              <span className="badge !bg-[var(--success)] !text-slate-950 font-black mb-1.5 shadow-[var(--shadow-size)]">
                 نقطه کنونی
               </span>
               <h3 className="text-xl font-black text-[var(--primary-text)]">
@@ -256,17 +256,17 @@ export function TimelineContainer({
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)] animate-pulse" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--success)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)] animate-pulse" />
 
             {/* Info Card Below Line with more padding */}
             <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-[var(--shadow-size)] border-[var(--border-color)] space-y-2 z-20">
-              <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--tb-success)]">
+              <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>
               <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-mono" dir="ltr">
                 {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())}
               </div>
-              <p className="text-xs text-[var(--tb-fg-secondary)] leading-5 pt-2 border-t-[length:var(--border-size)] border-[var(--border-color)]">
+              <p className="text-xs text-[var(--paragraph-color)] leading-5 pt-2 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                 به سوی آینده فناوری اطلاعات، زیرساخت‌های ابری و هوش مصنوعی...
               </p>
             </div>

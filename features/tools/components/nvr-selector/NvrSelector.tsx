@@ -185,7 +185,7 @@ export function NvrSelector({
               <span className="text-[13px] paragraph-color mr-2">({fa.format(filteredModels.length)} مدل موجود)</span>
             </div>
             {recommendedModel && (
-              <div className="text-[12px] px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-success)_14%,transparent)] text-[var(--tb-success)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_24%,transparent)] flex items-center gap-1 font-bold">
+              <div className="text-[12px] px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--success)_14%,transparent)] text-[var(--success)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_24%,transparent)] flex items-center gap-1 font-bold">
                 <Icon name="check" className="w-3.5 h-3.5" /> بهترین انتخاب برای این پروژه
               </div>
             )}
@@ -213,7 +213,7 @@ export function NvrSelector({
                           <div className="text-[12px] paragraph-color mt-0.5">{model.name}</div>
                         </div>
                         {isRecommended && (
-                          <div className="badge !bg-[color-mix(in_oklch,var(--tb-success)_12%,transparent)] !text-[var(--tb-success)] !border-[color-mix(in_oklch,var(--tb-success)_22%,transparent)]">پیشنهادی</div>
+                          <div className="badge !bg-[color-mix(in_oklch,var(--success)_12%,transparent)] !text-[var(--success)] !border-[color-mix(in_oklch,var(--success)_22%,transparent)]">پیشنهادی</div>
                         )}
                       </div>
 

@@ -63,40 +63,19 @@ export const navItems: NavItem[] = [
  iconActiveClassName: moduleColors.shop.active,
  },
  {
- title: "NAS Selector",
- href: "/tools/nas-selector",
- icon: NasIcon,
- iconClassName: moduleColors.nas.base,
- iconHoverClassName: moduleColors.nas.hover,
- iconActiveClassName: moduleColors.nas.active,
- tooltipClassName: "text-[var(--tb-nas)]",
- },
- {
- title: "NVR Selector",
- href: "/tools/nvr-selector",
- icon: NvrIcon,
- iconClassName: moduleColors.nvr.base,
- iconHoverClassName: moduleColors.nvr.hover,
- iconActiveClassName: moduleColors.nvr.active,
- tooltipClassName: "text-[var(--tb-nvr)]",
- },
- {
- title: "RAID Calculator",
- href: "/tools/raid-calculator",
+ title: "ابزارهای زیرساخت",
+ href: "/tools",
  icon: Calculator,
- iconClassName: moduleColors.raid.base,
- iconHoverClassName: moduleColors.raid.hover,
- iconActiveClassName: moduleColors.raid.active,
- tooltipClassName: "text-[var(--tb-raid)]",
- },
- {
- title: "Subnet Calculator",
- href: "/tools/subnet-calculator",
- icon: Network,
- iconClassName: moduleColors.subnet.base,
- iconHoverClassName: moduleColors.subnet.hover,
- iconActiveClassName: moduleColors.subnet.active,
- tooltipClassName: "text-[var(--tb-subnet)]",
+ iconClassName: moduleColors.tools.base,
+ iconHoverClassName: moduleColors.tools.hover,
+ iconActiveClassName: moduleColors.tools.active,
+ tooltipClassName: "text-[var(--tools)]",
+ children: [
+   { title: "NAS Selector", href: "/tools/nas-selector", icon: NasIcon, iconClassName: moduleColors.nas.base, iconHoverClassName: moduleColors.nas.hover, iconActiveClassName: moduleColors.nas.active },
+   { title: "NVR Selector", href: "/tools/nvr-selector", icon: NvrIcon, iconClassName: moduleColors.nvr.base, iconHoverClassName: moduleColors.nvr.hover, iconActiveClassName: moduleColors.nvr.active },
+   { title: "RAID Calculator", href: "/tools/raid-calculator", icon: Calculator, iconClassName: moduleColors.raid.base, iconHoverClassName: moduleColors.raid.hover, iconActiveClassName: moduleColors.raid.active },
+   { title: "Subnet Calculator", href: "/tools/subnet-calculator", icon: Network, iconClassName: moduleColors.subnet.base, iconHoverClassName: moduleColors.subnet.hover, iconActiveClassName: moduleColors.subnet.active },
+ ],
  },
  {
  title: "انجمن",
@@ -121,7 +100,7 @@ export const navItems: NavItem[] = [
  iconClassName: moduleColors.timeline.base,
  iconHoverClassName: moduleColors.timeline.hover,
  iconActiveClassName: moduleColors.timeline.active,
- tooltipClassName: "text-[var(--tb-timeline)]",
+ tooltipClassName: "text-[var(--timeline)]",
  },
  {
  title: "دانلود",
@@ -144,16 +123,16 @@ export const accountItem: NavItem = {
 
 export const themeIconClass = {
  buttonBase:
- "inline-flex h-10 w-10 items-center rounded-[var(--tb-radius-lg)] transition-all duration-[var(--tb-motion-md)]",
- buttonClassName: "text-[var(--tb-fg-muted)]",
- buttonHoverClassName: "hover:text-[var(--tb-fg-primary)]",
- sunIconClassName: "text-[var(--tb-warning)]",
- sunIconHoverClassName: "group-hover:text-[var(--tb-warning)]",
- sunIconActiveClassName: "text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-warning)]",
-  moonIconClassName: "text-[var(--tb-fg-primary)]",
- moonIconHoverClassName: "group-hover:text-[var(--tb-info)]",
+ "inline-flex h-10 w-10 items-center rounded-[var(--corner-radius)] transition-all duration-[200ms]",
+ buttonClassName: "text-[var(--paragraph-color)]",
+ buttonHoverClassName: "hover:text-[var(--primary-text)]",
+ sunIconClassName: "text-[var(--warning)]",
+ sunIconHoverClassName: "group-hover:text-[var(--warning)]",
+ sunIconActiveClassName: "text-[var(--primary-text)] group-hover:text-[var(--warning)]",
+  moonIconClassName: "text-[var(--primary-text)]",
+ moonIconHoverClassName: "group-hover:text-[var(--info)]",
  moonIconActiveClassName:
- "text-[var(--tb-fg-primary)] dark:text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-info)]",
+ "text-[var(--primary-text)] dark:text-[var(--primary-text)] group-hover:text-[var(--info)]",
 };
 
 export const sidebarBase = [
@@ -162,11 +141,11 @@ export const sidebarBase = [
 ].join(" ");
 
 export const linkBase =
- "group relative flex h-11 w-full items-center rounded-[var(--tb-radius-lg)] tb-text-md transition-all duration-[var(--tb-motion-md)]";
+ "group relative flex h-11 w-full items-center rounded-[var(--corner-radius)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-all duration-[200ms]";
 
-export const linkInactive = "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]";
+export const linkInactive = "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]";
 
-export const linkActive = "bg-[var(--tb-bg-muted)]/50 text-[var(--tb-fg-primary)]";
+export const linkActive = "bg-[var(--muted-background)]/50 text-[var(--primary-text)]";
 
 export function isActive(pathname: string, href: string) {
  return href === "/"

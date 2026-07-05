@@ -20,8 +20,8 @@ export default function NewsList() {
  {items.map((n: any) => (
                 <Link key={n.slug} href={`/news/${n.slug}`} className="card overflow-hidden group hover:shadow-[var(--shadow-size)] transition-all !p-0 grid sm:grid-cols-3 gap-4 items-center">
                   <div className="block relative aspect-[16/9] sm:aspect-[4/3] sm:h-full overflow-hidden bg-[var(--muted-background)]">
-                    <Image src={n.image || "/assets/blog-1.jpg"} alt={n.title} fill sizes="(min-width:1024px) 30vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
-                    <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">{n.category}</span>
+                    <Image src={n.image || "/assets/blog-1.jpg"} alt={n.title} fill sizes="(min-width:1024px) 30vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
+                    <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">{n.category}</span>
                   </div>
                   <div className="p-4 sm:col-span-2">
                     <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex flex-wrap items-center gap-2 paragraph-color">

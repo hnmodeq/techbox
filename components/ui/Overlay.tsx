@@ -12,7 +12,7 @@ export const Overlay = React.forwardRef<HTMLDivElement, OverlayProps>(
  ({ className, layer = "modal", blur = true, style, ...props }, ref) => (
  <div
  ref={ref}
- className={cn("fixed inset-0", blur ? "tb-overlay-backdrop" : "bg-[color-mix(in oklch, black 55%, transparent)]", className)}
+ className={cn("fixed inset-0", blur ? "bg-black/60 backdrop-blur-sm" : "bg-[color-mix(in oklch, black 55%, transparent)]", className)}
  style={{ zIndex: zIndex[layer], ...style }}
  {...props}
  />
@@ -28,7 +28,7 @@ export const OverlayBackdrop = React.forwardRef<HTMLDivElement, OverlayBackdropP
  ({ className, blur = true, ...props }, ref) => (
  <div
  ref={ref}
- className={cn("absolute inset-0", blur ? "tb-overlay-backdrop" : "bg-[color-mix(in oklch, black 55%, transparent)]", className)}
+ className={cn("absolute inset-0", blur ? "bg-black/60 backdrop-blur-sm" : "bg-[color-mix(in oklch, black 55%, transparent)]", className)}
  {...props}
  />
  )

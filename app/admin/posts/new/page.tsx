@@ -80,7 +80,7 @@ function NewPostInner() {
  if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="text-[var(--home)] underline" href="/admin/login">وارد شوید</Link></main>;
 
  const canEdit = user.role==="super_admin" || (user.modules||[]).includes(module);
- if (!canEdit) return <main className="p-10 text-center text-[var(--tb-danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
+ if (!canEdit) return <main className="p-10 text-center text-[var(--danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
 
  const save = async (e: React.FormEvent) => {
  e.preventDefault();
@@ -126,7 +126,7 @@ function NewPostInner() {
  const allowed: ModuleSlug[] = user.role==="super_admin" ? Object.keys(moduleMeta) as ModuleSlug[] : (user.modules||[]);
  const isSuccess = msg.includes("✓");
  const isDraft = msg.includes("پیش‌نویس");
- const statusClass = isSuccess ? "text-[var(--tb-success)]" : isDraft ? "text-[var(--tb-warning)]" : "paragraph-color";
+ const statusClass = isSuccess ? "text-[var(--success)]" : isDraft ? "text-[var(--warning)]" : "paragraph-color";
  
  return (
  <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">

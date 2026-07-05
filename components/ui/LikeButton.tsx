@@ -129,8 +129,8 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
 
   return (
     <div className="relative inline-flex items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-      <Button onClick={() => vote("up")} variant="link" size="xs" className={v === "up" ? "text-[var(--tb-success)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▲ {(l ?? 0).toLocaleString("fa-IR")}</Button>
-      <Button onClick={() => vote("down")} variant="link" size="xs" className={v === "down" ? "text-[var(--tb-danger)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▼ {(d ?? 0).toLocaleString("fa-IR")}</Button>
+      <Button onClick={() => vote("up")} variant="link" size="xs" className={v === "up" ? "text-[var(--success)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▲ {(l ?? 0).toLocaleString("fa-IR")}</Button>
+      <Button onClick={() => vote("down")} variant="link" size="xs" className={v === "down" ? "text-[var(--danger)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▼ {(d ?? 0).toLocaleString("fa-IR")}</Button>
       {needLogin && (
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)] text-center">
           <p className="text-xs text-[var(--primary-text)] mb-1.5">برای امتیاز به نظر ابتدا وارد شوید</p>

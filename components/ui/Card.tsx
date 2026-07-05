@@ -15,7 +15,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
  "rounded-[var(--corner-radius)]",
  "shadow-[var(--shadow-size)]",
  padding && "p-4 md:p-5",
- hover && "transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)] hover:shadow-[var(--shadow-size)] hover:-translate-y-[1px]",
+ hover && "transition-all duration-[200ms] ease-[ease] hover:shadow-[var(--shadow-size)] hover:-translate-y-[1px]",
  className
  )}
  {...props}

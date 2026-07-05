@@ -29,7 +29,7 @@ export default function TeamChromaSection({ team }: { team: TeamMember[] }) {
 
  // The accent var cycles across module tokens so each card is tinted from central tokens.
  const accentVars = useMemo(
- () => ["--tb-blog", "--tb-news", "--tb-subnet", "--tb-vip", "--tb-tools", "--tb-shop"],
+ () => ["--blog", "--news", "--subnet", "--vip", "--tools", "--shop"],
  []
  );
 

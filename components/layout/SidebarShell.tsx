@@ -100,7 +100,7 @@ export default function SidebarShell({
        onToggleMobile();
      }}
      style={{ top: `${btnTop}px`, zIndex: zIndex.mobileFab }}
-     className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[var(--tb-motion-lg)] shadow-[var(--shadow-size)] cursor-pointer"
+     className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[300ms] shadow-[var(--shadow-size)] cursor-pointer"
      aria-label="باز کردن منو"
    >
      <div className="relative flex h-16 w-16 items-center justify-center rounded-l-full border-[length:var(--border-size)] border-r-0 border-[var(--border-color)] bg-[var(--card-background)]/95 shadow-[var(--shadow-size)] backdrop-blur-md p-2">
@@ -128,7 +128,7 @@ export default function SidebarShell({
       )}
 
       <aside
-        className={`fixed right-0 top-0 h-full transition-transform duration-[var(--tb-motion-lg)] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase}`}
+        className={`fixed right-0 top-0 h-full transition-transform duration-[300ms] sm:hidden ${MOBILE_SIDEBAR_WIDTH} ${sidebarBase}`}
         aria-hidden={!mobileOpen}
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(100%)",
@@ -146,7 +146,7 @@ export default function SidebarShell({
       </aside>
 
  <div
- className={`hidden shrink-0 sm:block transition-[width] duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${
+ className={`hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
  desktopOpen
  ? DESKTOP_SIDEBAR_OPEN_WIDTH
  : DESKTOP_SIDEBAR_CLOSED_WIDTH
@@ -155,7 +155,7 @@ export default function SidebarShell({
  />
 
  <aside
- className={`fixed right-0 top-0 hidden h-screen flex-col overflow-hidden sm:flex transition-[width] duration-[var(--tb-motion-lg)] ease-[var(--tb-ease)] ${
+ className={`fixed right-0 top-0 hidden h-screen flex-col overflow-hidden sm:flex transition-[width] duration-[300ms] ease-[ease] ${
  desktopOpen
  ? DESKTOP_SIDEBAR_OPEN_WIDTH
  : DESKTOP_SIDEBAR_CLOSED_WIDTH

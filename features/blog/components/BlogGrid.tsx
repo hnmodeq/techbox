@@ -16,10 +16,10 @@ export default function BlogGrid(){
           <Link
             key={p.slug}
             href={`/blog/${p.slug}`}
-            className="group flex flex-col overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]"
+            className="group flex flex-col overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)] transition-all duration-[200ms] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]"
           >
             <div className="block relative aspect-square overflow-hidden bg-[var(--muted-background)]">
-              <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
+              <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1024px) 33vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
             </div>
             <div className="p-4 flex flex-col flex-1">
               <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold line-clamp-2 min-h-[56px] transition-colors group-hover:text-[var(--blog)]">{p.title}</h3>

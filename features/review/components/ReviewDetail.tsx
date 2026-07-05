@@ -87,15 +87,15 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         {/* Strengths & Weaknesses Boxes */}
         <div className="grid md:grid-cols-2 gap-6 my-8">
           {/* Strengths */}
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_8%,var(--card-background))] p-5 space-y-4 shadow-[var(--shadow-size)]">
-            <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-success)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_25%,transparent)] pb-3">
+          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_40%,transparent)] bg-[color-mix(in_oklch,var(--success)_8%,var(--card-background))] p-5 space-y-4 shadow-[var(--shadow-size)]">
+            <div className="flex items-center gap-2.5 text-base font-black text-[var(--success)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_25%,transparent)] pb-3">
               <Icon name="check" size={20} className="stroke-[2.5]" />
               <span>نقاط قوت</span>
             </div>
             <ul className="space-y-3">
               {strengths.map((str: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-2.5 text-[14px] leading-7 text-[var(--primary-text)]">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--tb-success)]" />
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--success)]" />
                   <span>{str}</span>
                 </li>
               ))}
@@ -103,15 +103,15 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           </div>
 
           {/* Weaknesses */}
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-warning)_8%,var(--card-background))] p-5 space-y-4 shadow-[var(--shadow-size)]">
-            <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-warning)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_25%,transparent)] pb-3">
+          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--warning)_8%,var(--card-background))] p-5 space-y-4 shadow-[var(--shadow-size)]">
+            <div className="flex items-center gap-2.5 text-base font-black text-[var(--warning)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--warning)_25%,transparent)] pb-3">
               <Icon name="shield" size={20} className="stroke-[2.5]" />
               <span>نقاط ضعف</span>
             </div>
             <ul className="space-y-3">
               {weaknesses.map((wk: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-2.5 text-[14px] leading-7 text-[var(--primary-text)]">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--tb-warning)]" />
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--warning)]" />
                   <span>{wk}</span>
                 </li>
               ))}

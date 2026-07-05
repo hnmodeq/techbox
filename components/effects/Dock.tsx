@@ -197,7 +197,7 @@ export default function Dock({
  isHovered.set(0);
  mousePos.set(Infinity);
  }}
- className={`${className} flex w-fit gap-4 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/70 backdrop-blur-[var(--tb-blur-sm)] ${
+ className={`${className} flex w-fit gap-4 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/70 backdrop-blur-[0px] ${
  isVertical ? "flex-col items-center py-4 px-2" : "items-end pb-2 px-4"
  }`}
  style={isVertical ? { width: panelSize } : { height: panelSize }}

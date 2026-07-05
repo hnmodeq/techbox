@@ -63,7 +63,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
  <Link
  key={`${item.module || "news"}-${item.slug}-${index}`}
  href={`/${itemModule}/${item.slug}`}
- className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color transition-colors duration-[var(--tb-motion-sm)] ${hoverTone}`}
+ className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color transition-colors duration-[150ms] ${hoverTone}`}
  >
                 <span className="h-1.5 w-1.5 rounded-[var(--corner-radius)] bg-[var(--paragraph-color)] opacity-70 transition-transform group-hover:scale-125" />
                 <span className={`px-2 py-0.5 font-bold ${tone}`}>

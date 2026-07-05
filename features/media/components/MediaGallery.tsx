@@ -141,8 +141,8 @@ export default function MediaGallery() {
                     onClick={() => handleLike(activeVideo.slug, activeVideo.likes)}
                     className={`inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] px-4 py-1.5 rounded-[var(--corner-radius)] border transition-all ${
                       likedList[activeVideo.slug]
-                        ? "bg-[var(--tb-danger)]/15 border-[var(--tb-danger)] text-[var(--tb-danger)] shadow-[var(--shadow-size)]"
-                        : "bg-[var(--card-background)] border-[var(--border-color)] text-[var(--primary-text)] hover:border-[var(--tb-danger)]"
+                        ? "bg-[var(--danger)]/15 border-[var(--danger)] text-[var(--danger)] shadow-[var(--shadow-size)]"
+                        : "bg-[var(--card-background)] border-[var(--border-color)] text-[var(--primary-text)] hover:border-[var(--danger)]"
                     }`}
                   >
                     <Icon name="like" size={16} className={likedList[activeVideo.slug] ? "fill-current" : ""} />
