@@ -74,7 +74,7 @@ export default function DownloadRow() {
               <Link
                 key={file.slug}
                 href={`/download/${file.slug}`}
-                className="group card p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
+                className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   {/* Yellow Special File Icon Box */}

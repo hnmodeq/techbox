@@ -95,7 +95,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
       </nav>
 
       {/* Main Topic Question Card - NO generic top image */}
-      <article className="card p-6 sm:p-8 space-y-6 shadow-[var(--shadow-size)] border-[var(--border-color)]">
+      <article className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 space-y-6 shadow-[var(--shadow-size)] border-[var(--border-color)]">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6">
           <div className="flex items-center gap-4">
             <Image
@@ -143,7 +143,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
         </div>
 
         {/* New Reply Form */}
-        <form onSubmit={handleAddReply} className="card p-5 space-y-3 bg-[var(--card-background)]/60">
+        <form onSubmit={handleAddReply} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-3 bg-[var(--card-background)]/60">
           <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold">ارسال پاسخ یا راه‌حل شما</h3>
           <textarea
             value={newReply}

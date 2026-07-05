@@ -3,7 +3,7 @@ export default function Consultation(){
  return (
  <main className="max-w-2xl mx-auto px-5 py-16" dir="rtl">
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-4">درخواست مشاوره زیرساخت</h1>
- <div className="card p-6 space-y-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 space-y-4">
  <input className="input" placeholder="نام سازمان" />
  <input className="input" placeholder="تلفن" />
  <textarea className="input min-h-[120px]" placeholder="نیاز شما؟ سرور، شبکه، ذخیره‌سازی..." />

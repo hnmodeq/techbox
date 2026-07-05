@@ -33,7 +33,7 @@ export default function ReviewGrid() {
           const rating = 4.7 - (i * 0.12);
           const comments = 18 + i * 7;
           return (
-            <Link key={r.slug} href={`/review/${r.slug}`} className="card overflow-hidden group grid md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] gap-6 !p-0 transition-all hover:shadow-[var(--shadow-size)] items-stretch">
+            <Link key={r.slug} href={`/review/${r.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group grid md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] gap-6 !p-0 transition-all hover:shadow-[var(--shadow-size)] items-stretch">
               <div className="block relative aspect-[16/10] md:aspect-auto md:h-full bg-[var(--muted-background)] overflow-hidden min-h-[220px]">
                 <Image src={r.image || "/assets/blog-1.jpg"} fill sizes="(min-width:1024px) 320px, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" alt={r.title} />
                 <span className="absolute top-3 right-3 rounded-full border-[length:var(--border-size)] border-white/30 bg-black/50 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">{r.category}</span>

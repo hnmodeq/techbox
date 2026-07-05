@@ -43,7 +43,7 @@ export default function SubnetCalculator() {
   return (
     <div className="space-y-5" dir="rtl">
       {/* What is it? */}
-      <div className="card p-5 space-y-2">
+      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-2">
         <div className="flex items-center gap-2 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold text-[var(--subnet)]">
           <Icon name="server" size={20} strokeWidth={1.75} />
           ماشین‌حساب ساب‌نت (Subnet) چیست؟
@@ -58,7 +58,7 @@ export default function SubnetCalculator() {
       </div>
 
       {/* Inputs */}
-      <div className="card p-5 space-y-4">
+      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="space-y-1 block">
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">آدرس IP</span>

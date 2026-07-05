@@ -87,7 +87,7 @@ export default function ShopGrid(){
  {filtered.map(p=>{
  const pr = prices[p.slug] || { price: "تماس بگیرید" };
  return (
-        <Link key={p.slug} href={`/shop/${p.slug}`} className="card overflow-hidden group flex flex-col rounded-[var(--corner-radius)] !p-0">
+        <Link key={p.slug} href={`/shop/${p.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group flex flex-col rounded-[var(--corner-radius)] !p-0">
               <div className="block relative aspect-[4/3] bg-[var(--muted-background)] overflow-hidden">
                 <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
                 <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">موجود</span>

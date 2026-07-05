@@ -75,7 +75,7 @@ export default function CheckoutPage(){
  </p>
 
  <div className="grid lg:grid-cols-3 gap-6">
- <div className="lg:col-span-2 card p-5 space-y-4">
+ <div className="lg:col-span-2 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4">
  <h3 className="">اطلاعات ارسال</h3>
  <div className="grid sm:grid-cols-2 gap-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
  <input className="input" placeholder="نام و نام خانوادگی *" value={name} onChange={e=>setName(e.target.value)} />
@@ -106,7 +106,7 @@ export default function CheckoutPage(){
  </p>
  </div>
 
- <div className="card p-5 h-fit sticky top-24">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 h-fit sticky top-24">
  <h4 className=" mb-3">خلاصه سبد ({count.toLocaleString("fa-IR")} قلم)</h4>
  <div className="space-y-2 max-h-80 overflow-y-auto text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {items.length===0 ? <p className="paragraph-color">سبد خالی است – <Link href="/shop" className="underline text-[var(--shop)]">فروشگاه</Link></p> :

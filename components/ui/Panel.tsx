@@ -6,10 +6,11 @@ export interface PanelProps extends React.HTMLAttributes<HTMLDivElement> {
  padding?: boolean;
 }
 
+const baseCard = "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]";
 const variants = {
- card: "card",
- overlay: "card !bg-[var(--modal-background)]",
- soft: "card !bg-[var(--card-background)]",
+ card: baseCard,
+ overlay: `${baseCard} !bg-[var(--modal-background)]`,
+ soft: `${baseCard} !bg-[var(--card-background)]`,
 } as const;
 
 export const Panel = React.forwardRef<HTMLDivElement, PanelProps>(

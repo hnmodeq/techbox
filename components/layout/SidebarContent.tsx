@@ -33,7 +33,7 @@ function TehranDateTime({ now, expanded }: { now: Date | null; expanded: boolean
  <div className={expanded ? "shrink-0" : "h-[58px] shrink-0"}>
  {!expanded ? (
  <SidebarTooltip enabled label={label} tooltipClassName="paragraph-color">
- <span className="icon-rail-btn" aria-label="ساعت تهران">
+ <span className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer" aria-label="ساعت تهران">
  <Icon name="clock" size={18} />
  </span>
  </SidebarTooltip>
@@ -173,7 +173,7 @@ export default function SidebarContent({
  ? createPortal(
  <div
  ref={notifPanelRef}
- className="fixed w-[320px] max-w-[92vw] p-3 text-right card"
+ className="fixed w-[320px] max-w-[92vw] p-3 text-right bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]"
  style={{ zIndex: zIndex.notification, top: notifPos.top, right: notifPos.right }}
  dir="rtl"
  >

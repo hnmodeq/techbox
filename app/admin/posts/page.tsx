@@ -106,19 +106,19 @@ function AdminPostsInner() {
  </div>
 
  <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">نتیجه فعلی</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{filteredItems.length.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">بازدیدها</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{stats.views.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پسندها</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{stats.likes.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">برچسب یکتا</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{stats.tagCount.toLocaleString("fa-IR")}</div>
  </div>
@@ -137,7 +137,7 @@ function AdminPostsInner() {
  ))}
  </div>
 
- <div className="card overflow-hidden">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden">
  <div className="overflow-x-auto">
  <table className="w-full min-w-[760px] text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
  <thead className="bg-[var(--muted-background)]/40 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">

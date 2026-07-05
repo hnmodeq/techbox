@@ -50,7 +50,7 @@ export default function AdminLogin() {
 
   return (
     <main className="flex min-h-[70vh] items-center justify-center px-4 py-10" dir="rtl">
-      <form onSubmit={submit} className="card w-full max-w-lg space-y-5 p-6">
+      <form onSubmit={submit} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] w-full max-w-lg space-y-5 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">ورود ویراستار و مدیران</h1>

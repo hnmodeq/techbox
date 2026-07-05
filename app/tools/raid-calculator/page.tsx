@@ -24,15 +24,15 @@ export default function RaidCalculatorPage() {
         <RaidCalculator />
       </div>
 
-      <section className="mt-10 card p-5">
+      <section className="mt-10 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5">
         <h2 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mb-3">پیشنهاد محصول مرتبط</h2>
         <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
           بعد از محاسبه RAID، مدل NAS پیشنهادی خود را در <a className="text-[var(--home)] font-bold hover:underline" href="/tools/nas-selector">انتخاب‌گر NAS</a> ببینید یا مستقیم از فروشگاه هارد مناسب تهیه کنید.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <a href="/tools/nas-selector" className="btn btn-primary">رفتن به NAS Selector</a>
-          <a href="/shop?category=nas" className="btn btn-ghost">مشاهده NAS ها در فروشگاه</a>
-          <a href="/tools/subnet-calculator" className="btn btn-ghost">Subnet Calculator</a>
+          <a href="/tools/nas-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">رفتن به NAS Selector</a>
+          <a href="/shop?category=nas" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">مشاهده NAS ها در فروشگاه</a>
+          <a href="/tools/subnet-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">Subnet Calculator</a>
         </div>
       </section>
     </main>

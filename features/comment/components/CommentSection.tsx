@@ -75,7 +75,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   const renderNode = (c: CommentNode, depth = 0) => (
     <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
       <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
-        <div className="card p-4">
+        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
           <div className="flex justify-between items-center gap-2">
             <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-semibold text-[var(--primary-text)]">{(c as any).authorName || "کاربر"}</div>
             <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
@@ -134,7 +134,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       </div>
 
       {user ? (
-        <form action={formAction} className="card p-5 space-y-4 mb-8">
+        <form action={formAction} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8">
           <input type="hidden" name="module" value={module} />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="parentId" value="" />
@@ -163,7 +163,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           </div>
         </form>
       ) : (
-        <div className="card p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed">
+        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed">
           <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
           <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
             برای ثبت دیدگاه، پاسخ به نظرات دیگران و پسندیدن مطالب، ابتدا باید وارد حساب کاربری خود شوید یا در کمتر از یک دقیقه ثبت‌نام کنید.

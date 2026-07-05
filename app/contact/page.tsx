@@ -10,7 +10,7 @@ export default function Contact() {
  titleClassName="text-[var(--contact)]"
  description="پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک"
  />
- <div className="card p-6 space-y-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 space-y-4">
  <div className="grid md:grid-cols-2 gap-4">
  <input className="input" placeholder="نام" />
  <input className="input" placeholder="ایمیل" />

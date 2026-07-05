@@ -61,7 +61,7 @@ export default function AdminPage() {
  if (!user) {
  return (
  <main className="min-h-dvh px-4 py-16" dir="rtl">
- <div className="mx-auto max-w-md card space-y-4 p-7 text-center">
+ <div className="mx-auto max-w-md bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] space-y-4 p-7 text-center">
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">ورود ادمین</h1>
  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">برای مدیریت محتوا ابتدا وارد شوید.</p>
  <ButtonLink href="/admin/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
@@ -91,26 +91,26 @@ export default function AdminPage() {
  </div>
 
  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
- <div className="card p-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">ماژول قابل مدیریت</div>
  <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{modules.length.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">محتوای قابل مدیریت</div>
  <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{totals.count.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">بازدید منبع‌ها</div>
  <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{totals.views.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پیش‌نویس لوکال</div>
  <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
  </div>
  </div>
 
  {drafts.length > 0 && (
- <div className="card p-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
  <h2 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">پیش‌نویس‌های لوکال</h2>
  <Badge variant="warning">ذخیره‌شده در مرورگر</Badge>
@@ -131,7 +131,7 @@ export default function AdminPage() {
  {moduleStats.map(({ module, count, views, latest }) => {
  const meta = moduleMeta[module];
  return (
- <div key={module} className="card p-5">
+ <div key={module} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5">
  <div className="flex items-start justify-between gap-2">
  <div>
  <div className={`text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ${meta.color}`}>{meta.titleFa}</div>
@@ -153,7 +153,7 @@ export default function AdminPage() {
  </div>
 
  {user.role === "super_admin" && (
- <div className="card p-5">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5">
  <div className="mb-3 flex items-center justify-between gap-3">
  <h3 className="">مدیریت کاربران (مدیر کل)</h3>
  <Badge variant="info">{allUsers.length.toLocaleString("fa-IR")} کاربر</Badge>

@@ -104,7 +104,7 @@ export default function VideoReelsRow() {
                   <span>منتشرشده توسط: <b className="text-[var(--primary-text)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span> • {activeVideo.date_fa}</span>
                 </div>
-                <Link href={`/media/${activeVideo.slug}`} className="btn btn-primary px-5 py-2 text-xs font-bold">
+                <Link href={`/media/${activeVideo.slug}`} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-5 py-2 text-xs font-bold">
                   مشاهده صفحه اختصاصی ویدیو و دیدگاه‌ها ←
                 </Link>
               </div>

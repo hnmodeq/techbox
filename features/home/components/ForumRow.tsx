@@ -28,7 +28,7 @@ export default function ForumRow() {
             <Link
               key={top.slug}
               href={`/forum/${top.slug}`}
-              className="group card p-5 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)] flex items-start gap-4"
+              className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)] flex items-start gap-4"
             >
               <Image
                 src={top.author?.avatar || '/assets/hooman.png'}

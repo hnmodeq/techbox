@@ -169,7 +169,7 @@ export function TimelineContainer({
 
             {/* Comment Box Below Line with more distance */}
             <div
-              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-[var(--shadow-size)] border-[var(--border-color)] flex flex-col gap-2.5 z-20"
+              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3.5 shadow-[var(--shadow-size)] border-[var(--border-color)] flex flex-col gap-2.5 z-20"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <form onSubmit={handleAddEarlyComment} className="flex gap-1.5 items-center">
@@ -259,7 +259,7 @@ export function TimelineContainer({
             <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--success)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)] animate-pulse" />
 
             {/* Info Card Below Line with more padding */}
-            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-[var(--shadow-size)] border-[var(--border-color)] space-y-2 z-20">
+            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 text-center shadow-[var(--shadow-size)] border-[var(--border-color)] space-y-2 z-20">
               <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>

@@ -72,7 +72,7 @@ export function NvrSelector({
       {/* Stack layout: tool options top, results below */}
       <div className="flex flex-col gap-8">
         {/* Filters Panel */}
-        <div className="card p-6 sm:p-8">
+        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8">
           <div className="flex items-center gap-3 mb-6">
             <Icon name="tools" className="w-5 h-5 text-[var(--home)]" />
             <h3 className="font-black text-[17px]">مشخصات مورد نیاز پروژه</h3>
@@ -173,7 +173,7 @@ export function NvrSelector({
                 {fa.format(storageTB)} <span className="text-[12px] font-semibold paragraph-color">ترابایت</span>
               </span>
             </div>
-            <a href={consultationHref} className="btn btn-ghost">مشاوره تخصصی زیرساخت نظارت تصویری</a>
+            <a href={consultationHref} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">مشاوره تخصصی زیرساخت نظارت تصویری</a>
           </div>
         </div>
 
@@ -247,7 +247,7 @@ export function NvrSelector({
                       <a
                         href={targetHref}
                         onClick={(e) => e.stopPropagation()}
-                        className="btn btn-primary px-5 text-[13px]"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-5 text-[13px]"
                       >
                         مشاهده در فروشگاه
                       </a>
@@ -256,7 +256,7 @@ export function NvrSelector({
                 );
               })
             ) : (
-              <div className="card p-8 text-center md:col-span-2">
+              <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 text-center md:col-span-2">
                 <p className="paragraph-color font-bold">مدلی با این مشخصات پیدا نشد.</p>
                 <p className="text-[12px] mt-1 paragraph-color">لطفاً تعداد دوربین‌ها یا الزامات هوش مصنوعی را تغییر دهید.</p>
               </div>

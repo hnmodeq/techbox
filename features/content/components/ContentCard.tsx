@@ -58,7 +58,7 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
  return (
  <Link
  href={`/${item.module}/${item.slug}`}
- className="group/card block rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]"
+ className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] block rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]"
  >
  <div className="flex gap-3">
  {item.image && !compact && (
@@ -115,7 +115,7 @@ export function ContentFeedList({ items, variant="compact" }: { items: ContentIt
 
 function VideoFeedCard({item}:{item:ContentItem}){
  return (
- <Link href={`/${item.module}/${item.slug}`} className="group/card block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
+ <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative aspect-video overflow-hidden rounded-[var(--corner-radius)] bg-black">
         <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:768px) 33vw, 100vw" />
       </div>
@@ -133,7 +133,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
  const answers = ((item.likes ?? 0) % 7) + 2;
  const solved = !item.slug.includes("proxmox");
  return (
- <Link href={`/${item.module}/${item.slug}`} className="group/card flex gap-2.5 rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
+ <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] flex gap-2.5 rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
  <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "کاربر"} fill sizes="32px" className="object-cover" />
  </div>
@@ -151,7 +151,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
 
 function ProductFeedCard({item}:{item:ContentItem}){
  return (
- <Link href={`/${item.module}/${item.slug}`} className="group/card block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
+ <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
  <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:1024px) 180px, 50vw" />
  <span className="absolute left-2 top-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">موجود</span>
@@ -166,7 +166,7 @@ function ProductFeedCard({item}:{item:ContentItem}){
 
 function DownloadFeedCard({item}:{item:ContentItem}){
  return (
- <Link href={`/${item.module}/${item.slug}`} className="group/card flex items-center justify-between gap-3 rounded-[var(--corner-radius)] p-2.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
+ <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] flex items-center justify-between gap-3 rounded-[var(--corner-radius)] p-2.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="min-w-0 flex-1">
  <div className={`line-clamp-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa} • {item.category}</div>
@@ -178,7 +178,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
 
 function ReviewFeedCard({item}:{item:ContentItem}){
  return (
- <Link href={`/${item.module}/${item.slug}`} className="group/card flex gap-2.5 overflow-hidden rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
+ <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] flex gap-2.5 overflow-hidden rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
  <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="64px" />
  </div>

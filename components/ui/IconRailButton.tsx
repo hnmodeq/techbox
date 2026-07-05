@@ -63,7 +63,7 @@ export const IconRailButton = React.forwardRef<HTMLButtonElement, IconRailButton
  <button
  ref={ref}
  type="button"
- className={cn("icon-rail-btn relative", className)}
+ className={cn("inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer relative", className)}
  style={{ color: active ? `var(${cssVar})`: undefined, ...style }}
  {...props}
  />

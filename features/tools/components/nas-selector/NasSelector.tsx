@@ -348,8 +348,8 @@ function ProductCard({
           {renderPrice()}
         </div>
         <div className="flex gap-2 flex-1 sm:flex-none">
-          <a href={targetHref} onClick={onSelect} className="btn btn-primary px-5">مشاهده در فروشگاه</a>
-          <button type="button" onClick={onToggleCompare} className={cn("btn btn-ghost", selected && "bg-[var(--muted-background)] text-[var(--home)]")}>
+          <a href={targetHref} onClick={onSelect} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-5">مشاهده در فروشگاه</a>
+          <button type="button" onClick={onToggleCompare} className={cn("inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40", selected && "bg-[var(--muted-background)] text-[var(--home)]")}>
             {selected ? "حذف از مقایسه" : "مقایسه"}
           </button>
         </div>
@@ -402,7 +402,7 @@ export function NasSelector({
             </p>
 
             <div className="mt-6 grid gap-5">
-              <section className="card">
+              <section className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۱. نوع استفاده</h2>
                   <span className="text-[12px] paragraph-color">سناریوی اصلی را مشخص کنید</span>
@@ -421,7 +421,7 @@ export function NasSelector({
                 </div>
               </section>
 
-              <section className="card">
+              <section className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۲. سرویس‌ها و بار کاری</h2>
                   <span className="text-[12px] paragraph-color">چند گزینه قابل انتخاب است</span>
@@ -440,7 +440,7 @@ export function NasSelector({
                 </div>
               </section>
 
-              <section className="card">
+              <section className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۳. ظرفیت، RAID و عملکرد</h2>
                   <span className="badge">حداقل پیشنهادی: {persianNumber(minBays)} Bay</span>
@@ -457,7 +457,7 @@ export function NasSelector({
                     <div className="mb-2 text-[13px] font-extrabold">ظرفیت هر هارد</div>
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3">
                       {driveSizes.map((size) => (
-                        <button key={size} type="button" onClick={() => update("driveTb", size)} className={cn("btn btn-ghost", state.driveTb === size && "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)] text-[var(--home)]")}>{persianNumber(size)} TB</button>
+                        <button key={size} type="button" onClick={() => update("driveTb", size)} className={cn("inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40", state.driveTb === size && "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)] text-[var(--home)]")}>{persianNumber(size)} TB</button>
                       ))}
                     </div>
                   </div>
@@ -534,8 +534,8 @@ export function NasSelector({
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                 <div className="flex gap-2">
-                  <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="btn btn-ghost">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
-                  <a href={consultationHref} className="btn btn-primary">درخواست مشاوره تخصصی</a>
+                  <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
+                  <a href={consultationHref} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">درخواست مشاوره تخصصی</a>
                 </div>
                 <p className="text-[12px] paragraph-color">
                   ظرفیت RAID تقریبی است و باید با محدودیت فایل‌سیستم و سیاست بکاپ نهایی شود.

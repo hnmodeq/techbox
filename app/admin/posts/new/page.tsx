@@ -143,7 +143,7 @@ function NewPostInner() {
  </div>
 
  <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
- <form onSubmit={save} className="card space-y-4 p-5">
+ <form onSubmit={save} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] space-y-4 p-5">
  <div className="grid gap-4 md:grid-cols-2">
  <div>
  <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">ماژول *</label>
@@ -209,7 +209,7 @@ function NewPostInner() {
  </form>
 
  <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
- <div className="card p-4">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
  <h2 className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">پیش‌نمایش منبع</h2>
  <div className="mt-3 space-y-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <div>مسیر: <code dir="ltr">/{module}/{resolvedSlug || "slug"}</code></div>
@@ -224,7 +224,7 @@ function NewPostInner() {
  </div>
  </div>
 
- <div className="card p-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <b className="text-[var(--primary-text)]">راهنمای CMS</b><br/>
  • اسلاگ اگر خالی باشد از عنوان ساخته می‌شود.<br/>
  • دسته‌بندی اختیاری است ولی برای فیلتر و جدول مفید است.<br/>

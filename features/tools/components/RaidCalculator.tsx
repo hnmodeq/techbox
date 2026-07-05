@@ -25,7 +25,7 @@ export default function RaidCalculator(){
  }, [disks, size, level]);
 
  return (
- <div className="card p-5 space-y-4" dir="rtl">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4" dir="rtl">
  <div className="flex items-center justify-between">
  <h3 className=" text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold text-[var(--raid)]">RAID Calculator</h3>
  <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">تکباکس – ابزار زیرساخت</span>

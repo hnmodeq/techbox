@@ -18,7 +18,7 @@ export default function NewsList() {
  <section className="lg:col-span-8 order-1 lg:order-2">
  <div className="flex flex-col gap-5">
  {items.map((n: any) => (
-                <Link key={n.slug} href={`/news/${n.slug}`} className="card overflow-hidden group hover:shadow-[var(--shadow-size)] transition-all !p-0 grid sm:grid-cols-3 gap-4 items-center">
+                <Link key={n.slug} href={`/news/${n.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group hover:shadow-[var(--shadow-size)] transition-all !p-0 grid sm:grid-cols-3 gap-4 items-center">
                   <div className="block relative aspect-[16/9] sm:aspect-[4/3] sm:h-full overflow-hidden bg-[var(--muted-background)]">
                     <Image src={n.image || "/assets/blog-1.jpg"} alt={n.title} fill sizes="(min-width:1024px) 30vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
                     <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">{n.category}</span>
@@ -40,7 +40,7 @@ export default function NewsList() {
  </section>
 
  <aside className="lg:col-span-4 order-2 lg:order-1">
- <div className="card p-4 sticky top-20">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 sticky top-20">
  <div className="flex items-center justify-between mb-4">
  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--news)]">اخبار فوری</h3>
  <span className="inline-flex items-center gap-1.5 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">

@@ -38,7 +38,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         <span className="truncate text-[var(--primary-text)] max-w-xs">{item.title}</span>
       </nav>
 
-      <article className="card p-6 sm:p-8 space-y-8 shadow-[var(--shadow-size)] border-[var(--border-color)]">
+      <article className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 space-y-8 shadow-[var(--shadow-size)] border-[var(--border-color)]">
         {/* Header */}
         <header className="border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6 space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">

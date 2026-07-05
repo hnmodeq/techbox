@@ -21,17 +21,17 @@ export default function ToolsPage() {
         <ToolsGrid />
       </div>
 
-      <section className="mt-12 card p-6">
+      <section className="mt-12 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6">
         <h2 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mb-2">اتصال به فروشگاه</h2>
         <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
           ابزارهای انتخاب‌گر به صورت زنده از <code className="text-[11px]">/data/nas-products.json</code> و <code className="text-[11px]">/data/nvr-products.json</code> می‌خوانند و با <code className="text-[11px]">/data/shop.json</code> مرج می‌شوند. 
           برای افزودن محصول واقعی کافیست <b>shopSlug</b> را برابر slug فروشگاه قرار دهید – قیمت، موجودی و تصویر به صورت خودکار sync می‌شود.
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-[12px]">
-          <a href="/tools/nas-selector" className="btn btn-primary">NAS Selector</a>
-          <a href="/tools/nvr-selector" className="btn btn-primary" style={{ background: "var(--raid)" }}>NVR Selector</a>
-          <a href="/tools/raid-calculator" className="btn btn-ghost">RAID Calculator v2</a>
-          <a href="/tools/subnet-calculator" className="btn btn-ghost">Subnet Calculator</a>
+          <a href="/tools/nas-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">NAS Selector</a>
+          <a href="/tools/nvr-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]" style={{ background: "var(--raid)" }}>NVR Selector</a>
+          <a href="/tools/raid-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">RAID Calculator v2</a>
+          <a href="/tools/subnet-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">Subnet Calculator</a>
         </div>
       </section>
     </main>

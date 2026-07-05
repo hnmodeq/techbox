@@ -96,22 +96,22 @@ export default function RolesPage(){
  </div>
 
  <div className="mb-5 grid gap-3 sm:grid-cols-3">
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">کل نقش‌ها</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{roles.length.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">نقش سفارشی</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{customRoles.toLocaleString("fa-IR")}</div>
  </div>
- <div className="card p-3">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-3">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسترسی ماژولی</div>
  <div className="mt-1 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{totalAssignments.toLocaleString("fa-IR")}</div>
  </div>
  </div>
 
  <div className="grid items-start gap-5 lg:grid-cols-3">
- <form onSubmit={createRole} className="card space-y-3 p-4 lg:sticky lg:top-24 lg:col-span-1">
+ <form onSubmit={createRole} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] space-y-3 p-4 lg:sticky lg:top-24 lg:col-span-1">
  <div className="flex items-center justify-between gap-2">
  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">نقش جدید</h3>
  {selectedModules.length > 0 && <Badge variant="info">{selectedModules.length.toLocaleString("fa-IR")} ماژول</Badge>}
@@ -149,7 +149,7 @@ export default function RolesPage(){
  {msg && <p className={`text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${msg.includes("الزامی") || msg.includes("قبلاً") || msg.includes("قابل") ? "text-[var(--warning)]" : "text-[var(--success)]"}`}>{msg}</p>}
  </form>
 
- <div className="card overflow-hidden p-0 lg:col-span-2">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden p-0 lg:col-span-2">
  <div className="overflow-x-auto">
  <table className="w-full min-w-[720px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <thead className="bg-[var(--muted-background)]/50 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
@@ -196,7 +196,7 @@ export default function RolesPage(){
  </div>
  </div>
 
- <div className="card mt-6 p-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] mt-6 p-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <b className="text-[var(--primary-text)]">نقش‌های پیش‌فرض تکباکس:</b><br/>
  • <b>super_admin</b> (admin) – همه ۸ ماژول – مدیر کل<br/>
  • <b>blog_editor</b> (sara) – مجله<br/>

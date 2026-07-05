@@ -163,7 +163,7 @@ export default function MediaGallery() {
                     placeholder="نظر خود را درباره این ویدیو بنویسید..."
                     className="input flex-1 !h-11 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
                   />
-                  <button type="submit" className="btn btn-primary !h-11 px-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] shrink-0">
+                  <button type="submit" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] !h-11 px-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] shrink-0">
                     ارسال نظر
                   </button>
                 </form>

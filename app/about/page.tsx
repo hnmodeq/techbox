@@ -22,7 +22,7 @@ export default function About(){
  ["۶ ویراستار تخصصی", "RBAC واقعی"],
  ["۱۴۰۵", "هونامیک ارتباط رستاک"],
  ].map(([k,v])=>(
- <div key={k as string} className="card p-5 text-center">
+ <div key={k as string} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 text-center">
  <div className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold text-[var(--home)]">{k}</div>
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-1">{v}</div>
  </div>
@@ -35,7 +35,7 @@ export default function About(){
  </div>
 
  <div className="grid lg:grid-cols-5 gap-5 items-start">
- <div className="lg:col-span-3 card p-0 overflow-hidden">
+ <div className="lg:col-span-3 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-0 overflow-hidden">
  <div className="p-4 border-b-[length:var(--border-size)] border-[var(--border-color)]">
  <h3 className="">دفتر تهران</h3>
  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-1">میرداماد، هونامیک ارتباط رستاک</p>
@@ -48,7 +48,7 @@ export default function About(){
  loading="lazy"
  />
  </div>
- <div className="lg:col-span-2 space-y-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-muted-foreground card p-5">
+ <div className="lg:col-span-2 space-y-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-muted-foreground bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5">
  <p>تماس: <span dir="ltr">021-9100xxxx</span></p>
  <p>ایمیل: info@techbox.ir</p>
  <p>ساعت کاری: شنبه–چهارشنبه ۹–۱۷</p>

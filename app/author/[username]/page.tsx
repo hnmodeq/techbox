@@ -59,7 +59,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
       </PageHeader>
 
       {/* Author Showcase Card */}
-      <div className="mt-8 card p-6 sm:p-8 bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] grid md:grid-cols-[160px_1fr] gap-6 items-center">
+      <div className="mt-8 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] grid md:grid-cols-[160px_1fr] gap-6 items-center">
         <div className="flex flex-col items-center text-center">
           <div className="relative w-32 h-32 rounded-full overflow-hidden border-[length:var(--border-size)] border-[var(--home)] shadow-[var(--shadow-size)]">
             <Image
@@ -110,7 +110,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         </h2>
 
         {authorPosts.length === 0 ? (
-          <div className="card p-12 text-center paragraph-color">
+          <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-12 text-center paragraph-color">
             هنوز مطلبی به نام این نویسنده در آرشیو ثبت نشده است.
           </div>
         ) : (
@@ -119,7 +119,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
               <Link
                 key={`${post.module}-${post.slug}`}
                 href={`/${post.module}/${post.slug}`}
-                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--shadow-size)] transition-all border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]"
+                className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--shadow-size)] transition-all border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]"
               >
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--muted-background)]">
                   <Image

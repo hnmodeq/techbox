@@ -306,12 +306,12 @@ export default function RaidCalculator() {
                   ظرفیت قابل استفاده، افزونگی، فضای بلااستفاده و Hot Spare را برای RAIDهای کلاسیک و Synology Hybrid RAID با دیسک‌های هم‌اندازه یا ترکیبی محاسبه کنید.
                 </p>
               </div>
-              <button type="button" onClick={() => applyPreset(8, 4)} className="btn btn-ghost shrink-0">
+              <button type="button" onClick={() => applyPreset(8, 4)} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40 shrink-0">
                 بازنشانی نمونه ۴ دیسک ۸ ترابایت
               </button>
             </header>
 
-            <div className="card p-5 shadow-[var(--shadow-size)]">
+            <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 shadow-[var(--shadow-size)]">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black">انتخاب دیسک‌ها</h3>
@@ -334,7 +334,7 @@ export default function RaidCalculator() {
                         type="button"
                         disabled={!canRemove}
                         onClick={() => removeDrive(drive.id)}
-                        className="icon-rail-btn h-7 w-7 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer h-7 w-7 disabled:cursor-not-allowed disabled:opacity-40"
                         aria-label="حذف دیسک"
                       >
                         <Icon name="close" className="h-3.5 w-3.5" />
@@ -367,7 +367,7 @@ export default function RaidCalculator() {
               </div>
             </div>
 
-            <div className="card p-5 shadow-[var(--shadow-size)]">
+            <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 shadow-[var(--shadow-size)]">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black">انتخاب نوع RAID</h3>
@@ -403,7 +403,7 @@ export default function RaidCalculator() {
                     <span className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">بزرگ‌ترین دیسک‌ها به‌عنوان Spare رزرو می‌شوند و وارد ظرفیت Volume نمی‌شوند.</span>
                   </span>
                   <span className="flex items-center gap-2">
-                    <button type="button" className="icon-rail-btn" onClick={() => setSpareCount((value) => clamp(value - 1, 0, effectiveSpareMax))}>
+                    <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer" onClick={() => setSpareCount((value) => clamp(value - 1, 0, effectiveSpareMax))}>
                       <Icon name="minus" className="h-4 w-4" />
                     </button>
                     <input
@@ -414,7 +414,7 @@ export default function RaidCalculator() {
                       value={spareCount}
                       onChange={(event) => setSpareCount(clamp(Number(event.target.value), 0, effectiveSpareMax))}
                     />
-                    <button type="button" className="icon-rail-btn" onClick={() => setSpareCount((value) => clamp(value + 1, 0, effectiveSpareMax))}>
+                    <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer" onClick={() => setSpareCount((value) => clamp(value + 1, 0, effectiveSpareMax))}>
                       <Icon name="plus" className="h-4 w-4" />
                     </button>
                   </span>
@@ -434,7 +434,7 @@ export default function RaidCalculator() {
                 </p>
               </div>
             ) : (
-              <div className="card overflow-hidden p-0 shadow-[var(--shadow-size)]">
+              <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden p-0 shadow-[var(--shadow-size)]">
                 <div className="border-b-[length:var(--border-size)] border-[var(--border-color)] bg-[color-mix(in_oklch,var(--raid)_10%,var(--card-background))] p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>

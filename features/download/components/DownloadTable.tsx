@@ -30,7 +30,7 @@ export default function DownloadTable() {
       <ModuleHeader module="download" title="مرکز دانلود تکباکس" description="ISO • Firmware • Driver – لینک مستقیم داخل ایران" count={`${filtered.length.toLocaleString("fa-IR")} فایل`} />
 
       {/* filters */}
-      <div className="card p-4 mb-6 grid md:grid-cols-4 gap-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
+      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 mb-6 grid md:grid-cols-4 gap-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو فایل…" className="input md:col-span-1" />
         <select value={brand} onChange={(e) => setBrand(e.target.value)} className="input">
           <option value="all">همه برندها</option>
@@ -58,7 +58,7 @@ export default function DownloadTable() {
         </select>
       </div>
 
-      <div className="card overflow-hidden divide-y divide-[var(--border-color)]/60">
+      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden divide-y divide-[var(--border-color)]/60">
         <div className="hidden md:grid grid-cols-12 bg-[var(--muted-background)]/30 px-5 py-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
           <div className="col-span-7">نام فایل و توضیحات</div>
           <div className="col-span-3 text-right">تاریخ انتشار</div>

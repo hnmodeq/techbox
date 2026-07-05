@@ -84,7 +84,7 @@ export default function ForumList() {
         ))}
       </div>
 
-      <div className="card divide-y divide-[var(--border-color)]/60 overflow-hidden">
+      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] divide-y divide-[var(--border-color)]/60 overflow-hidden">
         <div className="hidden sm:grid grid-cols-12 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color px-4 py-2.5 bg-[var(--muted-background)]/30 font-bold">
           <div className="col-span-7">عنوان موضوع و نویسنده</div>
           <div className="col-span-1 text-center">امتیاز</div>
@@ -128,7 +128,7 @@ export default function ForumList() {
       {showNew && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
           <OverlayBackdrop onClick={() => setShowNew(false)} />
-          <form onSubmit={submitTopic} className="relative card w-full max-w-2xl p-6 space-y-4 z-10 shadow-[var(--shadow-size)]">
+          <form onSubmit={submitTopic} className="relative bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] w-full max-w-2xl p-6 space-y-4 z-10 shadow-[var(--shadow-size)]">
             <div className="flex justify-between items-center border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3">
               <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold">موضوع جدید در انجمن تکباکس</h3>
               <CloseButton onClick={() => setShowNew(false)} />

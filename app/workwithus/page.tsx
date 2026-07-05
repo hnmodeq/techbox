@@ -17,7 +17,7 @@ export default function WorkWithUs(){
 
  <div className="grid gap-4">
  {jobs.map(j=>(
- <Link key={j.slug} href={`/workwithus/${j.slug}`} className="card p-5 transition-all duration-[200ms] hover:-translate-y-0.5 hover:shadow-[var(--shadow-size)] group">
+ <Link key={j.slug} href={`/workwithus/${j.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 transition-all duration-[200ms] hover:-translate-y-0.5 hover:shadow-[var(--shadow-size)] group">
  <div className="flex flex-wrap items-start justify-between gap-3">
  <div>
  <h3 className=" text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold group-hover:text-[var(--home)]">{j.title}</h3>

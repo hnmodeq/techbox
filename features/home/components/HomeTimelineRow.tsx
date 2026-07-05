@@ -66,7 +66,7 @@ export default function HomeTimelineRow() {
         {/* Eager loading container replaced with click-to-activate performance wrapper */}
         <div className="w-full rounded-[var(--corner-radius)] border-0 overflow-hidden shadow-none">
           {!active ? (
-            <div className="card p-8 sm:p-12 text-center bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] flex flex-col items-center justify-center gap-4">
+            <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 sm:p-12 text-center bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] flex flex-col items-center justify-center gap-4">
               <Icon name="timeline" className="w-12 h-12 text-[var(--timeline)] opacity-80" />
               <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)]">تایم‌لاین تعاملی فناوری اطلاعات تکباکس</h3>
               <p className="text-xs sm:text-sm paragraph-color max-w-lg leading-6">
@@ -75,7 +75,7 @@ export default function HomeTimelineRow() {
               <button
                 type="button"
                 onClick={() => setActive(true)}
-                className="btn btn-primary bg-[var(--timeline)] text-slate-950 px-8 py-3 text-sm font-black shadow-[var(--shadow-size)] hover:opacity-90 transition-opacity cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] bg-[var(--timeline)] text-slate-950 px-8 py-3 text-sm font-black shadow-[var(--shadow-size)] hover:opacity-90 transition-opacity cursor-pointer"
               >
                 بارگذاری و اجرای تایم‌لاین تعاملی ←
               </button>

@@ -197,7 +197,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <main className="max-w-md mx-auto px-5 py-20 text-center" dir="rtl">
-        <div className="card p-8 space-y-4 animate-pulse">
+        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 space-y-4 animate-pulse">
           <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">در حال بررسی اطلاعات حساب در Neon...</p>
         </div>
       </main>
@@ -207,7 +207,7 @@ export default function AccountPage() {
   if (!user) {
     return (
       <main className="max-w-xl mx-auto px-4 py-12" dir="rtl">
-        <div className="card p-6 sm:p-8 space-y-6">
+        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
             <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
@@ -340,7 +340,7 @@ export default function AccountPage() {
 
       <form onSubmit={saveProfile} className="grid lg:grid-cols-3 gap-6 mt-6">
         {/* avatar card */}
-        <div className="card p-6 text-center space-y-4 h-fit">
+        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-4 h-fit">
           <div className="relative w-32 h-32 mx-auto">
             {avatar && avatar !== "/assets/hooman.png" ? (
               <Image
@@ -376,7 +376,7 @@ export default function AccountPage() {
         </div>
 
         {/* profile form */}
-        <div className="lg:col-span-2 card p-6 space-y-6">
+        <div className="lg:col-span-2 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 space-y-6">
           {saveStatus && (
             <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${saveStatus.ok ? "bg-[var(--success)]/15 text-[var(--success)] border-[length:var(--border-size)] border-[var(--success)]/30" : "bg-[var(--danger)]/15 text-[var(--danger)] border-[length:var(--border-size)] border-[var(--danger)]/30"}`}>
               {saveStatus.msg}

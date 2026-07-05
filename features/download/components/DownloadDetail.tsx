@@ -39,7 +39,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 
       {/* OS chooser */}
- <div className="card p-4 mt-8">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 mt-8">
  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
  <div className="">انتخاب سیستم‌عامل / نسخه</div>
  <div className="flex gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
@@ -84,7 +84,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-3">لینک مستقیم داخل ایران – قابلیت resume – SHA256 در صفحه چک‌سام موجود است.</p>
  </div>
 
- <div className="card p-4 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">
  {item.content}
  </div>
  </main>

@@ -20,7 +20,7 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
  <Badge variant="outline">{job.team}</Badge>
  <span className="text-muted-foreground">{job.date_fa}</span>
  </div>
- <div className="card mt-6 p-5 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] mt-6 p-5 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
  {job.description}
  <ul className="pr-5 mt-4 space-y-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" style={{listStyle:"disc"}}>
  <li>رزومه + نمونه کار</li>
@@ -29,7 +29,7 @@ export default function JobPage({ params }: { params: Promise<{slug:string}> }){
  </ul>
  </div>
 
- <form className="card p-5 mt-6 space-y-3" onSubmit={(e)=>{e.preventDefault(); alert("درخواست شما ثبت شد – تیم منابع انسانی تکباکس بررسی می‌کند.");}}>
+ <form className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 mt-6 space-y-3" onSubmit={(e)=>{e.preventDefault(); alert("درخواست شما ثبت شد – تیم منابع انسانی تکباکس بررسی می‌کند.");}}>
  <h3 className="">ارسال درخواست</h3>
  <div className="grid sm:grid-cols-2 gap-3">
  <input className="input text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" placeholder="نام و نام خانوادگی *" required />
