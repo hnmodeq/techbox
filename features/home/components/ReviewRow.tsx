@@ -42,7 +42,7 @@ export default function ReviewRow() {
             return (
               <div
                 key={rev.slug}
-                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)]"
+                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)]"
               >
                 <Link href={`/review/${rev.slug}`} className="block flex-1">
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
@@ -50,7 +50,7 @@ export default function ReviewRow() {
                       src={rev.image || '/assets/blog-1.jpg'}
                       alt={rev.title}
                       fill
-                      className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+                      className="object-cover"
                       sizes="(max-width: 768px) 100vw, 300px"
                     />
                   </div>

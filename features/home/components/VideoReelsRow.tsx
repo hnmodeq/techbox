@@ -37,13 +37,13 @@ export default function VideoReelsRow() {
                 type="button"
                 key={vid.slug}
                 onClick={() => setActiveVideo(vid)}
-                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:-translate-y-1.5 transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end text-right cursor-pointer"
+                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:shadow-2xl transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end text-right cursor-pointer"
               >
                 <Image
                   src={vid.image || '/assets/blog-1.jpg'}
                   alt={vid.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover"
                   sizes="260px"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />

@@ -29,7 +29,7 @@ export default function MagazineRow() {
           {articles.map((art) => (
             <div
               key={art.slug}
-              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)]"
+              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)]"
             >
               <Link href={`/blog/${art.slug}`} className="block flex-1">
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
@@ -37,7 +37,7 @@ export default function MagazineRow() {
                     src={art.image || '/assets/blog-1.jpg'}
                     alt={art.title}
                     fill
-                    className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, 300px"
                   />
                 </div>

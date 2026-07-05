@@ -27,7 +27,7 @@ export default function ShopRow() {
             <Link
               key={prod.slug}
               href={`/shop/${prod.slug}`}
-              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]"
+              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]"
             >
               {/* Product Image Showcase container */}
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--tb-bg-muted)]/70 p-4 flex items-center justify-center">
@@ -35,7 +35,7 @@ export default function ShopRow() {
                   src={prod.image || '/assets/blog-1.jpg'}
                   alt={prod.title}
                   fill
-                  className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105"
+                  className="object-cover"
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
               </div>

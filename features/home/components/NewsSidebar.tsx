@@ -104,7 +104,7 @@ export default function NewsSidebar() {
                   src={n.image || '/assets/blog-1.jpg'}
                   alt={n.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="object-cover"
                   sizes="320px"
                 />
               </div>

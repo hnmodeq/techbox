@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
 
-export default function HomeTimelineRow() {
+function ActiveTimelineContent() {
   const { events, isLoading, error } = useTimelineEvents();
   const { zoom, zoomIn, zoomOut, resetZoom, setZoom } = useTimelineZoom(1);
   const { pan, startPanning, stopPanning, handlePan, resetPan } = usePan({ x: 150, y: 0 });
@@ -17,8 +17,29 @@ export default function HomeTimelineRow() {
     resetPan();
   }, [resetZoom, resetPan]);
 
+  if (isLoading) return <TimelineLoading />;
+  if (error || !events || events.length === 0) return <TimelineError error={error || 'رویدادی یافت نشد'} />;
+
   return (
-    <section className={`w-full py-12 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
+    <TimelineContainer
+      events={events}
+      zoom={zoom}
+      pan={pan}
+      onPanStart={startPanning}
+      onPanMove={handlePan}
+      onPanEnd={stopPanning}
+      onResetView={handleResetView}
+      onZoomChange={setZoom}
+      onWheel={undefined}
+    />
+  );
+}
+
+export default function HomeTimelineRow() {
+  const [active, setActive] = useState(false);
+
+  return (
+    <section className={`w-full py-12 bg-[var(--tb-bg-primary)] border-0 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full px-4 sm:px-6 lg:px-8 space-y-6`}>
         
         {/* Row Header with Simple Text Link More Button */}
@@ -34,30 +55,33 @@ export default function HomeTimelineRow() {
         </div>
 
         {/* Helper Awareness Banner */}
-        <div className="text-center">
-          <span className="badge bg-[var(--tb-bg-secondary)] text-[var(--tb-timeline)] font-bold border border-[var(--tb-border)] shadow-sm px-4 py-1.5 tb-text-sm">
-            برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
-          </span>
-        </div>
+        {active && (
+          <div className="text-center">
+            <span className="badge bg-[var(--tb-bg-secondary)] text-[var(--tb-timeline)] font-bold border border-[var(--tb-border)] shadow-sm px-4 py-1.5 tb-text-sm">
+              برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
+            </span>
+          </div>
+        )}
 
-        {/* Full Interactive Timeline Container with Mouse Wheel Scrolling Isolated (onWheel={undefined}) */}
+        {/* Eager loading container replaced with click-to-activate performance wrapper */}
         <div className="w-full rounded-2xl border-0 overflow-hidden shadow-none">
-          {isLoading ? (
-            <TimelineLoading />
-          ) : error || !events || events.length === 0 ? (
-            <TimelineError error={error || 'رویدادی یافت نشد'} />
+          {!active ? (
+            <div className="card p-8 sm:p-12 text-center bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] rounded-2xl flex flex-col items-center justify-center gap-4">
+              <Icon name="timeline" className="w-12 h-12 text-[var(--tb-timeline)] opacity-80" />
+              <h3 className="text-lg sm:text-xl font-black text-[var(--tb-fg-primary)]">تایم‌لاین تعاملی فناوری اطلاعات تکباکس</h3>
+              <p className="text-xs sm:text-sm text-[var(--tb-fg-muted)] max-w-lg leading-6">
+                برای سرعت بیشتر در بارگذاری صفحه و صرفه‌جویی در منابع پردازشی دستگاه شما، تایم‌لاین زنده تنها در صورت تقاضا بارگذاری می‌شود.
+              </p>
+              <button
+                type="button"
+                onClick={() => setActive(true)}
+                className="btn btn-primary bg-[var(--tb-timeline)] text-slate-950 px-8 py-3 text-sm font-black shadow-lg hover:opacity-90 transition-opacity cursor-pointer"
+              >
+                بارگذاری و اجرای تایم‌لاین تعاملی ←
+              </button>
+            </div>
           ) : (
-            <TimelineContainer
-              events={events}
-              zoom={zoom}
-              pan={pan}
-              onPanStart={startPanning}
-              onPanMove={handlePan}
-              onPanEnd={stopPanning}
-              onResetView={handleResetView}
-              onZoomChange={setZoom}
-              onWheel={undefined}
-            />
+            <ActiveTimelineContent />
           )}
         </div>
 
