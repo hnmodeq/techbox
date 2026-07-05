@@ -39,7 +39,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  ref={ref}
  type="button"
  className={cn(
- "group relative block w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] text-right transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]",
+ "group relative block w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] text-right transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]",
  active ? "ring-2 ring-[var(--media)]" : "",
  className
  )}
@@ -61,25 +61,25 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  </span>
 
  {category && (
- <span className="absolute top-3 right-3 rounded-full border border-white/30 bg-black/40 px-2.5 py-0.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-white backdrop-blur-md">
+ <span className="absolute top-3 right-3 rounded-full border-[length:var(--border-size)] border-white/30 bg-black/40 px-2.5 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-md">
  {category}
  </span>
  )}
- <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-white backdrop-blur-sm">
+ <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-sm">
  {duration}
  </span>
 
  <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
- <h4 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--media)]">
+ <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--media)]">
  {title}
  </h4>
- <div className="mt-2 flex items-center justify-between text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-white/80">
+ <div className="mt-2 flex items-center justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">
  {author && <span>{author}</span>}
  {dateFa && <span>{dateFa}</span>}
  </div>
- <div className="mt-2 pt-2 border-t border-white/20">
+ <div className="mt-2 pt-2 border-t-[length:var(--border-size)] border-white/20">
  {slug ? <CardStats module="media" slug={slug} initialViews={views} initialLikes={likes} initialComments={comments} showComments={true} /> : (
- <div className="flex items-center gap-3 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-white/80">
+ <div className="flex items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">
  {typeof views === "number" && <span>👁 {views.toLocaleString("fa-IR")}</span>}
  {typeof likes === "number" && <span>♥ {likes.toLocaleString("fa-IR")}</span>}
  {typeof comments === "number" && <span>💬 {comments.toLocaleString("fa-IR")}</span>}

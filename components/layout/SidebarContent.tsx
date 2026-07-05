@@ -38,16 +38,16 @@ function TehranDateTime({ now, expanded }: { now: Date | null; expanded: boolean
  </span>
  </SidebarTooltip>
  ) : (
- <div className="flex items-center justify-between gap-2 rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--muted-background)] px-3 py-2 shadow-[var(--shadow-size)]">
+ <div className="flex items-center justify-between gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)] px-3 py-2 shadow-[var(--shadow-size)]">
  <div className="min-w-0">
- <div className="truncate text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="truncate text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  {now?.toLocaleDateString("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }) || "تهران"}
  </div>
- <div className="truncate text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="truncate text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  {now?.toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Tehran" }) || "—"}
  </div>
  </div>
- <div className="shrink-0 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] tabular-nums" dir="ltr">
+ <div className="shrink-0 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] tabular-nums" dir="ltr">
  {now?.toLocaleTimeString("fa-IR", { hour: "2-digit", minute: "2-digit", second: "2-digit", timeZone: "Asia/Tehran" }) || "--:--:--"}
  </div>
  </div>
@@ -175,32 +175,32 @@ export default function SidebarContent({
  style={{ zIndex: zIndex.notification, top: notifPos.top, right: notifPos.right }}
  dir="rtl"
  >
- <div className="mb-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] ">آخرین رویدادها</div>
- <ul className="max-h-80 space-y-2 overflow-y-auto text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">
+ <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">آخرین رویدادها</div>
+ <ul className="max-h-80 space-y-2 overflow-y-auto text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               {notifications.map((n: any) => {
                 // Title stays neutral; the source module label carries the module color.
                 const sourceColor = moduleColors[n.module as keyof typeof moduleColors]?.active ?? "paragraph-color";
                 const sourceLabel = moduleMeta[n.module as ModuleSlug]?.titleFa ?? n.module;
                 return (
-                  <li key={`${n.module}-${n.slug}`} className="border-b border-[color-mix(in_oklch,var(--border-color)_40%,transparent)] pb-2 last:border-0">
+                  <li key={`${n.module}-${n.slug}`} className="border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--border-color)_40%,transparent)] pb-2 last:border-0">
                     <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 text-[var(--primary-text)] transition-opacity hover:opacity-80">
                       {n.title}
                     </Link>
-                    <div className="mt-0.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+                    <div className="mt-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                       <span className={sourceColor}>{sourceLabel}</span> • {n.date_fa}{n.time ? ` • ${n.time}`: ""}
                     </div>
                   </li>
                 );
               })}
  </ul>
- <Button variant="ghost" size="xs" onClick={() => setNotifOpen(false)} className="mt-2 w-full text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">بستن</Button>
+ <Button variant="ghost" size="xs" onClick={() => setNotifOpen(false)} className="mt-2 w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">بستن</Button>
  </div>,
  document.body
  )
  : null;
 
  return (
- <div className="relative flex h-full w-full flex-col text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]" dir="rtl">
+ <div className="relative flex h-full w-full flex-col text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" dir="rtl">
  <header className="shrink-0 space-y-3 p-3">
  <div className="flex h-10 items-center gap-2">
  <div className="relative h-10 w-10 shrink-0">
@@ -216,8 +216,8 @@ export default function SidebarContent({
  </div>
 
           <div className={`overflow-hidden transition-all duration-[var(--tb-motion-md)] ${expanded ? "w-[170px] opacity-100" : "w-0 opacity-0"}`}>
-            <div className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">تکباکس</div>
-            <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">پاتوق بچه‌های فناوری اطلاعات</div>
+            <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">تکباکس</div>
+            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پاتوق بچه‌های فناوری اطلاعات</div>
           </div>
         </div>
 
@@ -234,7 +234,7 @@ export default function SidebarContent({
             <IconRailButton tone="shop" onClick={() => setCartOpen(true)} aria-label="سبد خرید">
               <Icon name="cart" size={18} />
               {cartCount > 0 && (
-                <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--shop)] px-1 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-[#ffffff]">
+                <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--shop)] px-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[#ffffff]">
                   {cartCount > 99 ? "۹۹+" : (cartCount ?? 0).toLocaleString("fa-IR")}
                 </span>
               )}
@@ -247,7 +247,7 @@ export default function SidebarContent({
  <div className="relative h-10 shrink-0">
  {expanded ? (
  <form onSubmit={doSearch} className="relative h-10">
- <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input h-10 !py-2 pe-8 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]" />
+ <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجو در تکباکس…" className="input h-10 !py-2 pe-8 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
  <Button type="submit" variant="link" size="iconSm" className="absolute left-1.5 top-1/2 -translate-y-1/2 paragraph-color hover:text-[var(--primary-text)]" aria-label="search">
  <Icon name="search" size={14} />
  </Button>
@@ -267,14 +267,14 @@ export default function SidebarContent({
  className="absolute left-full top-1/2 z-20 ms-2 flex h-10 -translate-y-1/2 items-center"
  dir="rtl"
  >
- <div className="relative w-56 max-w-[60vw] rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
+ <div className="relative w-56 max-w-[60vw] rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
  <input
  ref={collapsedSearchRef}
  value={q}
  onChange={(e) => setQ(e.target.value)}
  onBlur={() => { if (!q.trim()) setSearchOpen(false); }}
  placeholder="جستجو در تکباکس…"
- className="input h-10 w-full !py-2 pe-9 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] !border-0 !bg-transparent"
+ className="input h-10 w-full !py-2 pe-9 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] !border-0 !bg-transparent"
  />
  <Button type="submit" variant="link" size="iconSm" className="absolute left-1.5 top-1/2 -translate-y-1/2 paragraph-color hover:text-[var(--primary-text)]" aria-label="search">
  <Icon name="search" size={14} />
@@ -292,7 +292,7 @@ export default function SidebarContent({
  type="button"
  variant="ghost"
  onClick={() => setConsultOpen(true)}
- className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--consultation)_35%,transparent)] text-center text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-[var(--consultation)] hover:bg-[color-mix(in_oklch,var(--consultation)_12%,transparent)]"
+ className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--consultation)_35%,transparent)] text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--consultation)] hover:bg-[color-mix(in_oklch,var(--consultation)_12%,transparent)]"
  >
  <Icon name="headset" size={16} strokeWidth={1.75} />
  مشاوره زیرساخت
@@ -312,7 +312,7 @@ export default function SidebarContent({
  </SidebarTooltip>
  </div>
 
- <div className="border-t border-[var(--border-color)]" />
+ <div className="border-t-[length:var(--border-size)] border-[var(--border-color)]" />
  </header>
 
  <nav className="flex-1 overflow-y-auto px-2 py-1">
@@ -327,7 +327,7 @@ export default function SidebarContent({
  <Link
  href={item.href}
  onClick={onLinkClick}
- className={`${linkBase} font-size-paragraph ${active ? `bg-[var(--muted-background)] font-bold ${item.iconActiveClassName || ""}` : `${linkInactive} ${item.iconHoverClassName || ""}`}`}
+ className={`${linkBase} paragraph-font-size ${active ? `bg-[var(--muted-background)] font-bold ${item.iconActiveClassName || ""}` : `${linkInactive} ${item.iconHoverClassName || ""}`}`}
  >
  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--home)]" />}
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
@@ -345,7 +345,7 @@ export default function SidebarContent({
  <Link
  href="/admin"
  onClick={onLinkClick}
- className={`${linkBase} text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] ${active ? "bg-[var(--muted-background)] text-[var(--primary-text)]" : linkInactive}`}
+ className={`${linkBase} text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${active ? "bg-[var(--muted-background)] text-[var(--primary-text)]" : linkInactive}`}
  >
  {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--vip)]" />}
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
@@ -360,9 +360,9 @@ export default function SidebarContent({
  </div>
  </nav>
 
- <div className="shrink-0 space-y-2 border-t border-[var(--border-color)] px-2 py-2">
+ <div className="shrink-0 space-y-2 border-t-[length:var(--border-size)] border-[var(--border-color)] px-2 py-2">
  {user ? (
- <Link href="/account" onClick={onLinkClick} className={`${linkBase} text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] ${isActive(pathname, "/account") ? "bg-[var(--muted-background)] text-[var(--primary-text)]" : linkInactive}`}>
+ <Link href="/account" onClick={onLinkClick} className={`${linkBase} text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${isActive(pathname, "/account") ? "bg-[var(--muted-background)] text-[var(--primary-text)]" : linkInactive}`}>
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
  {user.avatar && user.avatar !== "/assets/hooman.png" ? (
    <Image src={user.avatar} alt={user.name || "کاربر"} width={28} height={28} className="rounded-full object-cover ring-1 ring-[var(--border-color)]" />
@@ -371,13 +371,13 @@ export default function SidebarContent({
  )}
  </span>
  <span className={`truncate ${expanded ? "w-[140px] opacity-100" : "w-0 opacity-0"} overflow-hidden transition-all`}>
- <span className="block text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] font-bold">{user.name || user.username}</span>
+ <span className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold">{user.name || user.username}</span>
  <span className="block text-xs paragraph-color">{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر تکباکس")}</span>
  </span>
  </Link>
  ) : (
  <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--account)]">
- <Button variant="link" size="md" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} className={`${linkBase} ${linkInactive} w-full justify-start p-0 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] no-underline hover:no-underline`}>
+ <Button variant="link" size="md" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} className={`${linkBase} ${linkInactive} w-full justify-start p-0 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] no-underline hover:no-underline`}>
  <span className="flex h-10 w-10 items-center justify-center">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--muted-background)]"><Icon name="user" size={15} /></span>
  </span>

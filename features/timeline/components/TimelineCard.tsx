@@ -216,7 +216,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   return (
     <div style={style} className={`${widthClass} select-none shrink-0 group flex flex-col justify-start relative`}>
       {/* TIER 1: STRICTLY FIXED HEIGHT CARD BOX */}
-      <div className="relative h-[340px] sm:h-[360px] w-full rounded-xl overflow-hidden shadow-[var(--shadow-size)] border border-[var(--border-color)] hover:border-[var(--timeline)] transition-colors duration-[var(--tb-motion-md)] flex flex-col justify-end bg-slate-950">
+      <div className="relative h-[340px] sm:h-[360px] w-full rounded-[var(--corner-radius)] overflow-hidden shadow-[var(--shadow-size)] border-[length:var(--border-size)] border-[var(--border-color)] hover:border-[var(--timeline)] transition-colors duration-[var(--tb-motion-md)] flex flex-col justify-end bg-slate-950">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
             src={cardImage}
@@ -230,27 +230,27 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
         <div className="relative z-10 p-4.5 flex flex-col justify-end h-full text-white">
           <div className="flex-1 flex flex-col justify-end overflow-hidden mb-4">
-            <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-white mb-2 line-clamp-2 leading-7">
+            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-white mb-2 line-clamp-2 leading-7">
               {event.title}
             </h3>
-            <p className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-slate-300 line-clamp-4 leading-6">
+            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 line-clamp-4 leading-6">
               {event.description}
             </p>
           </div>
 
-          <div className="border-t border-white/20 pt-3 flex items-center justify-between gap-2 shrink-0">
+          <div className="border-t-[length:var(--border-size)] border-white/20 pt-3 flex items-center justify-between gap-2 shrink-0">
             <div className="relative">
               <button
                 type="button"
                 onClick={handleLikeToggle}
-                className="flex items-center gap-1.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-slate-300 hover:text-red-400 transition-colors cursor-pointer font-bold"
+                className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 hover:text-red-400 transition-colors cursor-pointer font-bold"
               >
                 <Heart size={16} className={liked ? 'fill-current text-red-500' : ''} />
                 <span>{likesCount.toLocaleString('fa-IR')}</span>
               </button>
 
               {showLoginPrompt && (
-                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-lg border border-[var(--border-color)] bg-slate-900 p-2.5 shadow-2xl text-center">
+                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-900 p-2.5 shadow-2xl text-center">
                   <p className="text-xs text-white mb-2">برای پسندیدن رویداد ابتدا وارد شوید.</p>
                   <div className="flex justify-center gap-1.5">
                     <Button size="xs" onClick={() => router.push('/account')}>ورود / عضویت</Button>
@@ -266,7 +266,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                 e.stopPropagation();
                 setShowComments(!showComments);
               }}
-              className="flex items-center gap-1.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer font-bold"
+              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer font-bold"
             >
               <MessageCircle size={16} />
               <span>{comments.length.toLocaleString('fa-IR')} نظر</span>
@@ -278,7 +278,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       {/* TIER 2: EXPANDING COMMENT DRAWER */}
       {showComments && (
         <div
-          className="w-full mt-2 rounded-xl border border-[var(--border-color)] bg-slate-950/95 p-3.5 shadow-2xl flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
+          className="w-full mt-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-950/95 p-3.5 shadow-2xl flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onWheel={(e) => e.stopPropagation()}
@@ -293,7 +293,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   setCommentError('');
                 }}
                 placeholder="نظر یا تجربه خود را بنویسید..."
-                className="input !h-9 !py-1 !px-2.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] flex-1 !bg-slate-900 !text-white !border-slate-700"
+                className="input !h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-slate-900 !text-white !border-slate-700"
               />
               <button
                 type="submit"
@@ -304,7 +304,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               </button>
             </div>
             {commentError && (
-              <div className="text-[11px] text-red-400 bg-red-950/40 p-1.5 rounded border border-red-800 flex justify-between items-center">
+              <div className="text-[11px] text-red-400 bg-red-950/40 p-1.5 rounded border-[length:var(--border-size)] border-red-800 flex justify-between items-center">
                 <span>{commentError}</span>
                 <button type="button" onClick={() => router.push('/account')} className="underline font-bold text-white">ورود</button>
               </div>
@@ -315,7 +315,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             {comments.map((comment, idx) => (
               <li
                 key={idx}
-                className="rounded-[var(--corner-radius)] bg-slate-900/90 p-2.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-slate-200 border border-slate-700/60 leading-5"
+                className="rounded-[var(--corner-radius)] bg-slate-900/90 p-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-200 border-[length:var(--border-size)] border-slate-700/60 leading-5"
               >
                 <div className="flex items-center justify-between text-[11px] text-cyan-400 mb-1">
                   <span className="font-bold">{comment.authorName}</span>

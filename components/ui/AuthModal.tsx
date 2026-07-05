@@ -92,7 +92,7 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in-0 duration-200" dir="rtl">
-      <div className="relative w-full max-w-[440px] rounded-2xl border border-[var(--border-color)] bg-[var(--main-background)] p-6 sm:p-8 shadow-2xl text-[var(--primary-text)]">
+      <div className="relative w-full max-w-[440px] rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--main-background)] p-6 sm:p-8 shadow-2xl text-[var(--primary-text)]">
         {/* Close Button */}
         <button
           type="button"
@@ -104,7 +104,7 @@ export function AuthModal() {
 
         {/* Logo & Header */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--home)]/10 border border-[var(--home)]/30 text-[var(--home)] font-black text-2xl shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--home)]/10 border-[length:var(--border-size)] border-[var(--home)]/30 text-[var(--home)] font-black text-2xl shadow-sm">
             TB
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
@@ -116,13 +116,13 @@ export function AuthModal() {
         </div>
 
         {errorMsg && (
-          <div className="mt-5 rounded-xl bg-red-950/40 border border-red-800/80 p-3 text-center text-xs sm:text-sm text-red-300 font-bold animate-shake">
+          <div className="mt-5 rounded-[var(--corner-radius)] bg-red-950/40 border-[length:var(--border-size)] border-red-800/80 p-3 text-center text-xs sm:text-sm text-red-300 font-bold animate-shake">
             {errorMsg}
           </div>
         )}
 
         {forgotOpen ? (
-          <div className="mt-6 space-y-4 rounded-xl bg-[var(--card-background)] p-4 border border-[var(--border-color)] text-center">
+          <div className="mt-6 space-y-4 rounded-[var(--corner-radius)] bg-[var(--card-background)] p-4 border-[length:var(--border-size)] border-[var(--border-color)] text-center">
             <h4 className="font-bold text-sm text-[var(--tb-warning)]">بازیابی رمز عبور</h4>
             <p className="text-xs paragraph-color leading-5">
               برای تغییر یا بازیابی رمز عبور حساب کاربری خود، لطفاً با ایمیل پشتیبانی یا ادمین سیستم تماس بگیرید.
@@ -130,7 +130,7 @@ export function AuthModal() {
             <button
               type="button"
               onClick={() => setForgotOpen(false)}
-              className="w-full py-2 rounded-lg bg-[var(--home)] text-white text-xs font-bold hover:opacity-90"
+              className="w-full py-2 rounded-[var(--corner-radius)] bg-[var(--home)] text-white text-xs font-bold hover:opacity-90"
             >
               بازگشت به ورود
             </button>
@@ -191,14 +191,14 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full !h-11 rounded-xl bg-[var(--home)] text-white font-black text-sm shadow-lg hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full !h-11 rounded-[var(--corner-radius)] bg-[var(--home)] text-white font-black text-sm shadow-lg hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
             >
               {busy ? "در حال پردازش..." : "ورود یا شروع عضویت"}
             </button>
           </form>
         )}
 
-        <div className="mt-6 pt-4 border-t border-[var(--border-color)]/60 text-center">
+        <div className="mt-6 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 text-center">
           <p className="text-[11px] paragraph-color leading-4">
             با ورود به تکباکس، قوانین حریم خصوصی و استفاده از زیرساخت را می‌پذیرید.
           </p>

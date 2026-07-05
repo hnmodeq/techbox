@@ -80,7 +80,7 @@ export function ToolsGrid({ className }: { className?: string }) {
         <Link
           key={tool.slug}
           href={tool.href}
-          className="group relative flex flex-col overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]"
+          className="group relative flex flex-col overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]"
         >
           <div
             className="absolute -left-10 -top-10 h-28 w-28 rounded-full opacity-[0.14] blur-[28px] transition-opacity group-hover:opacity-25"

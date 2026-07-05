@@ -159,13 +159,13 @@ export function TimelineContainer({
               <span className="badge !bg-[var(--timeline)] !text-slate-950 font-black mb-1.5 shadow-md">
                 آغاز خط تایم‌لاین تکباکس
               </span>
-              <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] leading-6">
+              <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] leading-6">
                 از اینجا به قبل خبری نبوده؛ اگه بوده شما به ما بگید!
               </h3>
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-4 border-[var(--main-background)] shadow-xl" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-xl" />
 
             {/* Comment Box Below Line with more distance */}
             <div
@@ -178,7 +178,7 @@ export function TimelineContainer({
                   value={earlyHistoryComment}
                   onChange={(e) => setEarlyHistoryComment(e.target.value)}
                   placeholder="پیشنهاد رویداد تاریخی..."
-                  className="input !h-9 !py-1 !px-2.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] flex-1"
+                  className="input !h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1"
                 />
                 <button
                   type="submit"
@@ -228,7 +228,7 @@ export function TimelineContainer({
                 </div>
 
                 {/* 2. Milestone Dot sitting directly on the axis line */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--timeline)] rounded-full border-4 border-[var(--main-background)] shadow-lg transition-transform hover:scale-125" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--timeline)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-lg transition-transform hover:scale-125" />
 
                 {/* 3. Card hanging BELOW THE LINE top-aligned (top: 32px) with generous padding beneath line */}
                 <div className="absolute top-[32px] left-1/2 -translate-x-1/2 flex justify-center z-10">
@@ -256,17 +256,17 @@ export function TimelineContainer({
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-4 border-[var(--main-background)] shadow-xl animate-pulse" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-xl animate-pulse" />
 
             {/* Info Card Below Line with more padding */}
             <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--border-color)] space-y-2 z-20">
-              <div className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--tb-success)]">
+              <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--tb-success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>
-              <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color font-mono" dir="ltr">
+              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-mono" dir="ltr">
                 {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())}
               </div>
-              <p className="text-xs text-[var(--tb-fg-secondary)] leading-5 pt-2 border-t border-[var(--border-color)]">
+              <p className="text-xs text-[var(--tb-fg-secondary)] leading-5 pt-2 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                 به سوی آینده فناوری اطلاعات، زیرساخت‌های ابری و هوش مصنوعی...
               </p>
             </div>

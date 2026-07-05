@@ -18,7 +18,7 @@ export function TimelineError({ error, onRetry }: TimelineErrorProps) {
         {onRetry && (
           <button
             onClick={onRetry}
-            className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-[var(--corner-radius)] transition-colors"
           >
             تلاش مجدد
           </button>

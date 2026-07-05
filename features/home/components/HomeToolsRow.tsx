@@ -14,7 +14,7 @@ export default function HomeToolsRow() {
         {/* Simple Header */}
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">محاسبه زنده ظرفیت، آرایه دیسک‌ها و پهنای باند</h2>
-          <p className="mt-1 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+          <p className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
             ماشین حساب RAID زیر به‌صورت زنده قابل استفاده است؛ همچنین می‌توانید از ابزارهای تخصصی دیگر در پایین استفاده کنید:
           </p>
         </div>
@@ -25,7 +25,7 @@ export default function HomeToolsRow() {
         </div>
 
         {/* 3 Items for Other Tools Moved to BOTTOM CENTER with full width / centered buttons */}
-        <div className="pt-6 border-t border-[var(--border-color)] flex flex-col items-center justify-center gap-4">
+        <div className="pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-col items-center justify-center gap-4">
           <h3 className="text-sm font-extrabold paragraph-color">
             سایر ابزارهای تخصصی مهندسی زیرساخت تکباکس:
           </h3>

@@ -28,7 +28,7 @@ export default function ForumRow() {
             <Link
               key={top.slug}
               href={`/forum/${top.slug}`}
-              className="group card p-5 hover:bg-[var(--muted-background)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)] flex items-start gap-4"
+              className="group card p-5 hover:bg-[var(--muted-background)]/40 transition-all duration-[var(--tb-motion-md)] border-[length:var(--border-size)] border-[var(--border-color)] flex items-start gap-4"
             >
               <Image
                 src={top.author?.avatar || '/assets/hooman.png'}
@@ -40,17 +40,17 @@ export default function ForumRow() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
-                  <span className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] font-bold paragraph-color">
+                  <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">
                     {top.author?.name || 'عضو تکباکس'}
                   </span>
                   <ForumBadge slug={top.slug} fallback={idx % 2 === 0} />
                 </div>
 
-                <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
+                <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
                   {top.title}
                 </h3>
 
-                <div className="mt-3 pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between text-[11px] paragraph-color">
+                <div className="mt-3 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between text-[11px] paragraph-color">
                   <span>{top.date_fa}</span>
                   <CardStats module="forum" slug={top.slug} initialViews={top.views ?? 0} initialLikes={top.likes ?? 0} showComments={true} />
                 </div>

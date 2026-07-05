@@ -18,11 +18,11 @@ export function ForumBadge({ slug, fallback = false }: { slug: string; fallback?
   }, [slug]);
 
   return solved ? (
-    <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-success)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--tb-success)]">
+    <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-success)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--tb-success)]">
       حل‌شده ✓
     </span>
   ) : (
-    <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-warning)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-warning)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--tb-warning)]">
+    <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-warning)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--tb-warning)]">
       باز
     </span>
   );

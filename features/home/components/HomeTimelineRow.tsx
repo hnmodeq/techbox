@@ -57,16 +57,16 @@ export default function HomeTimelineRow() {
         {/* Helper Awareness Banner */}
         {active && (
           <div className="text-center">
-            <span className="badge bg-[var(--card-background)] text-[var(--timeline)] font-bold border border-[var(--border-color)] shadow-sm px-4 py-1.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">
+            <span className="badge bg-[var(--card-background)] text-[var(--timeline)] font-bold border-[length:var(--border-size)] border-[var(--border-color)] shadow-sm px-4 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
             </span>
           </div>
         )}
 
         {/* Eager loading container replaced with click-to-activate performance wrapper */}
-        <div className="w-full rounded-2xl border-0 overflow-hidden shadow-none">
+        <div className="w-full rounded-[var(--corner-radius)] border-0 overflow-hidden shadow-none">
           {!active ? (
-            <div className="card p-8 sm:p-12 text-center bg-[var(--card-background)] border border-[var(--border-color)] rounded-2xl flex flex-col items-center justify-center gap-4">
+            <div className="card p-8 sm:p-12 text-center bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] flex flex-col items-center justify-center gap-4">
               <Icon name="timeline" className="w-12 h-12 text-[var(--timeline)] opacity-80" />
               <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)]">تایم‌لاین تعاملی فناوری اطلاعات تکباکس</h3>
               <p className="text-xs sm:text-sm paragraph-color max-w-lg leading-6">

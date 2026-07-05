@@ -29,7 +29,7 @@ export default function MagazineRow() {
           {articles.map((art) => (
             <div
               key={art.slug}
-              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)]"
+              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border-[length:var(--border-size)] border-[var(--border-color)]"
             >
               <Link href={`/blog/${art.slug}`} className="block flex-1">
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--muted-background)]">
@@ -43,19 +43,19 @@ export default function MagazineRow() {
                 </div>
 
                 <div className="p-4">
-                  <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mb-1.5 font-bold">
+                  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5 font-bold">
                     <span>{art.date_fa}</span>
                   </div>
-                  <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--blog)] transition-colors line-clamp-2 leading-7">
+                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--blog)] transition-colors line-clamp-2 leading-7">
                     {art.title}
                   </h3>
-                  <p className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-6">
+                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-6">
                     {art.excerpt}
                   </p>
                 </div>
               </Link>
 
-              <div className="px-4 pb-4 pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
+              <div className="px-4 pb-4 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
                 <AuthorLink name={art.author?.name} avatar={art.author?.avatar} />
                 <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
               </div>

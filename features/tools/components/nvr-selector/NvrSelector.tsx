@@ -58,13 +58,13 @@ export function NvrSelector({
       {/* Header */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 mb-3">
-          <div className="px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--nvr)_12%,transparent)] text-[var(--nvr)] text-xs font-bold flex items-center gap-1.5 border border-[color-mix(in_oklch,var(--nvr)_22%,var(--border-color))]">
+          <div className="px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--nvr)_12%,transparent)] text-[var(--nvr)] text-xs font-bold flex items-center gap-1.5 border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--nvr)_22%,var(--border-color))]">
             <Icon name="nvr" className="w-3.5 h-3.5" />
             ماژول انتخاب ان‌وی‌آر
           </div>
         </div>
-        <h2 className="text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
-        <p className="paragraph-color max-w-md mx-auto text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold">
+        <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
+        <p className="paragraph-color max-w-md mx-auto text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
           تعداد دوربین، رزولوشن و مدت زمان ضبط را مشخص کنید تا بهترین مدل‌های موجود در فروشگاه را پیدا کنید
         </p>
       </div>
@@ -126,7 +126,7 @@ export function NvrSelector({
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-7 mt-6 pt-6 border-t border-[var(--border-color)] items-center">
+          <div className="grid md:grid-cols-2 gap-7 mt-6 pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)] items-center">
             {/* Resolution */}
             <div>
               <label className="block text-[13px] font-extrabold mb-2.5">رزولوشن میانگین دوربین‌ها</label>
@@ -148,7 +148,7 @@ export function NvrSelector({
             </div>
 
             {/* AI Toggle */}
-            <div className="flex items-center justify-between bg-[var(--muted-background)] px-5 py-4 rounded-[var(--corner-radius)] border border-[var(--border-color)]">
+            <div className="flex items-center justify-between bg-[var(--muted-background)] px-5 py-4 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)]">
               <div>
                 <div className="font-extrabold text-[14px]">تحلیل هوش مصنوعی و آنالیتیک</div>
                 <div className="text-[12px] paragraph-color mt-0.5">تشخیص چهره، پلاک و رویدادهای هوشمند</div>
@@ -166,7 +166,7 @@ export function NvrSelector({
           </div>
 
           {/* Storage Estimate Footer inside filter card */}
-          <div className="mt-6 pt-6 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
+          <div className="mt-6 pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="paragraph-color text-[13px]">حجم ذخیره‌سازی تخمینی پروژه:</span>
               <span className="font-black tabular-nums text-[20px] text-[var(--nvr)]">
@@ -178,14 +178,14 @@ export function NvrSelector({
         </div>
 
         {/* Results Section Positioned BELOW the tool */}
-        <div className="border-t border-[var(--border-color)] pt-4">
+        <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
           <div className="flex items-center justify-between mb-4 px-1">
             <div>
               <span className="font-black text-[18px]">مدل‌های NVR پیشنهادی فروشگاه</span>
               <span className="text-[13px] paragraph-color mr-2">({fa.format(filteredModels.length)} مدل موجود)</span>
             </div>
             {recommendedModel && (
-              <div className="text-[12px] px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-success)_14%,transparent)] text-[var(--tb-success)] border border-[color-mix(in_oklch,var(--tb-success)_24%,transparent)] flex items-center gap-1 font-bold">
+              <div className="text-[12px] px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-success)_14%,transparent)] text-[var(--tb-success)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_24%,transparent)] flex items-center gap-1 font-bold">
                 <Icon name="check" className="w-3.5 h-3.5" /> بهترین انتخاب برای این پروژه
               </div>
             )}
@@ -239,7 +239,7 @@ export function NvrSelector({
                       <p className="mt-4 text-[13px] paragraph-color leading-6">{model.descriptionFa}</p>
                     </div>
 
-                    <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
+                    <div className="mt-5 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
                       <div className="text-[15px] font-black text-[var(--shop)]">
                         {renderPrice(model)}
                       </div>

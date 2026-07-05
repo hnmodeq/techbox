@@ -26,15 +26,15 @@ export default function BentoCard({
  footerLabel = "مشاهده همه →",
 }: Props) {
  return (
- <div className={`group relative overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/80 p-5 transition-colors duration-[var(--tb-motion-md)] md:p-6 ${className}`} >
+ <div className={`group relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/80 p-5 transition-colors duration-[var(--tb-motion-md)] md:p-6 ${className}`} >
  <div className="flex h-full flex-col gap-3">
  <div className="flex items-start justify-between gap-3">
  <div>
- <h3 className={`text-[length:var(--font-size-h2)] text-[var(--h2-font-color)] font-bold md:text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold ${color}`}>
+ <h3 className={`text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ${color}`}>
  <Link href={href} className="hover:opacity-90">{title}</Link>
  </h3>
  {description && (
- <p className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mt-1.5 max-w-[36ch]">{description}</p>
+ <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1.5 max-w-[36ch]">{description}</p>
  )}
  </div>
  {badge && <Badge variant="brand" className="shrink-0">{badge}</Badge>}
@@ -42,13 +42,13 @@ export default function BentoCard({
 
  <div className="min-h-0 flex-1 overflow-hidden">
  {children ?? (
- <div className="h-full rounded-[var(--corner-radius)] border border-dashed border-[color-mix(in_oklch,var(--border-color)_50%,transparent)] bg-[var(--muted-background)]/15" />
+ <div className="h-full rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-dashed border-[color-mix(in_oklch,var(--border-color)_50%,transparent)] bg-[var(--muted-background)]/15" />
  )}
  </div>
 
  {footerLink && (
  <div className="pt-1">
- <Link href={footerLink} className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--primary-text)]">
+ <Link href={footerLink} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--primary-text)]">
  {footerLabel}
  </Link>
  </div>

@@ -11,9 +11,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
  ref={ref}
  className={cn(
  "w-full bg-[var(--muted-background)] text-[var(--primary-text)]",
- "border border-[var(--border-color)]",
+ "border-[length:var(--border-size)] border-[var(--border-color)]",
  "rounded-[var(--corner-radius)] px-[14px] py-[10px]",
- "text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] ",
+ "text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ",
  "transition-all duration-[var(--tb-motion-sm)] ease-[var(--tb-ease)]",
  "placeholder:paragraph-color/80",
  "focus:outline-none focus:border-[var(--tb-ring-1)] focus:shadow-[var(--tb-ring-3)]",

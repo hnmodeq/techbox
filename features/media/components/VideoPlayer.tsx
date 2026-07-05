@@ -29,12 +29,12 @@ export default function VideoPlayer({ src, poster, title }: { src: string; poste
  }, [src]);
 
  return (
- <div className="w-full bg-black rounded-[var(--corner-radius)] overflow-hidden border border-[var(--border-color)]">
+ <div className="w-full bg-black rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)]">
  <video ref={videoRef} controls playsInline poster={poster} preload="metadata" className="w-full aspect-video bg-black" />
  {title && (
- <div className="flex justify-between bg-[var(--card-background)] px-3 py-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="flex justify-between bg-[var(--card-background)] px-3 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <span className="truncate">{title}</span>
- <span className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
+ <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
  </div>
  )}
  </div>

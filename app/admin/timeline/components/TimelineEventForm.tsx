@@ -91,7 +91,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white"
+          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
           placeholder="Event title"
         />
       </div>
@@ -103,7 +103,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
           onChange={(e) => setDescription(e.target.value)}
           required
           rows={4}
-          className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white"
+          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
           placeholder="Description"
         />
       </div>
@@ -114,7 +114,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
           type="url"
           value={image}
           onChange={(e) => setImage(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white"
+          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
         />
       </div>
 
@@ -126,7 +126,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
             value={dateGr}
             onChange={(e) => setDateGr(e.target.value)}
             required
-            className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white"
+            className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
           />
         </div>
         <div>
@@ -135,7 +135,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
             type="text"
             value={dateFa}
             disabled
-            className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-slate-300"
+            className="w-full bg-slate-700 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-slate-300"
           />
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
           type="text"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
-          className="w-full bg-slate-800 border border-slate-600 rounded px-3 py-2 text-white"
+          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
           placeholder="tag1, tag2"
         />
       </div>

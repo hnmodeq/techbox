@@ -63,7 +63,7 @@ export default function AdminTimelinePage() {
               setEditingEvent(null);
               setShowForm(!showForm);
             }}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-[var(--corner-radius)] transition-colors"
           >
             <Plus size={20} />
             New Event
@@ -71,7 +71,7 @@ export default function AdminTimelinePage() {
         </div>
 
         {showForm && (
-          <div className="mb-8 bg-slate-900 rounded-lg p-6 border border-slate-700">
+          <div className="mb-8 bg-slate-900 rounded-[var(--corner-radius)] p-6 border-[length:var(--border-size)] border-slate-700">
             <TimelineEventForm
               event={editingEvent}
               onClose={handleFormClose}
@@ -81,14 +81,14 @@ export default function AdminTimelinePage() {
 
         <div className="space-y-4">
           {events.length === 0 ? (
-            <div className="text-center py-12 bg-slate-900 rounded-lg border border-slate-700">
+            <div className="text-center py-12 bg-slate-900 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-slate-700">
               <p className="text-slate-400 mb-4">No events found</p>
             </div>
           ) : (
             events.map(event => (
               <div
                 key={event.id}
-                className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden hover:border-blue-500 transition-colors"
+                className="bg-slate-900 border-[length:var(--border-size)] border-slate-700 rounded-[var(--corner-radius)] overflow-hidden hover:border-blue-500 transition-colors"
               >
                 <div
                   onClick={() => setExpandedId(expandedId === event.id ? null : event.id)}
@@ -109,7 +109,7 @@ export default function AdminTimelinePage() {
                 </div>
 
                 {expandedId === event.id && (
-                  <div className="border-t border-slate-700 p-4 bg-slate-800/30">
+                  <div className="border-t-[length:var(--border-size)] border-slate-700 p-4 bg-slate-800/30">
                     <p className="text-slate-300 mb-4">{event.description}</p>
 
                     <div className="flex gap-2">

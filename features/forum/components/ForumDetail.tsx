@@ -86,7 +86,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
   return (
     <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+      <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
         <Link href="/" className="hover:text-[var(--primary-text)]">خانه</Link>
         <span>/</span>
         <Link href="/forum" className="hover:text-[var(--primary-text)]">انجمن تکباکس</Link>
@@ -96,7 +96,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
 
       {/* Main Topic Question Card - NO generic top image */}
       <article className="card p-6 sm:p-8 space-y-6 shadow-md border-[var(--border-color)]">
-        <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--border-color)] pb-6">
+        <header className="flex flex-wrap items-start justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6">
           <div className="flex items-center gap-4">
             <Image
               src={item.author?.avatar || "/assets/hooman.png"}
@@ -110,7 +110,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{item.title}</h1>
                 <ForumBadge slug={item.slug} fallback={item.solved ?? false} />
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                 <span>ارسال‌شده توسط <b className="text-[var(--primary-text)]">{item.author?.name || "کاربر انجمن"}</b></span>
                 <span>•</span>
                 <span>{item.date_fa}</span>
@@ -139,17 +139,17 @@ export default function ForumDetail({ item }: ForumDetailProps) {
           <h2 className="text-lg font-black text-[var(--primary-text)]">
             پاسخ‌ها و راه‌حل‌ها ({replies.length.toLocaleString("fa-IR")})
           </h2>
-          <span className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">مرتب‌شده بر اساس بهترین پاسخ</span>
+          <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">مرتب‌شده بر اساس بهترین پاسخ</span>
         </div>
 
         {/* New Reply Form */}
         <form onSubmit={handleAddReply} className="card p-5 space-y-3 bg-[var(--card-background)]/60">
-          <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold">ارسال پاسخ یا راه‌حل شما</h3>
+          <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold">ارسال پاسخ یا راه‌حل شما</h3>
           <textarea
             value={newReply}
             onChange={(e) => setNewReply(e.target.value)}
             placeholder="اگر تجربه، راهکار یا پیشنهادی برای حل این موضوع دارید بنویسید..."
-            className="input w-full min-h-[110px] text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]"
+            className="input w-full min-h-[110px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
             required
           />
           <div className="flex justify-end">
@@ -164,12 +164,12 @@ export default function ForumDetail({ item }: ForumDetailProps) {
               key={reply.id}
               className={`card p-6 transition-all ${
                 reply.isBestAnswer
-                  ? "border-2 border-[color-mix(in_oklch,var(--tb-success)_60%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_7%,var(--card-background))] shadow-md"
+                  ? "border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_60%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_7%,var(--card-background))] shadow-md"
                   : "bg-[var(--card-background)] border-[var(--border-color)]"
               }`}
             >
               {reply.isBestAnswer && (
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--tb-success)]/15 border border-[var(--tb-success)]/30 px-3.5 py-1 text-xs font-bold text-[var(--tb-success)]">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--tb-success)]/15 border-[length:var(--border-size)] border-[var(--tb-success)]/30 px-3.5 py-1 text-xs font-bold text-[var(--tb-success)]">
                   <Icon name="check" size={14} className="stroke-[2.5]" />
                   <span>پاسخ انتخابی توسط ایجادکننده موضوع</span>
                 </div>
@@ -180,11 +180,11 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                   <Image src={reply.avatar} alt={reply.author} width={44} height={44} className="h-11 w-11 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
                   <div>
                     <div className="font-bold text-[var(--primary-text)]">{reply.author}</div>
-                    <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mt-0.5">{reply.date}</div>
+                    <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-0.5">{reply.date}</div>
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--muted-background)] border border-[var(--border-color)] text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--muted-background)] border-[length:var(--border-size)] border-[var(--border-color)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
                   <span>▲</span>
                   <span>{reply.likes.toLocaleString("fa-IR")}</span>
                 </div>

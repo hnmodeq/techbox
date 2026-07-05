@@ -59,9 +59,9 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
       </PageHeader>
 
       {/* Author Showcase Card */}
-      <div className="mt-8 card p-6 sm:p-8 bg-[var(--card-background)] border border-[var(--border-color)] shadow-xl grid md:grid-cols-[160px_1fr] gap-6 items-center">
+      <div className="mt-8 card p-6 sm:p-8 bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-xl grid md:grid-cols-[160px_1fr] gap-6 items-center">
         <div className="flex flex-col items-center text-center">
-          <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--home)] shadow-lg">
+          <div className="relative w-32 h-32 rounded-full overflow-hidden border-[length:var(--border-size)] border-[var(--home)] shadow-lg">
             <Image
               src={userRecord.avatar || "/assets/hooman.png"}
               alt={userRecord.name}
@@ -74,7 +74,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
         <div className="space-y-4 text-right">
           <div>
-            <span className="badge bg-[var(--home)]/15 text-[var(--home)] border border-[var(--home)]/30 font-bold px-3 py-1 text-xs">
+            <span className="badge bg-[var(--home)]/15 text-[var(--home)] border-[length:var(--border-size)] border-[var(--home)]/30 font-bold px-3 py-1 text-xs">
               {userRecord.roleFa || "ویراستار و پژوهشگر"}
             </span>
             <h1 className="mt-2 text-2xl sm:text-3xl font-black text-[var(--primary-text)]">
@@ -86,7 +86,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
             {bio}
           </p>
 
-          <div className="pt-3 border-t border-[var(--border-color)] flex flex-wrap items-center gap-6 text-xs sm:text-sm font-bold paragraph-color">
+          <div className="pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center gap-6 text-xs sm:text-sm font-bold paragraph-color">
             <span className="flex items-center gap-1.5 text-[var(--primary-text)]">
               <Icon name="blog" size={18} className="text-[var(--home)]" />
               <span>تعداد مطالب: <b>{authorPosts.length.toLocaleString("fa-IR")}</b></span>
@@ -105,7 +105,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
       {/* Author's Posts Grid */}
       <div className="mt-12 space-y-6">
-        <h2 className="text-xl font-black text-[var(--primary-text)] border-b border-[var(--border-color)] pb-4">
+        <h2 className="text-xl font-black text-[var(--primary-text)] border-b-[length:var(--border-size)] border-[var(--border-color)] pb-4">
           آرشیو مطالب منتشر شده توسط {userRecord.name} ({authorPosts.length.toLocaleString("fa-IR")})
         </h2>
 
@@ -119,7 +119,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
               <Link
                 key={`${post.module}-${post.slug}`}
                 href={`/${post.module}/${post.slug}`}
-                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all border border-[var(--border-color)] bg-[var(--card-background)]"
+                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]"
               >
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--muted-background)]">
                   <Image
@@ -147,7 +147,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between">
+                  <div className="pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between">
                     <CardStats module={post.module} slug={post.slug} initialViews={post.views ?? 0} initialLikes={post.likes ?? 0} showComments={true} />
                   </div>
                 </div>

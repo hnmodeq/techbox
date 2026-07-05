@@ -24,7 +24,7 @@ export function Dropdown({ trigger, items, align="end" }: {
  {items.map(it=>(
  <button key={it.value}
  onClick={()=>{ it.onSelect?.(); setOpen(false); if(it.href) window.location.href=it.href; }}
- className="w-full text-right px-3 py-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)] hover:bg-[var(--muted-background)] transition-colors"
+ className="w-full text-right px-3 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)] hover:bg-[var(--muted-background)] transition-colors"
  >{it.label}</button>
  ))}
  </div>
@@ -43,7 +43,7 @@ export function Select({ value, onValueChange, options, placeholder="انتخا�
  <select
  value={value}
  onChange={e=>onValueChange?.(e.target.value)}
- className="input appearance-none pe-8 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] cursor-pointer"
+ className="input appearance-none pe-8 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] cursor-pointer"
  style={{
  backgroundImage: "none"
  }}

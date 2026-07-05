@@ -112,7 +112,7 @@ function RangeField({
 }) {
   const percent = ((value - min) / (max - min)) * 100;
   return (
-    <label className="block rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-4">
+    <label className="block rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4">
       <span className="flex items-center justify-between gap-3">
         <span className="text-[13px] font-extrabold text-[var(--primary-text)]">{label}</span>
         <span className="badge bg-[color-mix(in_oklch,var(--home)_10%,var(--muted-background))] text-[var(--primary-text)]">
@@ -217,8 +217,8 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
   const rows = [2, 4, 6, 8, 12];
   const raids: RaidType[] = ["raid1", "raid5", "raid6", "raid10"];
   return (
-    <div className="overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]">
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--border-color)] p-4">
+    <div className="overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]">
+      <div className="flex items-center justify-between gap-3 border-b-[length:var(--border-size)] border-[var(--border-color)] p-4">
         <div>
           <h3 className="text-[15px] font-black">جدول سریع ظرفیت قابل استفاده</h3>
           <p className="mt-1 text-[12px] leading-6 paragraph-color">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
@@ -237,7 +237,7 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
           </thead>
           <tbody>
             {rows.map((bays) => (
-              <tr key={bays} className="border-t border-[var(--border-color)]">
+              <tr key={bays} className="border-t-[length:var(--border-size)] border-[var(--border-color)]">
                 <td className="p-3 font-black text-[var(--primary-text)]">{persianNumber(bays)}</td>
                 {raids.map((raid) => {
                   const value = estimateUsableCapacity(bays, state.driveTb, raid);
@@ -283,11 +283,11 @@ function ProductCard({
   };
 
   return (
-    <article className="relative overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)] flex flex-col justify-between">
+    <article className="relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)] flex flex-col justify-between">
       <div>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--home)_20%,transparent),transparent_45%),var(--muted-background)]">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--home)_20%,transparent),transparent_45%),var(--muted-background)]">
               <Icon name={product.formFactor === "rackmount" ? "server" : "disk"} className="h-7 w-7 text-[var(--home)]" />
             </div>
             <div>
@@ -343,7 +343,7 @@ function ProductCard({
         </div>
       </div>
 
-      <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-5 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
         <div className="text-[14px] font-bold text-[var(--shop)]">
           {renderPrice()}
         </div>
@@ -392,11 +392,11 @@ export function NasSelector({
 
   return (
     <section dir="rtl" className={cn("font-sans text-[var(--primary-text)]", className)}>
-      <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
+      <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--vip)_14%,transparent),transparent_30%)]" />
         <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
-            <h1 className="text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
+            <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-8 paragraph-color">
               نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
             </p>
@@ -475,7 +475,7 @@ export function NasSelector({
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <label className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-4">
+                  <label className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4">
                     <span className="text-[13px] font-extrabold">حداقل شبکه</span>
                     <select className="input mt-3" value={state.networkGbE} onChange={(e) => update("networkGbE", Number(e.currentTarget.value))}>
                       <option value={1}>1GbE</option>
@@ -499,9 +499,9 @@ export function NasSelector({
           </div>
 
           {/* Results section positioned BELOW the tool */}
-          <div className="border-t border-[var(--border-color)] pt-8">
-            <div className="rounded-[calc(var(--corner-radius)+6px)] border border-[var(--border-color)] bg-[color-mix(in_oklch,var(--card-background)_88%,transparent)] p-6 shadow-[var(--shadow-size)] backdrop-blur-[var(--tb-blur-md)]">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+          <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-8">
+            <div className="rounded-[calc(var(--corner-radius)+6px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[color-mix(in_oklch,var(--card-background)_88%,transparent)] p-6 shadow-[var(--shadow-size)] backdrop-blur-[var(--tb-blur-md)]">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-4">
                 <div>
                   <h2 className="text-[20px] font-black">نتایج و مدل‌های پیشنهادی فروشگاه</h2>
                   <p className="mt-1 text-[13px] paragraph-color">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
@@ -510,10 +510,10 @@ export function NasSelector({
               </div>
 
               {!isOptionSelected ? (
-                <div className="my-10 text-center p-8 rounded-[var(--corner-radius)] border border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
+                <div className="my-10 text-center p-8 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
                   <Icon name="server" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
-                  <p className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
-                  <p className="mt-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
+                  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
+                  <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
                     لطفاً ابتدا نوع استفاده یا حداقل یک سرویس را از گزینه‌های بالا انتخاب کنید تا بهترین دستگاه‌های NAS موجود در فروشگاه محاسبه و نمایش داده شوند.
                   </p>
                 </div>
@@ -532,7 +532,7 @@ export function NasSelector({
                 </div>
               )}
 
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--border-color)]">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                 <div className="flex gap-2">
                   <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="btn btn-ghost">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
                   <a href={consultationHref} className="btn btn-primary">درخواست مشاوره تخصصی</a>

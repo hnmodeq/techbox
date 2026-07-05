@@ -16,7 +16,7 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Icon key={i} name="star" size={14} className={i < full ? 'fill-current' : 'opacity-35'} strokeWidth={1.5} />
       ))}
-      <span className="ms-1.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{rating.toFixed(1)}</span>
+      <span className="ms-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{rating.toFixed(1)}</span>
     </span>
   );
 }
@@ -42,7 +42,7 @@ export default function ReviewRow() {
             return (
               <div
                 key={rev.slug}
-                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)]"
+                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border-[length:var(--border-size)] border-[var(--border-color)]"
               >
                 <Link href={`/review/${rev.slug}`} className="block flex-1">
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--muted-background)]">
@@ -59,16 +59,16 @@ export default function ReviewRow() {
                     <div className="mb-2">
                       <Stars rating={rating} />
                     </div>
-                    <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
                       {rev.title}
                     </h3>
-                    <p className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-5">
+                    <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-5">
                       {rev.excerpt}
                     </p>
                   </div>
                 </Link>
 
-                <div className="px-4 pb-4 pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
+                <div className="px-4 pb-4 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
                   <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
                   <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} initialComments={getCommentCount("review", rev.slug)} showComments={true} />
                 </div>

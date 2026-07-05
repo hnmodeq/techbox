@@ -27,7 +27,7 @@ export default function ShopRow() {
             <Link
               key={prod.slug}
               href={`/shop/${prod.slug}`}
-              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)] bg-[var(--card-background)]"
+              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]"
             >
               {/* Product Image Showcase container */}
               <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--muted-background)]/70 p-4 flex items-center justify-center">
@@ -42,7 +42,7 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   

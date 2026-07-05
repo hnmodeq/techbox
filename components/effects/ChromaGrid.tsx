@@ -110,7 +110,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
             key={i}
             onMouseMove={handleCardMove}
             onClick={c.url ? () => handleCardClick(c.url) : undefined}
-            className={`group relative flex flex-col w-[300px] h-[360px] overflow-hidden border-2 border-transparent transition-colors duration-300 rounded-[var(--corner-radius)] ${c.url ? "cursor-pointer" : ""}`}
+            className={`group relative flex flex-col w-[300px] h-[360px] overflow-hidden border-[length:var(--border-size)] border-transparent transition-colors duration-300 rounded-[var(--corner-radius)] ${c.url ? "cursor-pointer" : ""}`}
             style={
               {
                 "--card-border": c.borderColor || "transparent",

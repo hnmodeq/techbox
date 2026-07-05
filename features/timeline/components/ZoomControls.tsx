@@ -12,7 +12,7 @@ interface ZoomControlsProps {
 export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps) {
   return (
     <div
-      className="absolute bottom-8 right-8 flex items-center gap-3 z-50 bg-[var(--card-background)]/95 backdrop-blur-md border border-[var(--border-color)] rounded-[var(--corner-radius)] px-4 py-2.5 shadow-[var(--shadow-size)] select-none"
+      className="absolute bottom-8 right-8 flex items-center gap-3 z-50 bg-[var(--card-background)]/95 backdrop-blur-md border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] px-4 py-2.5 shadow-[var(--shadow-size)] select-none"
       onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
@@ -62,7 +62,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
         <ZoomIn size={18} />
       </button>
 
-      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--timeline)] text-center border-l border-[var(--border-color)] pl-2">
+      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--timeline)] text-center border-l-[length:var(--border-size)] border-[var(--border-color)] pl-2">
         {(zoom * 100).toFixed(0)}%
       </div>
 

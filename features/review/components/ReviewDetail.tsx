@@ -30,7 +30,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
+      <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
         <Link href="/" className="hover:text-[var(--primary-text)]">خانه</Link>
         <span>/</span>
         <Link href="/review" className="hover:text-[var(--primary-text)]">نقد و بررسی</Link>
@@ -40,12 +40,12 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
 
       <article className="card p-6 sm:p-8 space-y-8 shadow-lg border-[var(--border-color)]">
         {/* Header */}
-        <header className="border-b border-[var(--border-color)] pb-6 space-y-4">
+        <header className="border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6 space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <span className="rounded-full bg-[color-mix(in_oklch,var(--review)_15%,transparent)] border border-[color-mix(in_oklch,var(--review)_30%,transparent)] px-3.5 py-1 text-xs font-bold text-[var(--review)]">
+            <span className="rounded-full bg-[color-mix(in_oklch,var(--review)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--review)_30%,transparent)] px-3.5 py-1 text-xs font-bold text-[var(--review)]">
               {item.category || "بررسی تخصصی"}
             </span>
-            <span className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa}</span>
+            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-[var(--primary-text)] leading-10">
@@ -63,7 +63,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
               />
               <div>
                 <div className="font-bold text-[var(--primary-text)]">{item.author?.name || "نویسنده تکباکس"}</div>
-                <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">{item.author?.role || "تحلیلگر سخت‌افزار"}</div>
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.author?.role || "تحلیلگر سخت‌افزار"}</div>
               </div>
             </div>
 
@@ -87,8 +87,8 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         {/* Strengths & Weaknesses Boxes */}
         <div className="grid md:grid-cols-2 gap-6 my-8">
           {/* Strengths */}
-          <div className="rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-success)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_8%,var(--card-background))] p-5 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-success)] border-b border-[color-mix(in_oklch,var(--tb-success)_25%,transparent)] pb-3">
+          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-success)_8%,var(--card-background))] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-success)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-success)_25%,transparent)] pb-3">
               <Icon name="check" size={20} className="stroke-[2.5]" />
               <span>نقاط قوت</span>
             </div>
@@ -103,8 +103,8 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           </div>
 
           {/* Weaknesses */}
-          <div className="rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-warning)_8%,var(--card-background))] p-5 space-y-4 shadow-sm">
-            <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-warning)] border-b border-[color-mix(in_oklch,var(--tb-warning)_25%,transparent)] pb-3">
+          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_40%,transparent)] bg-[color-mix(in_oklch,var(--tb-warning)_8%,var(--card-background))] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2.5 text-base font-black text-[var(--tb-warning)] border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--tb-warning)_25%,transparent)] pb-3">
               <Icon name="shield" size={20} className="stroke-[2.5]" />
               <span>نقاط ضعف</span>
             </div>
@@ -120,7 +120,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         </div>
 
         {/* Full Review Content */}
-        <div className="prose max-w-none leading-9 text-[15px] text-[var(--primary-text)] whitespace-pre-line pt-4 border-t border-[var(--border-color)]">
+        <div className="prose max-w-none leading-9 text-[15px] text-[var(--primary-text)] whitespace-pre-line pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
           {item.content || "متن کامل ارزیابی این محصول در درگاه آزمایشگاهی تکباکس ثبت شده است."}
         </div>
 

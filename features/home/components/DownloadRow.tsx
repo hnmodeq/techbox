@@ -74,11 +74,11 @@ export default function DownloadRow() {
               <Link
                 key={file.slug}
                 href={`/download/${file.slug}`}
-                className="group card p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
+                className="group card p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[var(--tb-motion-md)] border-[length:var(--border-size)] border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   {/* Yellow Special File Icon Box */}
-                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-xl bg-[var(--tb-warning)]/15 text-[var(--tb-warning)] border border-[var(--tb-warning)]/35 shadow-sm">
+                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-[var(--corner-radius)] bg-[var(--tb-warning)]/15 text-[var(--tb-warning)] border-[length:var(--border-size)] border-[var(--tb-warning)]/35 shadow-sm">
                     <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
                       <polyline points="14 2 14 8 20 8" />
@@ -93,7 +93,7 @@ export default function DownloadRow() {
                       </span>
                     </div>
 
-                    <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
                       {file.title}
                     </h3>
                     <div className="text-xs paragraph-color mt-1 line-clamp-1">
