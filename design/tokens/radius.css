@@ -3,8 +3,8 @@
    ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --tb-radius-sm: 5px;
-  --tb-radius-md: 9px;
-  --tb-radius-lg: 14px;
+  --tb-radius-sm: 0px;
+  --tb-radius-md: 0px;
+  --tb-radius-lg: 0px;
   --tb-radius-full: 9999px;
 }

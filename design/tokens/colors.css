@@ -24,7 +24,7 @@
 :root {
   /* ── Backgrounds (neutral grays) ── */
   --tb-bg-primary:   light-dark(oklch(0.985 0 0), oklch(0.16 0 0)); /* app background      */
-  --tb-bg-secondary: light-dark(oklch(1 0 0),     oklch(0.21 0 0)); /* cards / panels / popovers */
+  --tb-bg-secondary: light-dark(oklch(100% 0.00011 271.152),     oklch(0.21 0 0)); /* cards / panels / popovers */
   --tb-bg-muted:     light-dark(oklch(0.955 0 0), oklch(0.26 0 0)); /* muted fills / inputs */
 
   /* ── Foregrounds (text, neutral) ── */

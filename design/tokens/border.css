@@ -8,7 +8,7 @@
 
 :root {
   --tb-border: color-mix(in oklch, var(--tb-fg-primary) 14%, transparent);
-  --tb-border-sm: 1px;
-  --tb-border-md: 2px;
-  --tb-border-lg: 3px;
+  --tb-border-sm: 0px;
+  --tb-border-md: 0px;
+  --tb-border-lg: 0px;
 }
