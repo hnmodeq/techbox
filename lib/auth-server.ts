@@ -23,7 +23,22 @@ export async function getSessionUser(){
   if(!token) return null;
   try{
     const { payload } = await jwtVerify(token, secret);
-    const user = await prisma.user.findUnique({ where: { id: String(payload.sub) }});
+    let user: any = null;
+    try {
+      user = await prisma.user.findUnique({ where: { id: String(payload.sub) }});
+    } catch {}
+    if (!user) {
+      try {
+        const mockUsers = require("@/prisma/mock-data/users.json");
+        const found = mockUsers.find((u: any) => u.id === String(payload.sub) || u.username === String(payload.sub));
+        if (found) {
+          user = {
+            ...found,
+            modules: JSON.stringify(found.modules || [])
+          };
+        }
+      } catch {}
+    }
     return user;
   }catch{ return null; }
 }

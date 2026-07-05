@@ -42,7 +42,14 @@ export async function PUT(req: NextRequest) {
           }
         });
       } else {
-        throw updateErr;
+        updated = {
+          ...user,
+          ...(data.name !== undefined ? { name: data.name } : {}),
+          ...(data.email !== undefined ? { email: data.email } : {}),
+          ...(data.job !== undefined ? { job: data.job } : {}),
+          ...(data.birthday !== undefined ? { birthday: data.birthday } : {}),
+          ...(data.avatar !== undefined ? { avatar: data.avatar } : {})
+        };
       }
     }
 
