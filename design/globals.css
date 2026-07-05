@@ -68,11 +68,11 @@
   color-scheme: light;
 
   --corner-radius: 0px;
-  --border-size: 0px;
 
-  --shadow-size: 0 2px 8px light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.45));
+  --shadow-size: 0 0px 0px light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.45));
 
   --border-color: light-dark(oklch(0.88 0 0), oklch(0.25 0 0));
+  --border-size: 0px;
 
   --hover-card-scale: 1.02;
   --hover-card-translate-y: -2px;
@@ -97,11 +97,11 @@
   --paragraph-font-size: 0.9375rem;
   --paragraph-color: light-dark(oklch(0.48 0 0), oklch(0.68 0 0));
 
-  --main-background: light-dark(oklch(0.985 0 0), oklch(0.13 0 0));
-  --card-background: light-dark(oklch(1 0 0), oklch(0.17 0 0));
-  --button-background: light-dark(oklch(0.95 0 0), oklch(0.22 0 0));
-  --modal-background: light-dark(oklch(1 0 0), oklch(0.18 0 0));
-  --sidebar-background: light-dark(oklch(0.97 0 0), oklch(0.15 0 0));
+  --main-background: light-dark(oklch(86.709% 0.28939 143.098), oklch(0.13 0 0));
+  --card-background: light-dark(oklch(62.793% 0.25768 29.223), oklch(0.17 0 0));
+  --button-background: light-dark(oklch(62.733% 0.30691 316.377), oklch(0.22 0 0));
+  --modal-background: light-dark(oklch(45.457% 0.31135 265.276), oklch(0.18 0 0));
+  --sidebar-background: light-dark(oklch(95.471% 0.21554 114.604), oklch(0.15 0 0));
 
   --blog: light-dark(oklch(0.7 0.17 52), #fb923c);
   --news: light-dark(oklch(0.64 0.22 25), #fb7185);
@@ -113,7 +113,6 @@
   --nas: light-dark(oklch(0.7 0.18 285), #c084fc);
   --nvr: light-dark(oklch(0.75 0.18 145), #34d399);
   --timeline: light-dark(oklch(0.72 0.16 210), #06b6d4);
-  --vip: light-dark(oklch(0.66 0.22 300), #e879f9);
   --forum: light-dark(oklch(0.78 0.16 5), #fda4af);
   --review: light-dark(oklch(0.7 0.17 240), #38bdf8);
   --download: light-dark(oklch(0.72 0.2 350), #f472b6);
@@ -131,12 +130,25 @@
   --info: light-dark(oklch(0.72 0.16 230), #7dd3fc);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 .dark {
   color-scheme: dark;
 }
 
 @theme inline {
-  --font-sans: "KalamehWebFaNum", "Vazirmatn", "Tahoma", system-ui, sans-serif;
+  --font-sans: "KalamehWebFaNum", sans-serif;
 }
 
 * {
@@ -151,7 +163,7 @@ html {
 
 body {
   margin: 0;
-  font-family: "KalamehWebFaNum", "Vazirmatn", "Tahoma", system-ui, sans-serif;
+  font-family: "KalamehWebFaNum", sans-serif;
   background: var(--main-background);
   color: var(--paragraph-color);
   min-height: 100dvh;
