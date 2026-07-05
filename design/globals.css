@@ -145,7 +145,7 @@
 
 html {
   font-family:
-    var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb",
+    var(--font-kalameh), "KalamehWebFaNum",
     "Tahoma", system-ui, sans-serif;
   direction: rtl;
   overflow-x: hidden;
@@ -155,8 +155,7 @@ html {
 body {
   margin: 0;
   font-family:
-    var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb",
-    "Tahoma", system-ui, sans-serif;
+    var(--font-kalameh), "KalamehWebFaNum";
   background: var(--main-background);
   color: var(--paragraph-color);
   min-height: 100dvh;
