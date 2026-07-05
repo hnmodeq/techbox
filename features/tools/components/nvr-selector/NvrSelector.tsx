@@ -63,8 +63,8 @@ export function NvrSelector({
             ماژول انتخاب ان‌وی‌آر
           </div>
         </div>
-        <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
-        <p className="paragraph-color max-w-md mx-auto text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
+        <h2 className="text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
+        <p className="paragraph-color max-w-md mx-auto text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold">
           تعداد دوربین، رزولوشن و مدت زمان ضبط را مشخص کنید تا بهترین مدل‌های موجود در فروشگاه را پیدا کنید
         </p>
       </div>

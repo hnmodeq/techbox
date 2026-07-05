@@ -396,7 +396,7 @@ export function NasSelector({
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--vip)_14%,transparent),transparent_30%)]" />
         <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
-            <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
+            <h1 className="text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
             <p className="mt-3 max-w-2xl text-[14px] leading-8 paragraph-color">
               نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
             </p>
@@ -512,8 +512,8 @@ export function NasSelector({
               {!isOptionSelected ? (
                 <div className="my-10 text-center p-8 rounded-[var(--corner-radius)] border border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
                   <Icon name="server" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
-                  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
-                  <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
+                  <p className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
+                  <p className="mt-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
                     لطفاً ابتدا نوع استفاده یا حداقل یک سرویس را از گزینه‌های بالا انتخاب کنید تا بهترین دستگاه‌های NAS موجود در فروشگاه محاسبه و نمایش داده شوند.
                   </p>
                 </div>

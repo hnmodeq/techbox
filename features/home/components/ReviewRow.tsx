@@ -16,7 +16,7 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Icon key={i} name="star" size={14} className={i < full ? 'fill-current' : 'opacity-35'} strokeWidth={1.5} />
       ))}
-      <span className="ms-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{rating.toFixed(1)}</span>
+      <span className="ms-1.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{rating.toFixed(1)}</span>
     </span>
   );
 }
@@ -59,10 +59,10 @@ export default function ReviewRow() {
                     <div className="mb-2">
                       <Stars rating={rating} />
                     </div>
-                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
+                    <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
                       {rev.title}
                     </h3>
-                    <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-5">
+                    <p className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-5">
                       {rev.excerpt}
                     </p>
                   </div>

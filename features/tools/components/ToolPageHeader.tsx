@@ -38,9 +38,9 @@ export function ToolPageHeader({
           ))}
         </nav>
       )}
-      <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold" style={{ color: "var(--primary-text)" }}>{title}</h1>
+      <h1 className="text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold" style={{ color: "var(--primary-text)" }}>{title}</h1>
       {subtitle && (
-        <p className="mt-2 max-w-2xl text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">{subtitle}</p>
+        <p className="mt-2 max-w-2xl text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold paragraph-color">{subtitle}</p>
       )}
     </div>
   );

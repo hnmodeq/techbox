@@ -93,7 +93,7 @@ export default function DownloadRow() {
                       </span>
                     </div>
 
-                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
+                    <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
                       {file.title}
                     </h3>
                     <div className="text-xs paragraph-color mt-1 line-clamp-1">

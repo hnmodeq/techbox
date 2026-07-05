@@ -57,7 +57,7 @@ export default function HomeTimelineRow() {
         {/* Helper Awareness Banner */}
         {active && (
           <div className="text-center">
-            <span className="badge bg-[var(--card-background)] text-[var(--timeline)] font-bold border border-[var(--border-color)] shadow-sm px-4 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+            <span className="badge bg-[var(--card-background)] text-[var(--timeline)] font-bold border border-[var(--border-color)] shadow-sm px-4 py-1.5 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">
               برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
             </span>
           </div>

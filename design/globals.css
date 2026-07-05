@@ -21,15 +21,15 @@
   --hover-card-scale: 1.02;
   --hover-card-translate-y: -2px;
 
-  --hero-font-size: clamp(2.2rem, 5vw, 3.5rem);
+  --font-size-hero: clamp(2.2rem, 5vw, 3.5rem);
   --hero-font-color: light-dark(oklch(0.15 0 0), oklch(0.96 0 0));
-  --h1-font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+  --font-size-h1: clamp(1.5rem, 3.5vw, 2.4rem);
   --h1-font-color: light-dark(oklch(0.15 0 0), oklch(0.96 0 0));
-  --h2-font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  --font-size-h2: clamp(1.25rem, 2.5vw, 1.75rem);
   --h2-font-color: light-dark(oklch(0.18 0 0), oklch(0.93 0 0));
-  --h3-font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  --font-size-h3: clamp(1.05rem, 1.8vw, 1.3rem);
   --h3-font-color: light-dark(oklch(0.20 0 0), oklch(0.90 0 0));
-  --paragraph-font-size: 0.9375rem;
+  --font-size-paragraph: 0.9375rem;
   --paragraph-color: light-dark(oklch(0.48 0 0), oklch(0.68 0 0));
 
   --main-background: light-dark(oklch(0.985 0 0), oklch(0.13 0 0));
@@ -72,11 +72,6 @@
 
 @theme inline {
   --font-sans: var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb", "Tahoma", system-ui, sans-serif;
-  --font-size-hero: var(--hero-font-size);
-  --font-size-h1: var(--h1-font-size);
-  --font-size-h2: var(--h2-font-size);
-  --font-size-h3: var(--h3-font-size);
-  --font-size-paragraph: var(--paragraph-font-size);
 }
 
 * {
@@ -100,19 +95,19 @@ body {
   max-width: 100vw;
 }
 
-.hero-font-size { font-size: var(--hero-font-size); }
+.font-size-hero { font-size: var(--font-size-hero); }
 .hero-font-color { color: var(--hero-font-color); }
 
-.h1-font-size { font-size: var(--h1-font-size); }
+.font-size-h1 { font-size: var(--font-size-h1); }
 .h1-font-color { color: var(--h1-font-color); }
 
-.h2-font-size { font-size: var(--h2-font-size); }
+.font-size-h2 { font-size: var(--font-size-h2); }
 .h2-font-color { color: var(--h2-font-color); }
 
-.h3-font-size { font-size: var(--h3-font-size); }
+.font-size-h3 { font-size: var(--font-size-h3); }
 .h3-font-color { color: var(--h3-font-color); }
 
-.paragraph-font-size { font-size: var(--paragraph-font-size); }
+.font-size-paragraph { font-size: var(--font-size-paragraph); }
 .paragraph-color { color: var(--paragraph-color); }
 
 .line-clamp-2 {

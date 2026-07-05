@@ -28,9 +28,9 @@ export const CardHeader = ({className,...p}:React.HTMLAttributes<HTMLDivElement>
  <div className={cn("mb-3",className)} {...p} />
 );
 export const CardTitle = ({className,...p}:React.HTMLAttributes<HTMLHeadingElement>)=>(
- <h3 className={cn("text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold md:text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ",className)} {...p} />
+ <h3 className={cn("text-[length:var(--font-size-h2)] text-[var(--h2-font-color)] font-bold md:text-[length:var(--font-size-h2)] text-[var(--h2-font-color)] font-bold ",className)} {...p} />
 );
 export const CardContent = ({className,...p}:React.HTMLAttributes<HTMLDivElement>)=>(
- <div className={cn("text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ", "paragraph-color", className)} {...p} />
+ <div className={cn("text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] ", "paragraph-color", className)} {...p} />
 );
 export default Card;

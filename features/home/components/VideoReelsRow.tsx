@@ -76,7 +76,7 @@ export default function VideoReelsRow() {
             
             <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--main-background)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
               <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
-                <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
+                <h3 className="text-[length:var(--font-size-h2)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
                 <button
                   type="button"
                   onClick={() => setActiveVideo(null)}
@@ -100,7 +100,7 @@ export default function VideoReelsRow() {
               </div>
 
               <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+                <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
                   <span>منتشرشده توسط: <b className="text-[var(--primary-text)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span> • {activeVideo.date_fa}</span>
                 </div>

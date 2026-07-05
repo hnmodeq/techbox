@@ -42,7 +42,7 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                  <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   

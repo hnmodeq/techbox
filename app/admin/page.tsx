@@ -62,10 +62,10 @@ export default function AdminPage() {
  return (
  <main className="min-h-dvh px-4 py-16" dir="rtl">
  <div className="mx-auto max-w-md card space-y-4 p-7 text-center">
- <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">ورود ادمین</h1>
- <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">برای مدیریت محتوا ابتدا وارد شوید.</p>
+ <h1 className="text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold ">ورود ادمین</h1>
+ <p className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold paragraph-color">برای مدیریت محتوا ابتدا وارد شوید.</p>
  <ButtonLink href="/admin/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
- <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3 text-right text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3 text-right text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
  <b className="text-[var(--primary-text)]">کاربران تست:</b><br/>
  {allUsers.slice(0, 6).map(u => <span key={u.id} className="block"><code>{u.username}</code> – {u.name}</span>)}
  </div>
@@ -81,7 +81,7 @@ export default function AdminPage() {
  <div className="flex flex-wrap gap-2">
  <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
  {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
- <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">خروج</Button>
+ <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">خروج</Button>
  </div>
  </PageHeader>
  <div className="flex flex-wrap gap-1">
@@ -92,35 +92,35 @@ export default function AdminPage() {
 
  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
  <div className="card p-4">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">ماژول قابل مدیریت</div>
- <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{modules.length.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">ماژول قابل مدیریت</div>
+ <div className="mt-1 text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold ">{modules.length.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">محتوای قابل مدیریت</div>
- <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{totals.count.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">محتوای قابل مدیریت</div>
+ <div className="mt-1 text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold ">{totals.count.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">بازدید منبع‌ها</div>
- <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{totals.views.toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">بازدید منبع‌ها</div>
+ <div className="mt-1 text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold ">{totals.views.toLocaleString("fa-IR")}</div>
  </div>
  <div className="card p-4">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پیش‌نویس لوکال</div>
- <div className="mt-1 text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
+ <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">پیش‌نویس لوکال</div>
+ <div className="mt-1 text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold ">{drafts.reduce((s,d)=>s+d.count,0).toLocaleString("fa-IR")}</div>
  </div>
  </div>
 
  {drafts.length > 0 && (
  <div className="card p-4">
  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
- <h2 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">پیش‌نویس‌های لوکال</h2>
+ <h2 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold ">پیش‌نویس‌های لوکال</h2>
  <Badge variant="warning">ذخیره‌شده در مرورگر</Badge>
  </div>
- <div className="flex flex-wrap gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+ <div className="flex flex-wrap gap-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)]">
  {drafts.map(d => (
  <div key={d.module} className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3">
  <ModuleBadge module={d.module}>{moduleMeta[d.module].titleFa}</ModuleBadge>
  <div className="mt-2 paragraph-color">{d.count.toLocaleString("fa-IR")} پیش‌نویس</div>
- {d.latest && <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">آخرین: {d.latest}</div>}
+ {d.latest && <div className="mt-1 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">آخرین: {d.latest}</div>}
  </div>
  ))}
  </div>
@@ -134,12 +134,12 @@ export default function AdminPage() {
  <div key={module} className="card p-5">
  <div className="flex items-start justify-between gap-2">
  <div>
- <div className={`text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ${meta.color}`}>{meta.titleFa}</div>
- <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">/{module}</div>
+ <div className={`text-[length:var(--font-size-h2)] text-[var(--h2-font-color)] font-bold ${meta.color}`}>{meta.titleFa}</div>
+ <div className="mt-1 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">/{module}</div>
  </div>
  <ModuleBadge module={module}>{count.toLocaleString("fa-IR")} آیتم</ModuleBadge>
  </div>
- <div className="mt-4 grid grid-cols-2 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+ <div className="mt-4 grid grid-cols-2 gap-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
  <div className="rounded-[var(--corner-radius)] bg-[var(--card-background)] p-2">بازدید: <b className="text-[var(--primary-text)]">{views.toLocaleString("fa-IR")}</b></div>
  <div className="rounded-[var(--corner-radius)] bg-[var(--card-background)] p-2">آخرین: <b className="text-[var(--primary-text)]">{latest || "—"}</b></div>
  </div>
@@ -158,13 +158,13 @@ export default function AdminPage() {
  <h3 className="">مدیریت کاربران (مدیر کل)</h3>
  <Badge variant="info">{allUsers.length.toLocaleString("fa-IR")} کاربر</Badge>
  </div>
- <div className="grid gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] sm:grid-cols-2">
+ <div className="grid gap-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] sm:grid-cols-2">
  {allUsers.map(u => (
  <div key={u.id} className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3">
  <div className="flex flex-wrap items-center justify-between gap-2">
  <div>
  <div className=" text-[var(--primary-text)]">{u.name}</div>
- <div className="mt-0.5 font-mono text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">@{u.username} • {u.email}</div>
+ <div className="mt-0.5 font-mono text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">@{u.username} • {u.email}</div>
  </div>
  <ModuleBadge module={u.role === "super_admin" ? "vip" : "info"}>{u.role === "super_admin" ? "مدیر کل" : "ویراستار"}</ModuleBadge>
  </div>

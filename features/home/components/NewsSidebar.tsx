@@ -77,7 +77,7 @@ export default function NewsSidebar() {
         <div className="p-5 border-b border-[var(--border-color)] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <Icon name="news" className="h-5 w-5 text-[var(--news)]" />
-            <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
+            <h3 className="text-[length:var(--font-size-h2)] text-[var(--h2-font-color)] font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
           </div>
           <button
             type="button"
@@ -114,12 +114,12 @@ export default function NewsSidebar() {
                 <span>{n.date_fa} {n.time || ''}</span>
               </div>
 
-              <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--news)] transition-colors line-clamp-2 leading-6">
+              <h4 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--news)] transition-colors line-clamp-2 leading-6">
                 {n.title}
               </h4>
 
               {/* News Description */}
-              <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1.5 line-clamp-2 leading-5">
+              <p className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color mt-1.5 line-clamp-2 leading-5">
                 {n.excerpt}
               </p>
             </Link>
@@ -131,7 +131,7 @@ export default function NewsSidebar() {
           <Link
             href="/news"
             onClick={() => setOpen(false)}
-            className="btn btn-ghost w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--news)] font-bold"
+            className="btn btn-ghost w-full text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] text-[var(--news)] font-bold"
           >
             مشاهده آرشیو کامل اخبار ←
           </Link>

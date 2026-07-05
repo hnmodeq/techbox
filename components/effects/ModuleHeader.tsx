@@ -23,11 +23,11 @@ export default function ModuleHeader({ module, title, description, eyebrow, coun
   return (
     <header className={cn("mb-6 flex flex-wrap items-end justify-between gap-3", className)}>
       <div>
-        {eyebrow && <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{eyebrow}</div>}
-        <h1 className={cn("text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold", meta.color)}>{title}</h1>
-        {description && <p className="mt-2 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">{description}</p>}
+        {eyebrow && <div className="mb-2 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">{eyebrow}</div>}
+        <h1 className={cn("text-[length:var(--font-size-h1)] text-[var(--h1-font-color)] font-extrabold", meta.color)}>{title}</h1>
+        {description && <p className="mt-2 text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold paragraph-color">{description}</p>}
       </div>
-      {count && <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{count}</div>}
+      {count && <div className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">{count}</div>}
       {children}
     </header>
   );

@@ -14,7 +14,7 @@ export default function HomeToolsRow() {
         {/* Simple Header */}
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">محاسبه زنده ظرفیت، آرایه دیسک‌ها و پهنای باند</h2>
-          <p className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+          <p className="mt-1 text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] paragraph-color">
             ماشین حساب RAID زیر به‌صورت زنده قابل استفاده است؛ همچنین می‌توانید از ابزارهای تخصصی دیگر در پایین استفاده کنید:
           </p>
         </div>

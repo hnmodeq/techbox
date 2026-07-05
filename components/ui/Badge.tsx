@@ -10,7 +10,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const base =
  "inline-flex items-center gap-1 rounded-full border px-[10px] py-[3px] " +
- "text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-[600] whitespace-nowrap " +
+ "text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] font-[600] whitespace-nowrap " +
  "transition-colors duration-[var(--tb-motion-sm)]";
 
 const variants: Record<Variant, string> = {

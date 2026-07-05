@@ -40,13 +40,13 @@ export default function ForumRow() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
-                  <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">
+                  <span className="text-[length:var(--font-size-paragraph)] text-[var(--paragraph-color)] font-bold paragraph-color">
                     {top.author?.name || 'عضو تکباکس'}
                   </span>
                   <ForumBadge slug={top.slug} fallback={idx % 2 === 0} />
                 </div>
 
-                <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
+                <h3 className="text-[length:var(--font-size-h3)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
                   {top.title}
                 </h3>
 
