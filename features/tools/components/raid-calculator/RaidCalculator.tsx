@@ -255,9 +255,9 @@ function StatCard({ label, value, hint, tone = "default" }: { label: string; val
     : "text-[var(--primary-text)]";
   return (
     <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--muted-background)]/70 p-4">
-      <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{label}</div>
+      <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{label}</div>
       <div className={`mt-2 text-2xl font-black leading-none ${toneClass}`}>{value}</div>
-      <div className="mt-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{hint}</div>
+      <div className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{hint}</div>
     </div>
   );
 }
@@ -302,8 +302,8 @@ export default function RaidCalculator() {
                   <Icon name="server" className="h-3.5 w-3.5 text-[var(--tb-raid)]" />
                   ابزار محاسبه RAID
                 </div>
-                <h2 className="h1-font-size h1-font-color font-extrabold">ماشین حساب RAID و SHR</h2>
-                <p className="mt-3 max-w-2xl h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)]">
+                <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">ماشین حساب RAID و SHR</h2>
+                <p className="mt-3 max-w-2xl text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
                   ظرفیت قابل استفاده، افزونگی، فضای بلااستفاده و Hot Spare را برای RAIDهای کلاسیک و Synology Hybrid RAID با دیسک‌های هم‌اندازه یا ترکیبی محاسبه کنید.
                 </p>
               </div>
@@ -315,8 +315,8 @@ export default function RaidCalculator() {
             <div className="card p-5 shadow-[var(--shadow-size)]">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="h2-font-size h2-font-color font-bold font-black">انتخاب دیسک‌ها</h3>
-                  <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">برای افزودن دیسک جدید روی دکمه + کلیک کنید و ظرفیت مورد نظر را از منو انتخاب نمایید.</p>
+                  <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black">انتخاب دیسک‌ها</h3>
+                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">برای افزودن دیسک جدید روی دکمه + کلیک کنید و ظرفیت مورد نظر را از منو انتخاب نمایید.</p>
                 </div>
                 <div className="badge">{nf.format(drives.length)} دیسک فعال</div>
               </div>
@@ -371,8 +371,8 @@ export default function RaidCalculator() {
             <div className="card p-5 shadow-[var(--shadow-size)]">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="h2-font-size h2-font-color font-bold font-black">انتخاب نوع RAID</h3>
-                  <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">معماری و نوع آرایه دیسک را از منوی کشویی انتخاب کنید.</p>
+                  <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black">انتخاب نوع RAID</h3>
+                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">معماری و نوع آرایه دیسک را از منوی کشویی انتخاب کنید.</p>
                 </div>
               </div>
 
@@ -401,7 +401,7 @@ export default function RaidCalculator() {
                 <label className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <span>
                     <span className="block font-black">دیسک رزرو (Hot Spare)</span>
-                    <span className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)]">بزرگ‌ترین دیسک‌ها به‌عنوان Spare رزرو می‌شوند و وارد ظرفیت Volume نمی‌شوند.</span>
+                    <span className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">بزرگ‌ترین دیسک‌ها به‌عنوان Spare رزرو می‌شوند و وارد ظرفیت Volume نمی‌شوند.</span>
                   </span>
                   <span className="flex items-center gap-2">
                     <button type="button" className="icon-rail-btn" onClick={() => setSpareCount((value) => clamp(value - 1, 0, effectiveSpareMax))}>
@@ -428,9 +428,9 @@ export default function RaidCalculator() {
           <div className="border-t border-[var(--border-color)] pt-4">
             {!raid || !selectedOption ? (
               <div className="my-6 text-center p-8 rounded-[var(--corner-radius)] border border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
-                <Icon name="disk" className="h-10 w-10 mx-auto text-[var(--paragraph-color)] mb-3 opacity-60" />
-                <p className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)]">هیچ نوع RAID انتخاب نشده است</p>
-                <p className="mt-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)] max-w-md mx-auto">
+                <Icon name="disk" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
+                <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ نوع RAID انتخاب نشده است</p>
+                <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
                   لطفاً برای مشاهده نتیجه محاسبه، نقشه ظرفیت و تحلیل راندمان، یکی از انواع RAID یا SHR را از گزینه‌های بالا انتخاب کنید.
                 </p>
               </div>
@@ -439,14 +439,14 @@ export default function RaidCalculator() {
                 <div className="border-b border-[var(--border-color)] bg-[color-mix(in_oklch,var(--tb-raid)_10%,var(--card-background))] p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <div className="paragraph-font-size paragraph-color font-bold text-[var(--paragraph-color)]">نتیجه نهایی محاسبه برای</div>
+                      <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">نتیجه نهایی محاسبه برای</div>
                       <div className="mt-1 text-3xl font-black text-[var(--tb-raid)]">{selectedOption.label}</div>
                     </div>
                     <div className={`badge ${result.valid ? "border-[color-mix(in_oklch,var(--tb-success)_40%,var(--border-color))] text-[var(--tb-success)]" : "border-[color-mix(in_oklch,var(--tb-danger)_40%,var(--border-color))] text-[var(--tb-danger)]"}`}>
                       {result.valid ? "پیکربندی معتبر" : "نیازمند اصلاح دیسک‌ها"}
                     </div>
                   </div>
-                  <p className="mt-3 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{result.description}</p>
+                  <p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{result.description}</p>
                 </div>
 
                 <div className="space-y-6 p-6">
@@ -458,9 +458,9 @@ export default function RaidCalculator() {
                   </div>
 
                   <div>
-                    <div className="mb-2 flex items-center justify-between paragraph-font-size paragraph-color font-bold">
+                    <div className="mb-2 flex items-center justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold">
                       <span>نقشه توزیع ظرفیت</span>
-                      <span className="text-[var(--paragraph-color)]">ظرفیت خام کل: {formatTb(result.rawTb)}</span>
+                      <span className="paragraph-color">ظرفیت خام کل: {formatTb(result.rawTb)}</span>
                     </div>
                     <div className="flex h-6 overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--muted-background)] shadow-inner" aria-label="نمودار ظرفیت RAID">
                       <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--tb-raid)]" />
@@ -468,7 +468,7 @@ export default function RaidCalculator() {
                       <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--tb-warning)]" />
                       <Segment label="Hot Spare" value={result.spareTb} total={barTotal} className="bg-[var(--paragraph-color)]" />
                     </div>
-                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-raid)]" /> قابل استفاده</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-success)]" /> حفاظت</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-warning)]" /> بلااستفاده</span>
@@ -481,21 +481,21 @@ export default function RaidCalculator() {
                       <Icon name="shield" className="h-5 w-5 text-[var(--tb-raid)]" />
                       خلاصه فنی پیکربندی
                     </div>
-                    <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 paragraph-font-size paragraph-color">
+                    <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
                       <div>
-                        <dt className="text-[var(--paragraph-color)]">دیسک فعال</dt>
+                        <dt className="paragraph-color">دیسک فعال</dt>
                         <dd className="mt-1 font-black text-[16px]">{nf.format(drives.length - spareCount)} عدد</dd>
                       </div>
                       <div>
-                        <dt className="text-[var(--paragraph-color)]">Hot Spare</dt>
+                        <dt className="paragraph-color">Hot Spare</dt>
                         <dd className="mt-1 font-black text-[16px]">{nf.format(spareCount)} عدد</dd>
                       </div>
                       <div>
-                        <dt className="text-[var(--paragraph-color)]">ظرفیت خام فعال</dt>
+                        <dt className="paragraph-color">ظرفیت خام فعال</dt>
                         <dd className="mt-1 font-black text-[16px]">{formatTb(result.activeRawTb)}</dd>
                       </div>
                       <div>
-                        <dt className="text-[var(--paragraph-color)]">تحمل خرابی</dt>
+                        <dt className="paragraph-color">تحمل خرابی</dt>
                         <dd className="mt-1 font-black text-[16px]">{result.faultTolerance}</dd>
                       </div>
                     </dl>
@@ -504,13 +504,13 @@ export default function RaidCalculator() {
                   {result.warnings.length > 0 ? (
                     <div className="space-y-2">
                       {result.warnings.map((warning) => (
-                        <div key={warning} className="rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-warning)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-warning)_11%,var(--card-background))] p-3.5 paragraph-font-size paragraph-color text-[var(--primary-text)]">
+                        <div key={warning} className="rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-warning)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-warning)_11%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)]">
                           {warning}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-success)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-success)_10%,var(--card-background))] p-3.5 paragraph-font-size paragraph-color text-[var(--primary-text)] font-bold">
+                    <div className="rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-success)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-success)_10%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] font-bold">
                       این چیدمان از نظر تعداد دیسک معتبر است و ظرفیت بدون هیچ هشداری محاسبه شد.
                     </div>
                   )}

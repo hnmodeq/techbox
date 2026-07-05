@@ -97,7 +97,7 @@ export function AuthModal() {
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 left-4 h-8 w-8 rounded-full flex items-center justify-center text-[var(--paragraph-color)] hover:bg-[var(--card-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
+          className="absolute top-4 left-4 h-8 w-8 rounded-full flex items-center justify-center paragraph-color hover:bg-[var(--card-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
         >
           ✕
         </button>
@@ -110,7 +110,7 @@ export function AuthModal() {
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
             ورود و عضویت در تکباکس
           </h2>
-          <p className="text-xs sm:text-sm text-[var(--paragraph-color)] leading-5 max-w-xs mx-auto">
+          <p className="text-xs sm:text-sm paragraph-color leading-5 max-w-xs mx-auto">
             اگر حساب ندارید، با وارد کردن نام کاربری و رمز عبور، حسابتان به صورت خودکار ایجاد می‌شود.
           </p>
         </div>
@@ -124,7 +124,7 @@ export function AuthModal() {
         {forgotOpen ? (
           <div className="mt-6 space-y-4 rounded-xl bg-[var(--card-background)] p-4 border border-[var(--border-color)] text-center">
             <h4 className="font-bold text-sm text-[var(--tb-warning)]">بازیابی رمز عبور</h4>
-            <p className="text-xs text-[var(--paragraph-color)] leading-5">
+            <p className="text-xs paragraph-color leading-5">
               برای تغییر یا بازیابی رمز عبور حساب کاربری خود، لطفاً با ایمیل پشتیبانی یا ادمین سیستم تماس بگیرید.
             </p>
             <button
@@ -169,7 +169,7 @@ export function AuthModal() {
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-[var(--paragraph-color)] select-none">
+              <label className="flex items-center gap-2 cursor-pointer paragraph-color select-none">
                 <input
                   type="checkbox"
                   checked={rememberMe}
@@ -199,7 +199,7 @@ export function AuthModal() {
         )}
 
         <div className="mt-6 pt-4 border-t border-[var(--border-color)]/60 text-center">
-          <p className="text-[11px] text-[var(--paragraph-color)] leading-4">
+          <p className="text-[11px] paragraph-color leading-4">
             با ورود به تکباکس، قوانین حریم خصوصی و استفاده از زیرساخت را می‌پذیرید.
           </p>
         </div>

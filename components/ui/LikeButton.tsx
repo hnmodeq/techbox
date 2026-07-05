@@ -77,7 +77,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
         disabled={busy}
         variant={liked ? "primary" : "ghost"}
         size="sm"
-        className="gap-2 paragraph-font-size paragraph-color disabled:opacity-60"
+        className="gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] disabled:opacity-60"
         aria-pressed={liked}
       >
         <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-white" : ""} aria-hidden />
@@ -87,7 +87,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
 
       {showLoginPrompt && (
         <div className="absolute bottom-full mb-2 right-0 z-50 w-64 rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-3 shadow-[var(--shadow-size)] text-center animate-in fade-in zoom-in-95">
-          <p className="paragraph-font-size paragraph-color text-[var(--primary-text)] mb-2">برای پسندیدن مطالب باید وارد حساب کاربری خود شوید.</p>
+          <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] mb-2">برای پسندیدن مطالب باید وارد حساب کاربری خود شوید.</p>
           <div className="flex justify-center gap-2">
             <Button size="xs" onClick={() => { setShowLoginPrompt(false); window.dispatchEvent(new CustomEvent("tb_open_auth")); }}>ورود / عضویت</Button>
             <Button variant="ghost" size="xs" onClick={() => setShowLoginPrompt(false)}>بستن</Button>
@@ -128,9 +128,9 @@ export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id:
   };
 
   return (
-    <div className="relative inline-flex items-center gap-3 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
-      <Button onClick={() => vote("up")} variant="link" size="xs" className={v === "up" ? "text-[var(--tb-success)]" : "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]"}>▲ {(l ?? 0).toLocaleString("fa-IR")}</Button>
-      <Button onClick={() => vote("down")} variant="link" size="xs" className={v === "down" ? "text-[var(--tb-danger)]" : "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]"}>▼ {(d ?? 0).toLocaleString("fa-IR")}</Button>
+    <div className="relative inline-flex items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+      <Button onClick={() => vote("up")} variant="link" size="xs" className={v === "up" ? "text-[var(--tb-success)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▲ {(l ?? 0).toLocaleString("fa-IR")}</Button>
+      <Button onClick={() => vote("down")} variant="link" size="xs" className={v === "down" ? "text-[var(--tb-danger)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▼ {(d ?? 0).toLocaleString("fa-IR")}</Button>
       {needLogin && (
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)] text-center">
           <p className="text-xs text-[var(--primary-text)] mb-1.5">برای امتیاز به نظر ابتدا وارد شوید</p>

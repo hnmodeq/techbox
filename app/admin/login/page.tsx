@@ -53,14 +53,14 @@ export default function AdminLogin() {
       <form onSubmit={submit} className="card w-full max-w-lg space-y-5 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="h2-font-size h2-font-color font-bold ">ورود ویراستار و مدیران</h1>
-            <p className="mt-1 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">متصل به پایگاه داده Neon PostgreSQL و احراز هویت کوکی</p>
+            <h1 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">ورود ویراستار و مدیران</h1>
+            <p className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">متصل به پایگاه داده Neon PostgreSQL و احراز هویت کوکی</p>
           </div>
           <Badge variant="info">Real Auth</Badge>
         </div>
 
         <div>
-          <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">نام کاربری</label>
+          <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">نام کاربری</label>
           <div className="mt-1 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <input value={u} onChange={e => { setU(e.target.value); setErr(""); }} className="input" placeholder="sara / admin / nima ..." dir="ltr" />
             <Button disabled={busy}>{busy ? "..." : "ورود"}</Button>
@@ -68,11 +68,11 @@ export default function AdminLogin() {
         </div>
 
         {selectedUser && (
-          <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3 paragraph-font-size paragraph-color">
+          <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="">{selectedUser.name}</div>
-                <div className="font-mono paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{selectedUser.email}</div>
+                <div className="font-mono text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{selectedUser.email}</div>
               </div>
               <ModuleBadge module={selectedUser.role === "super_admin" ? "vip" : "info"}>{selectedUser.role === "super_admin" ? "مدیر کل" : "ویراستار"}</ModuleBadge>
             </div>
@@ -82,7 +82,7 @@ export default function AdminLogin() {
           </div>
         )}
 
-        {err && <p className="paragraph-font-size paragraph-color text-[var(--tb-danger)]">{err}</p>}
+        {err && <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">{err}</p>}
       </form>
     </main>
   );

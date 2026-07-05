@@ -10,12 +10,12 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const base =
  "inline-flex items-center gap-1 rounded-full border px-[10px] py-[3px] " +
- "paragraph-font-size paragraph-color font-[600] whitespace-nowrap " +
+ "text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-[600] whitespace-nowrap " +
  "transition-colors duration-[var(--tb-motion-sm)]";
 
 const variants: Record<Variant, string> = {
  default: "bg-[var(--muted-background)] text-[var(--primary-text)] border-[var(--border-color)]",
- secondary: "bg-[var(--muted-background)] text-[var(--paragraph-color)] border-[var(--border-color)]",
+ secondary: "bg-[var(--muted-background)] paragraph-color border-[var(--border-color)]",
  outline: "bg-transparent text-[var(--primary-text)] border-[var(--border-color)]",
  brand: "bg-[color-mix(in_oklch,var(--home)_14%,transparent)] text-[var(--home)] border-[color-mix(in_oklch,var(--home)_30%,transparent)]",
  home: "",
@@ -46,7 +46,7 @@ const neutralVariants = new Set<Variant>([
 ]);
 
 const neutralClass =
- "bg-transparent text-[var(--paragraph-color)] border-[var(--border-color)]";
+ "bg-transparent paragraph-color border-[var(--border-color)]";
 
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
  ({ className, variant="default", style, ...props }, ref) => {

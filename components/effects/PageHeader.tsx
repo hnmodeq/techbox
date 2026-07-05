@@ -20,8 +20,8 @@ export default function PageHeader({ title, description, titleClassName, classNa
   return (
     <header className={cn("mb-6 flex flex-wrap items-end justify-between gap-3", className)} dir="rtl">
       <div>
-        <h1 className={cn("h1-font-size h1-font-color font-extrabold", titleClassName)}>{title}</h1>
-        {description && <p className="mt-2 h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)]">{description}</p>}
+        <h1 className={cn("text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold", titleClassName)}>{title}</h1>
+        {description && <p className="mt-2 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">{description}</p>}
       </div>
       {children}
     </header>

@@ -34,10 +34,10 @@ const variants: Record<Variant,string> = {
 };
 
 const sizes: Record<Size,string> = {
- xs: "h-7 px-2.5 paragraph-font-size paragraph-color rounded-[var(--corner-radius)]",
- sm: "h-8 px-3 paragraph-font-size paragraph-color rounded-[var(--corner-radius)]",
- md: "h-10 px-4 paragraph-font-size paragraph-color rounded-[var(--corner-radius)]",
- lg: "h-11 px-5 h3-font-size h3-font-color font-semibold rounded-[var(--corner-radius)]",
+ xs: "h-7 px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)]",
+ sm: "h-8 px-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)]",
+ md: "h-10 px-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)]",
+ lg: "h-11 px-5 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold rounded-[var(--corner-radius)]",
  icon: "h-10 w-10 p-0 rounded-[var(--corner-radius)]",
  iconSm: "h-7 w-7 p-0 rounded-[var(--corner-radius)]"
 };

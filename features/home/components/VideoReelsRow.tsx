@@ -76,11 +76,11 @@ export default function VideoReelsRow() {
             
             <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--main-background)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
               <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
-                <h3 className="h2-font-size h2-font-color font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
+                <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
                 <button
                   type="button"
                   onClick={() => setActiveVideo(null)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--muted-background)] text-[var(--paragraph-color)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--muted-background)] paragraph-color hover:text-[var(--primary-text)] transition-colors cursor-pointer"
                   aria-label="بستن"
                 >
                   <Icon name="close" size={18} />
@@ -100,7 +100,7 @@ export default function VideoReelsRow() {
               </div>
 
               <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-                <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                   <span>منتشرشده توسط: <b className="text-[var(--primary-text)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span> • {activeVideo.date_fa}</span>
                 </div>

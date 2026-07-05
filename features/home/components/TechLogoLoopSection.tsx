@@ -26,7 +26,7 @@ export default function TechLogoLoopSection() {
  <section className="relative w-full max-w-full overflow-x-hidden overflow-hidden px-4 py-20 md:py-24 border-t border-[var(--border-color)] bg-[var(--main-background)]" aria-labelledby="tech-stack-title">
  <div className="mx-auto max-w-7xl w-full max-w-full overflow-x-hidden">
  <div className="mb-10 text-center">
- <h2 id="tech-stack-title" className="h1-font-size h1-font-color font-extrabold text-[var(--primary-text)]">شرکت‌های همکار</h2>
+ <h2 id="tech-stack-title" className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold text-[var(--primary-text)]">شرکت‌های همکار</h2>
  </div>
  <LogoLoop
  logos={techLogos}

@@ -30,7 +30,7 @@ function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { s
         <span>↓</span>
       </span>
       <div className="flex items-center gap-3">
-        <span className="inline-flex items-center gap-1 text-xs text-[var(--paragraph-color)] font-bold" title="حجم فایل">
+        <span className="inline-flex items-center gap-1 text-xs paragraph-color font-bold" title="حجم فایل">
           <svg className="w-3.5 h-3.5 text-[var(--tb-warning)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
@@ -93,10 +93,10 @@ export default function DownloadRow() {
                       </span>
                     </div>
 
-                    <h3 className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
                       {file.title}
                     </h3>
-                    <div className="text-xs text-[var(--paragraph-color)] mt-1 line-clamp-1">
+                    <div className="text-xs paragraph-color mt-1 line-clamp-1">
                       {file.excerpt || 'سرورهای Enterprise و مجازی‌سازی'}
                     </div>
                   </div>

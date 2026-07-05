@@ -56,7 +56,7 @@ export const ChipButton = React.forwardRef<HTMLButtonElement, ChipButtonProps>(
  ref={ref}
  type="button"
  className={cn(
- "inline-flex items-center justify-center gap-1 rounded-[var(--corner-radius)] border px-3 py-1.5 paragraph-font-size paragraph-color ",
+ "inline-flex items-center justify-center gap-1 rounded-[var(--corner-radius)] border px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ",
  "transition-colors duration-[var(--tb-motion-sm)] ease-[var(--tb-ease)]",
  "focus-visible:outline-none focus-visible:shadow-[var(--tb-ring-3)] disabled:pointer-events-none disabled:opacity-50",
  className

@@ -69,15 +69,15 @@ export default function CheckoutPage(){
 
  return (
  <main className="max-w-5xl mx-auto px-4 py-12" dir="rtl">
- <h1 className="h1-font-size h1-font-color font-extrabold mb-2 text-[var(--tb-shop)]">تسویه حساب – زرین‌پال</h1>
- <p className="mb-6 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+ <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2 text-[var(--tb-shop)]">تسویه حساب – زرین‌پال</h1>
+ <p className="mb-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  درگاه: <b>ZarinPal</b> – {process.env.NEXT_PUBLIC_ZARIN_MERCHANT_ID ? "Live" : "Sandbox / Mock"} – برای فعال‌سازی واقعی، در .env بگذارید: <code>ZARIN_MERCHANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>
  </p>
 
  <div className="grid lg:grid-cols-3 gap-6">
  <div className="lg:col-span-2 card p-5 space-y-4">
  <h3 className="">اطلاعات ارسال</h3>
- <div className="grid sm:grid-cols-2 gap-3 h3-font-size h3-font-color font-semibold">
+ <div className="grid sm:grid-cols-2 gap-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
  <input className="input" placeholder="نام و نام خانوادگی *" value={name} onChange={e=>setName(e.target.value)} />
  <input className="input" placeholder="تلفن *" dir="ltr" value={phone} onChange={e=>setPhone(e.target.value)} />
  <input className="input sm:col-span-2" placeholder="آدرس" />
@@ -89,7 +89,7 @@ export default function CheckoutPage(){
  </div>
 
  <h3 className=" pt-2">پرداخت</h3>
- <div className="flex gap-4 paragraph-font-size paragraph-color flex-wrap">
+ <div className="flex gap-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-wrap">
  <label className="flex items-center gap-2 rounded-[var(--corner-radius)] border border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_8%,transparent)] px-3 py-2">
  <input type="radio" name="pay" defaultChecked readOnly /> 
  <span>درگاه <b>زرین‌پال</b> – کارت شتاب</span>
@@ -98,31 +98,31 @@ export default function CheckoutPage(){
  <label className="flex items-center gap-2 rounded-[var(--corner-radius)] border border-[var(--border-color)] px-3 py-2"><input type="radio" name="pay" disabled /> کارت به کارت (غیرفعال در دمو)</label>
  </div>
 
- <Button onClick={pay} disabled={loading || items.length===0} className="w-full h3-font-size h3-font-color font-semibold disabled:opacity-60">
+ <Button onClick={pay} disabled={loading || items.length===0} className="w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold disabled:opacity-60">
  {loading ? "در حال اتصال به زرین‌پال…" : `پرداخت ${totalToman>0 ? totalToman.toLocaleString("fa-IR")+" تومان" : "–"} با زرین‌پال`}
  </Button>
- <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+ <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  پرداخت امن – اگر <code>ZARIN_MERCHANT_ID</code> تنظیم نباشد، تراکنش شبیه‌سازی می‌شود و به‌صورت خودکار Verify می‌شود – مناسب تست لوکال.
  </p>
  </div>
 
  <div className="card p-5 h-fit sticky top-24">
  <h4 className=" mb-3">خلاصه سبد ({count.toLocaleString("fa-IR")} قلم)</h4>
- <div className="space-y-2 max-h-80 overflow-y-auto paragraph-font-size paragraph-color">
- {items.length===0 ? <p className="text-[var(--paragraph-color)]">سبد خالی است – <Link href="/shop" className="underline text-[var(--tb-shop)]">فروشگاه</Link></p> :
+ <div className="space-y-2 max-h-80 overflow-y-auto text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+ {items.length===0 ? <p className="paragraph-color">سبد خالی است – <Link href="/shop" className="underline text-[var(--tb-shop)]">فروشگاه</Link></p> :
  items.map(i=>(
  <div key={i.slug} className="flex justify-between border-b border-[var(--border-color)] pb-2">
  <span className="truncate ps-2">{i.title} × {i.qty.toLocaleString("fa-IR")}</span>
- <span className="text-[var(--paragraph-color)]">{i.price}</span>
+ <span className="paragraph-color">{i.price}</span>
  </div>
  ))
  }
  </div>
- <div className="mt-3 space-y-1 paragraph-font-size paragraph-color">
+ <div className="mt-3 space-y-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <div className="flex justify-between"><span>جمع جزء</span><span>{totalToman.toLocaleString("fa-IR")} تومان</span></div>
- <div className="flex justify-between text-[var(--paragraph-color)]"><span>ارسال</span><span>رایگان</span></div>
- <div className="flex justify-between border-t border-[var(--border-color)] pt-2 h3-font-size h3-font-color font-semibold "><span>مبلغ قابل پرداخت</span><span className="text-[var(--tb-shop)]">{totalToman.toLocaleString("fa-IR")} تومان</span></div>
- <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">≈ {(amountRial).toLocaleString("fa-IR")} ریال – درگاه زرین‌پال</div>
+ <div className="flex justify-between paragraph-color"><span>ارسال</span><span>رایگان</span></div>
+ <div className="flex justify-between border-t border-[var(--border-color)] pt-2 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold "><span>مبلغ قابل پرداخت</span><span className="text-[var(--tb-shop)]">{totalToman.toLocaleString("fa-IR")} تومان</span></div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">≈ {(amountRial).toLocaleString("fa-IR")} ریال – درگاه زرین‌پال</div>
  </div>
  </div>
  </div>

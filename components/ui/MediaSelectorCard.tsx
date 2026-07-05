@@ -61,25 +61,25 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  </span>
 
  {category && (
- <span className="absolute top-3 right-3 rounded-full border border-white/30 bg-black/40 px-2.5 py-0.5 paragraph-font-size paragraph-color text-white backdrop-blur-md">
+ <span className="absolute top-3 right-3 rounded-full border border-white/30 bg-black/40 px-2.5 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-md">
  {category}
  </span>
  )}
- <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 paragraph-font-size paragraph-color text-white backdrop-blur-sm">
+ <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-sm">
  {duration}
  </span>
 
  <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
- <h4 className="h3-font-size h3-font-color font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--tb-media)]">
+ <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--tb-media)]">
  {title}
  </h4>
- <div className="mt-2 flex items-center justify-between paragraph-font-size paragraph-color text-white/80">
+ <div className="mt-2 flex items-center justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">
  {author && <span>{author}</span>}
  {dateFa && <span>{dateFa}</span>}
  </div>
  <div className="mt-2 pt-2 border-t border-white/20">
  {slug ? <CardStats module="media" slug={slug} initialViews={views} initialLikes={likes} initialComments={comments} showComments={true} /> : (
- <div className="flex items-center gap-3 paragraph-font-size paragraph-color text-white/80">
+ <div className="flex items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">
  {typeof views === "number" && <span>👁 {views.toLocaleString("fa-IR")}</span>}
  {typeof likes === "number" && <span>♥ {likes.toLocaleString("fa-IR")}</span>}
  {typeof comments === "number" && <span>💬 {comments.toLocaleString("fa-IR")}</span>}

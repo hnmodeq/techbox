@@ -57,7 +57,7 @@ export default function HomeTimelineRow() {
         {/* Helper Awareness Banner */}
         {active && (
           <div className="text-center">
-            <span className="badge bg-[var(--card-background)] text-[var(--tb-timeline)] font-bold border border-[var(--border-color)] shadow-sm px-4 py-1.5 paragraph-font-size paragraph-color">
+            <span className="badge bg-[var(--card-background)] text-[var(--tb-timeline)] font-bold border border-[var(--border-color)] shadow-sm px-4 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
             </span>
           </div>
@@ -69,7 +69,7 @@ export default function HomeTimelineRow() {
             <div className="card p-8 sm:p-12 text-center bg-[var(--card-background)] border border-[var(--border-color)] rounded-2xl flex flex-col items-center justify-center gap-4">
               <Icon name="timeline" className="w-12 h-12 text-[var(--tb-timeline)] opacity-80" />
               <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)]">تایم‌لاین تعاملی فناوری اطلاعات تکباکس</h3>
-              <p className="text-xs sm:text-sm text-[var(--paragraph-color)] max-w-lg leading-6">
+              <p className="text-xs sm:text-sm paragraph-color max-w-lg leading-6">
                 برای سرعت بیشتر در بارگذاری صفحه و صرفه‌جویی در منابع پردازشی دستگاه شما، تایم‌لاین زنده تنها در صورت تقاضا بارگذاری می‌شود.
               </p>
               <button

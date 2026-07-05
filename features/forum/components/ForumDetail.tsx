@@ -86,7 +86,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
   return (
     <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+      <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
         <Link href="/" className="hover:text-[var(--primary-text)]">خانه</Link>
         <span>/</span>
         <Link href="/forum" className="hover:text-[var(--primary-text)]">انجمن تکباکس</Link>
@@ -110,7 +110,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{item.title}</h1>
                 <ForumBadge slug={item.slug} fallback={item.solved ?? false} />
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                 <span>ارسال‌شده توسط <b className="text-[var(--primary-text)]">{item.author?.name || "کاربر انجمن"}</b></span>
                 <span>•</span>
                 <span>{item.date_fa}</span>
@@ -139,17 +139,17 @@ export default function ForumDetail({ item }: ForumDetailProps) {
           <h2 className="text-lg font-black text-[var(--primary-text)]">
             پاسخ‌ها و راه‌حل‌ها ({replies.length.toLocaleString("fa-IR")})
           </h2>
-          <span className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">مرتب‌شده بر اساس بهترین پاسخ</span>
+          <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">مرتب‌شده بر اساس بهترین پاسخ</span>
         </div>
 
         {/* New Reply Form */}
         <form onSubmit={handleAddReply} className="card p-5 space-y-3 bg-[var(--card-background)]/60">
-          <h3 className="h3-font-size h3-font-color font-semibold font-bold">ارسال پاسخ یا راه‌حل شما</h3>
+          <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold">ارسال پاسخ یا راه‌حل شما</h3>
           <textarea
             value={newReply}
             onChange={(e) => setNewReply(e.target.value)}
             placeholder="اگر تجربه، راهکار یا پیشنهادی برای حل این موضوع دارید بنویسید..."
-            className="input w-full min-h-[110px] paragraph-font-size paragraph-color"
+            className="input w-full min-h-[110px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
             required
           />
           <div className="flex justify-end">
@@ -180,11 +180,11 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                   <Image src={reply.avatar} alt={reply.author} width={44} height={44} className="h-11 w-11 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
                   <div>
                     <div className="font-bold text-[var(--primary-text)]">{reply.author}</div>
-                    <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] mt-0.5">{reply.date}</div>
+                    <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-0.5">{reply.date}</div>
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--muted-background)] border border-[var(--border-color)] paragraph-font-size paragraph-color text-[var(--paragraph-color)] font-bold">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--muted-background)] border border-[var(--border-color)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
                   <span>▲</span>
                   <span>{reply.likes.toLocaleString("fa-IR")}</span>
                 </div>

@@ -54,7 +54,7 @@ export function AuthorLink({
           {authorName}
         </div>
         {role && (
-          <div className="text-[10px] sm:text-[11px] text-[var(--paragraph-color)] truncate">
+          <div className="text-[10px] sm:text-[11px] paragraph-color truncate">
             {role}
           </div>
         )}

@@ -25,8 +25,8 @@ export default function HomeModulesSection() {
  <section className="px-4 md:px-10 lg:px-20 pb-24 w-full max-w-full overflow-x-hidden">
  <div className="mx-auto max-w-7xl w-full">
  <div className="flex items-end justify-between mb-6 px-1">
- <h2 className="h1-font-size h1-font-color font-extrabold ">آخرین‌ها از تکباکس</h2>
- <span className="paragraph-font-size paragraph-color text-muted-foreground">فید زنده ماژول‌ها</span>
+ <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">آخرین‌ها از تکباکس</h2>
+ <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">فید زنده ماژول‌ها</span>
  </div>
  <div className="grid grid-cols-1 gap-5 md:grid-cols-7 md:auto-rows-min">
  {sortedModules.map((module) => {

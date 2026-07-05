@@ -80,14 +80,14 @@ function ToggleCard({
           "mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border",
           selected
             ? "border-[color-mix(in_oklch,var(--home)_35%,transparent)] bg-[var(--home)] text-[#ffffff]"
-            : "border-[var(--border-color)] bg-[var(--muted-background)] text-[var(--paragraph-color)]",
+            : "border-[var(--border-color)] bg-[var(--muted-background)] paragraph-color",
         )}
       >
         <Icon name={icon} className="h-4 w-4" />
       </span>
       <span className="min-w-0">
         <span className="block text-[14px] font-black text-[var(--primary-text)]">{title}</span>
-        {desc ? <span className="mt-1 block text-[12px] leading-6 text-[var(--paragraph-color)]">{desc}</span> : null}
+        {desc ? <span className="mt-1 block text-[12px] leading-6 paragraph-color">{desc}</span> : null}
       </span>
     </button>
   );
@@ -221,13 +221,13 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
       <div className="flex items-center justify-between gap-3 border-b border-[var(--border-color)] p-4">
         <div>
           <h3 className="text-[15px] font-black">جدول سریع ظرفیت قابل استفاده</h3>
-          <p className="mt-1 text-[12px] leading-6 text-[var(--paragraph-color)]">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
+          <p className="mt-1 text-[12px] leading-6 paragraph-color">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
         </div>
         <Icon name="disk" className="h-5 w-5 text-[var(--home)]" />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[520px] border-collapse text-center text-[12px]">
-          <thead className="bg-[var(--muted-background)] text-[var(--paragraph-color)]">
+          <thead className="bg-[var(--muted-background)] paragraph-color">
             <tr>
               <th className="p-3 font-black">Bay</th>
               {raids.map((raid) => (
@@ -292,7 +292,7 @@ function ProductCard({
             </div>
             <div>
               <h3 className="text-[16px] font-black text-[var(--primary-text)]">{product.title}</h3>
-              <p className="mt-0.5 text-[12px] text-[var(--paragraph-color)]">{product.subtitle}</p>
+              <p className="mt-0.5 text-[12px] paragraph-color">{product.subtitle}</p>
             </div>
           </div>
           {rank === 0 ? (
@@ -314,7 +314,7 @@ function ProductCard({
             ["شبکه", `${persianNumber(product.networkGbE)} GbE`],
           ].map(([label, value]) => (
             <div key={label as string} className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2.5 text-center">
-              <div className="text-[11px] text-[var(--paragraph-color)]">{label}</div>
+              <div className="text-[11px] paragraph-color">{label}</div>
               <div className="mt-1 text-[13px] font-black text-[var(--primary-text)]">{value}</div>
             </div>
           ))}
@@ -335,7 +335,7 @@ function ProductCard({
             </div>
           ))}
           {product.warnings.map((warning) => (
-            <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--paragraph-color)]">
+            <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 paragraph-color">
               <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-warning)]" />
               <span>{warning}</span>
             </div>
@@ -396,8 +396,8 @@ export function NasSelector({
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--tb-vip)_14%,transparent),transparent_30%)]" />
         <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
-            <h1 className="h1-font-size h1-font-color font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
-            <p className="mt-3 max-w-2xl text-[14px] leading-8 text-[var(--paragraph-color)]">
+            <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
+            <p className="mt-3 max-w-2xl text-[14px] leading-8 paragraph-color">
               نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
             </p>
 
@@ -405,7 +405,7 @@ export function NasSelector({
               <section className="card">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۱. نوع استفاده</h2>
-                  <span className="text-[12px] text-[var(--paragraph-color)]">سناریوی اصلی را مشخص کنید</span>
+                  <span className="text-[12px] paragraph-color">سناریوی اصلی را مشخص کنید</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {personas.map((persona) => (
@@ -424,7 +424,7 @@ export function NasSelector({
               <section className="card">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۲. سرویس‌ها و بار کاری</h2>
-                  <span className="text-[12px] text-[var(--paragraph-color)]">چند گزینه قابل انتخاب است</span>
+                  <span className="text-[12px] paragraph-color">چند گزینه قابل انتخاب است</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {workloads.map((workload) => (
@@ -467,7 +467,7 @@ export function NasSelector({
                       {raidTypes.map((raid) => (
                         <button key={raid} type="button" onClick={() => update("raid", raid)} className={cn("rounded-[var(--corner-radius)] border p-3 text-right transition", state.raid === raid ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
                           <span className="block text-[12px] font-black">{raidLabels[raid].title}</span>
-                          <span className="mt-1 block text-[11px] leading-5 text-[var(--paragraph-color)]">{raidLabels[raid].desc}</span>
+                          <span className="mt-1 block text-[11px] leading-5 paragraph-color">{raidLabels[raid].desc}</span>
                         </button>
                       ))}
                     </div>
@@ -485,11 +485,11 @@ export function NasSelector({
                   </label>
                   <button type="button" onClick={() => update("nvme", !state.nvme)} className={cn("rounded-[var(--corner-radius)] border p-4 text-right transition", state.nvme ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
                     <span className="block text-[13px] font-extrabold">نیاز به NVMe / SSD Cache</span>
-                    <span className="mt-2 block text-[12px] text-[var(--paragraph-color)]">برای دیتابیس، VM یا فایل‌های پرتکرار</span>
+                    <span className="mt-2 block text-[12px] paragraph-color">برای دیتابیس، VM یا فایل‌های پرتکرار</span>
                   </button>
                   <button type="button" onClick={() => update("rackmount", !state.rackmount)} className={cn("rounded-[var(--corner-radius)] border p-4 text-right transition", state.rackmount ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
                     <span className="block text-[13px] font-extrabold">فرم‌فکتور Rackmount</span>
-                    <span className="mt-2 block text-[12px] text-[var(--paragraph-color)]">برای رک، اتاق سرور و دیتاسنتر</span>
+                    <span className="mt-2 block text-[12px] paragraph-color">برای رک، اتاق سرور و دیتاسنتر</span>
                   </button>
                 </div>
               </section>
@@ -504,16 +504,16 @@ export function NasSelector({
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
                 <div>
                   <h2 className="text-[20px] font-black">نتایج و مدل‌های پیشنهادی فروشگاه</h2>
-                  <p className="mt-1 text-[13px] text-[var(--paragraph-color)]">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
+                  <p className="mt-1 text-[13px] paragraph-color">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
                 </div>
                 {isOptionSelected && top ? <span className="badge text-[var(--home)]">{persianNumber(top.match)}٪ بهترین انتخاب</span> : null}
               </div>
 
               {!isOptionSelected ? (
                 <div className="my-10 text-center p-8 rounded-[var(--corner-radius)] border border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
-                  <Icon name="server" className="h-10 w-10 mx-auto text-[var(--paragraph-color)] mb-3 opacity-60" />
-                  <p className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
-                  <p className="mt-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)] max-w-md mx-auto">
+                  <Icon name="server" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
+                  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
+                  <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
                     لطفاً ابتدا نوع استفاده یا حداقل یک سرویس را از گزینه‌های بالا انتخاب کنید تا بهترین دستگاه‌های NAS موجود در فروشگاه محاسبه و نمایش داده شوند.
                   </p>
                 </div>
@@ -537,7 +537,7 @@ export function NasSelector({
                   <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="btn btn-ghost">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
                   <a href={consultationHref} className="btn btn-primary">درخواست مشاوره تخصصی</a>
                 </div>
-                <p className="text-[12px] text-[var(--paragraph-color)]">
+                <p className="text-[12px] paragraph-color">
                   ظرفیت RAID تقریبی است و باید با محدودیت فایل‌سیستم و سیاست بکاپ نهایی شود.
                 </p>
               </div>

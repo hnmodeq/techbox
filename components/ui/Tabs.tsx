@@ -21,8 +21,8 @@ export function TabsTrigger({value, children, __tb_active, __tb_onSelect, classN
  <button
  onClick={()=>__tb_onSelect?.(value)}
  className={cn(
- "px-3 py-1.5 paragraph-font-size paragraph-color rounded-[var(--corner-radius)] transition-all",
- __tb_active ? "bg-[var(--card-background)] shadow-[var(--shadow-size)] text-[var(--primary-text)]" : "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]",
+ "px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)] transition-all",
+ __tb_active ? "bg-[var(--card-background)] shadow-[var(--shadow-size)] text-[var(--primary-text)]" : "paragraph-color hover:text-[var(--primary-text)]",
  className
  )}
  aria-selected={__tb_active}

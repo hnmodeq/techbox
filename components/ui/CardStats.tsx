@@ -83,7 +83,7 @@ export function CardStats({
   const iconColor = moduleIconColors[module] || "text-[var(--home)]";
 
   return (
-    <div className="flex items-center gap-3 text-xs text-[var(--paragraph-color)] font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
+    <div className="flex items-center gap-3 text-xs paragraph-color font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
       <span className="inline-flex items-center gap-1" title="بازدید">
         <Icon name="view" size={16} strokeWidth={2} className={iconColor} />
         <span className="text-[var(--primary-text)]">{views.toLocaleString("fa-IR")}</span>

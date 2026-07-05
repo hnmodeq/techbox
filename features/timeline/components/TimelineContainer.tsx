@@ -159,7 +159,7 @@ export function TimelineContainer({
               <span className="badge !bg-[var(--tb-timeline)] !text-slate-950 font-black mb-1.5 shadow-md">
                 آغاز خط تایم‌لاین تکباکس
               </span>
-              <h3 className="h3-font-size h3-font-color font-semibold font-black text-[var(--primary-text)] leading-6">
+              <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] leading-6">
                 از اینجا به قبل خبری نبوده؛ اگه بوده شما به ما بگید!
               </h3>
             </div>
@@ -178,7 +178,7 @@ export function TimelineContainer({
                   value={earlyHistoryComment}
                   onChange={(e) => setEarlyHistoryComment(e.target.value)}
                   placeholder="پیشنهاد رویداد تاریخی..."
-                  className="input !h-9 !py-1 !px-2.5 paragraph-font-size paragraph-color flex-1"
+                  className="input !h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1"
                 />
                 <button
                   type="submit"
@@ -260,10 +260,10 @@ export function TimelineContainer({
 
             {/* Info Card Below Line with more padding */}
             <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--border-color)] space-y-2 z-20">
-              <div className="h3-font-size h3-font-color font-semibold font-bold text-[var(--tb-success)]">
+              <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--tb-success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>
-              <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] font-mono" dir="ltr">
+              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-mono" dir="ltr">
                 {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())}
               </div>
               <p className="text-xs text-[var(--tb-fg-secondary)] leading-5 pt-2 border-t border-[var(--border-color)]">

@@ -32,21 +32,21 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
 
  return (
  <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
- <div className="paragraph-font-size paragraph-color text-muted-foreground mb-2">
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mb-2">
  <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--tb-download)]">{item.category}</span>
  </div>
- <h1 className="h1-font-size h1-font-color font-extrabold md:h1-font-size h1-font-color font-extrabold ">{item.title}</h1>
+ <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{item.title}</h1>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 
       {/* OS chooser */}
  <div className="card p-4 mt-8">
  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
  <div className="">انتخاب سیستم‌عامل / نسخه</div>
- <div className="flex gap-2 paragraph-font-size paragraph-color">
- <select value={os} onChange={e=>setOs(e.target.value)} className="input !w-auto !py-1.5 paragraph-font-size paragraph-color">
+ <div className="flex gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+ <select value={os} onChange={e=>setOs(e.target.value)} className="input !w-auto !py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {osOptions.map(o=> <option key={o} value={o}>{o==="all"?"همه OS":o}</option>)}
  </select>
- <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input !w-auto !py-1.5 paragraph-font-size paragraph-color">
+ <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input !w-auto !py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <option value="new">جدیدترین اول</option>
  <option value="old">قدیمی‌ترین اول</option>
  </select>
@@ -54,8 +54,8 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  </div>
 
  <div className="overflow-x-auto">
- <table className="w-full h3-font-size h3-font-color font-semibold">
- <thead className="paragraph-font-size paragraph-color text-muted-foreground border-b border-[var(--border-color)]">
+ <table className="w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
+ <thead className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground border-b border-[var(--border-color)]">
  <tr>
  <th className="text-right py-2 pe-2">نسخه</th>
  <th className="text-right py-2">تاریخ</th>
@@ -68,23 +68,23 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  <tbody>
  {list.map(v=>(
  <tr key={v.ver+v.date} className="border-b border-[var(--border-color)]/40 hover:bg-[var(--muted-background)]/20">
- <td className="py-3 pe-2 font-mono paragraph-font-size paragraph-color ">{v.ver}</td>
- <td className="py-3 paragraph-font-size paragraph-color">{v.dateFa}</td>
- <td className="py-3 hidden sm:table-cell"><Badge variant="download" className="paragraph-font-size paragraph-color">{v.os}</Badge></td>
- <td className="py-3 hidden sm:table-cell paragraph-font-size paragraph-color text-muted-foreground" dir="ltr">{v.size}</td>
- <td className="py-3 paragraph-font-size paragraph-color text-muted-foreground">{v.notes}</td>
+ <td className="py-3 pe-2 font-mono text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">{v.ver}</td>
+ <td className="py-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{v.dateFa}</td>
+ <td className="py-3 hidden sm:table-cell"><Badge variant="download" className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{v.os}</Badge></td>
+ <td className="py-3 hidden sm:table-cell text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground" dir="ltr">{v.size}</td>
+ <td className="py-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">{v.notes}</td>
  <td className="py-3 text-left">
- <Button size="xs" onClick={e=>{e.preventDefault(); alert(`شروع دانلود ${item.title} – ${v.ver} (${v.os})`);}} className="px-3 py-1.5 paragraph-font-size paragraph-color">دانلود</Button>
+ <Button size="xs" onClick={e=>{e.preventDefault(); alert(`شروع دانلود ${item.title} – ${v.ver} (${v.os})`);}} className="px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">دانلود</Button>
  </td>
  </tr>
  ))}
  </tbody>
  </table>
  </div>
- <p className="paragraph-font-size paragraph-color text-muted-foreground mt-3">لینک مستقیم داخل ایران – قابلیت resume – SHA256 در صفحه چک‌سام موجود است.</p>
+ <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-3">لینک مستقیم داخل ایران – قابلیت resume – SHA256 در صفحه چک‌سام موجود است.</p>
  </div>
 
- <div className="card p-4 mt-6 paragraph-font-size paragraph-color text-muted-foreground">
+ <div className="card p-4 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">
  {item.content}
  </div>
  </main>
