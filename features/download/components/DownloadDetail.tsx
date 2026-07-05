@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import type { ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { useState, useMemo } from "react";
+import { LiveViewCounter } from "@/components/ui/live-view-counter";
 
 const fakeVersions = (slug:string) => {
  const base = [
@@ -36,6 +37,9 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--download)]">{item.category}</span>
  </div>
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{item.title}</h1>
+ <div className="mt-2">
+   <LiveViewCounter module="download" slug={item.slug} initialViews={item.views ?? 320} showLabel />
+ </div>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 
       {/* OS chooser */}
