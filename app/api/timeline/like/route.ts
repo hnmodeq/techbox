@@ -57,3 +57,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e?.message || "failed to like timeline event" }, { status: 400 });
   }
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;

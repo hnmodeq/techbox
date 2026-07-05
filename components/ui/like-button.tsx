@@ -13,7 +13,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
 
   useEffect(() => {
     let active = true;
-    fetch(`/api/like?module=${encodeURIComponent(contentType)}&slug=${encodeURIComponent(slug)}`)
+    fetch(`/api/like?module=${encodeURIComponent(contentType)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
       .then(r => r.json())
       .then(data => {
         if (active && typeof data.likes === "number") {

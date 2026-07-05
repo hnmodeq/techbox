@@ -32,7 +32,8 @@ export function LiveViewCounter({
     fetch("/api/views", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ module, slug })
+      body: JSON.stringify({ module, slug }),
+      cache: "no-store"
     })
       .then(res => res.json())
       .then(data => {

@@ -14,10 +14,6 @@ const moduleIconColors: Record<string, string> = {
   timeline: "text-[var(--timeline)]"
 };
 
-// Simple memory cache so multiple cards on one page don't spam requests
-let statsCache: Record<string, { views: number; likes: number; comments: number }> | null = null;
-let statsFetchPromise: Promise<any> | null = null;
-
 export function CardStats({
   module,
   slug,
@@ -41,30 +37,15 @@ export function CardStats({
 
   useEffect(() => {
     let mounted = true;
-    const key = `${module}:${slug}`;
-
-    const updateFromData = (data: any) => {
-      if (!mounted || !data || !data[key]) return;
-      const s = data[key];
-      if (typeof s.views === "number") setViews(s.views);
-      if (typeof s.likes === "number") setLikes(s.likes);
-      if (typeof s.comments === "number") setComments(s.comments);
-    };
-
-    if (statsCache && statsCache[key]) {
-      updateFromData(statsCache);
-    } else {
-      if (!statsFetchPromise) {
-        statsFetchPromise = fetch("/api/stats")
-          .then(r => r.json())
-          .then(data => {
-            statsCache = data;
-            return data;
-          })
-          .catch(() => null);
-      }
-      statsFetchPromise.then(data => updateFromData(data));
-    }
+    fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+      .then(r => r.json())
+      .then(s => {
+        if (!mounted || !s) return;
+        if (typeof s.views === "number") setViews(s.views);
+        if (typeof s.likes === "number") setLikes(s.likes);
+        if (typeof s.comments === "number") setComments(s.comments);
+      })
+      .catch(() => null);
 
     const handleUpdate = (e: any) => {
       if (e.detail && e.detail.module === module && e.detail.slug === slug) {

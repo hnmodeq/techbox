@@ -43,3 +43,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e?.message || "failed to create comment" }, { status: 400 });
   }
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;

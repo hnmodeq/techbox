@@ -117,3 +117,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(stats);
   }
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
