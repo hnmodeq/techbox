@@ -23,3 +23,7 @@ next-env.d.ts
 dev.db
 prisma/dev.db
 .vscode/settings.json
+
+# Local workspace / package manager cache
+.local
+.pnpm-store
