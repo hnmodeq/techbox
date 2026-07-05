@@ -10,116 +10,237 @@
 @font-face { font-family: 'KalamehWebFaNum'; font-style: normal; font-weight: 800; font-display: swap; src: url('/fonts/KalamehWebFaNum-ExtraBold.woff2') format('woff2'); }
 @font-face { font-family: 'KalamehWebFaNum'; font-style: normal; font-weight: 900; font-display: swap; src: url('/fonts/KalamehWebFaNum-Black.woff2') format('woff2'); }
 
-/* Design tokens — single master file controlling the entire project */
-@import "../tokens/theme.css";
+:root {
+  color-scheme: light;
+}
 
-@import "./primitives.css";
+.dark {
+  color-scheme: dark;
+}
+
+:root {
+  /* ── Master Surfaces & Backgrounds ── */
+  --main-background:    light-dark(oklch(0.985 0 0), oklch(0.13 0 0));
+  --card-background:    light-dark(oklch(1 0 0),     oklch(0.17 0 0));
+  --button-background:  light-dark(oklch(0.95 0 0),  oklch(0.22 0 0));
+  --modal-background:   light-dark(oklch(1 0 0),     oklch(0.18 0 0));
+  --sidebar-background: light-dark(oklch(0.97 0 0),  oklch(0.15 0 0));
+  --muted-background:   light-dark(oklch(0.94 0 0),  oklch(0.23 0 0));
+
+  /* ── Foregrounds & Typography Colors ── */
+  --hero-font-color:    light-dark(oklch(0.15 0 0),  oklch(0.96 0 0));
+  --h1-font-color:      light-dark(oklch(0.15 0 0),  oklch(0.96 0 0));
+  --h2-font-color:      light-dark(oklch(0.18 0 0),  oklch(0.93 0 0));
+  --h3-font-color:      light-dark(oklch(0.20 0 0),  oklch(0.90 0 0));
+  --paragraph-color:    light-dark(oklch(0.48 0 0),  oklch(0.68 0 0));
+  --primary-text:       light-dark(oklch(0.15 0 0),  oklch(0.96 0 0));
+
+  /* ── Font Sizes ── */
+  --hero-font-size:      clamp(2.2rem, 5vw, 3.5rem);
+  --h1-font-size:        clamp(1.5rem, 3.5vw, 2.4rem);
+  --h2-font-size:        clamp(1.25rem, 2.5vw, 1.75rem);
+  --h3-font-size:        clamp(1.05rem, 1.8vw, 1.3rem);
+  --paragraph-font-size: 0.9375rem;
+
+  /* ── Corner Radius (Sharp 0px everywhere per user instruction) ── */
+  --corner-radius:       0px;
+
+  /* ── Shadows Size & Color ── */
+  --shadow-color:        light-dark(oklch(0 0 0 / 0.08), oklch(0 0 0 / 0.45));
+  --shadow-size:         0 2px 8px var(--shadow-color);
+
+  /* ── Blur Size (0px) ── */
+  --blur-size:           0px;
+
+  /* ── Ring Size ── */
+  --ring-size:           2px;
+  --ring-color:          light-dark(oklch(0.2 0 0 / 0.15), oklch(0.8 0 0 / 0.2));
+
+  /* ── Borders ── */
+  --border-color:        light-dark(oklch(0.88 0 0), oklch(0.25 0 0));
+
+  /* ── Hover Card Transitions ── */
+  --hover-card-scale:       1.02;
+  --hover-card-translate-y: -2px;
+
+  /* ── Module & Brand Accents ── */
+  --blog:         light-dark(oklch(0.70 0.17 52),  #fb923c);
+  --news:         light-dark(oklch(0.64 0.22 25),  #fb7185);
+  --media:        light-dark(oklch(0.82 0.15 85),  #fcd34d);
+  --shop:         light-dark(oklch(0.80 0.19 125), #a3e635);
+  --tools:        light-dark(oklch(0.82 0.12 200), #67e8f9);
+  --raid:         light-dark(oklch(0.66 0.18 175), #2dd4bf);
+  --subnet:       light-dark(oklch(0.68 0.19 230), #60a5fa);
+  --nas:          light-dark(oklch(0.70 0.18 285), #c084fc);
+  --nvr:          light-dark(oklch(0.75 0.18 145), #34d399);
+  --timeline:     light-dark(oklch(0.72 0.16 210), #06b6d4);
+  --vip:          light-dark(oklch(0.66 0.22 300), #e879f9);
+  --forum:        light-dark(oklch(0.78 0.16 5),   #fda4af);
+  --review:       light-dark(oklch(0.70 0.17 240), #38bdf8);
+  --download:     light-dark(oklch(0.72 0.20 350), #f472b6);
+  --home:         light-dark(oklch(0.62 0.22 290), #a78bfa);
+  --account:      light-dark(oklch(0.80 0.12 15),  #fca5a5);
+  --admin:        light-dark(oklch(0.66 0.22 300), #e879f9);
+  --about:        light-dark(oklch(0.72 0.16 230), #7dd3fc);
+  --contact:      light-dark(oklch(0.72 0.18 150), #4ade80);
+  --workwithus:   light-dark(oklch(0.70 0.17 52),  #fb923c);
+  --consultation: light-dark(oklch(0.66 0.22 300), #e879f9);
+
+  /* ── Status Accents ── */
+  --success:      light-dark(oklch(0.72 0.18 150), #4ade80);
+  --danger:       light-dark(oklch(0.64 0.22 25),  #fb7185);
+  --warning:      light-dark(oklch(0.82 0.15 85),  #fcd34d);
+  --info:         light-dark(oklch(0.72 0.16 230), #7dd3fc);
+
+  /* ── System Aliases linking cleanly to single tokens ── */
+  --tb-bg-primary:   var(--main-background);
+  --tb-bg-secondary: var(--card-background);
+  --tb-bg-muted:     var(--muted-background);
+  --tb-fg-primary:   var(--primary-text);
+  --tb-fg-muted:     var(--paragraph-color);
+  --tb-border:       var(--border-color);
+  --tb-primary:      var(--home);
+  --tb-on-accent:    #ffffff;
+  --tb-radius-md:    var(--corner-radius);
+  --tb-radius-lg:    var(--corner-radius);
+  --tb-radius-full:  var(--corner-radius);
+  --tb-shadow-md:    var(--shadow-size);
+  --tb-shadow-lg:    var(--shadow-size);
+  --tb-motion-md:    200ms;
+  --tb-motion-lg:    300ms;
+  --tb-ease:         cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 @theme inline {
   --font-sans: var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb", "Tahoma", system-ui, sans-serif;
 
-  --color-background: var(--tb-bg-primary);
-  --color-foreground: var(--tb-fg-primary);
-  --color-primary: var(--tb-primary);
-  --color-primary-foreground: var(--tb-on-accent);
-  --color-muted: var(--tb-bg-muted);
-  --color-muted-foreground: var(--tb-fg-muted);
-  --color-border: var(--tb-border);
-  --color-ring: var(--tb-ring-1);
-  --color-card: var(--tb-bg-secondary);
-  --color-card-foreground: var(--tb-fg-primary);
+  --color-background: var(--main-background);
+  --color-foreground: var(--primary-text);
+  --color-primary: var(--home);
+  --color-muted: var(--muted-background);
+  --color-muted-foreground: var(--paragraph-color);
+  --color-border: var(--border-color);
+  --color-card: var(--card-background);
+  --color-card-foreground: var(--primary-text);
 
-  --radius-lg: var(--tb-radius-md);
-  --radius-xl: var(--tb-radius-lg);
-  --radius-2xl: var(--tb-radius-lg);
+  --radius-lg: var(--corner-radius);
+  --radius-xl: var(--corner-radius);
+  --radius-2xl: var(--corner-radius);
 }
 
-*{
-  box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
-html{
-  font-family:var(--font-kalameh),"KalamehWebFaNum","Vazirmatn","IRANSansWeb","Tahoma",system-ui,sans-serif;
-  direction:rtl;
-  overflow-x:hidden;
-  max-width:100vw;
+html {
+  font-family: var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb", "Tahoma", system-ui, sans-serif;
+  direction: rtl;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
-body{
-  margin:0;
-  font-family:var(--font-kalameh),"KalamehWebFaNum","Vazirmatn","IRANSansWeb","Tahoma",system-ui,sans-serif;
-  background:var(--tb-bg-primary);
-  color:var(--tb-fg-primary);
-  min-height:100dvh;
-  overflow-x:hidden;
-  max-width:100vw;
+body {
+  margin: 0;
+  font-family: var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb", "Tahoma", system-ui, sans-serif;
+  background: var(--main-background);
+  color: var(--paragraph-color);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
-/* typography — base elements map onto the text utility scales */
-
-h1{
-  font-size:clamp(1.6rem,3.5vw,2.5rem);
-  font-weight:900;
-  line-height:1.2;
-  letter-spacing:-0.01em;
+.tb-hero {
+  font-size: var(--hero-font-size);
+  color: var(--hero-font-color);
+  font-weight: 900;
+  line-height: 1.15;
 }
 
-h2{
-  font-size:clamp(1.3rem,2.5vw,1.75rem);
-  font-weight:800;
+h1 {
+  font-size: var(--h1-font-size);
+  color: var(--h1-font-color);
+  font-weight: 850;
+  line-height: 1.25;
 }
 
-h3{
-  font-size:clamp(1.05rem,1.8vw,1.25rem);
-  font-weight:700;
+h2 {
+  font-size: var(--h2-font-size);
+  color: var(--h2-font-color);
+  font-weight: 800;
+  line-height: 1.35;
 }
 
-p,li{
-  font-size:0.9375rem;
-  line-height:1.8;
-  color:var(--tb-fg-muted);
+h3 {
+  font-size: var(--h3-font-size);
+  color: var(--h3-font-color);
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+p, li {
+  font-size: var(--paragraph-font-size);
+  color: var(--paragraph-color);
+  line-height: 1.8;
+}
+
+.tb-text-big-title {
+  font-size: var(--h1-font-size);
+  color: var(--h1-font-color);
+  font-weight: 800;
+}
+
+.tb-text-lg {
+  font-size: var(--h2-font-size);
+  color: var(--h2-font-color);
+  font-weight: 700;
+}
+
+.tb-text-md {
+  font-size: var(--h3-font-size);
+  color: var(--h3-font-color);
+  font-weight: 650;
+}
+
+.tb-text-sm {
+  font-size: var(--paragraph-font-size);
+  color: var(--paragraph-color);
+  font-weight: 500;
 }
 
 /* utilities */
-
-.line-clamp-2{
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.line-clamp-3{
-  display:-webkit-box;
-  -webkit-line-clamp:3;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-@keyframes tb-ticker-scroll-right{
-  from{
-    transform:translate3d(0,0,0);
-  }
-  to{
-    transform:translate3d(33.333%,0,0);
-  }
+@keyframes tb-ticker-scroll-right {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(33.333%, 0, 0); }
 }
 
-.ticker-track{
-  transform:translate3d(0,0,0);
-  animation:tb-ticker-scroll-right 80s linear infinite;
-  will-change:transform;
-  backface-visibility:hidden;
+.ticker-track {
+  transform: translate3d(0, 0, 0);
+  animation: tb-ticker-scroll-right 80s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
-.ticker-wrapper:hover .ticker-track{
-  animation-play-state:paused;
+.ticker-wrapper:hover .ticker-track {
+  animation-play-state: paused;
 }
 
-@media (prefers-reduced-motion: reduce){
-  .ticker-track{
-    animation:none;
-    transform:none;
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    transform: none;
   }
 }
-
