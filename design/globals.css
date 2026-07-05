@@ -136,8 +136,7 @@
 
 @theme inline {
   --font-sans:
-    var(--font-kalameh), "KalamehWebFaNum", "Vazirmatn", "IRANSansWeb",
-    "Tahoma", system-ui, sans-serif;
+    var(--font-kalameh), "KalamehWebFaNum";
 }
 
 * {
