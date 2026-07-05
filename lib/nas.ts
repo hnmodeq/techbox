@@ -1,6 +1,6 @@
 import type { NasProduct } from "@/features/tools/components/nas-selector/nas-selector-data";
-import nasProducts from "@/data/nas-products.json";
-import shopData from "@/data/shop.json";
+import nasProducts from "@/prisma/mock-data/nas-products.json";
+import shopData from "@/prisma/mock-data/shop.json";
 
 type ShopItem = {
   id?: string;

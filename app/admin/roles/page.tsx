@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
-import { Button } from "@/components/ui/Button";
-import { ModuleBadge } from "@/components/ui/ModuleBadge";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/button";
+import { ModuleBadge } from "@/components/ui/module-badge";
+import { Badge } from "@/components/ui/badge";
 
 type RoleRow = { id:string; name:string; titleFa:string; modules:ModuleSlug[]; users:number };
 

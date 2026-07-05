@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { getCurrentUserClient, logout, type AppUser, canEdit, allUsers } from "@/lib/auth";
 import { getModuleItems, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useRouter } from "next/navigation";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { ModuleBadge } from "@/components/ui/ModuleBadge";
-import { Badge } from "@/components/ui/Badge";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { ModuleBadge } from "@/components/ui/module-badge";
+import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/components/effects/PageHeader";
 
 const moduleOrder = Object.keys(moduleMeta) as ModuleSlug[];

@@ -1,15 +1,15 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import blog from "../data/blog.json";
-import news from "../data/news.json";
-import media from "../data/media.json";
-import review from "../data/review.json";
-import tools from "../data/tools.json";
-import download from "../data/download.json";
-import shop from "../data/shop.json";
-import forum from "../data/forum.json";
-import users from "../data/users.json";
-import comments from "../data/comments.json";
+import blog from "./mock-data/blog.json";
+import news from "./mock-data/news.json";
+import media from "./mock-data/media.json";
+import review from "./mock-data/review.json";
+import tools from "./mock-data/tools.json";
+import download from "./mock-data/download.json";
+import shop from "./mock-data/shop.json";
+import forum from "./mock-data/forum.json";
+import users from "./mock-data/users.json";
+import comments from "./mock-data/comments.json";
 
 const prisma = new PrismaClient();
 

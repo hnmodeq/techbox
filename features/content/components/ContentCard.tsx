@@ -3,9 +3,9 @@ import Image from "next/image";
 import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
-import { ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/button";
 import { Icon } from "@/design/icons";
-import { CardStats } from "@/components/ui/CardStats";
+import { CardStats } from "@/components/ui/card-stats";
 
 const fallbackImage = "/assets/blog-1.jpg";
 const fallbackAvatar = "/assets/hooman.png";

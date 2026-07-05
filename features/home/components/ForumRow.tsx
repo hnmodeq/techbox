@@ -5,8 +5,8 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CardStats } from '@/components/ui/CardStats';
-import { ForumBadge } from '@/components/ui/ForumBadge';
+import { CardStats } from '@/components/ui/card-stats';
+import { ForumBadge } from '@/components/ui/forum-badge';
 
 export default function ForumRow() {
   const topics = getLatest('forum', 6);

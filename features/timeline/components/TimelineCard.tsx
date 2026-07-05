@@ -5,7 +5,7 @@ import { TimelineEvent } from '@/types/timeline';
 import { Heart, MessageCircle, Send } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 interface TimelineCardProps {
   event: TimelineEvent;

@@ -2,8 +2,8 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { zIndex } from "@/design";
-import { OverlayBackdrop } from "./Overlay";
-import { Panel } from "./Panel";
+import { OverlayBackdrop } from "./overlay";
+import { Panel } from "./panel";
 export function Modal({ open, onClose, children, className }: { open: boolean; onClose: ()=>void; children: React.ReactNode; className?: string }){
  if(!open) return null;
  return (

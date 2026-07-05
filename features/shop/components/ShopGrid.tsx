@@ -4,10 +4,10 @@ import { getModuleItems, getCommentCount } from "@/lib/content";
 import Link from "next/link";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useCart } from "@/providers/cart.provider";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Icon } from "@/design/icons";
 import ModuleHeader from "@/components/effects/ModuleHeader";
-import { CardStats } from "@/components/ui/CardStats";
+import { CardStats } from "@/components/ui/card-stats";
 
 const prices: Record<string, {price: string, old?: string}> = {
  "qnap-ts-2277": { price: "۴۸,۹۰۰,۰۰۰", old: "۵۲,۰۰۰,۰۰۰" },

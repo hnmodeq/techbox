@@ -1,10 +1,10 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { zIndex } from "@/design";
-import { Button } from "@/components/ui/Button";
-import { CloseButton } from "@/components/ui/CloseButton";
-import { ChipButton } from "@/components/ui/ChipButton";
-import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
+import { Button } from "@/components/ui/button";
+import { CloseButton } from "@/components/ui/close-button";
+import { ChipButton } from "@/components/ui/chip-button";
+import { FloatingActionButton } from "@/components/ui/floating-action-button";
 import { Icon } from "@/design/icons";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };

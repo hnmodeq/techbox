@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { zIndex } from "@/design";
-import { Button } from "@/components/ui/Button";
-import { CloseButton } from "@/components/ui/CloseButton";
-import { OverlayBackdrop } from "@/components/ui/Overlay";
-import { Panel } from "@/components/ui/Panel";
+import { Button } from "@/components/ui/button";
+import { CloseButton } from "@/components/ui/close-button";
+import { OverlayBackdrop } from "@/components/ui/overlay";
+import { Panel } from "@/components/ui/panel";
 
 type ConsultationModalProps = {
  open: boolean;

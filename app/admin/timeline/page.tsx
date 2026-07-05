@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { Plus, Edit, Trash2, ChevronDown } from 'lucide-react';
 import { getJalaliDateStringPersian } from '@/lib/jalali';
-import TimelineEventForm from './components/TimelineEventForm';
+import TimelineEventForm from '@/features/timeline/components/timeline-event-form';
 
 export default function AdminTimelinePage() {
   const [events, setEvents] = useState<TimelineEvent[]>([]);

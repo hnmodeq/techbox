@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth-server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import commentsData from "@/data/comments.json";
+import commentsData from "@/prisma/mock-data/comments.json";
 
 const postSchema = z.object({
   module: z.string(),

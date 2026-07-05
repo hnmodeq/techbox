@@ -4,9 +4,9 @@ import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
 import { getModuleItems, moduleMeta, type ModuleSlug, type ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Button, ButtonLink } from "@/components/ui/Button";
-import { ModuleBadge } from "@/components/ui/ModuleBadge";
-import { Badge } from "@/components/ui/Badge";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { ModuleBadge } from "@/components/ui/module-badge";
+import { Badge } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 

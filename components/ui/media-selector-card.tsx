@@ -2,8 +2,8 @@
 import Image from "next/image";
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Badge } from "./Badge";
-import { CardStats } from "./CardStats";
+import { Badge } from "./badge";
+import { CardStats } from "./card-stats";
 
 export interface MediaSelectorCardProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  active?: boolean;

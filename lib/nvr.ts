@@ -1,6 +1,6 @@
 import type { NvrModel } from "@/features/tools/components/nvr-selector/nvr-selector-data";
-import nvrProducts from "@/data/nvr-products.json";
-import shopData from "@/data/shop.json";
+import nvrProducts from "@/prisma/mock-data/nvr-products.json";
+import shopData from "@/prisma/mock-data/shop.json";
 
 type ShopItem = {
   id?: string;

@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { X } from "lucide-react";
-import { Button, type ButtonProps } from "./Button";
+import { Button, type ButtonProps } from "./button";
 import { cn } from "@/lib/utils";
 
 export interface CloseButtonProps extends Omit<ButtonProps, "children" | "variant" | "size"> {

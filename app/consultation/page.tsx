@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 export default function Consultation(){
  return (
  <main className="max-w-2xl mx-auto px-5 py-16" dir="rtl">

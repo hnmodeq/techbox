@@ -1,12 +1,12 @@
 "use client";
 import { getModuleItems } from "@/lib/content";
-import { MediaSelectorCard } from "@/components/ui/MediaSelectorCard";
+import { MediaSelectorCard } from "@/components/ui/media-selector-card";
 import { useState, useMemo } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { createPortal } from "react-dom";
 import { zIndex } from "@/design";
 import { Icon } from "@/design/icons";
-import { CardStats } from "@/components/ui/CardStats";
+import { CardStats } from "@/components/ui/card-stats";
 
 const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 

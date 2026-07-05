@@ -6,7 +6,7 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@/design/icons';
-import { CardStats } from '@/components/ui/CardStats';
+import { CardStats } from '@/components/ui/card-stats';
 import { createPortal } from 'react-dom';
 import { zIndex } from '@/design';
 

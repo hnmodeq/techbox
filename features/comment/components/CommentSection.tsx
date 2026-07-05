@@ -2,9 +2,9 @@
 import * as React from "react";
 import { useActionState, useEffect, useTransition, useState } from "react";
 import { getCommentsAction, createCommentAction } from "@/features/comment/actions/comments";
-import { CommentVote } from "@/components/ui/LikeButton";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { CommentVote } from "@/components/ui/like-button";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";

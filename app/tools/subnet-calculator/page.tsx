@@ -1,4 +1,4 @@
-import SubnetCalculator from "@/features/tools/components/SubnetCalculator";
+import { SubnetCalculator } from "@/features/tools/components/subnet-calculator";
 import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
 
 export const metadata = {

@@ -27,15 +27,15 @@ export type ContentItem = {
   category?: string;
 };
 
-import blogData from "@/data/blog.json";
-import newsData from "@/data/news.json";
-import mediaData from "@/data/media.json";
-import reviewData from "@/data/review.json";
-import toolsData from "@/data/tools.json";
-import downloadData from "@/data/download.json";
-import shopData from "@/data/shop.json";
-import forumData from "@/data/forum.json";
-import commentsData from "@/data/comments.json";
+import blogData from "@/prisma/mock-data/blog.json";
+import newsData from "@/prisma/mock-data/news.json";
+import mediaData from "@/prisma/mock-data/media.json";
+import reviewData from "@/prisma/mock-data/review.json";
+import toolsData from "@/prisma/mock-data/tools.json";
+import downloadData from "@/prisma/mock-data/download.json";
+import shopData from "@/prisma/mock-data/shop.json";
+import forumData from "@/prisma/mock-data/forum.json";
+import commentsData from "@/prisma/mock-data/comments.json";
 import { moduleColors } from "@/config/module-colors";
 
 const all: Record<ModuleSlug, ContentItem[]> = {

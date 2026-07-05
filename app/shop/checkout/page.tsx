@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useCart } from "@/providers/cart.provider";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 function parseFaPrice(s:string){
  // "۴۸,۹۰۰,۰۰۰" -> 48900000
