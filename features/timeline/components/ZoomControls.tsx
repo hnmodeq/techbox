@@ -12,7 +12,7 @@ interface ZoomControlsProps {
 export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps) {
   return (
     <div
-      className="absolute bottom-8 right-8 flex items-center gap-3 z-50 bg-[var(--tb-bg-secondary)]/95 backdrop-blur-md border border-[var(--tb-border)] rounded-[var(--tb-radius-lg)] px-4 py-2.5 shadow-[var(--tb-shadow-lg)] select-none"
+      className="absolute bottom-8 right-8 flex items-center gap-3 z-50 bg-[var(--card-background)]/95 backdrop-blur-md border border-[var(--border-color)] rounded-[var(--corner-radius)] px-4 py-2.5 shadow-[var(--shadow-size)] select-none"
       onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
@@ -23,7 +23,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onZoomChange?.(Math.max(0.1, zoom - 0.2));
         }}
-        className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
         title="کوچک‌نمایی (-)"
         aria-label="Zoom Out"
       >
@@ -43,7 +43,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           onTouchStart={(e) => e.stopPropagation()}
           onChange={(e) => onZoomChange?.(parseFloat(e.target.value))}
           onInput={(e) => onZoomChange?.(parseFloat(e.currentTarget.value))}
-          className="w-32 sm:w-44 h-2.5 cursor-pointer appearance-none rounded-full bg-[var(--tb-bg-muted)] accent-[var(--tb-timeline)]"
+          className="w-32 sm:w-44 h-2.5 cursor-pointer appearance-none rounded-full bg-[var(--muted-background)] accent-[var(--tb-timeline)]"
           title="تنظیم بزرگ‌نمایی"
           aria-label="تنظیم بزرگ‌نمایی"
         />
@@ -55,14 +55,14 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onZoomChange?.(Math.min(6.0, zoom + 0.2));
         }}
-        className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
         title="بزرگ‌نمایی (+)"
         aria-label="Zoom In"
       >
         <ZoomIn size={18} />
       </button>
 
-      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--tb-timeline)] text-center border-l border-[var(--tb-border)] pl-2">
+      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--tb-timeline)] text-center border-l border-[var(--border-color)] pl-2">
         {(zoom * 100).toFixed(0)}%
       </div>
 
@@ -72,7 +72,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onReset();
         }}
-        className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors cursor-pointer"
+        className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
         title="بازنشانی دید (100%)"
         aria-label="Reset View"
       >

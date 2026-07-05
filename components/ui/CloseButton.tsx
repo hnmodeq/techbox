@@ -17,7 +17,7 @@ export const CloseButton = React.forwardRef<HTMLButtonElement, CloseButtonProps>
  variant="ghost"
  size="iconSm"
  aria-label={label}
- className={cn("text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]", className)}
+ className={cn("text-[var(--paragraph-color)] hover:text-[var(--primary-text)]", className)}
  {...props}
  >
  {icon ?? <X size={14} aria-hidden />}

@@ -49,9 +49,9 @@ export default function ShopGrid(){
  <ModuleHeader module="shop" title="فروشگاه زیرساخت" description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`} />
  
  <div className="relative mb-6" ref={dropdownRef}>
-   <div className="grid gap-2 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/50 p-3 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
-     <input value={q} onChange={e=>setQ(e.target.value)} placeholder="جستجوی محصول…" className="input text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]" />
-     <Button type="button" variant={filterOpen ? "primary" : "ghost"} onClick={()=>setFilterOpen(!filterOpen)} className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] flex items-center gap-2">
+   <div className="grid gap-2 rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]/50 p-3 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
+     <input value={q} onChange={e=>setQ(e.target.value)} placeholder="جستجوی محصول…" className="input h3-font-size h3-font-color font-semibold" />
+     <Button type="button" variant={filterOpen ? "primary" : "ghost"} onClick={()=>setFilterOpen(!filterOpen)} className="h3-font-size h3-font-color font-semibold flex items-center gap-2">
        <span>فیلترها {cat !== "all" ? `• ${cat}`: ""}</span>
        <Icon name="chevronDown" className={`h-4 w-4 transition-transform ${filterOpen ? "rotate-180" : ""}`} />
      </Button>
@@ -59,23 +59,23 @@ export default function ShopGrid(){
 
    {/* Dropdown Menu Filter */}
    {filterOpen && (
-     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] p-4 shadow-xl space-y-4 animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)]">
+     <div className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--main-background)] p-4 shadow-xl space-y-4 animate-in fade-in-0 zoom-in-95 duration-[var(--tb-motion-sm)]">
        <div className="space-y-3">
-         <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">دسته‌بندی
-           <select value={cat} onChange={e=>setCat(e.target.value)} className="input mt-1 w-full text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">
+         <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)]">دسته‌بندی
+           <select value={cat} onChange={e=>setCat(e.target.value)} className="input mt-1 w-full h3-font-size h3-font-color font-semibold">
              <option value="all">همه دسته‌ها</option>
              {categories.map(c=> <option key={c} value={c}>{c}</option>)}
            </select>
          </label>
-         <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">مرتب‌سازی
-           <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input mt-1 w-full text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)]">
+         <label className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)]">مرتب‌سازی
+           <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input mt-1 w-full h3-font-size h3-font-color font-semibold">
              <option value="new">جدیدترین</option>
              <option value="popular">پربازدیدترین</option>
              <option value="cheap">محبوب‌ترین</option>
            </select>
          </label>
        </div>
-       <div className="flex justify-end gap-2 pt-2 border-t border-[var(--tb-border)]">
+       <div className="flex justify-end gap-2 pt-2 border-t border-[var(--border-color)]">
          <Button type="button" variant="ghost" size="xs" onClick={()=>{setCat("all"); setSort("new");}}>پاک کردن</Button>
          <Button type="button" size="xs" onClick={()=>setFilterOpen(false)}>بستن منو</Button>
        </div>
@@ -87,22 +87,22 @@ export default function ShopGrid(){
  {filtered.map(p=>{
  const pr = prices[p.slug] || { price: "تماس بگیرید" };
  return (
-        <Link key={p.slug} href={`/shop/${p.slug}`} className="card overflow-hidden group flex flex-col rounded-[var(--tb-radius-lg)] !p-0">
-              <div className="block relative aspect-[4/3] bg-[var(--tb-bg-muted)] overflow-hidden">
+        <Link key={p.slug} href={`/shop/${p.slug}`} className="card overflow-hidden group flex flex-col rounded-[var(--corner-radius)] !p-0">
+              <div className="block relative aspect-[4/3] bg-[var(--muted-background)] overflow-hidden">
                 <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[var(--tb-motion-lg)] group-hover:scale-105" />
-                <span className="absolute top-3 left-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
-                {pr.old && <span className="absolute top-3 right-3 rounded-[var(--tb-radius-full)] border border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
+                <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] border border-white/30 bg-transparent px-2 py-1 paragraph-font-size paragraph-color text-white backdrop-blur-[var(--tb-blur-sm)]">موجود</span>
+                {pr.old && <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border border-white/30 bg-transparent px-2 py-1 paragraph-font-size paragraph-color text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
               </div>
               <div className="p-4 flex-1 flex flex-col">
-                <div className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] mt-1 transition-colors group-hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
-                <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
+                <div className="h3-font-size h3-font-color font-semibold mt-1 transition-colors group-hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
+                <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
                 
                 {/* Price section removed from card display per request, keeping add to cart / consultation system underlying */}
                 
                 <div className="flex gap-2 mt-4">
                   <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--tb-shop)] text-[var(--tb-shop)] hover:bg-[var(--tb-shop)]/10 font-bold">مشاوره خرید</Button>
                 </div>
-                <div className="mt-3 pt-3 border-t border-[var(--tb-border)]">
+                <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
                   <CardStats module="shop" slug={p.slug} initialViews={p.views ?? 0} initialLikes={p.likes ?? 0} initialComments={getCommentCount("shop", p.slug)} showComments={true} />
                 </div>
               </div>

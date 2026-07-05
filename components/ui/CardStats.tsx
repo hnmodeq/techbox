@@ -80,23 +80,23 @@ export function CardStats({
     };
   }, [module, slug]);
 
-  const iconColor = moduleIconColors[module] || "text-[var(--tb-primary)]";
+  const iconColor = moduleIconColors[module] || "text-[var(--home)]";
 
   return (
-    <div className="flex items-center gap-3 text-xs text-[var(--tb-fg-muted)] font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
+    <div className="flex items-center gap-3 text-xs text-[var(--paragraph-color)] font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
       <span className="inline-flex items-center gap-1" title="بازدید">
         <Icon name="view" size={16} strokeWidth={2} className={iconColor} />
-        <span className="text-[var(--tb-fg-primary)]">{views.toLocaleString("fa-IR")}</span>
+        <span className="text-[var(--primary-text)]">{views.toLocaleString("fa-IR")}</span>
         {showLabel && <span className="font-normal ms-0.5">بازدید</span>}
       </span>
       <span className="inline-flex items-center gap-1" title="پسند">
         <Icon name="like" size={16} strokeWidth={2} className="text-red-400 fill-current" />
-        <span className="text-[var(--tb-fg-primary)]">{likes.toLocaleString("fa-IR")}</span>
+        <span className="text-[var(--primary-text)]">{likes.toLocaleString("fa-IR")}</span>
       </span>
       {showComments && (
         <span className="inline-flex items-center gap-1" title="دیدگاه">
           <Icon name="comment" size={16} strokeWidth={2} className="text-cyan-400" />
-          <span className="text-[var(--tb-fg-primary)]">{comments.toLocaleString("fa-IR")}</span>
+          <span className="text-[var(--primary-text)]">{comments.toLocaleString("fa-IR")}</span>
         </span>
       )}
     </div>

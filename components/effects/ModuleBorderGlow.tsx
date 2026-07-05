@@ -85,7 +85,7 @@ export default function ModuleBorderGlow({ children, moduleColor, className }: M
  setConfig({
  colors,
  glowColor: rgbToHsl(moduleRgb),
- backgroundColor: resolveColor("var(--tb-bg-secondary)", "#0b152a"),
+ backgroundColor: resolveColor("var(--card-background)", "#0b152a"),
  borderRadius: radiusPx,
  // shader-shape tunables (not colors/borders/shadows) — kept as constants
  glowRadius: 34,
@@ -108,9 +108,9 @@ export default function ModuleBorderGlow({ children, moduleColor, className }: M
  <div
  className={className}
  style={{
- borderRadius: "var(--tb-radius-lg)",
- border: "var(--tb-border-sm) solid var(--tb-border)",
- background: "var(--tb-bg-secondary)",
+ borderRadius: "var(--corner-radius)",
+ border: "var(--tb-border-sm) solid var(--border-color)",
+ background: "var(--card-background)",
  }}
  >
  {children}

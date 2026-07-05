@@ -92,25 +92,25 @@ export function AuthModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in-0 duration-200" dir="rtl">
-      <div className="relative w-full max-w-[440px] rounded-2xl border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] p-6 sm:p-8 shadow-2xl text-[var(--tb-fg-primary)]">
+      <div className="relative w-full max-w-[440px] rounded-2xl border border-[var(--border-color)] bg-[var(--main-background)] p-6 sm:p-8 shadow-2xl text-[var(--primary-text)]">
         {/* Close Button */}
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          className="absolute top-4 left-4 h-8 w-8 rounded-full flex items-center justify-center text-[var(--tb-fg-muted)] hover:bg-[var(--tb-bg-secondary)] hover:text-[var(--tb-fg-primary)] transition-colors cursor-pointer"
+          className="absolute top-4 left-4 h-8 w-8 rounded-full flex items-center justify-center text-[var(--paragraph-color)] hover:bg-[var(--card-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
         >
           ✕
         </button>
 
         {/* Logo & Header */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--tb-primary)]/10 border border-[var(--tb-primary)]/30 text-[var(--tb-primary)] font-black text-2xl shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--home)]/10 border border-[var(--home)]/30 text-[var(--home)] font-black text-2xl shadow-sm">
             TB
           </div>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
             ورود و عضویت در تکباکس
           </h2>
-          <p className="text-xs sm:text-sm text-[var(--tb-fg-muted)] leading-5 max-w-xs mx-auto">
+          <p className="text-xs sm:text-sm text-[var(--paragraph-color)] leading-5 max-w-xs mx-auto">
             اگر حساب ندارید، با وارد کردن نام کاربری و رمز عبور، حسابتان به صورت خودکار ایجاد می‌شود.
           </p>
         </div>
@@ -122,15 +122,15 @@ export function AuthModal() {
         )}
 
         {forgotOpen ? (
-          <div className="mt-6 space-y-4 rounded-xl bg-[var(--tb-bg-secondary)] p-4 border border-[var(--tb-border)] text-center">
+          <div className="mt-6 space-y-4 rounded-xl bg-[var(--card-background)] p-4 border border-[var(--border-color)] text-center">
             <h4 className="font-bold text-sm text-[var(--tb-warning)]">بازیابی رمز عبور</h4>
-            <p className="text-xs text-[var(--tb-fg-muted)] leading-5">
+            <p className="text-xs text-[var(--paragraph-color)] leading-5">
               برای تغییر یا بازیابی رمز عبور حساب کاربری خود، لطفاً با ایمیل پشتیبانی یا ادمین سیستم تماس بگیرید.
             </p>
             <button
               type="button"
               onClick={() => setForgotOpen(false)}
-              className="w-full py-2 rounded-lg bg-[var(--tb-primary)] text-white text-xs font-bold hover:opacity-90"
+              className="w-full py-2 rounded-lg bg-[var(--home)] text-white text-xs font-bold hover:opacity-90"
             >
               بازگشت به ورود
             </button>
@@ -138,7 +138,7 @@ export function AuthModal() {
         ) : (
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
             <div>
-              <label className="block text-xs font-bold text-[var(--tb-fg-primary)] mb-1.5">
+              <label className="block text-xs font-bold text-[var(--primary-text)] mb-1.5">
                 ایمیل یا نام کاربری انگلیسی
               </label>
               <input
@@ -153,7 +153,7 @@ export function AuthModal() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[var(--tb-fg-primary)] mb-1.5">
+              <label className="block text-xs font-bold text-[var(--primary-text)] mb-1.5">
                 رمز عبور
               </label>
               <input
@@ -169,12 +169,12 @@ export function AuthModal() {
             </div>
 
             <div className="flex items-center justify-between text-xs pt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-[var(--tb-fg-muted)] select-none">
+              <label className="flex items-center gap-2 cursor-pointer text-[var(--paragraph-color)] select-none">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] text-[var(--tb-primary)] focus:ring-0 h-4 w-4"
+                  className="rounded border-[var(--border-color)] bg-[var(--card-background)] text-[var(--home)] focus:ring-0 h-4 w-4"
                 />
                 <span>مرا به خاطر بسپار</span>
               </label>
@@ -182,7 +182,7 @@ export function AuthModal() {
               <button
                 type="button"
                 onClick={() => setForgotOpen(true)}
-                className="font-bold text-[var(--tb-primary)] hover:underline cursor-pointer"
+                className="font-bold text-[var(--home)] hover:underline cursor-pointer"
               >
                 فراموشی رمز عبور؟
               </button>
@@ -191,15 +191,15 @@ export function AuthModal() {
             <button
               type="submit"
               disabled={busy}
-              className="w-full !h-11 rounded-xl bg-[var(--tb-primary)] text-white font-black text-sm shadow-lg hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full !h-11 rounded-xl bg-[var(--home)] text-white font-black text-sm shadow-lg hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
             >
               {busy ? "در حال پردازش..." : "ورود یا شروع عضویت"}
             </button>
           </form>
         )}
 
-        <div className="mt-6 pt-4 border-t border-[var(--tb-border)]/60 text-center">
-          <p className="text-[11px] text-[var(--tb-fg-muted)] leading-4">
+        <div className="mt-6 pt-4 border-t border-[var(--border-color)]/60 text-center">
+          <p className="text-[11px] text-[var(--paragraph-color)] leading-4">
             با ورود به تکباکس، قوانین حریم خصوصی و استفاده از زیرساخت را می‌پذیرید.
           </p>
         </div>

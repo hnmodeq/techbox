@@ -30,12 +30,12 @@ function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { s
         <span>↓</span>
       </span>
       <div className="flex items-center gap-3">
-        <span className="inline-flex items-center gap-1 text-xs text-[var(--tb-fg-muted)] font-bold" title="حجم فایل">
+        <span className="inline-flex items-center gap-1 text-xs text-[var(--paragraph-color)] font-bold" title="حجم فایل">
           <svg className="w-3.5 h-3.5 text-[var(--tb-warning)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
-          <span className="text-[var(--tb-fg-primary)]">{fileSize}</span>
+          <span className="text-[var(--primary-text)]">{fileSize}</span>
         </span>
         <CardStats module="download" slug={slug} initialViews={initialViews} initialLikes={initialLikes} initialComments={initialComments} showComments={true} />
       </div>
@@ -54,11 +54,11 @@ export default function DownloadRow() {
   };
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.downloadMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.downloadMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
           <Link href="/download" className="text-sm font-bold text-[var(--download)] hover:underline flex items-center gap-1 shrink-0">
             <span>ورود به مرکز دانلود</span>
             <span>←</span>
@@ -74,7 +74,7 @@ export default function DownloadRow() {
               <Link
                 key={file.slug}
                 href={`/download/${file.slug}`}
-                className="group card p-4 hover:bg-[var(--tb-bg-muted)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] flex flex-col justify-between gap-3 bg-[var(--tb-bg-secondary)]"
+                className="group card p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   {/* Yellow Special File Icon Box */}
@@ -93,10 +93,10 @@ export default function DownloadRow() {
                       </span>
                     </div>
 
-                    <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
+                    <h3 className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
                       {file.title}
                     </h3>
-                    <div className="text-xs text-[var(--tb-fg-muted)] mt-1 line-clamp-1">
+                    <div className="text-xs text-[var(--paragraph-color)] mt-1 line-clamp-1">
                       {file.excerpt || 'سرورهای Enterprise و مجازی‌سازی'}
                     </div>
                   </div>

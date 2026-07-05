@@ -74,15 +74,15 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const renderNode = (c: CommentNode, depth = 0) => (
     <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
-      <div className={depth ? "border-r-2 border-[var(--tb-border)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
+      <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
         <div className="card p-4">
           <div className="flex justify-between items-center gap-2">
-            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-semibold text-[var(--tb-fg-primary)]">{(c as any).authorName || "کاربر"}</div>
-            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
+            <div className="paragraph-font-size paragraph-color font-semibold text-[var(--primary-text)]">{(c as any).authorName || "کاربر"}</div>
+            <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
               {new Date((c as any).createdAt).toLocaleString("fa-IR", { dateStyle: "medium", timeStyle: "short" })}
             </div>
           </div>
-          <p className="mt-2 whitespace-pre-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{(c as any).text}</p>
+          <p className="mt-2 whitespace-pre-wrap paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{(c as any).text}</p>
           <div className="flex items-center gap-4 mt-3">
             <CommentVote
               id={c.id}
@@ -93,7 +93,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               onClick={() => handleReplyClick(c.id)}
               variant="link"
               size="xs"
-              className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-primary)]"
+              className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] hover:text-[var(--home)]"
               type="button"
             >
               {replyOpen === c.id ? "بستن" : "پاسخ"}
@@ -101,11 +101,11 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           </div>
 
           {replyOpen === c.id && (
-            <form action={formAction} className="mt-3 space-y-2 border-t border-[var(--tb-border)] pt-3">
+            <form action={formAction} className="mt-3 space-y-2 border-t border-[var(--border-color)] pt-3">
               <input type="hidden" name="module" value={module} />
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="parentId" value={c.id} />
-              <textarea name="text" required className="input min-h-[80px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" placeholder={`پاسخ شما به ${(c as any).authorName}…`} />
+              <textarea name="text" required className="input min-h-[80px] w-full paragraph-font-size paragraph-color" placeholder={`پاسخ شما به ${(c as any).authorName}…`} />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
                 <Button disabled={isSubmitting || isPending} size="xs">
@@ -127,10 +127,10 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   const totalCount = comments.reduce((s, c: any) => s + 1 + ((c.replies?.length) || 0), 0);
 
   return (
-    <section className="mt-14 border-t border-[var(--tb-border)] pt-10">
+    <section className="mt-14 border-t border-[var(--border-color)] pt-10">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-bold">دیدگاه‌ها و گفتگو <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
-        <Badge variant="secondary" className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">ذخیره در Neon PostgreSQL</Badge>
+        <h3 className="h2-font-size h2-font-color font-bold font-bold">دیدگاه‌ها و گفتگو <span className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
+        <Badge variant="secondary" className="paragraph-font-size paragraph-color">ذخیره در Neon PostgreSQL</Badge>
       </div>
 
       {user ? (
@@ -138,23 +138,23 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           <input type="hidden" name="module" value={module} />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="parentId" value="" />
-          <div className="flex items-center gap-3 border-b border-[var(--tb-border)] pb-3">
+          <div className="flex items-center gap-3 border-b border-[var(--border-color)] pb-3">
             {user.avatar && user.avatar !== "/assets/hooman.png" ? (
-              <Image src={user.avatar} width={36} height={36} alt={user.name || "کاربر"} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--tb-border)]" />
+              <Image src={user.avatar} width={36} height={36} alt={user.name || "کاربر"} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
             ) : (
-              <div className="h-9 w-9 rounded-full bg-[var(--tb-bg-muted)] border border-[var(--tb-border)] flex items-center justify-center text-[var(--tb-fg-muted)] shrink-0">
+              <div className="h-9 w-9 rounded-full bg-[var(--muted-background)] border border-[var(--border-color)] flex items-center justify-center text-[var(--paragraph-color)] shrink-0">
                 <Icon name="user" size={18} />
               </div>
             )}
             <div>
-              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-semibold">{user.name}</div>
-              <div className="text-xs text-[var(--tb-fg-muted)] font-mono" dir="ltr">@{user.username}</div>
+              <div className="paragraph-font-size paragraph-color font-semibold">{user.name}</div>
+              <div className="text-xs text-[var(--paragraph-color)] font-mono" dir="ltr">@{user.username}</div>
             </div>
             <Badge variant="info" className="ms-auto text-xs">حساب متصل</Badge>
           </div>
-          <textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="input min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
+          <textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="input min-h-[100px] w-full paragraph-font-size paragraph-color" />
           <div className="flex justify-between items-center">
-            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
+            <span className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
               {state?.ok ? <span className="text-[var(--tb-success)] font-semibold">✓ دیدگاه شما با موفقیت در پایگاه داده ثبت شد</span> : (state as any)?.error ? <span className="text-[var(--tb-danger)]">{(state as any).error}</span> : ""}
             </span>
             <Button disabled={isSubmitting || isPending} size="sm">
@@ -163,9 +163,9 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           </div>
         </form>
       ) : (
-        <div className="card p-6 text-center space-y-3 mb-8 bg-[var(--tb-bg-secondary)]/40 border-dashed">
-          <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-semibold text-[var(--tb-fg-primary)]">برای ثبت دیدگاه وارد شوید</h4>
-          <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] max-w-md mx-auto">
+        <div className="card p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed">
+          <h4 className="h3-font-size h3-font-color font-semibold font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
+          <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] max-w-md mx-auto">
             برای ثبت دیدگاه، پاسخ به نظرات دیگران و پسندیدن مطالب، ابتدا باید وارد حساب کاربری خود شوید یا در کمتر از یک دقیقه ثبت‌نام کنید.
           </p>
           <div className="pt-2">
@@ -176,9 +176,9 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
       <div className="space-y-1 min-h-[60px]">
         {loading ? (
-          <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)] text-center py-6 animate-pulse">در حال بارگذاری دیدگاه‌ها از پایگاه داده Neon...</p>
+          <p className="h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)] text-center py-6 animate-pulse">در حال بارگذاری دیدگاه‌ها از پایگاه داده Neon...</p>
         ) : comments.length === 0 ? (
-          <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)] text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
+          <p className="h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)] text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (
           comments.map(c => renderNode(c, 0))
         )}

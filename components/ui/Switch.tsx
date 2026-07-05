@@ -18,7 +18,7 @@ export function Switch({ checked, onCheckedChange, disabled, className }:{
  className={cn(
  "relative inline-flex h-5 w-9 shrink-0 rounded-full border transition-colors",
  "duration-[var(--tb-motion-sm)]",
- checked ? "bg-[var(--tb-primary)] border-[var(--tb-primary)]" : "bg-[var(--tb-bg-muted)] border-[var(--tb-border)]",
+ checked ? "bg-[var(--home)] border-[var(--home)]" : "bg-[var(--muted-background)] border-[var(--border-color)]",
  "disabled:opacity-50",
  className
  )}

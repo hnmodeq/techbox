@@ -17,11 +17,11 @@ export default function VideoReelsRow() {
   const [activeVideo, setActiveVideo] = useState<any | null>(null);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">ریلزها و ویدیوهای کوتاه زیرساخت</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">ریلزها و ویدیوهای کوتاه زیرساخت</h2>
           <Link href="/media" className="text-sm font-bold text-[var(--media)] hover:underline flex items-center gap-1 shrink-0">
             <span>مشاهده همه ویدیوها</span>
             <span>←</span>
@@ -37,7 +37,7 @@ export default function VideoReelsRow() {
                 type="button"
                 key={vid.slug}
                 onClick={() => setActiveVideo(vid)}
-                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--tb-border)] shadow-xl hover:shadow-2xl transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end text-right cursor-pointer"
+                className="group relative w-full aspect-[9/16] rounded-2xl overflow-hidden border border-[var(--border-color)] shadow-xl hover:shadow-2xl transition-all duration-[var(--tb-motion-md)] bg-slate-950 flex flex-col justify-end text-right cursor-pointer"
               >
                 <Image
                   src={vid.image || '/assets/blog-1.jpg'}
@@ -74,13 +74,13 @@ export default function VideoReelsRow() {
           <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
             
-            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
-              <div className="flex items-center justify-between p-4 border-b border-[var(--tb-border)]">
-                <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
+            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--main-background)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
+              <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
+                <h3 className="h2-font-size h2-font-color font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
                 <button
                   type="button"
                   onClick={() => setActiveVideo(null)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors cursor-pointer"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--muted-background)] text-[var(--paragraph-color)] hover:text-[var(--primary-text)] transition-colors cursor-pointer"
                   aria-label="بستن"
                 >
                   <Icon name="close" size={18} />
@@ -100,8 +100,8 @@ export default function VideoReelsRow() {
               </div>
 
               <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
-                  <span>منتشرشده توسط: <b className="text-[var(--tb-fg-primary)]">{activeVideo.author?.name || "تکباکس"}</b></span>
+                <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+                  <span>منتشرشده توسط: <b className="text-[var(--primary-text)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span> • {activeVideo.date_fa}</span>
                 </div>
                 <Link href={`/media/${activeVideo.slug}`} className="btn btn-primary px-5 py-2 text-xs font-bold">

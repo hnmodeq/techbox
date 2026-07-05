@@ -90,9 +90,9 @@ function DockItem({
  onBlur={() => isHovered.set(0)}
  onClick={onClick}
  onKeyDown={handleKeyDown}
- className={`relative inline-flex items-center justify-center rounded-full border-2 shadow-[var(--tb-shadow-md)] ${
- active ? "border-[var(--tb-primary)]" : "border-[var(--tb-border)]"
- } bg-[var(--tb-bg-secondary)] ${className}`}
+ className={`relative inline-flex items-center justify-center rounded-full border-2 shadow-[var(--shadow-size)] ${
+ active ? "border-[var(--home)]" : "border-[var(--border-color)]"
+ } bg-[var(--card-background)] ${className}`}
  tabIndex={0}
  role="button"
  aria-haspopup="true"
@@ -141,7 +141,7 @@ function DockLabel({ children, className = "", isHovered, orientation = "horizon
  animate={{ opacity: 1, x: 0, y: orientation === "vertical" ? 0 : -10 }}
  exit={{ opacity: 0, x: orientation === "vertical" ? 8 : 0 }}
  transition={{ duration: 0.2 }}
- className={`${className} ${positionClasses} absolute z-50 w-fit whitespace-pre rounded-md border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-primary)] shadow-[var(--tb-shadow-md)]`}
+ className={`${className} ${positionClasses} absolute z-50 w-fit whitespace-pre rounded-md border border-[var(--border-color)] bg-[var(--card-background)] px-2 py-0.5 paragraph-font-size paragraph-color text-[var(--primary-text)] shadow-[var(--shadow-size)]`}
  role="tooltip"
  >
  {children}
@@ -197,7 +197,7 @@ export default function Dock({
  isHovered.set(0);
  mousePos.set(Infinity);
  }}
- className={`${className} flex w-fit gap-4 rounded-2xl border-2 border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/70 backdrop-blur-[var(--tb-blur-sm)] ${
+ className={`${className} flex w-fit gap-4 rounded-2xl border-2 border-[var(--border-color)] bg-[var(--card-background)]/70 backdrop-blur-[var(--tb-blur-sm)] ${
  isVertical ? "flex-col items-center py-4 px-2" : "items-end pb-2 px-4"
  }`}
  style={isVertical ? { width: panelSize } : { height: panelSize }}

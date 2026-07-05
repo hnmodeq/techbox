@@ -100,10 +100,10 @@ export default function SidebarShell({
        onToggleMobile();
      }}
      style={{ top: `${btnTop}px`, zIndex: zIndex.mobileFab }}
-     className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[var(--tb-motion-lg)] shadow-[var(--tb-shadow-lg)] cursor-pointer"
+     className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[var(--tb-motion-lg)] shadow-[var(--shadow-size)] cursor-pointer"
      aria-label="باز کردن منو"
    >
-     <div className="relative flex h-16 w-16 items-center justify-center rounded-l-full border border-r-0 border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]/95 shadow-xl backdrop-blur-md p-2">
+     <div className="relative flex h-16 w-16 items-center justify-center rounded-l-full border border-r-0 border-[var(--border-color)] bg-[var(--card-background)]/95 shadow-xl backdrop-blur-md p-2">
        <Image
          src="/logo.png"
          alt="لوگو تکباکس"

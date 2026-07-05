@@ -11,11 +11,11 @@ export default function ShopRow() {
   const products = getLatest('shop', 5);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--tb-bg-primary)] ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-[var(--tb-fg-primary)]">جدیدترین تجهیزات سرور، استوریج و شبکه</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">جدیدترین تجهیزات سرور، استوریج و شبکه</h2>
           <Link href="/shop" className="text-sm font-bold text-[var(--shop)] hover:underline flex items-center gap-1 shrink-0">
             <span>مشاهده کل فروشگاه</span>
             <span>←</span>
@@ -27,10 +27,10 @@ export default function ShopRow() {
             <Link
               key={prod.slug}
               href={`/shop/${prod.slug}`}
-              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]"
+              className="group card !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] border border-[var(--border-color)] bg-[var(--card-background)]"
             >
               {/* Product Image Showcase container */}
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--tb-bg-muted)]/70 p-4 flex items-center justify-center">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--muted-background)]/70 p-4 flex items-center justify-center">
                 <Image
                   src={prod.image || '/assets/blog-1.jpg'}
                   alt={prod.title}
@@ -42,11 +42,11 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-black text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                  <h3 className="h3-font-size h3-font-color font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   
-                  <p className="mt-2.5 text-xs text-[var(--tb-fg-muted)] leading-5 line-clamp-3">
+                  <p className="mt-2.5 text-xs text-[var(--paragraph-color)] leading-5 line-clamp-3">
                     {prod.excerpt}
                   </p>
                 </div>

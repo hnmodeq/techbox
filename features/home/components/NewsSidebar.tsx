@@ -39,7 +39,7 @@ export default function NewsSidebar() {
           type="button"
           onClick={() => setOpen(true)}
           style={{ zIndex: zIndex.mobileFab }}
-          className="fixed left-0 top-6 select-none rounded-r-[var(--tb-radius-lg)] bg-[var(--tb-bg-secondary)] border border-l-0 border-[var(--tb-border)] p-2.5 text-[var(--tb-news)] shadow-[var(--tb-shadow-lg)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--tb-bg-muted)] cursor-pointer"
+          className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border border-l-0 border-[var(--border-color)] p-2.5 text-[var(--tb-news)] shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--muted-background)] cursor-pointer"
           title="اخبار زنده تکباکس"
           aria-label="اخبار زنده تکباکس"
         >
@@ -74,15 +74,15 @@ export default function NewsSidebar() {
         dir="rtl"
       >
         {/* Clean Header WITHOUT background fill and WITHOUT X button */}
-        <div className="p-5 border-b border-[var(--tb-border)] flex items-center justify-between shrink-0">
+        <div className="p-5 border-b border-[var(--border-color)] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <Icon name="news" className="h-5 w-5 text-[var(--tb-news)]" />
-            <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-black text-[var(--tb-fg-primary)]">اخبار زنده تکباکس</h3>
+            <h3 className="h2-font-size h2-font-color font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="p-1.5 text-[var(--tb-fg-muted)] hover:text-[var(--tb-news)] transition-colors cursor-pointer"
+            className="p-1.5 text-[var(--paragraph-color)] hover:text-[var(--tb-news)] transition-colors cursor-pointer"
             title="بستن"
           >
             <Icon name="chevronLeft" className="h-5 w-5 rtl:rotate-180" />
@@ -99,7 +99,7 @@ export default function NewsSidebar() {
               className="group block px-2 sm:px-3"
             >
               {/* Wide Banner Image */}
-              <div className="relative aspect-[3/1] w-full rounded-[var(--tb-radius-md)] overflow-hidden bg-[var(--tb-bg-muted)] mb-3 border border-[var(--tb-border)]/50">
+              <div className="relative aspect-[3/1] w-full rounded-[var(--corner-radius)] overflow-hidden bg-[var(--muted-background)] mb-3 border border-[var(--border-color)]/50">
                 <Image
                   src={n.image || '/assets/blog-1.jpg'}
                   alt={n.title}
@@ -110,16 +110,16 @@ export default function NewsSidebar() {
               </div>
 
               {/* Date & Time */}
-              <div className="text-[11px] text-[var(--tb-fg-muted)] mb-1 font-bold">
+              <div className="text-[11px] text-[var(--paragraph-color)] mb-1 font-bold">
                 <span>{n.date_fa} {n.time || ''}</span>
               </div>
 
-              <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
+              <h4 className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
                 {n.title}
               </h4>
 
               {/* News Description */}
-              <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] mt-1.5 line-clamp-2 leading-5">
+              <p className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] mt-1.5 line-clamp-2 leading-5">
                 {n.excerpt}
               </p>
             </Link>
@@ -127,11 +127,11 @@ export default function NewsSidebar() {
         </div>
 
         {/* Footer Link */}
-        <div className="p-3.5 border-t border-[var(--tb-border)] text-center shrink-0">
+        <div className="p-3.5 border-t border-[var(--border-color)] text-center shrink-0">
           <Link
             href="/news"
             onClick={() => setOpen(false)}
-            className="btn btn-ghost w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-news)] font-bold"
+            className="btn btn-ghost w-full paragraph-font-size paragraph-color text-[var(--tb-news)] font-bold"
           >
             مشاهده آرشیو کامل اخبار ←
           </Link>

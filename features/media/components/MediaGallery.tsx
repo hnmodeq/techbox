@@ -83,10 +83,10 @@ export default function MediaGallery() {
             <button
               key={p}
               onClick={() => setPage(p)}
-              className={`h-10 w-10 rounded-[var(--tb-radius-md)] border font-bold transition-all ${
+              className={`h-10 w-10 rounded-[var(--corner-radius)] border font-bold transition-all ${
                 page === p
-                  ? "bg-[var(--tb-media)] text-[var(--tb-on-accent)] border-[var(--tb-media)] shadow-md scale-105"
-                  : "border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-media)] hover:text-[var(--tb-media)]"
+                  ? "bg-[var(--tb-media)] text-[#ffffff] border-[var(--tb-media)] shadow-md scale-105"
+                  : "border-[var(--border-color)] bg-[var(--card-background)] text-[var(--primary-text)] hover:border-[var(--tb-media)] hover:text-[var(--tb-media)]"
               }`}
             >
               {p.toLocaleString("fa-IR")}
@@ -100,12 +100,12 @@ export default function MediaGallery() {
         <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
           
-          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--tb-radius-xl)] border border-[var(--tb-border)] bg-[var(--tb-bg-primary)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
-            <div className="flex items-center justify-between p-4 border-b border-[var(--tb-border)]">
-              <h3 className="text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] font-bold truncate text-[var(--tb-fg-primary)]">{activeVideo.title}</h3>
+          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--main-background)] shadow-2xl flex flex-col" style={{ zIndex: zIndex.modalContent }}>
+            <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
+              <h3 className="h2-font-size h2-font-color font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
               <button
                 onClick={() => setActiveVideo(null)}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)] transition-colors"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--muted-background)] text-[var(--paragraph-color)] hover:text-[var(--primary-text)] transition-colors"
                 aria-label="بستن"
               >
                 <Icon name="close" size={18} />
@@ -125,24 +125,24 @@ export default function MediaGallery() {
             </div>
 
             <div className="p-5 space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--tb-border)] pb-4">
-                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] flex items-center gap-3">
-                  <span>منتشرشده توسط: <b className="text-[var(--tb-fg-primary)]">{activeVideo.author?.name || "تکباکس"}</b></span>
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
+                <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] flex items-center gap-3">
+                  <span>منتشرشده توسط: <b className="text-[var(--primary-text)]">{activeVideo.author?.name || "تکباکس"}</b></span>
                   <span>•</span>
                   <span>{activeVideo.date_fa}</span>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <span className="inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] bg-[var(--tb-bg-secondary)] px-3 py-1.5 rounded-[var(--tb-radius-full)] border border-[var(--tb-border)]">
+                  <span className="inline-flex items-center gap-1.5 paragraph-font-size paragraph-color text-[var(--paragraph-color)] bg-[var(--card-background)] px-3 py-1.5 rounded-[var(--corner-radius)] border border-[var(--border-color)]">
                     <CardStats module="media" slug={activeVideo.slug} initialViews={activeVideo.views ?? 0} initialLikes={activeVideo.likes ?? 0} showLabel={true} />
                   </span>
 
                   <button
                     onClick={() => handleLike(activeVideo.slug, activeVideo.likes)}
-                    className={`inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] px-4 py-1.5 rounded-[var(--tb-radius-full)] border transition-all ${
+                    className={`inline-flex items-center gap-1.5 paragraph-font-size paragraph-color px-4 py-1.5 rounded-[var(--corner-radius)] border transition-all ${
                       likedList[activeVideo.slug]
                         ? "bg-[var(--tb-danger)]/15 border-[var(--tb-danger)] text-[var(--tb-danger)] shadow-sm"
-                        : "bg-[var(--tb-bg-secondary)] border-[var(--tb-border)] text-[var(--tb-fg-primary)] hover:border-[var(--tb-danger)]"
+                        : "bg-[var(--card-background)] border-[var(--border-color)] text-[var(--primary-text)] hover:border-[var(--tb-danger)]"
                     }`}
                   >
                     <Icon name="like" size={16} className={likedList[activeVideo.slug] ? "fill-current" : ""} />
@@ -153,7 +153,7 @@ export default function MediaGallery() {
 
               {/* Comments Section */}
               <div className="space-y-4">
-                <h4 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold">نظرات کاربران ({getComments(activeVideo.slug).length.toLocaleString("fa-IR")})</h4>
+                <h4 className="h3-font-size h3-font-color font-semibold font-bold">نظرات کاربران ({getComments(activeVideo.slug).length.toLocaleString("fa-IR")})</h4>
 
                 <form onSubmit={(e) => handleAddComment(e, activeVideo.slug)} className="flex gap-2">
                   <input
@@ -161,21 +161,21 @@ export default function MediaGallery() {
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="نظر خود را درباره این ویدیو بنویسید..."
-                    className="input flex-1 !h-11 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
+                    className="input flex-1 !h-11 paragraph-font-size paragraph-color"
                   />
-                  <button type="submit" className="btn btn-primary !h-11 px-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] shrink-0">
+                  <button type="submit" className="btn btn-primary !h-11 px-6 paragraph-font-size paragraph-color shrink-0">
                     ارسال نظر
                   </button>
                 </form>
 
                 <ul className="space-y-3 max-h-60 overflow-y-auto pr-1">
                   {getComments(activeVideo.slug).map((c, i) => (
-                    <li key={i} className="p-3 rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
-                      <div className="flex items-center justify-between mb-1 text-[12px] text-[var(--tb-fg-muted)]">
+                    <li key={i} className="p-3 rounded-[var(--corner-radius)] bg-[var(--card-background)] border border-[var(--border-color)] paragraph-font-size paragraph-color">
+                      <div className="flex items-center justify-between mb-1 text-[12px] text-[var(--paragraph-color)]">
                         <b>کاربر تکباکس</b>
                         <span>لحظاتی پیش</span>
                       </div>
-                      <p className="text-[var(--tb-fg-primary)]">{c}</p>
+                      <p className="text-[var(--primary-text)]">{c}</p>
                     </li>
                   ))}
                 </ul>

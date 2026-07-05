@@ -24,22 +24,22 @@ const base =
  "disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<Variant,string> = {
- primary: "text-[var(--tb-on-accent)] bg-[var(--tb-primary)] hover:brightness-[1.06] active:scale-[0.985] shadow-[var(--tb-shadow-sm)]",
- secondary: "text-[var(--tb-fg-primary)] bg-[var(--tb-bg-muted)] hover:brightness-[1.03]",
- ghost: "bg-transparent text-[var(--tb-fg-primary)] hover:bg-[var(--tb-bg-muted)] border border-[var(--tb-border)]",
- outline: "bg-transparent border border-[var(--tb-border)] text-[var(--tb-fg-primary)] hover:bg-[var(--tb-bg-muted)]",
- danger: "text-[var(--tb-on-accent)] bg-[var(--tb-danger)] border-transparent hover:brightness-[1.05] active:scale-[0.985]",
+ primary: "text-[#ffffff] bg-[var(--home)] hover:brightness-[1.06] active:scale-[0.985] shadow-[var(--shadow-size)]",
+ secondary: "text-[var(--primary-text)] bg-[var(--muted-background)] hover:brightness-[1.03]",
+ ghost: "bg-transparent text-[var(--primary-text)] hover:bg-[var(--muted-background)] border border-[var(--border-color)]",
+ outline: "bg-transparent border border-[var(--border-color)] text-[var(--primary-text)] hover:bg-[var(--muted-background)]",
+ danger: "text-[#ffffff] bg-[var(--tb-danger)] border-transparent hover:brightness-[1.05] active:scale-[0.985]",
  vip: "tb-cta tb-cta-vip px-4",
  link: "bg-transparent underline-offset-4 hover:underline p-0 h-auto border-0 shadow-none"
 };
 
 const sizes: Record<Size,string> = {
- xs: "h-7 px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--tb-radius-md)]",
- sm: "h-8 px-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--tb-radius-md)]",
- md: "h-10 px-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--tb-radius-lg)]",
- lg: "h-11 px-5 text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] rounded-[var(--tb-radius-lg)]",
- icon: "h-10 w-10 p-0 rounded-[var(--tb-radius-lg)]",
- iconSm: "h-7 w-7 p-0 rounded-[var(--tb-radius-md)]"
+ xs: "h-7 px-2.5 paragraph-font-size paragraph-color rounded-[var(--corner-radius)]",
+ sm: "h-8 px-3 paragraph-font-size paragraph-color rounded-[var(--corner-radius)]",
+ md: "h-10 px-4 paragraph-font-size paragraph-color rounded-[var(--corner-radius)]",
+ lg: "h-11 px-5 h3-font-size h3-font-color font-semibold rounded-[var(--corner-radius)]",
+ icon: "h-10 w-10 p-0 rounded-[var(--corner-radius)]",
+ iconSm: "h-7 w-7 p-0 rounded-[var(--corner-radius)]"
 };
 
 export function buttonClassName({ variant = "primary", size = "md", className }: { variant?: Variant; size?: Size; className?: string } = {}) {

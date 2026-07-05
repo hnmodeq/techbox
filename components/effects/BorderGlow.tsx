@@ -105,13 +105,13 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
   edgeSensitivity = 30,
   // Fallbacks only — ModuleBorderGlow always overrides these with resolved design tokens.
   glowColor = "40 80 80",
-  backgroundColor = "var(--tb-bg-secondary)",
+  backgroundColor = "var(--card-background)",
   borderRadius = 28,
   glowRadius = 40,
   glowIntensity = 1.0,
   coneSpread = 25,
   animated = false,
-  colors = ["var(--tb-primary)", "var(--tb-vip)", "var(--tb-subnet)"],
+  colors = ["var(--home)", "var(--tb-vip)", "var(--tb-subnet)"],
   fillOpacity = 0.5,
 }) => {
  const cardRef = useRef<HTMLDivElement>(null);
@@ -224,7 +224,7 @@ const BorderGlow: React.FC<BorderGlowProps> = ({
  style={{
  background: backgroundColor,
  borderRadius: `${borderRadius}px`,
- border: "1px solid var(--tb-border)",
+ border: "1px solid var(--border-color)",
  transform: "translate3d(0, 0, 0.01px)",
  }}
  >

@@ -16,19 +16,19 @@ export function ToolPageHeader({
   accent?: string;
 }) {
   return (
-    <div dir="rtl" className="relative overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-5 sm:p-7 shadow-[var(--tb-shadow-sm)]">
+    <div dir="rtl" className="relative overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-5 sm:p-7 shadow-[var(--shadow-size)]">
       <div
         className="pointer-events-none absolute -left-20 -top-20 h-44 w-44 rounded-full opacity-15 blur-[40px]"
         style={{ background: accent }}
         aria-hidden
       />
       {breadcrumbs.length > 0 && (
-        <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-[12px] text-[var(--tb-fg-muted)]">
+        <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-[12px] text-[var(--paragraph-color)]">
           {breadcrumbs.map((c, i) => (
             <span key={i} className="flex items-center gap-1.5">
               {i > 0 && <Icon name="chevronLeft" className="h-3 w-3 opacity-60 rtl:rotate-180" />}
               {c.href ? (
-                <Link href={c.href} className="hover:text-[var(--tb-fg-primary)] transition-colors">
+                <Link href={c.href} className="hover:text-[var(--primary-text)] transition-colors">
                   {c.label}
                 </Link>
               ) : (
@@ -38,9 +38,9 @@ export function ToolPageHeader({
           ))}
         </nav>
       )}
-      <h1 className="text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)]" style={{ color: "var(--tb-fg-primary)" }}>{title}</h1>
+      <h1 className="h1-font-size h1-font-color font-extrabold" style={{ color: "var(--primary-text)" }}>{title}</h1>
       {subtitle && (
-        <p className="mt-2 max-w-2xl text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)]">{subtitle}</p>
+        <p className="mt-2 max-w-2xl h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)]">{subtitle}</p>
       )}
     </div>
   );

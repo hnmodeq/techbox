@@ -14,15 +14,15 @@ export function Tabs({ value, onValueChange, children, className }:{
 }
 
 export function TabsList({className, ...p}: React.HTMLAttributes<HTMLDivElement>){
- return <div className={cn("flex gap-1 p-1 rounded-[var(--tb-radius-lg)] bg-[var(--tb-bg-muted)]", className)} {...p} />;
+ return <div className={cn("flex gap-1 p-1 rounded-[var(--corner-radius)] bg-[var(--muted-background)]", className)} {...p} />;
 }
 export function TabsTrigger({value, children, __tb_active, __tb_onSelect, className}:{value:string; children:React.ReactNode; __tb_active?:boolean; __tb_onSelect?:(v:string)=>void; className?:string}){
  return (
  <button
  onClick={()=>__tb_onSelect?.(value)}
  className={cn(
- "px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--tb-radius-md)] transition-all",
- __tb_active ? "bg-[var(--tb-bg-secondary)] shadow-[var(--tb-shadow-sm)] text-[var(--tb-fg-primary)]" : "text-[var(--tb-fg-muted)] hover:text-[var(--tb-fg-primary)]",
+ "px-3 py-1.5 paragraph-font-size paragraph-color rounded-[var(--corner-radius)] transition-all",
+ __tb_active ? "bg-[var(--card-background)] shadow-[var(--shadow-size)] text-[var(--primary-text)]" : "text-[var(--paragraph-color)] hover:text-[var(--primary-text)]",
  className
  )}
  aria-selected={__tb_active}

@@ -29,10 +29,10 @@ export default function HeroSection() {
   const item = items[index];
 
   return (
-    <section className={`relative w-full max-w-full overflow-hidden bg-[var(--tb-bg-primary)] border-0 ${HOME_ROW_SIZES.heroMinHeight} flex flex-col justify-center items-center px-4 py-16 text-center`} dir="rtl">
+    <section className={`relative w-full max-w-full overflow-hidden bg-[var(--main-background)] border-0 ${HOME_ROW_SIZES.heroMinHeight} flex flex-col justify-center items-center px-4 py-16 text-center`} dir="rtl">
       <div className="relative z-10 flex flex-col items-center w-full max-w-3xl">
-        <h1 className="text-[length:var(--hero-font-size)] font-black text-[var(--hero-font-color)] font-black tracking-tight">تکباکس</h1>
-        <p className="mt-2 text-sm sm:text-base text-[var(--tb-fg-muted)] font-bold">پلتفرم جامع زیرساخت و فناوری اطلاعات</p>
+        <h1 className="hero-font-size hero-font-color font-black font-black tracking-tight">تکباکس</h1>
+        <p className="mt-2 text-sm sm:text-base text-[var(--paragraph-color)] font-bold">پلتفرم جامع زیرساخت و فناوری اطلاعات</p>
         <div className="hero-rotator mt-6 w-full">
           <AnimatePresence mode="wait">
             <motion.div

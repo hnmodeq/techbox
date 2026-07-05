@@ -17,20 +17,20 @@ export default function WorkWithUs(){
 
  <div className="grid gap-4">
  {jobs.map(j=>(
- <Link key={j.slug} href={`/workwithus/${j.slug}`} className="card p-5 transition-all duration-[var(--tb-motion-md)] hover:-translate-y-0.5 hover:shadow-[var(--tb-shadow-lg)] group">
+ <Link key={j.slug} href={`/workwithus/${j.slug}`} className="card p-5 transition-all duration-[var(--tb-motion-md)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-size)] group">
  <div className="flex flex-wrap items-start justify-between gap-3">
  <div>
- <h3 className=" text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] group-hover:text-[var(--tb-primary)]">{j.title}</h3>
- <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mt-1">{j.excerpt}</p>
- <div className="flex flex-wrap gap-2 mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+ <h3 className=" h2-font-size h2-font-color font-bold group-hover:text-[var(--home)]">{j.title}</h3>
+ <p className="paragraph-font-size paragraph-color text-muted-foreground mt-1">{j.excerpt}</p>
+ <div className="flex flex-wrap gap-2 mt-3 paragraph-font-size paragraph-color">
  <Badge variant="brand">{j.type}</Badge>
  <Badge variant="secondary">{j.remote}</Badge>
  <Badge variant="outline">{j.team}</Badge>
  </div>
  </div>
- <div className="text-left text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground">
+ <div className="text-left paragraph-font-size paragraph-color text-muted-foreground">
  {j.date_fa}
- <div className="mt-1 text-[var(--tb-primary)]">مشاهده →</div>
+ <div className="mt-1 text-[var(--home)]">مشاهده →</div>
  </div>
  </div>
  </Link>

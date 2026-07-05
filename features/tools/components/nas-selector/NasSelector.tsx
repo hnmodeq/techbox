@@ -68,26 +68,26 @@ function ToggleCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "group relative flex min-h-[92px] w-full items-start gap-3 rounded-[var(--tb-radius-lg)] border p-4 text-right transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)]",
+        "group relative flex min-h-[92px] w-full items-start gap-3 rounded-[var(--corner-radius)] border p-4 text-right transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)]",
         selected
-          ? "border-[color-mix(in_oklch,var(--tb-primary)_48%,var(--tb-border))] bg-[color-mix(in_oklch,var(--tb-primary)_10%,var(--tb-bg-secondary))] shadow-[var(--tb-shadow-sm)]"
-          : "border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] hover:-translate-y-0.5 hover:bg-[var(--tb-bg-muted)]",
+          ? "border-[color-mix(in_oklch,var(--home)_48%,var(--border-color))] bg-[color-mix(in_oklch,var(--home)_10%,var(--card-background))] shadow-[var(--shadow-size)]"
+          : "border-[var(--border-color)] bg-[var(--card-background)] hover:-translate-y-0.5 hover:bg-[var(--muted-background)]",
       )}
       aria-pressed={selected}
     >
       <span
         className={cn(
-          "mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--tb-radius-md)] border",
+          "mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border",
           selected
-            ? "border-[color-mix(in_oklch,var(--tb-primary)_35%,transparent)] bg-[var(--tb-primary)] text-[var(--tb-on-accent)]"
-            : "border-[var(--tb-border)] bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)]",
+            ? "border-[color-mix(in_oklch,var(--home)_35%,transparent)] bg-[var(--home)] text-[#ffffff]"
+            : "border-[var(--border-color)] bg-[var(--muted-background)] text-[var(--paragraph-color)]",
         )}
       >
         <Icon name={icon} className="h-4 w-4" />
       </span>
       <span className="min-w-0">
-        <span className="block text-[14px] font-black text-[var(--tb-fg-primary)]">{title}</span>
-        {desc ? <span className="mt-1 block text-[12px] leading-6 text-[var(--tb-fg-muted)]">{desc}</span> : null}
+        <span className="block text-[14px] font-black text-[var(--primary-text)]">{title}</span>
+        {desc ? <span className="mt-1 block text-[12px] leading-6 text-[var(--paragraph-color)]">{desc}</span> : null}
       </span>
     </button>
   );
@@ -112,16 +112,16 @@ function RangeField({
 }) {
   const percent = ((value - min) / (max - min)) * 100;
   return (
-    <label className="block rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-4">
+    <label className="block rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-4">
       <span className="flex items-center justify-between gap-3">
-        <span className="text-[13px] font-extrabold text-[var(--tb-fg-primary)]">{label}</span>
-        <span className="badge bg-[color-mix(in_oklch,var(--tb-primary)_10%,var(--tb-bg-muted))] text-[var(--tb-fg-primary)]">
+        <span className="text-[13px] font-extrabold text-[var(--primary-text)]">{label}</span>
+        <span className="badge bg-[color-mix(in_oklch,var(--home)_10%,var(--muted-background))] text-[var(--primary-text)]">
           {persianNumber(value)} {suffix}
         </span>
       </span>
       <input
-        className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--tb-bg-muted)] accent-[var(--tb-primary)]"
-        style={{ background: `linear-gradient(to left, var(--tb-primary) ${percent}%, var(--tb-bg-muted) ${percent}%)` }}
+        className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--muted-background)] accent-[var(--home)]"
+        style={{ background: `linear-gradient(to left, var(--home) ${percent}%, var(--muted-background) ${percent}%)` }}
         type="range"
         min={min}
         max={max}
@@ -217,17 +217,17 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
   const rows = [2, 4, 6, 8, 12];
   const raids: RaidType[] = ["raid1", "raid5", "raid6", "raid10"];
   return (
-    <div className="overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]">
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--tb-border)] p-4">
+    <div className="overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)]">
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--border-color)] p-4">
         <div>
           <h3 className="text-[15px] font-black">جدول سریع ظرفیت قابل استفاده</h3>
-          <p className="mt-1 text-[12px] leading-6 text-[var(--tb-fg-muted)]">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
+          <p className="mt-1 text-[12px] leading-6 text-[var(--paragraph-color)]">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
         </div>
-        <Icon name="disk" className="h-5 w-5 text-[var(--tb-primary)]" />
+        <Icon name="disk" className="h-5 w-5 text-[var(--home)]" />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[520px] border-collapse text-center text-[12px]">
-          <thead className="bg-[var(--tb-bg-muted)] text-[var(--tb-fg-muted)]">
+          <thead className="bg-[var(--muted-background)] text-[var(--paragraph-color)]">
             <tr>
               <th className="p-3 font-black">Bay</th>
               {raids.map((raid) => (
@@ -237,13 +237,13 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
           </thead>
           <tbody>
             {rows.map((bays) => (
-              <tr key={bays} className="border-t border-[var(--tb-border)]">
-                <td className="p-3 font-black text-[var(--tb-fg-primary)]">{persianNumber(bays)}</td>
+              <tr key={bays} className="border-t border-[var(--border-color)]">
+                <td className="p-3 font-black text-[var(--primary-text)]">{persianNumber(bays)}</td>
                 {raids.map((raid) => {
                   const value = estimateUsableCapacity(bays, state.driveTb, raid);
                   const active = state.raid === raid && value >= state.usableTb;
                   return (
-                    <td key={raid} className={cn("p-3", active && "bg-[color-mix(in_oklch,var(--tb-success)_16%,transparent)] font-black text-[var(--tb-fg-primary)]")}>
+                    <td key={raid} className={cn("p-3", active && "bg-[color-mix(in_oklch,var(--tb-success)_16%,transparent)] font-black text-[var(--primary-text)]")}>
                       {value > 0 ? `${persianNumber(value)} TB` : "—"}
                     </td>
                   );
@@ -283,20 +283,20 @@ function ProductCard({
   };
 
   return (
-    <article className="relative overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-5 shadow-[var(--tb-shadow-sm)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-md)] flex flex-col justify-between">
+    <article className="relative overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)] flex flex-col justify-between">
       <div>
         <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--tb-primary)_20%,transparent),transparent_45%),var(--tb-bg-muted)]">
-              <Icon name={product.formFactor === "rackmount" ? "server" : "disk"} className="h-7 w-7 text-[var(--tb-primary)]" />
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--home)_20%,transparent),transparent_45%),var(--muted-background)]">
+              <Icon name={product.formFactor === "rackmount" ? "server" : "disk"} className="h-7 w-7 text-[var(--home)]" />
             </div>
             <div>
-              <h3 className="text-[16px] font-black text-[var(--tb-fg-primary)]">{product.title}</h3>
-              <p className="mt-0.5 text-[12px] text-[var(--tb-fg-muted)]">{product.subtitle}</p>
+              <h3 className="text-[16px] font-black text-[var(--primary-text)]">{product.title}</h3>
+              <p className="mt-0.5 text-[12px] text-[var(--paragraph-color)]">{product.subtitle}</p>
             </div>
           </div>
           {rank === 0 ? (
-            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--tb-primary),var(--tb-vip))] px-3 py-1 text-[11px] font-black text-[var(--tb-on-accent)] shadow-sm">
+            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--home),var(--tb-vip))] px-3 py-1 text-[11px] font-black text-[#ffffff] shadow-sm">
               بهترین پیشنهاد
             </span>
           ) : null}
@@ -313,18 +313,18 @@ function ProductCard({
             ["RAM", `${persianNumber(product.maxRamGb)} GB`],
             ["شبکه", `${persianNumber(product.networkGbE)} GbE`],
           ].map(([label, value]) => (
-            <div key={label as string} className="rounded-[var(--tb-radius-md)] bg-[var(--tb-bg-muted)] p-2.5 text-center">
-              <div className="text-[11px] text-[var(--tb-fg-muted)]">{label}</div>
-              <div className="mt-1 text-[13px] font-black text-[var(--tb-fg-primary)]">{value}</div>
+            <div key={label as string} className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2.5 text-center">
+              <div className="text-[11px] text-[var(--paragraph-color)]">{label}</div>
+              <div className="mt-1 text-[13px] font-black text-[var(--primary-text)]">{value}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-4 flex items-center gap-3">
-          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[var(--tb-bg-muted)]">
-            <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--tb-success),var(--tb-primary))]" style={{ width: `${product.match}%` }} />
+          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[var(--muted-background)]">
+            <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--tb-success),var(--home))]" style={{ width: `${product.match}%` }} />
           </div>
-          <span className="text-[13px] font-black text-[var(--tb-fg-primary)]">{persianNumber(product.match)}٪ تطابق</span>
+          <span className="text-[13px] font-black text-[var(--primary-text)]">{persianNumber(product.match)}٪ تطابق</span>
         </div>
 
         <div className="mt-4 space-y-2">
@@ -335,7 +335,7 @@ function ProductCard({
             </div>
           ))}
           {product.warnings.map((warning) => (
-            <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--tb-fg-muted)]">
+            <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--paragraph-color)]">
               <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--tb-warning)]" />
               <span>{warning}</span>
             </div>
@@ -343,13 +343,13 @@ function ProductCard({
         </div>
       </div>
 
-      <div className="mt-5 pt-4 border-t border-[var(--tb-border)] flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
         <div className="text-[14px] font-bold text-[var(--tb-shop)]">
           {renderPrice()}
         </div>
         <div className="flex gap-2 flex-1 sm:flex-none">
           <a href={targetHref} onClick={onSelect} className="btn btn-primary px-5">مشاهده در فروشگاه</a>
-          <button type="button" onClick={onToggleCompare} className={cn("btn btn-ghost", selected && "bg-[var(--tb-bg-muted)] text-[var(--tb-primary)]")}>
+          <button type="button" onClick={onToggleCompare} className={cn("btn btn-ghost", selected && "bg-[var(--muted-background)] text-[var(--home)]")}>
             {selected ? "حذف از مقایسه" : "مقایسه"}
           </button>
         </div>
@@ -391,13 +391,13 @@ export function NasSelector({
   };
 
   return (
-    <section dir="rtl" className={cn("font-sans text-[var(--tb-fg-primary)]", className)}>
-      <div className="relative overflow-hidden rounded-[calc(var(--tb-radius-lg)+8px)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] shadow-[var(--tb-shadow-md)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--tb-primary)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--tb-vip)_14%,transparent),transparent_30%)]" />
+    <section dir="rtl" className={cn("font-sans text-[var(--primary-text)]", className)}>
+      <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--tb-vip)_14%,transparent),transparent_30%)]" />
         <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
-            <h1 className="text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)]">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
-            <p className="mt-3 max-w-2xl text-[14px] leading-8 text-[var(--tb-fg-muted)]">
+            <h1 className="h1-font-size h1-font-color font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
+            <p className="mt-3 max-w-2xl text-[14px] leading-8 text-[var(--paragraph-color)]">
               نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
             </p>
 
@@ -405,7 +405,7 @@ export function NasSelector({
               <section className="card">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۱. نوع استفاده</h2>
-                  <span className="text-[12px] text-[var(--tb-fg-muted)]">سناریوی اصلی را مشخص کنید</span>
+                  <span className="text-[12px] text-[var(--paragraph-color)]">سناریوی اصلی را مشخص کنید</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {personas.map((persona) => (
@@ -424,7 +424,7 @@ export function NasSelector({
               <section className="card">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h2 className="text-[16px] font-black">۲. سرویس‌ها و بار کاری</h2>
-                  <span className="text-[12px] text-[var(--tb-fg-muted)]">چند گزینه قابل انتخاب است</span>
+                  <span className="text-[12px] text-[var(--paragraph-color)]">چند گزینه قابل انتخاب است</span>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {workloads.map((workload) => (
@@ -457,7 +457,7 @@ export function NasSelector({
                     <div className="mb-2 text-[13px] font-extrabold">ظرفیت هر هارد</div>
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3">
                       {driveSizes.map((size) => (
-                        <button key={size} type="button" onClick={() => update("driveTb", size)} className={cn("btn btn-ghost", state.driveTb === size && "border-[var(--tb-primary)] bg-[color-mix(in_oklch,var(--tb-primary)_10%,transparent)] text-[var(--tb-primary)]")}>{persianNumber(size)} TB</button>
+                        <button key={size} type="button" onClick={() => update("driveTb", size)} className={cn("btn btn-ghost", state.driveTb === size && "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)] text-[var(--home)]")}>{persianNumber(size)} TB</button>
                       ))}
                     </div>
                   </div>
@@ -465,9 +465,9 @@ export function NasSelector({
                     <div className="mb-2 text-[13px] font-extrabold">نوع RAID</div>
                     <div className="grid gap-2 sm:grid-cols-2">
                       {raidTypes.map((raid) => (
-                        <button key={raid} type="button" onClick={() => update("raid", raid)} className={cn("rounded-[var(--tb-radius-md)] border p-3 text-right transition", state.raid === raid ? "border-[var(--tb-primary)] bg-[color-mix(in_oklch,var(--tb-primary)_10%,transparent)]" : "border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] hover:bg-[var(--tb-bg-muted)]")}>
+                        <button key={raid} type="button" onClick={() => update("raid", raid)} className={cn("rounded-[var(--corner-radius)] border p-3 text-right transition", state.raid === raid ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
                           <span className="block text-[12px] font-black">{raidLabels[raid].title}</span>
-                          <span className="mt-1 block text-[11px] leading-5 text-[var(--tb-fg-muted)]">{raidLabels[raid].desc}</span>
+                          <span className="mt-1 block text-[11px] leading-5 text-[var(--paragraph-color)]">{raidLabels[raid].desc}</span>
                         </button>
                       ))}
                     </div>
@@ -475,7 +475,7 @@ export function NasSelector({
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <label className="rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-4">
+                  <label className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-4">
                     <span className="text-[13px] font-extrabold">حداقل شبکه</span>
                     <select className="input mt-3" value={state.networkGbE} onChange={(e) => update("networkGbE", Number(e.currentTarget.value))}>
                       <option value={1}>1GbE</option>
@@ -483,13 +483,13 @@ export function NasSelector({
                       <option value={10}>10GbE</option>
                     </select>
                   </label>
-                  <button type="button" onClick={() => update("nvme", !state.nvme)} className={cn("rounded-[var(--tb-radius-lg)] border p-4 text-right transition", state.nvme ? "border-[var(--tb-primary)] bg-[color-mix(in_oklch,var(--tb-primary)_10%,transparent)]" : "border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] hover:bg-[var(--tb-bg-muted)]")}>
+                  <button type="button" onClick={() => update("nvme", !state.nvme)} className={cn("rounded-[var(--corner-radius)] border p-4 text-right transition", state.nvme ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
                     <span className="block text-[13px] font-extrabold">نیاز به NVMe / SSD Cache</span>
-                    <span className="mt-2 block text-[12px] text-[var(--tb-fg-muted)]">برای دیتابیس، VM یا فایل‌های پرتکرار</span>
+                    <span className="mt-2 block text-[12px] text-[var(--paragraph-color)]">برای دیتابیس، VM یا فایل‌های پرتکرار</span>
                   </button>
-                  <button type="button" onClick={() => update("rackmount", !state.rackmount)} className={cn("rounded-[var(--tb-radius-lg)] border p-4 text-right transition", state.rackmount ? "border-[var(--tb-primary)] bg-[color-mix(in_oklch,var(--tb-primary)_10%,transparent)]" : "border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] hover:bg-[var(--tb-bg-muted)]")}>
+                  <button type="button" onClick={() => update("rackmount", !state.rackmount)} className={cn("rounded-[var(--corner-radius)] border p-4 text-right transition", state.rackmount ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
                     <span className="block text-[13px] font-extrabold">فرم‌فکتور Rackmount</span>
-                    <span className="mt-2 block text-[12px] text-[var(--tb-fg-muted)]">برای رک، اتاق سرور و دیتاسنتر</span>
+                    <span className="mt-2 block text-[12px] text-[var(--paragraph-color)]">برای رک، اتاق سرور و دیتاسنتر</span>
                   </button>
                 </div>
               </section>
@@ -499,21 +499,21 @@ export function NasSelector({
           </div>
 
           {/* Results section positioned BELOW the tool */}
-          <div className="border-t border-[var(--tb-border)] pt-8">
-            <div className="rounded-[calc(var(--tb-radius-lg)+6px)] border border-[var(--tb-border)] bg-[color-mix(in_oklch,var(--tb-bg-secondary)_88%,transparent)] p-6 shadow-[var(--tb-shadow-lg)] backdrop-blur-[var(--tb-blur-md)]">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--tb-border)] pb-4">
+          <div className="border-t border-[var(--border-color)] pt-8">
+            <div className="rounded-[calc(var(--corner-radius)+6px)] border border-[var(--border-color)] bg-[color-mix(in_oklch,var(--card-background)_88%,transparent)] p-6 shadow-[var(--shadow-size)] backdrop-blur-[var(--tb-blur-md)]">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border-color)] pb-4">
                 <div>
                   <h2 className="text-[20px] font-black">نتایج و مدل‌های پیشنهادی فروشگاه</h2>
-                  <p className="mt-1 text-[13px] text-[var(--tb-fg-muted)]">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
+                  <p className="mt-1 text-[13px] text-[var(--paragraph-color)]">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
                 </div>
-                {isOptionSelected && top ? <span className="badge text-[var(--tb-primary)]">{persianNumber(top.match)}٪ بهترین انتخاب</span> : null}
+                {isOptionSelected && top ? <span className="badge text-[var(--home)]">{persianNumber(top.match)}٪ بهترین انتخاب</span> : null}
               </div>
 
               {!isOptionSelected ? (
-                <div className="my-10 text-center p-8 rounded-[var(--tb-radius-lg)] border border-dashed border-[var(--tb-border)] bg-[var(--tb-bg-muted)]/40">
-                  <Icon name="server" className="h-10 w-10 mx-auto text-[var(--tb-fg-muted)] mb-3 opacity-60" />
-                  <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-fg-primary)]">هیچ گزینه‌ای انتخاب نشده است</p>
-                  <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] max-w-md mx-auto">
+                <div className="my-10 text-center p-8 rounded-[var(--corner-radius)] border border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
+                  <Icon name="server" className="h-10 w-10 mx-auto text-[var(--paragraph-color)] mb-3 opacity-60" />
+                  <p className="h3-font-size h3-font-color font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
+                  <p className="mt-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)] max-w-md mx-auto">
                     لطفاً ابتدا نوع استفاده یا حداقل یک سرویس را از گزینه‌های بالا انتخاب کنید تا بهترین دستگاه‌های NAS موجود در فروشگاه محاسبه و نمایش داده شوند.
                   </p>
                 </div>
@@ -532,12 +532,12 @@ export function NasSelector({
                 </div>
               )}
 
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--tb-border)]">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[var(--border-color)]">
                 <div className="flex gap-2">
                   <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="btn btn-ghost">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
                   <a href={consultationHref} className="btn btn-primary">درخواست مشاوره تخصصی</a>
                 </div>
-                <p className="text-[12px] text-[var(--tb-fg-muted)]">
+                <p className="text-[12px] text-[var(--paragraph-color)]">
                   ظرفیت RAID تقریبی است و باید با محدودیت فایل‌سیستم و سیاست بکاپ نهایی شود.
                 </p>
               </div>

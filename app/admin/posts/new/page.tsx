@@ -77,7 +77,7 @@ function NewPostInner() {
  const parsedTags = useMemo(() => tags.split(",").map(t=>t.trim()).filter(Boolean), [tags]);
  const resolvedSlug = slug.trim() || slugify(title);
 
- if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="text-[var(--tb-primary)] underline" href="/admin/login">وارد شوید</Link></main>;
+ if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="text-[var(--home)] underline" href="/admin/login">وارد شوید</Link></main>;
 
  const canEdit = user.role==="super_admin" || (user.modules||[]).includes(module);
  if (!canEdit) return <main className="p-10 text-center text-[var(--tb-danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
@@ -126,7 +126,7 @@ function NewPostInner() {
  const allowed: ModuleSlug[] = user.role==="super_admin" ? Object.keys(moduleMeta) as ModuleSlug[] : (user.modules||[]);
  const isSuccess = msg.includes("✓");
  const isDraft = msg.includes("پیش‌نویس");
- const statusClass = isSuccess ? "text-[var(--tb-success)]" : isDraft ? "text-[var(--tb-warning)]" : "text-[var(--tb-fg-muted)]";
+ const statusClass = isSuccess ? "text-[var(--tb-success)]" : isDraft ? "text-[var(--tb-warning)]" : "text-[var(--paragraph-color)]";
  
  return (
  <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
@@ -136,8 +136,8 @@ function NewPostInner() {
  <ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>
  {editSlug && <ModuleBadge module="warning">حالت ویرایش</ModuleBadge>}
  </div>
- <h1 className="text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)] ">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
- <p className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{user.name} • {user.role==="super_admin"?"مدیر کل":"ویراستار"}</p>
+ <h1 className="h1-font-size h1-font-color font-extrabold ">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
+ <p className="mt-1 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{user.name} • {user.role==="super_admin"?"مدیر کل":"ویراستار"}</p>
  </div>
  <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">بازگشت به مدیریت محتوا</ButtonLink>
  </div>
@@ -146,13 +146,13 @@ function NewPostInner() {
  <form onSubmit={save} className="card space-y-4 p-5">
  <div className="grid gap-4 md:grid-cols-2">
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">ماژول *</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">ماژول *</label>
  <select value={module} onChange={e=>setModule(e.target.value as ModuleSlug)} className="input mt-1" required>
  {allowed.map(m => <option key={m} value={m}>{moduleMeta[m].titleFa} – /{m}</option>)}
  </select>
  </div>
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">دسته‌بندی</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">دسته‌بندی</label>
  <input value={category} onChange={e=>setCategory(e.target.value)} list="category-hints" className="input mt-1" placeholder="مثلا امنیت، شبکه، فریم‌ور…" />
  <datalist id="category-hints">
  {categoryHints[module].map(c => <option key={c} value={c} />)}
@@ -161,13 +161,13 @@ function NewPostInner() {
  </div>
 
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">عنوان *</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">عنوان *</label>
  <input value={title} onChange={e=>setTitle(e.target.value)} className="input mt-1" required />
  </div>
 
  <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">اسلاگ</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">اسلاگ</label>
  <input value={slug} onChange={e=>setSlug(e.target.value)} className="input mt-1" placeholder="auto از عنوان" dir="ltr" />
  </div>
  <Button type="button" variant="ghost" size="xs" onClick={()=>setSlug(slugify(title))} disabled={!title.trim()}>
@@ -176,30 +176,30 @@ function NewPostInner() {
  </div>
 
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">خلاصه</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">خلاصه</label>
  <textarea value={excerpt} onChange={e=>setExcerpt(e.target.value)} className="input mt-1 min-h-[80px]" placeholder="خلاصه کوتاه برای کارت‌ها، فیدها و سئو…" />
  </div>
 
  <div className="grid gap-3 md:grid-cols-3">
  <div className="md:col-span-2">
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">برچسب‌ها – با , جدا کنید</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">برچسب‌ها – با , جدا کنید</label>
  <input value={tags} onChange={e=>setTags(e.target.value)} className="input mt-1" placeholder="QNAP-2277, nas, storage" />
  </div>
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">تصویر شاخص URL</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">تصویر شاخص URL</label>
  <input value={image} onChange={e=>setImage(e.target.value)} className="input mt-1" placeholder="/assets/..." dir="ltr" />
  </div>
  </div>
 
  <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">محتوا</label>
+ <label className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">محتوا</label>
  <textarea value={content} onChange={e=>setContent(e.target.value)} className="input mt-1 min-h-[260px]" placeholder="متن کامل / HTML / Markdown…" />
  </div>
 
  <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
- <div className={`text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${statusClass}`}>
+ <div className={`paragraph-font-size paragraph-color ${statusClass}`}>
  {msg || "POST → /api/posts – RBAC server-side؛ در خطا، پیش‌نویس لوکال ذخیره می‌شود."}
- {lastDraftKey && <span className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">کلید پیش‌نویس: <code>{lastDraftKey}</code></span>}
+ {lastDraftKey && <span className="block paragraph-font-size paragraph-color text-[var(--paragraph-color)]">کلید پیش‌نویس: <code>{lastDraftKey}</code></span>}
  </div>
  <div className="flex gap-2">
  <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">انصراف</ButtonLink>
@@ -210,8 +210,8 @@ function NewPostInner() {
 
  <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
  <div className="card p-4">
- <h2 className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">پیش‌نمایش منبع</h2>
- <div className="mt-3 space-y-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
+ <h2 className="paragraph-font-size paragraph-color ">پیش‌نمایش منبع</h2>
+ <div className="mt-3 space-y-2 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
  <div>مسیر: <code dir="ltr">/{module}/{resolvedSlug || "slug"}</code></div>
  <div>دسته: {category || "—"}</div>
  <div>برچسب‌ها: {parsedTags.length.toLocaleString("fa-IR")}</div>
@@ -219,13 +219,13 @@ function NewPostInner() {
  <div>محتوا: {content.length.toLocaleString("fa-IR")} کاراکتر</div>
  </div>
  <div className="mt-3 flex flex-wrap gap-1">
- {parsedTags.slice(0, 8).map(t => <span key={t} className="rounded-[var(--tb-radius-full)] border border-[var(--tb-border)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{t}</span>)}
+ {parsedTags.slice(0, 8).map(t => <span key={t} className="rounded-[var(--corner-radius)] border border-[var(--border-color)] px-2 py-0.5 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{t}</span>)}
  {parsedTags.length > 8 && <ModuleBadge module="info">+{(parsedTags.length-8).toLocaleString("fa-IR")}</ModuleBadge>}
  </div>
  </div>
 
- <div className="card p-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
- <b className="text-[var(--tb-fg-primary)]">راهنمای CMS</b><br/>
+ <div className="card p-4 paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
+ <b className="text-[var(--primary-text)]">راهنمای CMS</b><br/>
  • اسلاگ اگر خالی باشد از عنوان ساخته می‌شود.<br/>
  • دسته‌بندی اختیاری است ولی برای فیلتر و جدول مفید است.<br/>
  • برچسب‌های فارسی/انگلیسی باعث بهتر شدن جستجو و مطالب مرتبط می‌شوند.<br/>
@@ -234,10 +234,10 @@ function NewPostInner() {
  </aside>
  </div>
 
- <p className="mt-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
+ <p className="mt-3 text-center paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
  دسترسی شما:
  <span className="mx-1 inline-flex flex-wrap justify-center gap-1 align-middle">{allowed.map(m=><ModuleBadge key={m} module={m}>{moduleMeta[m]?.titleFa}</ModuleBadge>)}</span>
- – نقش توسط مدیر کل در <Link href="/admin/roles" className="text-[var(--tb-primary)] underline">/admin/roles</Link> قابل تغییر است.
+ – نقش توسط مدیر کل در <Link href="/admin/roles" className="text-[var(--home)] underline">/admin/roles</Link> قابل تغییر است.
  </p>
  </main>
  );

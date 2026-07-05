@@ -23,7 +23,7 @@ export default function GradientText({
 }: GradientTextProps) {
  const gradient = `linear-gradient(${direction === "horizontal" ? "90deg" : "180deg"}, ${colors.join(", ")})`;
  return (
- <span className={cn("relative inline-flex", showBorder && "rounded-[var(--tb-radius-lg)] p-[1px]")}> 
+ <span className={cn("relative inline-flex", showBorder && "rounded-[var(--corner-radius)] p-[1px]")}> 
  {showBorder && <span className="absolute inset-0 rounded-[inherit]" style={{ background: gradient }} aria-hidden="true" />}
  <motion.span
  className={cn("relative inline-block bg-clip-text text-transparent", className)}

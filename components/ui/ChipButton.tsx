@@ -56,7 +56,7 @@ export const ChipButton = React.forwardRef<HTMLButtonElement, ChipButtonProps>(
  ref={ref}
  type="button"
  className={cn(
- "inline-flex items-center justify-center gap-1 rounded-[var(--tb-radius-full)] border px-3 py-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ",
+ "inline-flex items-center justify-center gap-1 rounded-[var(--corner-radius)] border px-3 py-1.5 paragraph-font-size paragraph-color ",
  "transition-colors duration-[var(--tb-motion-sm)] ease-[var(--tb-ease)]",
  "focus-visible:outline-none focus-visible:shadow-[var(--tb-ring-3)] disabled:pointer-events-none disabled:opacity-50",
  className
@@ -66,7 +66,7 @@ export const ChipButton = React.forwardRef<HTMLButtonElement, ChipButtonProps>(
  borderColor: `color-mix(in oklch, var(${cssVar}) ${active ? "38%" : "22%"}, transparent)`,
  background: active
  ? `color-mix(in oklch, var(${cssVar}) 16%, transparent)`
- : "color-mix(in oklch, var(--tb-bg-muted) 78%, transparent)",
+ : "color-mix(in oklch, var(--muted-background) 78%, transparent)",
  ...style,
  }}
  {...props}

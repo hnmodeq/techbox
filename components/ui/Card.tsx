@@ -10,12 +10,12 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
  <div
  ref={ref}
  className={cn(
- "bg-[var(--tb-bg-secondary)] text-[var(--tb-fg-primary)]",
- "border border-[var(--tb-border)]",
- "rounded-[var(--tb-radius-lg)]",
- "shadow-[var(--tb-shadow-md)]",
+ "bg-[var(--card-background)] text-[var(--primary-text)]",
+ "border border-[var(--border-color)]",
+ "rounded-[var(--corner-radius)]",
+ "shadow-[var(--shadow-size)]",
  padding && "p-4 md:p-5",
- hover && "transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)] hover:shadow-[var(--tb-shadow-md)] hover:-translate-y-[1px]",
+ hover && "transition-all duration-[var(--tb-motion-md)] ease-[var(--tb-ease)] hover:shadow-[var(--shadow-size)] hover:-translate-y-[1px]",
  className
  )}
  {...props}
@@ -28,9 +28,9 @@ export const CardHeader = ({className,...p}:React.HTMLAttributes<HTMLDivElement>
  <div className={cn("mb-3",className)} {...p} />
 );
 export const CardTitle = ({className,...p}:React.HTMLAttributes<HTMLHeadingElement>)=>(
- <h3 className={cn("text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] md:text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] ",className)} {...p} />
+ <h3 className={cn("h2-font-size h2-font-color font-bold md:h2-font-size h2-font-color font-bold ",className)} {...p} />
 );
 export const CardContent = ({className,...p}:React.HTMLAttributes<HTMLDivElement>)=>(
- <div className={cn("text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ", "text-[var(--tb-fg-muted)]", className)} {...p} />
+ <div className={cn("paragraph-font-size paragraph-color ", "text-[var(--paragraph-color)]", className)} {...p} />
 );
 export default Card;

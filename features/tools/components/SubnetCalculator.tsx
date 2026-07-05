@@ -44,11 +44,11 @@ export default function SubnetCalculator() {
     <div className="space-y-5" dir="rtl">
       {/* What is it? */}
       <div className="card p-5 space-y-2">
-        <div className="flex items-center gap-2 text-[length:var(--h2-font-size)] font-bold text-[var(--h2-font-color)] text-[var(--tb-subnet)]">
+        <div className="flex items-center gap-2 h2-font-size h2-font-color font-bold text-[var(--tb-subnet)]">
           <Icon name="server" size={20} strokeWidth={1.75} />
           ماشین‌حساب ساب‌نت (Subnet) چیست؟
         </div>
-        <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] text-[var(--tb-fg-muted)] leading-8">
+        <p className="h3-font-size h3-font-color font-semibold text-[var(--paragraph-color)] leading-8">
           «ساب‌نت» یعنی تقسیم یک شبکه بزرگ به چند شبکه کوچک‌تر. با این ابزار کافیست یک
           آدرس IP و یک «پیشوند» (CIDR مثل <span dir="ltr" className="font-mono">/24</span>) وارد کنید تا
           ببینید شبکه شما از کجا شروع و به کجا ختم می‌شود، چه ماسکی دارد و چند دستگاه
@@ -61,7 +61,7 @@ export default function SubnetCalculator() {
       <div className="card p-5 space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
           <label className="space-y-1 block">
-            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">آدرس IP</span>
+            <span className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">آدرس IP</span>
             <input
               value={ip}
               onChange={(e) => setIp(e.target.value)}
@@ -69,12 +69,12 @@ export default function SubnetCalculator() {
               dir="ltr"
               placeholder="192.168.1.0"
             />
-            {!valid && <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-danger)]">آدرس IP معتبر نیست (مثال: 192.168.1.0)</span>}
+            {!valid && <span className="paragraph-font-size paragraph-color text-[var(--tb-danger)]">آدرس IP معتبر نیست (مثال: 192.168.1.0)</span>}
           </label>
           <label className="space-y-2 block">
-            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">
+            <span className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">
               پیشوند شبکه: <span dir="ltr" className="font-mono text-[var(--tb-subnet)]">/{cidr}</span>
-              {out && <span className="text-[var(--tb-fg-muted)]"> — ماسک <span dir="ltr" className="font-mono">{out.mask}</span></span>}
+              {out && <span className="text-[var(--paragraph-color)]"> — ماسک <span dir="ltr" className="font-mono">{out.mask}</span></span>}
             </span>
             <input
               type="range"
@@ -84,7 +84,7 @@ export default function SubnetCalculator() {
               onChange={(e) => setCidr(parseInt(e.target.value))}
               className="w-full accent-[var(--tb-subnet)]"
             />
-            <div className="flex justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]" dir="ltr">
+            <div className="flex justify-between paragraph-font-size paragraph-color text-[var(--paragraph-color)]" dir="ltr">
               <span>/8</span><span>/30</span>
             </div>
           </label>
@@ -95,9 +95,9 @@ export default function SubnetCalculator() {
       {out && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {(["network", "broadcast", "mask", "first", "last", "hosts"] as const).map((k) => (
-            <div key={k} className="rounded-[var(--tb-radius-md)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] px-3 py-2.5">
-              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)]">{RESULT_LABELS[k]}</div>
-              <div className="mt-1 font-mono text-[var(--tb-fg-primary)]" dir="ltr">{out[k]}</div>
+            <div key={k} className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] px-3 py-2.5">
+              <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)]">{RESULT_LABELS[k]}</div>
+              <div className="mt-1 font-mono text-[var(--primary-text)]" dir="ltr">{out[k]}</div>
             </div>
           ))}
         </div>

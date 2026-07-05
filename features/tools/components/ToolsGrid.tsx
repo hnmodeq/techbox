@@ -80,7 +80,7 @@ export function ToolsGrid({ className }: { className?: string }) {
         <Link
           key={tool.slug}
           href={tool.href}
-          className="group relative flex flex-col overflow-hidden rounded-[var(--tb-radius-lg)] border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)] p-5 shadow-[var(--tb-shadow-sm)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--tb-shadow-md)]"
+          className="group relative flex flex-col overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]"
         >
           <div
             className="absolute -left-10 -top-10 h-28 w-28 rounded-full opacity-[0.14] blur-[28px] transition-opacity group-hover:opacity-25"
@@ -89,10 +89,10 @@ export function ToolsGrid({ className }: { className?: string }) {
           />
           <div className="flex items-start justify-between gap-3">
             <span
-              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--tb-radius-md)] border"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--corner-radius)] border"
               style={{
-                background: `color-mix(in oklch, ${tool.accent} 14%, var(--tb-bg-muted))`,
-                borderColor: `color-mix(in oklch, ${tool.accent} 30%, var(--tb-border))`,
+                background: `color-mix(in oklch, ${tool.accent} 14%, var(--muted-background))`,
+                borderColor: `color-mix(in oklch, ${tool.accent} 30%, var(--border-color))`,
                 color: tool.accent,
               }}
             >
@@ -100,17 +100,17 @@ export function ToolsGrid({ className }: { className?: string }) {
             </span>
             {tool.badge && (
               <span className="badge" style={{
-                background: `color-mix(in oklch, ${tool.accent} 12%, var(--tb-bg-muted))`,
-                color: "var(--tb-fg-primary)",
-                borderColor: `color-mix(in oklch, ${tool.accent} 28%, var(--tb-border))`
+                background: `color-mix(in oklch, ${tool.accent} 12%, var(--muted-background))`,
+                color: "var(--primary-text)",
+                borderColor: `color-mix(in oklch, ${tool.accent} 28%, var(--border-color))`
               }}>
                 {tool.badge}
               </span>
             )}
           </div>
 
-          <h3 className="mt-4 text-[16px] font-black text-[var(--tb-fg-primary)]">{tool.titleFa}</h3>
-          <p className="mt-2 text-[12px] leading-7 text-[var(--tb-fg-muted)] min-h-[84px]">{tool.descFa}</p>
+          <h3 className="mt-4 text-[16px] font-black text-[var(--primary-text)]">{tool.titleFa}</h3>
+          <p className="mt-2 text-[12px] leading-7 text-[var(--paragraph-color)] min-h-[84px]">{tool.descFa}</p>
 
           {tool.stats && (
             <div className="mt-4 flex gap-2 flex-wrap">
@@ -123,7 +123,7 @@ export function ToolsGrid({ className }: { className?: string }) {
           )}
 
           <div className="mt-5 flex items-center justify-between text-[12px] font-bold">
-            <span className="text-[var(--tb-fg-muted)] group-hover:text-[var(--tb-fg-primary)] transition-colors">
+            <span className="text-[var(--paragraph-color)] group-hover:text-[var(--primary-text)] transition-colors">
               {tool.title}
             </span>
             <span style={{ color: tool.accent }} className="flex items-center gap-1">

@@ -106,7 +106,7 @@ export function TimelineContainer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[calc(100vh-64px)] min-h-[680px] bg-[var(--tb-bg-primary)] overflow-hidden select-none transition-colors duration-[var(--tb-motion-md)]"
+      className="relative w-full h-[calc(100vh-64px)] min-h-[680px] bg-[var(--main-background)] overflow-hidden select-none transition-colors duration-[var(--tb-motion-md)]"
     >
       {/* Background Grid synced with tokens */}
       <div className="absolute inset-0 opacity-[0.14] pointer-events-none">
@@ -159,17 +159,17 @@ export function TimelineContainer({
               <span className="badge !bg-[var(--tb-timeline)] !text-slate-950 font-black mb-1.5 shadow-md">
                 آغاز خط تایم‌لاین تکباکس
               </span>
-              <h3 className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-black text-[var(--tb-fg-primary)] leading-6">
+              <h3 className="h3-font-size h3-font-color font-semibold font-black text-[var(--primary-text)] leading-6">
                 از اینجا به قبل خبری نبوده؛ اگه بوده شما به ما بگید!
               </h3>
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-xl" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-7 h-7 bg-[var(--tb-warning)] rounded-full border-4 border-[var(--main-background)] shadow-xl" />
 
             {/* Comment Box Below Line with more distance */}
             <div
-              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-xl border-[var(--tb-border)] flex flex-col gap-2.5 z-20"
+              className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-3.5 shadow-xl border-[var(--border-color)] flex flex-col gap-2.5 z-20"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <form onSubmit={handleAddEarlyComment} className="flex gap-1.5 items-center">
@@ -178,11 +178,11 @@ export function TimelineContainer({
                   value={earlyHistoryComment}
                   onChange={(e) => setEarlyHistoryComment(e.target.value)}
                   placeholder="پیشنهاد رویداد تاریخی..."
-                  className="input !h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1"
+                  className="input !h-9 !py-1 !px-2.5 paragraph-font-size paragraph-color flex-1"
                 />
                 <button
                   type="submit"
-                  className="h-9 px-3 rounded-[var(--tb-radius-md)] bg-[var(--tb-warning)] text-slate-950 font-bold flex items-center justify-center cursor-pointer shrink-0"
+                  className="h-9 px-3 rounded-[var(--corner-radius)] bg-[var(--tb-warning)] text-slate-950 font-bold flex items-center justify-center cursor-pointer shrink-0"
                 >
                   <Send size={14} className="rtl:rotate-180" />
                 </button>
@@ -190,7 +190,7 @@ export function TimelineContainer({
 
               <ul className="space-y-1.5 max-h-40 overflow-y-auto text-right">
                 {earlyCommentsList.map((c, i) => (
-                  <li key={i} className="rounded bg-[var(--tb-bg-muted)]/80 p-2 text-xs text-[var(--tb-fg-primary)] leading-5">
+                  <li key={i} className="rounded bg-[var(--muted-background)]/80 p-2 text-xs text-[var(--primary-text)] leading-5">
                     {c}
                   </li>
                 ))}
@@ -228,7 +228,7 @@ export function TimelineContainer({
                 </div>
 
                 {/* 2. Milestone Dot sitting directly on the axis line */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-lg transition-transform hover:scale-125" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--tb-timeline)] rounded-full border-4 border-[var(--main-background)] shadow-lg transition-transform hover:scale-125" />
 
                 {/* 3. Card hanging BELOW THE LINE top-aligned (top: 32px) with generous padding beneath line */}
                 <div className="absolute top-[32px] left-1/2 -translate-x-1/2 flex justify-center z-10">
@@ -250,23 +250,23 @@ export function TimelineContainer({
               <span className="badge !bg-[var(--tb-success)] !text-slate-950 font-black mb-1.5 shadow-md">
                 نقطه کنونی
               </span>
-              <h3 className="text-xl font-black text-[var(--tb-fg-primary)]">
+              <h3 className="text-xl font-black text-[var(--primary-text)]">
                 امروز (Today)
               </h3>
             </div>
 
             {/* Landmark Dot on Axis */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-4 border-[var(--tb-bg-primary)] shadow-xl animate-pulse" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-[var(--tb-success)] rounded-full border-4 border-[var(--main-background)] shadow-xl animate-pulse" />
 
             {/* Info Card Below Line with more padding */}
-            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--tb-border)] space-y-2 z-20">
-              <div className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] font-bold text-[var(--tb-success)]">
+            <div className="absolute top-[32px] left-1/2 -translate-x-1/2 w-64 card p-4 text-center shadow-xl border-[var(--border-color)] space-y-2 z-20">
+              <div className="h3-font-size h3-font-color font-semibold font-bold text-[var(--tb-success)]">
                 {getJalaliDateStringPersian(new Date())}
               </div>
-              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-fg-muted)] font-mono" dir="ltr">
+              <div className="paragraph-font-size paragraph-color text-[var(--paragraph-color)] font-mono" dir="ltr">
                 {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())}
               </div>
-              <p className="text-xs text-[var(--tb-fg-secondary)] leading-5 pt-2 border-t border-[var(--tb-border)]">
+              <p className="text-xs text-[var(--tb-fg-secondary)] leading-5 pt-2 border-t border-[var(--border-color)]">
                 به سوی آینده فناوری اطلاعات، زیرساخت‌های ابری و هوش مصنوعی...
               </p>
             </div>

@@ -37,13 +37,13 @@ export default function TeamChromaSection({ team }: { team: TeamMember[] }) {
  const build = () => {
  const next = team.map((u, i) => {
  const varName = accentVars[i % accentVars.length];
-        const color = resolveVarColor(varName, "var(--tb-primary)");
+        const color = resolveVarColor(varName, "var(--home)");
           return {
             image: u.avatar || "/assets/hooman.png",
             title: u.name,
             subtitle: u.roleFa || (u.role === "super_admin" ? "مدیر کل" : "ویراستار"),
             borderColor: color,
-            gradient: `linear-gradient(145deg, ${color}, var(--tb-bg-secondary))`,
+            gradient: `linear-gradient(145deg, ${color}, var(--card-background))`,
           } satisfies ChromaItem;
  });
  setItems(next);

@@ -51,17 +51,17 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
       <PageHeader
         colorVar="--tb-primary"
         title={`پروفایل نویسنده: ${userRecord.name}`}
-        titleClassName="text-[var(--tb-fg-primary)]"
+        titleClassName="text-[var(--primary-text)]"
       >
-        <div className="flex items-center gap-2 text-sm text-[var(--tb-fg-muted)]">
+        <div className="flex items-center gap-2 text-sm text-[var(--paragraph-color)]">
           <span>آرشیو مطالب و نقد و بررسی‌های تخصصی</span>
         </div>
       </PageHeader>
 
       {/* Author Showcase Card */}
-      <div className="mt-8 card p-6 sm:p-8 bg-[var(--tb-bg-secondary)] border border-[var(--tb-border)] shadow-xl grid md:grid-cols-[160px_1fr] gap-6 items-center">
+      <div className="mt-8 card p-6 sm:p-8 bg-[var(--card-background)] border border-[var(--border-color)] shadow-xl grid md:grid-cols-[160px_1fr] gap-6 items-center">
         <div className="flex flex-col items-center text-center">
-          <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--tb-primary)] shadow-lg">
+          <div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[var(--home)] shadow-lg">
             <Image
               src={userRecord.avatar || "/assets/hooman.png"}
               alt={userRecord.name}
@@ -74,28 +74,28 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
         <div className="space-y-4 text-right">
           <div>
-            <span className="badge bg-[var(--tb-primary)]/15 text-[var(--tb-primary)] border border-[var(--tb-primary)]/30 font-bold px-3 py-1 text-xs">
+            <span className="badge bg-[var(--home)]/15 text-[var(--home)] border border-[var(--home)]/30 font-bold px-3 py-1 text-xs">
               {userRecord.roleFa || "ویراستار و پژوهشگر"}
             </span>
-            <h1 className="mt-2 text-2xl sm:text-3xl font-black text-[var(--tb-fg-primary)]">
+            <h1 className="mt-2 text-2xl sm:text-3xl font-black text-[var(--primary-text)]">
               {userRecord.name}
             </h1>
           </div>
 
-          <p className="text-sm sm:text-base leading-7 text-[var(--tb-fg-muted)] max-w-3xl">
+          <p className="text-sm sm:text-base leading-7 text-[var(--paragraph-color)] max-w-3xl">
             {bio}
           </p>
 
-          <div className="pt-3 border-t border-[var(--tb-border)] flex flex-wrap items-center gap-6 text-xs sm:text-sm font-bold text-[var(--tb-fg-muted)]">
-            <span className="flex items-center gap-1.5 text-[var(--tb-fg-primary)]">
-              <Icon name="blog" size={18} className="text-[var(--tb-primary)]" />
+          <div className="pt-3 border-t border-[var(--border-color)] flex flex-wrap items-center gap-6 text-xs sm:text-sm font-bold text-[var(--paragraph-color)]">
+            <span className="flex items-center gap-1.5 text-[var(--primary-text)]">
+              <Icon name="blog" size={18} className="text-[var(--home)]" />
               <span>تعداد مطالب: <b>{authorPosts.length.toLocaleString("fa-IR")}</b></span>
             </span>
-            <span className="flex items-center gap-1.5 text-[var(--tb-fg-primary)]">
+            <span className="flex items-center gap-1.5 text-[var(--primary-text)]">
               <Icon name="view" size={18} className="text-[var(--tb-blog)]" />
               <span>مجموع بازدید: <b>{totalViews.toLocaleString("fa-IR")}</b></span>
             </span>
-            <span className="flex items-center gap-1.5 text-[var(--tb-fg-primary)]">
+            <span className="flex items-center gap-1.5 text-[var(--primary-text)]">
               <Icon name="like" size={18} className="text-red-400" />
               <span>مجموع پسند: <b>{totalLikes.toLocaleString("fa-IR")}</b></span>
             </span>
@@ -105,12 +105,12 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
       {/* Author's Posts Grid */}
       <div className="mt-12 space-y-6">
-        <h2 className="text-xl font-black text-[var(--tb-fg-primary)] border-b border-[var(--tb-border)] pb-4">
+        <h2 className="text-xl font-black text-[var(--primary-text)] border-b border-[var(--border-color)] pb-4">
           آرشیو مطالب منتشر شده توسط {userRecord.name} ({authorPosts.length.toLocaleString("fa-IR")})
         </h2>
 
         {authorPosts.length === 0 ? (
-          <div className="card p-12 text-center text-[var(--tb-fg-muted)]">
+          <div className="card p-12 text-center text-[var(--paragraph-color)]">
             هنوز مطلبی به نام این نویسنده در آرشیو ثبت نشده است.
           </div>
         ) : (
@@ -119,9 +119,9 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
               <Link
                 key={`${post.module}-${post.slug}`}
                 href={`/${post.module}/${post.slug}`}
-                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all border border-[var(--tb-border)] bg-[var(--tb-bg-secondary)]"
+                className="group card !p-0 overflow-hidden flex flex-col justify-between hover:-translate-y-1 hover:shadow-lg transition-all border border-[var(--border-color)] bg-[var(--card-background)]"
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--tb-bg-muted)]">
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--muted-background)]">
                   <Image
                     src={post.image || "/assets/blog-1.jpg"}
                     alt={post.title}
@@ -136,18 +136,18 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
                 <div className="p-4 flex-1 flex flex-col justify-between space-y-4">
                   <div>
-                    <div className="text-xs text-[var(--tb-fg-muted)] font-bold mb-1">
+                    <div className="text-xs text-[var(--paragraph-color)] font-bold mb-1">
                       <span>{post.date_fa}</span>
                     </div>
-                    <h3 className="text-base font-bold text-[var(--tb-fg-primary)] group-hover:text-[var(--tb-primary)] transition-colors line-clamp-2 leading-7">
+                    <h3 className="text-base font-bold text-[var(--primary-text)] group-hover:text-[var(--home)] transition-colors line-clamp-2 leading-7">
                       {post.title}
                     </h3>
-                    <p className="text-xs text-[var(--tb-fg-muted)] mt-2 line-clamp-2 leading-5">
+                    <p className="text-xs text-[var(--paragraph-color)] mt-2 line-clamp-2 leading-5">
                       {post.excerpt}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[var(--tb-border)]/60 flex items-center justify-between">
+                  <div className="pt-3 border-t border-[var(--border-color)]/60 flex items-center justify-between">
                     <CardStats module={post.module} slug={post.slug} initialViews={post.views ?? 0} initialLikes={post.likes ?? 0} showComments={true} />
                   </div>
                 </div>
