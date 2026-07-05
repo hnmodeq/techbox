@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState, Suspense } from "react";
-import { moduleMeta, type ModuleSlug, getBySlug, type ContentItem } from "@/lib/content";
+import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -59,27 +59,19 @@ function NewPostInner() {
  const [lastDraftKey, setLastDraftKey] = useState("");
 
  useEffect(()=>{ getMe().then(setUser); },[]);
-
- // FIX: await the async getBySlug in edit mode
- useEffect(() => {
-   if (!editSlug) return;
-   let cancelled = false;
-   (async () => {
-     try {
-       const it: ContentItem | null = await getBySlug(module, editSlug);
-       if (cancelled || !it) return;
-       setTitle(it.title || "");
-       setSlug(it.slug || "");
-       setExcerpt(it.excerpt || "");
-       setCategory(it.category || "");
-       setTags((it.tags || []).join(", "));
-       setContent(it.content || "");
-       setImage(it.image || "");
-     } catch (e) {
-       console.error("Failed to load edit item", e);
-     }
-   })();
-   return () => { cancelled = true; };
+ useEffect(()=>{
+ if (editSlug) {
+ const it = getBySlug(module, editSlug);
+ if (it) {
+ setTitle(it.title);
+ setSlug(it.slug);
+ setExcerpt(it.excerpt);
+ setCategory(it.category || "");
+ setTags(it.tags.join(", "));
+ setContent(it.content || "");
+ setImage(it.image||"");
+ }
+ }
  }, [editSlug, module]);
 
  const parsedTags = useMemo(() => tags.split(",").map(t=>t.trim()).filter(Boolean), [tags]);
@@ -91,43 +83,44 @@ function NewPostInner() {
  if (!canEdit) return <main className="p-10 text-center text-[var(--danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
 
  const save = async (e: React.FormEvent) => {
-   e.preventDefault();
-   if (!title.trim()) { setMsg("عنوان الزامی است"); return; }
-   setSaving(true); setMsg(""); setLastDraftKey("");
-   const payload = {
-     module,
-     slug: resolvedSlug,
-     title: title.trim(),
-     excerpt: excerpt.trim(),
-     content: content.trim(),
-     image: image.trim() || undefined,
-     tags: parsedTags,
-     category: category.trim() || undefined,
-   };
-   try{
-     const res = await fetch("/api/posts", {
-       method:"POST", headers:{"Content-Type":"application/json"},
-       body: JSON.stringify(payload),
-       credentials:"include"
-     });
-     const data = await res.json();
-     if(!res.ok) throw new Error(data.error || "save_failed");
-     setMsg("منتشر شد ✓ در حال انتقال به لیست محتوا…");
-     setTimeout(()=> router.push(`/admin/posts?module=${module}`), 650);
-   }catch(err:any){
-     const key = `tb_drafts_${module}`;
-     const drafts = JSON.parse(localStorage.getItem(key) || "[]");
-     const draft = {
-       ...payload,
-       savedAt: new Date().toISOString(),
-       savedAtFa: new Intl.DateTimeFormat("fa-IR", { dateStyle:"medium", timeStyle:"short" }).format(new Date()),
-       apiError: err.message,
-     };
-     drafts.unshift(draft);
-     localStorage.setItem(key, JSON.stringify(drafts.slice(0, 30)));
-     setLastDraftKey(key);
-     setMsg("API در دسترس نبود؛ پیش‌نویس امن در مرورگر ذخیره شد.");
-   }finally{ setSaving(false); }
+ e.preventDefault();
+ if (!title.trim()) { setMsg("عنوان الزامی است"); return; }
+ setSaving(true); setMsg(""); setLastDraftKey("");
+ const payload = {
+ module,
+ slug: resolvedSlug,
+ title: title.trim(),
+ excerpt: excerpt.trim(),
+ content: content.trim(),
+ image: image.trim() || undefined,
+ tags: parsedTags,
+ category: category.trim() || undefined,
+ };
+ try{
+ const res = await fetch("/api/posts", {
+ method:"POST", headers:{"Content-Type":"application/json"},
+ body: JSON.stringify(payload),
+ credentials:"include"
+ });
+ const data = await res.json();
+ if(!res.ok) throw new Error(data.error || "save_failed");
+ setMsg("منتشر شد ✓ در حال انتقال به لیست محتوا…");
+ setTimeout(()=> router.push(`/admin/posts?module=${module}`), 650);
+ }catch(err:any){
+ // fallback local draft – keeps admin usable offline
+ const key = `tb_drafts_${module}`;
+ const drafts = JSON.parse(localStorage.getItem(key) || "[]");
+ const draft = {
+ ...payload,
+ savedAt: new Date().toISOString(),
+ savedAtFa: new Intl.DateTimeFormat("fa-IR", { dateStyle:"medium", timeStyle:"short" }).format(new Date()),
+ apiError: err.message,
+ };
+ drafts.unshift(draft);
+ localStorage.setItem(key, JSON.stringify(drafts.slice(0, 30)));
+ setLastDraftKey(key);
+ setMsg("API در دسترس نبود؛ پیش‌نویس امن در مرورگر ذخیره شد.");
+ }finally{ setSaving(false); }
  };
 
  const allowed: ModuleSlug[] = user.role==="super_admin" ? Object.keys(moduleMeta) as ModuleSlug[] : (user.modules||[]);
@@ -217,7 +210,7 @@ function NewPostInner() {
 
  <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
  <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
- <h2 className="text-[length:var(--paragraph-font-size)] text-[var(--primary-text)] ">پیش‌نمایش منبع</h2>
+ <h2 className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">پیش‌نمایش منبع</h2>
  <div className="mt-3 space-y-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <div>مسیر: <code dir="ltr">/{module}/{resolvedSlug || "slug"}</code></div>
  <div>دسته: {category || "—"}</div>
