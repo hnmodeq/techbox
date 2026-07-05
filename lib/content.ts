@@ -1,3 +1,6 @@
+import { prisma } from "./db";
+import { moduleColors } from "@/config/module-colors";
+
 export type ModuleSlug =
   | "blog"
   | "news"
@@ -25,88 +28,135 @@ export type ContentItem = {
   likes: number;
   views: number;
   category?: string;
+  solved?: boolean;
+  fileSize?: string;
 };
 
-import blogData from "@/prisma/mock-data/blog.json";
-import newsData from "@/prisma/mock-data/news.json";
-import mediaData from "@/prisma/mock-data/media.json";
-import reviewData from "@/prisma/mock-data/review.json";
-import toolsData from "@/prisma/mock-data/tools.json";
-import downloadData from "@/prisma/mock-data/download.json";
-import shopData from "@/prisma/mock-data/shop.json";
-import forumData from "@/prisma/mock-data/forum.json";
-import commentsData from "@/prisma/mock-data/comments.json";
-import { moduleColors } from "@/config/module-colors";
-
-const all: Record<ModuleSlug, ContentItem[]> = {
-  blog: blogData as unknown as ContentItem[],
-  news: newsData as unknown as ContentItem[],
-  media: mediaData as unknown as ContentItem[],
-  review: reviewData as unknown as ContentItem[],
-  tools: toolsData as unknown as ContentItem[],
-  download: downloadData as unknown as ContentItem[],
-  shop: shopData as unknown as ContentItem[],
-  forum: forumData as unknown as ContentItem[],
-  timeline: [],
-};
-
-export function getModuleItems(module: ModuleSlug): ContentItem[] {
-  return [...(all[module] || [])].sort((a, b) => +new Date(b.date) - +new Date(a.date));
+function formatPost(p: any): ContentItem {
+  return {
+    slug: p.slug,
+    module: p.module as ModuleSlug,
+    title: p.title,
+    excerpt: p.excerpt || "",
+    content: p.content || "",
+    image: p.image || null,
+    tags: typeof p.tags === "string" ? JSON.parse(p.tags || "[]") : p.tags || [],
+    author: {
+      name: p.authorName || "تحریریه",
+      role: p.author?.role || "تحریریه",
+      avatar: p.author?.avatar || null,
+    },
+    date: p.date instanceof Date ? p.date.toISOString() : p.date,
+    date_fa: p.dateFa || "",
+    likes: p.likes || 0,
+    views: p.views || 0,
+    category: p.category || null,
+    solved: p.solved ?? undefined,
+    fileSize: p.fileSize || undefined,
+  };
 }
 
-export function getLatest(module: ModuleSlug, n = 3) {
-  return getModuleItems(module).slice(0, n);
-}
-
-export function getBySlug(module: ModuleSlug, slug: string) {
-  return getModuleItems(module).find(i => i.slug === slug) || null;
-}
-
-export function getAllAcross(): ContentItem[] {
-  return (Object.keys(all) as ModuleSlug[])
-    .flatMap(m => getModuleItems(m))
-    .sort((a, b) => +new Date(b.date) - +new Date(a.date));
-}
-
-export function getRelated(current: ContentItem, limit = 6): ContentItem[] {
-  const tagSet = new Set(current.tags);
-  const pool = getAllAcross().filter(
-    c => c.slug !== current.slug && c.tags.some(t => tagSet.has(t))
-  );
-  // fallback: same category / module
-  if (pool.length < limit) {
-    const extra = getAllAcross().filter(
-      c => c.slug !== current.slug && !pool.includes(c) && (c.category === current.category || c.module !== current.module)
-    );
-    pool.push(...extra);
+export async function getModuleItems(module: ModuleSlug): Promise<ContentItem[]> {
+  try {
+    const posts = await prisma.post.findMany({
+      where: { module, published: true },
+      orderBy: { date: "desc" },
+    });
+    return posts.map(formatPost);
+  } catch {
+    return [];
   }
-  // score
-  return pool
+}
+
+export async function getLatest(module: ModuleSlug, n = 3): Promise<ContentItem[]> {
+  const items = await getModuleItems(module);
+  return items.slice(0, n);
+}
+
+export async function getBySlug(module: ModuleSlug, slug: string): Promise<ContentItem | null> {
+  try {
+    const post = await prisma.post.findUnique({
+      where: { module_slug: { module, slug } },
+    });
+    return post ? formatPost(post) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getAllAcross(): Promise<ContentItem[]> {
+  try {
+    const posts = await prisma.post.findMany({
+      where: { published: true },
+      orderBy: { date: "desc" },
+    });
+    return posts.map(formatPost);
+  } catch {
+    return [];
+  }
+}
+
+export async function getRelated(current: ContentItem, limit = 6): Promise<ContentItem[]> {
+  const tagSet = new Set(current.tags);
+  const pool = await getAllAcross();
+  const filtered = pool.filter(c => c.slug !== current.slug);
+
+  // Score by tag overlap + same category
+  const scored = filtered
     .map(c => ({
       c,
-      score: c.tags.filter(t => tagSet.has(t)).length * 3 +
+      score:
+        c.tags.filter(t => tagSet.has(t)).length * 3 +
         (c.category === current.category ? 1 : 0) +
-        (c.module !== current.module ? 0.5 : 0)
+        (c.module !== current.module ? 0.5 : 0),
     }))
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map(x => x.c);
+
+  // Fallback: if not enough, add more from different modules
+  if (scored.length < limit) {
+    const extra = filtered
+      .filter(c => !scored.includes(c))
+      .slice(0, limit - scored.length);
+    scored.push(...extra);
+  }
+
+  return scored;
 }
 
-export function searchAcross(q: string) {
+export async function searchAcross(q: string): Promise<ContentItem[]> {
   const s = q.trim().toLowerCase();
   if (!s) return [];
-  return getAllAcross().filter(
-    c =>
-      c.title.toLowerCase().includes(s) ||
-      c.excerpt.toLowerCase().includes(s) ||
-      c.tags.some(t => t.toLowerCase().includes(s))
-  );
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        published: true,
+        OR: [
+          { title: { contains: s, mode: "insensitive" } },
+          { excerpt: { contains: s, mode: "insensitive" } },
+        ],
+      },
+      orderBy: { date: "desc" },
+    });
+    return posts.map(formatPost);
+  } catch {
+    return [];
+  }
 }
 
-export function getCommentCount(module: string, slug: string): number {
-  const count = (commentsData as any[]).filter(c => c.content_type === module && c.content_slug === slug).length;
-  return count > 0 ? count : 0;
+export async function getCommentCount(module: string, slug: string): Promise<number> {
+  try {
+    const post = await prisma.post.findUnique({
+      where: { module_slug: { module: module as ModuleSlug, slug } },
+      select: { id: true },
+    });
+    if (!post) return 0;
+    const count = await prisma.comment.count({ where: { postId: post.id } });
+    return count;
+  } catch {
+    return 0;
+  }
 }
 
 export const moduleMeta: Record<ModuleSlug, { title: string; titleFa: string; color: string; href: string }> = {

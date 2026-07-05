@@ -6,13 +6,14 @@ type P = Promise<{ slug: string }>;
 
 export async function generateStaticParams() {
  const mod = "review" as any;
- return getModuleItems(mod).map((p) => ({ slug: p.slug }));
+ const items = await getModuleItems(mod);
+ return items.map((p) => ({ slug: p.slug }));
 }
 
 export default async function Page({ params }: { params: P }) {
  const { slug } = await params;
  const mod = "review" as any;
- const item = getBySlug(mod, slug);
+ const item = await getBySlug(mod, slug);
  if (!item) return notFound();
  return <ReviewDetail item={item} />;
 }
@@ -20,6 +21,6 @@ export default async function Page({ params }: { params: P }) {
 export async function generateMetadata({ params }: { params: P }) {
  const { slug } = await params;
  const mod = "review" as any;
- const item = getBySlug(mod, slug);
+ const item = await getBySlug(mod, slug);
  return { title: item ? `${item.title} | نقد و بررسی تکباکس`: "یافت نشد" };
 }

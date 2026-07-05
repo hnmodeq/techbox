@@ -6,16 +6,27 @@ import { z } from "zod";
 export async function GET(req: NextRequest){
  const { searchParams } = new URL(req.url);
  const postModule = searchParams.get("module") || undefined;
+ const search = searchParams.get("search");
  const take = Math.min(parseInt(searchParams.get("take") || "50"), 100);
- const posts = await prisma.post.findMany({
- where: { published: true, ...(postModule ? { module: postModule as any } : {}) },
- orderBy: { date: "desc" },
- take,
- select: {
- slug: true, module: true, title: true, excerpt: true, image: true,
- tags: true, date: true, dateFa: true, likes: true, views: true,
- category: true, authorName: true
+
+ const where: any = { published: true };
+ if (postModule) where.module = postModule;
+ if (search) {
+   where.OR = [
+     { title: { contains: search, mode: "insensitive" } },
+     { excerpt: { contains: search, mode: "insensitive" } },
+   ];
  }
+
+ const posts = await prisma.post.findMany({
+   where,
+   orderBy: { date: "desc" },
+   take,
+   select: {
+     slug: true, module: true, title: true, excerpt: true, image: true,
+     tags: true, date: true, dateFa: true, likes: true, views: true,
+     category: true, authorName: true
+   }
  });
  const out = posts.map(p => ({ ...p, tags: JSON.parse(p.tags || "[]"), author: { name: p.authorName }}));
  return NextResponse.json(out);
@@ -42,11 +53,11 @@ export async function POST(req: NextRequest){
  try{
  const post = await prisma.post.create({
  data: {
- ...data,
- tags: JSON.stringify(data.tags),
- authorId: user.id,
- authorName: user.name,
- dateFa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
+   ...data,
+   tags: JSON.stringify(data.tags),
+   authorId: user.id,
+   authorName: user.name,
+   dateFa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
  }
  });
  return NextResponse.json(post, { status: 201 });

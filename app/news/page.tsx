@@ -1,3 +1,7 @@
-import NewsList from "@/features/news/components/NewsList";
+import { getModuleItems } from "@/lib/content";
+import NewsListAsync from "@/features/news/components/NewsListAsync";
 export const metadata = { title: "اخبار | تکباکس" };
-export default function NewsPage(){ return <NewsList />; }
+export default async function NewsPage(){ 
+  const items = await getModuleItems("news");
+  return <NewsListAsync items={items} />;
+}
