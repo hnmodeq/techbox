@@ -25,7 +25,7 @@ function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { s
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 w-full mt-3">
-      <span className="text-xs font-extrabold text-[var(--tb-download)] group-hover:underline flex items-center gap-1 shrink-0">
+      <span className="text-xs font-extrabold text-[var(--download)] group-hover:underline flex items-center gap-1 shrink-0">
         <span>دانلود مستقیم</span>
         <span>↓</span>
       </span>
@@ -88,12 +88,12 @@ export default function DownloadRow() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-[var(--tb-download)] bg-[var(--tb-download)]/10 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-bold text-[var(--download)] bg-[var(--download)]/10 px-2 py-0.5 rounded">
                         {file.category || 'سیستم‌عامل'}
                       </span>
                     </div>
 
-                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-download)] transition-colors line-clamp-1 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
                       {file.title}
                     </h3>
                     <div className="text-xs paragraph-color mt-1 line-clamp-1">

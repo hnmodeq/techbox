@@ -42,7 +42,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         {/* Header */}
         <header className="border-b border-[var(--border-color)] pb-6 space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <span className="rounded-full bg-[color-mix(in_oklch,var(--tb-review)_15%,transparent)] border border-[color-mix(in_oklch,var(--tb-review)_30%,transparent)] px-3.5 py-1 text-xs font-bold text-[var(--tb-review)]">
+            <span className="rounded-full bg-[color-mix(in_oklch,var(--review)_15%,transparent)] border border-[color-mix(in_oklch,var(--review)_30%,transparent)] px-3.5 py-1 text-xs font-bold text-[var(--review)]">
               {item.category || "بررسی تخصصی"}
             </span>
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa}</span>
@@ -80,7 +80,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         </div>
 
         {/* Excerpt Lead */}
-        <p className="text-lg font-bold leading-9 text-[var(--primary-text)] bg-[var(--muted-background)]/40 p-5 rounded-[var(--corner-radius)] border-r-4 border-[var(--tb-review)]">
+        <p className="text-lg font-bold leading-9 text-[var(--primary-text)] bg-[var(--muted-background)]/40 p-5 rounded-[var(--corner-radius)] border-r-4 border-[var(--review)]">
           {item.excerpt}
         </p>
 

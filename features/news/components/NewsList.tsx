@@ -28,7 +28,7 @@ export default function NewsList() {
                       <span className="inline-flex items-center gap-1"><Icon name="clock" size={13} strokeWidth={1.75} />{n.date_fa} {n.time ? `• ${n.time}`: ""}</span>
                       {n.source && <><span>•</span><span>منبع: {n.source}</span></>}
                     </div>
-                    <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mt-2 transition-colors group-hover:text-[var(--tb-news)]">{n.title}</h3>
+                    <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mt-2 transition-colors group-hover:text-[var(--news)]">{n.title}</h3>
                     <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] line-clamp-2 mt-2 paragraph-color">{n.excerpt}</p>
                     <div className="mt-3 pt-2 border-t border-[var(--border-color)]/50">
                       <CardStats module="news" slug={n.slug} initialViews={n.views ?? 0} initialLikes={n.likes ?? 0} initialComments={getCommentCount("news", n.slug)} showComments={true} />
@@ -42,25 +42,25 @@ export default function NewsList() {
  <aside className="lg:col-span-4 order-2 lg:order-1">
  <div className="card p-4 sticky top-20">
  <div className="flex items-center justify-between mb-4">
- <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--tb-news)]">اخبار فوری</h3>
+ <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--news)]">اخبار فوری</h3>
  <span className="inline-flex items-center gap-1.5 rounded-[var(--corner-radius)] border border-[var(--border-color)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- <span className="h-2 w-2 rounded-[var(--corner-radius)] bg-[var(--tb-news)] animate-pulse" /> زنده
+ <span className="h-2 w-2 rounded-[var(--corner-radius)] bg-[var(--news)] animate-pulse" /> زنده
  </span>
  </div>
  <div className="relative">
- <div className="absolute right-[8px] top-2 bottom-2 w-px" style={{ background: "linear-gradient(to bottom, color-mix(in oklch, var(--tb-news) 60%, transparent), var(--border-color), transparent)" }} />
+ <div className="absolute right-[8px] top-2 bottom-2 w-px" style={{ background: "linear-gradient(to bottom, color-mix(in oklch, var(--news) 60%, transparent), var(--border-color), transparent)" }} />
               <ul className="space-y-5">
                 {forceNews.map((f: any) => (
                   <li key={f.slug} className="relative pr-7">
-                    <span className="absolute right-0 top-[4px] w-[17px] h-[17px] rounded-full flex items-center justify-center bg-[var(--main-background)] border-2 border-[color-mix(in_oklch,var(--tb-news)_65%,transparent)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--tb-news)]" />
+                    <span className="absolute right-0 top-[4px] w-[17px] h-[17px] rounded-full flex items-center justify-center bg-[var(--main-background)] border-2 border-[color-mix(in_oklch,var(--news)_65%,transparent)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--news)]" />
                     </span>
                     <Link href={`/news/${f.slug}`} className="group block">
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex items-center gap-1 paragraph-color">
                         <Icon name="clock" size={13} strokeWidth={1.75} />
                         <span>{f.date_fa} {f.time || ""}</span>
                       </div>
-                      <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] block mt-1 transition-colors group-hover:text-[var(--tb-news)]">{f.title}</span>
+                      <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] block mt-1 transition-colors group-hover:text-[var(--news)]">{f.title}</span>
                     </Link>
                   </li>
                 ))}

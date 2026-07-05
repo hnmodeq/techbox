@@ -49,7 +49,7 @@ export default function SidebarDock({ className }: { className?: string }) {
  label: "مدیریت",
  onClick: () => router.push("/admin"),
  active: adminActive,
- icon: <ShieldCheck strokeWidth={ICON_STROKE} className="h-5 w-5 text-[var(--tb-vip)]" />,
+ icon: <ShieldCheck strokeWidth={ICON_STROKE} className="h-5 w-5 text-[var(--vip)]" />,
  });
  }
 

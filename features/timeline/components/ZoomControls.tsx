@@ -23,7 +23,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onZoomChange?.(Math.max(0.1, zoom - 0.2));
         }}
-        className="p-1.5 paragraph-color hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        className="p-1.5 paragraph-color hover:text-[var(--timeline)] transition-colors cursor-pointer"
         title="کوچک‌نمایی (-)"
         aria-label="Zoom Out"
       >
@@ -43,7 +43,7 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           onTouchStart={(e) => e.stopPropagation()}
           onChange={(e) => onZoomChange?.(parseFloat(e.target.value))}
           onInput={(e) => onZoomChange?.(parseFloat(e.currentTarget.value))}
-          className="w-32 sm:w-44 h-2.5 cursor-pointer appearance-none rounded-full bg-[var(--muted-background)] accent-[var(--tb-timeline)]"
+          className="w-32 sm:w-44 h-2.5 cursor-pointer appearance-none rounded-full bg-[var(--muted-background)] accent-[var(--timeline)]"
           title="تنظیم بزرگ‌نمایی"
           aria-label="تنظیم بزرگ‌نمایی"
         />
@@ -55,14 +55,14 @@ export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps)
           e.stopPropagation();
           onZoomChange?.(Math.min(6.0, zoom + 0.2));
         }}
-        className="p-1.5 paragraph-color hover:text-[var(--tb-timeline)] transition-colors cursor-pointer"
+        className="p-1.5 paragraph-color hover:text-[var(--timeline)] transition-colors cursor-pointer"
         title="بزرگ‌نمایی (+)"
         aria-label="Zoom In"
       >
         <ZoomIn size={18} />
       </button>
 
-      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--tb-timeline)] text-center border-l border-[var(--border-color)] pl-2">
+      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--timeline)] text-center border-l border-[var(--border-color)] pl-2">
         {(zoom * 100).toFixed(0)}%
       </div>
 

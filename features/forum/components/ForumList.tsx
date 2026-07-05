@@ -78,7 +78,7 @@ export default function ForumList() {
 
       <div className="flex gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mb-4">
         {(["داغ", "جدید", "برتر", "حل‌شده"] as const).map((t) => (
-          <ChipButton key={t} tone="forum" aria-pressed={filter === t} onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--tb-forum)] text-[var(--tb-forum)]" : ""}>
+          <ChipButton key={t} tone="forum" aria-pressed={filter === t} onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--forum)] text-[var(--forum)]" : ""}>
             {t}
           </ChipButton>
         ))}
@@ -105,7 +105,7 @@ export default function ForumList() {
               <Image src={t.avatar} alt={t.author?.name || "کاربر"} width={40} height={40} className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--tb-forum)]">{t.title}</span>
+                  <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--forum)]">{t.title}</span>
                   <ForumBadge slug={t.slug} fallback={t.solved} />
                 </div>
                 <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1">

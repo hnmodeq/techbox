@@ -59,7 +59,7 @@ export default function ReviewRow() {
                     <div className="mb-2">
                       <Stars rating={rating} />
                     </div>
-                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-review)] transition-colors line-clamp-2 leading-6">
+                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
                       {rev.title}
                     </h3>
                     <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-5">

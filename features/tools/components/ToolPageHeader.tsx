@@ -8,7 +8,7 @@ export function ToolPageHeader({
   title,
   subtitle,
   breadcrumbs = [],
-  accent = "var(--tb-tools)",
+  accent = "var(--tools)",
 }: {
   title: string;
   subtitle?: string;

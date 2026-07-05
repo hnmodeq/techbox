@@ -55,7 +55,7 @@ export default function VideoReelsRow() {
                 </div>
 
                 <div className="relative z-30 p-3.5 text-white w-full">
-                  <h3 className="text-xs sm:text-sm font-bold leading-5 line-clamp-2 text-white group-hover:text-[var(--tb-media)] transition-colors">
+                  <h3 className="text-xs sm:text-sm font-bold leading-5 line-clamp-2 text-white group-hover:text-[var(--media)] transition-colors">
                     {vid.title}
                   </h3>
                   

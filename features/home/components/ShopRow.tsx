@@ -42,7 +42,7 @@ export default function ShopRow() {
 
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--tb-shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] group-hover:text-[var(--shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
                     {prod.title}
                   </h3>
                   
@@ -55,7 +55,7 @@ export default function ShopRow() {
                   <div className="flex justify-start items-center">
                     <CardStats module="shop" slug={prod.slug} initialViews={prod.views ?? 0} initialLikes={prod.likes ?? 0} initialComments={getCommentCount("shop", prod.slug)} showComments={true} />
                   </div>
-                  <span className="text-xs font-black text-[var(--tb-shop)] hover:underline flex items-center justify-center py-1">
+                  <span className="text-xs font-black text-[var(--shop)] hover:underline flex items-center justify-center py-1">
                     ثبت درخواست خرید ←
                   </span>
                 </div>

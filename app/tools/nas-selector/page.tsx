@@ -16,7 +16,7 @@ export default async function NasSelectorPage() {
       <ToolPageHeader
         title="انتخاب‌گر NAS"
         subtitle="پیکربندی هوشمند بر اساس نیاز واقعی شما"
-        accent="var(--tb-tools)"
+        accent="var(--tools)"
         breadcrumbs={[
           { label: "خانه", href: "/" },
           { label: "ابزارها", href: "/tools" },

@@ -77,7 +77,7 @@ export default function AdminPage() {
  return (
  <main className="min-h-dvh px-4 py-10" dir="rtl">
  <section className="mx-auto max-w-6xl space-y-8">
- <PageHeader colorVar="--tb-admin" title={`سلام، ${user.name}`} titleClassName="text-[var(--tb-admin)]" description={`پنل مدیریت • نقش: ${user.role === "super_admin" ? "مدیر کل" : "ویراستار"}`}>
+ <PageHeader colorVar="--tb-admin" title={`سلام، ${user.name}`} titleClassName="text-[var(--admin)]" description={`پنل مدیریت • نقش: ${user.role === "super_admin" ? "مدیر کل" : "ویراستار"}`}>
  <div className="flex flex-wrap gap-2">
  <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
  {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}

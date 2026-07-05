@@ -13,7 +13,7 @@ export default function ToolsPage() {
       <ToolPageHeader
         title="ابزارهای TechBox"
         subtitle="انتخاب‌گر NAS و NVR، محاسبه RAID/SHR و ساب‌نت"
-        accent="var(--tb-tools)"
+        accent="var(--tools)"
         breadcrumbs={[{ label: "خانه", href: "/" }, { label: "ابزارها" }]}
       />
 
@@ -29,7 +29,7 @@ export default function ToolsPage() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-[12px]">
           <a href="/tools/nas-selector" className="btn btn-primary">NAS Selector</a>
-          <a href="/tools/nvr-selector" className="btn btn-primary" style={{ background: "var(--tb-raid)" }}>NVR Selector</a>
+          <a href="/tools/nvr-selector" className="btn btn-primary" style={{ background: "var(--raid)" }}>NVR Selector</a>
           <a href="/tools/raid-calculator" className="btn btn-ghost">RAID Calculator v2</a>
           <a href="/tools/subnet-calculator" className="btn btn-ghost">Subnet Calculator</a>
         </div>

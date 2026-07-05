@@ -85,8 +85,8 @@ export default function MediaGallery() {
               onClick={() => setPage(p)}
               className={`h-10 w-10 rounded-[var(--corner-radius)] border font-bold transition-all ${
                 page === p
-                  ? "bg-[var(--tb-media)] text-[#ffffff] border-[var(--tb-media)] shadow-md scale-105"
-                  : "border-[var(--border-color)] bg-[var(--card-background)] text-[var(--primary-text)] hover:border-[var(--tb-media)] hover:text-[var(--tb-media)]"
+                  ? "bg-[var(--media)] text-[#ffffff] border-[var(--media)] shadow-md scale-105"
+                  : "border-[var(--border-color)] bg-[var(--card-background)] text-[var(--primary-text)] hover:border-[var(--media)] hover:text-[var(--media)]"
               }`}
             >
               {p.toLocaleString("fa-IR")}

@@ -22,7 +22,7 @@ export default function ConsultationModal({ open, onClose }: ConsultationModalPr
  <OverlayBackdrop onClick={onClose} />
  <Panel className="relative w-full max-w-md space-y-4" style={{ zIndex: zIndex.modalContent }}>
  <div className="flex items-center justify-between">
- <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--tb-consultation)]">درخواست مشاوره زیرساخت</h3>
+ <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--consultation)]">درخواست مشاوره زیرساخت</h3>
  <CloseButton onClick={onClose} label="بستن" />
  </div>
 

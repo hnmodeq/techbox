@@ -223,18 +223,18 @@ export default function SidebarContent({
 
         {/* Notifications + cart — always visible, stable in both expanded & collapsed states */}
         <div className={`flex shrink-0 items-center gap-1 ${expanded ? "flex-row justify-start" : "flex-col"}`}>
-          <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--tb-news)]">
+          <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--news)]">
             <IconRailButton ref={notifButtonRef} tone="news" onClick={() => setNotifOpen((o) => !o)} aria-label="notifications">
               <Icon name="bell" size={18} />
               <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--tb-danger)]" />
             </IconRailButton>
           </SidebarTooltip>
 
-          <SidebarTooltip label={cartCount > 0 ? `سبد خرید – ${cartCount} قلم`: "سبد خرید"} enabled={!expanded} tooltipClassName="text-[var(--tb-shop)]">
+          <SidebarTooltip label={cartCount > 0 ? `سبد خرید – ${cartCount} قلم`: "سبد خرید"} enabled={!expanded} tooltipClassName="text-[var(--shop)]">
             <IconRailButton tone="shop" onClick={() => setCartOpen(true)} aria-label="سبد خرید">
               <Icon name="cart" size={18} />
               {cartCount > 0 && (
-                <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--tb-shop)] px-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[#ffffff]">
+                <span className="absolute -left-0.5 -top-0.5 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-[var(--shop)] px-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[#ffffff]">
                   {cartCount > 99 ? "۹۹+" : (cartCount ?? 0).toLocaleString("fa-IR")}
                 </span>
               )}
@@ -292,13 +292,13 @@ export default function SidebarContent({
  type="button"
  variant="ghost"
  onClick={() => setConsultOpen(true)}
- className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--tb-consultation)_35%,transparent)] text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-consultation)] hover:bg-[color-mix(in_oklch,var(--tb-consultation)_12%,transparent)]"
+ className="flex h-10 w-full items-center justify-center gap-2 rounded-[var(--corner-radius)] border border-[color-mix(in_oklch,var(--consultation)_35%,transparent)] text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--consultation)] hover:bg-[color-mix(in_oklch,var(--consultation)_12%,transparent)]"
  >
  <Icon name="headset" size={16} strokeWidth={1.75} />
  مشاوره زیرساخت
  </Button>
  ) : (
- <SidebarTooltip label="مشاوره زیرساخت" enabled tooltipClassName="text-[var(--tb-consultation)]">
+ <SidebarTooltip label="مشاوره زیرساخت" enabled tooltipClassName="text-[var(--consultation)]">
  <IconRailButton tone="consultation" onClick={() => setConsultOpen(true)} aria-label="مشاوره زیرساخت">
  <Icon name="headset" size={18} strokeWidth={1.75} />
  </IconRailButton>
@@ -341,15 +341,15 @@ export default function SidebarContent({
  {(user?.role === "super_admin" || (user?.role as string) === "admin") && (() => {
  const active = isActive(pathname, "/admin");
  return (
- <SidebarTooltip key="/admin" label="مدیریت" enabled={!expanded} tooltipClassName="text-[var(--tb-vip)]">
+ <SidebarTooltip key="/admin" label="مدیریت" enabled={!expanded} tooltipClassName="text-[var(--vip)]">
  <Link
  href="/admin"
  onClick={onLinkClick}
  className={`${linkBase} text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${active ? "bg-[var(--muted-background)] text-[var(--primary-text)]" : linkInactive}`}
  >
- {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--tb-vip)]" />}
+ {active && <span className="absolute bottom-[8px] right-0 top-[8px] w-[3px] rounded-full bg-[var(--vip)]" />}
  <span className="flex h-10 w-10 shrink-0 items-center justify-center">
- <Icon name="shield" size={19} className="text-[var(--tb-vip)]" strokeWidth={1.75} />
+ <Icon name="shield" size={19} className="text-[var(--vip)]" strokeWidth={1.75} />
  </span>
  <span className={`truncate transition-all ${expanded ? "w-[160px] opacity-100" : "w-0 opacity-0"}`}>مدیریت</span>
  </Link>
@@ -376,7 +376,7 @@ export default function SidebarContent({
  </span>
  </Link>
  ) : (
- <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--tb-account)]">
+ <SidebarTooltip label="ورود / حساب کاربری" enabled={!expanded} tooltipClassName="text-[var(--account)]">
  <Button variant="link" size="md" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} className={`${linkBase} ${linkInactive} w-full justify-start p-0 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] no-underline hover:no-underline`}>
  <span className="flex h-10 w-10 items-center justify-center">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--muted-background)]"><Icon name="user" size={15} /></span>

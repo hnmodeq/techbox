@@ -9,7 +9,7 @@ type ToolCard = {
   titleFa: string;
   descFa: string;
   icon: IconName;
-  accent: string; // css var e.g. var(--tb-tools)
+  accent: string; // css var e.g. var(--tools)
   badge?: string;
   href: string;
   stats?: { label: string; value: string }[];
@@ -22,7 +22,7 @@ const TOOLS: ToolCard[] = [
     titleFa: "انتخاب‌گر NAS",
     descFa: "بهترین NAS را بر اساس کاربران، ظرفیت، RAID، سرویس‌ها و بودجه پیدا کنید. رتبه‌بندی زنده + دلیل پیشنهاد.",
     icon: "nas",
-    accent: "var(--tb-nas)",
+    accent: "var(--nas)",
     badge: "جدید",
     href: "/tools/nas-selector",
     stats: [
@@ -36,7 +36,7 @@ const TOOLS: ToolCard[] = [
     titleFa: "انتخاب‌گر NVR",
     descFa: "تعداد دوربین، رزولوشن و مدت ضبط را وارد کنید تا NVR مناسب با AI پیشنهاد شود.",
     icon: "nvr",
-    accent: "var(--tb-nvr)",
+    accent: "var(--nvr)",
     badge: "جدید",
     href: "/tools/nvr-selector",
     stats: [
@@ -50,7 +50,7 @@ const TOOLS: ToolCard[] = [
     titleFa: "ماشین حساب RAID",
     descFa: "RAID 0/1/5/6/10 + SHR-1/SHR-2، دیسک ترکیبی، Hot Spare، نقشه ظرفیت زنده.",
     icon: "disk",
-    accent: "var(--tb-raid)",
+    accent: "var(--raid)",
     badge: "v2",
     href: "/tools/raid-calculator",
     stats: [
@@ -64,7 +64,7 @@ const TOOLS: ToolCard[] = [
     titleFa: "ماشین حساب ساب‌نت",
     descFa: "محاسبه سریع IP، ماسک، تعداد هاست و محدوده شبکه – بدون تغییر.",
     icon: "tools",
-    accent: "var(--tb-subnet)",
+    accent: "var(--subnet)",
     href: "/tools/subnet-calculator",
     stats: [
       { label: "IPv4", value: "✓" },

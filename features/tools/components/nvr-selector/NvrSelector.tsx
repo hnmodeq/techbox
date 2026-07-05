@@ -58,7 +58,7 @@ export function NvrSelector({
       {/* Header */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 mb-3">
-          <div className="px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--tb-nvr)_12%,transparent)] text-[var(--tb-nvr)] text-xs font-bold flex items-center gap-1.5 border border-[color-mix(in_oklch,var(--tb-nvr)_22%,var(--border-color))]">
+          <div className="px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--nvr)_12%,transparent)] text-[var(--nvr)] text-xs font-bold flex items-center gap-1.5 border border-[color-mix(in_oklch,var(--nvr)_22%,var(--border-color))]">
             <Icon name="nvr" className="w-3.5 h-3.5" />
             ماژول انتخاب ان‌وی‌آر
           </div>
@@ -169,7 +169,7 @@ export function NvrSelector({
           <div className="mt-6 pt-6 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="paragraph-color text-[13px]">حجم ذخیره‌سازی تخمینی پروژه:</span>
-              <span className="font-black tabular-nums text-[20px] text-[var(--tb-nvr)]">
+              <span className="font-black tabular-nums text-[20px] text-[var(--nvr)]">
                 {fa.format(storageTB)} <span className="text-[12px] font-semibold paragraph-color">ترابایت</span>
               </span>
             </div>
@@ -204,7 +204,7 @@ export function NvrSelector({
                     onClick={() => setSelectedModel(model.id)}
                     className={`card p-5 cursor-pointer transition-all hover:shadow-[var(--shadow-size)] flex flex-col justify-between ${
                       isSelected ? "ring-2 ring-[var(--home)]" : ""
-                    } ${isRecommended ? "border-[color-mix(in_oklch,var(--tb-nvr)_45%,var(--border-color))]" : ""}`}
+                    } ${isRecommended ? "border-[color-mix(in_oklch,var(--nvr)_45%,var(--border-color))]" : ""}`}
                   >
                     <div>
                       <div className="flex items-start justify-between gap-3">
@@ -240,7 +240,7 @@ export function NvrSelector({
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
-                      <div className="text-[15px] font-black text-[var(--tb-shop)]">
+                      <div className="text-[15px] font-black text-[var(--shop)]">
                         {renderPrice(model)}
                       </div>
 
