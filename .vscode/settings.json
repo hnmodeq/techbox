@@ -14,7 +14,7 @@
   "files.exclude": {
     "**/.git": true,
     "**/.env": false,
-    "**/.env.local": true,
+    "**/.env.local": false,
     "**.env.example": false,
     "**/.gitattributes": true,
     "**/.gitignore": true,
@@ -37,7 +37,7 @@
     "**/.coverage": true,
     "**/pnpm-debug.log": true,
     "**/tsconfig.tsbuildinfo": true,
-    "**/next.config.mjs": true,
+    "**/next.config.mjs": false,
     "**/.config" : true,
     "**/.continue" : true,
     "**/.vercel" : true,
