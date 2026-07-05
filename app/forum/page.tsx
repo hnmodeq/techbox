@@ -1,7 +1,3 @@
-import { getModuleItems } from "@/lib/content";
-import ForumListAsync from "@/features/forum/components/ForumListAsync";
+import ForumList from "@/features/forum/components/ForumList";
 export const metadata = { title: "انجمن | تکباکس" };
-export default async function ForumPage(){ 
-  const items = await getModuleItems("forum");
-  return <ForumListAsync items={items} />;
-}
+export default function ForumPage(){ return <ForumList />; }

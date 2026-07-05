@@ -3,19 +3,18 @@ import ContentDetail from "@/features/content/components/ContentDetail";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
- const items = await getModuleItems("blog");
- return items.map(p => ({ slug: p.slug }));
+ return getModuleItems("blog").map(p => ({ slug: p.slug }));
 }
 
 export default async function BlogDetail({ params }: { params: Promise<{ slug: string }> }) {
  const { slug } = await params;
- const item = await getBySlug("blog", slug);
+ const item = getBySlug("blog", slug);
  if (!item) return notFound();
  return <ContentDetail item={item} />;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
  const { slug } = await params;
- const item = await getBySlug("blog", slug);
+ const item = getBySlug("blog", slug);
  return { title: item ? `${item.title} | تکباکس`: "یافت نشد" };
 }

@@ -1,7 +1,3 @@
-import { getModuleItems } from "@/lib/content";
-import ReviewGridAsync from "@/features/review/components/ReviewGridAsync";
+import ReviewGrid from "@/features/review/components/ReviewGrid";
 export const metadata = { title: "نقد و بررسی | تکباکس" };
-export default async function ReviewPage(){ 
-  const items = await getModuleItems("review");
-  return <ReviewGridAsync items={items} />;
-}
+export default function ReviewPage(){ return <ReviewGrid />; }

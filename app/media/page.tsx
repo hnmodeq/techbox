@@ -1,7 +1,3 @@
-import { getModuleItems } from "@/lib/content";
-import MediaGalleryAsync from "@/features/media/components/MediaGalleryAsync";
+import MediaGallery from "@/features/media/components/MediaGallery";
 export const metadata = { title: "رسانه | تکباکس" };
-export default async function MediaPage(){ 
-  const items = await getModuleItems("media");
-  return <MediaGalleryAsync items={items} />;
-}
+export default function MediaPage(){ return <MediaGallery />; }

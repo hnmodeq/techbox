@@ -43,7 +43,6 @@ model Post {
   views      Int      @default(0)
   solved     Boolean? @default(false)
   fileSize   String?
-  rating     Float?
   published  Boolean  @default(true)
 
   author   User?     @relation(fields: [authorId], references: [id])

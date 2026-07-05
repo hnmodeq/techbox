@@ -1,51 +1,23 @@
-"use client";
-import { useEffect, useState } from "react";
-import { moduleMeta, type ModuleSlug, type ContentItem } from "@/lib/content";
+import { getModuleItems, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { ContentCard } from "@/features/content/components/ContentCard";
 import Link from "next/link";
 
 export default function ModuleList({ module }: { module: ModuleSlug }) {
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const meta = moduleMeta[module];
-
-  useEffect(() => {
-    let mounted = true;
-    setLoading(true);
-    fetch(`/api/posts?module=${module}&take=100`)
-      .then(r => r.json())
-      .then((data: any[]) => {
-        if (mounted) {
-          setItems(data.map((p: any) => ({
-            ...p,
-            module: p.module as ModuleSlug,
-            author: p.author || { name: p.authorName || "تحریریه" },
-            date: p.date || new Date().toISOString(),
-          })));
-        }
-      })
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-    return () => { mounted = false; };
-  }, [module]);
-
-  return (
-    <main className="mx-auto max-w-5xl px-5 py-14" dir="rtl">
-      <div className="flex items-end justify-between mb-8">
-        <div>
-          <h1 className={`text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ${meta.color}`}>{meta.titleFa}</h1>
-          <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-muted-foreground mt-2">{loading ? "..." : `${items.length} مطلب • مرتب‌سازی تازه‌ترین`}</p>
-        </div>
-        <Link href="/" className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-foreground">خانه →</Link>
-      </div>
-      {loading ? (
-        <p className="text-center paragraph-color py-16 animate-pulse">در حال بارگذاری...</p>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {items.map((i: any) => <ContentCard key={i.slug} item={i} />)}
-        </div>
-      )}
-      {!loading && items.length === 0 && <p className="text-center text-muted-foreground py-16">محتوایی ثبت نشده</p>}
-    </main>
-  );
+ const items = getModuleItems(module);
+ const meta = moduleMeta[module];
+ return (
+ <main className="mx-auto max-w-5xl px-5 py-14" dir="rtl">
+ <div className="flex items-end justify-between mb-8">
+ <div>
+ <h1 className={`text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ${meta.color}`}>{meta.titleFa}</h1>
+ <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-muted-foreground mt-2">{items.length} مطلب • مرتب‌سازی تازه‌ترین</p>
+ </div>
+ <Link href="/" className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-foreground">خانه →</Link>
+ </div>
+ <div className="grid gap-4 md:grid-cols-2">
+ {items.map(i => <ContentCard key={i.slug} item={i} />)}
+ </div>
+ {items.length === 0 && <p className="text-center text-muted-foreground py-16">محتوایی ثبت نشده</p>}
+ </main>
+ );
 }

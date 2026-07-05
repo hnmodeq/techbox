@@ -12,7 +12,7 @@ import SidebarTooltip from "@/components/layout/SidebarTooltip";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getCurrentUserClient, type AppUser } from "@/lib/auth";
 import { useCart } from "@/providers/cart.provider";
-import { moduleMeta, type ModuleSlug } from "@/lib/content";
+import { getAllAcross, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
 import { zIndex } from "@/design";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -159,14 +159,7 @@ export default function SidebarContent({
  if (searchOpen) collapsedSearchRef.current?.focus();
  }, [searchOpen]);
 
- const [notifications, setNotifications] = useState<any[]>([]);
-
-  useEffect(() => {
-    fetch("/api/posts?take=8")
-      .then(r => r.json())
-      .then(data => setNotifications(Array.isArray(data) ? data : []))
-      .catch(() => setNotifications([]));
-  }, []);
+ const notifications = useMemo(() => getAllAcross().slice(0, 8), []);
 
  const doSearch = (e?: React.FormEvent) => {
  e?.preventDefault();

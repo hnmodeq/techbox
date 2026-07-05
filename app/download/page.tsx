@@ -1,7 +1,3 @@
-import { getModuleItems } from "@/lib/content";
-import DownloadTableAsync from "@/features/download/components/DownloadTableAsync";
+import DownloadTable from "@/features/download/components/DownloadTable";
 export const metadata = { title: "دانلود | تکباکس" };
-export default async function DownloadPage(){ 
-  const items = await getModuleItems("download");
-  return <DownloadTableAsync items={items} />;
-}
+export default function DownloadPage(){ return <DownloadTable />; }

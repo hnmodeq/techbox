@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth-server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import commentsData from "@/prisma/mock-data/comments.json";
 
 const postSchema = z.object({
   module: z.string(),
@@ -25,10 +26,18 @@ export async function getCommentsAction(module: string, slug: string) {
       });
       return comments;
     }
-    return [];
-  } catch (err) {
-    return [];
-  }
+  } catch (err) {}
+
+  const list = (commentsData as any[]).filter(c => c.content_slug === slug || (c.content_type === module && !c.content_slug));
+  return list.map((c, i) => ({
+    id: c.id || `c-${i}`,
+    authorName: c.author || "کاربر تکباکس",
+    text: c.text,
+    likes: c.likes || 2,
+    dislikes: c.dislikes || 0,
+    createdAt: new Date(c.date || Date.now()),
+    replies: [],
+  }));
 }
 
 export async function createCommentAction(prevState: any, formData: FormData) {
