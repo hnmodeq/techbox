@@ -46,7 +46,7 @@ export default function MagazineRow() {
                   <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5 font-bold">
                     <span>{art.date_fa}</span>
                   </div>
-                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-blog)] transition-colors line-clamp-2 leading-7">
+                  <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--blog)] transition-colors line-clamp-2 leading-7">
                     {art.title}
                   </h3>
                   <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-2 line-clamp-2 leading-6">

@@ -72,7 +72,7 @@ export default function DownloadTable() {
             className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-4 sm:px-5 py-4 hover:bg-[var(--muted-background)]/25 transition-all items-center cursor-pointer"
           >
             <div className="col-span-7">
-              <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--tb-download)]">{f.title}</div>
+              <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--download)]">{f.title}</div>
               <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1 line-clamp-2">{f.excerpt}</div>
             </div>
 

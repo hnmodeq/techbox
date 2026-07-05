@@ -7,7 +7,7 @@ export default function Contact() {
  <PageHeader
  colorVar="--tb-contact"
  title="ارتباط با ما"
- titleClassName="text-[var(--tb-contact)]"
+ titleClassName="text-[var(--contact)]"
  description="پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک"
  />
  <div className="card p-6 space-y-4">

@@ -33,7 +33,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  return (
  <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mb-2">
- <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--tb-download)]">{item.category}</span>
+ <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--download)]">{item.category}</span>
  </div>
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{item.title}</h1>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>

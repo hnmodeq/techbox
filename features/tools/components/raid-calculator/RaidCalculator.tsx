@@ -249,7 +249,7 @@ function Segment({ label, value, total, className }: { label: string; value: num
 
 function StatCard({ label, value, hint, tone = "default" }: { label: string; value: string; hint: string; tone?: "default" | "accent" | "success" | "warning" }) {
   const toneClass =
-    tone === "accent" ? "text-[var(--tb-raid)]"
+    tone === "accent" ? "text-[var(--raid)]"
     : tone === "success" ? "text-[var(--tb-success)]"
     : tone === "warning" ? "text-[var(--tb-warning)]"
     : "text-[var(--primary-text)]";
@@ -291,15 +291,15 @@ export default function RaidCalculator() {
   return (
     <section dir="rtl" className="w-full font-sans text-[var(--primary-text)]">
       <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
-        <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_12%_8%,color-mix(in_oklch,var(--tb-raid)_22%,transparent),transparent_32%),radial-gradient(circle_at_88%_0%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_34%)]" />
+        <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(circle_at_12%_8%,color-mix(in_oklch,var(--raid)_22%,transparent),transparent_32%),radial-gradient(circle_at_88%_0%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_34%)]" />
 
         {/* Vertical stack or wide split: Top panel for tool options, bottom panel for results */}
         <div className="relative grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(420px,0.85fr)] lg:p-8">
           <div className="space-y-6">
             <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
-                <div className="badge mb-3 border-[color-mix(in_oklch,var(--tb-raid)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--tb-raid)_12%,var(--muted-background))] text-[var(--primary-text)]">
-                  <Icon name="server" className="h-3.5 w-3.5 text-[var(--tb-raid)]" />
+                <div className="badge mb-3 border-[color-mix(in_oklch,var(--raid)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--raid)_12%,var(--muted-background))] text-[var(--primary-text)]">
+                  <Icon name="server" className="h-3.5 w-3.5 text-[var(--raid)]" />
                   ابزار محاسبه RAID
                 </div>
                 <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">ماشین حساب RAID و SHR</h2>
@@ -323,10 +323,10 @@ export default function RaidCalculator() {
 
               <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center">
                 {drives.map((drive, index) => (
-                  <div key={drive.id} className="group rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-3.5 transition hover:border-[color-mix(in_oklch,var(--tb-raid)_42%,var(--border-color))]">
+                  <div key={drive.id} className="group rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-3.5 transition hover:border-[color-mix(in_oklch,var(--raid)_42%,var(--border-color))]">
                     <div className="mb-3 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 font-black">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-[var(--corner-radius)] bg-[color-mix(in_oklch,var(--tb-raid)_15%,var(--muted-background))] text-[var(--tb-raid)]">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-[var(--corner-radius)] bg-[color-mix(in_oklch,var(--raid)_15%,var(--muted-background))] text-[var(--raid)]">
                           <Icon name="disk" className="h-4.5 w-4.5" />
                         </span>
                         دیسک {nf.format(index + 1)}
@@ -360,7 +360,7 @@ export default function RaidCalculator() {
                 <button
                   type="button"
                   onClick={() => addDrive(8)}
-                  className="h-full min-h-[110px] rounded-[var(--corner-radius)] border-2 border-dashed border-[var(--tb-raid)]/50 bg-[var(--tb-raid)]/5 hover:bg-[var(--tb-raid)]/15 transition-all flex flex-col items-center justify-center gap-2 text-[var(--tb-raid)] font-black p-4 cursor-pointer hover:scale-[1.02]"
+                  className="h-full min-h-[110px] rounded-[var(--corner-radius)] border-2 border-dashed border-[var(--raid)]/50 bg-[var(--raid)]/5 hover:bg-[var(--raid)]/15 transition-all flex flex-col items-center justify-center gap-2 text-[var(--raid)] font-black p-4 cursor-pointer hover:scale-[1.02]"
                 >
                   <Icon name="plus" className="h-8 w-8 stroke-[3]" />
                   <span className="text-sm">افزودن دیسک جدید</span>
@@ -391,7 +391,7 @@ export default function RaidCalculator() {
                 </select>
                 {selectedOption && (
                   <div className="mt-3.5 p-3.5 rounded-lg bg-[var(--muted-background)] border border-[var(--border-color)] text-sm leading-6 text-[var(--primary-text)]">
-                    <span className="font-extrabold text-[var(--tb-raid)]">{selectedOption.label}: </span>
+                    <span className="font-extrabold text-[var(--raid)]">{selectedOption.label}: </span>
                     {selectedOption.description}
                   </div>
                 )}
@@ -436,11 +436,11 @@ export default function RaidCalculator() {
               </div>
             ) : (
               <div className="card overflow-hidden p-0 shadow-[var(--shadow-size)]">
-                <div className="border-b border-[var(--border-color)] bg-[color-mix(in_oklch,var(--tb-raid)_10%,var(--card-background))] p-6">
+                <div className="border-b border-[var(--border-color)] bg-[color-mix(in_oklch,var(--raid)_10%,var(--card-background))] p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">نتیجه نهایی محاسبه برای</div>
-                      <div className="mt-1 text-3xl font-black text-[var(--tb-raid)]">{selectedOption.label}</div>
+                      <div className="mt-1 text-3xl font-black text-[var(--raid)]">{selectedOption.label}</div>
                     </div>
                     <div className={`badge ${result.valid ? "border-[color-mix(in_oklch,var(--tb-success)_40%,var(--border-color))] text-[var(--tb-success)]" : "border-[color-mix(in_oklch,var(--tb-danger)_40%,var(--border-color))] text-[var(--tb-danger)]"}`}>
                       {result.valid ? "پیکربندی معتبر" : "نیازمند اصلاح دیسک‌ها"}
@@ -463,13 +463,13 @@ export default function RaidCalculator() {
                       <span className="paragraph-color">ظرفیت خام کل: {formatTb(result.rawTb)}</span>
                     </div>
                     <div className="flex h-6 overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--muted-background)] shadow-inner" aria-label="نمودار ظرفیت RAID">
-                      <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--tb-raid)]" />
+                      <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--raid)]" />
                       <Segment label="حفاظت" value={result.protectionTb} total={barTotal} className="bg-[var(--tb-success)]" />
                       <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--tb-warning)]" />
                       <Segment label="Hot Spare" value={result.spareTb} total={barTotal} className="bg-[var(--paragraph-color)]" />
                     </div>
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-raid)]" /> قابل استفاده</span>
+                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--raid)]" /> قابل استفاده</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-success)]" /> حفاظت</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--tb-warning)]" /> بلااستفاده</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--paragraph-color)]" /> Spare</span>
@@ -478,7 +478,7 @@ export default function RaidCalculator() {
 
                   <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--muted-background)]/60 p-5">
                     <div className="mb-3 flex items-center gap-2 font-black text-[16px]">
-                      <Icon name="shield" className="h-5 w-5 text-[var(--tb-raid)]" />
+                      <Icon name="shield" className="h-5 w-5 text-[var(--raid)]" />
                       خلاصه فنی پیکربندی
                     </div>
                     <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">

@@ -16,7 +16,7 @@ export default async function NvrSelectorPage() {
       <ToolPageHeader
         title="انتخاب‌گر NVR"
         subtitle="پیشنهاد مدل NVR مناسب پروژه دوربین مداربسته"
-        accent="var(--tb-raid)"
+        accent="var(--raid)"
         breadcrumbs={[
           { label: "خانه", href: "/" },
           { label: "ابزارها", href: "/tools" },

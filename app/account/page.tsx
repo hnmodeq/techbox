@@ -329,7 +329,7 @@ export default function AccountPage() {
       <PageHeader
         colorVar="--tb-account"
         title="پروفایل و حساب کاربری واقعی"
-        titleClassName="text-[var(--tb-account)]"
+        titleClassName="text-[var(--account)]"
       >
         <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
           <Badge variant="info">{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>

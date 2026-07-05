@@ -296,7 +296,7 @@ function ProductCard({
             </div>
           </div>
           {rank === 0 ? (
-            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--home),var(--tb-vip))] px-3 py-1 text-[11px] font-black text-[#ffffff] shadow-sm">
+            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--home),var(--vip))] px-3 py-1 text-[11px] font-black text-[#ffffff] shadow-sm">
               بهترین پیشنهاد
             </span>
           ) : null}
@@ -344,7 +344,7 @@ function ProductCard({
       </div>
 
       <div className="mt-5 pt-4 border-t border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
-        <div className="text-[14px] font-bold text-[var(--tb-shop)]">
+        <div className="text-[14px] font-bold text-[var(--shop)]">
           {renderPrice()}
         </div>
         <div className="flex gap-2 flex-1 sm:flex-none">
@@ -393,7 +393,7 @@ export function NasSelector({
   return (
     <section dir="rtl" className={cn("font-sans text-[var(--primary-text)]", className)}>
       <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--tb-vip)_14%,transparent),transparent_30%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--vip)_14%,transparent),transparent_30%)]" />
         <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
           <div>
             <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>

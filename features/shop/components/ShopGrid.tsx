@@ -94,13 +94,13 @@ export default function ShopGrid(){
                 {pr.old && <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[var(--tb-blur-sm)]">تخفیف</span>}
               </div>
               <div className="p-4 flex-1 flex flex-col">
-                <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold mt-1 transition-colors group-hover:text-[var(--tb-shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
+                <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold mt-1 transition-colors group-hover:text-[var(--shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
                 <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
                 
                 {/* Price section removed from card display per request, keeping add to cart / consultation system underlying */}
                 
                 <div className="flex gap-2 mt-4">
-                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--tb-shop)] text-[var(--tb-shop)] hover:bg-[var(--tb-shop)]/10 font-bold">مشاوره خرید</Button>
+                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold">مشاوره خرید</Button>
                 </div>
                 <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
                   <CardStats module="shop" slug={p.slug} initialViews={p.views ?? 0} initialLikes={p.likes ?? 0} initialComments={getCommentCount("shop", p.slug)} showComments={true} />

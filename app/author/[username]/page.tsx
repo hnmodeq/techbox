@@ -92,7 +92,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
               <span>تعداد مطالب: <b>{authorPosts.length.toLocaleString("fa-IR")}</b></span>
             </span>
             <span className="flex items-center gap-1.5 text-[var(--primary-text)]">
-              <Icon name="view" size={18} className="text-[var(--tb-blog)]" />
+              <Icon name="view" size={18} className="text-[var(--blog)]" />
               <span>مجموع بازدید: <b>{totalViews.toLocaleString("fa-IR")}</b></span>
             </span>
             <span className="flex items-center gap-1.5 text-[var(--primary-text)]">

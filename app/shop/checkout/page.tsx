@@ -69,7 +69,7 @@ export default function CheckoutPage(){
 
  return (
  <main className="max-w-5xl mx-auto px-4 py-12" dir="rtl">
- <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2 text-[var(--tb-shop)]">تسویه حساب – زرین‌پال</h1>
+ <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2 text-[var(--shop)]">تسویه حساب – زرین‌پال</h1>
  <p className="mb-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  درگاه: <b>ZarinPal</b> – {process.env.NEXT_PUBLIC_ZARIN_MERCHANT_ID ? "Live" : "Sandbox / Mock"} – برای فعال‌سازی واقعی، در .env بگذارید: <code>ZARIN_MERCHANT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</code>
  </p>
@@ -109,7 +109,7 @@ export default function CheckoutPage(){
  <div className="card p-5 h-fit sticky top-24">
  <h4 className=" mb-3">خلاصه سبد ({count.toLocaleString("fa-IR")} قلم)</h4>
  <div className="space-y-2 max-h-80 overflow-y-auto text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
- {items.length===0 ? <p className="paragraph-color">سبد خالی است – <Link href="/shop" className="underline text-[var(--tb-shop)]">فروشگاه</Link></p> :
+ {items.length===0 ? <p className="paragraph-color">سبد خالی است – <Link href="/shop" className="underline text-[var(--shop)]">فروشگاه</Link></p> :
  items.map(i=>(
  <div key={i.slug} className="flex justify-between border-b border-[var(--border-color)] pb-2">
  <span className="truncate ps-2">{i.title} × {i.qty.toLocaleString("fa-IR")}</span>
@@ -121,7 +121,7 @@ export default function CheckoutPage(){
  <div className="mt-3 space-y-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  <div className="flex justify-between"><span>جمع جزء</span><span>{totalToman.toLocaleString("fa-IR")} تومان</span></div>
  <div className="flex justify-between paragraph-color"><span>ارسال</span><span>رایگان</span></div>
- <div className="flex justify-between border-t border-[var(--border-color)] pt-2 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold "><span>مبلغ قابل پرداخت</span><span className="text-[var(--tb-shop)]">{totalToman.toLocaleString("fa-IR")} تومان</span></div>
+ <div className="flex justify-between border-t border-[var(--border-color)] pt-2 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold "><span>مبلغ قابل پرداخت</span><span className="text-[var(--shop)]">{totalToman.toLocaleString("fa-IR")} تومان</span></div>
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">≈ {(amountRial).toLocaleString("fa-IR")} ریال – درگاه زرین‌پال</div>
  </div>
  </div>

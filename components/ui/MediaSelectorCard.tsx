@@ -40,7 +40,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  type="button"
  className={cn(
  "group relative block w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] text-right transition-all duration-[var(--tb-motion-md)] hover:-translate-y-1 hover:shadow-[var(--shadow-size)]",
- active ? "ring-2 ring-[var(--tb-media)]" : "",
+ active ? "ring-2 ring-[var(--media)]" : "",
  className
  )}
  {...props}
@@ -70,7 +70,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  </span>
 
  <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
- <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--tb-media)]">
+ <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[var(--tb-motion-sm)] group-hover:text-[var(--media)]">
  {title}
  </h4>
  <div className="mt-2 flex items-center justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">

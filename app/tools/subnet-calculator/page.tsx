@@ -12,7 +12,7 @@ export default function SubnetCalculatorPage() {
       <ToolPageHeader
         title="ماشین حساب ساب‌نت"
         subtitle="بدون تغییر – نسخه فعلی شما"
-        accent="var(--tb-subnet)"
+        accent="var(--subnet)"
         breadcrumbs={[
           { label: "خانه", href: "/" },
           { label: "ابزارها", href: "/tools" },

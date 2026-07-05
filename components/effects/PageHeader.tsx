@@ -6,7 +6,7 @@ type PageHeaderProps = {
   colorVar?: string;
   title: string;
   description?: string;
-  /** Tailwind text color class for the title, e.g. "text-[var(--tb-admin)]". */
+  /** Tailwind text color class for the title, e.g. "text-[var(--admin)]". */
   titleClassName?: string;
   className?: string;
   children?: ReactNode;

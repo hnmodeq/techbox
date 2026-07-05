@@ -216,7 +216,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   return (
     <div style={style} className={`${widthClass} select-none shrink-0 group flex flex-col justify-start relative`}>
       {/* TIER 1: STRICTLY FIXED HEIGHT CARD BOX */}
-      <div className="relative h-[340px] sm:h-[360px] w-full rounded-xl overflow-hidden shadow-[var(--shadow-size)] border border-[var(--border-color)] hover:border-[var(--tb-timeline)] transition-colors duration-[var(--tb-motion-md)] flex flex-col justify-end bg-slate-950">
+      <div className="relative h-[340px] sm:h-[360px] w-full rounded-xl overflow-hidden shadow-[var(--shadow-size)] border border-[var(--border-color)] hover:border-[var(--timeline)] transition-colors duration-[var(--tb-motion-md)] flex flex-col justify-end bg-slate-950">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <Image
             src={cardImage}
@@ -297,7 +297,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               />
               <button
                 type="submit"
-                className="h-9 px-3 rounded-[var(--corner-radius)] bg-[var(--tb-timeline)] text-slate-950 font-bold flex items-center justify-center transition-opacity hover:opacity-90 cursor-pointer shrink-0"
+                className="h-9 px-3 rounded-[var(--corner-radius)] bg-[var(--timeline)] text-slate-950 font-bold flex items-center justify-center transition-opacity hover:opacity-90 cursor-pointer shrink-0"
                 title="ارسال نظر"
               >
                 <Send size={14} className="rtl:rotate-180" />

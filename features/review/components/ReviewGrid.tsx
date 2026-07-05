@@ -46,7 +46,7 @@ export default function ReviewGrid() {
                     <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{r.date_fa}</span>
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)] transition-colors group-hover:text-[var(--tb-review)] leading-8">
+                  <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)] transition-colors group-hover:text-[var(--review)] leading-8">
                     {r.title}
                   </h3>
 

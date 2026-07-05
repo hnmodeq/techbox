@@ -11,7 +11,7 @@ export default function WorkWithUs(){
  <PageHeader
  colorVar="--tb-workwithus"
  title="فرصت‌های شغلی تکباکس"
- titleClassName="text-[var(--tb-workwithus)]"
+ titleClassName="text-[var(--workwithus)]"
  description={`به تیم رسانه زیرساخت ایران بپیوندید – ${jobs.length} موقعیت فعال`}
  />
 

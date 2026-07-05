@@ -13,7 +13,7 @@ export default function RaidCalculatorPage() {
       <ToolPageHeader
         title="ماشین حساب RAID"
         subtitle="RAID 0 · 1 · 5 · 6 · 10 · SHR-1 · SHR-2"
-        accent="var(--tb-raid)"
+        accent="var(--raid)"
         breadcrumbs={[
           { label: "خانه", href: "/" },
           { label: "ابزارها", href: "/tools" },

@@ -44,7 +44,7 @@ export default function SubnetCalculator() {
     <div className="space-y-5" dir="rtl">
       {/* What is it? */}
       <div className="card p-5 space-y-2">
-        <div className="flex items-center gap-2 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold text-[var(--tb-subnet)]">
+        <div className="flex items-center gap-2 text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold text-[var(--subnet)]">
           <Icon name="server" size={20} strokeWidth={1.75} />
           ماشین‌حساب ساب‌نت (Subnet) چیست؟
         </div>
@@ -73,7 +73,7 @@ export default function SubnetCalculator() {
           </label>
           <label className="space-y-2 block">
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              پیشوند شبکه: <span dir="ltr" className="font-mono text-[var(--tb-subnet)]">/{cidr}</span>
+              پیشوند شبکه: <span dir="ltr" className="font-mono text-[var(--subnet)]">/{cidr}</span>
               {out && <span className="paragraph-color"> — ماسک <span dir="ltr" className="font-mono">{out.mask}</span></span>}
             </span>
             <input
@@ -82,7 +82,7 @@ export default function SubnetCalculator() {
               max={30}
               value={cidr}
               onChange={(e) => setCidr(parseInt(e.target.value))}
-              className="w-full accent-[var(--tb-subnet)]"
+              className="w-full accent-[var(--subnet)]"
             />
             <div className="flex justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color" dir="ltr">
               <span>/8</span><span>/30</span>

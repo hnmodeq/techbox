@@ -46,7 +46,7 @@ export default function ForumRow() {
                   <ForumBadge slug={top.slug} fallback={idx % 2 === 0} />
                 </div>
 
-                <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-forum)] transition-colors line-clamp-2 leading-6">
+                <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
                   {top.title}
                 </h3>
 

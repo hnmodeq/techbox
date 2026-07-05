@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { Icon } from "@/design/icons";
 
 const moduleIconColors: Record<string, string> = {
-  blog: "text-[var(--tb-blog)]",
-  news: "text-[var(--tb-news)]",
-  media: "text-[var(--tb-media)]",
-  review: "text-[var(--tb-review)]",
-  tools: "text-[var(--tb-tools)]",
-  download: "text-[var(--tb-download)]",
-  shop: "text-[var(--tb-shop)]",
-  forum: "text-[var(--tb-forum)]",
-  timeline: "text-[var(--tb-timeline)]"
+  blog: "text-[var(--blog)]",
+  news: "text-[var(--news)]",
+  media: "text-[var(--media)]",
+  review: "text-[var(--review)]",
+  tools: "text-[var(--tools)]",
+  download: "text-[var(--download)]",
+  shop: "text-[var(--shop)]",
+  forum: "text-[var(--forum)]",
+  timeline: "text-[var(--timeline)]"
 };
 
 export function LiveViewCounter({

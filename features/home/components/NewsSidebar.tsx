@@ -39,7 +39,7 @@ export default function NewsSidebar() {
           type="button"
           onClick={() => setOpen(true)}
           style={{ zIndex: zIndex.mobileFab }}
-          className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border border-l-0 border-[var(--border-color)] p-2.5 text-[var(--tb-news)] shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--muted-background)] cursor-pointer"
+          className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[var(--tb-motion-lg)] hover:bg-[var(--muted-background)] cursor-pointer"
           title="اخبار زنده تکباکس"
           aria-label="اخبار زنده تکباکس"
         >
@@ -76,13 +76,13 @@ export default function NewsSidebar() {
         {/* Clean Header WITHOUT background fill and WITHOUT X button */}
         <div className="p-5 border-b border-[var(--border-color)] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <Icon name="news" className="h-5 w-5 text-[var(--tb-news)]" />
+            <Icon name="news" className="h-5 w-5 text-[var(--news)]" />
             <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="p-1.5 paragraph-color hover:text-[var(--tb-news)] transition-colors cursor-pointer"
+            className="p-1.5 paragraph-color hover:text-[var(--news)] transition-colors cursor-pointer"
             title="بستن"
           >
             <Icon name="chevronLeft" className="h-5 w-5 rtl:rotate-180" />
@@ -114,7 +114,7 @@ export default function NewsSidebar() {
                 <span>{n.date_fa} {n.time || ''}</span>
               </div>
 
-              <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--tb-news)] transition-colors line-clamp-2 leading-6">
+              <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--news)] transition-colors line-clamp-2 leading-6">
                 {n.title}
               </h4>
 
@@ -131,7 +131,7 @@ export default function NewsSidebar() {
           <Link
             href="/news"
             onClick={() => setOpen(false)}
-            className="btn btn-ghost w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--tb-news)] font-bold"
+            className="btn btn-ghost w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--news)] font-bold"
           >
             مشاهده آرشیو کامل اخبار ←
           </Link>
