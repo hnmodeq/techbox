@@ -5,6 +5,7 @@ import { kalameh } from "@/lib/fonts";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ScrollRestoration } from "@/components/ScrollRestoration";
 
 // Inline script to prevent dark mode flash (FOUC)
 const themeScript = `
@@ -48,6 +49,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans antialiased text-foreground">
+        <ScrollRestoration />
         <LayoutShell>{children}</LayoutShell>
         <Analytics />
         <SpeedInsights />
