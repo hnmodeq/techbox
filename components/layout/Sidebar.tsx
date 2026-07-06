@@ -3,28 +3,28 @@
 import * as React from "react";
 import { SidebarMainProps } from "@/types/sidebar.types";
 import { desktopStore } from "@/stores/sidebar.store";
-import { themeStore } from "@/stores/theme.store";
 import SidebarShell from "@/components/layout/SidebarShell";
+import { useTheme } from "next-themes";
 
 export default function SidebarMain({ onMobileOpenChange }: SidebarMainProps) {
   const [mounted, setMounted] = React.useState(false);
   const [desktopOpen, setDesktopOpen] = React.useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [theme, setTheme] = React.useState<"light" | "dark">("dark");
+  const { theme, setTheme: setNextTheme } = useTheme();
+
+  const currentTheme = (theme === "dark" || theme === "light") ? theme : "dark";
 
   React.useEffect(() => {
     setMounted(true);
     setDesktopOpen(desktopStore.getSnapshot());
-    setTheme(themeStore.getClientSnapshot());
 
     const u1 = desktopStore.subscribe(() => setDesktopOpen(desktopStore.getSnapshot()));
-    const u3 = themeStore.subscribe(() => setTheme(themeStore.getClientSnapshot()));
-    return () => { u1(); u3(); };
+    return () => { u1(); };
   }, []);
 
-  React.useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+  const toggleTheme = React.useCallback(() => {
+    setNextTheme(currentTheme === "dark" ? "light" : "dark");
+  }, [currentTheme, setNextTheme]);
 
   React.useEffect(() => {
     onMobileOpenChange?.(mobileOpen);
@@ -55,16 +55,12 @@ export default function SidebarMain({ onMobileOpenChange }: SidebarMainProps) {
     setMobileOpen(false);
   }, []);
 
-  const onToggleTheme = React.useCallback(() => {
-    themeStore.toggle();
-  }, []);
-
   return (
     <SidebarShell
       mobileOpen={mobileOpen}
       desktopOpen={desktopOpen}
-      theme={theme}
-      onToggleTheme={onToggleTheme}
+      theme={currentTheme}
+      onToggleTheme={toggleTheme}
       onToggleMobile={onToggleMobile}
       onCloseMobile={onCloseMobile}
       onToggleDesktop={onToggleDesktop}
