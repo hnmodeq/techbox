@@ -10,20 +10,27 @@ type StatEntry = {
 };
 
 type StatsMap = Record<string, StatEntry>;
+type StatsStatus = "loading" | "ready" | "error";
 
-const StatsContext = createContext<StatsMap>({});
+const StatsContext = createContext<{ stats: StatsMap; status: StatsStatus }>({
+  stats: {},
+  status: "loading"
+});
 
 /**
  * Fetches stats for ALL posts in a single request (using the existing bulk
  * mode of /api/stats) instead of every card/badge on the page firing its
  * own request. This turns e.g. 20 separate DB round-trips into 1.
  *
- * Individual components still get live updates (likes/views changing after
- * a user action) via the existing `tb_stats_update` window event, which is
- * now handled centrally here and merged into the shared map.
+ * Consumers (useStatEntry) get both the data AND a `status` flag so they
+ * can tell the difference between "still loading" and "loaded, but this
+ * item genuinely isn't in the result" - this avoids racing the bulk fetch
+ * with a guessed timeout, which previously caused every card to fire its
+ * own redundant request whenever the bulk fetch was a bit slow.
  */
 export function StatsProvider({ children }: { children: ReactNode }) {
   const [stats, setStats] = useState<StatsMap>({});
+  const [status, setStatus] = useState<StatsStatus>("loading");
 
   useEffect(() => {
     let mounted = true;
@@ -31,11 +38,17 @@ export function StatsProvider({ children }: { children: ReactNode }) {
     fetch("/api/stats", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
-        if (mounted && data && typeof data === "object") {
+        if (!mounted) return;
+        if (data && typeof data === "object") {
           setStats((prev) => ({ ...data, ...prev }));
+          setStatus("ready");
+        } else {
+          setStatus("error");
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (mounted) setStatus("error");
+      });
 
     const handleUpdate = (e: any) => {
       const { module, slug, views, likes, comments, solved, fileSize } = e.detail || {};
@@ -64,10 +77,16 @@ export function StatsProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <StatsContext.Provider value={stats}>{children}</StatsContext.Provider>;
+  return <StatsContext.Provider value={{ stats, status }}>{children}</StatsContext.Provider>;
 }
 
-export function useStatEntry(module: string, slug: string): StatEntry | undefined {
-  const stats = useContext(StatsContext);
-  return stats[`${module}:${slug}`];
+/**
+ * Returns the shared stat entry for a given module/slug plus the loading
+ * status of the bulk fetch. Consumers should only fall back to their own
+ * per-item fetch once `status !== "loading"` and `entry` is still missing -
+ * never on a fixed timer, since that races against real network latency.
+ */
+export function useStatEntry(module: string, slug: string): { entry?: StatEntry; status: StatsStatus } {
+  const { stats, status } = useContext(StatsContext);
+  return { entry: stats[`${module}:${slug}`], status };
 }

@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Send } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { useTimelineLiked } from '@/providers/timeline-likes.provider';
 
 interface TimelineCardProps {
   event: TimelineEvent;
@@ -91,7 +92,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       ? event.likes
       : baseFallbackLikes;
 
-  const [liked, setLiked] = useState(false);
+  const { liked, setLiked } = useTimelineLiked(event.id);
   const [likesCount, setLikesCount] = useState<number>(initialLikesCount);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [commentError, setCommentError] = useState('');
@@ -111,39 +112,35 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const [newCommentText, setNewCommentText] = useState('');
   const router = useRouter();
 
+  // NOTE: /api/timeline/events already fetches comments + likes for every
+  // event in bulk (via Prisma `include`) as part of the single page-load
+  // request, and whether the CURRENT user liked each event comes from the
+  // single bulk /api/timeline/liked-events request via TimelineLikesProvider
+  // (see providers/timeline-likes.provider.tsx). Previously this component
+  // fired its own per-card /api/timeline/like and /api/timeline/comments
+  // GET requests on mount, meaning a page with N timeline cards made 2N
+  // extra redundant DB round trips on top of the bulk fetches that already
+  // had the data.
+
+  // Keep local comments/likes state in sync if the `event` prop itself is
+  // refreshed (e.g. parent re-fetches the timeline).
   useEffect(() => {
-    let mounted = true;
-    fetch(`/api/timeline/like?eventId=${encodeURIComponent(event.id)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (mounted && data) {
-          if (typeof data.likes === 'number' && data.likes > 0) {
-            setLikesCount(data.likes);
-          }
-          if (typeof data.liked === 'boolean') {
-            setLiked(data.liked);
-          }
-        }
-      })
-      .catch(() => {});
+    if (Array.isArray(event.comments) && event.comments.length > 0) {
+      setComments(
+        event.comments.map((c: any) => ({
+          authorName: c.authorName || 'عضو تکباکس',
+          text: c.text,
+          createdAt: 'لحظاتی پیش',
+        }))
+      );
+    }
+  }, [event.comments]);
 
-    fetch(`/api/timeline/comments?eventId=${encodeURIComponent(event.id)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (mounted && Array.isArray(data) && data.length > 0) {
-          setComments(
-            data.map((c: any) => ({
-              authorName: c.authorName || 'عضو تکباکس',
-              text: c.text,
-              createdAt: 'لحظاتی پیش',
-            }))
-          );
-        }
-      })
-      .catch(() => {});
-
-    return () => { mounted = false; };
-  }, [event.id]);
+  useEffect(() => {
+    if (Array.isArray(event.likes) && event.likes.length > 0) {
+      setLikesCount(event.likes.length);
+    }
+  }, [event.likes]);
 
   const widthClass =
     importance >= 8

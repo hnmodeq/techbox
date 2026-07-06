@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
+import { TimelineLikesProvider } from '@/providers/timeline-likes.provider';
 
 export default function TimelinePage() {
   const { events, isLoading, error } = useTimelineEvents();
@@ -31,17 +32,22 @@ export default function TimelinePage() {
   if (!events || events.length === 0) return <TimelineError error="هیچ رویدادی یافت نشد" />;
 
   return (
-    <TimelineContainer
-      events={events}
-      zoom={zoom}
-      pan={pan}
-      onPanStart={startPanning}
-      onPanMove={handlePan}
-      onPanEnd={stopPanning}
-      onZoomIn={zoomIn}
-      onZoomOut={zoomOut}
-      onResetView={handleResetView}
-      onWheel={handleWheel}
-    />
+    // Scoped here (rather than globally in LayoutShell) since only
+    // /timeline needs to know which events the current user liked - no
+    // need to fire that bulk request on every other page in the app.
+    <TimelineLikesProvider>
+      <TimelineContainer
+        events={events}
+        zoom={zoom}
+        pan={pan}
+        onPanStart={startPanning}
+        onPanMove={handlePan}
+        onPanEnd={stopPanning}
+        onZoomIn={zoomIn}
+        onZoomOut={zoomOut}
+        onResetView={handleResetView}
+        onWheel={handleWheel}
+      />
+    </TimelineLikesProvider>
   );
 }

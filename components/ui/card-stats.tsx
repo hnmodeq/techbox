@@ -40,7 +40,7 @@ export function CardStats({
   // page load (see providers/stats.provider.tsx), instead of every card
   // firing its own request. This drastically cuts the number of DB round
   // trips on pages with many cards.
-  const shared = useStatEntry(module, slug);
+  const { entry: shared, status } = useStatEntry(module, slug);
 
   useEffect(() => {
     if (!shared) return;
@@ -52,23 +52,29 @@ export function CardStats({
   useEffect(() => {
     let mounted = true;
 
-    // Fallback: only hit the per-item endpoint if the shared bulk fetch
-    // hasn't produced an entry for this item after a short delay (e.g. a
-    // brand-new post that isn't reflected yet, or the provider is missing
-    // from the tree for some reason).
-    const timer = setTimeout(() => {
-      if (shared) return;
-      fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
-        .then(r => r.json())
-        .then(s => {
-          if (!mounted || !s) return;
-          if (typeof s.views === "number") setViews(s.views);
-          if (typeof s.likes === "number") setLikes(s.likes);
-          if (typeof s.comments === "number") setComments(s.comments);
-        })
-        .catch(() => null);
-    }, 800);
+    // Only fall back to the per-item endpoint once the bulk fetch has
+    // actually settled (succeeded or failed) and this item still isn't in
+    // it - e.g. brand-new content not yet reflected. Waiting on the real
+    // status (instead of a guessed timeout) avoids every card racing off
+    // its own redundant request whenever the bulk fetch is a bit slow.
+    if (status === "loading" || shared) {
+      return () => { mounted = false; };
+    }
 
+    fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+      .then(r => r.json())
+      .then(s => {
+        if (!mounted || !s) return;
+        if (typeof s.views === "number") setViews(s.views);
+        if (typeof s.likes === "number") setLikes(s.likes);
+        if (typeof s.comments === "number") setComments(s.comments);
+      })
+      .catch(() => null);
+
+    return () => { mounted = false; };
+  }, [module, slug, shared, status]);
+
+  useEffect(() => {
     const handleUpdate = (e: any) => {
       if (e.detail && e.detail.module === module && e.detail.slug === slug) {
         if (typeof e.detail.views === "number") setViews(e.detail.views);
@@ -77,12 +83,8 @@ export function CardStats({
       }
     };
     window.addEventListener("tb_stats_update", handleUpdate);
-    return () => {
-      mounted = false;
-      clearTimeout(timer);
-      window.removeEventListener("tb_stats_update", handleUpdate);
-    };
-  }, [module, slug, shared]);
+    return () => window.removeEventListener("tb_stats_update", handleUpdate);
+  }, [module, slug]);
 
   const iconColor = moduleIconColors[module] || "text-[var(--home)]";
 
