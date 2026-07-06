@@ -63,6 +63,7 @@ export default function RootLayout({
         <LayoutShell>{children}</LayoutShell>
         <Analytics />
         <SpeedInsights />
+        <script src="/register-sw.js" defer />
       </body>
     </html>
   );
