@@ -64,73 +64,45 @@
   --danger: light-dark(oklch(0.64 0.22 25), #fb7185);
   --warning: light-dark(oklch(0.82 0.15 85), #fcd34d);
   --info: light-dark(oklch(0.72 0.16 230), #7dd3fc);
+
+  /* Ensure Kalameh is the default font */
+  --font-sans: var(--font-kalameh);
 }
 
 .dark {
   color-scheme: dark;
 }
 
-@theme inline {
-  --font-sans: "KalamehWebFaNum", sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-}
-
+/* Global font application - Kalameh with all weights */
 html {
-  direction: rtl;
-  overflow-x: hidden;
-  max-width: 100vw;
+  font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
 }
 
 body {
-  margin: 0;
-  font-family: "KalamehWebFaNum", sans-serif;
-  background: var(--main-background);
-  color: var(--paragraph-color);
-  min-height: 100dvh;
-  overflow-x: hidden;
-  max-width: 100vw;
+  font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
 }
 
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* Tailwind font-sans override */
+.font-sans {
+  font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif !important;
 }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* Ensure all text elements use Kalameh */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label {
+  font-family: inherit;
 }
 
-@keyframes tb-ticker-scroll-right {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(33.333%, 0, 0);
-  }
-}
+/* Weight utilities */
+.font-thin    { font-weight: 100; }
+.font-extralight { font-weight: 200; }
+.font-light   { font-weight: 300; }
+.font-normal  { font-weight: 400; }
+.font-medium  { font-weight: 500; }
+.font-semibold{ font-weight: 600; }
+.font-bold    { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+.font-black   { font-weight: 900; }
 
-.ticker-track {
-  transform: translate3d(0, 0, 0);
-  animation: tb-ticker-scroll-right 80s linear infinite;
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-.ticker-wrapper:hover .ticker-track {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ticker-track {
-    animation: none;
-    transform: none;
-  }
+@theme inline {
+  --font-family-sans: var(--font-kalameh);
 }

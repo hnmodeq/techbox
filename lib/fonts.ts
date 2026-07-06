@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 
+// Full Kalameh font family with all 9 weights for perfect typography
 export const kalameh = localFont({
   src: [
     { path: "../public/fonts/KalamehWebFaNum-Thin.woff2", weight: "100", style: "normal" },
@@ -15,5 +16,6 @@ export const kalameh = localFont({
   variable: "--font-kalameh",
   display: "swap",
   fallback: ["Vazirmatn", "system-ui", "Tahoma", "sans-serif"],
-  adjustFontFallback: false,
+  adjustFontFallback: true,
+  preload: true,
 });
