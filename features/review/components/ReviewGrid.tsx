@@ -65,7 +65,7 @@ export default function ReviewGrid() {
                     </div>
                   </div>
 
-                  <CardStats module="review" slug={r.slug} initialViews={r.views ?? 0} initialLikes={r.likes ?? 0} initialComments={getCommentCount("review", r.slug)} showComments={true} />
+                  <CardStats module="review" slug={r.slug} showComments={true} />
                 </div>
               </div>
             </Link>

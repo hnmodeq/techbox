@@ -38,7 +38,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  </div>
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{item.title}</h1>
  <div className="mt-2">
-   <LiveViewCounter module="download" slug={item.slug} initialViews={item.views ?? 320} showLabel />
+   <LiveViewCounter module="download" slug={item.slug} showLabel />
  </div>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 

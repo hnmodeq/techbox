@@ -53,7 +53,7 @@ export default function ShopRow() {
 
                 <div className="mt-4 space-y-3">
                   <div className="flex justify-start items-center">
-                    <CardStats module="shop" slug={prod.slug} initialViews={prod.views ?? 0} initialLikes={prod.likes ?? 0} initialComments={getCommentCount("shop", prod.slug)} showComments={true} />
+                    <CardStats module="shop" slug={prod.slug} showComments={true} />
                   </div>
                   <span className="text-xs font-black text-[var(--shop)] hover:underline flex items-center justify-center py-1">
                     ثبت درخواست خرید ←

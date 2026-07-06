@@ -8,7 +8,7 @@ import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/card-stats';
 import { useStatEntry } from '@/providers/stats.provider';
 
-function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { slug: string; initialViews: number; initialLikes: number; initialComments: number }) {
+function DownloadMeta({ slug }: { slug: string }) {
   const [fileSize, setFileSize] = useState('۶۸۰ مگابایت');
   const { entry: shared, status } = useStatEntry('download', slug);
 
@@ -49,7 +49,7 @@ function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { s
           </svg>
           <span className="text-[var(--primary-text)]">{fileSize}</span>
         </span>
-        <CardStats module="download" slug={slug} initialViews={initialViews} initialLikes={initialLikes} initialComments={initialComments} showComments={true} />
+        <CardStats module="download" slug={slug} showComments={true} />
       </div>
     </div>
   );
@@ -115,7 +115,7 @@ export default function DownloadRow() {
                 </div>
 
                 {/* Bottom Footer without visible separator line */}
-                <DownloadMeta slug={file.slug} initialViews={file.views ?? 0} initialLikes={file.likes ?? 0} initialComments={commentsCount} />
+                <DownloadMeta slug={file.slug} />
               </Link>
             );
           })}

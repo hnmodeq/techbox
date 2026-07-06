@@ -52,7 +52,7 @@ export default function ForumRow() {
 
                 <div className="mt-3 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between text-[11px] paragraph-color">
                   <span>{top.date_fa}</span>
-                  <CardStats module="forum" slug={top.slug} initialViews={top.views ?? 0} initialLikes={top.likes ?? 0} showComments={true} />
+                  <CardStats module="forum" slug={top.slug} showComments={true} />
                 </div>
               </div>
             </Link>

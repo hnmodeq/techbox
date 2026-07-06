@@ -148,7 +148,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
                   </div>
 
                   <div className="pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between">
-                    <CardStats module={post.module} slug={post.slug} initialViews={post.views ?? 0} initialLikes={post.likes ?? 0} showComments={true} />
+                    <CardStats module={post.module} slug={post.slug} showComments={true} />
                   </div>
                 </div>
               </Link>

@@ -66,8 +66,8 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <LiveViewCounter module="review" slug={item.slug} initialViews={item.views ?? 0} showLabel={true} />
-              <LikeButton contentType="review" slug={item.slug} initial={item.likes ?? 0} />
+              <LiveViewCounter module="review" slug={item.slug} showLabel={true} />
+              <LikeButton contentType="review" slug={item.slug} />
             </div>
           </div>
         </header>

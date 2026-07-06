@@ -78,7 +78,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  {dateFa && <span>{dateFa}</span>}
  </div>
  <div className="mt-2 pt-2 border-t-[length:var(--border-size)] border-white/20">
- {slug ? <CardStats module="media" slug={slug} initialViews={views} initialLikes={likes} initialComments={comments} showComments={true} /> : (
+ {slug ? <CardStats module="media" slug={slug} showComments={true} /> : (
  <div className="flex items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white/80">
  {typeof views === "number" && <span>👁 {views.toLocaleString("fa-IR")}</span>}
  {typeof likes === "number" && <span>♥ {likes.toLocaleString("fa-IR")}</span>}

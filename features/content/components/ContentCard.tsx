@@ -73,7 +73,7 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
  <h4 className={`mt-1 line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] transition-colors ${moduleHover(item.module)}`}>{item.title}</h4>
  {!compact && <p className="mt-1 line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.excerpt}</p>}
           <div className="mt-2">
-            <CardStats module={item.module} slug={item.slug} initialViews={item.views ?? 0} initialLikes={item.likes ?? 0} showComments={true} />
+            <CardStats module={item.module} slug={item.slug} showComments={true} />
           </div>
  </div>
  </div>
@@ -122,7 +122,7 @@ function VideoFeedCard({item}:{item:ContentItem}){
       <div className="px-1 pt-2">
         <div className={`line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
         <div className="mt-1">
-          <CardStats module={item.module} slug={item.slug} initialViews={item.views ?? 0} initialLikes={item.likes ?? 0} showComments={true} />
+          <CardStats module={item.module} slug={item.slug} showComments={true} />
         </div>
       </div>
  </Link>
@@ -191,7 +191,7 @@ function ReviewFeedCard({item}:{item:ContentItem}){
  <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.author?.name || "تکباکس"}</span>
  </div>
           <div className="mt-1">
-            <CardStats module={item.module} slug={item.slug} initialViews={item.views ?? 0} initialLikes={item.likes ?? 0} showComments={true} />
+            <CardStats module={item.module} slug={item.slug} showComments={true} />
           </div>
  </div>
  </Link>

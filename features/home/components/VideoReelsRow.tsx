@@ -61,7 +61,7 @@ export default function VideoReelsRow() {
                   
                   {/* Clean, distinct icons for views, likes, comments without line separator */}
                   <div className="mt-2.5">
-                    <CardStats module="media" slug={vid.slug} initialViews={vid.views ?? 0} initialLikes={vid.likes ?? 0} initialComments={commentsCount} showComments={true} />
+                    <CardStats module="media" slug={vid.slug} showComments={true} />
                   </div>
                 </div>
               </button>

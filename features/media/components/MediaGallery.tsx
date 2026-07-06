@@ -107,10 +107,10 @@ export default function MediaGallery() {
 
                 <div className="flex items-center gap-4">
                   <span className="inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color bg-[var(--card-background)] px-3 py-1.5 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)]">
-                    <CardStats module="media" slug={activeVideo.slug} initialViews={activeVideo.views ?? 0} initialLikes={activeVideo.likes ?? 0} showLabel={true} />
+                    <CardStats module="media" slug={activeVideo.slug} showLabel={true} />
                   </span>
 
-                  <LikeButton contentType="media" slug={activeVideo.slug} initial={activeVideo.likes ?? 0} />
+                  <LikeButton contentType="media" slug={activeVideo.slug} />
                 </div>
               </div>
 

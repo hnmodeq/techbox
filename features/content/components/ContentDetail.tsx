@@ -34,7 +34,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  </div>
  <div className="ms-auto flex items-center gap-2 paragraph-color">
- <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views ?? 120} />
+ <LiveViewCounter module={item.module} slug={item.slug} />
  </div>
  </div>
 
@@ -48,8 +48,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
  />
  <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex items-center gap-4">
- <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views ?? 120} showLabel />
- <LikeButton contentType={item.module} slug={item.slug} initial={item.likes ?? 0} />
+ <LiveViewCounter module={item.module} slug={item.slug} showLabel />
+ <LikeButton contentType={item.module} slug={item.slug} />
  </div>
  </div>
  ) : item.image && (
@@ -72,7 +72,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
 
  <div className="mt-8 flex flex-wrap items-center gap-3">
- <LikeButton contentType={item.module} slug={item.slug} initial={item.likes ?? 0} />
+ <LikeButton contentType={item.module} slug={item.slug} />
  <Button variant="ghost" size="sm">اشتراک‌گذاری</Button>
  </div>
 

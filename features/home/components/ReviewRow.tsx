@@ -70,7 +70,7 @@ export default function ReviewRow() {
 
                 <div className="px-4 pb-4 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
                   <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
-                  <CardStats module="review" slug={rev.slug} initialViews={rev.views ?? 0} initialLikes={rev.likes ?? 0} initialComments={getCommentCount("review", rev.slug)} showComments={true} />
+                  <CardStats module="review" slug={rev.slug} showComments={true} />
                 </div>
               </div>
             );

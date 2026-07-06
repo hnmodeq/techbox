@@ -188,8 +188,8 @@ export default function ForumList() {
               <CardStats
                 module="forum"
                 slug={t.slug}
-                initialViews={t.views ?? 0}
-                initialLikes={t.likes ?? 0}
+                
+                
                 showComments={true}
               />
             </div>

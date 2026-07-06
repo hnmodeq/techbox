@@ -54,13 +54,13 @@ export default function ForumDetail({ item }: ForumDetailProps) {
                 <span>•</span>
                 <span>{item.date_fa}</span>
                 <span>•</span>
-                <LiveViewCounter module="forum" slug={item.slug} initialViews={item.views ?? 0} showLabel={true} />
+                <LiveViewCounter module="forum" slug={item.slug} showLabel={true} />
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <LikeButton contentType="forum" slug={item.slug} initial={item.likes ?? 0} />
+            <LikeButton contentType="forum" slug={item.slug} />
           </div>
         </header>
 

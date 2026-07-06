@@ -103,7 +103,7 @@ export default function ShopGrid(){
                   <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold">مشاوره خرید</Button>
                 </div>
                 <div className="mt-3 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]">
-                  <CardStats module="shop" slug={p.slug} initialViews={p.views ?? 0} initialLikes={p.likes ?? 0} initialComments={getCommentCount("shop", p.slug)} showComments={true} />
+                  <CardStats module="shop" slug={p.slug} showComments={true} />
                 </div>
               </div>
             </Link>

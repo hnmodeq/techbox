@@ -32,7 +32,7 @@ export default function BlogGrid(){
                     <div>{p.date_fa}</div>
                   </div>
                 </div>
-                <CardStats module="blog" slug={p.slug} initialViews={p.views ?? 0} initialLikes={p.likes ?? 0} initialComments={getCommentCount("blog", p.slug)} showComments={true} />
+                <CardStats module="blog" slug={p.slug} showComments={true} />
               </div>
             </div>
           </Link>

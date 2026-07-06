@@ -57,7 +57,7 @@ export default function MagazineRow() {
 
               <div className="px-4 pb-4 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]/60 flex items-center justify-between text-xs paragraph-color font-bold">
                 <AuthorLink name={art.author?.name} avatar={art.author?.avatar} />
-                <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views ?? 0} initialLikes={art.likes ?? 0} initialComments={getCommentCount("blog", art.slug)} showComments={true} />
+                <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
               </div>
             </div>
           ))}
