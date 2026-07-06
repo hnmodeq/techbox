@@ -11,19 +11,12 @@ coverage
 *.tsbuildinfo
 .DS_Store
 .npm
-uploads/
-.vscode/settings.json
-next-env.d.ts
-
-# Local SQLite databases
 *.db
 *.db-journal
 *.sqlite
 *.sqlite3
 dev.db
 prisma/dev.db
-
-# Local workspace / package manager cache
 .local
 .pnpm-store
-next-env.d.ts
+
