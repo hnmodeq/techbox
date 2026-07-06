@@ -16,6 +16,6 @@ export const kalameh = localFont({
   variable: "--font-kalameh",
   display: "swap",
   fallback: ["Vazirmatn", "system-ui", "Tahoma", "sans-serif"],
-  adjustFontFallback: true,
+  adjustFontFallback: false,
   preload: true,
 });
