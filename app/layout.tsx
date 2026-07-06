@@ -33,6 +33,16 @@ const themeScript = `
 export const metadata: Metadata = {
   title: "رسانه تکنولوژی تکباکس",
   description: "پاتوق بچه‌های فناوری اطلاعات",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "تکباکس",
+  },
 };
 
 export default function RootLayout({
