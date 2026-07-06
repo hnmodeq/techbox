@@ -23,6 +23,7 @@
     "@gsap/react": "^2.1.2",
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/client": "^6.19.3",
+    "@tanstack/react-query": "^5.101.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^2.4.3",
