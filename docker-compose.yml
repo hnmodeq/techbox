@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: techbox-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: techbox
+      POSTGRES_PASSWORD: techbox
+      POSTGRES_DB: techbox
+    ports:
+      - "5433:5432"
+    volumes:
+      - techbox_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U techbox -d techbox"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  techbox_pgdata:
