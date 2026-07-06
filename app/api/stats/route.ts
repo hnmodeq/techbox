@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     try {
       const post = await prisma.post.findUnique({
         where: { module_slug: { module, slug } },
-        select: { id: true, views: true, solved: true, fileSize: true },
+        select: { id: true, views: true, likes: true, solved: true, fileSize: true },
       });
       if (!post) {
         return NextResponse.json({
@@ -44,6 +44,7 @@ export async function GET(req: NextRequest) {
         module: true,
         slug: true,
         views: true,
+        likes: true,
         solved: true,
         fileSize: true,
       },
