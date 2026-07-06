@@ -65,7 +65,7 @@
   --warning: light-dark(oklch(0.82 0.15 85), #fcd34d);
   --info: light-dark(oklch(0.72 0.16 230), #7dd3fc);
 
-  /* Ensure Kalameh is the default font */
+
   --font-sans: var(--font-kalameh);
 }
 
@@ -73,7 +73,7 @@
   color-scheme: dark;
 }
 
-/* Global font application - Kalameh with all weights */
+
 html {
   font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
 }
@@ -82,17 +82,17 @@ body {
   font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
 }
 
-/* Tailwind font-sans override */
+
 .font-sans {
   font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif !important;
 }
 
-/* Ensure all text elements use Kalameh */
+
 h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label {
   font-family: inherit;
 }
 
-/* Weight utilities */
+
 .font-thin    { font-weight: 100; }
 .font-extralight { font-weight: 200; }
 .font-light   { font-weight: 300; }
