@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Icon } from "@/design/icons";
+import { useStatEntry } from "@/providers/stats.provider";
 
 const moduleIconColors: Record<string, string> = {
   blog: "text-[var(--blog)]",
@@ -35,17 +36,38 @@ export function CardStats({
   const [likes, setLikes] = useState(initialLikes);
   const [comments, setComments] = useState(initialComments);
 
+  // Shared stats come from a single bulk /api/stats request made once per
+  // page load (see providers/stats.provider.tsx), instead of every card
+  // firing its own request. This drastically cuts the number of DB round
+  // trips on pages with many cards.
+  const shared = useStatEntry(module, slug);
+
+  useEffect(() => {
+    if (!shared) return;
+    if (typeof shared.views === "number") setViews(shared.views);
+    if (typeof shared.likes === "number") setLikes(shared.likes);
+    if (typeof shared.comments === "number") setComments(shared.comments);
+  }, [shared]);
+
   useEffect(() => {
     let mounted = true;
-    fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
-      .then(r => r.json())
-      .then(s => {
-        if (!mounted || !s) return;
-        if (typeof s.views === "number") setViews(s.views);
-        if (typeof s.likes === "number") setLikes(s.likes);
-        if (typeof s.comments === "number") setComments(s.comments);
-      })
-      .catch(() => null);
+
+    // Fallback: only hit the per-item endpoint if the shared bulk fetch
+    // hasn't produced an entry for this item after a short delay (e.g. a
+    // brand-new post that isn't reflected yet, or the provider is missing
+    // from the tree for some reason).
+    const timer = setTimeout(() => {
+      if (shared) return;
+      fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+        .then(r => r.json())
+        .then(s => {
+          if (!mounted || !s) return;
+          if (typeof s.views === "number") setViews(s.views);
+          if (typeof s.likes === "number") setLikes(s.likes);
+          if (typeof s.comments === "number") setComments(s.comments);
+        })
+        .catch(() => null);
+    }, 800);
 
     const handleUpdate = (e: any) => {
       if (e.detail && e.detail.module === module && e.detail.slug === slug) {
@@ -57,9 +79,10 @@ export function CardStats({
     window.addEventListener("tb_stats_update", handleUpdate);
     return () => {
       mounted = false;
+      clearTimeout(timer);
       window.removeEventListener("tb_stats_update", handleUpdate);
     };
-  }, [module, slug]);
+  }, [module, slug, shared]);
 
   const iconColor = moduleIconColors[module] || "text-[var(--home)]";
 

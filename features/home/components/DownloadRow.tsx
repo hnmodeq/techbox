@@ -6,22 +6,33 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/card-stats';
+import { useStatEntry } from '@/providers/stats.provider';
 
 function DownloadMeta({ slug, initialViews, initialLikes, initialComments }: { slug: string; initialViews: number; initialLikes: number; initialComments: number }) {
   const [fileSize, setFileSize] = useState('۶۸۰ مگابایت');
+  const shared = useStatEntry('download', slug);
+
+  useEffect(() => {
+    if (shared && typeof shared.fileSize === 'string') {
+      setFileSize(shared.fileSize);
+    }
+  }, [shared]);
 
   useEffect(() => {
     let mounted = true;
-    fetch(`/api/stats?module=download&slug=${encodeURIComponent(slug)}`)
-      .then(r => r.json())
-      .then(d => {
-        if (mounted && d && typeof d.fileSize === 'string') {
-          setFileSize(d.fileSize);
-        }
-      })
-      .catch(() => {});
-    return () => { mounted = false; };
-  }, [slug]);
+    const timer = setTimeout(() => {
+      if (shared) return;
+      fetch(`/api/stats?module=download&slug=${encodeURIComponent(slug)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (mounted && d && typeof d.fileSize === 'string') {
+            setFileSize(d.fileSize);
+          }
+        })
+        .catch(() => {});
+    }, 800);
+    return () => { mounted = false; clearTimeout(timer); };
+  }, [slug, shared]);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-2 w-full mt-3">
