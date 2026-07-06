@@ -7,6 +7,14 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
 
+// Critical inline styles (inlined for performance)
+const criticalStyles = `
+:root { --font-kalameh: var(--font-kalameh); }
+html, body { font-family: var(--font-kalameh), system-ui, sans-serif; direction: rtl; }
+h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
+button, .btn { font-family: inherit; transition: all 0.2s ease; }
+`;
+
 // Inline script to prevent dark mode flash (FOUC)
 const themeScript = `
 (function() {
@@ -24,7 +32,6 @@ const themeScript = `
     } else {
       document.documentElement.classList.remove('dark');
     }
-    // Also set color-scheme early
     document.documentElement.style.colorScheme = theme;
   } catch (e) {}
 })();
@@ -56,6 +63,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans antialiased text-foreground">
