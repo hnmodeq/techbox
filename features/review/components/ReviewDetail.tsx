@@ -13,8 +13,7 @@ type ReviewDetailProps = {
 };
 
 export default function ReviewDetail({ item }: ReviewDetailProps) {
-  const [likesCount, setLikesCount] = useState<number>(item.likes || 45);
-  const [hasLiked, setHasLiked] = useState(false);
+  // Likes/counts are rendered by the real <LikeButton /> / <CommentSection /> below.
 
   // Fallback strengths/weaknesses if not explicit in item data
   const strengths = item.strengths || [

@@ -35,7 +35,6 @@ import toolsData from "@/prisma/mock-data/tools.json";
 import downloadData from "@/prisma/mock-data/download.json";
 import shopData from "@/prisma/mock-data/shop.json";
 import forumData from "@/prisma/mock-data/forum.json";
-import commentsData from "@/prisma/mock-data/comments.json";
 import { moduleColors } from "@/config/module-colors";
 
 const all: Record<ModuleSlug, ContentItem[]> = {
@@ -104,9 +103,12 @@ export function searchAcross(q: string) {
   );
 }
 
-export function getCommentCount(module: string, slug: string): number {
-  const count = (commentsData as any[]).filter(c => c.content_type === module && c.content_slug === slug).length;
-  return count > 0 ? count : 0;
+// The real comment count is fetched live from the database by the stats
+// provider (see app/api/stats). We intentionally return 0 here so the
+// server-rendered initial never shows a fabricated number; the bulk
+// /api/stats request replaces it with the real count on the client.
+export function getCommentCount(_module: string, _slug: string): number {
+  return 0;
 }
 
 export const moduleMeta: Record<ModuleSlug, { title: string; titleFa: string; color: string; href: string }> = {

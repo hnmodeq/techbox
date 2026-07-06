@@ -3,7 +3,6 @@ import { prisma } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth-server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import commentsData from "@/prisma/mock-data/comments.json";
 
 const postSchema = z.object({
   module: z.string(),
@@ -16,28 +15,22 @@ export async function getCommentsAction(module: string, slug: string) {
   try {
     const post = await prisma.post.findUnique({
       where: { module_slug: { module: module as any, slug } },
-      select: { id: true }
+      select: { id: true },
     });
     if (post) {
       const comments = await prisma.comment.findMany({
         where: { postId: post.id },
         orderBy: { createdAt: "asc" },
-        include: { replies: { orderBy: { createdAt: "asc" } } }
+        include: { replies: { orderBy: { createdAt: "asc" } } },
       });
       return comments;
     }
-  } catch (err) {}
-
-  const list = (commentsData as any[]).filter(c => c.content_slug === slug || (c.content_type === module && !c.content_slug));
-  return list.map((c, i) => ({
-    id: c.id || `c-${i}`,
-    authorName: c.author || "کاربر تکباکس",
-    text: c.text,
-    likes: c.likes || 2,
-    dislikes: c.dislikes || 0,
-    createdAt: new Date(c.date || Date.now()),
-    replies: [],
-  }));
+    // Post exists in the DB only after it has been seeded/created; until then
+    // there are simply no comments yet (we no longer fabricate mock ones).
+    return [];
+  } catch {
+    return [];
+  }
 }
 
 export async function createCommentAction(prevState: any, formData: FormData) {
@@ -56,7 +49,7 @@ export async function createCommentAction(prevState: any, formData: FormData) {
   try {
     const { module, slug, text, parentId } = postSchema.parse(raw);
     let post = await prisma.post.findUnique({
-      where: { module_slug: { module: module as any, slug } }
+      where: { module_slug: { module: module as any, slug } },
     });
     if (!post) {
       post = await prisma.post.create({
@@ -66,8 +59,8 @@ export async function createCommentAction(prevState: any, formData: FormData) {
           title: slug,
           authorName: "تحریریه",
           dateFa: "۱۴۰۵",
-          published: true
-        }
+          published: true,
+        },
       });
     }
 
@@ -77,13 +70,13 @@ export async function createCommentAction(prevState: any, formData: FormData) {
         parentId,
         authorId: user.id,
         authorName: user.name || user.username,
-        text
-      }
+        text,
+      },
     });
 
     revalidatePath(`/${module}/${slug}`);
     return { ok: true };
   } catch (e: any) {
-    return { ok: false, error: e.message };
+    return { ok: false, error: e?.message || "خطا در ثبت دیدگاه" };
   }
 }

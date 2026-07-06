@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { zIndex } from "@/design";
 import { Button } from "@/components/ui/button";
 import ModuleHeader from "@/components/effects/ModuleHeader";
@@ -11,14 +11,23 @@ import { CloseButton } from "@/components/ui/close-button";
 import { OverlayBackdrop } from "@/components/ui/overlay";
 import { CardStats } from "@/components/ui/card-stats";
 import { ForumBadge } from "@/components/ui/forum-badge";
+import { useStats } from "@/providers/stats.provider";
 
-type ForumPost = ReturnType<typeof getModuleItems>[0] & { answers?: number; solved?: boolean };
+type ForumPost = ReturnType<typeof getModuleItems>[0] & { solved?: boolean };
 
 export default function ForumList() {
+  const { stats } = useStats();
+
+  // Real stats come from the database (filled in by the bulk /api/stats
+  // request). Until they arrive we fall back to the static seed value so the
+  // UI never shows a fabricated number.
+  const realLikes = (t: ForumPost) => stats[`forum:${t.slug}`]?.likes ?? t.likes ?? 0;
+  const realSolved = (t: ForumPost) =>
+    stats[`forum:${t.slug}`]?.solved ?? (t as any).solved ?? false;
+
   const items = getModuleItems("forum").map((t) => ({
     ...t,
-    answers: (t.likes % 9) + 2,
-    solved: (t as any).solved ?? (t.likes % 2 === 0),
+    solved: (t as any).solved ?? false,
     avatar: t.author?.avatar || "/assets/hooman.png",
   })) as (ForumPost & { avatar: string })[];
 
@@ -32,15 +41,19 @@ export default function ForumList() {
   const all = (() => {
     const list = [...merged];
     if (filter === "جدید") return list.sort((a, b) => +new Date(b.date) - +new Date(a.date));
-    if (filter === "برتر") return list.sort((a, b) => b.likes - a.likes);
-    if (filter === "حل‌شده") return list.filter((t) => t.solved);
-    return list.sort((a, b) => b.views - a.views); // داغ
+    if (filter === "برتر") return list.sort((a, b) => realLikes(b) - realLikes(a));
+    if (filter === "حل‌شده") return list.filter((t) => realSolved(t));
+    return list.sort((a, b) => (b.views ?? 0) - (a.views ?? 0)); // داغ
   })();
 
-  const submitTopic = (e: React.FormEvent) => {
+  const submitTopic = (e: FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    const slug = title.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").slice(0, 60) + "-" + Date.now().toString(36);
+    const slug =
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9\u0600-\u06FF]+/g, "-")
+        .slice(0, 60) + "-" + Date.now().toString(36);
     const nt: any = {
       slug,
       module: "forum",
@@ -55,7 +68,6 @@ export default function ForumList() {
       likes: 0,
       views: 1,
       category: "پرسش",
-      answers: 0,
       solved: false,
     };
     setLocal((l) => [nt, ...l]);
@@ -69,16 +81,35 @@ export default function ForumList() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
-      <ModuleHeader module="forum" title="انجمن تکباکس" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={`${all.length.toLocaleString("fa-IR")} موضوع`}>
+      <ModuleHeader
+        module="forum"
+        title="انجمن تکباکس"
+        description="پرسش و پاسخ تخصصی زیرساخت و شبکه"
+        count={`${all.length.toLocaleString("fa-IR")} موضوع`}
+      >
         <div className="flex gap-2">
-          <input placeholder="جستجو در انجمن…" className="input w-56 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" />
-          <Button onClick={() => setShowNew(true)} className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">+ موضوع جدید</Button>
+          <input
+            placeholder="جستجو در انجمن…"
+            className="input w-56 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold"
+          />
+          <Button
+            onClick={() => setShowNew(true)}
+            className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold"
+          >
+            + موضوع جدید
+          </Button>
         </div>
       </ModuleHeader>
 
       <div className="flex gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mb-4">
         {(["داغ", "جدید", "برتر", "حل‌شده"] as const).map((t) => (
-          <ChipButton key={t} tone="forum" aria-pressed={filter === t} onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--forum)] text-[var(--forum)]" : ""}>
+          <ChipButton
+            key={t}
+            tone="forum"
+            aria-pressed={filter === t}
+            onClick={() => setFilter(t)}
+            className={filter === t ? "ring-1 ring-[var(--forum)] text-[var(--forum)]" : ""}
+          >
             {t}
           </ChipButton>
         ))}
@@ -92,52 +123,123 @@ export default function ForumList() {
           <div className="col-span-2 text-left">آخرین فعالیت</div>
         </div>
         {all.map((t) => (
-          <Link key={t.slug} href={`/forum/${t.slug}`} className="group grid grid-cols-12 px-3 sm:px-4 py-3.5 hover:bg-[var(--muted-background)]/20 gap-2 items-center transition-colors">
+          <Link
+            key={t.slug}
+            href={`/forum/${t.slug}`}
+            className="group grid grid-cols-12 px-3 sm:px-4 py-3.5 hover:bg-[var(--muted-background)]/20 gap-2 items-center transition-colors"
+          >
             {/* vote column */}
             <div className="hidden sm:flex col-span-1 flex-col items-center paragraph-color text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
-              <Button type="button" variant="link" size="xs" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--success)] font-bold">▲</Button>
-              <span className="font-bold text-[var(--primary-text)]">{t.likes.toLocaleString("fa-IR")}</span>
-              <Button type="button" variant="link" size="xs" onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); }} className="paragraph-color hover:text-[var(--warning)] font-bold">▼</Button>
+              <Button
+                type="button"
+                variant="link"
+                size="xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="paragraph-color hover:text-[var(--success)] font-bold"
+              >
+                ▲
+              </Button>
+              <span className="font-bold text-[var(--primary-text)]">
+                {realLikes(t).toLocaleString("fa-IR")}
+              </span>
+              <Button
+                type="button"
+                variant="link"
+                size="xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                className="paragraph-color hover:text-[var(--warning)] font-bold"
+              >
+                ▼
+              </Button>
             </div>
 
             {/* main */}
             <div className="col-span-12 sm:col-span-6 flex gap-3.5 items-center">
-              <Image src={t.avatar} alt={t.author?.name || "کاربر"} width={40} height={40} className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
+              <Image
+                src={t.avatar}
+                alt={t.author?.name || "کاربر"}
+                width={40}
+                height={40}
+                className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-[var(--border-color)]"
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--forum)]">{t.title}</span>
-                  <ForumBadge slug={t.slug} fallback={t.solved} />
+                  <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--forum)]">
+                    {t.title}
+                  </span>
+                  <ForumBadge slug={t.slug} fallback={realSolved(t)} />
                 </div>
                 <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1">
-                  ارسال‌شده توسط <b className="text-[var(--primary-text)]">{t.author?.name || "کاربر تکباکس"}</b> • {t.date_fa}
+                  ارسال‌شده توسط{" "}
+                  <b className="text-[var(--primary-text)]">{t.author?.name || "کاربر تکباکس"}</b> •{" "}
+                  {t.date_fa}
                 </div>
               </div>
             </div>
 
             {/* stats */}
             <div className="col-span-12 sm:col-span-4 flex items-center justify-end px-2">
-              <CardStats module="forum" slug={t.slug} initialViews={t.views ?? 0} initialLikes={t.likes ?? 0} showComments={true} />
+              <CardStats
+                module="forum"
+                slug={t.slug}
+                initialViews={t.views ?? 0}
+                initialLikes={t.likes ?? 0}
+                showComments={true}
+              />
             </div>
             <div className="hidden sm:block col-span-1 text-left text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              {t.date_fa.split(" ")[0]}<br />{t.author?.name.split(" ")[0]}
+              {t.date_fa.split(" ")[0]}
+              <br />
+              {t.author?.name.split(" ")[0]}
             </div>
           </Link>
         ))}
       </div>
 
       {showNew && (
-        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ zIndex: zIndex.modal }}
+          dir="rtl"
+        >
           <OverlayBackdrop onClick={() => setShowNew(false)} />
-          <form onSubmit={submitTopic} className="relative bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] w-full max-w-2xl p-6 space-y-4 z-10 shadow-[var(--shadow-size)]">
+          <form
+            onSubmit={submitTopic}
+            className="relative bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] w-full max-w-2xl p-6 space-y-4 z-10 shadow-[var(--shadow-size)]"
+          >
             <div className="flex justify-between items-center border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3">
-              <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold">موضوع جدید در انجمن تکباکس</h3>
+              <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold">
+                موضوع جدید در انجمن تکباکس
+              </h3>
               <CloseButton onClick={() => setShowNew(false)} />
             </div>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="عنوان واضح و دقیق بپرسید…" className="input w-full" required />
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="جزئیات کامل مشکل، توپولوژی، لاگ‌ها یا چیزی که تا الان امتحان کردید..." className="input w-full min-h-[160px]" required />
-            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.</div>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="عنوان واضح و دقیق بپرسید…"
+              className="input w-full"
+              required
+            />
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="جزئیات کامل مشکل، توپولوژی، لاگ‌ها یا چیزی که تا الان امتحان کردید..."
+              className="input w-full min-h-[160px]"
+              required
+            />
+            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+              پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.
+            </div>
             <div className="flex justify-end gap-2 pt-2 border-t-[length:var(--border-size)] border-[var(--border-color)]">
-              <Button type="button" variant="ghost" onClick={() => setShowNew(false)}>انصراف</Button>
+              <Button type="button" variant="ghost" onClick={() => setShowNew(false)}>
+                انصراف
+              </Button>
               <Button type="submit">ارسال موضوع</Button>
             </div>
           </form>

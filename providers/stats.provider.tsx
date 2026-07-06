@@ -6,7 +6,7 @@ type StatEntry = {
   likes: number;
   comments: number;
   solved?: boolean;
-  fileSize?: string;
+  fileSize?: string | null;
 };
 
 type StatsMap = Record<string, StatEntry>;
@@ -36,10 +36,16 @@ export function StatsProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     fetch("/api/stats", { cache: "no-store" })
-      .then((r) => r.json())
+      .then((r) => {
+        // A 503 ("db_unavailable") is an expected, non-fatal case: the client
+        // simply keeps the server-rendered initial values instead of inventing
+        // fake numbers like 340 views / 14 likes / 4 comments.
+        if (!r.ok) throw new Error("stats_unavailable");
+        return r.json();
+      })
       .then((data) => {
         if (!mounted) return;
-        if (data && typeof data === "object") {
+        if (data && typeof data === "object" && !("error" in data)) {
           setStats((prev) => ({ ...data, ...prev }));
           setStatus("ready");
         } else {
@@ -64,8 +70,8 @@ export function StatsProvider({ children }: { children: ReactNode }) {
             ...(typeof likes === "number" ? { likes } : {}),
             ...(typeof comments === "number" ? { comments } : {}),
             ...(typeof solved === "boolean" ? { solved } : {}),
-            ...(typeof fileSize === "string" ? { fileSize } : {})
-          }
+            ...(typeof fileSize === "string" ? { fileSize } : {}),
+          },
         };
       });
     };
@@ -89,4 +95,9 @@ export function StatsProvider({ children }: { children: ReactNode }) {
 export function useStatEntry(module: string, slug: string): { entry?: StatEntry; status: StatsStatus } {
   const { stats, status } = useContext(StatsContext);
   return { entry: stats[`${module}:${slug}`], status };
+}
+
+/** Returns the whole stats map + status (handy for list views). */
+export function useStats(): { stats: StatsMap; status: StatsStatus } {
+  return useContext(StatsContext);
 }

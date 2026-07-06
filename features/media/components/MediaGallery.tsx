@@ -7,6 +7,8 @@ import { createPortal } from "react-dom";
 import { zIndex } from "@/design";
 import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
+import { LikeButton } from "@/components/ui/like-button";
+import CommentSection from "@/features/comment/components/CommentSection";
 
 const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
@@ -18,41 +20,12 @@ export default function MediaGallery() {
   }, []);
 
   const [activeVideo, setActiveVideo] = useState<any | null>(null);
-  const [likesMap, setLikesMap] = useState<Record<string, number>>({});
-  const [likedList, setLikedList] = useState<Record<string, boolean>>({});
-  const [commentsList, setCommentsList] = useState<Record<string, string[]>>({
-    default: ["ویدیو بسیار عالی و کاربردی بود، ممنون از تکباکس!", "لطفاً قسمت دوم این آموزش رو هم بسازید."],
-  });
-  const [newComment, setNewComment] = useState("");
 
   // Pagination state
   const [page, setPage] = useState(1);
   const itemsPerPage = 6;
   const totalPages = Math.max(1, Math.ceil(allItems.length / itemsPerPage));
   const displayedItems = allItems.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const getLikes = (slug: string, initial: number) => {
-    return likesMap[slug] !== undefined ? likesMap[slug] : initial;
-  };
-
-  const handleLike = (slug: string, initial: number) => {
-    const current = getLikes(slug, initial);
-    const isLiked = likedList[slug];
-    setLikesMap({ ...likesMap, [slug]: isLiked ? current - 1 : current + 1 });
-    setLikedList({ ...likedList, [slug]: !isLiked });
-  };
-
-  const getComments = (slug: string) => {
-    return commentsList[slug] || commentsList.default;
-  };
-
-  const handleAddComment = (e: React.FormEvent, slug: string) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-    const prev = getComments(slug);
-    setCommentsList({ ...commentsList, [slug]: [...prev, newComment.trim()] });
-    setNewComment("");
-  };
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
@@ -69,8 +42,8 @@ export default function MediaGallery() {
             author={v.author?.name}
             dateFa={v.date_fa}
             views={v.views}
-            likes={getLikes(v.slug, v.likes)}
-            comments={getComments(v.slug).length}
+            likes={v.likes}
+            comments={0}
             onClick={() => setActiveVideo(v)}
           />
         ))}
@@ -99,7 +72,7 @@ export default function MediaGallery() {
       {activeVideo && typeof window !== "undefined" && createPortal(
         <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
-          
+
           <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--modal-background)] shadow-[var(--shadow-size)] flex flex-col" style={{ zIndex: zIndex.modalContent }}>
             <div className="flex items-center justify-between p-4 border-b-[length:var(--border-size)] border-[var(--border-color)]">
               <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
@@ -137,49 +110,12 @@ export default function MediaGallery() {
                     <CardStats module="media" slug={activeVideo.slug} initialViews={activeVideo.views ?? 0} initialLikes={activeVideo.likes ?? 0} showLabel={true} />
                   </span>
 
-                  <button
-                    onClick={() => handleLike(activeVideo.slug, activeVideo.likes)}
-                    className={`inline-flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] px-4 py-1.5 rounded-[var(--corner-radius)] border transition-all ${
-                      likedList[activeVideo.slug]
-                        ? "bg-[var(--danger)]/15 border-[var(--danger)] text-[var(--danger)] shadow-[var(--shadow-size)]"
-                        : "bg-[var(--card-background)] border-[var(--border-color)] text-[var(--primary-text)] hover:border-[var(--danger)]"
-                    }`}
-                  >
-                    <Icon name="like" size={16} className={likedList[activeVideo.slug] ? "fill-current" : ""} />
-                    <span>{getLikes(activeVideo.slug, activeVideo.likes).toLocaleString("fa-IR")} پسند</span>
-                  </button>
+                  <LikeButton contentType="media" slug={activeVideo.slug} initial={activeVideo.likes ?? 0} />
                 </div>
               </div>
 
-              {/* Comments Section */}
-              <div className="space-y-4">
-                <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold">نظرات کاربران ({getComments(activeVideo.slug).length.toLocaleString("fa-IR")})</h4>
-
-                <form onSubmit={(e) => handleAddComment(e, activeVideo.slug)} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="نظر خود را درباره این ویدیو بنویسید..."
-                    className="input flex-1 !h-11 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"
-                  />
-                  <button type="submit" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] !h-11 px-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] shrink-0">
-                    ارسال نظر
-                  </button>
-                </form>
-
-                <ul className="space-y-3 max-h-60 overflow-y-auto pr-1">
-                  {getComments(activeVideo.slug).map((c, i) => (
-                    <li key={i} className="p-3 rounded-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
-                      <div className="flex items-center justify-between mb-1 text-[12px] paragraph-color">
-                        <b>کاربر تکباکس</b>
-                        <span>لحظاتی پیش</span>
-                      </div>
-                      <p className="text-[var(--primary-text)]">{c}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {/* Real, database-backed comments (persist across refreshes). */}
+              <CommentSection module="media" slug={activeVideo.slug} />
             </div>
           </div>
         </div>,
