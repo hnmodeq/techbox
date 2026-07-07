@@ -17,7 +17,8 @@
     "data:legacy": "node scripts/data.cjs",
     "tree:legacy": "node scripts/tree.cjs",
     "prisma:generate": "prisma generate",
-    "db:backfill-metadata": "tsx prisma/backfill-metadata.ts"
+    "db:backfill-metadata": "tsx prisma/backfill-metadata.ts",
+    "db:seed-blob-content": "tsx prisma/seed-blob-content.ts"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.8",

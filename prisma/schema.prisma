@@ -32,6 +32,8 @@ model Post {
   excerpt    String   @default("")
   content    String   @default("")
   image      String?
+  videoUrl   String?
+  gallery    String   @default("[]")
   tags       String   @default("[]")
   category   String?
   authorId   String?
