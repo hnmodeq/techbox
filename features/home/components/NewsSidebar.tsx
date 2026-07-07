@@ -9,11 +9,29 @@ import { usePathname } from 'next/navigation';
 import { zIndex } from '@/design';
 import { sidebarBase } from '@/config/sidebar.config';
 
+const NEWS_SIDEBAR_OPEN_KEY = 'techbox-news-sidebar-open';
+
+function readSavedOpenState() {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(NEWS_SIDEBAR_OPEN_KEY) === 'true';
+}
+
 export default function NewsSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const newsItems = getModuleItems('news').slice(0, 15);
+
+  useEffect(() => {
+    setOpen(readSavedOpenState());
+  }, []);
+
+  const setPersistedOpen = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(NEWS_SIDEBAR_OPEN_KEY, String(nextOpen));
+    }
+  };
 
   // Close when clicking outside ONLY on mobile devices (sm: hidden)
   useEffect(() => {
@@ -21,7 +39,7 @@ export default function NewsSidebar() {
     const handleOutsideClick = (e: MouseEvent) => {
       if (typeof window !== 'undefined' && window.innerWidth >= 640) return;
       if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        setPersistedOpen(false);
       }
     };
     document.addEventListener('mousedown', handleOutsideClick);
@@ -37,7 +55,7 @@ export default function NewsSidebar() {
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => setPersistedOpen(true)}
           style={{ zIndex: zIndex.mobileFab }}
           className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[300ms] hover:bg-[var(--muted-background)] cursor-pointer"
           title="اخبار زنده تکباکس"
@@ -52,7 +70,7 @@ export default function NewsSidebar() {
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
           style={{ zIndex: zIndex.sidebarBackdrop }}
-          onClick={() => setOpen(false)}
+          onClick={() => setPersistedOpen(false)}
         />
       )}
 
@@ -81,7 +99,7 @@ export default function NewsSidebar() {
           </div>
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={() => setPersistedOpen(false)}
             className="p-1.5 paragraph-color hover:text-[var(--news)] transition-colors cursor-pointer"
             title="بستن"
           >
@@ -95,7 +113,7 @@ export default function NewsSidebar() {
             <Link
               key={n.slug}
               href={`/news/${n.slug}`}
-              onClick={() => setOpen(false)}
+              onClick={() => setPersistedOpen(false)}
               className="group block px-2 sm:px-3"
             >
               {/* Wide Banner Image */}
@@ -130,7 +148,7 @@ export default function NewsSidebar() {
         <div className="p-3.5 border-t-[length:var(--border-size)] border-[var(--border-color)] text-center shrink-0">
           <Link
             href="/news"
-            onClick={() => setOpen(false)}
+            onClick={() => setPersistedOpen(false)}
             className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40 w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--news)] font-bold"
           >
             مشاهده آرشیو کامل اخبار ←
