@@ -72,6 +72,96 @@ type SeedPost = {
 
 
 
+
+const forumPosts: SeedPost[] = [
+  {
+    slug: "forum-vlan-design-for-camera-network",
+    module: "forum",
+    title: "برای شبکه دوربین‌ها VLAN جدا بسازیم یا همان شبکه اصلی کافی است؟",
+    excerpt: "در یک ساختمان ۴ طبقه حدود ۴۸ دوربین داریم و نمی‌دانم جداسازی VLAN چقدر ضروری است.",
+    content: "سلام دوستان. برای پروژه‌ای با حدود ۴۸ دوربین IP و یک NVR مرکزی، بهتر است دوربین‌ها را در VLAN جدا قرار دهیم؟ نگرانی اصلی من Broadcast، امنیت و دسترسی کاربران عادی به دوربین‌هاست.",
+    image: `${BLOB}/thumbnails/thumbnail8.jpg`,
+    tags: ["forum", "vlan", "camera", "nvr"],
+    category: "شبکه",
+    authorUsername: "panizbagheri",
+    date: "2026-07-22",
+    dateFa: "31 تیر 1405",
+    likes: 7,
+    views: 140,
+    solved: true,
+  },
+  {
+    slug: "forum-backup-retention-for-small-company",
+    module: "forum",
+    title: "Retention مناسب برای بکاپ شرکت ۳۰ نفره چیست؟",
+    excerpt: "روزانه بکاپ می‌گیریم اما فضای NAS سریع پر می‌شود.",
+    content: "ما روی NAS بکاپ روزانه داریم ولی بعد از چند ماه فضا کم می‌آوریم. برای فایل‌سرور و VMها چه retention policy پیشنهاد می‌کنید؟",
+    image: `${BLOB}/thumbnails/thumbnail9.jpg`,
+    tags: ["forum", "backup", "nas", "retention"],
+    category: "بکاپ",
+    authorUsername: "shaghayeghrastegaar",
+    date: "2026-07-21",
+    dateFa: "30 تیر 1405",
+    likes: 9,
+    views: 175,
+    solved: false,
+  },
+  {
+    slug: "forum-firewall-vpn-for-branches",
+    module: "forum",
+    title: "برای اتصال شعبه‌ها VPN روی فایروال بهتر است یا روتر جدا؟",
+    excerpt: "سه شعبه داریم و می‌خواهیم ارتباط پایدار و قابل مانیتور داشته باشیم.",
+    content: "برای اتصال سه شعبه به دفتر مرکزی، استفاده از VPN روی فایروال اصلی بهتر است یا روتر جداگانه؟ گزارش‌گیری و مدیریت دسترسی برایمان مهم است.",
+    image: `${BLOB}/thumbnails/thumbnail10.jpg`,
+    tags: ["forum", "vpn", "firewall", "branch"],
+    category: "امنیت",
+    authorUsername: "faridfeizi",
+    date: "2026-07-20",
+    dateFa: "29 تیر 1405",
+    likes: 6,
+    views: 120,
+    solved: true,
+  },
+];
+
+type SeedComment = { module: string; slug: string; username: string; text: string; likes?: number };
+const seedComments: SeedComment[] = [
+  { module: "forum", slug: "forum-vlan-design-for-camera-network", username: "hoomanmodeq", text: "بله، برای دوربین‌ها VLAN جدا پیشنهاد می‌شود. دسترسی از شبکه کاربران را فقط از طریق NVR یا Rule مشخص روی فایروال باز کنید.", likes: 4 },
+  { module: "forum", slug: "forum-vlan-design-for-camera-network", username: "atiyehatami", text: "اگر PoE Switch دارید، بهتر است DHCP و Gateway دوربین‌ها هم از شبکه کاربران جدا باشد تا عیب‌یابی ساده‌تر شود.", likes: 2 },
+  { module: "forum", slug: "forum-backup-retention-for-small-company", username: "nastarankhodakarami", text: "برای شروع: روزانه ۱۴ نسخه، هفتگی ۸ نسخه، ماهانه ۱۲ نسخه. اما حتماً Restore تست کنید؛ retention بدون تست بازیابی کافی نیست.", likes: 5 },
+  { module: "forum", slug: "forum-backup-retention-for-small-company", username: "mohsenakbari", text: "ما برای فایل‌سرور Snapshot کوتاه‌مدت و بکاپ آفلاین ماهانه داریم. ترکیبش خیلی کمک کرده.", likes: 1 },
+  { module: "forum", slug: "forum-firewall-vpn-for-branches", username: "behnazghaderi", text: "اگر فایروال مرکزی منابع کافی دارد، VPN روی همان بهتر است چون Policy و لاگ‌ها یکپارچه می‌مانند.", likes: 3 },
+  { module: "forum", slug: "forum-firewall-vpn-for-branches", username: "farazfeizi", text: "برای پایداری، مانیتورینگ tunnel و failover لینک اینترنت را هم از ابتدا در طراحی ببینید.", likes: 2 },
+];
+
+async function upsertComments(comments: SeedComment[]) {
+  for (const c of comments) {
+    const post = await prisma.post.findUnique({ where: { module_slug: { module: c.module, slug: c.slug } } });
+    const user = await prisma.user.findUnique({ where: { username: c.username } });
+    if (!post || !user) continue;
+    const existing = await prisma.comment.findFirst({ where: { postId: post.id, authorId: user.id, text: c.text } });
+    if (!existing) {
+      await prisma.comment.create({ data: { postId: post.id, authorId: user.id, authorName: user.name, text: c.text, likes: c.likes || 0 } });
+    }
+  }
+  console.log(`Upserted ${comments.length} comments.`);
+}
+
+async function seedLikesForPosts(posts: SeedPost[]) {
+  const users = await prisma.user.findMany({ select: { id: true, username: true } });
+  for (const post of posts) {
+    const likers = users.slice(0, Math.min(users.length, 8));
+    for (const user of likers) {
+      await prisma.like.upsert({
+        where: { fingerprint_module_slug: { fingerprint: user.id, module: post.module, slug: post.slug } },
+        update: {},
+        create: { fingerprint: user.id, userId: user.id, module: post.module, slug: post.slug },
+      });
+    }
+    await prisma.post.updateMany({ where: { module: post.module, slug: post.slug }, data: { likes: likers.length } });
+  }
+}
+
 const downloadPosts: SeedPost[] = [
   {
     slug: "archive-pdf-1",
@@ -454,6 +544,11 @@ async function main() {
   if (step === "3" || step === "reviews" || step === "review" || step === "all") await upsertPosts(reviewPosts);
   if (step === "4" || step === "news" || step === "all") await upsertPosts(newsPosts);
   if (step === "5" || step === "downloads" || step === "download" || step === "all") await upsertPosts(downloadPosts);
+  if (step === "6" || step === "forum" || step === "all") {
+    await upsertPosts(forumPosts);
+    await upsertComments(seedComments);
+    await seedLikesForPosts([...forumPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...mediaPosts, ...downloadPosts]);
+  }
 }
 
 main()
