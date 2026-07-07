@@ -146,7 +146,7 @@ export default function SidebarShell({
       </aside>
 
  <div
- className={`hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
+ className={`main-sidebar-spacer hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
  desktopOpen
  ? DESKTOP_SIDEBAR_OPEN_WIDTH
  : DESKTOP_SIDEBAR_CLOSED_WIDTH
@@ -155,7 +155,7 @@ export default function SidebarShell({
  />
 
  <aside
- className={`fixed right-0 top-0 hidden h-screen flex-col overflow-hidden sm:flex transition-[width] duration-[300ms] ease-[ease] ${
+ className={`main-sidebar-panel fixed right-0 top-0 hidden h-screen flex-col overflow-hidden sm:flex transition-[width] duration-[300ms] ease-[ease] ${
  desktopOpen
  ? DESKTOP_SIDEBAR_OPEN_WIDTH
  : DESKTOP_SIDEBAR_CLOSED_WIDTH

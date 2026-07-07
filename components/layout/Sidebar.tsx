@@ -11,17 +11,33 @@ export default function SidebarMain({ onMobileOpenChange }: SidebarMainProps) {
   const [desktopOpen, setDesktopOpen] = React.useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const { theme, resolvedTheme, setTheme: setNextTheme } = useTheme();
+  const skipInitialDatasetSyncRef = React.useRef(true);
 
   const activeTheme = resolvedTheme ?? theme;
   const currentTheme = activeTheme === "dark" ? "dark" : "light";
 
   React.useEffect(() => {
     setMounted(true);
-    setDesktopOpen(desktopStore.getSnapshot());
+    const savedDesktopOpen = desktopStore.getSnapshot();
+    document.documentElement.dataset.mainSidebarOpen = String(savedDesktopOpen);
+    setDesktopOpen(savedDesktopOpen);
+
+    requestAnimationFrame(() => {
+      document.documentElement.classList.remove("main-sidebar-booting");
+    });
 
     const u1 = desktopStore.subscribe(() => setDesktopOpen(desktopStore.getSnapshot()));
     return () => { u1(); };
   }, []);
+
+  React.useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (skipInitialDatasetSyncRef.current) {
+      skipInitialDatasetSyncRef.current = false;
+      return;
+    }
+    document.documentElement.dataset.mainSidebarOpen = String(desktopOpen);
+  }, [desktopOpen]);
 
   const toggleTheme = React.useCallback(() => {
     setNextTheme(currentTheme === "dark" ? "light" : "dark");
