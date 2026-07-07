@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { getLatest } from '@/lib/content';
+import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { DownloadMetaLine } from '@/components/ui/download-meta';
 import { DownloadAction } from '@/components/ui/download-action';
 
 export default function DownloadRow() {
-  const files = getLatest('download', 8);
+  const fallbackFiles = getLatest('download', 8);
+  const { items: dbFiles } = useDbPosts('download', fallbackFiles, 8);
+  const files = dbFiles.slice(0, 8);
 
   const getExtension = (title: string, category?: string) => {
     if (title.toLowerCase().includes('iso')) return '.ISO';
