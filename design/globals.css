@@ -66,7 +66,9 @@
   --info: light-dark(oklch(0.72 0.16 230), #7dd3fc);
 
 
-  --font-sans: var(--font-kalameh);
+  --font-kalameh-stack: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
+  --font-sans: var(--font-kalameh-stack);
+  --font-techbox-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 .dark {
@@ -75,22 +77,39 @@
 
 
 html {
-  font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
+  font-family: var(--font-kalameh-stack);
+  font-synthesis-weight: none;
+  font-synthesis-style: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
+  font-family: var(--font-kalameh-stack);
+  font-weight: 400;
+  line-height: 1.75;
 }
 
 
 .font-sans {
-  font-family: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif !important;
+  font-family: var(--font-kalameh-stack) !important;
+}
+
+.font-mono, code, kbd, pre, samp {
+  font-family: var(--font-techbox-mono) !important;
 }
 
 
-h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label {
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label, li, summary, figcaption {
   font-family: inherit;
 }
+
+h1, .hero-title { font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; }
+h2 { font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
+h3 { font-weight: 600; line-height: 1.35; }
+p, li { line-height: 1.9; }
+strong, b { font-weight: 700; }
 
 
 .font-thin    { font-weight: 100; }
@@ -104,7 +123,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label {
 .font-black   { font-weight: 900; }
 
 @theme inline {
-  --font-family-sans: var(--font-kalameh);
+  --font-sans: var(--font-kalameh-stack);
+  --font-mono: var(--font-techbox-mono);
 }
 
 /* Home news ticker --------------------------------------------------------- */

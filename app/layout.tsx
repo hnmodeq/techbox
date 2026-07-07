@@ -9,8 +9,7 @@ import { ScrollRestoration } from "@/components/ScrollRestoration";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
-:root { --font-kalameh: var(--font-kalameh); }
-html, body { font-family: var(--font-kalameh), system-ui, sans-serif; direction: rtl; }
+html, body { font-family: var(--font-kalameh), Vazirmatn, system-ui, Tahoma, sans-serif; direction: rtl; font-synthesis-weight: none; font-synthesis-style: none; }
 h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
 button, .btn { font-family: inherit; transition: all 0.2s ease; }
 `;
@@ -59,7 +58,7 @@ export default function RootLayout({
     <html
       lang="fa"
       dir="rtl"
-      className={kalameh.variable}
+      className={`${kalameh.variable} ${kalameh.className}`}
       suppressHydrationWarning
     >
       <head>
