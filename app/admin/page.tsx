@@ -81,6 +81,7 @@ export default function AdminPage() {
  <div className="flex flex-wrap gap-2">
  <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
  {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
+ {user.role === "super_admin" && <ButtonLink href="/admin/blob" variant="ghost" size="sm">فایل‌های Blob</ButtonLink>}
  <Button variant="ghost" size="sm" onClick={()=>{logout(); setUser(null); router.refresh();}} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">خروج</Button>
  </div>
  </PageHeader>
