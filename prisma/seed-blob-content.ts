@@ -532,28 +532,70 @@ async function upsertPosts(posts: SeedPost[]) {
 }
 
 
-const engagementUsers = ["alirastegaar", "amiralmasi", "aylingharagozloo", "mohsenakbari", "mohsenshafaat", "nazaninrastegaar", "parsaghahremanpoor", "pouryamodeq", "raminrastegaar"];
+const engagementUsers = ["alirastegaar", "amiralmasi", "aylingharagozloo", "mohsenakbari", "mohsenshafaat", "nazaninrastegaar", "parsaghahremanpoor", "pouryamodeq", "raminrastegaar", "hannamasoumy", "fatamehrastegaar"];
 
-function commentForModule(module: string) {
-  switch (module) {
-    case "blog": return "مقاله کاربردی بود؛ مخصوصاً بخش چک‌لیست اجرایی برای تیم‌های کوچک خیلی کمک می‌کند.";
-    case "review": return "در تصمیم خرید، بخش تجربه عملی و محدودیت‌های محصول برای ما از مشخصات خام مهم‌تر است.";
-    case "shop": return "برای انتخاب نهایی بهتر است سناریوی استفاده و ظرفیت رشد هم کنار مشخصات محصول بررسی شود.";
-    case "media": return "ویدیو روان و قابل فهم بود؛ اگر فایل‌های نمونه یا دیاگرام هم اضافه شود عالی می‌شود.";
-    case "news": return "خوب است کنار خبر، اثر عملی آن روی تصمیم‌های زیرساختی هم توضیح داده شده.";
-    case "download": return "لطفاً اگر checksum یا نسخه جدیدتر منتشر شد در همین صفحه بروزرسانی شود.";
-    default: return "مطلب مفیدی بود و برای تصمیم‌گیری فنی کمک کرد.";
-  }
+const commentPools: Record<string, string[]> = {
+  blog: [
+    "این مقاله برای مستندسازی داخلی تیم ما ایده‌های خوبی داشت.",
+    "بخش چک‌لیست اجرایی خیلی کاربردی بود و می‌شود مستقیم در پروژه استفاده کرد.",
+    "خوب است در نسخه بعدی یک نمونه دیاگرام هم اضافه شود.",
+    "توضیح تفاوت سناریوهای کوچک و متوسط خیلی کمک‌کننده بود.",
+  ],
+  review: [
+    "این نوع نقد عملی از جدول مشخصات خام برای تصمیم خرید مهم‌تر است.",
+    "اگر تست مصرف انرژی هم اضافه شود تصویر کامل‌تری می‌دهد.",
+    "جمع‌بندی برای سناریوی مناسب استفاده خیلی مفید بود.",
+    "نکته‌های محدودیت محصول باعث می‌شود انتخاب واقع‌بینانه‌تر باشد.",
+  ],
+  shop: [
+    "برای این محصول بهتر است سناریوی استفاده و ظرفیت رشد قبل از خرید بررسی شود.",
+    "اگر امکان مقایسه با مدل‌های نزدیک اضافه شود انتخاب راحت‌تر می‌شود.",
+    "برای دفترهای کوچک، مصرف برق و صدای دستگاه هم مهم است.",
+    "مشاوره خرید برای چنین تجهیزاتی واقعاً لازم است چون فقط مشخصات کافی نیست.",
+  ],
+  media: [
+    "ویدیو روان بود و روند اجرای سناریو را خوب نشان می‌داد.",
+    "اگر فایل دیاگرام یا کانفیگ نمونه هم کنار ویدیو باشد عالی می‌شود.",
+    "برای آموزش تیم تازه‌کار، این نوع ویدیو خیلی بهتر از متن تنهاست.",
+    "کیفیت توضیح مرحله‌به‌مرحله خوب بود و قابل پیاده‌سازی است.",
+  ],
+  news: [
+    "خوب است اثر عملی این خبر روی تصمیم‌های خرید هم توضیح داده شده.",
+    "این روند احتمالاً روی بودجه زیرساخت سال آینده اثر می‌گذارد.",
+    "برای تیم‌های کوچک هم دانستن این تغییرات بازار مهم است.",
+    "خبر کوتاه و مفید بود؛ لینک منبع رسمی هم اگر اضافه شود عالی است.",
+  ],
+  download: [
+    "لطفاً checksum فایل هم در آینده اضافه شود.",
+    "دانلود مستقیم و شمارنده دانلود برای مدیریت نسخه‌ها خیلی خوب است.",
+    "اگر نسخه جدید منتشر شد همین صفحه را بروزرسانی کنید.",
+    "ثبت نام فایل و حجم در دیتابیس باعث می‌شود آرشیو قابل اعتمادتر باشد.",
+  ],
+  forum: [
+    "من هم با این مسئله در پروژه مشابه روبه‌رو شدم و جداسازی شبکه خیلی کمک کرد.",
+    "به نظرم اول نیازمندی‌ها و محدودیت‌های فعلی را دقیق‌تر بنویسید تا پیشنهاد بهتر شود.",
+    "اگر لاگ یا دیاگرام توپولوژی دارید، اضافه کنید تا پاسخ‌ها دقیق‌تر شوند.",
+    "این سوال برای خیلی از تیم‌های کوچک پیش می‌آید و بحث خوبی است.",
+  ],
+};
+
+function commentForModule(module: string, index: number) {
+  const pool = commentPools[module] || commentPools.blog;
+  return pool[index % pool.length];
 }
 
 async function seedEngagement(posts: SeedPost[]) {
-  const users = await prisma.user.findMany({ where: { username: { in: engagementUsers } } });
-  const timelineUsers = await prisma.user.findMany({ take: 8 });
+  const users = await prisma.user.findMany({ where: { username: { in: engagementUsers } }, orderBy: { username: "asc" } });
+  const timelineUsers = await prisma.user.findMany({ take: 8, orderBy: { username: "asc" } });
 
-  for (const post of posts) {
+  for (const [postIndex, post] of posts.entries()) {
     const dbPost = await prisma.post.findUnique({ where: { module_slug: { module: post.module, slug: post.slug } } });
     if (!dbPost) continue;
-    const selected = users.slice(0, 3 + (post.slug.length % 4));
+
+    await prisma.comment.deleteMany({ where: { postId: dbPost.id } });
+    await prisma.like.deleteMany({ where: { module: post.module, slug: post.slug } });
+
+    const selected = users.slice(postIndex % 3, Math.min(users.length, (postIndex % 3) + 5));
     for (const user of selected) {
       await prisma.like.upsert({
         where: { fingerprint_module_slug: { fingerprint: user.id, module: post.module, slug: post.slug } },
@@ -563,17 +605,18 @@ async function seedEngagement(posts: SeedPost[]) {
     }
     await prisma.post.update({ where: { id: dbPost.id }, data: { likes: selected.length } });
 
-    for (const user of selected.slice(0, 2)) {
-      const text = commentForModule(post.module);
-      const exists = await prisma.comment.findFirst({ where: { postId: dbPost.id, authorId: user.id, text } });
-      if (!exists) {
-        await prisma.comment.create({ data: { postId: dbPost.id, authorId: user.id, authorName: user.name, text, likes: 1 } });
-      }
+    const commentCount = post.module === "forum" ? 4 : 3;
+    for (let i = 0; i < Math.min(commentCount, users.length); i += 1) {
+      const user = users[(postIndex + i) % users.length];
+      const text = commentForModule(post.module, postIndex + i);
+      await prisma.comment.create({ data: { postId: dbPost.id, authorId: user.id, authorName: user.name, text, likes: i % 3 } });
     }
   }
 
-  const timelineEvents = await prisma.timelineEvent.findMany({ where: { published: true }, take: 12 });
-  for (const event of timelineEvents) {
+  const timelineEventsDb = await prisma.timelineEvent.findMany({ where: { published: true }, take: 17, orderBy: { dateGr: "asc" } });
+  for (const [eventIndex, event] of timelineEventsDb.entries()) {
+    await prisma.timelineComment.deleteMany({ where: { eventId: event.id } });
+    await prisma.timelineLike.deleteMany({ where: { eventId: event.id } });
     for (const user of timelineUsers.slice(0, 4)) {
       await prisma.timelineLike.upsert({
         where: { timeline_fingerprint_eventId: { fingerprint: user.id, eventId: event.id } },
@@ -581,13 +624,102 @@ async function seedEngagement(posts: SeedPost[]) {
         create: { fingerprint: user.id, userId: user.id, eventId: event.id },
       });
     }
-    for (const user of timelineUsers.slice(0, 2)) {
-      const text = "این رویداد برای درک مسیر تکامل زیرساخت واقعاً مهم است.";
-      const exists = await prisma.timelineComment.findFirst({ where: { eventId: event.id, authorName: user.name, text } });
-      if (!exists) await prisma.timelineComment.create({ data: { eventId: event.id, authorName: user.name, text } });
+    const texts = [
+      "این نقطه عطف نشان می‌دهد فناوری همیشه با نیاز واقعی انسان جلو رفته است.",
+      "ارتباط این رویداد با زیرساخت‌های امروزی خیلی جالب است.",
+      "خوب است در آینده منابع تاریخی بیشتری هم کنار کارت اضافه شود.",
+    ];
+    for (let i = 0; i < 3 && i < timelineUsers.length; i += 1) {
+      await prisma.timelineComment.create({ data: { eventId: event.id, authorName: timelineUsers[(eventIndex + i) % timelineUsers.length].name, text: texts[i] } });
     }
   }
-  console.log(`Seeded engagement for ${posts.length} posts and ${timelineEvents.length} timeline events.`);
+  console.log(`Seeded varied engagement for ${posts.length} posts and ${timelineEventsDb.length} timeline events.`);
+}
+
+
+
+const timelineEvents = [
+  { title: "نخستین ابزارهای سنگی", description: "آغاز فناوری با ابزارهای سنگی ساده، توان انسان را برای شکار، ساخت و بقا چند برابر کرد.", image: `${BLOB}/timeline-images/timeline1.jpg`, dateGr: "0001-01-01T00:00:00.000Z", dateFa: "حدود ۳.۳ میلیون سال پیش", year: 1, yearFa: 1, importance: 9, tags: ["ابزار", "سنگ", "آغاز فناوری"] },
+  { title: "مهار آتش", description: "کنترل آتش مسیر پخت غذا، گرمایش، امنیت و شکل‌گیری اجتماع‌های انسانی را دگرگون کرد.", image: `${BLOB}/timeline-images/timeline2.jpg`, dateGr: "0002-01-01T00:00:00.000Z", dateFa: "حدود ۱ میلیون سال پیش", year: 2, yearFa: 2, importance: 9, tags: ["آتش", "انرژی", "تمدن"] },
+  { title: "انقلاب کشاورزی", description: "کشاورزی و اهلی‌سازی حیوانات باعث سکونت‌گاه‌های پایدار، ذخیره غذا و رشد شهرها شد.", image: `${BLOB}/timeline-images/timeline3.jpg`, dateGr: "0003-01-01T00:00:00.000Z", dateFa: "حدود ۱۰٬۰۰۰ سال پیش", year: 3, yearFa: 3, importance: 8, tags: ["کشاورزی", "تمدن", "شهرنشینی"] },
+  { title: "اختراع چرخ", description: "چرخ حمل‌ونقل، سفال‌گری، ماشین‌های اولیه و در نهایت مهندسی مکانیک را متحول کرد.", image: `${BLOB}/timeline-images/timeline4.jpg`, dateGr: "0004-01-01T00:00:00.000Z", dateFa: "حدود ۳۵۰۰ پیش از میلاد", year: 4, yearFa: 4, importance: 8, tags: ["چرخ", "حمل‌ونقل", "مکانیک"] },
+  { title: "خط و ثبت دانش", description: "نوشتار امکان انتقال دقیق دانش، حسابداری، قانون و مدیریت فناوری در مقیاس بزرگ را فراهم کرد.", image: `${BLOB}/timeline-images/timeline5.jpg`, dateGr: "0005-01-01T00:00:00.000Z", dateFa: "حدود ۳۲۰۰ پیش از میلاد", year: 5, yearFa: 5, importance: 9, tags: ["نوشتار", "دانش", "اطلاعات"] },
+  { title: "عصر برنز", description: "آلیاژسازی مس و قلع ابزارها، سلاح‌ها و سازه‌های مقاوم‌تری را وارد زندگی انسان کرد.", image: `${BLOB}/timeline-images/timeline6.jpg`, dateGr: "0006-01-01T00:00:00.000Z", dateFa: "حدود ۳۰۰۰ پیش از میلاد", year: 6, yearFa: 6, importance: 7, tags: ["فلزکاری", "برنز", "ابزار"] },
+  { title: "عصر آهن", description: "فناوری استخراج و شکل‌دهی آهن، کشاورزی، جنگ‌افزار و ساخت‌وساز را وارد مرحله تازه‌ای کرد.", image: `${BLOB}/timeline-images/timeline7.jpg`, dateGr: "0007-01-01T00:00:00.000Z", dateFa: "حدود ۱۲۰۰ پیش از میلاد", year: 7, yearFa: 7, importance: 7, tags: ["آهن", "متالورژی", "صنعت"] },
+  { title: "کاغذ و تکثیر دانش", description: "کاغذ هزینه ثبت و انتقال دانش را کاهش داد و زیرساختی برای آموزش، علم و دیوان‌سالاری شد.", image: `${BLOB}/timeline-images/timeline8.jpg`, dateGr: "0105-01-01T00:00:00.000Z", dateFa: "۱۰۵ میلادی", year: 105, yearFa: 105, importance: 8, tags: ["کاغذ", "دانش", "آموزش"] },
+  { title: "قطب‌نما و ناوبری", description: "قطب‌نما سفرهای دریایی، تجارت جهانی و نقشه‌برداری دقیق‌تر را ممکن کرد.", image: `${BLOB}/timeline-images/timeline9.jpg`, dateGr: "1100-01-01T00:00:00.000Z", dateFa: "حدود قرن ۱۲ میلادی", year: 1100, yearFa: 1100, importance: 7, tags: ["قطب‌نما", "ناوبری", "تجارت"] },
+  { title: "چاپ با حروف متحرک", description: "چاپ گوتنبرگ سرعت تکثیر کتاب و انتشار دانش را به شکل بی‌سابقه‌ای افزایش داد.", image: `${BLOB}/timeline-images/timeline10.jpg`, dateGr: "1450-01-01T00:00:00.000Z", dateFa: "حدود ۱۴۵۰ میلادی", year: 1450, yearFa: 1450, importance: 9, tags: ["چاپ", "کتاب", "رسانه"] },
+  { title: "موتور بخار", description: "موتور بخار پایه انقلاب صنعتی، کارخانه‌ها، راه‌آهن و تولید انبوه مدرن شد.", image: `${BLOB}/timeline-images/timeline11.jpg`, dateGr: "1712-01-01T00:00:00.000Z", dateFa: "۱۷۱۲ میلادی", year: 1712, yearFa: 1712, importance: 9, tags: ["بخار", "انقلاب صنعتی", "ماشین"] },
+  { title: "تلگراف و ارتباط سریع", description: "تلگراف برای نخستین بار پیام‌ها را سریع‌تر از حمل فیزیکی در مسافت‌های طولانی منتقل کرد.", image: `${BLOB}/timeline-images/timeline12.jpg`, dateGr: "1837-01-01T00:00:00.000Z", dateFa: "۱۸۳۷ میلادی", year: 1837, yearFa: 1837, importance: 8, tags: ["تلگراف", "ارتباطات", "شبکه"] },
+  { title: "تلفن", description: "تلفن ارتباط صوتی زنده را به خانه‌ها، شرکت‌ها و شبکه‌های شهری آورد.", image: `${BLOB}/timeline-images/timeline13.jpg`, dateGr: "1876-01-01T00:00:00.000Z", dateFa: "۱۸۷۶ میلادی", year: 1876, yearFa: 1876, importance: 8, tags: ["تلفن", "صوت", "ارتباطات"] },
+  { title: "برق‌رسانی و روشنایی", description: "شبکه‌های برق و لامپ‌های کاربردی، کار شبانه، کارخانه‌های مدرن و زندگی شهری را متحول کردند.", image: `${BLOB}/timeline-images/timeline14.jpg`, dateGr: "1879-01-01T00:00:00.000Z", dateFa: "۱۸۷۹ میلادی", year: 1879, yearFa: 1879, importance: 9, tags: ["برق", "لامپ", "انرژی"] },
+  { title: "پرواز کنترل‌شده", description: "پرواز برادران رایت نشان داد ماشین‌های سنگین‌تر از هوا می‌توانند کنترل‌شده و پایدار پرواز کنند.", image: `${BLOB}/timeline-images/timeline15.jpg`, dateGr: "1903-01-01T00:00:00.000Z", dateFa: "۱۹۰۳ میلادی", year: 1903, yearFa: 1903, importance: 8, tags: ["هواپیما", "پرواز", "حمل‌ونقل"] },
+  { title: "ترانزیستور", description: "ترانزیستور کوچک‌سازی، پایداری و رشد انفجاری رایانه‌ها و الکترونیک دیجیتال را ممکن کرد.", image: `${BLOB}/timeline-images/timeline16.jpg`, dateGr: "1947-01-01T00:00:00.000Z", dateFa: "۱۹۴۷ میلادی", year: 1947, yearFa: 1947, importance: 10, tags: ["ترانزیستور", "رایانه", "الکترونیک"] },
+  { title: "اینترنت و وب", description: "شبکه‌های رایانه‌ای و وب، دسترسی جهانی به اطلاعات، ارتباطات و اقتصاد دیجیتال را شکل دادند.", image: `${BLOB}/timeline-images/timeline17.jpg`, dateGr: "1989-01-01T00:00:00.000Z", dateFa: "۱۹۸۹ میلادی", year: 1989, yearFa: 1989, importance: 10, tags: ["اینترنت", "وب", "اطلاعات"] },
+];
+
+async function replaceTimeline() {
+  await prisma.timelineCommentVote.deleteMany();
+  await prisma.timelineComment.deleteMany();
+  await prisma.timelineLike.deleteMany();
+  await prisma.timelineEvent.deleteMany();
+  for (const event of timelineEvents) {
+    await prisma.timelineEvent.create({
+      data: {
+        title: event.title,
+        description: event.description,
+        image: event.image,
+        dateGr: new Date(event.dateGr),
+        dateFa: event.dateFa,
+        year: event.year,
+        yearFa: event.yearFa,
+        importance: event.importance,
+        tags: JSON.stringify(event.tags),
+        published: true,
+      },
+    });
+  }
+  console.log(`Replaced timeline with ${timelineEvents.length} technology history events.`);
+}
+
+const duplicateSeedTexts = [
+  "مقاله کاربردی بود؛ مخصوصاً بخش چک‌لیست اجرایی برای تیم‌های کوچک خیلی کمک می‌کند.",
+  "در تصمیم خرید، بخش تجربه عملی و محدودیت‌های محصول برای ما از مشخصات خام مهم‌تر است.",
+  "برای انتخاب نهایی بهتر است سناریوی استفاده و ظرفیت رشد هم کنار مشخصات محصول بررسی شود.",
+  "ویدیو روان و قابل فهم بود؛ اگر فایل‌های نمونه یا دیاگرام هم اضافه شود عالی می‌شود.",
+  "خوب است کنار خبر، اثر عملی آن روی تصمیم‌های زیرساختی هم توضیح داده شده.",
+  "لطفاً اگر checksum یا نسخه جدیدتر منتشر شد در همین صفحه بروزرسانی شود.",
+  "مطلب مفیدی بود و برای تصمیم‌گیری فنی کمک کرد.",
+];
+
+async function cleanOldContent() {
+  const seedUsernames = seedUsers.map((u) => u.username);
+  const seedPosts = [...mediaPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...downloadPosts, ...forumPosts, ...productPosts];
+  const modules = ["blog", "news", "media", "review", "download", "shop", "forum"];
+  const seedByModule = new Map<string, string[]>();
+  for (const post of seedPosts) seedByModule.set(post.module, [...(seedByModule.get(post.module) || []), post.slug]);
+
+  await prisma.comment.deleteMany({ where: { text: { in: duplicateSeedTexts } } });
+
+  for (const moduleKey of modules) {
+    const keep = seedByModule.get(moduleKey) || [];
+    const oldPosts = await prisma.post.findMany({ where: { module: moduleKey, slug: { notIn: keep } }, select: { slug: true } });
+    if (oldPosts.length) {
+      const oldSlugs = oldPosts.map((post) => post.slug);
+      await prisma.like.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
+      await prisma.post.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
+    }
+  }
+
+  const oldUsers = await prisma.user.findMany({ where: { username: { notIn: seedUsernames } }, select: { id: true } });
+  const oldUserIds = oldUsers.map((u) => u.id);
+  if (oldUserIds.length) {
+    await prisma.post.updateMany({ where: { authorId: { in: oldUserIds } }, data: { authorId: null } });
+    await prisma.comment.updateMany({ where: { authorId: { in: oldUserIds } }, data: { authorId: null } });
+    await prisma.user.deleteMany({ where: { id: { in: oldUserIds } } });
+  }
+
+  console.log(`Cleaned old content/users. Kept ${seedPosts.length} posts and ${seedUsers.length} users.`);
 }
 
 async function upsertUsers() {
@@ -623,6 +755,7 @@ async function upsertUsers() {
 async function main() {
   const stepArg = process.argv.find((arg) => arg.startsWith("--step="));
   const step = stepArg?.split("=")[1] || "all";
+  if (step === "clean" || step === "reset" || step === "all") await cleanOldContent();
   if (step === "0" || step === "users" || step === "all") await upsertUsers();
   if (step === "1" || step === "media" || step === "all") await upsertPosts(mediaPosts);
   if (step === "2" || step === "articles" || step === "blog" || step === "all") await upsertPosts(articlePosts);
@@ -635,6 +768,7 @@ async function main() {
     await seedLikesForPosts([...forumPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...mediaPosts, ...downloadPosts]);
   }
   if (step === "7" || step === "shop" || step === "products" || step === "all") await upsertPosts(productPosts);
+  if (step === "timeline" || step === "all") await replaceTimeline();
   if (step === "8" || step === "engagement" || step === "all") {
     await seedEngagement([...mediaPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...downloadPosts, ...forumPosts, ...productPosts]);
   }
