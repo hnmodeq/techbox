@@ -106,3 +106,30 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label {
 @theme inline {
   --font-family-sans: var(--font-kalameh);
 }
+
+/* Home news ticker --------------------------------------------------------- */
+.ticker-track {
+  animation: techbox-ticker-scroll 42s linear infinite;
+  will-change: transform;
+}
+
+.ticker-wrapper:hover .ticker-track,
+.ticker-wrapper:focus-within .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes techbox-ticker-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-33.333%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+    transform: none;
+  }
+}
