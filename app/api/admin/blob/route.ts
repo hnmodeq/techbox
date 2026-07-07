@@ -95,8 +95,7 @@ export async function GET(req: NextRequest) {
       if (!cursor) break;
     }
 
-    const files = blobs
-      .filter((blob) => !blob.pathname.slice(prefix.length).includes("/"))
+    const allFiles = blobs
       .map((blob) => ({
         pathname: blob.pathname,
         name: blob.pathname.split("/").pop() || blob.pathname,
@@ -108,6 +107,8 @@ export async function GET(req: NextRequest) {
       }))
       .sort((a, b) => a.pathname.localeCompare(b.pathname));
 
+    const files = allFiles.filter((blob) => !blob.pathname.slice(prefix.length).includes("/"));
+
     const folders = collectFolders(blobs, prefix);
     const totalSize = blobs.reduce((sum, blob) => sum + (blob.size || 0), 0);
 
@@ -115,6 +116,7 @@ export async function GET(req: NextRequest) {
       prefix,
       folders,
       files,
+      allFiles,
       totalFiles: blobs.length,
       totalSize,
       hasMore,
