@@ -16,6 +16,8 @@ export type ContentItem = {
   excerpt: string;
   content?: string;
   image?: string;
+  videoUrl?: string | null;
+  gallery?: string[];
   tags: string[];
   author: { name: string; role?: string; avatar?: string };
   date: string; // ISO
