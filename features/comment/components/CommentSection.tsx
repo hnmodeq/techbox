@@ -76,13 +76,23 @@ export default function CommentSection({ module, slug }: { module: string; slug:
     <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
       <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
         <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
-          <div className="flex justify-between items-center gap-2">
-            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-semibold text-[var(--primary-text)]">{(c as any).authorName || "کاربر"}</div>
-            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+          <div className="flex justify-between items-start gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              {(c as any).author?.avatar ? (
+                <Image src={(c as any).author.avatar} width={34} height={34} alt={(c as any).authorName || "کاربر"} className="h-8.5 w-8.5 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
+              ) : (
+                <div className="h-8 w-8 rounded-full bg-[var(--muted-background)] flex items-center justify-center"><Icon name="user" size={15} /></div>
+              )}
+              <div className="min-w-0">
+                <div className="text-[length:var(--paragraph-font-size)] font-semibold text-[var(--primary-text)] truncate">{(c as any).authorName || "کاربر"}</div>
+                {(c as any).author?.username && <div className="text-[11px] paragraph-color" dir="ltr">@{(c as any).author.username}</div>}
+              </div>
+            </div>
+            <div className="text-[length:var(--paragraph-font-size)] paragraph-color shrink-0">
               {new Date((c as any).createdAt).toLocaleString("fa-IR", { dateStyle: "medium", timeStyle: "short" })}
             </div>
           </div>
-          <p className="mt-2 whitespace-pre-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{(c as any).text}</p>
+          <p className="mt-2 whitespace-pre-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{depth > 0 && (c as any).author?.username ? <span className="text-[var(--home)]" dir="ltr">@{(c as any).author.username} </span> : null}{(c as any).text}</p>
           <div className="flex items-center gap-4 mt-3">
             <CommentVote
               id={c.id}

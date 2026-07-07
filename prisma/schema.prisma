@@ -22,6 +22,7 @@ model User {
 
   posts    Post[]
   comments Comment[]
+  ratings  Rating[]
 }
 
 model Post {
@@ -53,8 +54,23 @@ model Post {
 
   author   User?     @relation(fields: [authorId], references: [id])
   comments Comment[]
+  ratings  Rating[]
 
   @@unique([module, slug], name: "module_slug")
+}
+
+model Rating {
+  id          String   @id @default(cuid())
+  postId      String
+  userId      String
+  value       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId], name: "postId_userId")
 }
 
 model Comment {
@@ -87,11 +103,12 @@ model CommentVote {
 }
 
 model Like {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   fingerprint String
   userId      String?
   module      String
   slug        String
+  createdAt   DateTime @default(now())
 
   @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
 }
@@ -143,10 +160,11 @@ model TimelineCommentVote {
 }
 
 model TimelineLike {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   fingerprint String
   userId      String?
   eventId     String
+  createdAt   DateTime @default(now())
 
   event TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 

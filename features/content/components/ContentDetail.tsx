@@ -29,6 +29,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <p className="paragraph-color mt-4 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">{item.excerpt}</p>
 
  <div className="flex flex-wrap items-center gap-3 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
+ {item.module !== "media" && (
  <div className="flex items-center gap-2">
  {item.author?.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--corner-radius)] object-cover ring-1 ring-[var(--border-color)]" alt={item.author.name || "نویسنده"} />}
  <div>
@@ -36,6 +37,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <div className="paragraph-color text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{item.author?.role || "تحریریه"}</div>
  </div>
  </div>
+ )}
  <div className="ms-auto flex items-center gap-2 paragraph-color">
  <LiveViewCounter module={item.module} slug={item.slug} />
  </div>
@@ -49,7 +51,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  controls
  playsInline
  poster={item.image}
- className="w-full aspect-video object-contain bg-black"
+ className="mx-auto h-[70vh] max-h-[780px] aspect-[9/16] object-contain bg-black"
  src={videoSrc}
  />
  <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex items-center gap-4">
@@ -67,11 +69,13 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <p>{item.content || item.excerpt}</p>
  </div>
 
+ {item.module !== "media" && (
  <div className="flex flex-wrap gap-2 mt-8">
  {(item.tags || []).map(t => (
  <Link key={t} href={`/search?q=${encodeURIComponent(t)}`} className="transition-opacity hover:opacity-85"><span className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-transparent px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">#{t}</span></Link>
  ))}
  </div>
+ )}
 
  <div className="mt-8 flex flex-wrap items-center gap-3">
  <LikeButton contentType={item.module} slug={item.slug} />

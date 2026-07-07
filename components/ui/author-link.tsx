@@ -4,6 +4,17 @@ import Link from "next/link";
 import Image from "next/image";
 
 const nameToSlug: Record<string, string> = {
+
+  "هومن مدق": "hoomanmodeq",
+  "عطیه حاتمی": "atiyehatami",
+  "بهناز قادری": "behnazghaderi",
+  "بهروز قادری": "behruzghaderi",
+  "نسترن خداکرمی": "nastarankhodakarami",
+  "فراز فیضی": "farazfeizi",
+  "مصطفی نجفی": "mostafanajafi",
+  "پانیز باقری": "panizbagheri",
+  "شقایق رستگار": "shaghayeghrastegaar",
+  "فرید فیضی": "faridfeizi",
   "سارا احمدی": "sara",
   "نیما": "nima",
   "روژینا باقری": "rojina",

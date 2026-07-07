@@ -75,12 +75,12 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
       <Button
         onClick={toggle}
         disabled={busy}
-        variant={liked ? "primary" : "ghost"}
+        variant="ghost"
         size="sm"
-        className="gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] disabled:opacity-60"
+        className={`gap-2 text-[length:var(--paragraph-font-size)] disabled:opacity-60 ${liked ? "text-red-500" : "text-[var(--paragraph-color)]"}`}
         aria-pressed={liked}
       >
-        <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-white" : ""} aria-hidden />
+        <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-red-500" : ""} aria-hidden />
         <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
         <span className="hidden sm:inline">پسندیدم</span>
       </Button>
@@ -98,46 +98,37 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
   );
 }
 
-export function CommentVote({ id, initialLikes = 0, initialDislikes = 0 }: { id: string; initialLikes?: number; initialDislikes?: number }) {
+export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes?: number; initialDislikes?: number }) {
   const [l, setL] = useState(initialLikes);
-  const [d, setD] = useState(initialDislikes);
-  const [v, setV] = useState<"up" | "down" | null>(null);
+  const [v, setV] = useState<"up" | null>(null);
   const [needLogin, setNeedLogin] = useState(false);
-  const router = useRouter();
 
-  const vote = async (type: "up" | "down") => {
-    const next = v === type ? 0 : (type === "up" ? 1 : -1);
-    const prev = v === "up" ? 1 : v === "down" ? -1 : 0;
+  const vote = async () => {
+    const next = v === "up" ? 0 : 1;
     try {
       const res = await fetch("/api/comments/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commentId: id, vote: next })
       });
-      if (res.status === 401) {
-        setNeedLogin(true);
-        return;
-      }
+      if (res.status === 401) { setNeedLogin(true); return; }
       if (res.ok) {
         const data = await res.json();
         setL(data.likes);
-        setD(data.dislikes);
-        setV(next === 0 ? null : type);
+        setV(next === 0 ? null : "up");
       }
     } catch {}
   };
 
   return (
-    <div className="relative inline-flex items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-      <Button onClick={() => vote("up")} variant="link" size="xs" className={v === "up" ? "text-[var(--success)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▲ {(l ?? 0).toLocaleString("fa-IR")}</Button>
-      <Button onClick={() => vote("down")} variant="link" size="xs" className={v === "down" ? "text-[var(--danger)]" : "paragraph-color hover:text-[var(--primary-text)]"}>▼ {(d ?? 0).toLocaleString("fa-IR")}</Button>
+    <div className="relative inline-flex items-center gap-2 text-[length:var(--paragraph-font-size)] paragraph-color">
+      <Button onClick={vote} variant="link" size="xs" className={v === "up" ? "text-red-500" : "paragraph-color hover:text-red-500"}>
+        <Heart size={15} fill={v === "up" ? "currentColor" : "none"} /> {(l ?? 0).toLocaleString("fa-IR")}
+      </Button>
       {needLogin && (
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)] text-center">
-          <p className="text-xs text-[var(--primary-text)] mb-1.5">برای امتیاز به نظر ابتدا وارد شوید</p>
-          <div className="flex justify-center gap-2">
-            <Button size="xs" onClick={() => { setNeedLogin(false); window.dispatchEvent(new CustomEvent("tb_open_auth")); }}>ورود</Button>
-            <Button variant="ghost" size="xs" onClick={() => setNeedLogin(false)}>بستن</Button>
-          </div>
+          <p className="text-xs text-[var(--primary-text)] mb-1.5">برای پسندیدن نظر ابتدا وارد شوید</p>
+          <Button size="xs" onClick={() => { setNeedLogin(false); window.dispatchEvent(new CustomEvent("tb_open_auth")); }}>ورود</Button>
         </div>
       )}
     </div>

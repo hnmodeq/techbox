@@ -1,14 +1,17 @@
 'use client';
 
 import React from 'react';
-import { getLatest, getCommentCount } from '@/lib/content';
+import { getLatest } from '@/lib/content';
+import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CardStats } from '@/components/ui/card-stats';
 
 export default function ShopRow() {
-  const products = getLatest('shop', 5);
+  const fallbackProducts = getLatest('shop', 5);
+  const { items: dbProducts } = useDbPosts('shop', fallbackProducts, 5);
+  const products = dbProducts.slice(0, 5);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">

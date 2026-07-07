@@ -66,11 +66,13 @@ export default function HomeTimelineRow() {
         {/* Eager loading container replaced with click-to-activate performance wrapper */}
         <div className="w-full rounded-[var(--corner-radius)] border-0 overflow-hidden shadow-none">
           {!active ? (
-            <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 sm:p-12 text-center bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] flex flex-col items-center justify-center gap-4">
-              <Icon name="timeline" className="w-12 h-12 text-[var(--timeline)] opacity-80" />
-              <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)]">تایم‌لاین تعاملی فناوری اطلاعات تکباکس</h3>
-              <p className="text-xs sm:text-sm paragraph-color max-w-lg leading-6">
-                برای سرعت بیشتر در بارگذاری صفحه و صرفه‌جویی در منابع پردازشی دستگاه شما، تایم‌لاین زنده تنها در صورت تقاضا بارگذاری می‌شود.
+            <div className="relative min-h-[360px] overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] flex flex-col items-center justify-center gap-4 p-8 sm:p-12 text-center">
+              <div className="absolute inset-0 bg-[url('https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com/timeline-images/timeline1.jpg')] bg-cover bg-center opacity-45" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--main-background)] via-[var(--main-background)]/70 to-transparent" />
+              <Icon name="timeline" className="relative w-12 h-12 text-[var(--timeline)] opacity-90" />
+              <h3 className="relative text-lg sm:text-xl font-black text-[var(--primary-text)]">تایم‌لاین تعاملی تاریخ فناوری</h3>
+              <p className="relative text-xs sm:text-sm paragraph-color max-w-lg leading-6">
+                برای سرعت بیشتر صفحه، نسخه تعاملی فقط با کلیک شما بارگذاری می‌شود.
               </p>
               <button
                 type="button"

@@ -74,7 +74,7 @@ export default function Chatbot(){
  <div dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{zIndex:zIndex.chatbot}}>
  <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] !bg-[var(--modal-background)] flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0">
  <div className="flex items-center justify-between border-b-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] px-3 py-2.5">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">دستیار تکباکس <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">AI Beta</span></div>
+ <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">پشتیبانی تکباکس</div>
  <div className="flex items-center gap-2">
  <Button variant="link" size="xs" onClick={()=>{setMsgs([]); localStorage.removeItem(STORAGE_KEY)}} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--primary-text)]">پاک‌سازی</Button>
  <CloseButton onClick={()=>setOpen(false)} label="بستن چت" />
@@ -83,14 +83,8 @@ export default function Chatbot(){
 
  <div className="flex-1 space-y-3 overflow-y-auto bg-[var(--main-background)] p-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {msgs.length===0 && (
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- سلام! من دستیار هوشمند تکباکس هستم.<br/>
- درباره محصولات (مثلا <b>QNAP-2277</b>)، مشکلات شبکه، یا مقالات بپرسید.<br/>
- <div className="flex flex-wrap gap-1.5 mt-2">
- {["قیمت QNAP-2277؟","RAID مناسب سرور HP؟","فرق NAS و SAN؟","مشکل iSCSI؟"].map(s=>(
- <ChipButton key={s} tone="brand" onClick={()=>setInput(s)} className="px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{s}</ChipButton>
- ))}
- </div>
+ <div className="text-[length:var(--paragraph-font-size)] paragraph-color text-center py-8">
+   سوال خود را بنویسید. پاسخ هوشمند بعداً با API فعال می‌شود.
  </div>
  )}
  {msgs.map((m,i)=>(
@@ -117,9 +111,7 @@ export default function Chatbot(){
  {loading ? "…" : "ارسال"}
  </Button>
  </form>
- <div className="px-3 pb-2 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- پاسخ‌ها ممکن است نادرست باشند – همیشه مستندات رسمی را چک کنید • API: <code>/api/chat</code>
- </div>
+
  </div>
  </div>
  )}

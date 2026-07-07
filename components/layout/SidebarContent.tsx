@@ -327,7 +327,7 @@ export default function SidebarContent({
 
             if (item.children && item.children.length > 0) {
               return (
-                <div key={item.href} className="flex flex-col">
+                <div key={item.href} className="flex flex-col" onMouseEnter={() => expanded && setToolsExpanded(true)}>
                   <SidebarTooltip label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
                     <div className="flex items-center">
                       <Link
@@ -348,7 +348,7 @@ export default function SidebarContent({
                           className="flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] paragraph-color hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] cursor-pointer shrink-0"
                           aria-label="زیرمنو ابزارها"
                         >
-                          <span className={`transition-transform duration-200 ${toolsExpanded ? "rotate-90" : "-rotate-90 rtl:rotate-90"}`}>▼</span>
+                          <Icon name={toolsExpanded ? "chevronDown" : "chevronLeft"} size={16} strokeWidth={2} />
                         </button>
                       )}
                     </div>

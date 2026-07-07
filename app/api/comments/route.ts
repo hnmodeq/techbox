@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     const comments = await prisma.comment.findMany({
       where: { postId: post.id },
       orderBy: { createdAt: "asc" },
-      include: { replies: { orderBy: { createdAt: "asc" } } },
+      include: { author: { select: { name: true, username: true, avatar: true } }, replies: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, username: true, avatar: true } } } } },
     });
     return NextResponse.json(comments);
   } catch {

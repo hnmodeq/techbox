@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { zIndex } from '@/design';
 import { sidebarBase } from '@/config/sidebar.config';
+import { CardStats } from '@/components/ui/card-stats';
 
 const NEWS_SIDEBAR_OPEN_KEY = 'techbox-news-sidebar-open';
 
@@ -149,6 +150,9 @@ export default function NewsSidebar() {
               <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1.5 line-clamp-2 leading-5">
                 {n.excerpt}
               </p>
+              <div className="mt-2">
+                <CardStats module="news" slug={n.slug} showComments={true} />
+              </div>
             </Link>
           ))}
         </div>
