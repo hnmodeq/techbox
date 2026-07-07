@@ -13,8 +13,6 @@ type ForumDetailProps = {
 };
 
 export default function ForumDetail({ item }: ForumDetailProps) {
-  const solved = !item.slug.includes("proxmox");
-
   return (
     <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
@@ -44,7 +42,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{item.title}</h1>
-                <ForumBadge slug={item.slug} fallback={item.solved ?? solved} />
+                <ForumBadge slug={item.slug} fallback={null} />
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                 <span>

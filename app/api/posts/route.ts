@@ -14,7 +14,7 @@ export async function GET(req: NextRequest){
  select: {
  slug: true, module: true, title: true, excerpt: true, image: true,
  tags: true, date: true, dateFa: true, likes: true, views: true,
- category: true, authorName: true
+ category: true, authorName: true, solved: true
  }
  });
  const out = posts.map(p => ({ ...p, tags: JSON.parse(p.tags || "[]"), author: { name: p.authorName }}));

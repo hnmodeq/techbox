@@ -205,15 +205,15 @@ export default function SidebarContent({
  <div className="relative flex h-full w-full flex-col text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" dir="rtl">
  <header className="shrink-0 space-y-3 p-3">
  <div className="flex h-10 items-center gap-2">
- <div className="relative h-10 w-10 shrink-0">
+ <div className="relative h-10 w-10 shrink-0 bg-[url('/logo.png')] bg-contain bg-center bg-no-repeat">
  {onLogoClick ? (
  <SidebarTooltip label="باز/بستن منو" enabled={!expanded} tooltipClassName="text-[var(--home)]">
- <Button onClick={onLogoClick} variant="link" size="icon" className="relative h-10 w-10 overflow-hidden rounded-[var(--corner-radius)] p-0 transition-opacity hover:opacity-90" aria-label="toggle sidebar">
- <Image src="/logo.png" alt="تکباکس" fill sizes="40px" className="object-contain" />
+ <Button onClick={onLogoClick} variant="link" size="icon" className="relative h-10 w-10 overflow-hidden rounded-[var(--corner-radius)] bg-[url('/logo.png')] bg-contain bg-center bg-no-repeat p-0 transition-opacity hover:opacity-90" aria-label="toggle sidebar">
+ <Image src="/logo.png" alt="تکباکس" fill sizes="40px" priority className="object-contain" />
  </Button>
  </SidebarTooltip>
  ) : (
- <Image src="/logo.png" alt="تکباکس" fill sizes="40px" className="object-contain" />
+ <Image src="/logo.png" alt="تکباکس" fill sizes="40px" priority className="object-contain" />
  )}
  </div>
 

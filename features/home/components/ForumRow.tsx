@@ -43,7 +43,7 @@ export default function ForumRow() {
                   <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">
                     {top.author?.name || 'عضو تکباکس'}
                   </span>
-                  <ForumBadge slug={top.slug} fallback={idx % 2 === 0} />
+                  <ForumBadge slug={top.slug} fallback={null} />
                 </div>
 
                 <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">

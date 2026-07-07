@@ -173,7 +173,7 @@ export default function ForumList() {
                   <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--forum)]">
                     {t.title}
                   </span>
-                  <ForumBadge slug={t.slug} fallback={realSolved(t)} />
+                  <ForumBadge slug={t.slug} fallback={null} />
                 </div>
                 <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1">
                   ارسال‌شده توسط{" "}

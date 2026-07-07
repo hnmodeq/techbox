@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { useStatEntry } from "@/providers/stats.provider";
 
-export function ForumBadge({ slug, fallback = false }: { slug: string; fallback?: boolean }) {
-  const [solved, setSolved] = useState(fallback);
+export function ForumBadge({ slug, fallback = null }: { slug: string; fallback?: boolean | null }) {
+  const [solved, setSolved] = useState<boolean | null>(fallback);
   const { entry: shared, status } = useStatEntry("forum", slug);
 
   useEffect(() => {
@@ -28,6 +28,14 @@ export function ForumBadge({ slug, fallback = false }: { slug: string; fallback?
       .catch(() => {});
     return () => { mounted = false; };
   }, [slug, shared, status]);
+
+  if (solved === null) {
+    return (
+      <span className="rounded-full bg-[color-mix(in_oklch,var(--info)_10%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--info)_24%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--info)]">
+        در حال بررسی…
+      </span>
+    );
+  }
 
   return solved ? (
     <span className="rounded-full bg-[color-mix(in_oklch,var(--success)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--success)]">
