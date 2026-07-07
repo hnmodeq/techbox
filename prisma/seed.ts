@@ -50,6 +50,8 @@ async function main(){
         excerpt: p.excerpt || "",
         content: p.content || p.excerpt || "",
         image: p.image || null,
+        videoUrl: p.videoUrl || null,
+        gallery: JSON.stringify(p.gallery || []),
         tags: JSON.stringify(p.tags || []),
         category: p.category || null,
         authorName: p.author?.name || "تحریریه",
