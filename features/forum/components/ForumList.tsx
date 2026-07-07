@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { zIndex } from "@/design";
 import { Button } from "@/components/ui/button";
 import ModuleHeader from "@/components/effects/ModuleHeader";
@@ -18,32 +18,70 @@ type ForumPost = ReturnType<typeof getModuleItems>[0] & { solved?: boolean };
 export default function ForumList() {
   const { stats } = useStats();
 
-  // Real stats come from the database (filled in by the bulk /api/stats
-  // request). Until they arrive we fall back to the static seed value so the
-  // UI never shows a fabricated number.
-  const realLikes = (t: ForumPost) => stats[`forum:${t.slug}`]?.likes ?? t.likes ?? 0;
-  const realSolved = (t: ForumPost) =>
-    stats[`forum:${t.slug}`]?.solved ?? (t as any).solved ?? false;
-
-  const items = getModuleItems("forum").map((t) => ({
+  const fallbackItems = getModuleItems("forum").map((t) => ({
     ...t,
-    solved: (t as any).solved ?? false,
     avatar: t.author?.avatar || "/assets/hooman.png",
   })) as (ForumPost & { avatar: string })[];
 
+  const [dbItems, setDbItems] = useState<(ForumPost & { avatar: string })[] | null>(null);
+  const [loadingTopics, setLoadingTopics] = useState(true);
+  const [topicsError, setTopicsError] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [local, setLocal] = useState<typeof items>([]);
+  const [local, setLocal] = useState<(ForumPost & { avatar: string })[]>([]);
   const [filter, setFilter] = useState<"داغ" | "جدید" | "برتر" | "حل‌شده">("داغ");
 
-  const merged = [...local, ...items];
+  useEffect(() => {
+    let mounted = true;
+
+    fetch("/api/posts?module=forum&take=100", { cache: "no-store" })
+      .then((r) => {
+        if (!r.ok) throw new Error("forum_posts_unavailable");
+        return r.json();
+      })
+      .then((data) => {
+        if (!mounted) return;
+        const nextItems = Array.isArray(data)
+          ? data.map((t: ForumPost) => ({
+              ...t,
+              avatar: t.author?.avatar || "/assets/hooman.png",
+            }))
+          : [];
+        setDbItems(nextItems as (ForumPost & { avatar: string })[]);
+        setTopicsError(false);
+      })
+      .catch(() => {
+        if (mounted) {
+          setDbItems(null);
+          setTopicsError(true);
+        }
+      })
+      .finally(() => {
+        if (mounted) setLoadingTopics(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Real stats/status come from the database (bulk /api/stats request). The
+  // topic list itself is DB-first via /api/posts; static seed data is only a
+  // resilience fallback if the DB/API is unavailable.
+  const realLikes = (t: ForumPost) => stats[`forum:${t.slug}`]?.likes ?? t.likes ?? 0;
+  const realViews = (t: ForumPost) => stats[`forum:${t.slug}`]?.views ?? t.views ?? 0;
+  const realSolved = (t: ForumPost) =>
+    stats[`forum:${t.slug}`]?.solved ?? (typeof (t as any).solved === "boolean" ? (t as any).solved : false);
+
+  const sourceItems = dbItems ?? (topicsError ? fallbackItems : []);
+  const merged = [...local, ...sourceItems];
   const all = (() => {
     const list = [...merged];
     if (filter === "جدید") return list.sort((a, b) => +new Date(b.date) - +new Date(a.date));
     if (filter === "برتر") return list.sort((a, b) => realLikes(b) - realLikes(a));
     if (filter === "حل‌شده") return list.filter((t) => realSolved(t));
-    return list.sort((a, b) => (b.views ?? 0) - (a.views ?? 0)); // داغ
+    return list.sort((a, b) => realViews(b) - realViews(a)); // داغ
   })();
 
   const submitTopic = (e: FormEvent) => {
@@ -70,7 +108,7 @@ export default function ForumList() {
       category: "پرسش",
       solved: false,
     };
-    setLocal((l) => [nt, ...l]);
+    setLocal((l) => [nt as ForumPost & { avatar: string }, ...l]);
     setTitle("");
     setBody("");
     setShowNew(false);
@@ -85,7 +123,7 @@ export default function ForumList() {
         module="forum"
         title="انجمن تکباکس"
         description="پرسش و پاسخ تخصصی زیرساخت و شبکه"
-        count={`${all.length.toLocaleString("fa-IR")} موضوع`}
+        count={loadingTopics ? "در حال دریافت…" : `${all.length.toLocaleString("fa-IR")} موضوع`}
       >
         <div className="flex gap-2">
           <input
@@ -122,7 +160,25 @@ export default function ForumList() {
           <div className="col-span-2 text-center">پاسخ / بازدید</div>
           <div className="col-span-2 text-left">آخرین فعالیت</div>
         </div>
-        {all.map((t) => (
+        {loadingTopics && all.length === 0 ? (
+          Array.from({ length: 6 }).map((_, index) => (
+            <div key={index} className="grid grid-cols-12 px-3 sm:px-4 py-3.5 gap-2 items-center">
+              <div className="hidden sm:block col-span-1 h-10 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+              <div className="col-span-12 sm:col-span-6 flex gap-3.5 items-center">
+                <div className="h-11 w-11 shrink-0 animate-pulse rounded-full bg-[var(--muted-background)]" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-5 w-4/5 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+                  <div className="h-4 w-1/2 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+                </div>
+              </div>
+              <div className="col-span-12 sm:col-span-4 h-5 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+            </div>
+          ))
+        ) : all.length === 0 ? (
+          <div className="px-4 py-8 text-center paragraph-color">
+            هنوز موضوعی در دیتابیس انجمن ثبت نشده است.
+          </div>
+        ) : all.map((t) => (
           <Link
             key={t.slug}
             href={`/forum/${t.slug}`}
@@ -173,7 +229,7 @@ export default function ForumList() {
                   <span className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold transition-colors group-hover:text-[var(--forum)]">
                     {t.title}
                   </span>
-                  <ForumBadge slug={t.slug} fallback={null} />
+                  <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
                 </div>
                 <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1">
                   ارسال‌شده توسط{" "}

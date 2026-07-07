@@ -2,17 +2,96 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Icon } from "@/design/icons";
+import { useEffect, useState } from "react";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 
 type ForumDetailProps = {
-  item: any;
+  slug: string;
+  initialItem?: any | null;
 };
 
-export default function ForumDetail({ item }: ForumDetailProps) {
+function ForumDetailSkeleton() {
+  return (
+    <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
+      <div className="mb-6 h-5 w-64 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+      <article className="bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] p-6 sm:p-8 space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 animate-pulse rounded-full bg-[var(--muted-background)]" />
+          <div className="flex-1 space-y-3">
+            <div className="h-8 w-4/5 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+            <div className="h-4 w-1/2 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+          </div>
+        </div>
+        <div className="space-y-3 pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)]">
+          <div className="h-4 w-full animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+          <div className="h-4 w-11/12 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+          <div className="h-4 w-2/3 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+        </div>
+      </article>
+    </main>
+  );
+}
+
+export default function ForumDetail({ slug, initialItem = null }: ForumDetailProps) {
+  const [item, setItem] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fetch(`/api/posts?module=forum&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+      .then((r) => {
+        if (!r.ok) throw new Error("forum_topic_unavailable");
+        return r.json();
+      })
+      .then((data) => {
+        if (!mounted) return;
+        if (data) {
+          setItem(data);
+          setNotFound(false);
+        } else if (initialItem) {
+          setItem(initialItem);
+          setNotFound(false);
+        } else {
+          setNotFound(true);
+        }
+      })
+      .catch(() => {
+        if (!mounted) return;
+        if (initialItem) {
+          setItem(initialItem);
+          setNotFound(false);
+        } else {
+          setNotFound(true);
+        }
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [slug, initialItem]);
+
+  if (loading) return <ForumDetailSkeleton />;
+
+  if (notFound || !item) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-16 text-center" dir="rtl">
+        <h1 className="text-[length:var(--h1-font-size)] font-black text-[var(--primary-text)]">موضوع پیدا نشد</h1>
+        <p className="mt-3 paragraph-color">این موضوع در دیتابیس انجمن وجود ندارد یا موقتاً در دسترس نیست.</p>
+        <Link href="/forum" className="mt-6 inline-flex text-[var(--forum)] font-bold hover:underline">
+          بازگشت به انجمن
+        </Link>
+      </main>
+    );
+  }
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
@@ -42,7 +121,7 @@ export default function ForumDetail({ item }: ForumDetailProps) {
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{item.title}</h1>
-                <ForumBadge slug={item.slug} fallback={null} />
+                <ForumBadge slug={item.slug} fallback={typeof item.solved === "boolean" ? item.solved : null} />
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
                 <span>
