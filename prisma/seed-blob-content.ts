@@ -531,6 +531,65 @@ async function upsertPosts(posts: SeedPost[]) {
   console.log(`Upserted ${posts.length} posts.`);
 }
 
+
+const engagementUsers = ["alirastegaar", "amiralmasi", "aylingharagozloo", "mohsenakbari", "mohsenshafaat", "nazaninrastegaar", "parsaghahremanpoor", "pouryamodeq", "raminrastegaar"];
+
+function commentForModule(module: string) {
+  switch (module) {
+    case "blog": return "مقاله کاربردی بود؛ مخصوصاً بخش چک‌لیست اجرایی برای تیم‌های کوچک خیلی کمک می‌کند.";
+    case "review": return "در تصمیم خرید، بخش تجربه عملی و محدودیت‌های محصول برای ما از مشخصات خام مهم‌تر است.";
+    case "shop": return "برای انتخاب نهایی بهتر است سناریوی استفاده و ظرفیت رشد هم کنار مشخصات محصول بررسی شود.";
+    case "media": return "ویدیو روان و قابل فهم بود؛ اگر فایل‌های نمونه یا دیاگرام هم اضافه شود عالی می‌شود.";
+    case "news": return "خوب است کنار خبر، اثر عملی آن روی تصمیم‌های زیرساختی هم توضیح داده شده.";
+    case "download": return "لطفاً اگر checksum یا نسخه جدیدتر منتشر شد در همین صفحه بروزرسانی شود.";
+    default: return "مطلب مفیدی بود و برای تصمیم‌گیری فنی کمک کرد.";
+  }
+}
+
+async function seedEngagement(posts: SeedPost[]) {
+  const users = await prisma.user.findMany({ where: { username: { in: engagementUsers } } });
+  const timelineUsers = await prisma.user.findMany({ take: 8 });
+
+  for (const post of posts) {
+    const dbPost = await prisma.post.findUnique({ where: { module_slug: { module: post.module, slug: post.slug } } });
+    if (!dbPost) continue;
+    const selected = users.slice(0, 3 + (post.slug.length % 4));
+    for (const user of selected) {
+      await prisma.like.upsert({
+        where: { fingerprint_module_slug: { fingerprint: user.id, module: post.module, slug: post.slug } },
+        update: {},
+        create: { fingerprint: user.id, userId: user.id, module: post.module, slug: post.slug },
+      });
+    }
+    await prisma.post.update({ where: { id: dbPost.id }, data: { likes: selected.length } });
+
+    for (const user of selected.slice(0, 2)) {
+      const text = commentForModule(post.module);
+      const exists = await prisma.comment.findFirst({ where: { postId: dbPost.id, authorId: user.id, text } });
+      if (!exists) {
+        await prisma.comment.create({ data: { postId: dbPost.id, authorId: user.id, authorName: user.name, text, likes: 1 } });
+      }
+    }
+  }
+
+  const timelineEvents = await prisma.timelineEvent.findMany({ where: { published: true }, take: 12 });
+  for (const event of timelineEvents) {
+    for (const user of timelineUsers.slice(0, 4)) {
+      await prisma.timelineLike.upsert({
+        where: { timeline_fingerprint_eventId: { fingerprint: user.id, eventId: event.id } },
+        update: {},
+        create: { fingerprint: user.id, userId: user.id, eventId: event.id },
+      });
+    }
+    for (const user of timelineUsers.slice(0, 2)) {
+      const text = "این رویداد برای درک مسیر تکامل زیرساخت واقعاً مهم است.";
+      const exists = await prisma.timelineComment.findFirst({ where: { eventId: event.id, authorName: user.name, text } });
+      if (!exists) await prisma.timelineComment.create({ data: { eventId: event.id, authorName: user.name, text } });
+    }
+  }
+  console.log(`Seeded engagement for ${posts.length} posts and ${timelineEvents.length} timeline events.`);
+}
+
 async function upsertUsers() {
   const password = await bcrypt.hash(PASSWORD, 10);
   for (const user of seedUsers) {
@@ -576,6 +635,9 @@ async function main() {
     await seedLikesForPosts([...forumPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...mediaPosts, ...downloadPosts]);
   }
   if (step === "7" || step === "shop" || step === "products" || step === "all") await upsertPosts(productPosts);
+  if (step === "8" || step === "engagement" || step === "all") {
+    await seedEngagement([...mediaPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...downloadPosts, ...forumPosts, ...productPosts]);
+  }
 }
 
 main()
