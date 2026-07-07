@@ -12,15 +12,15 @@ const schema = z.object({
 // Make sure a Post row exists for module+slug so a like can be attached even
 // for content that has not been seeded yet. All seeded posts already exist,
 // so this only runs for brand-new slugs (e.g. topics created on the fly).
-async function ensurePost(module: string, slug: string) {
+async function ensurePost(moduleKey: string, slug: string) {
   const existing = await prisma.post.findUnique({
-    where: { module_slug: { module, slug } },
+    where: { module_slug: { module: moduleKey, slug } },
     select: { id: true },
   });
   if (existing) return existing;
   return prisma.post.create({
     data: {
-      module,
+      module: moduleKey,
       slug,
       title: slug,
       authorName: "تحریریه",
@@ -33,15 +33,15 @@ async function ensurePost(module: string, slug: string) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const module = searchParams.get("module");
+  const moduleKey = searchParams.get("module");
   const slug = searchParams.get("slug");
-  if (!module || !slug)
+  if (!moduleKey || !slug)
     return NextResponse.json({ error: "module+slug required" }, { status: 400 });
 
   try {
     // The like count lives on the Post row (seeded + incremented on each like).
     const post = await prisma.post.findUnique({
-      where: { module_slug: { module, slug } },
+      where: { module_slug: { module: moduleKey, slug } },
       select: { likes: true },
     });
 
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     let liked = false;
     if (user) {
       const existing = await prisma.like.findUnique({
-        where: { fingerprint_module_slug: { fingerprint: user.id, module, slug } },
+        where: { fingerprint_module_slug: { fingerprint: user.id, module: moduleKey, slug } },
       });
       liked = !!existing;
     }
@@ -75,13 +75,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { module, slug } = schema.parse(body);
+    const { module: moduleKey, slug } = schema.parse(body);
 
-    await ensurePost(module, slug);
+    await ensurePost(moduleKey, slug);
 
     const fp = user.id;
     const existing = await prisma.like.findUnique({
-      where: { fingerprint_module_slug: { fingerprint: fp, module, slug } },
+      where: { fingerprint_module_slug: { fingerprint: fp, module: moduleKey, slug } },
     });
 
     let liked: boolean;
@@ -89,24 +89,24 @@ export async function POST(req: NextRequest) {
       // Unlike: remove the user's Like row and decrement the counter.
       await prisma.like.delete({ where: { id: existing.id } });
       await prisma.post.updateMany({
-        where: { module, slug },
+        where: { module: moduleKey, slug },
         data: { likes: { decrement: 1 } },
       });
       liked = false;
     } else {
       // Like: record the user's Like row and increment the counter.
       await prisma.like.create({
-        data: { fingerprint: fp, userId: user.id, module, slug },
+        data: { fingerprint: fp, userId: user.id, module: moduleKey, slug },
       });
       await prisma.post.updateMany({
-        where: { module, slug },
+        where: { module: moduleKey, slug },
         data: { likes: { increment: 1 } },
       });
       liked = true;
     }
 
     const post = await prisma.post.findFirst({
-      where: { module, slug },
+      where: { module: moduleKey, slug },
       select: { likes: true },
     });
     return NextResponse.json({ liked, likes: Math.max(0, post?.likes ?? 0) });

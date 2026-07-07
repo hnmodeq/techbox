@@ -51,9 +51,8 @@ export function TimelineContainer({
 
   // Exact Edge-to-Edge math: xPos[idx] = xPos[idx - 1] + (W[idx-1]/2) + (W[idx]/2) + timeGap
   const xPositions = React.useMemo(() => {
-    let currX = 360;
-    return events.map((ev, idx) => {
-      if (idx === 0) return currX;
+    return events.reduce<number[]>((positions, ev, idx) => {
+      if (idx === 0) return [360];
       const prevDate = new Date(events[idx - 1].dateGr).getTime();
       const currDate = new Date(ev.dateGr).getTime();
       const diffYears = Math.max(0, (currDate - prevDate) / (1000 * 60 * 60 * 24 * 365.2425));
@@ -62,9 +61,9 @@ export function TimelineContainer({
       const currWidth = ev.importance >= 8 ? 320 : ev.importance >= 6 ? 288 : 256;
 
       const timeGap = Math.min(Math.max(diffYears * 22 * zoom, 48 * zoom), 700 * zoom);
-      currX += prevWidth / 2 + currWidth / 2 + timeGap;
-      return currX;
-    });
+      const nextX = positions[idx - 1] + prevWidth / 2 + currWidth / 2 + timeGap;
+      return [...positions, nextX];
+    }, []);
   }, [events, zoom]);
 
   const endPosition = (xPositions[xPositions.length - 1] || 1000) + 420;

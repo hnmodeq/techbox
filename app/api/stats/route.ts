@@ -3,13 +3,13 @@ import { prisma } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const module = searchParams.get("module");
+  const moduleKey = searchParams.get("module");
   const slug = searchParams.get("slug");
 
-  if (module && slug) {
+  if (moduleKey && slug) {
     try {
       const post = await prisma.post.findUnique({
-        where: { module_slug: { module, slug } },
+        where: { module_slug: { module: moduleKey, slug } },
         select: { id: true, views: true, likes: true, solved: true, fileSize: true },
       });
       if (!post) {
