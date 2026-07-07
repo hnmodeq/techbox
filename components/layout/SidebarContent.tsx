@@ -78,6 +78,8 @@ export default function SidebarContent({
  const [q, setQ] = useState("");
  const [now, setNow] = useState<Date | null>(null);
  const [notifOpen, setNotifOpen] = useState(false);
+ const [notifications, setNotifications] = useState<any[]>([]);
+ const [lastSeenNotif, setLastSeenNotif] = useState<string>("");
  const [consultOpen, setConsultOpen] = useState(false);
  const [searchOpen, setSearchOpen] = useState(false);
  const collapsedSearchRef = useRef<HTMLInputElement | null>(null);
@@ -159,7 +161,21 @@ export default function SidebarContent({
  if (searchOpen) collapsedSearchRef.current?.focus();
  }, [searchOpen]);
 
- const notifications = useMemo(() => getAllAcross().slice(0, 8), []);
+ useEffect(() => {
+ fetch("/api/notifications", { cache: "no-store" }).then(r=>r.json()).then(d=>{ if(Array.isArray(d)) setNotifications(d); }).catch(()=>{});
+ try { setLastSeenNotif(localStorage.getItem("tb_notifications_seen_at") || ""); } catch {}
+ }, []);
+
+ useEffect(() => {
+ if (!notifOpen) return;
+ const latest = notifications[0]?.createdAt;
+ if (latest) {
+   localStorage.setItem("tb_notifications_seen_at", latest);
+   setLastSeenNotif(latest);
+ }
+ }, [notifOpen, notifications]);
+
+ const hasUnreadNotif = Boolean(notifications[0]?.createdAt && notifications[0].createdAt !== lastSeenNotif);
 
  const doSearch = (e?: React.FormEvent) => {
  e?.preventDefault();
@@ -180,17 +196,14 @@ export default function SidebarContent({
  <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">آخرین رویدادها</div>
  <ul className="max-h-80 space-y-2 overflow-y-auto text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               {notifications.map((n: any) => {
-                // Title stays neutral; the source module label carries the module color.
                 const sourceColor = moduleColors[n.module as keyof typeof moduleColors]?.active ?? "paragraph-color";
                 const sourceLabel = moduleMeta[n.module as ModuleSlug]?.titleFa ?? n.module;
                 return (
-                  <li key={`${n.module}-${n.slug}`} className="border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--border-color)_40%,transparent)] pb-2 last:border-0">
+                  <li key={n.id} className="border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--border-color)_40%,transparent)] pb-2 last:border-0">
                     <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 text-[var(--primary-text)] transition-opacity hover:opacity-80">
-                      {n.title}
+                      <span className={sourceColor}>{sourceLabel}</span> • {n.actor}: {n.text}
                     </Link>
-                    <div className="mt-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-                      <span className={sourceColor}>{sourceLabel}</span> • {n.date_fa}{n.time ? ` • ${n.time}`: ""}
-                    </div>
+                    <div className="mt-0.5 text-[11px] paragraph-color line-clamp-1">روی «{n.title}» • {new Date(n.createdAt).toLocaleString("fa-IR")}</div>
                   </li>
                 );
               })}
@@ -228,7 +241,7 @@ export default function SidebarContent({
           <SidebarTooltip label="اعلان‌ها" enabled={!expanded} tooltipClassName="text-[var(--news)]">
             <IconRailButton ref={notifButtonRef} tone="news" onClick={() => setNotifOpen((o) => !o)} aria-label="notifications">
               <Icon name="bell" size={18} />
-              <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--danger)]" />
+              {hasUnreadNotif && <span className="absolute left-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--danger)]" />}
             </IconRailButton>
           </SidebarTooltip>
 
