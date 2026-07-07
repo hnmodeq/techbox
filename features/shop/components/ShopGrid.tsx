@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems, getCommentCount } from "@/lib/content";
+import { getModuleItems } from "@/lib/content";
+import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useCart } from "@/providers/cart.provider";
@@ -10,7 +11,8 @@ import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 
 export default function ShopGrid(){
- const items = getModuleItems("shop");
+ const fallbackItems = getModuleItems("shop");
+ const { items } = useDbPosts("shop", fallbackItems, 100);
  const [q, setQ] = useState("");
  const [cat, setCat] = useState<string>("all");
  const [sort, setSort] = useState<"new"|"popular"|"liked">("new");

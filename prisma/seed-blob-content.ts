@@ -73,6 +73,32 @@ type SeedPost = {
 
 
 
+
+const productPosts: SeedPost[] = Array.from({ length: 20 }, (_, i) => {
+  const n = i + 1;
+  const ext = [10, 14, 18, 19, 2, 3, 5].includes(n) ? "webp" : "png";
+  const gallery = [`${BLOB}/products/product${n}/image1.${ext}`];
+  if (n === 1) gallery.push(`${BLOB}/products/product1/image2.png`, `${BLOB}/products/product1/image4.png`);
+  if (n === 2) gallery.push(`${BLOB}/products/product2/image2.webp`);
+  if (n === 3) gallery.push(`${BLOB}/products/product3/image2.webp`);
+  return {
+    slug: `product-${String(n).padStart(2, "0")}`,
+    module: "shop",
+    title: `تجهیز زیرساخت تکباکس مدل ${n}`,
+    excerpt: "محصول واقعی ثبت‌شده در دیتابیس با تصویر Blob و آماده ثبت درخواست مشاوره خرید.",
+    content: "این محصول با تصاویر واقعی آپلودشده در Vercel Blob ثبت شده است. برای دریافت قیمت، موجودی و پیشنهاد جایگزین با تیم فروش تکباکس هماهنگ کنید.",
+    image: gallery[0],
+    gallery,
+    tags: ["shop", "product", "infrastructure"],
+    category: n % 4 === 0 ? "شبکه" : n % 4 === 1 ? "سرور" : n % 4 === 2 ? "ذخیره‌سازی" : "امنیت",
+    authorUsername: "hoomanmodeq",
+    date: `2026-07-${String(22 - (i % 20)).padStart(2, "0")}`,
+    dateFa: `${31 - (i % 20)} تیر 1405`,
+    likes: 3 + i,
+    views: 80 + i * 17,
+  } satisfies SeedPost;
+});
+
 const forumPosts: SeedPost[] = [
   {
     slug: "forum-vlan-design-for-camera-network",
@@ -549,6 +575,7 @@ async function main() {
     await upsertComments(seedComments);
     await seedLikesForPosts([...forumPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...mediaPosts, ...downloadPosts]);
   }
+  if (step === "7" || step === "shop" || step === "products" || step === "all") await upsertPosts(productPosts);
 }
 
 main()
