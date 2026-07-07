@@ -1,24 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { getModuleItems, getCommentCount } from "@/lib/content";
+import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
-import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
-
-/** Star rating rendered with central-system icons (filled + outline). */
-function Stars({ rating }: { rating: number }) {
-  const full = Math.round(rating);
-  return (
-    <span className="inline-flex items-center gap-1 text-[var(--warning)]">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Icon key={i} name="star" size={15} className={i < full ? "fill-current" : "opacity-35"} strokeWidth={1.5} />
-      ))}
-      <span className="ms-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{rating.toFixed(1)}</span>
-    </span>
-  );
-}
 
 export default function ReviewGrid() {
   const items = getModuleItems("review");
@@ -29,10 +15,7 @@ export default function ReviewGrid() {
 
       {/* Single column vertical list with full-width horizontal cards */}
       <div className="flex flex-col gap-6 mt-8">
-        {items.map((r: any, i: number) => {
-          const rating = 4.7 - (i * 0.12);
-          const comments = 18 + i * 7;
-          return (
+        {items.map((r: any) => (
             <Link key={r.slug} href={`/review/${r.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group grid md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] gap-6 !p-0 transition-all hover:shadow-[var(--shadow-size)] items-stretch">
               <div className="block relative aspect-[16/10] md:aspect-auto md:h-full bg-[var(--muted-background)] overflow-hidden min-h-[220px]">
                 <Image src={r.image || "/assets/blog-1.jpg"} fill sizes="(min-width:1024px) 320px, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" alt={r.title} />
@@ -41,9 +24,9 @@ export default function ReviewGrid() {
 
               <div className="p-5 sm:p-6 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
-                    <Stars rating={rating} />
-                    <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{r.date_fa}</span>
+                  <div className="flex items-center justify-between gap-3 mb-2 flex-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
+                    <span>{r.category || 'بررسی تخصصی'}</span>
+                    <span>{r.date_fa}</span>
                   </div>
 
                   <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)] transition-colors group-hover:text-[var(--review)] leading-8">
@@ -69,8 +52,7 @@ export default function ReviewGrid() {
                 </div>
               </div>
             </Link>
-          );
-        })}
+          ))}
       </div>
     </main>
   );

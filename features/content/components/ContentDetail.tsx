@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
  const meta = moduleMeta[item.module];
+ const videoSrc = (item as any).videoUrl || (item as any).video || (item as any).videoSrc;
  return (
  <article className="mx-auto max-w-3xl px-5 md:px-0 py-10" dir="rtl">
  <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-3">
@@ -38,14 +39,14 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  </div>
 
- {item.module === "media" ? (
+ {item.module === "media" && videoSrc ? (
  <div className="mt-8 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-black shadow-[var(--shadow-size)]">
  <video
  controls
  playsInline
  poster={item.image}
  className="w-full aspect-video object-contain bg-black"
- src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+ src={videoSrc}
  />
  <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex items-center gap-4">
  <LiveViewCounter module={item.module} slug={item.slug} showLabel />
@@ -60,9 +61,6 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="prose prose-invert max-w-none mt-8 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color" dir="rtl">
  <p>{item.content || item.excerpt}</p>
- <p className="mt-4">
- این مطلب به صورت آزمایشی از دیتاسورس JSON تکباکس بارگذاری شده و سیستم لایک، کامنت و پیشنهاد مرتبط فعال است.
- </p>
  </div>
 
  <div className="flex flex-wrap gap-2 mt-8">

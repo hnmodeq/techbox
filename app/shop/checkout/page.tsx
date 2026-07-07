@@ -6,8 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 function parseFaPrice(s:string){
- // "۴۸,۹۰۰,۰۰۰" -> 48900000
- const map:any = {"۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9", ",":"", "٬":""};
+  const map:any = {"۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9", ",":"", "٬":""};
  let out=""; for(const ch of s) out += map[ch] ?? (/[0-9]/.test(ch)?ch:"");
  const n = parseInt(out||"0",10);
  return Number.isFinite(n) ? n : 0;

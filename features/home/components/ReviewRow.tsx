@@ -1,25 +1,12 @@
 'use client';
 
 import React from 'react';
-import { getLatest, getCommentCount } from '@/lib/content';
+import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
-
-function Stars({ rating }: { rating: number }) {
-  const full = Math.round(rating);
-  return (
-    <span className="inline-flex items-center gap-1 text-[var(--warning)]">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Icon key={i} name="star" size={14} className={i < full ? 'fill-current' : 'opacity-35'} strokeWidth={1.5} />
-      ))}
-      <span className="ms-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{rating.toFixed(1)}</span>
-    </span>
-  );
-}
 
 export default function ReviewRow() {
   const reviews = getLatest('review', 5);
@@ -37,9 +24,7 @@ export default function ReviewRow() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {reviews.map((rev, idx) => {
-            const rating = 4.8 - idx * 0.15;
-            return (
+          {reviews.map((rev) => (
               <div
                 key={rev.slug}
                 className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] !p-0 overflow-hidden flex flex-col justify-between hover:shadow-[var(--shadow-size)] transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)]"
@@ -56,8 +41,9 @@ export default function ReviewRow() {
                   </div>
 
                   <div className="p-4">
-                    <div className="mb-2">
-                      <Stars rating={rating} />
+                    <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
+                      <span>{rev.category || 'بررسی تخصصی'}</span>
+                      <span> • {rev.date_fa}</span>
                     </div>
                     <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
                       {rev.title}
@@ -73,8 +59,7 @@ export default function ReviewRow() {
                   <CardStats module="review" slug={rev.slug} showComments={true} />
                 </div>
               </div>
-            );
-          })}
+            ))}
         </div>
       </div>
     </section>

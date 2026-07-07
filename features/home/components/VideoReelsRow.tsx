@@ -1,21 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { getLatest, getCommentCount } from '@/lib/content';
+import React from 'react';
+import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/card-stats';
-import { createPortal } from 'react-dom';
-import { zIndex } from '@/design';
-
-const SAMPLE_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
 export default function VideoReelsRow() {
   const videos = getLatest('media', 5);
-  const [activeVideo, setActiveVideo] = useState<any | null>(null);
-
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
@@ -30,13 +23,10 @@ export default function VideoReelsRow() {
 
         {/* Clean Grid Layout without scrollbars */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-          {videos.map((vid) => {
-            const commentsCount = getCommentCount('media', vid.slug);
-            return (
-              <button
-                type="button"
+          {videos.map((vid) => (
+              <Link
                 key={vid.slug}
-                onClick={() => setActiveVideo(vid)}
+                href={`/media/${vid.slug}`}
                 className="group relative w-full aspect-[9/16] rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] hover:shadow-[var(--shadow-size)] transition-all duration-[200ms] bg-[var(--card-background)] flex flex-col justify-end text-right cursor-pointer"
               >
                 <Image
@@ -64,54 +54,9 @@ export default function VideoReelsRow() {
                     <CardStats module="media" slug={vid.slug} showComments={true} />
                   </div>
                 </div>
-              </button>
-            );
-          })}
+              </Link>
+            ))}
         </div>
-
-        {/* Pop-up Modal Video Player */}
-        {activeVideo && typeof window !== "undefined" && createPortal(
-          <div className="fixed inset-0 flex items-center justify-center p-3 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setActiveVideo(null)} />
-            
-            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--modal-background)] shadow-[var(--shadow-size)] flex flex-col" style={{ zIndex: zIndex.modalContent }}>
-              <div className="flex items-center justify-between p-4 border-b-[length:var(--border-size)] border-[var(--border-color)]">
-                <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold truncate text-[var(--primary-text)]">{activeVideo.title}</h3>
-                <button
-                  type="button"
-                  onClick={() => setActiveVideo(null)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--muted-background)] paragraph-color hover:text-[var(--primary-text)] transition-colors cursor-pointer"
-                  aria-label="بستن"
-                >
-                  <Icon name="close" size={18} />
-                </button>
-              </div>
-
-              <div className="relative aspect-video bg-black shrink-0">
-                <video
-                  key={activeVideo.slug}
-                  controls
-                  autoPlay
-                  playsInline
-                  poster={activeVideo.image}
-                  className="w-full h-full object-contain bg-black"
-                  src={SAMPLE_VIDEO}
-                />
-              </div>
-
-              <div className="p-5 flex flex-wrap items-center justify-between gap-4">
-                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-                  <span>منتشرشده توسط: <b className="text-[var(--primary-text)]">{activeVideo.author?.name || "تکباکس"}</b></span>
-                  <span> • {activeVideo.date_fa}</span>
-                </div>
-                <Link href={`/media/${activeVideo.slug}`} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-5 py-2 text-xs font-bold">
-                  مشاهده صفحه اختصاصی ویدیو و دیدگاه‌ها ←
-                </Link>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
       </div>
     </section>
   );

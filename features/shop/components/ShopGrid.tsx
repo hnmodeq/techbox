@@ -9,16 +9,11 @@ import { Icon } from "@/design/icons";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 
-const prices: Record<string, {price: string, old?: string}> = {
- "qnap-ts-2277": { price: "۴۸,۹۰۰,۰۰۰", old: "۵۲,۰۰۰,۰۰۰" },
- "dell-r750": { price: "۲۹۵,۰۰۰,۰۰۰" }
-};
-
 export default function ShopGrid(){
  const items = getModuleItems("shop");
  const [q, setQ] = useState("");
  const [cat, setCat] = useState<string>("all");
- const [sort, setSort] = useState<"new"|"popular"|"cheap">("new");
+ const [sort, setSort] = useState<"new"|"popular"|"liked">("new");
  const [filterOpen, setFilterOpen] = useState(false);
  const dropdownRef = useRef<HTMLDivElement>(null);
  const { add } = useCart();
@@ -40,7 +35,7 @@ export default function ShopGrid(){
  if(q) { const s=q.toLowerCase(); list = list.filter(i=> i.title.toLowerCase().includes(s) || i.tags.some(t=>t.includes(s))); }
  if(cat !== "all") list = list.filter(i=>i.category===cat);
  if(sort==="popular") list.sort((a,b)=>b.views-a.views);
- if(sort==="cheap") list.sort((a,b)=>a.likes-b.likes); // mock price sort
+ if(sort==="liked") list.sort((a,b)=>b.likes-a.likes);
  return list;
  }, [items, q, cat, sort]);
 
@@ -71,7 +66,7 @@ export default function ShopGrid(){
            <select value={sort} onChange={e=>setSort(e.target.value as any)} className="input mt-1 w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
              <option value="new">جدیدترین</option>
              <option value="popular">پربازدیدترین</option>
-             <option value="cheap">محبوب‌ترین</option>
+             <option value="liked">محبوب‌ترین</option>
            </select>
          </label>
        </div>
@@ -84,14 +79,10 @@ export default function ShopGrid(){
  </div>
 
  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
- {filtered.map(p=>{
- const pr = prices[p.slug] || { price: "تماس بگیرید" };
- return (
+ {filtered.map(p=>(
         <Link key={p.slug} href={`/shop/${p.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group flex flex-col rounded-[var(--corner-radius)] !p-0">
               <div className="block relative aspect-[4/3] bg-[var(--muted-background)] overflow-hidden">
                 <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
-                <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">موجود</span>
-                {pr.old && <span className="absolute top-3 right-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">تخفیف</span>}
               </div>
               <div className="p-4 flex-1 flex flex-col">
                 <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold mt-1 transition-colors group-hover:text-[var(--shop)] line-clamp-2 min-h-[48px]">{p.title}</div>
@@ -100,15 +91,14 @@ export default function ShopGrid(){
                 {/* Price section removed from card display per request, keeping add to cart / consultation system underlying */}
                 
                 <div className="flex gap-2 mt-4">
-                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: pr.price, image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold">مشاوره خرید</Button>
+                  <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: "مشاوره خرید", image: p.image || "" },1); }} size="sm" variant="outline" className="flex-1 border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold">مشاوره خرید</Button>
                 </div>
                 <div className="mt-3 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                   <CardStats module="shop" slug={p.slug} showComments={true} />
                 </div>
               </div>
             </Link>
-          )
- })}
+          ))}
  </div>
  {filtered.length===0 && <div className="text-center py-16 text-muted-foreground">محصولی یافت نشد</div>}
  </main>

@@ -31,7 +31,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  views,
  likes,
  comments,
- duration = "۱۲:۴۴",
+ duration,
  className,
  ...props
  }, ref) => (
@@ -65,9 +65,11 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  {category}
  </span>
  )}
+ {duration && (
  <span className="absolute top-3 left-3 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-sm">
  {duration}
  </span>
+ )}
 
  <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
  <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold line-clamp-2 transition-colors duration-[150ms] group-hover:text-[var(--media)]">
