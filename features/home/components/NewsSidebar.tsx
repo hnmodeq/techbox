@@ -23,13 +23,19 @@ export default function NewsSidebar() {
   const newsItems = getModuleItems('news').slice(0, 15);
 
   useEffect(() => {
-    setOpen(readSavedOpenState());
+    const savedOpen = readSavedOpenState();
+    setOpen(savedOpen);
+    document.documentElement.dataset.newsSidebarOpen = String(savedOpen);
+    requestAnimationFrame(() => {
+      document.documentElement.classList.remove('news-sidebar-booting');
+    });
   }, []);
 
   const setPersistedOpen = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (typeof window !== 'undefined') {
       localStorage.setItem(NEWS_SIDEBAR_OPEN_KEY, String(nextOpen));
+      document.documentElement.dataset.newsSidebarOpen = String(nextOpen);
     }
   };
 
@@ -57,7 +63,7 @@ export default function NewsSidebar() {
           type="button"
           onClick={() => setPersistedOpen(true)}
           style={{ zIndex: zIndex.mobileFab }}
-          className="fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[300ms] hover:bg-[var(--muted-background)] cursor-pointer"
+          className="news-sidebar-toggle fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[300ms] hover:bg-[var(--muted-background)] cursor-pointer"
           title="اخبار زنده تکباکس"
           aria-label="اخبار زنده تکباکس"
         >
@@ -76,7 +82,7 @@ export default function NewsSidebar() {
 
       {/* Desktop Layout Width Spacer (Compresses <main> width smoothly when open) */}
       <div
-        className={`hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
+        className={`news-sidebar-spacer hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
           open ? 'w-80' : 'w-0'
         }`}
         aria-hidden="true"
@@ -85,7 +91,7 @@ export default function NewsSidebar() {
       {/* Fixed Left Sidebar Panel */}
       <aside
         ref={sidebarRef}
-        className={`fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden transition-transform duration-[300ms] ease-[ease] ${sidebarBase} ${
+        className={`news-sidebar-panel fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden transition-transform duration-[300ms] ease-[ease] ${sidebarBase} ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ zIndex: zIndex.sidebar }}

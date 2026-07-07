@@ -14,6 +14,21 @@ h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
 button, .btn { font-family: inherit; transition: all 0.2s ease; }
 `;
 
+const sidebarStateScript = `
+(function() {
+  try {
+    var root = document.documentElement;
+    root.classList.add('main-sidebar-booting', 'news-sidebar-booting');
+
+    var main = localStorage.getItem('takbox-sidebar-desktop-open');
+    var news = localStorage.getItem('techbox-news-sidebar-open');
+
+    root.dataset.mainSidebarOpen = main === null ? 'true' : String(main === 'true');
+    root.dataset.newsSidebarOpen = String(news === 'true');
+  } catch (e) {}
+})();
+`;
+
 const localServiceWorkerCleanupScript = `
 (function() {
   try {
@@ -80,6 +95,7 @@ export default function RootLayout({
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
+        <script dangerouslySetInnerHTML={{ __html: sidebarStateScript }} />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans antialiased text-foreground">
