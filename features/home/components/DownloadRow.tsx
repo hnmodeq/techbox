@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { getLatest } from '@/lib/content';
 import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
@@ -36,10 +35,9 @@ export default function DownloadRow() {
           {files.map((file) => {
             const ext = getExtension(file.title, file.category);
             return (
-              <Link
+              <article
                 key={file.slug}
-                href={`/download/${file.slug}`}
-                className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] border-[length:var(--border-size)] border-[var(--border-color)] flex flex-col justify-between gap-3 bg-[var(--card-background)]"
+                className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] flex flex-col justify-between gap-3"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   {/* Yellow Special File Icon Box */}
@@ -58,9 +56,11 @@ export default function DownloadRow() {
                       </span>
                     </div>
 
-                    <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
-                      {file.title}
-                    </h3>
+                    <Link href={`/download/${file.slug}`} className="block">
+                      <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
+                        {file.title}
+                      </h3>
+                    </Link>
                     <div className="text-xs paragraph-color mt-1 line-clamp-1">
                       {file.excerpt || 'سرورهای Enterprise و مجازی‌سازی'}
                     </div>
@@ -72,7 +72,7 @@ export default function DownloadRow() {
                   <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
                   <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} />
                 </div>
-              </Link>
+              </article>
             );
           })}
         </div>
