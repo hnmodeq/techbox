@@ -129,8 +129,12 @@ strong, b { font-weight: 700; }
 
 /* Home news ticker --------------------------------------------------------- */
 .ticker-track {
-  animation: techbox-ticker-scroll 42s linear infinite;
+  animation: techbox-ticker-scroll 46s linear infinite;
   will-change: transform;
+}
+
+.ticker-group {
+  padding-inline-end: 2rem;
 }
 
 .ticker-wrapper:hover .ticker-track,
@@ -143,7 +147,7 @@ strong, b { font-weight: 700; }
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-33.333%, 0, 0);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
