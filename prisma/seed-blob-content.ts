@@ -71,6 +71,61 @@ type SeedPost = {
 
 
 
+
+const downloadPosts: SeedPost[] = [
+  {
+    slug: "archive-pdf-1",
+    module: "download",
+    title: "دانلود PDF راهنمای طراحی شبکه امن",
+    excerpt: "فایل PDF واقعی از آرشیو تکباکس برای مطالعه و نگهداری آفلاین.",
+    content: "این فایل از Vercel Blob دریافت می‌شود و شمارش دانلود آن در دیتابیس ثبت می‌شود.",
+    image: `${BLOB}/article-images/article1.jpg`,
+    tags: ["pdf", "archive", "network", "download"],
+    category: "PDF",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-22",
+    dateFa: "31 تیر 1405",
+    fileName: "pdf1.pdf",
+    fileUrl: `${BLOB}/archive/pdf/pdf1.pdf`,
+    fileSize: "PDF",
+    downloadCount: 0,
+  },
+  {
+    slug: "archive-pdf-2",
+    module: "download",
+    title: "دانلود PDF چک‌لیست نگهداری سرور",
+    excerpt: "چک‌لیست PDF واقعی برای کنترل دوره‌ای سرویس‌ها، بکاپ و سلامت سخت‌افزار.",
+    content: "این فایل واقعی از فولدر archive/pdf در Blob خوانده می‌شود.",
+    image: `${BLOB}/article-images/article2.jpg`,
+    tags: ["pdf", "archive", "server", "download"],
+    category: "PDF",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-21",
+    dateFa: "30 تیر 1405",
+    fileName: "pdf2.pdf",
+    fileUrl: `${BLOB}/archive/pdf/pdf2.pdf`,
+    fileSize: "PDF",
+    downloadCount: 0,
+  },
+  {
+    slug: "archive-zip-1",
+    module: "download",
+    title: "دانلود ZIP نمونه فایل‌های پیکربندی",
+    excerpt: "آرشیو ZIP واقعی برای نمونه ساختار فایل‌ها و کانفیگ‌های مستندشده.",
+    content: "این فایل واقعی از فولدر archive/zip در Blob خوانده می‌شود و از مسیر /api/download شمارش می‌شود.",
+    image: `${BLOB}/article-images/article3.jpg`,
+    tags: ["zip", "archive", "config", "download"],
+    category: "ZIP",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-20",
+    dateFa: "29 تیر 1405",
+    fileName: "zip1.zip",
+    fileUrl: `${BLOB}/archive/zip/zip1.zip`,
+    fileSize: "ZIP",
+    downloadCount: 0,
+  },
+];
+
 const newsPosts: SeedPost[] = Array.from({ length: 11 }, (_, i) => {
   const n = i + 1;
   const titles = [
@@ -398,6 +453,7 @@ async function main() {
   if (step === "2" || step === "articles" || step === "blog" || step === "all") await upsertPosts(articlePosts);
   if (step === "3" || step === "reviews" || step === "review" || step === "all") await upsertPosts(reviewPosts);
   if (step === "4" || step === "news" || step === "all") await upsertPosts(newsPosts);
+  if (step === "5" || step === "downloads" || step === "download" || step === "all") await upsertPosts(downloadPosts);
 }
 
 main()
