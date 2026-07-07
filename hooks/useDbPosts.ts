@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ContentItem, ModuleSlug } from "@/lib/content";
 
 type DbPost = ContentItem & {
@@ -17,6 +17,12 @@ type DbPost = ContentItem & {
 };
 
 export function useDbPosts(module: ModuleSlug, fallback: ContentItem[], take = 100) {
+  const fallbackRef = useRef<ContentItem[]>(fallback);
+
+  useEffect(() => {
+    fallbackRef.current = fallback;
+  });
+
   const [items, setItems] = useState<DbPost[]>(fallback as DbPost[]);
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
@@ -24,6 +30,7 @@ export function useDbPosts(module: ModuleSlug, fallback: ContentItem[], take = 1
   useEffect(() => {
     let mounted = true;
     setLoading(true);
+
     fetch(`/api/posts?module=${encodeURIComponent(module)}&take=${take}`, { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error("posts_unavailable");
@@ -35,27 +42,34 @@ export function useDbPosts(module: ModuleSlug, fallback: ContentItem[], take = 1
           setItems(data);
           setFromDb(true);
         } else {
-          setItems(fallback as DbPost[]);
+          setItems(fallbackRef.current as DbPost[]);
           setFromDb(false);
         }
       })
       .catch(() => {
         if (!mounted) return;
-        setItems(fallback as DbPost[]);
+        setItems(fallbackRef.current as DbPost[]);
         setFromDb(false);
       })
       .finally(() => {
         if (mounted) setLoading(false);
       });
+
     return () => {
       mounted = false;
     };
-  }, [module, take, fallback]);
+  }, [module, take]);
 
   return { items, loading, fromDb };
 }
 
 export function useDbPost(module: ModuleSlug, slug: string, fallback: ContentItem | null) {
+  const fallbackRef = useRef<ContentItem | null>(fallback);
+
+  useEffect(() => {
+    fallbackRef.current = fallback;
+  });
+
   const [item, setItem] = useState<DbPost | null>(fallback as DbPost | null);
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
@@ -63,6 +77,7 @@ export function useDbPost(module: ModuleSlug, slug: string, fallback: ContentIte
   useEffect(() => {
     let mounted = true;
     setLoading(true);
+
     fetch(`/api/posts?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
       .then((r) => {
         if (!r.ok) throw new Error("post_unavailable");
@@ -74,22 +89,23 @@ export function useDbPost(module: ModuleSlug, slug: string, fallback: ContentIte
           setItem(data);
           setFromDb(true);
         } else {
-          setItem(fallback as DbPost | null);
+          setItem(fallbackRef.current as DbPost | null);
           setFromDb(false);
         }
       })
       .catch(() => {
         if (!mounted) return;
-        setItem(fallback as DbPost | null);
+        setItem(fallbackRef.current as DbPost | null);
         setFromDb(false);
       })
       .finally(() => {
         if (mounted) setLoading(false);
       });
+
     return () => {
       mounted = false;
     };
-  }, [module, slug, fallback]);
+  }, [module, slug]);
 
   return { item, loading, fromDb };
 }
