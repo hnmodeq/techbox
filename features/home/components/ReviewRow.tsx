@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { getLatest } from '@/lib/content';
+import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,7 +11,9 @@ import { AuthorLink } from '@/components/ui/author-link';
 import { ReviewRating } from '@/components/ui/review-rating';
 
 export default function ReviewRow() {
-  const reviews = getLatest('review', 5);
+  const fallbackReviews = getLatest('review', 5);
+  const { items: dbReviews } = useDbPosts('review', fallbackReviews, 5);
+  const reviews = dbReviews.slice(0, 5);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.reviewMinHeight} flex flex-col justify-center`} dir="rtl">

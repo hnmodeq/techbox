@@ -1,6 +1,5 @@
 import { getBySlug, getModuleItems } from "@/lib/content";
-import ReviewDetail from "@/features/review/components/ReviewDetail";
-import { notFound } from "next/navigation";
+import DbReviewDetail from "@/features/review/components/DbReviewDetail";
 
 type P = Promise<{ slug: string }>;
 
@@ -13,8 +12,7 @@ export default async function Page({ params }: { params: P }) {
  const { slug } = await params;
  const mod = "review" as any;
  const item = getBySlug(mod, slug);
- if (!item) return notFound();
- return <ReviewDetail item={item} />;
+ return <DbReviewDetail slug={slug} fallback={item} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {

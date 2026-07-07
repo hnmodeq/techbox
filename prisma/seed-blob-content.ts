@@ -69,6 +69,46 @@ type SeedPost = {
 };
 
 
+
+const reviewPosts: SeedPost[] = Array.from({ length: 13 }, (_, i) => {
+  const n = i + 1;
+  const authors = ["nastarankhodakarami", "farazfeizi", "mostafanajafi"];
+  const titles = [
+    "بررسی سوئیچ 10GbE برای رک‌های کوچک",
+    "بررسی NAS رک‌مونت برای بکاپ سازمانی",
+    "بررسی سرور مجازی‌سازی نسل جدید",
+    "بررسی فایروال SMB برای دفتر چند شعبه‌ای",
+    "بررسی SSD سازمانی NVMe در بار کاری دیتابیس",
+    "بررسی NVR مناسب دوربین‌های 4K",
+    "بررسی UPS آنلاین برای اتاق سرور کوچک",
+    "بررسی Access Point Wi‑Fi 7 سازمانی",
+    "بررسی ذخیره‌ساز Object برای آرشیو",
+    "بررسی روتر مرزی برای لینک‌های چندگانه",
+    "بررسی سیستم مانیتورینگ رک و پاور",
+    "بررسی سرور Tower برای شعبه‌ها",
+    "بررسی راهکار بکاپ Immutable",
+  ];
+  return {
+    slug: `review-${String(n).padStart(2, "0")}`,
+    module: "review",
+    title: titles[i],
+    excerpt: "نتیجه تست عملی، نقاط قوت و ضعف، سناریوی مناسب خرید و نکات نگهداری در محیط واقعی.",
+    content: `در این نقد و بررسی، ${titles[i]} را در سناریوی واقعی زیرساخت بررسی کردیم. معیارهای اصلی شامل پایداری، کارایی، مصرف انرژی، مدیریت‌پذیری، هزینه نگهداری و تناسب با تیم‌های IT کوچک و متوسط بود.
+
+جمع‌بندی تکباکس: این گزینه برای سازمان‌هایی مناسب است که قبل از خرید، نیاز واقعی، ظرفیت رشد و توان پشتیبانی خود را مستند کرده‌اند.`,
+    image: `${BLOB}/review-images/review${n}.${n === 1 ? "jpeg" : "jpg"}`,
+    tags: ["review", "بررسی", "زیرساخت", "سخت‌افزار"],
+    category: i % 3 === 0 ? "شبکه" : i % 3 === 1 ? "ذخیره‌سازی" : "سرور",
+    authorUsername: authors[i % authors.length],
+    date: `2026-07-${String(22 - i).padStart(2, "0")}`,
+    dateFa: `${31 - i} تیر 1405`,
+    likes: 12 + i * 2,
+    views: 260 + i * 41,
+    rating: Math.round((4.1 + (i % 7) * 0.12) * 10) / 10,
+    ratingCount: 9 + i,
+  } satisfies SeedPost;
+});
+
 const articlePosts: SeedPost[] = Array.from({ length: 14 }, (_, i) => {
   const n = i + 1;
   const authors = ["atiyehatami", "behnazghaderi", "behruzghaderi"];
@@ -321,6 +361,7 @@ async function main() {
   if (step === "0" || step === "users" || step === "all") await upsertUsers();
   if (step === "1" || step === "media" || step === "all") await upsertPosts(mediaPosts);
   if (step === "2" || step === "articles" || step === "blog" || step === "all") await upsertPosts(articlePosts);
+  if (step === "3" || step === "reviews" || step === "review" || step === "all") await upsertPosts(reviewPosts);
 }
 
 main()

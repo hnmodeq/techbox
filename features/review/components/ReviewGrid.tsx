@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
+import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 import { ReviewRating } from "@/components/ui/review-rating";
 
 export default function ReviewGrid() {
-  const items = getModuleItems("review");
+  const fallbackItems = getModuleItems("review");
+  const { items } = useDbPosts("review", fallbackItems, 100);
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-12" dir="rtl">
