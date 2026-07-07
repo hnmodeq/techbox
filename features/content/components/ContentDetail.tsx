@@ -9,10 +9,12 @@ import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ProductGallery } from "@/components/ui/product-gallery";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
  const meta = moduleMeta[item.module];
  const videoSrc = (item as any).videoUrl || (item as any).video || (item as any).videoSrc;
+ const gallery = Array.isArray((item as any).gallery) ? (item as any).gallery : [];
  return (
  <article className="mx-auto max-w-3xl px-5 md:px-0 py-10" dir="rtl">
  <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-3">
@@ -39,7 +41,9 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  </div>
 
- {item.module === "media" && videoSrc ? (
+ {item.module === "shop" && gallery.length > 0 ? (
+ <ProductGallery images={gallery} title={item.title} />
+ ) : item.module === "media" && videoSrc ? (
  <div className="mt-8 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-black shadow-[var(--shadow-size)]">
  <video
  controls

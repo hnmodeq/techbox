@@ -1,6 +1,5 @@
 import { getBySlug, getModuleItems } from "@/lib/content";
-import ContentDetail from "@/features/content/components/ContentDetail";
-import { notFound } from "next/navigation";
+import DbContentDetail from "@/features/content/components/DbContentDetail";
 
 type P = Promise<{ slug: string }>;
 
@@ -13,8 +12,7 @@ export default async function Page({ params }: { params: P }) {
  const { slug } = await params;
  const mod = "shop" as any;
  const item = getBySlug(mod, slug);
- if (!item) return notFound();
- return <ContentDetail item={item} />;
+ return <DbContentDetail module="shop" slug={slug} fallback={item} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {
