@@ -6,6 +6,7 @@ import { Icon } from "@/design/icons";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { LikeButton } from "@/components/ui/like-button";
 import { ReviewRating } from "@/components/ui/review-rating";
+import { RatingWidget } from "@/components/ui/rating-widget";
 import CommentSection from "@/features/comment/components/CommentSection";
 
 type ReviewDetailProps = {
@@ -119,6 +120,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           {item.content || item.excerpt}
         </div>
 
+        <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-5"><RatingWidget module="review" slug={item.slug} /></div>
         <CommentSection module="review" slug={item.slug} />
       </article>
     </main>
