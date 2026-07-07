@@ -68,6 +68,48 @@ type SeedPost = {
   solved?: boolean;
 };
 
+
+const articlePosts: SeedPost[] = Array.from({ length: 14 }, (_, i) => {
+  const n = i + 1;
+  const authors = ["atiyehatami", "behnazghaderi", "behruzghaderi"];
+  const topics = [
+    ["چک‌لیست طراحی شبکه امن برای شرکت‌های کوچک", "از تفکیک VLAN تا سیاست‌های دسترسی و مانیتورینگ اولیه."],
+    ["راهنمای انتخاب NAS برای بکاپ سازمانی", "چطور ظرفیت، RAID و رشد داده را قبل از خرید درست تخمین بزنیم؟"],
+    ["چطور یک رک تمیز و قابل پشتیبانی طراحی کنیم؟", "کابل‌کشی، لیبل‌گذاری، پاور و مستندسازی برای اتاق سرور."],
+    ["مقایسه ذخیره‌سازی Object و File در پروژه‌های واقعی", "چه زمانی S3-compatible storage بهتر از فایل‌سرور است؟"],
+    ["اصول مانیتورینگ شبکه قبل از بحران", "متریک‌های حیاتی برای سوئیچ، فایروال، سرور و ذخیره‌ساز."],
+    ["راهنمای ساده Zero Trust برای تیم‌های IT", "شروع عملی با احراز هویت، کمترین دسترسی و ثبت لاگ."],
+    ["برنامه‌ریزی ظرفیت برای مجازی‌سازی", "CPU Ready، RAM overcommit، IOPS و رشد ماشین‌های مجازی."],
+    ["پشتیبان‌گیری قابل اتکا برای فایل‌سرور", "نسخه‌برداری، Snapshot، نگهداری آفلاین و تست بازیابی."],
+    ["انتخاب فایروال برای دفتر چند شعبه‌ای", "VPN، گزارش‌گیری، UTM و مدیریت مرکزی در عمل."],
+    ["مدیریت Patch در زیرساخت ویندوز و لینوکس", "چرخه امن بروزرسانی بدون خاموشی طولانی سرویس‌ها."],
+    ["طراحی Wi‑Fi سازمانی بدون حدس و خطا", "Site survey، کانال‌ها، Roaming و ظرفیت کاربران."],
+    ["اصول مستندسازی زیرساخت برای تیم‌های کوچک", "نقشه شبکه، IP plan، دسترسی‌ها و Runbook حوادث."],
+    ["راهنمای خرید UPS برای رک‌های کوچک", "توان، Runtime، باتری و مانیتورینگ برق در اتاق سرور."],
+    ["چطور لاگ‌ها را برای عیب‌یابی نگه داریم؟", "Syslog، SIEM سبک، retention و هشدارهای قابل استفاده."],
+  ];
+  const [title, excerpt] = topics[i];
+  return {
+    slug: `article-${String(n).padStart(2, "0")}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "techbox"}`,
+    module: "blog",
+    title,
+    excerpt,
+    content: `${excerpt}
+
+در این مقاله تکباکس، موضوع را از دید اجرایی بررسی می‌کنیم: نیازسنجی، طراحی، پیاده‌سازی، نگهداری و خطاهای رایج. هدف این است که تیم IT بتواند تصمیمی قابل دفاع بگیرد و آن را در محیط واقعی با کمترین ریسک اجرا کند.
+
+نکته مهم این است که هیچ نسخه واحدی برای همه سازمان‌ها وجود ندارد؛ بنابراین پیشنهاد می‌شود قبل از خرید یا تغییر معماری، وضعیت فعلی، رشد آینده، بودجه و توان تیم پشتیبانی مستند شود.`,
+    image: `${BLOB}/article-images/article${n}.jpg`,
+    tags: ["زیرساخت", "شبکه", "راهنما", "techbox"],
+    category: n % 2 === 0 ? "زیرساخت" : "آموزشی",
+    authorUsername: authors[i % authors.length],
+    date: `2026-07-${String(22 - i).padStart(2, "0")}`,
+    dateFa: `${31 - i} تیر 1405`,
+    likes: 8 + i,
+    views: 180 + i * 37,
+  } satisfies SeedPost;
+});
+
 const mediaPosts: SeedPost[] = [
   {
     slug: "media-video-1-edge-ai-cameras",
@@ -278,6 +320,7 @@ async function main() {
   const step = stepArg?.split("=")[1] || "all";
   if (step === "0" || step === "users" || step === "all") await upsertUsers();
   if (step === "1" || step === "media" || step === "all") await upsertPosts(mediaPosts);
+  if (step === "2" || step === "articles" || step === "blog" || step === "all") await upsertPosts(articlePosts);
 }
 
 main()
