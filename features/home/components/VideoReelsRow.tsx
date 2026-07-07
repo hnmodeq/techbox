@@ -2,13 +2,16 @@
 
 import React from 'react';
 import { getLatest } from '@/lib/content';
+import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CardStats } from '@/components/ui/card-stats';
 
 export default function VideoReelsRow() {
-  const videos = getLatest('media', 5);
+  const fallbackVideos = getLatest('media', 5);
+  const { items: dbVideos } = useDbPosts('media', fallbackVideos, 7);
+  const videos = dbVideos.slice(0, 5);
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>

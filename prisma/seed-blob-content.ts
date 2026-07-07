@@ -42,6 +42,207 @@ export const seedUsers: SeedUser[] = [
   { username: "raminrastegaar", name: "رامین رستگار", role: "user", roleFa: "کاربر عضو", avatar: `${BLOB}/avatars/raminrastegaar.jpg` },
 ];
 
+
+type SeedPost = {
+  slug: string;
+  module: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  image?: string;
+  videoUrl?: string;
+  gallery?: string[];
+  tags?: string[];
+  category?: string;
+  authorUsername: string;
+  date: string;
+  dateFa: string;
+  likes?: number;
+  views?: number;
+  rating?: number;
+  ratingCount?: number;
+  fileName?: string;
+  fileUrl?: string;
+  fileSize?: string;
+  downloadCount?: number;
+  solved?: boolean;
+};
+
+const mediaPosts: SeedPost[] = [
+  {
+    slug: "media-video-1-edge-ai-cameras",
+    module: "media",
+    title: "ویدیو: پیاده‌سازی پردازش لبه برای دوربین‌های امنیتی",
+    excerpt: "در این ویدیو معماری Edge AI برای پردازش تصویر دوربین‌ها بدون ارسال همه داده‌ها به دیتاسنتر بررسی می‌شود.",
+    content: "این ویدیو درباره طراحی مسیر امن و کم‌تاخیر برای پردازش تصویر دوربین‌ها در لبه شبکه است. درباره انتخاب NVR، پهنای باند، ذخیره‌سازی و پردازش محلی صحبت می‌کنیم.",
+    image: `${BLOB}/thumbnails/thumbnail1.jpg`,
+    videoUrl: `${BLOB}/videos/video1.mp4`,
+    tags: ["edge-ai", "camera", "nvr", "video"],
+    category: "ویدیو آموزشی",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-22",
+    dateFa: "31 تیر 1405",
+    likes: 18,
+    views: 340,
+  },
+  {
+    slug: "media-video-2-proxmox-backup",
+    module: "media",
+    title: "ویدیو: سناریوی بکاپ Proxmox در شبکه سازمانی",
+    excerpt: "راهکار عملی برای نگهداری بکاپ ماشین‌های مجازی، زمان‌بندی، retention و بازیابی سریع.",
+    content: "در این ویدیو یک سناریوی کامل بکاپ Proxmox Backup Server را مرور می‌کنیم و درباره retention، فضای ذخیره‌سازی و تست restore صحبت می‌کنیم.",
+    image: `${BLOB}/thumbnails/thumbnail2.jpg`,
+    videoUrl: `${BLOB}/videos/video2.mp4`,
+    tags: ["proxmox", "backup", "virtualization", "video"],
+    category: "مجازی‌سازی",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-21",
+    dateFa: "30 تیر 1405",
+    likes: 23,
+    views: 510,
+  },
+  {
+    slug: "media-video-3-switching-vlan-lab",
+    module: "media",
+    title: "ویدیو: لَب VLAN و Switching برای رک‌های کوچک",
+    excerpt: "ساختار VLAN، Trunk، Access و جداسازی ترافیک سرویس‌ها در یک سناریوی واقعی.",
+    content: "این ویدیو یک لَب کوچک اما واقعی برای طراحی VLAN در رک‌های SMB را نشان می‌دهد؛ از پورت‌های Access تا Trunk و تست ارتباط بین شبکه‌ها.",
+    image: `${BLOB}/thumbnails/thumbnail3.jpg`,
+    videoUrl: `${BLOB}/videos/video3.mp4`,
+    tags: ["vlan", "switch", "network", "video"],
+    category: "شبکه",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-20",
+    dateFa: "29 تیر 1405",
+    likes: 16,
+    views: 280,
+  },
+  {
+    slug: "media-video-4-storage-sizing",
+    module: "media",
+    title: "ویدیو: سایزینگ ذخیره‌سازی برای فایل‌سرور و آرشیو",
+    excerpt: "چطور ظرفیت خام، ظرفیت قابل استفاده، RAID و رشد سالانه را برای ذخیره‌سازی محاسبه کنیم؟",
+    content: "در این ویدیو با چند مثال واقعی ظرفیت ذخیره‌سازی را محاسبه می‌کنیم و درباره RAID، Snapshot و رشد داده‌ها تصمیم می‌گیریم.",
+    image: `${BLOB}/thumbnails/thumbnail4.jpg`,
+    videoUrl: `${BLOB}/videos/video4.mp4`,
+    tags: ["storage", "raid", "nas", "video"],
+    category: "ذخیره‌سازی",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-19",
+    dateFa: "28 تیر 1405",
+    likes: 20,
+    views: 430,
+  },
+  {
+    slug: "media-video-5-firewall-policy-review",
+    module: "media",
+    title: "ویدیو: بازبینی Policy فایروال برای دفتر کوچک",
+    excerpt: "چک‌لیست عملی برای مرتب‌سازی رول‌های فایروال، لاگ‌گیری و کاهش سطح حمله.",
+    content: "در این ویدیو یک Rule Base ساده را بررسی می‌کنیم و درباره ترتیب رول‌ها، Object naming، لاگ‌ها و دسترسی‌های VPN صحبت می‌کنیم.",
+    image: `${BLOB}/thumbnails/thumbnail5.jpg`,
+    videoUrl: `${BLOB}/videos/video5.mp4`,
+    tags: ["firewall", "security", "vpn", "video"],
+    category: "امنیت",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-18",
+    dateFa: "27 تیر 1405",
+    likes: 27,
+    views: 610,
+  },
+  {
+    slug: "media-video-6-monitoring-stack",
+    module: "media",
+    title: "ویدیو: مانیتورینگ زیرساخت با Zabbix و Prometheus",
+    excerpt: "انتخاب ابزار مانیتورینگ بر اساس نیاز تیم عملیات، alerting و نگهداری طولانی‌مدت متریک‌ها.",
+    content: "در این ویدیو تفاوت‌های عملی Zabbix و Prometheus را با تمرکز روی زیرساخت شبکه و سرور بررسی می‌کنیم.",
+    image: `${BLOB}/thumbnails/thumbnail6.jpg`,
+    videoUrl: `${BLOB}/videos/video6.mp4`,
+    tags: ["monitoring", "zabbix", "prometheus", "video"],
+    category: "مانیتورینگ",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-17",
+    dateFa: "26 تیر 1405",
+    likes: 14,
+    views: 250,
+  },
+  {
+    slug: "media-video-7-rack-cabling",
+    module: "media",
+    title: "ویدیو: کابل‌کشی تمیز رک و مستندسازی پچ‌پنل",
+    excerpt: "اصول ساده اما مهم برای کابل‌کشی، لیبل‌گذاری و کاهش خطای انسانی در اتاق سرور.",
+    content: "این ویدیو درباره استانداردسازی کابل‌کشی و مستندسازی رک است تا در زمان عیب‌یابی و توسعه سرویس‌ها سردرگمی ایجاد نشود.",
+    image: `${BLOB}/thumbnails/thumbnail7.jpg`,
+    videoUrl: `${BLOB}/videos/video7.mp4`,
+    tags: ["rack", "cabling", "documentation", "video"],
+    category: "اتاق سرور",
+    authorUsername: "hoomanmodeq",
+    date: "2026-07-16",
+    dateFa: "25 تیر 1405",
+    likes: 11,
+    views: 190,
+  },
+];
+
+async function upsertPosts(posts: SeedPost[]) {
+  for (const post of posts) {
+    const author = await prisma.user.findUnique({ where: { username: post.authorUsername } });
+    await prisma.post.upsert({
+      where: { module_slug: { module: post.module, slug: post.slug } },
+      update: {
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        image: post.image || null,
+        videoUrl: post.videoUrl || null,
+        gallery: JSON.stringify(post.gallery || []),
+        tags: JSON.stringify(post.tags || []),
+        category: post.category || null,
+        authorId: author?.id || null,
+        authorName: author?.name || post.authorUsername,
+        date: new Date(post.date),
+        dateFa: post.dateFa,
+        likes: post.likes || 0,
+        views: post.views || 0,
+        rating: typeof post.rating === "number" ? post.rating : null,
+        ratingCount: post.ratingCount || 0,
+        fileName: post.fileName || null,
+        fileUrl: post.fileUrl || null,
+        fileSize: post.fileSize || null,
+        downloadCount: post.downloadCount || 0,
+        solved: typeof post.solved === "boolean" ? post.solved : false,
+        published: true,
+      },
+      create: {
+        slug: post.slug,
+        module: post.module,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        image: post.image || null,
+        videoUrl: post.videoUrl || null,
+        gallery: JSON.stringify(post.gallery || []),
+        tags: JSON.stringify(post.tags || []),
+        category: post.category || null,
+        authorId: author?.id || null,
+        authorName: author?.name || post.authorUsername,
+        date: new Date(post.date),
+        dateFa: post.dateFa,
+        likes: post.likes || 0,
+        views: post.views || 0,
+        rating: typeof post.rating === "number" ? post.rating : null,
+        ratingCount: post.ratingCount || 0,
+        fileName: post.fileName || null,
+        fileUrl: post.fileUrl || null,
+        fileSize: post.fileSize || null,
+        downloadCount: post.downloadCount || 0,
+        solved: typeof post.solved === "boolean" ? post.solved : false,
+        published: true,
+      },
+    });
+  }
+  console.log(`Upserted ${posts.length} posts.`);
+}
+
 async function upsertUsers() {
   const password = await bcrypt.hash(PASSWORD, 10);
   for (const user of seedUsers) {
@@ -76,6 +277,7 @@ async function main() {
   const stepArg = process.argv.find((arg) => arg.startsWith("--step="));
   const step = stepArg?.split("=")[1] || "all";
   if (step === "0" || step === "users" || step === "all") await upsertUsers();
+  if (step === "1" || step === "media" || step === "all") await upsertPosts(mediaPosts);
 }
 
 main()

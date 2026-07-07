@@ -1,11 +1,13 @@
 "use client";
 import { getModuleItems } from "@/lib/content";
+import { useDbPosts } from "@/hooks/useDbPosts";
 import { MediaSelectorCard } from "@/components/ui/media-selector-card";
 import { useState, useMemo } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 
 export default function MediaGallery() {
-  const allItems = useMemo(() => getModuleItems("media"), []);
+  const fallbackItems = useMemo(() => getModuleItems("media"), []);
+  const { items: allItems } = useDbPosts("media", fallbackItems, 100);
 
   // Pagination state
   const [page, setPage] = useState(1);
