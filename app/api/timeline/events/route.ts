@@ -21,14 +21,11 @@ export async function GET() {
     });
 
     if (events && events.length > 0) {
-      const transformedEvents = events.map((event, idx) => {
-        const fallbackImg = (timelineData as any[])[idx % timelineData.length]?.image || '/assets/blog-1.jpg';
-        return {
-          ...event,
-          image: event.image || fallbackImg,
-          tags: typeof event.tags === 'string' ? JSON.parse(event.tags || '[]') : event.tags,
-        };
-      });
+      const transformedEvents = events.map((event) => ({
+        ...event,
+        image: event.image || null,
+        tags: typeof event.tags === 'string' ? JSON.parse(event.tags || '[]') : event.tags,
+      }));
       return NextResponse.json(transformedEvents);
     }
   } catch (error) {

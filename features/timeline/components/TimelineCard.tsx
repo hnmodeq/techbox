@@ -14,100 +14,23 @@ interface TimelineCardProps {
   importance: number;
 }
 
-const fallbackImages = [
-  '/assets/blog-1.jpg',
-  '/assets/blog-2.jpg',
-  '/assets/blog-4.jpg',
-  '/assets/blog-5.jpg',
-  '/assets/blog-6.png',
-];
-
-const milestoneCommentsMap: Record<string, string[]> = {
-  'tl-dc-1': [
-    'معماری ۳۶۰ واقعاً تعریف استاندارد سرورها رو برای همیشه عوض کرد.',
-    'هنوز هم اصول I/O Channel و جداسازی سخت‌افزار از نرم‌افزار که اون زمان طراحی شد در مین‌فریم‌ها کاربرد داره.',
-    'پدربزرگ دیتاسنترهای مدرن امروزی! وزن و ابعاد اون تجهیزات در اتاق سرورهای دهه ۶۰ میلادی باورکردنی نبود.',
-    'اولین باری که مفهوم آپگرید سخت‌افزار بدون تغییر کد برنامه مطرح شد و سرمایه‌گذاری نرم‌افزاری سازمان‌ها حفظ شد.',
-    'سرمایه‌گذاری ۵ میلیارد دلاری IBM روی این پروژه در زمان خودش بزرگ‌ترین ریسک تاریخ فناوری اطلاعات بود.',
-  ],
-  'tl-dc-2': [
-    'باب متکالف وقتی اترنت رو طراحی کرد شاید تصور نمی‌کرد سرعتش از ۳ مگابیت به ۸۰۰ گیگابیت برسه!',
-    'پروتکل CSMA/CD اترنت یکی از شاهکارهای بی‌بدیل تاریخ مهندسی شبکه است.',
-    'هنوز بعد از نیم قرن، فریم‌های اترنت ساختار اصلی ارتباط سوئیچ‌های دیتاسنتری رو تشکیل می‌دن.',
-    'رقابت اترنت با Token Ring و پیروزی قاطعش به خاطر سادگی و هزینه کمتر واقعاً دیدنی بود.',
-  ],
-  'tl-dc-3': [
-    'مقاله پترسون و همکارانش در دانشگاه برکلی اساس تمام استوریج‌های سازمانی امروزی شد.',
-    'ایده استفاده از هارد دیسک‌های ارزان‌قیمت PC به جای دیسک‌های گران‌قیمت مین‌فریم نبوغ‌آمیز بود.',
-    'مفهوم Parity در RAID 5 هنوز هم یکی از جذاب‌ترین محاسبات منطقی در مهندسی ذخیره‌سازی است.',
-  ],
-  'tl-dc-4': [
-    'پروتکل فیبر نوری (Fibre Channel) سرعت انتقال داده بین سرور و SAN رو وارد ابعاد کاملاً جدیدی کرد.',
-    'تاخیر بسیار پایین و بدون Loss بودن فریم‌های FC باعث شد تمام بانک‌ها و سازمان‌ها به سمت SAN حرکت کنند.',
-  ],
-  'tl-dc-5': [
-    'تأسیس VMware و معرفی ESX در سال ۱۹۹۸ بزرگ‌ترین تحول بهره‌وری سرورهای x86 بود.',
-    'قبل از مجازی‌سازی، راندمان استفاده از پردازنده سرورها زیر ۱۵ درصد بود و کلی منابع هدر می‌رفت!',
-  ],
-  'tl-dc-6': [
-    'سرورهای تیغه‌ای (Blade) مفهوم تراکم پردازشی در هر یونیت از رک دیتاسنتر رو متحول کردند.',
-    'اشتراک پاور ساپلای‌های قدرتمند و فن‌های خنک‌کننده در شاسی Blade مصرف انرژی رو بسیار کاهش داد.',
-  ],
-  'tl-dc-7': [
-    'سال ۲۰۰۶ وقتی آمازون EC2 رو معرفی کرد، دوران سرورهای فیزیکی اختصاصی وارد مرحله جدیدی شد.',
-    'سرویس S3 هنوز هم استاندارد طلایی Object Storage در تمام دیتاسنترهای ابری دنیاست.',
-  ],
-  'tl-dc-8': [
-    'معرفی Proxmox VE به عنوان یک هایپروایزر متن‌باز مبتنی بر دبیان، هدیه بزرگی به جامعه متن‌باز بود.',
-    'ترکیب بی‌نظیر ماشین‌های مجازی KVM و کانتینرهای سبک LXC در یک رابط کاربری وب عالی کار شده.',
-  ],
-  'tl-dc-9': [
-    'پروژه OCP فیس‌بوک انحصار طراحی سخت‌افزارهای دیتاسنتری رو شکست و استانداردها رو باز کرد.',
-    'تغییر ولتاژ توزیع برق در رک از ۱۲ ولت به ۴۸ ولت تلفات انرژی در دیتاسنترها رو به شدت کاهش داد.',
-  ],
-  'tl-dc-10': [
-    'معرفی Docker در سال ۲۰۱۳ نحوه توسعه، تست و استقرار نرم‌افزارها روی سرورها را برای همیشه عوض کرد.',
-    'ایزوله‌سازی کانتینرها بدون سربار سنگین ماشین‌های مجازی (Overhead) مصرف RAM سرورها رو به شدت کاهش داد.',
-  ],
-  'tl-dc-11': [
-    'متن‌باز کردن کوبرنتیز (Kubernetes) توسط گوگل بر پایه تجربه یک دهه کار با Borg بزرگ‌ترین هدیه به دنیای DevOps بود.',
-    'کوبرنتیز به سرعت به سیستم‌عامل استاندارد مدیریت و هماهنگ‌سازی کلاسترها در تمام دیتاسنترها تبدیل شد.',
-  ],
-  'tl-dc-12': [
-    'معرفی معماری سوپرکلاسترهای هوش مصنوعی با ارتباطات پرسرعت NVLink دیتاسنترها رو وارد عصر جدیدی کرد.',
-    'تراکم توان مصرفی در هر رک از ۱۰ کیلووات کلاسیک به بیش از ۱۰۰ کیلووات در رک‌های هوش مصنوعی رسید!',
-  ],
-};
-
-const defaultGeneralComments = [
-  'نقطه عطف بسیار مهمی در تاریخ زیرساخت و فناوری اطلاعات بود.',
-  'این رویداد مسیر طراحی معماری دیتاسنترها را برای همیشه تغییر داد.',
-];
-
 export function TimelineCard({ event, style, importance }: TimelineCardProps) {
-  const baseFallbackLikes = (Math.abs((event.id || 'tl').split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % 45) + 12;
-  const initialLikesCount = Array.isArray(event.likes) && event.likes.length > 0
+  const initialLikesCount = Array.isArray(event.likes)
     ? event.likes.length
-    : typeof event.likes === 'number' && event.likes > 0
+    : typeof event.likes === 'number'
       ? event.likes
-      : baseFallbackLikes;
+      : 0;
 
   const { liked, setLiked } = useTimelineLiked(event.id);
   const [likesCount, setLikesCount] = useState<number>(initialLikesCount);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [commentError, setCommentError] = useState('');
 
-  const defaultCommentsList = (milestoneCommentsMap[event.id] || []).map((text, i) => ({
-    authorName: 'کاربر انجمن تکباکس',
-    text,
-    createdAt: 'لحظاتی پیش'
-  }));
-
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Array<{ authorName: string; text: string; createdAt: string }>>(
-    Array.isArray(event.comments) && event.comments.length > 0
+    Array.isArray(event.comments)
       ? event.comments.map((c: any) => ({ authorName: c.authorName || 'کاربر', text: c.text, createdAt: 'لحظاتی پیش' }))
-      : defaultCommentsList
+      : []
   );
   const [newCommentText, setNewCommentText] = useState('');
   const router = useRouter();
@@ -148,8 +71,6 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       : importance >= 6
         ? 'w-64 sm:w-72'
         : 'w-60 sm:w-64';
-
-  const cardImage = event.image || fallbackImages[Math.abs((event.title?.length || 0) % fallbackImages.length)];
 
   const handleLikeToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -215,13 +136,17 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       {/* TIER 1: STRICTLY FIXED HEIGHT CARD BOX */}
       <div className="relative h-[340px] sm:h-[360px] w-full rounded-[var(--corner-radius)] overflow-hidden shadow-[var(--shadow-size)] border-[length:var(--border-size)] border-[var(--border-color)] hover:border-[var(--timeline)] transition-colors duration-[200ms] flex flex-col justify-end bg-slate-950">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-          <Image
-            src={cardImage}
-            alt={event.title || 'تصویر رویداد'}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 320px"
-          />
+          {event.image ? (
+            <Image
+              src={event.image}
+              alt={event.title || 'تصویر رویداد'}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 320px"
+            />
+          ) : (
+            <div className="h-full w-full bg-[radial-gradient(circle_at_top,var(--timeline),transparent_38%),linear-gradient(145deg,#020617,#0f172a)]" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent" />
         </div>
 
@@ -309,6 +234,11 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
           </form>
 
           <ul className="space-y-2 text-right">
+            {comments.length === 0 && (
+              <li className="rounded-[var(--corner-radius)] bg-slate-900/70 p-2.5 text-xs text-slate-400 border-[length:var(--border-size)] border-slate-700/60">
+                هنوز نظری برای این رویداد ثبت نشده است.
+              </li>
+            )}
             {comments.map((comment, idx) => (
               <li
                 key={idx}

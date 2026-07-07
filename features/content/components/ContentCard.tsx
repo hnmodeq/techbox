@@ -153,11 +153,10 @@ function ProductFeedCard({item}:{item:ContentItem}){
  <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
  <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:1024px) 180px, 50vw" />
- <span className="absolute left-2 top-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/30 bg-transparent px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white backdrop-blur-[0px]">موجود</span>
  </div>
  <div className="px-1 pt-2">
  <div className={`line-clamp-2 min-h-[34px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
- <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--shop)]">۴۸,۹۰۰,۰۰۰ <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">تومان</span></div>
+ <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--shop)]">مشاوره خرید</div>
  </div>
  </Link>
  );
@@ -170,7 +169,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
  <div className={`line-clamp-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa} • {item.category}</div>
  </div>
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color shrink-0 font-bold">{(item.likes ?? 0).toLocaleString("fa-IR")} بار دانلود</div>
+ <CardStats module="download" slug={item.slug} showComments={true} />
  </Link>
  );
 }
