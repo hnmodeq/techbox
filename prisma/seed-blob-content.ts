@@ -70,6 +70,41 @@ type SeedPost = {
 
 
 
+
+const newsPosts: SeedPost[] = Array.from({ length: 11 }, (_, i) => {
+  const n = i + 1;
+  const titles = [
+    "افزایش استفاده از پردازش لبه در سامانه‌های نظارت تصویری",
+    "نسل جدید حافظه‌های سروری با تمرکز بر مصرف انرژی معرفی شد",
+    "رشد راهکارهای متن‌باز مانیتورینگ در تیم‌های زیرساخت",
+    "توجه شرکت‌ها به بکاپ Immutable بیشتر شده است",
+    "بازار تجهیزات 10GbE برای SMBها رقابتی‌تر شد",
+    "راهکارهای Zero Trust در سازمان‌های متوسط جدی‌تر دنبال می‌شود",
+    "بهبود ابزارهای مدیریت Kubernetes برای دیتاسنترهای کوچک",
+    "افزایش تقاضا برای ذخیره‌سازی Object در آرشیو سازمانی",
+    "گزارش جدید از اهمیت مستندسازی زیرساخت در کاهش زمان قطعی",
+    "ورود Wi‑Fi 7 به پروژه‌های سازمانی چند شعبه‌ای",
+    "تمرکز سازندگان UPS روی مانیتورینگ هوشمند باتری",
+  ];
+  return {
+    slug: `news-${String(n).padStart(2, "0")}`,
+    module: "news",
+    title: titles[i],
+    excerpt: "خلاصه خبر و تاثیر آن بر تصمیم‌های تیم‌های IT و زیرساخت در سازمان‌های ایرانی.",
+    content: `${titles[i]}
+
+این خبر از نگاه عملیاتی برای مدیران زیرساخت مهم است، چون روی برنامه‌ریزی خرید، نگهداری، امنیت و ظرفیت آینده اثر می‌گذارد. تکباکس روندهای فنی را با تمرکز بر کاربرد واقعی در شبکه، سرور، ذخیره‌سازی و امنیت دنبال می‌کند.`,
+    image: `${BLOB}/news-images/news${n}.webp`,
+    tags: ["news", "زیرساخت", "techbox"],
+    category: i % 2 === 0 ? "زیرساخت" : "بازار فناوری",
+    authorUsername: i % 3 === 0 ? "atiyehatami" : i % 3 === 1 ? "behnazghaderi" : "behruzghaderi",
+    date: `2026-07-${String(22 - i).padStart(2, "0")}`,
+    dateFa: `${31 - i} تیر 1405`,
+    likes: 5 + i,
+    views: 120 + i * 29,
+  } satisfies SeedPost;
+});
+
 const reviewPosts: SeedPost[] = Array.from({ length: 13 }, (_, i) => {
   const n = i + 1;
   const authors = ["nastarankhodakarami", "farazfeizi", "mostafanajafi"];
@@ -362,6 +397,7 @@ async function main() {
   if (step === "1" || step === "media" || step === "all") await upsertPosts(mediaPosts);
   if (step === "2" || step === "articles" || step === "blog" || step === "all") await upsertPosts(articlePosts);
   if (step === "3" || step === "reviews" || step === "review" || step === "all") await upsertPosts(reviewPosts);
+  if (step === "4" || step === "news" || step === "all") await upsertPosts(newsPosts);
 }
 
 main()

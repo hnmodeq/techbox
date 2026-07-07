@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { getModuleItems } from '@/lib/content';
+import { useDbPosts } from '@/hooks/useDbPosts';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
 import Image from 'next/image';
@@ -20,7 +21,9 @@ export default function NewsSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const newsItems = getModuleItems('news').slice(0, 15);
+  const fallbackNews = getModuleItems('news').slice(0, 15);
+  const { items: dbNews } = useDbPosts('news', fallbackNews, 15);
+  const newsItems = dbNews.slice(0, 15);
 
   useEffect(() => {
     const savedOpen = readSavedOpenState();

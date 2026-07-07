@@ -1,13 +1,15 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems, getCommentCount } from "@/lib/content";
+import { getModuleItems } from "@/lib/content";
+import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
 
 export default function NewsList() {
- const items = getModuleItems("news");
+ const fallbackItems = getModuleItems("news");
+ const { items } = useDbPosts("news", fallbackItems, 100);
  const forceNews = items.slice(0, 8);
 
  return (
