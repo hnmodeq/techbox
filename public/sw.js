@@ -1,12 +1,30 @@
-const CACHE_NAME = 'techbox-v2';
+const CACHE_NAME = 'techbox-v3';
 const urlsToCache = ['/', '/manifest.json', '/logo.png'];
+const IS_LOCAL_DEV = ['localhost', '127.0.0.1', '::1'].includes(self.location.hostname);
 
 self.addEventListener('install', (event) => {
+  if (IS_LOCAL_DEV) {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
+
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
+  if (IS_LOCAL_DEV) {
+    event.waitUntil(
+      caches
+        .keys()
+        .then((cacheNames) => Promise.all(cacheNames.map((name) => caches.delete(name))))
+        .then(() => self.registration.unregister())
+        .then(() => self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
+        .then((clients) => clients.forEach((client) => client.navigate(client.url)))
+    );
+    return;
+  }
+
   event.waitUntil(
     caches
       .keys()
@@ -36,6 +54,8 @@ function shouldSkipCache(request) {
 }
 
 self.addEventListener('fetch', (event) => {
+  if (IS_LOCAL_DEV) return;
+
   const { request } = event;
   if (shouldSkipCache(request)) return;
 

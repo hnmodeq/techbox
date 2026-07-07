@@ -14,6 +14,23 @@ h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
 button, .btn { font-family: inherit; transition: all 0.2s ease; }
 `;
 
+const localServiceWorkerCleanupScript = `
+(function() {
+  try {
+    var isLocalhost = ['localhost', '127.0.0.1', '::1'].indexOf(window.location.hostname) !== -1;
+    if (!isLocalhost || !('serviceWorker' in navigator)) return;
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        registrations.forEach(function(registration) { registration.unregister(); });
+      });
+      if ('caches' in window) {
+        caches.keys().then(function(keys) { keys.forEach(function(key) { caches.delete(key); }); });
+      }
+    });
+  } catch (e) {}
+})();
+`;
+
 // Inline script to prevent dark mode flash (FOUC)
 const themeScript = `
 (function() {
@@ -70,7 +87,11 @@ export default function RootLayout({
         <LayoutShell>{children}</LayoutShell>
         <Analytics />
         <SpeedInsights />
-        <script src="/register-sw.js" defer />
+        {process.env.NODE_ENV === "production" ? (
+          <script src="/register-sw.js?v=3" defer />
+        ) : (
+          <script dangerouslySetInnerHTML={{ __html: localServiceWorkerCleanupScript }} />
+        )}
       </body>
     </html>
   );
