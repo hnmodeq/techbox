@@ -25,6 +25,13 @@ export type ContentItem = {
   likes: number;
   views: number;
   category?: string;
+  rating?: number | null;
+  ratingCount?: number;
+  fileName?: string | null;
+  fileUrl?: string | null;
+  fileSize?: string | null;
+  downloadCount?: number;
+  versions?: Array<Record<string, unknown>>;
 };
 
 import blogData from "@/prisma/mock-data/blog.json";

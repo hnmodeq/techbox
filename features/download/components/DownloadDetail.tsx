@@ -2,6 +2,8 @@
 import type { ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
+import { DownloadMetaLine } from "@/components/ui/download-meta";
+import { DownloadAction } from "@/components/ui/download-action";
 
 export default function DownloadDetail({ item }: { item: ContentItem }){
  const versions = Array.isArray((item as any).versions) ? (item as any).versions : [];
@@ -12,8 +14,12 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--download)]">{item.category}</span>
  </div>
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{item.title}</h1>
- <div className="mt-2">
+ <div className="mt-3 flex flex-wrap items-center gap-4">
    <LiveViewCounter module="download" slug={item.slug} showLabel />
+   <DownloadMetaLine slug={item.slug} fallbackFileName={item.fileName ?? null} fallbackFileSize={item.fileSize ?? null} fallbackDownloadCount={item.downloadCount ?? 0} />
+ </div>
+ <div className="mt-5">
+   <DownloadAction slug={item.slug} fallbackFileName={item.fileName ?? null} />
  </div>
       <p className="text-muted-foreground mt-3">{item.excerpt}</p>
 

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     try {
       const post = await prisma.post.findUnique({
         where: { module_slug: { module: moduleKey, slug } },
-        select: { id: true, views: true, likes: true, solved: true, fileSize: true },
+        select: { id: true, views: true, likes: true, rating: true, ratingCount: true, solved: true, fileName: true, fileSize: true, downloadCount: true },
       });
       if (!post) {
         return NextResponse.json({
@@ -18,7 +18,11 @@ export async function GET(req: NextRequest) {
           likes: 0,
           comments: 0,
           solved: false,
+          fileName: null,
           fileSize: null,
+          downloadCount: 0,
+          rating: null,
+          ratingCount: 0,
         });
       }
       const commentsCount = await prisma.comment.count({
@@ -29,7 +33,11 @@ export async function GET(req: NextRequest) {
         likes: post.likes || 0,
         comments: commentsCount || 0,
         solved: post.solved ?? false,
+        fileName: post.fileName || null,
         fileSize: post.fileSize || null,
+        downloadCount: post.downloadCount || 0,
+        rating: post.rating ?? null,
+        ratingCount: post.ratingCount || 0,
       });
     } catch {
       return NextResponse.json({ error: "db_unavailable" }, { status: 503 });
@@ -46,7 +54,11 @@ export async function GET(req: NextRequest) {
         views: true,
         likes: true,
         solved: true,
+        rating: true,
+        ratingCount: true,
+        fileName: true,
         fileSize: true,
+        downloadCount: true,
       },
     });
 
@@ -58,14 +70,18 @@ export async function GET(req: NextRequest) {
       (commentCounts as any[]).map((c) => [c.postId, c._count?._all || 0])
     );
 
-    const stats: Record<string, { views: number; likes: number; comments: number; solved?: boolean; fileSize?: string | null }> = {};
+    const stats: Record<string, { views: number; likes: number; comments: number; solved?: boolean; rating?: number | null; ratingCount?: number; fileName?: string | null; fileSize?: string | null; downloadCount?: number }> = {};
     for (const p of posts) {
       stats[`${p.module}:${p.slug}`] = {
         views: p.views || 0,
         likes: p.likes || 0,
         comments: commentMap.get(p.id) || 0,
         solved: p.solved ?? false,
+        rating: p.rating ?? null,
+        ratingCount: p.ratingCount || 0,
+        fileName: p.fileName || null,
         fileSize: p.fileSize || null,
+        downloadCount: p.downloadCount || 0,
       };
     }
     return NextResponse.json(stats);

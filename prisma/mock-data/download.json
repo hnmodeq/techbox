@@ -1,5 +1,42 @@
 [
   {
+    "slug": "techbox-utils-sample-ts",
+    "module": "download",
+    "title": "نمونه فایل واقعی TypeScript تکباکس",
+    "excerpt": "یک فایل واقعی کوچک از سورس پروژه برای تست سیستم دانلود، شمارش دانلود و نمایش متادیتا.",
+    "content": "این آیتم به یک فایل واقعی داخل public/downloads متصل است. برای فایل‌های بزرگ‌تر، URL را به Vercel Blob، Cloudflare R2 یا S3 منتقل کنید.",
+    "image": "/assets/blog-1.jpg",
+    "tags": [
+      "techbox",
+      "typescript",
+      "sample",
+      "download",
+      "نمونه",
+      "دانلود"
+    ],
+    "author": {
+      "name": "تکباکس دانلود",
+      "role": "دانلود",
+      "avatar": "/assets/hooman.png"
+    },
+    "date": "2026-07-22",
+    "date_fa": "31 تیر 1405",
+    "likes": 0,
+    "views": 0,
+    "category": "نمونه فایل",
+    "fileName": "techbox-utils-sample.ts",
+    "fileUrl": "/downloads/techbox-utils-sample.ts",
+    "fileSize": "0.2 KB",
+    "downloadCount": 0,
+    "versions": [
+      {
+        "version": "1.0",
+        "size": "0.2 KB",
+        "dateFa": "31 تیر 1405"
+      }
+    ]
+  },
+  {
     "slug": "ubuntu-server-24-iso",
     "module": "download",
     "title": "دانلود Ubuntu Server 24.04 LTS",

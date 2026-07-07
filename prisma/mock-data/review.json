@@ -34,7 +34,9 @@
     "date_fa": "27 تیر 1405",
     "likes": 61,
     "views": 2680,
-    "category": "شبکه"
+    "category": "شبکه",
+    "rating": 4.6,
+    "ratingCount": 18
   },
   {
     "slug": "synology-rackstation-rs2426-review",
@@ -71,7 +73,9 @@
     "date_fa": "26 تیر 1405",
     "likes": 73,
     "views": 3190,
-    "category": "ذخیره‌سازی"
+    "category": "ذخیره‌سازی",
+    "rating": 4.7,
+    "ratingCount": 24
   },
   {
     "slug": "hpe-dl380-gen11-review",
@@ -98,7 +102,9 @@
     "date_fa": "25 تیر 1405",
     "likes": 95,
     "views": 4020,
-    "category": "سرور"
+    "category": "سرور",
+    "rating": 4.5,
+    "ratingCount": 12
   },
   {
     "slug": "qnap-2277-full-review",
@@ -125,7 +131,9 @@
     "date_fa": "20 تیر 1405",
     "likes": 87,
     "views": 4120,
-    "category": "سخت‌افزار"
+    "category": "سخت‌افزار",
+    "rating": 4.4,
+    "ratingCount": 31
   },
   {
     "slug": "dell-r750-review",
@@ -150,7 +158,9 @@
     "date_fa": "10 تیر 1405",
     "likes": 54,
     "views": 2100,
-    "category": "سرور"
+    "category": "سرور",
+    "rating": 4.8,
+    "ratingCount": 27
   },
   {
     "slug": "ubiquiti-u7-pro-review",
@@ -175,7 +185,9 @@
     "date_fa": "29 تیر 1405",
     "likes": 66,
     "views": 2880,
-    "category": "شبکه"
+    "category": "شبکه",
+    "rating": 4.3,
+    "ratingCount": 9
   },
   {
     "slug": "fortigate-60f-office-review",
@@ -202,7 +214,9 @@
     "date_fa": "28 تیر 1405",
     "likes": 82,
     "views": 3410,
-    "category": "امنیت"
+    "category": "امنیت",
+    "rating": 4.6,
+    "ratingCount": 16
   },
   {
     "slug": "apc-smart-ups-review",
@@ -227,6 +241,8 @@
     "date_fa": "23 تیر 1405",
     "likes": 47,
     "views": 1980,
-    "category": "برق و رک"
+    "category": "برق و رک",
+    "rating": 4.2,
+    "ratingCount": 11
   }
 ]

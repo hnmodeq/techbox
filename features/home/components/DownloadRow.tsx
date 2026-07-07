@@ -4,55 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
-import { CardStats } from '@/components/ui/card-stats';
-import { useStatEntry } from '@/providers/stats.provider';
-
-function DownloadMeta({ slug }: { slug: string }) {
-  const [fileSize, setFileSize] = useState<string | null>(null);
-  const { entry: shared, status } = useStatEntry('download', slug);
-
-  useEffect(() => {
-    if (shared && typeof shared.fileSize === 'string') {
-      setFileSize(shared.fileSize);
-    }
-  }, [shared]);
-
-  useEffect(() => {
-    let mounted = true;
-    // Only fall back once the bulk fetch has actually settled and this
-    // item still isn't in it - not on a guessed timer.
-    if (status === 'loading' || shared) return () => { mounted = false; };
-
-    fetch(`/api/stats?module=download&slug=${encodeURIComponent(slug)}`)
-      .then(r => r.json())
-      .then(d => {
-        if (mounted && d && typeof d.fileSize === 'string') {
-          setFileSize(d.fileSize);
-        }
-      })
-      .catch(() => {});
-    return () => { mounted = false; };
-  }, [slug, shared, status]);
-
-  return (
-    <div className="flex flex-wrap items-center justify-between gap-2 w-full mt-3">
-      <span className="text-xs font-extrabold text-[var(--download)] group-hover:underline flex items-center gap-1 shrink-0">
-        <span>دانلود مستقیم</span>
-        <span>↓</span>
-      </span>
-      <div className="flex items-center gap-3">
-        <span className="inline-flex items-center gap-1 text-xs paragraph-color font-bold" title="حجم فایل">
-          <svg className="w-3.5 h-3.5 text-[var(--warning)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-          </svg>
-          <span className="text-[var(--primary-text)]">{fileSize || 'حجم ثبت نشده'}</span>
-        </span>
-        <CardStats module="download" slug={slug} showComments={true} />
-      </div>
-    </div>
-  );
-}
+import { DownloadMetaLine } from '@/components/ui/download-meta';
+import { DownloadAction } from '@/components/ui/download-action';
 
 export default function DownloadRow() {
   const files = getLatest('download', 8);
@@ -112,7 +65,10 @@ export default function DownloadRow() {
                 </div>
 
                 {/* Bottom Footer without visible separator line */}
-                <DownloadMeta slug={file.slug} />
+                <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
+                  <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
+                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} />
+                </div>
               </Link>
             );
           })}

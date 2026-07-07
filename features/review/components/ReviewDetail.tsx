@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Icon } from "@/design/icons";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { LikeButton } from "@/components/ui/like-button";
+import { ReviewRating } from "@/components/ui/review-rating";
 import CommentSection from "@/features/comment/components/CommentSection";
 
 type ReviewDetailProps = {
@@ -35,6 +36,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
               {item.category || "بررسی تخصصی"}
             </span>
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa}</span>
+            <ReviewRating slug={item.slug} fallbackRating={item.rating ?? null} fallbackCount={item.ratingCount ?? 0} />
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-[var(--primary-text)] leading-10">

@@ -41,8 +41,13 @@ export async function GET(req: NextRequest) {
         dateFa: true,
         likes: true,
         views: true,
+        rating: true,
+        ratingCount: true,
         solved: true,
+        fileName: true,
+        fileUrl: true,
         fileSize: true,
+        downloadCount: true,
         category: true,
         authorName: true,
         author: {
@@ -70,8 +75,13 @@ export async function GET(req: NextRequest) {
       dateFa: p.dateFa,
       likes: p.likes,
       views: p.views,
+      rating: p.rating ?? null,
+      ratingCount: p.ratingCount || 0,
       solved: p.solved ?? false,
+      fileName: p.fileName,
+      fileUrl: p.fileUrl,
       fileSize: p.fileSize,
+      downloadCount: p.downloadCount || 0,
       category: p.category,
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
@@ -95,6 +105,12 @@ const createSchema = z.object({
   image: z.string().optional(),
   tags: z.array(z.string()).default([]),
   category: z.string().optional(),
+  rating: z.number().min(0).max(5).optional(),
+  ratingCount: z.number().int().min(0).optional(),
+  fileName: z.string().optional(),
+  fileUrl: z.string().optional(),
+  fileSize: z.string().optional(),
+  downloadCount: z.number().int().min(0).optional(),
 });
 
 export async function POST(req: NextRequest) {

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
+import { ReviewRating } from '@/components/ui/review-rating';
 
 export default function ReviewRow() {
   const reviews = getLatest('review', 5);
@@ -41,9 +42,9 @@ export default function ReviewRow() {
                   </div>
 
                   <div className="p-4">
-                    <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
-                      <span>{rev.category || 'بررسی تخصصی'}</span>
-                      <span> • {rev.date_fa}</span>
+                    <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
+                      <span>{rev.category || 'بررسی تخصصی'} • {rev.date_fa}</span>
+                      <ReviewRating slug={rev.slug} fallbackRating={rev.rating ?? null} fallbackCount={rev.ratingCount ?? 0} compact />
                     </div>
                     <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
                       {rev.title}

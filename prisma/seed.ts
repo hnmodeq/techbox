@@ -57,6 +57,13 @@ async function main(){
         dateFa: p.date_fa || "۱ تیر ۱۴۰۵",
         likes: p.likes || 0,
         views: p.views || 0,
+        rating: typeof p.rating === "number" ? p.rating : null,
+        ratingCount: typeof p.ratingCount === "number" ? p.ratingCount : 0,
+        solved: typeof p.solved === "boolean" ? p.solved : false,
+        fileName: p.fileName || null,
+        fileUrl: p.fileUrl || null,
+        fileSize: p.fileSize || null,
+        downloadCount: typeof p.downloadCount === "number" ? p.downloadCount : 0,
         published: true
       }
     });

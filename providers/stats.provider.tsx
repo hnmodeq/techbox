@@ -6,7 +6,11 @@ type StatEntry = {
   likes: number;
   comments: number;
   solved?: boolean;
+  rating?: number | null;
+  ratingCount?: number;
+  fileName?: string | null;
   fileSize?: string | null;
+  downloadCount?: number;
 };
 
 type StatsMap = Record<string, StatEntry>;
@@ -57,7 +61,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
       });
 
     const handleUpdate = (e: any) => {
-      const { module, slug, views, likes, comments, solved, fileSize } = e.detail || {};
+      const { module, slug, views, likes, comments, solved, rating, ratingCount, fileName, fileSize, downloadCount } = e.detail || {};
       if (!module || !slug) return;
       const key = `${module}:${slug}`;
       setStats((prev) => {
@@ -70,7 +74,11 @@ export function StatsProvider({ children }: { children: ReactNode }) {
             ...(typeof likes === "number" ? { likes } : {}),
             ...(typeof comments === "number" ? { comments } : {}),
             ...(typeof solved === "boolean" ? { solved } : {}),
+            ...(typeof rating === "number" ? { rating } : {}),
+            ...(typeof ratingCount === "number" ? { ratingCount } : {}),
+            ...(typeof fileName === "string" ? { fileName } : {}),
             ...(typeof fileSize === "string" ? { fileSize } : {}),
+            ...(typeof downloadCount === "number" ? { downloadCount } : {}),
           },
         };
       });
