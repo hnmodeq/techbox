@@ -6,11 +6,13 @@ import NewsSidebar from "@/features/home/components/NewsSidebar";
 import FooterSection from "@/components/layout/Footer";
 import { CartProvider } from "@/providers/cart.provider";
 import { StatsProvider } from "@/providers/stats.provider";
+import { ThemeProvider } from "@/providers/theme.provider";
 import Chatbot from "@/features/chat/components/Chatbot";
 import { AuthModal } from "@/features/auth/components/auth-modal";
 
 export function LayoutShell({ children }: { children: React.ReactNode }) {
  return (
+ <ThemeProvider>
  <CartProvider>
  <StatsProvider>
  <div className="relative min-h-screen text-foreground overflow-x-hidden w-full max-w-full">
@@ -29,5 +31,6 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
  </div>
  </StatsProvider>
  </CartProvider>
+ </ThemeProvider>
  );
 }

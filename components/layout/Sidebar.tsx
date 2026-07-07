@@ -10,9 +10,10 @@ export default function SidebarMain({ onMobileOpenChange }: SidebarMainProps) {
   const [mounted, setMounted] = React.useState(false);
   const [desktopOpen, setDesktopOpen] = React.useState(true);
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { theme, setTheme: setNextTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme: setNextTheme } = useTheme();
 
-  const currentTheme = (theme === "dark" || theme === "light") ? theme : "dark";
+  const activeTheme = resolvedTheme ?? theme;
+  const currentTheme = activeTheme === "dark" ? "dark" : "light";
 
   React.useEffect(() => {
     setMounted(true);
