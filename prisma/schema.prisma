@@ -37,6 +37,15 @@ model Post {
   gallery    String   @default("[]")
   tags       String   @default("[]")
   category   String?
+  seoTitle   String?
+  seoDescription String?
+  brand      String?
+  model      String?
+  sku        String?
+  priceLabel String?
+  availability String?
+  warranty   String?
+  specs      String   @default("{}")
   authorId   String?
   authorName String   @default("تحریریه")
   date       DateTime @default(now())

@@ -13,6 +13,16 @@ function safeJsonArray(value: string | null | undefined): string[] {
   }
 }
 
+function safeJsonObject(value: string | null | undefined): Record<string, unknown> {
+  if (!value) return {};
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const postModule = searchParams.get("module") || undefined;
@@ -51,6 +61,15 @@ export async function GET(req: NextRequest) {
         fileSize: true,
         downloadCount: true,
         category: true,
+        seoTitle: true,
+        seoDescription: true,
+        brand: true,
+        model: true,
+        sku: true,
+        priceLabel: true,
+        availability: true,
+        warranty: true,
+        specs: true,
         authorName: true,
         author: {
           select: {
@@ -87,6 +106,15 @@ export async function GET(req: NextRequest) {
       fileSize: p.fileSize,
       downloadCount: p.downloadCount || 0,
       category: p.category,
+      seoTitle: p.seoTitle,
+      seoDescription: p.seoDescription,
+      brand: p.brand,
+      model: p.model,
+      sku: p.sku,
+      priceLabel: p.priceLabel,
+      availability: p.availability,
+      warranty: p.warranty,
+      specs: safeJsonObject(p.specs),
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         role: p.author?.roleFa || p.author?.role || "عضو انجمن",
@@ -111,6 +139,15 @@ const createSchema = z.object({
   gallery: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
   category: z.string().optional(),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  brand: z.string().optional(),
+  model: z.string().optional(),
+  sku: z.string().optional(),
+  priceLabel: z.string().optional(),
+  availability: z.string().optional(),
+  warranty: z.string().optional(),
+  specs: z.record(z.unknown()).default({}),
   rating: z.number().min(0).max(5).optional(),
   ratingCount: z.number().int().min(0).optional(),
   fileName: z.string().optional(),
@@ -127,19 +164,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
   try {
-    const post = await prisma.post.create({
-      data: {
-        ...data,
-        gallery: JSON.stringify(data.gallery || []),
-        tags: JSON.stringify(data.tags),
-        authorId: user.id,
-        authorName: user.name,
+    const serialized = {
+      ...data,
+      gallery: JSON.stringify(data.gallery || []),
+      tags: JSON.stringify(data.tags),
+      specs: JSON.stringify(data.specs || {}),
+      authorId: user.id,
+      authorName: user.name,
+    };
+
+    const post = await prisma.post.upsert({
+      where: { module_slug: { module: data.module, slug: data.slug } },
+      update: serialized,
+      create: {
+        ...serialized,
         dateFa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
       },
     });
     return NextResponse.json(post, { status: 201 });
   } catch (e: any) {
-    if (String(e.message).includes("Unique")) return NextResponse.json({ error: "slug exists" }, { status: 409 });
     return NextResponse.json({ error: e.message }, { status: 400 });
   }
 }

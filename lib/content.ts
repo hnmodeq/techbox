@@ -27,6 +27,15 @@ export type ContentItem = {
   likes: number;
   views: number;
   category?: string;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  brand?: string | null;
+  model?: string | null;
+  sku?: string | null;
+  priceLabel?: string | null;
+  availability?: string | null;
+  warranty?: string | null;
+  specs?: Record<string, unknown> | null;
   rating?: number | null;
   ratingCount?: number;
   fileName?: string | null;
