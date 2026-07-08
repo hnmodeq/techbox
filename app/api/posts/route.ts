@@ -281,7 +281,7 @@ export async function PATCH(req: NextRequest) {
         postId: current.id,
         oldTitle: changedTitle ? current.title : undefined,
         oldContent: changedContent ? current.content : undefined,
-        oldImage: changedImage ? current.image : undefined,
+        oldImage: changedImage ? (current.image ?? undefined) : undefined,
         editedBy: user.id,
       });
     }
