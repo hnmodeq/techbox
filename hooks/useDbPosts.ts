@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ContentItem, ModuleSlug } from "@/lib/content";
 
 type DbPost = ContentItem & {
   id?: string;
   videoUrl?: string | null;
+  videoDuration?: string | null;
+  videoMimeType?: string | null;
+  videoFileSize?: string | null;
   gallery?: string[];
   fileName?: string | null;
   fileUrl?: string | null;
@@ -16,50 +19,60 @@ type DbPost = ContentItem & {
   solved?: boolean | null;
 };
 
-export function useDbPosts(module: ModuleSlug, fallback: ContentItem[], take = 100) {
-  const fallbackRef = useRef<ContentItem[]>(fallback);
-  useEffect(() => { fallbackRef.current = fallback; });
+export function useDbPosts(module: ModuleSlug, _fallback: ContentItem[] = [], take = 100) {
   const [items, setItems] = useState<DbPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
+    setError("");
     fetch(`/api/posts?module=${encodeURIComponent(module)}&take=${take}`, { cache: "no-store" })
       .then((r) => { if (!r.ok) throw new Error("posts_unavailable"); return r.json(); })
       .then((data) => {
         if (!mounted) return;
-        if (Array.isArray(data) && data.length > 0) { setItems(data); setFromDb(true); }
-        else { setItems([]); setFromDb(true); }
+        setItems(Array.isArray(data) ? data : []);
+        setFromDb(true);
       })
-      .catch(() => { if (mounted) { setItems(fallbackRef.current as DbPost[]); setFromDb(false); } })
+      .catch(() => {
+        if (!mounted) return;
+        setItems([]);
+        setFromDb(false);
+        setError("db_unavailable");
+      })
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
   }, [module, take]);
-  return { items, loading, fromDb };
+  return { items, loading, fromDb, error };
 }
 
-export function useDbPost(module: ModuleSlug, slug: string, fallback: ContentItem | null) {
-  const fallbackRef = useRef<ContentItem | null>(fallback);
-  useEffect(() => { fallbackRef.current = fallback; });
+export function useDbPost(module: ModuleSlug, slug: string, _fallback: ContentItem | null = null) {
   const [item, setItem] = useState<DbPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
+    setError("");
     fetch(`/api/posts?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
       .then((r) => { if (!r.ok) throw new Error("post_unavailable"); return r.json(); })
       .then((data) => {
         if (!mounted) return;
-        if (data) { setItem(data); setFromDb(true); }
-        else { setItem(null); setFromDb(true); }
+        setItem(data || null);
+        setFromDb(Boolean(data));
       })
-      .catch(() => { if (mounted) { setItem(fallbackRef.current as DbPost | null); setFromDb(false); } })
+      .catch(() => {
+        if (!mounted) return;
+        setItem(null);
+        setFromDb(false);
+        setError("db_unavailable");
+      })
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
   }, [module, slug]);
-  return { item, loading, fromDb };
+  return { item, loading, fromDb, error };
 }

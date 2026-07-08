@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,9 +8,7 @@ import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { ForumBadge } from '@/components/ui/forum-badge';
 
-type ForumTopic = ReturnType<typeof getLatest>[0] & { solved?: boolean | null };
-
-const fallbackTopics = getLatest('forum', 6) as ForumTopic[];
+type ForumTopic = { slug: string; title: string; excerpt?: string; date_fa?: string; solved?: boolean | null; author?: { name?: string; avatar?: string } };
 
 function ForumCardSkeleton() {
   return (
@@ -42,7 +39,7 @@ export default function ForumRow() {
         setTopics(Array.isArray(data) ? data : []);
       })
       .catch(() => {
-        if (mounted) setTopics(fallbackTopics);
+        if (mounted) setTopics([]);
       });
 
     return () => {

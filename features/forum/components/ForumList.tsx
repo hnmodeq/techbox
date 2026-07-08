@@ -67,14 +67,13 @@ export default function ForumList() {
   }, []);
 
   // Real stats/status come from the database (bulk /api/stats request). The
-  // topic list itself is DB-first via /api/posts; static seed data is only a
-  // resilience fallback if the DB/API is unavailable.
+  // topic list itself is DB-first via /api/posts; no public static fallback is shown.
   const realLikes = (t: ForumPost) => stats[`forum:${t.slug}`]?.likes ?? t.likes ?? 0;
   const realViews = (t: ForumPost) => stats[`forum:${t.slug}`]?.views ?? t.views ?? 0;
   const realSolved = (t: ForumPost) =>
     stats[`forum:${t.slug}`]?.solved ?? (typeof (t as any).solved === "boolean" ? (t as any).solved : false);
 
-  const sourceItems = dbItems ?? (topicsError ? fallbackItems : []);
+  const sourceItems = dbItems ?? [];
   const merged = [...local, ...sourceItems];
   const all = (() => {
     const list = [...merged];

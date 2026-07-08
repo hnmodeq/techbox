@@ -9,17 +9,12 @@ import ForumRow from '@/features/home/components/ForumRow';
 import ReviewRow from '@/features/home/components/ReviewRow';
 import DownloadRow from '@/features/home/components/DownloadRow';
 import HomeTimelineRow from '@/features/home/components/HomeTimelineRow';
-import { getAllAcross } from '@/lib/content';
 
 export default function Page() {
-  const tickerItems = getAllAcross()
-    .filter((i) => ['news', 'blog', 'media', 'forum', 'download', 'review'].includes(i.module))
-    .slice(0, 16);
-
   return (
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
       {/* 1. Ticker Bar right at the top of the page */}
-      <NewsTicker items={tickerItems} className="border-b-[length:var(--border-size)] border-[var(--border-color)]/60 bg-[var(--card-background)]/40" />
+      <NewsTicker items={[]} className="border-b-[length:var(--border-size)] border-[var(--border-color)]/60 bg-[var(--card-background)]/40" />
 
       {/* 2. Hero Section (Big Website Title & Tagline Rotator) */}
       <HeroSection />

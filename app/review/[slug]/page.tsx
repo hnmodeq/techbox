@@ -1,4 +1,3 @@
-import { getBySlug, getModuleItems } from "@/lib/content";
 import { getDbPost } from "@/lib/server-post";
 import { getSlugRedirect } from "@/lib/slug-redirects";
 import { redirect } from "next/navigation";
@@ -9,19 +8,18 @@ export const dynamic = "force-dynamic";
 
 type P = Promise<{ slug: string }>;
 
-export async function generateStaticParams() {
- return [];
-}
-
 export default async function Page({ params }: { params: P }) {
- const { slug } = await params;
- const mod = "review" as any;
- const item = getBySlug(mod, slug);
- return <DbReviewDetail slug={slug} fallback={item} />;
+  const { slug } = await params;
+  const dbItem = await getDbPost("review", slug);
+  if (!dbItem) {
+    const target = await getSlugRedirect("review", slug);
+    if (target) redirect(`/${target.targetModule}/${target.targetSlug}`);
+  }
+  return <DbReviewDetail slug={slug} fallback={null} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {
- const { slug } = await params;
- const item = await getDbPost("review", slug);
- return { title: item ? `${item.title} | نقد و بررسی تکباکس` : "نقد و بررسی تکباکس" };
+  const { slug } = await params;
+  const item = await getDbPost("review", slug);
+  return { title: item ? `${item.title} | نقد و بررسی تکباکس` : "نقد و بررسی تکباکس" };
 }

@@ -63,12 +63,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
       })
       .catch(() => {
         if (!mounted) return;
-        if (initialItem) {
-          setItem(initialItem);
-          setNotFound(false);
-        } else {
-          setNotFound(true);
-        }
+        setNotFound(true);
       })
       .finally(() => {
         if (mounted) setLoading(false);

@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { searchAcross, type ModuleSlug, type ContentItem } from "@/lib/content";
+import { type ModuleSlug, type ContentItem } from "@/lib/content";
 import { ContentCard } from "@/features/content/components/ContentCard";
 import { Button } from "@/components/ui/button";
 import { moduleMeta } from "@/lib/content";
@@ -52,10 +52,9 @@ function SearchInner() {
       })
       .catch(() => {
         if (!mounted) return;
-        const fallback = searchAcross(q).filter((item) => moduleFilter === "all" || item.module === moduleFilter);
-        setResults(fallback as SearchResult[]);
+        setResults([]);
         setFromDb(false);
-        setError("جستجوی دیتابیس در دسترس نبود؛ نتایج fallback نمایش داده شد.");
+        setError("جستجوی دیتابیس در دسترس نبود. لطفاً دوباره تلاش کنید.");
       })
       .finally(() => {
         if (mounted) setLoading(false);

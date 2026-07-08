@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
-import { getAllAcross } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -75,9 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  for (const post of getAllAcross()) {
-    routes.push(entry(`${base}/${post.module}/${post.slug}`, post.date, 0.55, "monthly"));
-  }
 
   return routes;
 }

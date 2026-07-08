@@ -1,22 +1,25 @@
-import { getBySlug, getModuleItems } from "@/lib/content";
+import { getDbPost } from "@/lib/server-post";
+import { getSlugRedirect } from "@/lib/slug-redirects";
+import { redirect } from "next/navigation";
 import ForumDetail from "@/features/forum/components/ForumDetail";
 
 type P = Promise<{ slug: string }>;
 
 export const dynamicParams = true;
-
-export async function generateStaticParams() {
-  return getModuleItems("forum").map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function Page({ params }: { params: P }) {
   const { slug } = await params;
-  const initialItem = getBySlug("forum", slug);
-  return <ForumDetail slug={slug} initialItem={initialItem} />;
+  const dbItem = await getDbPost("forum", slug);
+  if (!dbItem) {
+    const target = await getSlugRedirect("forum", slug);
+    if (target) redirect(`/${target.targetModule}/${target.targetSlug}`);
+  }
+  return <ForumDetail slug={slug} initialItem={null} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {
   const { slug } = await params;
-  const item = getBySlug("forum", slug);
+  const item = await getDbPost("forum", slug);
   return { title: item ? `${item.title} | انجمن تکباکس` : "موضوع انجمن | تکباکس" };
 }
