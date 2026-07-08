@@ -74,6 +74,7 @@ model Post {
   author   User?     @relation(fields: [authorId], references: [id])
   comments Comment[]
   ratings  Rating[]
+  revisions PostRevision[]
 
   @@unique([module, slug], name: "module_slug")
   @@index([module, published, date], name: "post_module_published_date_idx")
@@ -183,6 +184,20 @@ model SlugRedirect {
   @@unique([sourceModule, sourceSlug], name: "source_module_slug")
   @@index([targetModule, targetSlug], name: "redirect_target_idx")
   @@index([createdAt], name: "redirect_created_idx")
+}
+
+model PostRevision {
+  id        String   @id @default(cuid())
+  postId    String
+  oldTitle  String?
+  oldContent String?
+  oldImage  String?
+  editedBy  String?
+  editedAt  DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, editedAt], name: "post_revision_post_edited_idx")
 }
 
 model TimelineEvent {
