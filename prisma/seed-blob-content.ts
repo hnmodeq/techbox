@@ -67,6 +67,13 @@ type SeedPost = {
   fileSize?: string;
   downloadCount?: number;
   solved?: boolean;
+  brand?: string;
+  model?: string;
+  sku?: string;
+  priceLabel?: string;
+  availability?: string;
+  warranty?: string;
+  specs?: Record<string, unknown>;
 };
 
 
@@ -92,6 +99,18 @@ const productPosts: SeedPost[] = Array.from({ length: 20 }, (_, i) => {
     gallery,
     tags: ["shop", "product", "infrastructure"],
     category: n % 4 === 0 ? "شبکه" : n % 4 === 1 ? "سرور" : n % 4 === 2 ? "ذخیره‌سازی" : "امنیت",
+    brand: ["HPE", "Dell", "QNAP", "Fortinet", "MikroTik"][n % 5],
+    model: `TB-${1000 + n}`,
+    sku: `TB-SKU-${String(n).padStart(4, "0")}`,
+    priceLabel: n % 3 === 0 ? "تماس بگیرید" : `${(45 + n * 7).toLocaleString("fa-IR")} میلیون تومان`,
+    availability: n % 4 === 0 ? "پیش‌سفارش" : "موجود برای مشاوره",
+    warranty: "گارانتی اصالت و سلامت فیزیکی",
+    specs: {
+      "کاربری پیشنهادی": n % 4 === 0 ? "شبکه" : n % 4 === 1 ? "سرور" : n % 4 === 2 ? "ذخیره‌سازی" : "امنیت",
+      "سطح سازمانی": n % 2 === 0 ? "SMB / Mid-Market" : "Enterprise Lite",
+      "نوع تأمین": "استعلام از فروش تکباکس",
+      "نیاز به مشاوره": "بله",
+    },
     authorUsername: "hoomanmodeq",
     date: `2026-07-${String(22 - (i % 20)).padStart(2, "0")}`,
     dateFa: `${31 - (i % 20)} تیر 1405`,
@@ -514,6 +533,13 @@ async function upsertPosts(posts: SeedPost[]) {
         fileUrl: post.fileUrl || null,
         fileSize: post.fileSize || null,
         downloadCount: post.downloadCount || 0,
+        brand: post.brand || null,
+        model: post.model || null,
+        sku: post.sku || null,
+        priceLabel: post.priceLabel || null,
+        availability: post.availability || null,
+        warranty: post.warranty || null,
+        specs: JSON.stringify(post.specs || {}),
         solved: typeof post.solved === "boolean" ? post.solved : false,
         published: true,
       },
@@ -540,6 +566,13 @@ async function upsertPosts(posts: SeedPost[]) {
         fileUrl: post.fileUrl || null,
         fileSize: post.fileSize || null,
         downloadCount: post.downloadCount || 0,
+        brand: post.brand || null,
+        model: post.model || null,
+        sku: post.sku || null,
+        priceLabel: post.priceLabel || null,
+        availability: post.availability || null,
+        warranty: post.warranty || null,
+        specs: JSON.stringify(post.specs || {}),
         solved: typeof post.solved === "boolean" ? post.solved : false,
         published: true,
       },
