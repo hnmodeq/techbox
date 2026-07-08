@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit --pretty false",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate || echo 'Prisma generate skipped (network issue in some environments)'",
+    "postinstall": "prisma generate",
     "data": "node scripts/data.cjs",
     "tree": "node scripts/tree.cjs",
     "data:legacy": "node scripts/data.cjs",
