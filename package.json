@@ -18,7 +18,11 @@
     "tree:legacy": "node scripts/tree.cjs",
     "prisma:generate": "prisma generate",
     "db:backfill-metadata": "tsx prisma/backfill-metadata.ts",
-    "db:seed-blob-content": "tsx prisma/seed-blob-content.ts"
+    "db:seed-blob-content": "tsx prisma/seed-blob-content.ts",
+    "check:content": "tsx scripts/checks/content.ts",
+    "check:blob": "tsx scripts/checks/blob.ts",
+    "check:db": "tsx scripts/checks/db.ts",
+    "check:all": "tsx scripts/checks/all.ts"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.2.8",
