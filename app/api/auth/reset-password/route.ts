@@ -14,8 +14,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { email, token, newPassword } = schema.parse(body);
 
-    // In production, validate the token properly (JWT or DB token)
-    // For now we do a simple check
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
     });
@@ -24,10 +22,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "کاربر یافت نشد" }, { status: 404 });
     }
 
-    // Simple token validation (in real app use proper token verification)
-    const expectedToken = Buffer.from(`${user.id}:${Date.now() - 86400000}`).toString("base64url"); // 24h
-    // Note: For demo we accept any token that was generated in forgot-password
+    // Find valid reset token
+    const resetToken = await prisma.passwordResetToken.findFirst({
+      where: {
+        token,
+        userId: user.id,
+        used: false,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+    });
 
+    if (!resetToken) {
+      return NextResponse.json({ 
+        error: "لینک بازیابی نامعتبر یا منقضی شده است" 
+      }, { status: 400 });
+    }
+
+    // Update password
     const hashed = await hashPassword(newPassword);
 
     await prisma.user.update({
@@ -35,7 +48,16 @@ export async function POST(req: NextRequest) {
       data: { password: hashed },
     });
 
-    return NextResponse.json({ ok: true, message: "رمز عبور با موفقیت تغییر کرد" });
+    // Mark token as used
+    await prisma.passwordResetToken.update({
+      where: { id: resetToken.id },
+      data: { used: true },
+    });
+
+    return NextResponse.json({ 
+      ok: true, 
+      message: "رمز عبور با موفقیت تغییر کرد" 
+    });
 
   } catch (e: any) {
     if (e instanceof z.ZodError) {

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { sendEmail, emailTemplates } from "@/lib/email";
-import { createSession } from "@/lib/auth-server";
 
 const schema = z.object({
   email: z.string().email(),
@@ -22,9 +21,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, message: "اگر ایمیل وجود داشته باشد، لینک ارسال شد." });
     }
 
-    // Generate a simple reset token (in production use proper JWT or crypto token)
-    const resetToken = Buffer.from(`${user.id}:${Date.now()}`).toString("base64url");
-    const resetLink = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+    // Delete any existing unused tokens for this user
+    await prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: user.id,
+        used: false,
+      },
+    });
+
+    // Create a secure reset token
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+
+    await prisma.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        token,
+        expiresAt,
+      },
+    });
+
+    const resetLink = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
     // Send reset email
     const { subject, html } = emailTemplates.passwordReset(resetLink);

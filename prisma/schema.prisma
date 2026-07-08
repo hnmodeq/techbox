@@ -25,6 +25,7 @@ model User {
   comments Comment[]
   ratings  Rating[]
   notificationState UserNotificationState?
+  passwordResetTokens PasswordResetToken[]
 
   @@index([role, status], name: "user_role_status_idx")
   @@index([status], name: "user_status_idx")
@@ -280,4 +281,18 @@ model NewsletterSubscriber {
   updatedAt DateTime @updatedAt
 
   @@index([active, createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([expiresAt])
 }
