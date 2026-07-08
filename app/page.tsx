@@ -12,12 +12,10 @@ import LandingStats from '@/features/home/components/LandingStats';
 import TrustSection from '@/features/home/components/TrustSection';
 import RecommendationRow from '@/features/home/components/RecommendationRow';
 import NewsletterSignup from '@/components/newsletter/NewsletterSignup';
-import { HomeDataProvider } from '@/features/home/lib/home-data';
 import { getHomepageRecommendations } from '@/lib/recommendations';
 
 export default function Page() {
   return (
-    <HomeDataProvider>
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
       {/* 1. Ticker Bar right at the top of the page */}
       <NewsTicker items={[]} className="border-b-[length:var(--border-size)] border-[var(--border-color)]/60 bg-[var(--card-background)]/40" />
@@ -64,6 +62,5 @@ export default function Page() {
       </div>
 
     </main>
-    </HomeDataProvider>
   );
 }
