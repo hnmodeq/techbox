@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 const BLOB = "https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com";
 const PASSWORD = "123456xX";
+const DRY_RUN = process.argv.includes("--dry-run");
 const ALL_MODULES = ["blog", "news", "media", "review", "download", "shop", "forum", "tools"];
 
 type SeedUser = {
@@ -715,27 +716,53 @@ async function cleanOldContent() {
   const seedByModule = new Map<string, string[]>();
   for (const post of seedPosts) seedByModule.set(post.module, [...(seedByModule.get(post.module) || []), post.slug]);
 
-  await prisma.comment.deleteMany({ where: { text: { in: duplicateSeedTexts } } });
+  if (DRY_RUN) console.log("DRY RUN: cleanup will only report old content/users, no deletes.");
+  if (!DRY_RUN) await prisma.comment.deleteMany({ where: { text: { in: duplicateSeedTexts } } });
 
   for (const moduleKey of modules) {
     const keep = seedByModule.get(moduleKey) || [];
     const oldPosts = await prisma.post.findMany({ where: { module: moduleKey, slug: { notIn: keep } }, select: { slug: true } });
     if (oldPosts.length) {
       const oldSlugs = oldPosts.map((post) => post.slug);
-      await prisma.like.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
-      await prisma.post.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
+      console.log(`${DRY_RUN ? "DRY RUN: would remove" : "Removing"} ${oldSlugs.length} old ${moduleKey} posts: ${oldSlugs.join(", ")}`);
+      if (!DRY_RUN) {
+        await prisma.like.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
+        await prisma.post.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
+      }
     }
   }
 
   const oldUsers = await prisma.user.findMany({ where: { username: { notIn: seedUsernames } }, select: { id: true } });
   const oldUserIds = oldUsers.map((u) => u.id);
   if (oldUserIds.length) {
-    await prisma.post.updateMany({ where: { authorId: { in: oldUserIds } }, data: { authorId: null } });
-    await prisma.comment.updateMany({ where: { authorId: { in: oldUserIds } }, data: { authorId: null } });
-    await prisma.user.deleteMany({ where: { id: { in: oldUserIds } } });
+    console.log(`${DRY_RUN ? "DRY RUN: would remove" : "Removing"} ${oldUserIds.length} old users.`);
+    if (!DRY_RUN) {
+      await prisma.post.updateMany({ where: { authorId: { in: oldUserIds } }, data: { authorId: null } });
+      await prisma.comment.updateMany({ where: { authorId: { in: oldUserIds } }, data: { authorId: null } });
+      await prisma.user.deleteMany({ where: { id: { in: oldUserIds } } });
+    }
   }
 
-  console.log(`Cleaned old content/users. Kept ${seedPosts.length} posts and ${seedUsers.length} users.`);
+  console.log(`${DRY_RUN ? "Dry-run checked" : "Cleaned"} old content/users. Kept ${seedPosts.length} posts and ${seedUsers.length} users.`);
+}
+
+
+const defaultRedirects = [
+  { sourceModule: "news", sourceSlug: "open-source-siem-growth", targetModule: "news", targetSlug: "news-03", reason: "old static news slug" },
+  { sourceModule: "blog", sourceSlug: "zero-trust-for-smb-iran", targetModule: "blog", targetSlug: "article-06-zero-trust", reason: "old static article slug" },
+  { sourceModule: "media", sourceSlug: "proxmox-ha-demo-video", targetModule: "media", targetSlug: "media-video-2-proxmox-backup", reason: "old static media slug" },
+  { sourceModule: "review", sourceSlug: "qnap-2277-full-review", targetModule: "review", targetSlug: "review-02", reason: "old static review slug" },
+];
+
+async function seedRedirects() {
+  for (const row of defaultRedirects) {
+    await prisma.slugRedirect.upsert({
+      where: { source_module_slug: { sourceModule: row.sourceModule, sourceSlug: row.sourceSlug } },
+      update: row,
+      create: row,
+    });
+  }
+  console.log(`Upserted ${defaultRedirects.length} slug redirects.`);
 }
 
 async function upsertUsers() {
@@ -784,6 +811,7 @@ async function main() {
     await seedLikesForPosts([...forumPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...mediaPosts, ...downloadPosts]);
   }
   if (step === "7" || step === "shop" || step === "products" || step === "all") await upsertPosts(productPosts);
+  if (step === "redirects" || step === "all") await seedRedirects();
   if (step === "timeline" || step === "all") await replaceTimeline();
   if (step === "8" || step === "engagement" || step === "all") {
     await seedEngagement([...mediaPosts, ...articlePosts, ...reviewPosts, ...newsPosts, ...downloadPosts, ...forumPosts, ...productPosts]);

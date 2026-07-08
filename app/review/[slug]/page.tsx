@@ -1,8 +1,11 @@
 import { getBySlug, getModuleItems } from "@/lib/content";
 import { getDbPost } from "@/lib/server-post";
+import { getSlugRedirect } from "@/lib/slug-redirects";
+import { redirect } from "next/navigation";
 import DbReviewDetail from "@/features/review/components/DbReviewDetail";
 
 export const dynamicParams = true;
+export const dynamic = "force-dynamic";
 
 type P = Promise<{ slug: string }>;
 

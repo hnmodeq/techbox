@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -111,6 +111,20 @@ model Like {
   createdAt   DateTime @default(now())
 
   @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
+}
+
+
+model SlugRedirect {
+  id           String   @id @default(cuid())
+  sourceModule String
+  sourceSlug   String
+  targetModule String
+  targetSlug   String
+  reason       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([sourceModule, sourceSlug], name: "source_module_slug")
 }
 
 model TimelineEvent {
