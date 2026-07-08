@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2 } from "lucide-react";
 import type { ContentItem } from "@/lib/content";
@@ -68,11 +69,15 @@ export default function ProductComparisonModal({
                     <th key={idx} className="min-w-[220px] px-4 py-3 text-center">
                       <div className="flex flex-col items-center gap-2">
                         {product.image && (
-                          <img
-                            src={product.image}
-                            alt={product.title}
-                            className="h-16 w-16 rounded object-cover border border-[var(--border-color)]"
-                          />
+                          <div className="relative h-16 w-16 overflow-hidden rounded border border-[var(--border-color)]">
+                            <Image
+                              src={product.image}
+                              alt={product.title}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
+                          </div>
                         )}
                         <div className="font-bold text-[var(--primary-text)] line-clamp-2 text-center">
                           {product.title}
