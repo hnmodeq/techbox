@@ -18,18 +18,10 @@ async function ensurePost(moduleKey: string, slug: string) {
     where: { module_slug: { module: moduleKey, slug } },
     select: { id: true },
   });
-  if (existing) return existing;
-  return prisma.post.create({
-    data: {
-      module: moduleKey,
-      slug,
-      title: slug,
-      authorName: "تحریریه",
-      dateFa: "۱۴۰۵",
-      published: true,
-    },
-    select: { id: true },
-  });
+  if (!existing) {
+    throw new Error("not_found");
+  }
+  return existing;
 }
 
 export async function GET(req: NextRequest) {
@@ -88,7 +80,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { module: moduleKey, slug } = schema.parse(body);
 
-    await ensurePost(moduleKey, slug);
+    try {
+      await ensurePost(moduleKey, slug);
+    } catch (e) {
+      return NextResponse.json({ error: "post_not_found", message: "مطلب مورد نظر یافت نشد." }, { status: 404 });
+    }
 
     const fp = user.id;
     const existing = await prisma.like.findUnique({

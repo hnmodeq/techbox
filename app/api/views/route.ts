@@ -18,16 +18,7 @@ export async function POST(req: NextRequest) {
       where: { module_slug: { module, slug } },
     });
     if (!post) {
-      post = await prisma.post.create({
-        data: {
-          module,
-          slug,
-          title: slug,
-          authorName: "تحریریه",
-          dateFa: "۱۴۰۵",
-          published: true,
-        },
-      });
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
 
     const updated = await prisma.post.update({
