@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { hashPassword, createSession, setSessionCookie } from "@/lib/auth-server";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const registerSchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ حرف باشد"),
@@ -11,6 +12,16 @@ const registerSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(ip, "register");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "ثبت‌نام موقتاً محدود شده است." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { name, username, email, password } = registerSchema.parse(body);

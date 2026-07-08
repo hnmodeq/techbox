@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth-server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const postSchema = z.object({
   postModule: z.string(),
@@ -48,6 +49,16 @@ export async function POST(req: NextRequest) {
   }
   if ((user as any).status === "banned" || (user as any).status === "suspended") {
     return NextResponse.json({ error: "forbidden", message: "حساب شما اجازه ثبت دیدگاه ندارد." }, { status: 403 });
+  }
+
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "comments");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد دیدگاه‌های ارسالی بیش از حد مجاز است." },
+      { status: 429 }
+    );
   }
 
   try {

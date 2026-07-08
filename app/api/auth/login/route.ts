@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { verifyPassword, createSession, setSessionCookie } from "@/lib/auth-server";
 import { z } from "zod";
 import { captureAuthError } from "@/lib/sentry";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const schema = z.object({ username: z.string(), password: z.string().optional().default("techbox123") });
 
@@ -19,6 +20,16 @@ function parseModules(raw: any): string[] {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(ip, "login");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً دوباره تلاش کنید." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { username, password } = schema.parse(body);

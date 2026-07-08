@@ -21,7 +21,7 @@ export async function GET() {
     });
 
     if (events && events.length > 0) {
-      const transformedEvents = events.map((event) => ({
+      const transformedEvents = events.map((event: any) => ({
         ...event,
         image: event.image || null,
         tags: typeof event.tags === 'string' ? JSON.parse(event.tags || '[]') : event.tags,

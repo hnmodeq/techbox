@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     const lower = q.toLowerCase();
     const results = posts
-      .map((p) => {
+      .map((p: any) => {
         const tags = safeJsonArray(p.tags);
         const haystack = `${p.title} ${p.excerpt} ${p.content} ${tags.join(" ")} ${p.category || ""} ${p.authorName}`.toLowerCase();
         const exactTitle = p.title.toLowerCase().includes(lower) ? 40 : 0;
@@ -116,8 +116,8 @@ export async function GET(req: NextRequest) {
           score,
         };
       })
-      .sort((a, b) => b.score - a.score)
-      .map(({ score, ...item }) => item);
+      .sort((a: any, b: any) => b.score - a.score)
+      .map(({ score, ...item }: any) => item);
 
     return NextResponse.json({ q, results, count: results.length }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
   } catch (e: any) {

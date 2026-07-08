@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { getSessionUser } from "@/lib/auth-server";
 import { captureUploadError } from "@/lib/sentry";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const MAX_SIZE_BY_KIND: Record<string, number> = {
   image: 8 * 1024 * 1024,
@@ -76,6 +77,16 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUser();
   if (!user || !["super_admin", "editor"].includes(user.role)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "upload");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد آپلودها بیش از حد مجاز است." },
+      { status: 429 }
+    );
   }
 
   if (!process.env.BLOB_READ_WRITE_TOKEN) {

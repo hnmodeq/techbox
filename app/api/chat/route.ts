@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +15,16 @@ const SYSTEM_FA = `تو دستیار فارسی «تکباکس» هستی – ر
 type Msg = { role: "system"|"user"|"assistant"; content: string };
 
 export async function POST(req: NextRequest){
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(ip, "chat");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد پیام‌های چت بیش از حد مجاز است." },
+      { status: 429 }
+    );
+  }
+
  try{
  const { messages = [], model, temperature = 0.5 } : {messages: Msg[], model?:string, temperature?:number} = await req.json();
 
