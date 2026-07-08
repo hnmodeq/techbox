@@ -7,7 +7,6 @@ export const metadata = modulePageMetadata(
   "آخرین خبرهای فناوری اطلاعات، زیرساخت، امنیت، شبکه و سخت‌افزار از نگاه تکباکس."
 );
 
-export const revalidate = 60;
 
 export default async function NewsPage() {
   const dbItems = await getDbModulePosts("news", 100);

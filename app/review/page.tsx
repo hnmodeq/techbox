@@ -7,7 +7,6 @@ export const metadata = modulePageMetadata(
   "نقد و بررسی تخصصی تجهیزات شبکه، سرور، ذخیره‌سازی، امنیت و زیرساخت."
 );
 
-export const revalidate = 60;
 
 export default async function ReviewPage() {
   const dbItems = await getDbModulePosts("review", 60);

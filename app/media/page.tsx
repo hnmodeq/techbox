@@ -7,7 +7,6 @@ export const metadata = modulePageMetadata(
   "ویدیوهای آموزشی و عملی تکباکس درباره شبکه، سرور، ذخیره‌سازی و امنیت."
 );
 
-export const revalidate = 60;
 
 export default async function MediaPage() {
   const dbItems = await getDbModulePosts("media", 80);

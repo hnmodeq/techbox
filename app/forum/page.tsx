@@ -4,7 +4,6 @@ import { getDbModulePosts } from "@/lib/server-posts";
 
 export const metadata = modulePageMetadata("forum", "انجمن گفتگوی فنی تکباکس — پرسش و پاسخ، تجربیات و راه‌حل‌ها.");
 
-export const revalidate = 60;
 
 export default async function ForumPage() {
   const dbItems = await getDbModulePosts("forum", 80);

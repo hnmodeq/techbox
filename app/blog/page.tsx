@@ -7,7 +7,6 @@ export const metadata = modulePageMetadata(
   "مقالات تخصصی زیرساخت، شبکه، امنیت، ذخیره‌سازی و تجربه‌های اجرایی تیم تکباکس."
 );
 
-export const revalidate = 60;
 
 export default async function BlogPage() {
   const dbItems = await getDbModulePosts("blog", 100);

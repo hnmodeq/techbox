@@ -7,7 +7,6 @@ export const metadata = modulePageMetadata(
   "مرکز دانلود تکباکس برای فایل‌ها، PDFها، آرشیوها، ابزارها، فریم‌ورها و منابع فنی."
 );
 
-export const revalidate = 60;
 
 export default async function DownloadPage() {
   const dbItems = await getDbModulePosts("download", 60);
