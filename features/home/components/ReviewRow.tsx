@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getLatest } from '@/lib/content';
-import { useDbPosts } from '@/hooks/useDbPosts';
+import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,8 +11,7 @@ import { AuthorLink } from '@/components/ui/author-link';
 import { ReviewRating } from '@/components/ui/review-rating';
 
 export default function ReviewRow() {
-  const fallbackReviews = getLatest('review', 5);
-  const { items: dbReviews } = useDbPosts('review', fallbackReviews, 5);
+  const { items: dbReviews } = useHomeModule('review');
   const reviews = dbReviews.slice(0, 5);
 
   return (

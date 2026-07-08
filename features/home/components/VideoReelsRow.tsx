@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getLatest } from '@/lib/content';
-import { useDbPosts } from '@/hooks/useDbPosts';
+import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -14,8 +13,7 @@ import { zIndex } from '@/design';
 import { Icon } from '@/design/icons';
 
 export default function VideoReelsRow() {
-  const fallbackVideos = getLatest('media', 5);
-  const { items: dbVideos } = useDbPosts('media', fallbackVideos, 7);
+  const { items: dbVideos } = useHomeModule('media');
   const videos = dbVideos.slice(0, 5);
   const [active, setActive] = useState<any | null>(null);
 

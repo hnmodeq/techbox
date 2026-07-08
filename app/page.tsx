@@ -9,9 +9,11 @@ import ForumRow from '@/features/home/components/ForumRow';
 import ReviewRow from '@/features/home/components/ReviewRow';
 import DownloadRow from '@/features/home/components/DownloadRow';
 import HomeTimelineRow from '@/features/home/components/HomeTimelineRow';
+import { HomeDataProvider } from '@/features/home/lib/home-data';
 
 export default function Page() {
   return (
+    <HomeDataProvider>
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
       {/* 1. Ticker Bar right at the top of the page */}
       <NewsTicker items={[]} className="border-b-[length:var(--border-size)] border-[var(--border-color)]/60 bg-[var(--card-background)]/40" />
@@ -41,5 +43,6 @@ export default function Page() {
       <HomeTimelineRow />
 
     </main>
+    </HomeDataProvider>
   );
 }

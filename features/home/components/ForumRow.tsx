@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
+import { useHomeModule } from '@/features/home/lib/home-data';
 import Link from 'next/link';
 import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { ForumBadge } from '@/components/ui/forum-badge';
-
-type ForumTopic = { slug: string; title: string; excerpt?: string; date_fa?: string; solved?: boolean | null; author?: { name?: string; avatar?: string } };
 
 function ForumCardSkeleton() {
   return (
@@ -24,28 +23,7 @@ function ForumCardSkeleton() {
 }
 
 export default function ForumRow() {
-  const [topics, setTopics] = useState<ForumTopic[] | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-
-    fetch('/api/posts?module=forum&take=6', { cache: 'no-store' })
-      .then((r) => {
-        if (!r.ok) throw new Error('forum_posts_unavailable');
-        return r.json();
-      })
-      .then((data) => {
-        if (!mounted) return;
-        setTopics(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {
-        if (mounted) setTopics([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  const { items: topics, loading } = useHomeModule('forum');
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.forumMinHeight} flex flex-col justify-center`} dir="rtl">
@@ -60,7 +38,7 @@ export default function ForumRow() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {topics === null ? (
+          {loading ? (
             Array.from({ length: 6 }).map((_, index) => <ForumCardSkeleton key={index} />)
           ) : topics.length === 0 ? (
             <div className="col-span-full rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-6 text-center paragraph-color">
@@ -87,7 +65,7 @@ export default function ForumRow() {
                     <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">
                       {top.author?.name || 'عضو تکباکس'}
                     </span>
-                    <ForumBadge slug={top.slug} fallback={typeof top.solved === 'boolean' ? top.solved : null} />
+                    <ForumBadge slug={top.slug} fallback={typeof (top as any).solved === 'boolean' ? (top as any).solved : null} />
                   </div>
 
                   <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">

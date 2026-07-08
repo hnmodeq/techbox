@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getLatest } from '@/lib/content';
-import { useDbPosts } from '@/hooks/useDbPosts';
+import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,8 +11,7 @@ import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
 
 export default function MagazineRow() {
-  const fallbackArticles = getLatest('blog', 5);
-  const { items: dbArticles } = useDbPosts('blog', fallbackArticles, 5);
+  const { items: dbArticles } = useHomeModule('blog');
   const articles = dbArticles.slice(0, 5);
 
   return (

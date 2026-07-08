@@ -1,15 +1,13 @@
 'use client';
 
-import { getLatest } from '@/lib/content';
-import { useDbPosts } from '@/hooks/useDbPosts';
+import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { DownloadMetaLine } from '@/components/ui/download-meta';
 import { DownloadAction } from '@/components/ui/download-action';
 
 export default function DownloadRow() {
-  const fallbackFiles = getLatest('download', 8);
-  const { items: dbFiles } = useDbPosts('download', fallbackFiles, 8);
+  const { items: dbFiles } = useHomeModule('download');
   const files = dbFiles.slice(0, 8);
 
   const getFileType = (title: string, category?: string, fileName?: string | null) => {

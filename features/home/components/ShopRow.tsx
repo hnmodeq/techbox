@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { getLatest } from '@/lib/content';
-import { useDbPosts } from '@/hooks/useDbPosts';
+import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,8 +9,7 @@ import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 
 export default function ShopRow() {
-  const fallbackProducts = getLatest('shop', 5);
-  const { items: dbProducts } = useDbPosts('shop', fallbackProducts, 5);
+  const { items: dbProducts } = useHomeModule('shop');
   const products = dbProducts.slice(0, 5);
 
   return (
