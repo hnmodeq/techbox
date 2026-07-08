@@ -37,8 +37,8 @@ function ForumDetailSkeleton() {
 }
 
 export default function ForumDetail({ slug, initialItem = null }: ForumDetailProps) {
-  const [item, setItem] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [item, setItem] = useState<any | null>(initialItem);
+  const [loading, setLoading] = useState(!initialItem);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
