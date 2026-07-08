@@ -117,13 +117,10 @@ export async function GET() {
     );
     const modules = Object.fromEntries(entries);
 
-    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const tickerPosts = await prisma.post.findMany({
       where: {
         published: true,
         deletedAt: null,
-        module: { not: "news" },
-        date: { gte: cutoff },
       },
       orderBy: { date: "desc" },
       take: 30,
