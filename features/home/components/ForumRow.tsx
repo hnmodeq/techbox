@@ -5,6 +5,7 @@ import { getLatest } from '@/lib/content';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { ForumBadge } from '@/components/ui/forum-badge';
 
@@ -81,6 +82,7 @@ export default function ForumRow() {
                   width={48}
                   height={48}
                   className="h-12 w-12 rounded-full object-cover ring-1 ring-[var(--border-color)] shrink-0"
+                  {...blurProps(top.author?.avatar || '/assets/hooman.png')}
                 />
 
                 <div className="flex-1 min-w-0">

@@ -6,6 +6,7 @@ import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { blurProps } from "@/lib/image-placeholder";
 import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
@@ -42,6 +43,7 @@ export default function MagazineRow() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 300px"
+                    {...blurProps(art.image || '/assets/blog-1.jpg')}
                   />
                 </div>
 

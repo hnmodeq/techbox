@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import Link from "next/link";
 import { Icon } from "@/design/icons";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
@@ -55,6 +56,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
                 width={48}
                 height={48}
                 className="h-12 w-12 rounded-full object-cover ring-1 ring-[var(--border-color)]"
+                {...blurProps(item.author?.avatar || "/assets/hooman.png")}
               />
               <div>
                 <div className="font-bold text-[var(--primary-text)]">{item.author?.name || "نویسنده تکباکس"}</div>
@@ -71,7 +73,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
 
         {/* Featured Image */}
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)] shadow-[var(--shadow-size)]">
-          <Image src={item.image || "/assets/blog-1.jpg"} alt={item.title} fill sizes="800px" className="object-cover" />
+          <Image src={item.image || "/assets/blog-1.jpg"} alt={item.title} fill sizes="800px" className="object-cover" {...blurProps(item.image || "/assets/blog-1.jpg")} />
         </div>
 
         {/* Excerpt Lead */}

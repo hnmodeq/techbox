@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import Link from "next/link";
 import PageHeader from "@/components/effects/PageHeader";
 import { Icon } from "@/design/icons";
@@ -28,7 +29,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
       </PageHeader>
       <div className="mt-8 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-6 sm:p-8 shadow-[var(--shadow-size)] grid md:grid-cols-[160px_1fr] gap-6 items-center">
         <div className="relative mx-auto h-32 w-32 overflow-hidden rounded-full border-[length:var(--border-size)] border-[var(--home)] shadow-[var(--shadow-size)]">
-          <Image src={user.avatar || "/logo.png"} alt={user.name} fill className="object-cover" sizes="128px" />
+          <Image src={user.avatar || "/logo.png"} alt={user.name} fill className="object-cover" sizes="128px" {...blurProps(user.avatar || "/logo.png")} />
         </div>
         <div className="space-y-4 text-right">
           <div><span className="badge bg-[var(--home)]/15 text-[var(--home)] border-[length:var(--border-size)] border-[var(--home)]/30 font-bold px-3 py-1 text-xs">{user.roleFa || user.role}</span><h1 className="mt-2 text-2xl sm:text-3xl font-black text-[var(--primary-text)]">{user.name}</h1></div>
@@ -41,7 +42,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
           </div>
         </div>
       </div>
-      <div className="mt-12 space-y-6"><h2 className="text-xl font-black text-[var(--primary-text)] border-b-[length:var(--border-size)] border-[var(--border-color)] pb-4">آرشیو محتوا</h2>{posts.length === 0 ? <div className="p-12 text-center paragraph-color">هنوز محتوایی ثبت نشده است.</div> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{posts.map((post) => <Link key={post.id} href={`/${post.module}/${post.slug}`} className="group rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] overflow-hidden"><div className="relative aspect-[16/10] bg-[var(--muted-background)]">{post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" />}</div><div className="p-4"><div className="text-xs paragraph-color">{post.dateFa} • {post.category || post.module}</div><h3 className="mt-2 font-bold text-[var(--primary-text)] group-hover:text-[var(--home)] line-clamp-2">{post.title}</h3><p className="mt-2 text-xs paragraph-color line-clamp-2">{post.excerpt}</p><div className="mt-3 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-3"><CardStats module={post.module} slug={post.slug} showComments /></div></div></Link>)}</div>}</div>
+      <div className="mt-12 space-y-6"><h2 className="text-xl font-black text-[var(--primary-text)] border-b-[length:var(--border-size)] border-[var(--border-color)] pb-4">آرشیو محتوا</h2>{posts.length === 0 ? <div className="p-12 text-center paragraph-color">هنوز محتوایی ثبت نشده است.</div> : <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{posts.map((post) => <Link key={post.id} href={`/${post.module}/${post.slug}`} className="group rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] overflow-hidden"><div className="relative aspect-[16/10] bg-[var(--muted-background)]">{post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" {...blurProps(post.image)} />}</div><div className="p-4"><div className="text-xs paragraph-color">{post.dateFa} • {post.category || post.module}</div><h3 className="mt-2 font-bold text-[var(--primary-text)] group-hover:text-[var(--home)] line-clamp-2">{post.title}</h3><p className="mt-2 text-xs paragraph-color line-clamp-2">{post.excerpt}</p><div className="mt-3 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-3"><CardStats module={post.module} slug={post.slug} showComments /></div></div></Link>)}</div>}</div>
     </main>
   );
 }

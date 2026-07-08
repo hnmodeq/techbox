@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import { getModuleItems } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
@@ -21,7 +22,7 @@ export default function ReviewGrid() {
         {items.map((r: any) => (
             <Link key={r.slug} href={`/review/${r.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group grid md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr] gap-6 !p-0 transition-all hover:shadow-[var(--shadow-size)] items-stretch">
               <div className="block relative aspect-[16/10] md:aspect-auto md:h-full bg-[var(--muted-background)] overflow-hidden min-h-[220px]">
-                <Image src={r.image || "/assets/blog-1.jpg"} fill sizes="(min-width:1024px) 320px, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" alt={r.title} />
+                <Image src={r.image || "/assets/blog-1.jpg"} fill sizes="(min-width:1024px) 320px, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" alt={r.title} {...blurProps(r.image || "/assets/blog-1.jpg")} />
                 <span className="absolute top-3 right-3 rounded-full border-[length:var(--border-size)] border-white/30 bg-black/50 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">{r.category}</span>
               </div>
 
@@ -44,7 +45,7 @@ export default function ReviewGrid() {
                 {/* Author & stats footer */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                   <div className="flex items-center gap-3">
-                    <Image src={r.author?.avatar || "/assets/hooman.png"} width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" alt={r.author?.name || "نویسنده"} />
+                    <Image src={r.author?.avatar || "/assets/hooman.png"} width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" alt={r.author?.name || "نویسنده"} {...blurProps(r.author?.avatar || "/assets/hooman.png")} />
                     <div>
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{r.author?.name || "نویسنده تکباکس"}</div>
                       <div className="text-[11px] paragraph-color">{r.author?.role || "تحلیلگر سخت‌افزار"}</div>

@@ -6,6 +6,7 @@ import { useDbPosts } from '@/hooks/useDbPosts';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
 import Image from 'next/image';
+import { blurProps } from "@/lib/image-placeholder";
 import { usePathname } from 'next/navigation';
 import { zIndex } from '@/design';
 import { sidebarBase } from '@/config/sidebar.config';
@@ -134,6 +135,7 @@ export default function NewsSidebar() {
                   fill
                   className="object-cover"
                   sizes="320px"
+                  {...blurProps(n.image || '/assets/blog-1.jpg')}
                 />
               </div>
 
