@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { getCurrentUserClient } from "@/lib/auth";
 import { ModuleBadge } from "@/components/ui/module-badge";
+import { BlobUploadField } from "@/components/admin/BlobUploadField";
 
 export const dynamic = "force-dynamic";
 
@@ -187,9 +188,10 @@ function NewPostInner() {
  </div>
  <div>
  <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">تصویر شاخص URL</label>
- <input value={image} onChange={e=>setImage(e.target.value)} className="input mt-1" placeholder="/assets/..." dir="ltr" />
+ <input value={image} onChange={e=>setImage(e.target.value)} className="input mt-1" placeholder="https://..." dir="ltr" />
  </div>
  </div>
+ <BlobUploadField label="آپلود تصویر شاخص" kind="image" folder={module === "review" ? "review-images" : module === "news" ? "news-images" : "article-images"} accept="image/*" onUploaded={(r) => setImage(r.url)} />
 
  <div>
  <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">محتوا</label>
