@@ -81,6 +81,7 @@ export default function AdminPage() {
  <div className="flex flex-wrap gap-2">
  <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
  {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
+ {user.role === "super_admin" && <ButtonLink href="/admin/users" variant="ghost" size="sm">کاربران</ButtonLink>}
  {user.role === "super_admin" && <ButtonLink href="/admin/upload" variant="ghost" size="sm">آپلود Blob</ButtonLink>}
  {user.role === "super_admin" && <ButtonLink href="/admin/blob" variant="ghost" size="sm">فایل‌های Blob</ButtonLink>}
  {user.role === "super_admin" && <ButtonLink href="/admin/content-health" variant="ghost" size="sm">سلامت محتوا</ButtonLink>}
