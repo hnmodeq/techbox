@@ -20,28 +20,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.12.1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Typecheck
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Build
         env:
           NEXT_PUBLIC_SITE_URL: https://hnmodeq-techbox.vercel.app
-        run: npm run build
+        run: pnpm run build
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
@@ -50,7 +55,7 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
           CI: 'true'
-        run: npm run test:smoke
+        run: pnpm run test:smoke
 
       - name: Upload Playwright report
         if: always()
@@ -75,14 +80,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.12.1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -93,12 +103,12 @@ jobs:
 
       - name: Validate content
         if: ${{ env.DATABASE_URL != '' }}
-        run: npm run check:content
+        run: pnpm run check:content
 
       - name: Validate database consistency
         if: ${{ env.DATABASE_URL != '' }}
-        run: npm run check:db
+        run: pnpm run check:db
 
       - name: Validate Blob URLs
         if: ${{ env.DATABASE_URL != '' }}
-        run: npm run check:blob
+        run: pnpm run check:blob
