@@ -6,5 +6,14 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
 
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@sentry/cli'
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver
+
 overrides:
   eslint: ^9.39.1
