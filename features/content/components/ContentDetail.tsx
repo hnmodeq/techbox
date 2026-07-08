@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import { type ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { Icon } from "@/design/icons";
@@ -37,7 +38,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <div className="flex flex-wrap items-center gap-3 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {item.module !== "media" && (
  <div className="flex items-center gap-2">
- {item.author?.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--corner-radius)] object-cover ring-1 ring-[var(--border-color)]" alt={item.author.name || "نویسنده"} />}
+ {item.author?.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--corner-radius)] object-cover ring-1 ring-[var(--border-color)]" alt={item.author.name || "نویسنده"} {...blurProps(item.author.avatar)} />}
  <div>
  <div className=" text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{item.author?.name || "تکباکس"}</div>
  <div className="paragraph-color text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{item.author?.role || "تحریریه"}</div>
@@ -70,7 +71,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  ) : item.image && (
  <div className="mt-8 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">
- <div className="relative aspect-[16/9] max-h-[420px]"><Image src={item.image} alt={item.title} fill sizes="(min-width:768px) 768px, 100vw" className="object-cover" /></div>
+ <div className="relative aspect-[16/9] max-h-[420px]"><Image src={item.image} alt={item.title} fill sizes="(min-width:768px) 768px, 100vw" className="object-cover" {...blurProps(item.image)} /></div>
  </div>
  )}
 

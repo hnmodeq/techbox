@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import { getModuleItems } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
@@ -84,7 +85,7 @@ export default function ShopGrid(){
  {filtered.map(p=>(
         <Link key={p.slug} href={`/shop/${p.slug}`} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden group flex flex-col rounded-[var(--corner-radius)] !p-0">
               <div className="block relative aspect-[4/3] bg-[var(--muted-background)] overflow-hidden">
-                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" />
+                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-[300ms] group-hover:scale-105" {...blurProps(p.image || "/assets/blog-1.jpg")} />
               </div>
               <div className="p-4 flex-1 flex flex-col">
                 <div className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold mt-1 transition-colors group-hover:text-[var(--shop)] line-clamp-2 min-h-[48px]">{p.title}</div>

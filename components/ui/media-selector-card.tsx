@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "./badge";
@@ -51,6 +52,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
  fill
  sizes="(min-width:1024px) 33vw, 100vw"
  className="object-cover transition-transform duration-[300ms] group-hover:scale-105"
+ {...blurProps(image || "/assets/blog-1.jpg")}
  />
  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10 transition-opacity group-hover:opacity-95" />
 

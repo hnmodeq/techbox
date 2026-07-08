@@ -6,6 +6,7 @@ import { useDbPosts } from '@/hooks/useDbPosts';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { LikeButton } from '@/components/ui/like-button';
 import CommentSection from '@/features/comment/components/CommentSection';
@@ -28,7 +29,7 @@ export default function VideoReelsRow() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {videos.map((vid) => (
             <button type="button" key={vid.slug} onClick={() => setActive(vid)} className="group relative w-full aspect-[9/16] rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] hover:shadow-[var(--shadow-size)] transition-all duration-[200ms] bg-[var(--card-background)] flex flex-col justify-end text-right cursor-pointer">
-              <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="260px" />
+              <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="260px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
               {(vid as any).videoDuration && <span className="absolute left-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white" dir="ltr">{(vid as any).videoDuration}</span>}
               <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"><div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-transform group-hover:scale-125 shadow-[var(--shadow-size)]">▶</div></div>

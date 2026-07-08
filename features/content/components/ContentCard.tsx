@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
@@ -50,6 +51,7 @@ function SafeImage({
  fill
  sizes={sizes}
  className={className}
+ {...blurProps(src || fallbackImage)}
  />
  );
 }
@@ -134,7 +136,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
  return (
  <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] flex gap-2.5 rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="relative mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
- <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "کاربر"} fill sizes="32px" className="object-cover" />
+ <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "کاربر"} fill sizes="32px" className="object-cover" {...blurProps(item.author?.avatar || fallbackAvatar)} />
  </div>
  <div className="min-w-0 flex-1">
  <div className={`line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
@@ -184,7 +186,7 @@ function ReviewFeedCard({item}:{item:ContentItem}){
  <div className={`line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="flex items-center gap-2">
  <div className="relative h-5 w-5 overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
- <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "نویسنده"} fill sizes="20px" className="object-cover" />
+ <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "نویسنده"} fill sizes="20px" className="object-cover" {...blurProps(item.author?.avatar || fallbackAvatar)} />
  </div>
  <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.author?.name || "تکباکس"}</span>
  </div>
