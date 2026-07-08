@@ -12,10 +12,10 @@ async function main() {
     prisma.slugRedirect.findMany({ select: { id: true, sourceModule: true, sourceSlug: true, targetModule: true, targetSlug: true } }),
   ]);
 
-  const postIds = new Set(posts.map((p) => p.id));
-  const userIds = new Set(users.map((u) => u.id));
-  const commentIds = new Set(comments.map((c) => c.id));
-  const postKeys = new Set(posts.map((p) => `${p.module}:${p.slug}`));
+  const postIds = new Set(posts.map((p: any) => p.id));
+  const userIds = new Set(users.map((u: any) => u.id));
+  const commentIds = new Set(comments.map((c: any) => c.id));
+  const postKeys = new Set(posts.map((p: any) => `${p.module}:${p.slug}`));
 
   for (const comment of comments) {
     if (!postIds.has(comment.postId)) issues.push({ level: 'error', scope: 'comment', id: comment.id, message: 'orphan comment postId' });

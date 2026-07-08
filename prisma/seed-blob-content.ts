@@ -786,7 +786,7 @@ async function cleanOldContent() {
     const keep = seedByModule.get(moduleKey) || [];
     const oldPosts = await prisma.post.findMany({ where: { module: moduleKey, slug: { notIn: keep } }, select: { slug: true } });
     if (oldPosts.length) {
-      const oldSlugs = oldPosts.map((post) => post.slug);
+      const oldSlugs = oldPosts.map((post: any) => post.slug);
       console.log(`${DRY_RUN ? "DRY RUN: would remove" : "Removing"} ${oldSlugs.length} old ${moduleKey} posts: ${oldSlugs.join(", ")}`);
       if (!DRY_RUN) {
         await prisma.like.deleteMany({ where: { module: moduleKey, slug: { in: oldSlugs } } });
@@ -796,7 +796,7 @@ async function cleanOldContent() {
   }
 
   const oldUsers = await prisma.user.findMany({ where: { username: { notIn: seedUsernames } }, select: { id: true } });
-  const oldUserIds = oldUsers.map((u) => u.id);
+  const oldUserIds = oldUsers.map((u: any) => u.id);
   if (oldUserIds.length) {
     console.log(`${DRY_RUN ? "DRY RUN: would remove" : "Removing"} ${oldUserIds.length} old users.`);
     if (!DRY_RUN) {

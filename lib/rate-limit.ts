@@ -8,11 +8,11 @@ const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_RE
     })
   : null;
 
-const createRatelimit = (requests: number, window: string) => {
+const createRatelimit = (requests: number, window: `${number} ${'s' | 'm' | 'h' | 'd'}`) => {
   if (!redis) return null;
   return new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(requests, window),
+    limiter: Ratelimit.slidingWindow(requests, window as any),
     analytics: true,
     prefix: "techbox:ratelimit",
   });

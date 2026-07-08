@@ -48,7 +48,7 @@ export async function getDbModulePosts(
       },
     });
 
-    return posts.map((p) => ({
+    return posts.map((p: any) => ({
       slug: p.slug,
       module: p.module as ModuleSlug,
       title: p.title,
