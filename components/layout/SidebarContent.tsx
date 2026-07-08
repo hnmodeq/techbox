@@ -9,7 +9,7 @@ import { createPortal } from "react-dom";
 import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.config";
 import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
 import SidebarTooltip from "@/components/layout/SidebarTooltip";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getCurrentUserClient, type AppUser } from "@/lib/auth";
 import { useCart } from "@/providers/cart.provider";
 import { getAllAcross, moduleMeta, type ModuleSlug } from "@/lib/content";
@@ -79,7 +79,7 @@ export default function SidebarContent({
  const [now, setNow] = useState<Date | null>(null);
  const [notifOpen, setNotifOpen] = useState(false);
  const [notifications, setNotifications] = useState<any[]>([]);
- const [lastSeenNotif, setLastSeenNotif] = useState<string>("");
+ const [unreadCount, setUnreadCount] = useState(0);
  const [consultOpen, setConsultOpen] = useState(false);
  const [searchOpen, setSearchOpen] = useState(false);
  const collapsedSearchRef = useRef<HTMLInputElement | null>(null);
@@ -162,21 +162,34 @@ export default function SidebarContent({
  if (searchOpen) collapsedSearchRef.current?.focus();
  }, [searchOpen]);
 
- useEffect(() => {
- fetch("/api/notifications", { cache: "no-store" }).then(r=>r.json()).then(d=>{ if(Array.isArray(d)) setNotifications(d); }).catch(()=>{});
- try { setLastSeenNotif(localStorage.getItem("tb_notifications_seen_at") || ""); } catch {}
+ const loadNotifications = useCallback(() => {
+ fetch("/api/notifications", { cache: "no-store" })
+   .then(r=>r.json())
+   .then(d=>{
+     if(Array.isArray(d)) {
+       setNotifications(d);
+       setUnreadCount(0);
+     } else {
+       setNotifications(Array.isArray(d.items) ? d.items : []);
+       setUnreadCount(typeof d.unreadCount === "number" ? d.unreadCount : 0);
+     }
+   })
+   .catch(()=>{});
  }, []);
 
- useEffect(() => {
- if (!notifOpen) return;
- const latest = notifications[0]?.createdAt;
- if (latest) {
-   localStorage.setItem("tb_notifications_seen_at", latest);
-   setLastSeenNotif(latest);
- }
- }, [notifOpen, notifications]);
+ useEffect(() => { loadNotifications(); }, [loadNotifications]);
 
- const hasUnreadNotif = Boolean(notifications[0]?.createdAt && notifications[0].createdAt !== lastSeenNotif);
+ useEffect(() => {
+ if (!notifOpen || unreadCount === 0) return;
+ const latest = notifications[0]?.createdAt;
+ fetch("/api/notifications", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ lastReadAt: latest || new Date().toISOString() })
+ }).then(() => setUnreadCount(0)).catch(()=>{});
+ }, [notifOpen, unreadCount, notifications]);
+
+ const hasUnreadNotif = unreadCount > 0;
 
  const doSearch = (e?: React.FormEvent) => {
  e?.preventDefault();
@@ -194,15 +207,15 @@ export default function SidebarContent({
  style={{ zIndex: zIndex.notification, top: notifPos.top, right: notifPos.right }}
  dir="rtl"
  >
- <div className="mb-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">آخرین رویدادها</div>
+ <div className="mb-2 flex items-center justify-between gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]"><span>آخرین رویدادها</span>{unreadCount > 0 && <span className="text-[var(--danger)]">{unreadCount.toLocaleString("fa-IR")} جدید</span>}</div>
  <ul className="max-h-80 space-y-2 overflow-y-auto text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
               {notifications.map((n: any) => {
                 const sourceColor = moduleColors[n.module as keyof typeof moduleColors]?.active ?? "paragraph-color";
                 const sourceLabel = moduleMeta[n.module as ModuleSlug]?.titleFa ?? n.module;
                 return (
-                  <li key={n.id} className="border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--border-color)_40%,transparent)] pb-2 last:border-0">
+                  <li key={n.id} className={`border-b-[length:var(--border-size)] border-[color-mix(in_oklch,var(--border-color)_40%,transparent)] pb-2 last:border-0 ${n.read ? "opacity-75" : ""}`}>
                     <Link href={`/${n.module}/${n.slug}`} onClick={() => setNotifOpen(false)} className="line-clamp-2 text-[var(--primary-text)] transition-opacity hover:opacity-80">
-                      <span className={sourceColor}>{sourceLabel}</span> • {n.actor}: {n.text}
+                      {!n.read && <span className="me-1 inline-block h-1.5 w-1.5 rounded-full bg-[var(--danger)]" />}<span className={sourceColor}>{sourceLabel}</span> • {n.actor}: {n.text}
                     </Link>
                     <div className="mt-0.5 text-[11px] paragraph-color line-clamp-1">روی «{n.title}» • {new Date(n.createdAt).toLocaleString("fa-IR")}</div>
                   </li>

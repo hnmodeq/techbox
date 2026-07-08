@@ -23,6 +23,7 @@ model User {
   posts    Post[]
   comments Comment[]
   ratings  Rating[]
+  notificationState UserNotificationState?
 }
 
 model Post {
@@ -69,6 +70,16 @@ model Post {
   ratings  Rating[]
 
   @@unique([module, slug], name: "module_slug")
+}
+
+
+model UserNotificationState {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  lastReadAt DateTime @default(dbgenerated("'1970-01-01 00:00:00'::timestamp"))
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Rating {
