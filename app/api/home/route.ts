@@ -131,11 +131,11 @@ export async function GET() {
       modules,
       ticker: tickerPosts.map(normalizeCard),
       generatedAt: new Date().toISOString(),
-    }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
+    }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "home_failed", modules: {}, ticker: [] }, { status: 503, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
 export const dynamic = "force-dynamic";
-export const revalidate = 60;
+export const revalidate = 0;
