@@ -25,6 +25,9 @@ model User {
   comments Comment[]
   ratings  Rating[]
   notificationState UserNotificationState?
+
+  @@index([role, status], name: "user_role_status_idx")
+  @@index([status], name: "user_status_idx")
 }
 
 model Post {
@@ -71,6 +74,14 @@ model Post {
   ratings  Rating[]
 
   @@unique([module, slug], name: "module_slug")
+  @@index([module, published, date], name: "post_module_published_date_idx")
+  @@index([published, date], name: "post_published_date_idx")
+  @@index([authorId], name: "post_author_idx")
+  @@index([module, category], name: "post_module_category_idx")
+  @@index([module, published, views], name: "post_module_published_views_idx")
+  @@index([module, published, likes], name: "post_module_published_likes_idx")
+  @@index([module, published, rating], name: "post_module_published_rating_idx")
+  @@index([date], name: "post_date_idx")
 }
 
 
@@ -81,6 +92,8 @@ model UserNotificationState {
   updatedAt  DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([lastReadAt], name: "user_notification_last_read_idx")
 }
 
 model Rating {
@@ -95,6 +108,9 @@ model Rating {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([postId, userId], name: "postId_userId")
+  @@index([postId], name: "rating_post_idx")
+  @@index([userId], name: "rating_user_idx")
+  @@index([createdAt], name: "rating_created_idx")
 }
 
 model Comment {
@@ -114,6 +130,11 @@ model Comment {
   parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies Comment[] @relation("CommentReplies")
   votes   CommentVote[]
+
+  @@index([postId, status, createdAt], name: "comment_post_status_created_idx")
+  @@index([authorId, createdAt], name: "comment_author_created_idx")
+  @@index([parentId], name: "comment_parent_idx")
+  @@index([status, createdAt], name: "comment_status_created_idx")
 }
 
 model CommentVote {
@@ -125,6 +146,7 @@ model CommentVote {
   comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([fingerprint, commentId], name: "fingerprint_commentId")
+  @@index([commentId], name: "comment_vote_comment_idx")
 }
 
 model Like {
@@ -136,6 +158,9 @@ model Like {
   createdAt   DateTime @default(now())
 
   @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
+  @@index([module, slug, createdAt], name: "like_module_slug_created_idx")
+  @@index([userId, createdAt], name: "like_user_created_idx")
+  @@index([createdAt], name: "like_created_idx")
 }
 
 
@@ -150,6 +175,8 @@ model SlugRedirect {
   updatedAt    DateTime @updatedAt
 
   @@unique([sourceModule, sourceSlug], name: "source_module_slug")
+  @@index([targetModule, targetSlug], name: "redirect_target_idx")
+  @@index([createdAt], name: "redirect_created_idx")
 }
 
 model TimelineEvent {
@@ -169,6 +196,10 @@ model TimelineEvent {
 
   comments TimelineComment[]
   likes    TimelineLike[]
+
+  @@index([published, dateGr], name: "timeline_event_published_date_idx")
+  @@index([year], name: "timeline_event_year_idx")
+  @@index([importance], name: "timeline_event_importance_idx")
 }
 
 model TimelineComment {
@@ -186,6 +217,10 @@ model TimelineComment {
   parent  TimelineComment?    @relation("TimelineCommentReplies", fields: [parentId], references: [id])
   replies TimelineComment[]   @relation("TimelineCommentReplies")
   votes   TimelineCommentVote[]
+
+  @@index([eventId, status, createdAt], name: "timeline_comment_event_status_created_idx")
+  @@index([parentId], name: "timeline_comment_parent_idx")
+  @@index([status, createdAt], name: "timeline_comment_status_created_idx")
 }
 
 model TimelineCommentVote {
@@ -197,6 +232,7 @@ model TimelineCommentVote {
   comment TimelineComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([fingerprint, commentId], name: "timeline_fingerprint_commentId")
+  @@index([commentId], name: "timeline_comment_vote_comment_idx")
 }
 
 model TimelineLike {
@@ -209,4 +245,7 @@ model TimelineLike {
   event TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   @@unique([fingerprint, eventId], name: "timeline_fingerprint_eventId")
+  @@index([eventId, createdAt], name: "timeline_like_event_created_idx")
+  @@index([userId, createdAt], name: "timeline_like_user_created_idx")
+  @@index([createdAt], name: "timeline_like_created_idx")
 }
