@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/design/icons";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
+import { useProductComparison } from "@/hooks/useProductComparison";
+import ProductComparisonModal from "@/components/ui/product-comparison-modal";
 
 export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
  const fallbackItems = getModuleItems("shop");
@@ -22,6 +24,18 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
  const [filterOpen, setFilterOpen] = useState(false);
  const dropdownRef = useRef<HTMLDivElement>(null);
  const { add } = useCart();
+
+ // Product Comparison (Step 13)
+ const {
+   comparedProducts,
+   addToComparison,
+   removeFromComparison,
+   clearComparison,
+   isInComparison,
+   count: compareCount,
+ } = useProductComparison();
+
+ const [showComparisonModal, setShowComparisonModal] = useState(false);
 
  const categories = Array.from(new Set(items.map(i=>i.category).filter(Boolean))) as string[];
 
@@ -101,14 +115,53 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                   <span className="text-sm font-black text-[var(--shop)]">{p.priceLabel || "مشاوره خرید"}</span>
                   <Button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); add({ slug: p.slug, title: p.title, price: p.priceLabel || "مشاوره خرید", image: p.image || "" },1); }} size="sm" variant="outline" className="border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold">مشاوره</Button>
                 </div>
-                <div className="mt-3 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)]">
+                <div className="mt-3 pt-3 border-t-[length:var(--border-size)] border-[var(--border-color)] flex items-center justify-between">
                   <CardStats module="shop" slug={p.slug} showComments={true} />
+                  
+                  {/* Compare Button (Step 13) */}
+                  <Button
+                    size="xs"
+                    variant={isInComparison(p.slug) ? "primary" : "ghost"}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isInComparison(p.slug)) {
+                        removeFromComparison(p.slug);
+                      } else {
+                        addToComparison(p);
+                      }
+                    }}
+                    className="text-xs"
+                  >
+                    {isInComparison(p.slug) ? "حذف از مقایسه" : "مقایسه"}
+                  </Button>
                 </div>
               </div>
             </Link>
           ))}
  </div>
  {filtered.length===0 && <div className="text-center py-16 text-muted-foreground">محصولی یافت نشد</div>}
- </main>
- );
+
+      {/* Floating Compare Button (Step 13) */}
+      {compareCount > 0 && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={() => setShowComparisonModal(true)}
+            className="shadow-[var(--shadow-size)] flex items-center gap-2"
+          >
+            مقایسه محصولات ({compareCount})
+          </Button>
+        </div>
+      )}
+
+      {/* Comparison Modal */}
+      <ProductComparisonModal
+        isOpen={showComparisonModal}
+        onClose={() => setShowComparisonModal(false)}
+        products={comparedProducts}
+        onRemove={removeFromComparison}
+        onClear={clearComparison}
+      />
+    </main>
+  );
 }
