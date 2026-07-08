@@ -5,11 +5,11 @@ import { captureUploadError } from "@/lib/sentry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const MAX_SIZE_BY_KIND: Record<string, number> = {
-  image: 8 * 1024 * 1024,
-  avatar: 3 * 1024 * 1024,
-  video: 120 * 1024 * 1024,
-  download: 250 * 1024 * 1024,
-  file: 50 * 1024 * 1024,
+  image: 5 * 1024 * 1024,      // 5MB
+  avatar: 2 * 1024 * 1024,     // 2MB
+  video: 50 * 1024 * 1024,     // 50MB
+  download: 100 * 1024 * 1024, // 100MB
+  file: 20 * 1024 * 1024,      // 20MB
 };
 
 const ALLOWED_BY_KIND: Record<string, RegExp[]> = {
