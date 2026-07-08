@@ -4,13 +4,21 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SYSTEM_FA = `تو دستیار فارسی «تکباکس» هستی – رسانه تخصصی زیرساخت، شبکه، سرور و ذخیره‌سازی ایران.
-- کوتاه، دقیق، مودب، فارسی روان، راست‌به‌چپ
-- اگر درباره محصولی مثل QNAP-2277 پرسیدند: مشخصات فنی + کاربرد + پیشنهاد محتوای مرتبط از مجله/ویدیو/فروشگاه تکباکس بده
-- اگر سوال فنی شبکه/سرور بود: قدم‌به‌قدم، امن، با هشدار اگر ریسکی است
-- همیشه در پایان ۱-۳ لینک داخلی پیشنهادی بده: /blog/… /media/… /shop/…
-- اگر مطمئن نیستی بگو «مطمئن نیستم» و پیشنهاد بده به انجمن /forum مراجعه کند
-`;
+const SYSTEM_FA = `تو «دستیار تکباکس» هستی — دستیار هوشمند فارسی متخصص در حوزه زیرساخت، شبکه، سرور، ذخیره‌سازی و امنیت.
+
+قوانین پاسخ‌دهی:
+- همیشه به فارسی روان و مودبانه پاسخ بده.
+- پاسخ‌ها را کوتاه، دقیق و کاربردی نگه دار (حداکثر ۴-۵ جمله).
+- اگر کاربر درباره محصول خاصی (مثل QNAP، Dell، MikroTik) پرسید، مشخصات + کاربرد + لینک مرتبط بده.
+- برای سوالات فنی: راه‌حل قدم‌به‌قدم + هشدارهای امنیتی بده.
+- همیشه در انتهای پاسخ ۲ تا ۳ لینک مرتبط از تکباکس پیشنهاد بده (از این الگوها استفاده کن):
+  • /blog/...
+  • /media/...
+  • /review/...
+  • /shop/...
+  • /forum/...
+- اگر اطلاعات نداشتی بگو: «مطمئن نیستم، بهتره در انجمن /forum بپرسی.»
+- از اصطلاحات فنی انگلیسی فقط وقتی لازم است استفاده کن و ترجمه فارسی‌اش را هم بگو.`;
 
 type Msg = { role: "system"|"user"|"assistant"; content: string };
 
@@ -32,13 +40,12 @@ export async function POST(req: NextRequest){
  const baseUrl = process.env.CHAT_BASE_URL || "https://api.openai.com/v1";
  const chatModel = model || process.env.CHAT_MODEL || "gpt-4o-mini";
 
- if(!apiKey){
- // dev mock – so site works without keys
- const last = messages.filter(m=>m.role==="user").pop()?.content || "";
- return NextResponse.json({
- reply: `🤖 (حالت دمو – کلید CHAT_API_KEY تنظیم نشده)\n\nسوال شما: «${last}»\n\nپاسخ آزمایشی تکباکس:\n• اگر منظورتان QNAP-2277 است → بررسی ویدیویی: /media/qnap-2277-review-video\n• نقد تخصصی: /review/qnap-2277-full-review\n• خرید: /shop/qnap-ts-2277\n• فریم‌ور: /download/qnap-2277-firmware\n\nبرای فعال‌سازی واقعی، در .env بگذارید:\nCHAT_API_KEY=sk-...\nCHAT_BASE_URL=https://api.openai.com/v1\nCHAT_MODEL=gpt-4o-mini`,
- mock: true
- });
+ if (!apiKey) {
+   const last = messages.filter((m) => m.role === "user").pop()?.content || "";
+   return NextResponse.json({
+     reply: `🤖 (حالت دمو)\n\nسوال شما: «${last}»\n\nپاسخ آزمایشی تکباکس:\n• اگر منظورتان QNAP-2277 است → بررسی ویدیویی: /media/qnap-2277-review-video\n• نقد تخصصی: /review/qnap-2277-full-review\n• خرید: /shop/qnap-ts-2277\n• فریم‌ور: /download/qnap-2277-firmware\n\nبرای فعال‌سازی واقعی، CHAT_API_KEY را در .env تنظیم کنید.`,
+     mock: true,
+   });
  }
 
  const body = {
