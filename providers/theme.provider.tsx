@@ -10,7 +10,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       storageKey="takbox-theme"
       defaultTheme="system"
       enableSystem
-      disableTransitionOnChange
+      // Enable smooth theme transitions
+      disableTransitionOnChange={false}
     >
       {children}
     </NextThemesProvider>

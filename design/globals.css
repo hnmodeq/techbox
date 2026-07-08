@@ -127,6 +127,39 @@ strong, b { font-weight: 700; }
   --font-mono: var(--font-techbox-mono);
 }
 
+/* Theme transition animations (Step 11) ---------------------------------- */
+:root {
+  --theme-transition-duration: 280ms;
+  --theme-transition-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+html {
+  transition:
+    background-color var(--theme-transition-duration) var(--theme-transition-ease),
+    color var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+body,
+.card,
+.panel,
+.modal,
+.sidebar,
+button,
+input,
+textarea,
+select {
+  transition:
+    background-color var(--theme-transition-duration) var(--theme-transition-ease),
+    border-color var(--theme-transition-duration) var(--theme-transition-ease),
+    color var(--theme-transition-duration) var(--theme-transition-ease),
+    box-shadow var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+/* Prevent transition on initial load */
+html.theme-transitioning * {
+  transition: none !important;
+}
+
 /* Home news ticker --------------------------------------------------------- */
 .ticker-track {
   animation: techbox-ticker-scroll 46s linear infinite;
