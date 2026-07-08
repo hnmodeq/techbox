@@ -12,11 +12,14 @@ export default function DownloadRow() {
   const { items: dbFiles } = useDbPosts('download', fallbackFiles, 8);
   const files = dbFiles.slice(0, 8);
 
-  const getExtension = (title: string, category?: string) => {
-    if (title.toLowerCase().includes('iso')) return '.ISO';
-    if (title.toLowerCase().includes('driver') || title.toLowerCase().includes('exe')) return '.EXE';
-    if (title.toLowerCase().includes('firmware') || title.toLowerCase().includes('bin')) return '.BIN';
-    return '.ZIP';
+  const getFileType = (title: string, category?: string, fileName?: string | null) => {
+    const source = `${title} ${category || ''} ${fileName || ''}`.toLowerCase();
+    if (source.includes('.pdf') || source.includes('pdf')) return 'PDF';
+    if (source.includes('.zip') || source.includes('zip')) return 'ZIP';
+    if (source.includes('iso')) return 'ISO';
+    if (source.includes('driver') || source.includes('exe')) return 'EXE';
+    if (source.includes('firmware') || source.includes('bin')) return 'BIN';
+    return 'FILE';
   };
 
   return (
@@ -33,20 +36,15 @@ export default function DownloadRow() {
 
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {files.map((file) => {
-            const ext = getExtension(file.title, file.category);
+            const fileType = getFileType(file.title, file.category, file.fileName ?? null);
             return (
               <article
                 key={file.slug}
                 className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] flex flex-col justify-between gap-3"
               >
                 <div className="flex items-start gap-3.5 min-w-0">
-                  {/* Yellow Special File Icon Box */}
-                  <div className="flex flex-col items-center justify-center h-14 w-14 shrink-0 rounded-[var(--corner-radius)] bg-[var(--warning)]/15 text-[var(--warning)] border-[length:var(--border-size)] border-[var(--warning)]/35 shadow-[var(--shadow-size)]">
-                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                      <polyline points="14 2 14 8 20 8" />
-                    </svg>
-                    <span className="text-[9px] font-mono font-black tracking-tight mt-0.5">{ext}</span>
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--download)]/10 text-[var(--download)] border-[length:var(--border-size)] border-[var(--download)]/30 shadow-[var(--shadow-size)]">
+                    <span className="text-[12px] font-mono font-black tracking-tight">{fileType}</span>
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -70,7 +68,7 @@ export default function DownloadRow() {
                 {/* Bottom Footer without visible separator line */}
                 <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
                   <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
-                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} />
+                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} />
                 </div>
               </article>
             );

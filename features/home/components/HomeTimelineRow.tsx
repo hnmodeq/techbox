@@ -66,21 +66,25 @@ export default function HomeTimelineRow() {
         {/* Eager loading container replaced with click-to-activate performance wrapper */}
         <div className="w-full rounded-[var(--corner-radius)] border-0 overflow-hidden shadow-none">
           {!active ? (
-            <div className="relative min-h-[360px] overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] flex flex-col items-center justify-center gap-4 p-8 sm:p-12 text-center">
-              <div className="absolute inset-0 bg-[url('https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com/timeline-images/timeline1.jpg')] bg-cover bg-center opacity-45" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--main-background)] via-[var(--main-background)]/70 to-transparent" />
-              <Icon name="timeline" className="relative w-12 h-12 text-[var(--timeline)] opacity-90" />
-              <h3 className="relative text-lg sm:text-xl font-black text-[var(--primary-text)]">تایم‌لاین تعاملی تاریخ فناوری</h3>
-              <p className="relative text-xs sm:text-sm paragraph-color max-w-lg leading-6">
-                برای سرعت بیشتر صفحه، نسخه تعاملی فقط با کلیک شما بارگذاری می‌شود.
-              </p>
-              <button
-                type="button"
-                onClick={() => setActive(true)}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] bg-[var(--timeline)] text-slate-950 px-8 py-3 text-sm font-black shadow-[var(--shadow-size)] hover:opacity-90 transition-opacity cursor-pointer"
-              >
-                بارگذاری و اجرای تایم‌لاین تعاملی ←
-              </button>
+            <div className="relative min-h-[420px] overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] bg-[var(--card-background)] p-6 sm:p-10">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,var(--timeline),transparent_36%)] opacity-25" />
+              <div className="relative mx-auto flex min-h-[300px] max-w-5xl items-center justify-center [perspective:1200px]">
+                {[
+                  ['timeline1.jpg','-translate-x-44 -rotate-6 scale-90 opacity-75'],
+                  ['timeline5.jpg','-translate-x-24 rotate-3 scale-95 opacity-85'],
+                  ['timeline10.jpg','z-10 scale-105'],
+                  ['timeline14.jpg','translate-x-24 -rotate-3 scale-95 opacity-85'],
+                  ['timeline17.jpg','translate-x-44 rotate-6 scale-90 opacity-75'],
+                ].map(([img, cls]) => (
+                  <div key={img} className={`absolute h-52 w-40 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-white/20 shadow-[var(--shadow-size)] bg-cover bg-center ${cls}`} style={{ backgroundImage: `url(https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com/timeline-images/${img})` }} />
+                ))}
+              </div>
+              <div className="relative z-20 -mt-4 flex flex-col items-center justify-center gap-4 text-center">
+                <Icon name="timeline" className="w-11 h-11 text-[var(--timeline)]" />
+                <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)]">نمای سریع تایم‌لاین تاریخ فناوری</h3>
+                <p className="text-xs sm:text-sm paragraph-color max-w-lg leading-6">پیش‌نمایش سبک از کارت‌های تایم‌لاین. نسخه تعاملی با کلیک شما فعال می‌شود.</p>
+                <button type="button" onClick={() => setActive(true)} className="inline-flex items-center justify-center gap-2 rounded-[var(--corner-radius)] bg-[var(--timeline)] px-8 py-3 text-sm font-black text-slate-950 shadow-[var(--shadow-size)] hover:opacity-90 transition-opacity cursor-pointer">بارگذاری تایم‌لاین تعاملی ←</button>
+              </div>
             </div>
           ) : (
             <ActiveTimelineContent />

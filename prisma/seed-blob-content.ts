@@ -335,8 +335,24 @@ const articlePosts: SeedPost[] = Array.from({ length: 14 }, (_, i) => {
     ["چطور لاگ‌ها را برای عیب‌یابی نگه داریم؟", "Syslog، SIEM سبک، retention و هشدارهای قابل استفاده."],
   ];
   const [title, excerpt] = topics[i];
+  const articleSlugs = [
+    "article-01-techbox",
+    "article-02-nas",
+    "article-03-rack-design",
+    "article-04-object-storage",
+    "article-05-monitoring",
+    "article-06-zero-trust",
+    "article-07-virtualization-capacity",
+    "article-08-fileserver-backup",
+    "article-09-branch-firewall",
+    "article-10-patch-management",
+    "article-11-wifi-design",
+    "article-12-documentation",
+    "article-13-ups-buying-guide",
+    "article-14-log-management",
+  ];
   return {
-    slug: `article-${String(n).padStart(2, "0")}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "techbox"}`,
+    slug: articleSlugs[i],
     module: "blog",
     title,
     excerpt,
@@ -395,7 +411,7 @@ const mediaPosts: SeedPost[] = [
     title: "ویدیو: لَب VLAN و Switching برای رک‌های کوچک",
     excerpt: "ساختار VLAN، Trunk، Access و جداسازی ترافیک سرویس‌ها در یک سناریوی واقعی.",
     content: "این ویدیو یک لَب کوچک اما واقعی برای طراحی VLAN در رک‌های SMB را نشان می‌دهد؛ از پورت‌های Access تا Trunk و تست ارتباط بین شبکه‌ها.",
-    image: `${BLOB}/thumbnails/thumbnail3.jpg`,
+    image: `${BLOB}/thumbnails/thumbnail13.jpg`,
     videoUrl: `${BLOB}/videos/video3.mp4`,
     tags: ["vlan", "switch", "network", "video"],
     category: "شبکه",

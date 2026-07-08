@@ -39,9 +39,9 @@ export default function VideoReelsRow() {
       {active && (
         <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
           <button type="button" className="absolute inset-0" onClick={() => setActive(null)} aria-label="بستن" />
-          <div className="relative z-10 grid w-full max-w-6xl max-h-[92vh] overflow-y-auto rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] lg:grid-cols-[minmax(320px,420px)_1fr]">
-            <div className="bg-black flex items-center justify-center p-3"><video src={active.videoUrl || undefined} poster={active.image} controls autoPlay playsInline className="max-h-[82vh] aspect-[9/16] object-contain bg-black" /></div>
-            <div className="min-w-0 p-4 space-y-4">
+          <div className="relative z-10 grid w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] lg:grid-cols-[minmax(320px,420px)_1fr]">
+            <div className="bg-black flex h-[82vh] max-h-[82vh] items-center justify-center p-3"><video src={active.videoUrl || undefined} poster={active.image} controls autoPlay playsInline className="h-full aspect-[9/16] object-contain bg-black" /></div>
+            <div className="min-w-0 h-[82vh] max-h-[82vh] overflow-y-auto p-4 space-y-4">
               <div className="flex items-start justify-between gap-3"><div><h3 className="font-black text-[var(--primary-text)] text-lg">{active.title}</h3><p className="paragraph-color mt-1 text-sm">{active.excerpt}</p></div><button onClick={() => setActive(null)} className="paragraph-color hover:text-[var(--primary-text)]"><Icon name="close" size={22}/></button></div>
               <div className="flex flex-wrap items-center gap-4"><CardStats module="media" slug={active.slug} showComments={true} /><LikeButton contentType="media" slug={active.slug} /></div>
               <CommentSection module="media" slug={active.slug} />
