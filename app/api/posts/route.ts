@@ -5,6 +5,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 import { createPostRevision } from "@/lib/revision";
+import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
 
 function safeJsonArray(value: string | null | undefined): string[] {
   if (!value) return [];
@@ -237,10 +238,10 @@ export async function PATCH(req: NextRequest) {
   if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
   if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
-  // Find current post for revision
+  // Find current post (for revision + slug change detection)
   const current = await prisma.post.findUnique({
     where: { module_slug: { module: moduleKey, slug } },
-    select: { id: true, title: true, content: true, image: true },
+    select: { id: true, title: true, content: true, image: true, slug: true },
   });
 
   const data: any = {};
@@ -251,6 +252,21 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.published === "boolean") data.published = body.published;
   if (typeof body.solved === "boolean") data.solved = body.solved;
   if (typeof body.category === "string") data.category = body.category;
+
+  // Handle slug change → auto-create redirect
+  let newSlug = slug;
+  if (typeof body.newSlug === "string" && body.newSlug.trim() && body.newSlug !== slug) {
+    newSlug = body.newSlug.trim();
+    data.slug = newSlug;
+
+    // Create automatic redirect from old slug to new slug
+    await createSlugRedirectOnChange({
+      module: moduleKey,
+      oldSlug: slug,
+      newSlug,
+      userId: user.id,
+    });
+  }
 
   if (!Object.keys(data).length) return NextResponse.json({ error: "nothing_to_update" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
@@ -271,11 +287,19 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  const updated = await prisma.post.update({ where: { module_slug: { module: moduleKey, slug } }, data });
+  const updated = await prisma.post.update({
+    where: { module_slug: { module: moduleKey, slug } },
+    data,
+  });
+
   revalidatePath('/');
   revalidatePath(`/${moduleKey}`);
   revalidatePath(`/${moduleKey}/${slug}`);
+  if (newSlug !== slug) {
+    revalidatePath(`/${moduleKey}/${newSlug}`);
+  }
   revalidatePath('/sitemap.xml');
+
   return NextResponse.json(updated, { headers: cacheHeaders(PRIVATE_NO_STORE) });
 }
 
