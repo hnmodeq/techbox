@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser, canEditModule } from "@/lib/auth-server";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
+import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 function safeJsonArray(value: string | null | undefined): string[] {
   if (!value) return [];
@@ -39,9 +41,9 @@ export async function GET(req: NextRequest) {
 
     if (includeAllPublishedStates) {
       const user = await getSessionUser();
-      if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
       if (postModule) {
-        if (!canEditModule(user as any, postModule)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+        if (!canEditModule(user as any, postModule)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
       } else if (user.role !== "super_admin") {
         let modules: string[] = [];
         try { modules = JSON.parse((user as any).modules || "[]"); } catch {}
@@ -147,9 +149,11 @@ export async function GET(req: NextRequest) {
       },
     }));
 
-    return NextResponse.json(slug ? (out[0] ?? null) : out);
+    return NextResponse.json(slug ? (out[0] ?? null) : out, {
+      headers: cacheHeaders(includeAllPublishedStates ? PRIVATE_NO_STORE : (slug ? PUBLIC_DETAIL_CACHE : PUBLIC_CONTENT_CACHE)),
+    });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "db_unavailable" }, { status: 503 });
+    return NextResponse.json({ error: e?.message || "db_unavailable" }, { status: 503, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
@@ -187,10 +191,10 @@ const createSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const data = createSchema.parse(await req.json());
   if (!canEditModule(user as any, data.module)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
   try {
     const serialized = {
@@ -211,45 +215,57 @@ export async function POST(req: NextRequest) {
         dateFa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
       },
     });
-    return NextResponse.json(post, { status: 201 });
+    revalidatePath('/');
+    revalidatePath(`/${data.module}`);
+    revalidatePath(`/${data.module}/${data.slug}`);
+    revalidatePath('/sitemap.xml');
+    return NextResponse.json(post, { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+    return NextResponse.json({ error: e.message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
 
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const body = await req.json();
   const moduleKey = String(body.module || "");
   const slug = String(body.slug || "");
-  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400 });
-  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
   const data: any = {};
   if (typeof body.published === "boolean") data.published = body.published;
   if (typeof body.solved === "boolean") data.solved = body.solved;
-  if (!Object.keys(data).length) return NextResponse.json({ error: "nothing_to_update" }, { status: 400 });
+  if (!Object.keys(data).length) return NextResponse.json({ error: "nothing_to_update" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
   const updated = await prisma.post.update({ where: { module_slug: { module: moduleKey, slug } }, data });
-  return NextResponse.json(updated);
+  revalidatePath('/');
+  revalidatePath(`/${moduleKey}`);
+  revalidatePath(`/${moduleKey}/${slug}`);
+  revalidatePath('/sitemap.xml');
+  return NextResponse.json(updated, { headers: cacheHeaders(PRIVATE_NO_STORE) });
 }
 
 export async function DELETE(req: NextRequest) {
   const user = await getSessionUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const { searchParams } = new URL(req.url);
   const moduleKey = searchParams.get("module") || "";
   const slug = searchParams.get("slug") || "";
-  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400 });
-  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
   const post = await prisma.post.findUnique({ where: { module_slug: { module: moduleKey, slug } }, select: { id: true } });
-  if (!post) return NextResponse.json({ ok: true });
+  if (!post) return NextResponse.json({ ok: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   await prisma.like.deleteMany({ where: { module: moduleKey, slug } });
   await prisma.post.delete({ where: { id: post.id } });
-  return NextResponse.json({ ok: true });
+  revalidatePath('/');
+  revalidatePath(`/${moduleKey}`);
+  revalidatePath(`/${moduleKey}/${slug}`);
+  revalidatePath('/sitemap.xml');
+  return NextResponse.json({ ok: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
 }
 
 export const dynamic = "force-dynamic";

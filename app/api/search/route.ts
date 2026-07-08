@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { cacheHeaders, PUBLIC_CONTENT_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 function safeJsonArray(value: string | null | undefined): string[] {
   if (!value) return [];
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
   const moduleKey = searchParams.get("module") || undefined;
   const take = Math.min(Math.max(Number(searchParams.get("take") || 40), 1), 100);
 
-  if (!q) return NextResponse.json({ q, results: [], count: 0 });
+  if (!q) return NextResponse.json({ q, results: [], count: 0 }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
 
   const words = q.split(" ").filter(Boolean).slice(0, 6);
 
@@ -118,11 +119,11 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => b.score - a.score)
       .map(({ score, ...item }) => item);
 
-    return NextResponse.json({ q, results, count: results.length });
+    return NextResponse.json({ q, results, count: results.length }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "search_failed", q, results: [], count: 0 }, { status: 500 });
+    return NextResponse.json({ error: e?.message || "search_failed", q, results: [], count: 0 }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;

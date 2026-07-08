@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { cacheHeaders, PUBLIC_CONTENT_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 const moduleTakes: Record<string, number> = {
   blog: 5,
@@ -115,11 +116,11 @@ export async function GET() {
       modules,
       ticker: tickerPosts.map(normalizePost),
       generatedAt: new Date().toISOString(),
-    });
+    }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "home_failed", modules: {}, ticker: [] }, { status: 503 });
+    return NextResponse.json({ error: e?.message || "home_failed", modules: {}, ticker: [] }, { status: 503, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
