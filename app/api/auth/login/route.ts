@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { verifyPassword, createSession, setSessionCookie } from "@/lib/auth-server";
 import { z } from "zod";
+import { captureAuthError } from "@/lib/sentry";
 
 const schema = z.object({ username: z.string(), password: z.string().optional().default("techbox123") });
 
@@ -70,6 +71,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("Login route error:", err);
+    captureAuthError(err, "login");
     return NextResponse.json({ error: err?.message || "خطای سرور در پردازش ورود" }, { status: 500 });
   }
 }

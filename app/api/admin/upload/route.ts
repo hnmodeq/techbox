@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { getSessionUser } from "@/lib/auth-server";
+import { captureUploadError } from "@/lib/sentry";
 
 const MAX_SIZE_BY_KIND: Record<string, number> = {
   image: 8 * 1024 * 1024,
@@ -81,12 +82,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "blob_not_configured", message: "BLOB_READ_WRITE_TOKEN is not configured." }, { status: 503 });
   }
 
+  let fileNameForError: string | undefined;
+
   try {
     const form = await req.formData();
     const file = form.get("file");
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "file_required" }, { status: 400 });
     }
+    fileNameForError = file.name;
 
     const contentType = file.type || "application/octet-stream";
     const kind = inferKind(contentType, String(form.get("kind") || ""));
@@ -121,6 +125,7 @@ export async function POST(req: NextRequest) {
       uploadedBy: { id: user.id, username: user.username, name: user.name },
     });
   } catch (e: any) {
+    captureUploadError(e, fileNameForError);
     return NextResponse.json({ error: e?.message || "upload_failed" }, { status: 500 });
   }
 }

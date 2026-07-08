@@ -23,7 +23,7 @@ async function buildNotifications() {
   const postMap = new Map(likePosts.map((p: any) => [`${p.module}:${p.slug}`, p]));
 
   return [
-    ...comments.map(c => ({
+    ...comments.map((c: any) => ({
       id: `comment-${c.id}`,
       type: "comment",
       module: c.post.module,
@@ -36,21 +36,22 @@ async function buildNotifications() {
       createdAt: c.createdAt.toISOString(),
       label: `${moduleFa[c.post.module] || c.post.module} • ${c.author?.name || c.authorName} دیدگاه گذاشت`,
     })),
-    ...likes.map(l => {
+    ...likes.map((l: any) => {
       const u = userMap.get(l.userId || "");
       const p = postMap.get(`${l.module}:${l.slug}`);
+      const userLike = u as any;
       return {
         id: `like-${l.id}`,
         type: "like",
         module: l.module,
         slug: l.slug,
-        title: p?.title || l.slug,
-        actor: u?.name || "کاربر",
-        username: u?.username || "",
-        avatar: u?.avatar || null,
+        title: (p as any)?.title || l.slug,
+        actor: userLike?.name || "کاربر",
+        username: userLike?.username || "",
+        avatar: userLike?.avatar || null,
         text: "پسندید",
         createdAt: l.createdAt.toISOString(),
-        label: `${moduleFa[l.module] || l.module} • ${u?.name || "کاربر"} پسندید`,
+        label: `${moduleFa[l.module] || l.module} • ${userLike?.name || "کاربر"} پسندید`,
       };
     }),
   ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 30);

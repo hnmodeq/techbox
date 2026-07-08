@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const out = posts.map((p) => ({
+    const out = posts.map((p: any) => ({
       id: p.id,
       slug: p.slug,
       module: p.module,
