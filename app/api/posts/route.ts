@@ -4,6 +4,7 @@ import { getSessionUser, canEditModule } from "@/lib/auth-server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
+import { createPostRevision } from "@/lib/revision";
 
 function safeJsonArray(value: string | null | undefined): string[] {
   if (!value) return [];
@@ -236,10 +237,39 @@ export async function PATCH(req: NextRequest) {
   if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
   if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
+  // Find current post for revision
+  const current = await prisma.post.findUnique({
+    where: { module_slug: { module: moduleKey, slug } },
+    select: { id: true, title: true, content: true, image: true },
+  });
+
   const data: any = {};
+  if (typeof body.title === "string") data.title = body.title;
+  if (typeof body.excerpt === "string") data.excerpt = body.excerpt;
+  if (typeof body.content === "string") data.content = body.content;
+  if (typeof body.image === "string") data.image = body.image;
   if (typeof body.published === "boolean") data.published = body.published;
   if (typeof body.solved === "boolean") data.solved = body.solved;
+  if (typeof body.category === "string") data.category = body.category;
+
   if (!Object.keys(data).length) return NextResponse.json({ error: "nothing_to_update" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+
+  // Create revision if important fields changed
+  if (current) {
+    const changedTitle = body.title && body.title !== current.title;
+    const changedContent = body.content && body.content !== current.content;
+    const changedImage = body.image && body.image !== current.image;
+
+    if (changedTitle || changedContent || changedImage) {
+      await createPostRevision({
+        postId: current.id,
+        oldTitle: changedTitle ? current.title : undefined,
+        oldContent: changedContent ? current.content : undefined,
+        oldImage: changedImage ? current.image : undefined,
+        editedBy: user.id,
+      });
+    }
+  }
 
   const updated = await prisma.post.update({ where: { module_slug: { module: moduleKey, slug } }, data });
   revalidatePath('/');
