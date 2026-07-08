@@ -102,7 +102,7 @@ function normalizeCard(p: any) {
 
 async function findPosts(module: string, take: number) {
   const posts = await prisma.post.findMany({
-    where: { module, published: true },
+    where: { module, published: true, deletedAt: null },
     orderBy: { date: "desc" },
     take,
     select: cardSelect,
@@ -121,6 +121,7 @@ export async function GET() {
     const tickerPosts = await prisma.post.findMany({
       where: {
         published: true,
+        deletedAt: null,
         module: { not: "news" },
         date: { gte: cutoff },
       },

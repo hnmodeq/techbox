@@ -32,6 +32,7 @@ export async function getDbModulePosts(
       where: {
         module,
         published: true,
+        deletedAt: null,
       },
       orderBy: { date: "desc" },
       take,
