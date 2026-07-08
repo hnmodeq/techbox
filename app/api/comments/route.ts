@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth-server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendEmail, emailTemplates } from "@/lib/email";
 
 const postSchema = z.object({
   postModule: z.string(),
@@ -33,8 +34,6 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json(comments);
   } catch {
-    // Database unreachable: caller keeps its current/empty state rather than
-    // being fed fabricated comments.
     return NextResponse.json({ error: "db_unavailable" }, { status: 503 });
   }
 }
@@ -90,6 +89,30 @@ export async function POST(req: NextRequest) {
         text,
       },
     });
+
+    // Send email notification to post author (if available)
+    if (post.authorId) {
+      const postAuthor = await prisma.user.findUnique({
+        where: { id: post.authorId },
+        select: { email: true, name: true },
+      });
+
+      if (postAuthor?.email) {
+        const { subject, html } = emailTemplates.newComment({
+          postTitle: post.title,
+          postUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "https://techbox.local"}/${postModule}/${postSlug}`,
+          commentAuthor: user.name || user.username,
+          commentText: text,
+        });
+
+        await sendEmail({
+          to: postAuthor.email,
+          subject,
+          html,
+        });
+      }
+    }
+
     return NextResponse.json(comment, { status: 201 });
   } catch {
     return NextResponse.json({ error: "db_unavailable" }, { status: 503 });
