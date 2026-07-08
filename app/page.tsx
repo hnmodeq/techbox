@@ -1,7 +1,6 @@
 import React from 'react';
 import HeroSection from '@/features/home/components/HeroSection';
 import NewsTicker from '@/features/news/components/NewsTicker';
-import NewsSidebar from '@/features/home/components/NewsSidebar';
 import MagazineRow from '@/features/home/components/MagazineRow';
 import VideoReelsRow from '@/features/home/components/VideoReelsRow';
 import ShopRow from '@/features/home/components/ShopRow';
@@ -9,6 +8,8 @@ import ForumRow from '@/features/home/components/ForumRow';
 import ReviewRow from '@/features/home/components/ReviewRow';
 import DownloadRow from '@/features/home/components/DownloadRow';
 import HomeTimelineRow from '@/features/home/components/HomeTimelineRow';
+import LandingStats from '@/features/home/components/LandingStats';
+import TrustSection from '@/features/home/components/TrustSection';
 import { HomeDataProvider } from '@/features/home/lib/home-data';
 
 export default function Page() {
@@ -20,6 +21,9 @@ export default function Page() {
 
       {/* 2. Hero Section (Big Website Title & Tagline Rotator) */}
       <HeroSection />
+
+      {/* NEW: Stats Section (Step 12) */}
+      <LandingStats />
 
       {/* 3. Full Width Magazine Row */}
       <MagazineRow />
@@ -41,6 +45,9 @@ export default function Page() {
 
       {/* 9. Technology Timeline Preview Row */}
       <HomeTimelineRow />
+
+      {/* NEW: Trust / Social Proof Section (Step 12) */}
+      <TrustSection />
 
     </main>
     </HomeDataProvider>
