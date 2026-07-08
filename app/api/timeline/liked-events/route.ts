@@ -21,8 +21,8 @@ export async function GET() {
     select: { eventId: true }
   });
 
-  return NextResponse.json({
-    likedEventIds: likes.map((l) => l.eventId),
+    return NextResponse.json({
+      likedEventIds: likes.map((l: any) => l.eventId),
     isLoggedIn: true
   });
 }

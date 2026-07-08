@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     if (!post) return NextResponse.json([]);
 
     const comments = await prisma.comment.findMany({
-      where: { postId: post.id, status: "approved" },
+      where: { postId: post.id, status: "approved", deletedAt: null },
       orderBy: { createdAt: "asc" },
       include: { author: { select: { name: true, username: true, avatar: true } }, replies: { where: { status: "approved" }, orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, username: true, avatar: true } } } } },
     });

@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
       ...(includeAllPublishedStates ? {} : { published: true }),
       ...(postModule ? { module: postModule } : {}),
       ...(slug ? { slug } : {}),
+      deletedAt: null, // soft delete filter
     };
 
     if (includeAllPublishedStates) {
@@ -259,13 +260,28 @@ export async function DELETE(req: NextRequest) {
 
   const post = await prisma.post.findUnique({ where: { module_slug: { module: moduleKey, slug } }, select: { id: true } });
   if (!post) return NextResponse.json({ ok: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
-  await prisma.like.deleteMany({ where: { module: moduleKey, slug } });
-  await prisma.post.delete({ where: { id: post.id } });
+
+  // Soft delete instead of hard delete
+  await prisma.post.update({
+    where: { id: post.id },
+    data: {
+      deletedAt: new Date(),
+      deletedBy: user.id,
+      published: false,
+    },
+  });
+
+  // Also soft delete related likes/comments (optional but recommended)
+  await prisma.like.updateMany({
+    where: { module: moduleKey, slug },
+    data: { deletedAt: new Date(), deletedBy: user.id },
+  });
+
   revalidatePath('/');
   revalidatePath(`/${moduleKey}`);
   revalidatePath(`/${moduleKey}/${slug}`);
   revalidatePath('/sitemap.xml');
-  return NextResponse.json({ ok: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+  return NextResponse.json({ ok: true, softDeleted: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
 }
 
 export const dynamic = "force-dynamic";

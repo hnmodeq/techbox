@@ -18,9 +18,9 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   }
 
   const posts = await prisma.post.findMany({ where: { published: true, OR: [{ authorId: user.id }, { authorName: user.name }] }, orderBy: { date: "desc" }, include: { comments: true } }).catch(() => []);
-  const totalViews = posts.reduce((acc, p) => acc + (p.views || 0), 0);
-  const totalLikes = posts.reduce((acc, p) => acc + (p.likes || 0), 0);
-  const totalComments = posts.reduce((acc, p) => acc + (p.comments?.length || 0), 0);
+  const totalViews = posts.reduce((acc: number, p: any) => acc + (p.views || 0), 0);
+  const totalLikes = posts.reduce((acc: number, p: any) => acc + (p.likes || 0), 0);
+  const totalComments = posts.reduce((acc: number, p: any) => acc + (p.comments?.length || 0), 0);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">

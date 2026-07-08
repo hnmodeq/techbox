@@ -68,6 +68,8 @@ model Post {
   fileSize      String?
   downloadCount Int      @default(0)
   published     Boolean  @default(true)
+  deletedAt     DateTime?
+  deletedBy     String?
 
   author   User?     @relation(fields: [authorId], references: [id])
   comments Comment[]
@@ -124,6 +126,8 @@ model Comment {
   likes      Int      @default(0)
   dislikes   Int      @default(0)
   createdAt  DateTime @default(now())
+  deletedAt     DateTime?
+  deletedBy     String?
 
   post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   author  User?     @relation(fields: [authorId], references: [id])
@@ -156,6 +160,8 @@ model Like {
   module      String
   slug        String
   createdAt   DateTime @default(now())
+  deletedAt   DateTime?
+  deletedBy   String?
 
   @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
   @@index([module, slug, createdAt], name: "like_module_slug_created_idx")
