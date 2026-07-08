@@ -14,6 +14,9 @@ import { ProductGallery } from "@/components/ui/product-gallery";
 export default function ContentDetail({ item }: { item: ContentItem }) {
  const meta = moduleMeta[item.module];
  const videoSrc = (item as any).videoUrl || (item as any).video || (item as any).videoSrc;
+ const videoDuration = (item as any).videoDuration;
+ const videoMimeType = (item as any).videoMimeType;
+ const videoFileSize = (item as any).videoFileSize;
  const gallery = Array.isArray((item as any).gallery) ? (item as any).gallery : [];
  return (
  <article className="mx-auto max-w-3xl px-5 md:px-0 py-10" dir="rtl">
@@ -54,9 +57,12 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  className="mx-auto h-[70vh] max-h-[780px] aspect-[9/16] object-contain bg-black"
  src={videoSrc}
  />
- <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex items-center gap-4">
+ <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex flex-wrap items-center gap-4">
  <LiveViewCounter module={item.module} slug={item.slug} showLabel />
  <LikeButton contentType={item.module} slug={item.slug} />
+ {videoDuration && <span dir="ltr">{videoDuration}</span>}
+ {videoFileSize && <span dir="ltr">{videoFileSize}</span>}
+ {videoMimeType && <span dir="ltr">{videoMimeType}</span>}
  </div>
  </div>
  ) : item.image && (

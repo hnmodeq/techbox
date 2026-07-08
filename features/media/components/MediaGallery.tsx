@@ -29,6 +29,7 @@ export default function MediaGallery() {
             category={v.category}
             author={v.author?.name}
             dateFa={v.date_fa}
+            duration={(v as any).videoDuration || undefined}
             onClick={() => { window.location.href = `/media/${v.slug}`; }}
           />
         ))}

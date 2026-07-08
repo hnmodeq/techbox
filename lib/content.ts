@@ -17,6 +17,9 @@ export type ContentItem = {
   content?: string;
   image?: string;
   videoUrl?: string | null;
+  videoDuration?: string | null;
+  videoMimeType?: string | null;
+  videoFileSize?: string | null;
   gallery?: string[];
   tags: string[];
   author: { name: string; role?: string; avatar?: string };
