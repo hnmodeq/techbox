@@ -17,9 +17,11 @@ export default async function About(){
 
  const team: TeamMember[] = dbUsers.map((u: any) => ({
    name: u.name,
+   role: u.role,
    roleFa: u.roleFa || u.role,
    avatar: u.avatar || "",
-   username: u.username
+   username: u.username,
+   modules: [],
  }));
 
  return (
