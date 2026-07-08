@@ -6,6 +6,7 @@ import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
+import { defaultSeo, siteUrl } from "@/lib/seo";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
@@ -69,9 +70,29 @@ const themeScript = `
 `;
 
 export const metadata: Metadata = {
-  title: "رسانه تکنولوژی تکباکس",
-  description: "پاتوق بچه‌های فناوری اطلاعات",
+  metadataBase: new URL(siteUrl()),
+  title: {
+    default: defaultSeo.title,
+    template: "%s",
+  },
+  description: defaultSeo.description,
   manifest: "/manifest.json",
+  alternates: { canonical: siteUrl() },
+  openGraph: {
+    type: "website",
+    locale: "fa_IR",
+    siteName: "TechBox",
+    title: defaultSeo.title,
+    description: defaultSeo.description,
+    url: siteUrl(),
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "TechBox" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultSeo.title,
+    description: defaultSeo.description,
+    images: ["/logo.png"],
+  },
   icons: {
     icon: "/logo.png",
     apple: "/logo.png",

@@ -1,6 +1,7 @@
+import { pageMetadata } from "@/lib/seo";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/effects/PageHeader";
-export const metadata = { title: "ارتباط با ما | تکباکس" };
+export const metadata = pageMetadata({ title: "ارتباط با ما | تکباکس", description: "راه‌های ارتباط با تیم تکباکس برای همکاری، مشاوره و پشتیبانی.", path: "/contact" });
 export default function Contact() {
  return (
  <main className="max-w-3xl mx-auto px-5 py-16" dir="rtl">

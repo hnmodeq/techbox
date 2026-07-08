@@ -1,9 +1,10 @@
+import { pageMetadata } from "@/lib/seo";
 import users from "@/prisma/mock-data/users.json";
 import { ButtonLink } from "@/components/ui/button";
 import TeamChromaSection, { type TeamMember } from "@/features/home/components/TeamChromaSection";
 import PageHeader from "@/components/effects/PageHeader";
 
-export const metadata = { title: "درباره تکباکس" };
+export const metadata = pageMetadata({ title: "درباره تکباکس | تکباکس", description: "درباره ماموریت تکباکس، رسانه تخصصی فناوری اطلاعات و زیرساخت.", path: "/about" });
 
 export default function About(){
  const team = (users as TeamMember[]).slice(0,6);

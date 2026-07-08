@@ -1,9 +1,10 @@
+import { pageMetadata } from "@/lib/seo";
 import jobs from "@/prisma/mock-data/jobs.json";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import PageHeader from "@/components/effects/PageHeader";
 
-export const metadata = { title: "فرصت‌های شغلی | تکباکس" };
+export const metadata = pageMetadata({ title: "فرصت‌های شغلی | تکباکس", description: "فرصت‌های همکاری و شغلی در تیم تکباکس.", path: "/work-with-us" });
 
 export default function WorkWithUs(){
  return (

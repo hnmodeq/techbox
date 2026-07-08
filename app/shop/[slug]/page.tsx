@@ -1,4 +1,5 @@
 import { getDbPost } from "@/lib/server-post";
+import { detailMetadata } from "@/lib/seo";
 import { getSlugRedirect } from "@/lib/slug-redirects";
 import { redirect } from "next/navigation";
 import DbProductDetail from "@/features/shop/components/DbProductDetail";
@@ -21,5 +22,5 @@ export default async function Page({ params }: { params: P }) {
 export async function generateMetadata({ params }: { params: P }) {
   const { slug } = await params;
   const item = await getDbPost("shop", slug);
-  return { title: item ? `${item.title} | فروشگاه تکباکس` : "فروشگاه تکباکس" };
+  return detailMetadata("shop", item, "فروشگاه تکباکس");
 }
