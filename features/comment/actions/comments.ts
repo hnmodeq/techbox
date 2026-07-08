@@ -19,9 +19,9 @@ export async function getCommentsAction(module: string, slug: string) {
     });
     if (post) {
       const comments = await prisma.comment.findMany({
-        where: { postId: post.id },
+        where: { postId: post.id, status: "approved" },
         orderBy: { createdAt: "asc" },
-        include: { author: { select: { name: true, username: true, avatar: true } }, replies: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, username: true, avatar: true } } } } },
+        include: { author: { select: { name: true, username: true, avatar: true } }, replies: { where: { status: "approved" }, orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, username: true, avatar: true } } } } },
       });
       return comments;
     }

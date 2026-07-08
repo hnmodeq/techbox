@@ -26,9 +26,9 @@ export async function GET(req: NextRequest) {
     if (!post) return NextResponse.json([]);
 
     const comments = await prisma.comment.findMany({
-      where: { postId: post.id },
+      where: { postId: post.id, status: "approved" },
       orderBy: { createdAt: "asc" },
-      include: { author: { select: { name: true, username: true, avatar: true } }, replies: { orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, username: true, avatar: true } } } } },
+      include: { author: { select: { name: true, username: true, avatar: true } }, replies: { where: { status: "approved" }, orderBy: { createdAt: "asc" }, include: { author: { select: { name: true, username: true, avatar: true } } } } },
     });
     return NextResponse.json(comments);
   } catch {
@@ -45,6 +45,9 @@ export async function POST(req: NextRequest) {
       { error: "unauthorized", message: "برای ثبت نظر ابتدا وارد حساب کاربری شوید." },
       { status: 401 }
     );
+  }
+  if ((user as any).status === "banned" || (user as any).status === "suspended") {
+    return NextResponse.json({ error: "forbidden", message: "حساب شما اجازه ثبت دیدگاه ندارد." }, { status: 403 });
   }
 
   try {

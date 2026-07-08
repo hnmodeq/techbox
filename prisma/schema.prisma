@@ -14,6 +14,7 @@ model User {
   email    String
   role     String
   roleFa   String?
+  status   String  @default("active")
   job      String?
   birthday String?
   modules  String  @default("[]")
@@ -103,6 +104,7 @@ model Comment {
   authorId   String?
   authorName String   @default("مهمان")
   text       String
+  status     String   @default("approved")
   likes      Int      @default(0)
   dislikes   Int      @default(0)
   createdAt  DateTime @default(now())
@@ -175,6 +177,7 @@ model TimelineComment {
   parentId   String?
   authorName String   @default("مهمان")
   text       String
+  status     String   @default("approved")
   likes      Int      @default(0)
   dislikes   Int      @default(0)
   createdAt  DateTime @default(now())

@@ -12,6 +12,7 @@ export async function GET(){
     username: user.username,
     email: user.email,
     role: user.role,
+    status: (user as any).status || "active",
     roleFa: user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر"),
     job: user.job || "",
     birthday: user.birthday || "",
