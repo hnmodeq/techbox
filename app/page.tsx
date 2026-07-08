@@ -11,6 +11,7 @@ import HomeTimelineRow from '@/features/home/components/HomeTimelineRow';
 import LandingStats from '@/features/home/components/LandingStats';
 import TrustSection from '@/features/home/components/TrustSection';
 import RecommendationRow from '@/features/home/components/RecommendationRow';
+import NewsletterSignup from '@/components/newsletter/NewsletterSignup';
 import { HomeDataProvider } from '@/features/home/lib/home-data';
 import { getHomepageRecommendations } from '@/lib/recommendations';
 
@@ -56,6 +57,11 @@ export default function Page() {
         items={getHomepageRecommendations(8)} 
         title="پیشنهادهای هوشمند برای شما" 
       />
+
+      {/* NEW: Newsletter Signup (Step 16) */}
+      <div className="mx-auto max-w-4xl px-4 py-16">
+        <NewsletterSignup />
+      </div>
 
     </main>
     </HomeDataProvider>

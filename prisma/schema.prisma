@@ -270,3 +270,14 @@ model TimelineLike {
   @@index([userId, createdAt], name: "timeline_like_user_created_idx")
   @@index([createdAt], name: "timeline_like_created_idx")
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, createdAt])
+}
