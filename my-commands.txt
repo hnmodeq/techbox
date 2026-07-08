@@ -6,3 +6,6 @@ pnpm run db:seed-blob-content -- --step=all
 pnpm run check:content
 pnpm run check:db
 pnpm run check:blob
+pnpm config set concurrent-downloads 1
+pnpm config set fetch-timeout 300000
+pnpm config set fetch-retries 5
