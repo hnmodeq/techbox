@@ -5,7 +5,7 @@ import { z } from "zod";
 import { captureAuthError } from "@/lib/sentry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
-const schema = z.object({ username: z.string(), password: z.string().optional().default("techbox123") });
+const schema = z.object({ username: z.string(), password: z.string() });
 
 function parseModules(raw: any): string[] {
   if (Array.isArray(raw)) return raw;
@@ -35,33 +35,12 @@ export async function POST(req: NextRequest) {
     const { username, password } = schema.parse(body);
     const cleanUser = username.trim().toLowerCase();
 
-    let user: any = null;
-    try {
-      user = await prisma.user.findUnique({ where: { username: cleanUser } });
-      if (!user) {
-        user = await prisma.user.findFirst({ where: { username: cleanUser } });
-      }
-    } catch (dbErr: any) {
-      console.warn("Prisma DB login lookup failed, falling back to local mock data:", dbErr.message);
-    }
-
-    if (!user) {
-      try {
-        const mockUsers = require("@/prisma/mock-data/users.json");
-        const found = mockUsers.find((u: any) => u.username.toLowerCase() === cleanUser);
-        if (found) {
-          user = {
-            ...found,
-            password: "$2a$10$fallbackpasswordhash"
-          };
-        }
-      } catch {}
-    }
+    const user = await prisma.user.findUnique({ where: { username: cleanUser } });
 
     if (!user) return NextResponse.json({ error: "not found" }, { status: 404 });
 
     const ok = await verifyPassword(password, user.password).catch(() => false);
-    if (!ok && password !== "techbox123") {
+    if (!ok) {
       return NextResponse.json({ error: "invalid" }, { status: 401 });
     }
 

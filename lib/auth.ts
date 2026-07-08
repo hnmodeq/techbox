@@ -1,7 +1,6 @@
 "use client";
 
-import users from "@/prisma/mock-data/users.json";
-
+// Client-side authentication types
 export type AppUser = {
   id: string;
   name: string;
@@ -16,14 +15,13 @@ export type AppUser = {
 
 const KEY = "tb_auth_user";
 
-export function login(username: string): AppUser | null {
-  const u = (users as AppUser[]).find(x => x.username === username.toLowerCase());
-  if (u && typeof window !== "undefined") {
-    localStorage.setItem(KEY, JSON.stringify(u));
+// Client-side login cache mechanism (only used to sync state across tabs instantly after successful server login)
+export function login(user: AppUser): AppUser {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(KEY, JSON.stringify(user));
     window.dispatchEvent(new StorageEvent("storage", { key: KEY }));
-    return u;
   }
-  return null;
+  return user;
 }
 
 export function logout() {
@@ -45,5 +43,3 @@ export function canEdit(user: AppUser | null, module: string) {
   if (user.role === "super_admin") return true;
   return user.modules.includes(module);
 }
-
-export const allUsers = users as AppUser[];

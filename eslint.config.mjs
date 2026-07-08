@@ -29,7 +29,7 @@ const config = [
 
       // The project currently uses plain <img> widely for local JSON-driven assets.
       // Migrate to next/image gradually where dimensions are known.
-      "@next/next/no-img-element": "warn",
+      "@next/next/no-img-element": "error",
     },
   },
 ];

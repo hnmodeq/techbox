@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { gregorianToJalali, formatJalaliDate } from '@/lib/jalali';
-import timelineData from '@/prisma/mock-data/timeline.json';
 
 export async function GET() {
   try {
@@ -32,29 +31,7 @@ export async function GET() {
     // Database table not created or unseeded locally
   }
 
-  // Fallback to local JSON timeline data (/data/timeline.json)
-  const fallbackOut = (timelineData as any[]).map((ev) => {
-    const dateGr = new Date(ev.dateGr);
-    const jalali = gregorianToJalali(dateGr);
-    const dateFa = formatJalaliDate(jalali.year, jalali.month, jalali.day);
-    return {
-      id: ev.id,
-      title: ev.title,
-      description: ev.description,
-      image: ev.image,
-      dateGr: dateGr.toISOString(),
-      dateFa,
-      year: dateGr.getFullYear(),
-      yearFa: jalali.year,
-      importance: ev.importance,
-      tags: ev.tags,
-      published: true,
-      comments: [],
-      likes: [],
-    };
-  });
-
-  return NextResponse.json(fallbackOut);
+  return NextResponse.json([]);
 }
 
 export async function POST(req: Request) {

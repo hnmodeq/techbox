@@ -48,25 +48,17 @@ export type ContentItem = {
   versions?: Array<Record<string, unknown>>;
 };
 
-import blogData from "@/prisma/mock-data/blog.json";
-import newsData from "@/prisma/mock-data/news.json";
-import mediaData from "@/prisma/mock-data/media.json";
-import reviewData from "@/prisma/mock-data/review.json";
-import toolsData from "@/prisma/mock-data/tools.json";
-import downloadData from "@/prisma/mock-data/download.json";
-import shopData from "@/prisma/mock-data/shop.json";
-import forumData from "@/prisma/mock-data/forum.json";
 import { moduleColors } from "@/config/module-colors";
 
 const all: Record<ModuleSlug, ContentItem[]> = {
-  blog: blogData as unknown as ContentItem[],
-  news: newsData as unknown as ContentItem[],
-  media: mediaData as unknown as ContentItem[],
-  review: reviewData as unknown as ContentItem[],
-  tools: toolsData as unknown as ContentItem[],
-  download: downloadData as unknown as ContentItem[],
-  shop: shopData as unknown as ContentItem[],
-  forum: forumData as unknown as ContentItem[],
+  blog: [],
+  news: [],
+  media: [],
+  review: [],
+  tools: [],
+  download: [],
+  shop: [],
+  forum: [],
   timeline: [],
 };
 

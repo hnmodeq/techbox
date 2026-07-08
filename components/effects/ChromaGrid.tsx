@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 
 export interface ChromaItem {
@@ -127,8 +128,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
               }}
             />
             <div className="relative z-10 flex-1 min-h-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={c.image} alt={c.title} loading="lazy" className="w-full h-full object-cover" />
+              <Image src={c.image} alt={c.title} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-cover" />
             </div>
             <footer className="relative z-10 p-3 text-white grid grid-cols-[1fr_auto] gap-x-3 gap-y-1">
               <h3 className="m-0 text-[1.05rem] ">{c.title}</h3>
