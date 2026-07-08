@@ -27,6 +27,7 @@ export const rateLimiters = {
   rating: createRatelimit(20, "1 m"),         // 20 ratings per minute
   upload: createRatelimit(10, "1 m"),         // 10 uploads per minute
   chat: createRatelimit(15, "1 m"),           // 15 chat messages per minute
+  views: createRatelimit(30, "1 m"),          // 30 view count increments per minute
 };
 
 export async function checkRateLimit(

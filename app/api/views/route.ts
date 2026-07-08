@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const schema = z.object({
   module: z.string().min(1),
@@ -8,6 +9,16 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(ip, "views");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد بازدیدهای ارسالی بیش از حد مجاز است." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { module, slug } = schema.parse(body);
