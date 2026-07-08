@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { hashPassword, createSession, setSessionCookie } from "@/lib/auth-server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendEmail, emailTemplates } from "@/lib/email";
 
 const registerSchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ حرف باشد"),
@@ -99,6 +100,16 @@ export async function POST(req: NextRequest) {
 
     const token = await createSession(user.id);
     await setSessionCookie(token);
+
+    // Send welcome email
+    if (user.email) {
+      const { subject, html } = emailTemplates.welcome(user.name || user.username);
+      await sendEmail({
+        to: user.email,
+        subject,
+        html,
+      });
+    }
 
     return NextResponse.json({
       ok: true,

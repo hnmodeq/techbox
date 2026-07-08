@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser, verifyPassword, hashPassword } from "@/lib/auth-server";
 import { z } from "zod";
+import { sendEmail } from "@/lib/email";
 
 const pwdSchema = z.object({
   currentPassword: z.string().min(1, "رمز عبور فعلی الزامی است"),
