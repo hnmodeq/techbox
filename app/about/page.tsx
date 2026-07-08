@@ -9,11 +9,17 @@ export const metadata = pageMetadata({ title: "درباره تکباکس | تک�
 export const revalidate = 3600;
 
 export default async function About(){
- const dbUsers = await prisma.user.findMany({
-   where: { role: { in: ["super_admin", "admin", "editor"] }, status: "active" },
-   take: 6,
-   select: { id: true, name: true, roleFa: true, role: true, avatar: true, username: true }
- });
+ let dbUsers: any[] = [];
+ 
+ try {
+   dbUsers = await prisma.user.findMany({
+     where: { role: { in: ["super_admin", "admin", "editor"] }, status: "active" },
+     take: 6,
+     select: { id: true, name: true, roleFa: true, role: true, avatar: true, username: true }
+   });
+ } catch (error) {
+   console.warn("[About Page] Database not available during prerender/build step.");
+ }
 
  const team: TeamMember[] = dbUsers.map((u: any) => ({
    name: u.name,
