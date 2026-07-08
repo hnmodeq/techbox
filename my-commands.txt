@@ -1,0 +1,8 @@
+taskkill /F /IM node.exe
+pnpm i
+pnpm exec prisma db push
+pnpm exec prisma generate
+pnpm run db:seed-blob-content -- --step=all
+pnpm run check:content
+pnpm run check:db
+pnpm run check:blob
