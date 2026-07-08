@@ -8,6 +8,7 @@ import { LikeButton } from "@/components/ui/like-button";
 import { ReviewRating } from "@/components/ui/review-rating";
 import { RatingWidget } from "@/components/ui/rating-widget";
 import CommentSection from "@/features/comment/components/CommentSection";
+import { ReviewJsonLd } from "@/components/seo/StructuredData";
 
 type ReviewDetailProps = {
   item: any;
@@ -19,6 +20,8 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
   const weaknesses = Array.isArray(item.weaknesses) ? item.weaknesses : [];
 
   return (
+    <>
+    <ReviewJsonLd item={item} />
     <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
@@ -124,5 +127,6 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         <CommentSection module="review" slug={item.slug} />
       </article>
     </main>
+    </>
   );
 }

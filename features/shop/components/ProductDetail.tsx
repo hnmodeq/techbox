@@ -8,6 +8,7 @@ import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/providers/cart.provider";
+import { ProductJsonLd } from "@/components/seo/StructuredData";
 
 type ProductItem = ContentItem & {
   brand?: string | null;
@@ -47,6 +48,8 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
   };
 
   return (
+    <>
+    <ProductJsonLd item={item} />
     <main className="mx-auto max-w-7xl px-4 py-10" dir="rtl">
       <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] paragraph-color">
         <Link href="/" className="hover:text-[var(--primary-text)]">خانه</Link>
@@ -99,5 +102,6 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
 
       <CommentSection module="shop" slug={item.slug} />
     </main>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/ui/product-gallery";
+import { ContentJsonLd } from "@/components/seo/StructuredData";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
  const meta = moduleMeta[item.module];
@@ -19,6 +20,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  const videoFileSize = (item as any).videoFileSize;
  const gallery = Array.isArray((item as any).gallery) ? (item as any).gallery : [];
  return (
+ <>
+ <ContentJsonLd item={item} />
  <article className="mx-auto max-w-3xl px-5 md:px-0 py-10" dir="rtl">
  <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-3">
  <Link href={`/${item.module}`} className={`${meta.color} hover:underline`}>{meta.titleFa}</Link>
@@ -91,5 +94,6 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <SuggestionGrid current={item} />
  <CommentSection module={item.module} slug={item.slug} />
  </article>
+ </>
  );
 }

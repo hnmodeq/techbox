@@ -7,6 +7,7 @@ import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
+import { ForumJsonLd } from "@/components/seo/StructuredData";
 
 type ForumDetailProps = {
   slug: string;
@@ -93,6 +94,8 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
   }
 
   return (
+    <>
+    <ForumJsonLd item={item} />
     <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
@@ -152,5 +155,6 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
           state). */}
       <CommentSection module="forum" slug={item.slug} />
     </main>
+    </>
   );
 }
