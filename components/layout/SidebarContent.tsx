@@ -87,6 +87,7 @@ export default function SidebarContent({
  const { count: cartCount, setOpen: setCartOpen } = useCart();
 
   const [toolsExpanded, setToolsExpanded] = useState(false);
+  const [toolsMenuPos, setToolsMenuPos] = useState<{ top: number; right: number } | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -209,6 +210,31 @@ export default function SidebarContent({
               })}
  </ul>
  <Button variant="ghost" size="xs" onClick={() => setNotifOpen(false)} className="mt-2 w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">بستن</Button>
+ </div>,
+ document.body
+ )
+ : null;
+
+ const toolsFloatingMenu = toolsExpanded && toolsMenuPos
+ ? createPortal(
+ <div
+   className="fixed w-60 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)]"
+   style={{ zIndex: zIndex.popover, top: toolsMenuPos.top, right: toolsMenuPos.right }}
+   dir="rtl"
+   onMouseEnter={() => setToolsExpanded(true)}
+   onMouseLeave={() => setToolsMenuPos(null)}
+ >
+   <div className="px-2 pb-2 text-xs font-bold text-[var(--tools)]">ابزارهای تخصصی</div>
+   {navItems.find((n) => n.children?.length)?.children?.map((child) => {
+     const ChildIcon = child.icon as any;
+     const childActive = isActive(pathname, child.href);
+     return (
+       <Link key={child.href} href={child.href} onClick={() => { setToolsMenuPos(null); onLinkClick?.(); }} className={`flex items-center gap-2.5 rounded-[var(--corner-radius)] px-3 py-2 text-xs transition-colors ${childActive ? "bg-[var(--muted-background)] font-bold text-[var(--tools)]" : "paragraph-color hover:bg-[var(--muted-background)]/50 hover:text-[var(--primary-text)]"}`}>
+         <ChildIcon size={16} className={child.iconClassName || "paragraph-color"} />
+         <span className="truncate">{child.title}</span>
+       </Link>
+     );
+   })}
  </div>,
  document.body
  )
@@ -339,8 +365,14 @@ export default function SidebarContent({
             const hoverClass = item.iconHoverClassName || item.iconActiveClassName || "group-hover:text-[var(--home)]";
 
             if (item.children && item.children.length > 0) {
+              const openFloatingChildren = (el: HTMLElement) => {
+                if (!expanded) return;
+                const rect = el.getBoundingClientRect();
+                setToolsExpanded(true);
+                setToolsMenuPos({ top: rect.top, right: window.innerWidth - rect.left + 8 });
+              };
               return (
-                <div key={item.href} className="flex flex-col" onMouseEnter={() => expanded && setToolsExpanded(true)}>
+                <div key={item.href} className="flex flex-col" onMouseEnter={(e) => openFloatingChildren(e.currentTarget)} onMouseLeave={() => setToolsMenuPos(null)}>
                   <SidebarTooltip label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
                     <div className="flex items-center">
                       <Link
@@ -366,26 +398,6 @@ export default function SidebarContent({
                       )}
                     </div>
                   </SidebarTooltip>
-
-                  {expanded && toolsExpanded && (
-                    <div className="flex flex-col gap-0.5 pr-8 pl-2 pt-1 pb-2 border-r border-[var(--border-color)] mr-5 mt-1">
-                      {item.children.map((child) => {
-                        const ChildIcon = child.icon as any;
-                        const childActive = isActive(pathname, child.href);
-                        return (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            onClick={onLinkClick}
-                            className={`flex items-center gap-2.5 py-2 px-3 rounded-[var(--corner-radius)] text-xs transition-colors ${childActive ? "bg-[var(--muted-background)] font-bold text-[var(--tools)]" : "paragraph-color hover:bg-[var(--muted-background)]/50 hover:text-[var(--primary-text)]"}`}
-                          >
-                            <ChildIcon size={16} className={child.iconClassName || "paragraph-color"} />
-                            <span className="truncate">{child.title}</span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
                 </div>
               );
             }
@@ -458,6 +470,7 @@ export default function SidebarContent({
  <ConsultationModal open={consultOpen} onClose={() => setConsultOpen(false)} />
 
  {notificationPanel}
+ {toolsFloatingMenu}
  </div>
  );
 }

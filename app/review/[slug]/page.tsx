@@ -2,11 +2,12 @@ import { getBySlug, getModuleItems } from "@/lib/content";
 import { getDbPost } from "@/lib/server-post";
 import DbReviewDetail from "@/features/review/components/DbReviewDetail";
 
+export const dynamicParams = true;
+
 type P = Promise<{ slug: string }>;
 
 export async function generateStaticParams() {
- const mod = "review" as any;
- return getModuleItems(mod).map((p) => ({ slug: p.slug }));
+ return [];
 }
 
 export default async function Page({ params }: { params: P }) {

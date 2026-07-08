@@ -2,6 +2,8 @@ import { getBySlug, getModuleItems } from "@/lib/content";
 import { getDbPost } from "@/lib/server-post";
 import DbDownloadDetail from "@/features/download/components/DbDownloadDetail";
 
+export const dynamicParams = true;
+
 type P = Promise<{slug:string}>;
 export async function generateStaticParams(){ return getModuleItems("download").map(p=>({slug:p.slug})) }
 export default async function Page({params}:{params:P}){ const {slug}=await params; const item=getBySlug("download",slug); return <DbDownloadDetail slug={slug} fallback={item} /> }

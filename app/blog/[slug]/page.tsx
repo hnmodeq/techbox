@@ -2,8 +2,10 @@ import { getBySlug, getModuleItems } from "@/lib/content";
 import { getDbPost } from "@/lib/server-post";
 import DbContentDetail from "@/features/content/components/DbContentDetail";
 
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
- return getModuleItems("blog").map(p => ({ slug: p.slug }));
+ return [];
 }
 
 export default async function BlogDetail({ params }: { params: Promise<{ slug: string }> }) {

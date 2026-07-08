@@ -8,11 +8,13 @@ export function DownloadMetaLine({
   fallbackFileName = null,
   fallbackFileSize = null,
   fallbackDownloadCount = 0,
+  showFileName = true,
 }: {
   slug: string;
   fallbackFileName?: string | null;
   fallbackFileSize?: string | null;
   fallbackDownloadCount?: number;
+  showFileName?: boolean;
 }) {
   const { entry } = useStatEntry("download", slug);
   const fileName = entry?.fileName ?? fallbackFileName;
@@ -21,7 +23,7 @@ export function DownloadMetaLine({
 
   return (
     <div className="flex flex-wrap items-center gap-3 text-xs paragraph-color font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
-      {fileName && (
+      {showFileName && fileName && (
         <span className="inline-flex min-w-0 items-center gap-1" title="نام فایل">
           <Icon name="download" size={15} className="text-[var(--download)]" />
           <span className="max-w-[180px] truncate text-[var(--primary-text)]" dir="ltr">{fileName}</span>
