@@ -1,41 +1,16 @@
-import { prisma } from '../lib/db';
-import { gregorianToJalali, formatJalaliDate } from '../lib/jalali';
-import timelineData from './mock-data/timeline.json';
+import { PrismaClient } from "@prisma/client";
 
-async function seedTimeline() {
-  console.log('شروع بذرپاشی Timeline با داده‌های تخصصی دیتاسنتر');
+const prisma = new PrismaClient();
 
-  for (const event of timelineData as any[]) {
-    const dateGr = new Date(event.dateGr);
-    const jalali = gregorianToJalali(dateGr);
-    const dateFa = formatJalaliDate(jalali.year, jalali.month, jalali.day);
-    const year = dateGr.getFullYear();
-    const yearFa = jalali.year;
-
-    try {
-      await prisma.timelineEvent.upsert({
-        where: { dateGr },
-        update: {},
-        create: {
-          title: event.title,
-          description: event.description,
-          image: event.image,
-          dateGr,
-          dateFa,
-          year,
-          yearFa,
-          importance: event.importance,
-          tags: JSON.stringify(event.tags),
-          published: true,
-        },
-      });
-      console.log(`Created: ${event.title}`);
-    } catch (error) {
-      console.error(`Error creating ${event.title}:`, error);
-    }
-  }
-
-  console.log('Timeline seed completed');
+async function main() {
+  console.log("Timeline seed script disabled: mock data removed.");
 }
 
-export { seedTimeline };
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
