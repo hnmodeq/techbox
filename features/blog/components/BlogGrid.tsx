@@ -1,15 +1,18 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems } from "@/lib/content";
+import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
 
-export default function BlogGrid(){
+export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("blog");
-  const { items } = useDbPosts("blog", fallbackItems, 100);
+  const { items: dbItems } = useDbPosts("blog", fallbackItems, 100);
+
+  // Prefer server-fetched items when available
+  const items = serverItems && serverItems.length > 0 ? serverItems : dbItems;
   return (
     <main className="mx-auto max-w-7xl px-4 md:px-8 py-14" dir="rtl">
       <ModuleHeader module="blog" title="مجله تکباکس" description={`مقالات تخصصی زیرساخت • ${items.length.toLocaleString("fa-IR")} مطلب`} />

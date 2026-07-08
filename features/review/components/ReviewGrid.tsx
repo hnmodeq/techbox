@@ -2,16 +2,18 @@
 
 import Image from "next/image";
 import { blurProps } from "@/lib/image-placeholder";
-import { getModuleItems } from "@/lib/content";
+import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 import { ReviewRating } from "@/components/ui/review-rating";
 
-export default function ReviewGrid() {
+export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("review");
-  const { items } = useDbPosts("review", fallbackItems, 100);
+  const { items: dbItems } = useDbPosts("review", fallbackItems, 100);
+
+  const items = serverItems && serverItems.length > 0 ? serverItems : dbItems;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-12" dir="rtl">

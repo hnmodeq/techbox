@@ -1,4 +1,12 @@
 import { modulePageMetadata } from "@/lib/seo";
 import ForumList from "@/features/forum/components/ForumList";
-export const metadata = modulePageMetadata("forum", "انجمن پرسش و پاسخ تخصصی تکباکس برای مسائل شبکه، زیرساخت، بکاپ، امنیت و سرور.");
-export default function ForumPage(){ return <ForumList />; }
+import { getDbModulePosts } from "@/lib/server-posts";
+
+export const metadata = modulePageMetadata("forum", "انجمن گفتگوی فنی تکباکس — پرسش و پاسخ، تجربیات و راه‌حل‌ها.");
+
+export const revalidate = 60;
+
+export default async function ForumPage() {
+  const dbItems = await getDbModulePosts("forum", 80);
+  return <ForumList serverItems={dbItems.length > 0 ? dbItems : undefined} />;
+}
