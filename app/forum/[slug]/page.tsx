@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: P }) {
     const target = await getSlugRedirect("forum", slug);
     if (target) redirect(`/${target.targetModule}/${target.targetSlug}`);
   }
-  return <ForumDetail slug={slug} initialItem={null} />;
+  return <ForumDetail slug={slug} initialItem={dbItem} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {
