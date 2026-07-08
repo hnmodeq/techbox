@@ -22,31 +22,58 @@ function safeJsonArray(value: string | null | undefined): string[] {
   }
 }
 
-function safeJsonObject(value: string | null | undefined): Record<string, unknown> {
-  if (!value) return {};
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
+const cardSelect = {
+  id: true,
+  slug: true,
+  module: true,
+  title: true,
+  excerpt: true,
+  image: true,
+  videoUrl: true,
+  videoDuration: true,
+  videoMimeType: true,
+  videoFileSize: true,
+  gallery: true,
+  tags: true,
+  date: true,
+  dateFa: true,
+  likes: true,
+  views: true,
+  rating: true,
+  ratingCount: true,
+  solved: true,
+  fileName: true,
+  fileSize: true,
+  downloadCount: true,
+  category: true,
+  brand: true,
+  model: true,
+  priceLabel: true,
+  availability: true,
+  authorName: true,
+  author: { select: { name: true, username: true, role: true, roleFa: true, avatar: true } },
+} as const;
+
+function firstGalleryImage(value: string | null | undefined) {
+  return safeJsonArray(value).slice(0, 3);
 }
 
-function normalizePost(p: any) {
+function normalizeCard(p: any) {
   return {
     id: p.id,
     slug: p.slug,
     module: p.module,
     title: p.title,
     excerpt: p.excerpt,
-    content: p.content,
     image: p.image,
     videoUrl: p.videoUrl,
     videoDuration: p.videoDuration,
     videoMimeType: p.videoMimeType,
     videoFileSize: p.videoFileSize,
-    gallery: safeJsonArray(p.gallery),
-    tags: safeJsonArray(p.tags),
+    // Keep a tiny gallery preview only; full gallery is loaded on detail page.
+    gallery: firstGalleryImage(p.gallery),
+    // Keep tags for ticker/suggestions/search entry points but not heavy fields.
+    tags: safeJsonArray(p.tags).slice(0, 8),
     date: p.date.toISOString(),
     date_fa: p.dateFa || new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(p.date),
     dateFa: p.dateFa,
@@ -56,20 +83,14 @@ function normalizePost(p: any) {
     ratingCount: p.ratingCount || 0,
     solved: p.solved ?? false,
     fileName: p.fileName,
-    fileUrl: p.fileUrl,
     fileSize: p.fileSize,
     downloadCount: p.downloadCount || 0,
-    published: p.published,
+    published: true,
     category: p.category,
-    seoTitle: p.seoTitle,
-    seoDescription: p.seoDescription,
     brand: p.brand,
     model: p.model,
-    sku: p.sku,
     priceLabel: p.priceLabel,
     availability: p.availability,
-    warranty: p.warranty,
-    specs: safeJsonObject(p.specs),
     author: {
       name: p.author?.name || p.authorName || "کاربر تکباکس",
       username: p.author?.username || "",
@@ -84,11 +105,9 @@ async function findPosts(module: string, take: number) {
     where: { module, published: true },
     orderBy: { date: "desc" },
     take,
-    include: {
-      author: { select: { name: true, username: true, role: true, roleFa: true, avatar: true } },
-    },
+    select: cardSelect,
   });
-  return posts.map(normalizePost);
+  return posts.map(normalizeCard);
 }
 
 export async function GET() {
@@ -107,14 +126,12 @@ export async function GET() {
       },
       orderBy: { date: "desc" },
       take: 30,
-      include: {
-        author: { select: { name: true, username: true, role: true, roleFa: true, avatar: true } },
-      },
+      select: cardSelect,
     });
 
     return NextResponse.json({
       modules,
-      ticker: tickerPosts.map(normalizePost),
+      ticker: tickerPosts.map(normalizeCard),
       generatedAt: new Date().toISOString(),
     }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
   } catch (e: any) {
