@@ -18,7 +18,7 @@ export async function getDbPost(module: ModuleSlug, slug: string) {
       where: { module_slug: { module, slug } },
       include: { author: { select: { name: true, role: true, roleFa: true, avatar: true, username: true } } },
     });
-    if (!p || !p.published) return null;
+    if (!p || !p.published || p.deletedAt !== null) return null;
     return {
       id: p.id,
       slug: p.slug,
