@@ -15,7 +15,7 @@ import { useStats } from "@/providers/stats.provider";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { solved?: boolean };
 
-export default function ForumList() {
+export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   const { stats } = useStats();
 
   const fallbackItems = getModuleItems("forum").map((t) => ({
@@ -23,7 +23,15 @@ export default function ForumList() {
     avatar: t.author?.avatar || "/assets/hooman.png",
   })) as (ForumPost & { avatar: string })[];
 
-  const [dbItems, setDbItems] = useState<(ForumPost & { avatar: string })[] | null>(null);
+  // If serverItems provided, use them directly
+  const [dbItems, setDbItems] = useState<(ForumPost & { avatar: string })[] | null>(
+    serverItems && serverItems.length > 0
+      ? (serverItems.map((t) => ({
+          ...t,
+          avatar: t.author?.avatar || "/assets/hooman.png",
+        })) as any)
+      : null
+  );
   const [loadingTopics, setLoadingTopics] = useState(true);
   const [topicsError, setTopicsError] = useState(false);
   const [showNew, setShowNew] = useState(false);

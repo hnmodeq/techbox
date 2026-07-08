@@ -1,14 +1,16 @@
 "use client";
-import { getModuleItems } from "@/lib/content";
+import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 
-export default function DownloadTable() {
+export default function DownloadTable({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("download");
-  const { items } = useDbPosts("download", fallbackItems, 100);
+  const { items: dbItems } = useDbPosts("download", fallbackItems, 100);
+
+  const items = serverItems && serverItems.length > 0 ? serverItems : dbItems;
   const brands = Array.from(new Set(items.flatMap((i) => i.tags.filter((t) => ["dell", "hp", "qnap", "ubuntu", "mikrotik"].includes(t.toLowerCase())))));
   const types = Array.from(new Set(items.map((i) => i.category).filter(Boolean))) as string[];
 

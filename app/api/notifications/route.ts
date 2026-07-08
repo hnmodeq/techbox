@@ -15,12 +15,12 @@ async function buildNotifications() {
     orderBy: { createdAt: "desc" },
     where: { userId: { not: null } },
   });
-  const likeUsers = await prisma.user.findMany({ where: { id: { in: likes.map(l => l.userId!).filter(Boolean) } }, select: { id: true, name: true, username: true, avatar: true } });
-  const userMap = new Map(likeUsers.map(u => [u.id, u]));
+  const likeUsers = await prisma.user.findMany({ where: { id: { in: likes.map((l: any) => l.userId!).filter(Boolean) } }, select: { id: true, name: true, username: true, avatar: true } });
+  const userMap = new Map(likeUsers.map((u: any) => [u.id, u]));
   const likePosts = likes.length
-    ? await prisma.post.findMany({ where: { OR: likes.map(l => ({ module: l.module, slug: l.slug })) }, select: { module: true, slug: true, title: true } })
+    ? await prisma.post.findMany({ where: { OR: likes.map((l: any) => ({ module: l.module, slug: l.slug })) }, select: { module: true, slug: true, title: true } })
     : [];
-  const postMap = new Map(likePosts.map(p => [`${p.module}:${p.slug}`, p]));
+  const postMap = new Map(likePosts.map((p: any) => [`${p.module}:${p.slug}`, p]));
 
   return [
     ...comments.map(c => ({

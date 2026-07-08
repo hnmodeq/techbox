@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       prisma.slugRedirect.findMany({ orderBy: { createdAt: "desc" } }),
     ]);
 
-    const postIssues = posts.map((post) => {
+    const postIssues = posts.map((post: any) => {
       const issues: string[] = [];
       const gallery = safeJsonArray(post.gallery);
       if (!post.title?.trim()) issues.push("missing_title");
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    const userIssues = users.map((u) => ({
+    const userIssues = users.map((u: any) => ({
       id: u.id,
       username: u.username,
       name: u.name,
@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     let urlStatuses: Array<UrlStatus & { module?: string; slug?: string; title?: string }> = [];
     if (checkUrls) {
       const targets: Array<{ field: string; url: string; module?: string; slug?: string; title?: string }> = [];
-      for (const post of posts) {
+      for (const post of posts as any[]) {
         for (const field of URL_FIELDS) {
           const url = post[field];
           if (isHttpUrl(url)) targets.push({ field, url: url!, module: post.module, slug: post.slug, title: post.title });
@@ -99,8 +99,8 @@ export async function GET(req: NextRequest) {
         posts: posts.length,
         users: users.length,
         redirects: redirects.length,
-        postsWithIssues: postIssues.filter((p) => p.issues.length).length,
-        usersWithIssues: userIssues.filter((u) => u.issues.length).length,
+         postsWithIssues: postIssues.filter((p: any) => p.issues.length).length,
+         usersWithIssues: userIssues.filter((u: any) => u.issues.length).length,
         checkedUrls: urlStatuses.length,
         brokenUrls: brokenUrls.length,
       },
