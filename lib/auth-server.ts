@@ -17,9 +17,6 @@ export async function createSession(userId: string){
     .sign(secret);
 }
 
-const gUsers = globalThis as unknown as { __local_users__?: Record<string, any> };
-if (!gUsers.__local_users__) gUsers.__local_users__ = {};
-
 export async function getSessionUser(){
   const c = await cookies();
   const h = await headers();
@@ -38,45 +35,19 @@ export async function getSessionUser(){
   }
   if (!sub) return null;
 
-  let user: any = null;
   try {
-    user = await prisma.user.findUnique({ where: { id: sub }});
-  } catch {}
-  if (!user) {
-    if (gUsers.__local_users__ && gUsers.__local_users__[sub]) {
-      user = gUsers.__local_users__[sub];
-    } else {
-      try {
-        const mockUsers = require("@/prisma/mock-data/users.json");
-        const found = mockUsers.find((u: any) => u.id === sub || u.username === sub);
-        if (found) {
-          user = {
-            ...found,
-            modules: JSON.stringify(found.modules || [])
-          };
-        }
-      } catch {}
-    }
+    const user = await prisma.user.findUnique({ where: { id: sub }});
+    if (user) return user;
+  } catch (err) {
+    console.error("[auth-server] Failed to fetch session user:", err);
   }
-  if (!user && (sub.startsWith("local_") || sub.startsWith("u"))) {
-    user = {
-      id: sub,
-      name: "کاربر تکباکس",
-      username: sub.replace("local_", "user_"),
-      email: "user@techbox.ir",
-      role: "user",
-      roleFa: "کاربر عضو",
-      modules: "[]",
-      avatar: ""
-    };
-    if (gUsers.__local_users__) gUsers.__local_users__[sub] = user;
-  }
-  return user;
+  
+  return null;
 }
 
 export async function setSessionCookie(token: string){
   const c = await cookies();
-  c.set(COOKIE, token, { httpOnly: true, sameSite: "lax", secure: false, path: "/", maxAge: 60*60*24*30 });
+  c.set(COOKIE, token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60*60*24*30 });
 }
 export async function clearSession(){
   const c = await cookies();

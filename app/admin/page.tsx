@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { getCurrentUserClient, logout, type AppUser, canEdit, allUsers } from "@/lib/auth";
+import { getCurrentUserClient, logout, type AppUser, canEdit } from "@/lib/auth";
 import { getModuleItems, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -65,10 +65,6 @@ export default function AdminPage() {
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">ورود ادمین</h1>
  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">برای مدیریت محتوا ابتدا وارد شوید.</p>
  <ButtonLink href="/admin/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
- <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/50 p-3 text-right text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- <b className="text-[var(--primary-text)]">کاربران تست:</b><br/>
- {allUsers.slice(0, 6).map(u => <span key={u.id} className="block"><code>{u.username}</code> – {u.name}</span>)}
- </div>
  </div>
  </main>
  );
@@ -162,23 +158,7 @@ export default function AdminPage() {
  <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5">
  <div className="mb-3 flex items-center justify-between gap-3">
  <h3 className="">مدیریت کاربران (مدیر کل)</h3>
- <Badge variant="info">{allUsers.length.toLocaleString("fa-IR")} کاربر</Badge>
- </div>
- <div className="grid gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] sm:grid-cols-2">
- {allUsers.map(u => (
- <div key={u.id} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/50 p-3">
- <div className="flex flex-wrap items-center justify-between gap-2">
- <div>
- <div className=" text-[var(--primary-text)]">{u.name}</div>
- <div className="mt-0.5 font-mono text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">@{u.username} • {u.email}</div>
- </div>
- <ModuleBadge module={u.role === "super_admin" ? "vip" : "info"}>{u.role === "super_admin" ? "مدیر کل" : "ویراستار"}</ModuleBadge>
- </div>
- <div className="mt-2 flex flex-wrap gap-1">
- {u.modules.map(m => <ModuleBadge key={m} module={m as ModuleSlug}>{moduleMeta[m as ModuleSlug]?.titleFa || m}</ModuleBadge>)}
- </div>
- </div>
- ))}
+ <ButtonLink href="/admin/users" variant="outline" size="sm">ورود به صفحه کاربران</ButtonLink>
  </div>
  </div>
  )}

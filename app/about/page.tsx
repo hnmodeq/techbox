@@ -1,13 +1,27 @@
 import { pageMetadata } from "@/lib/seo";
-import users from "@/prisma/mock-data/users.json";
+import { prisma } from "@/lib/db";
 import { ButtonLink } from "@/components/ui/button";
 import TeamChromaSection, { type TeamMember } from "@/features/home/components/TeamChromaSection";
 import PageHeader from "@/components/effects/PageHeader";
 
 export const metadata = pageMetadata({ title: "درباره تکباکس | تکباکس", description: "درباره ماموریت تکباکس، رسانه تخصصی فناوری اطلاعات و زیرساخت.", path: "/about" });
 
-export default function About(){
- const team = (users as TeamMember[]).slice(0,6);
+export const revalidate = 3600;
+
+export default async function About(){
+ const dbUsers = await prisma.user.findMany({
+   where: { role: { in: ["super_admin", "admin", "editor"] }, status: "active" },
+   take: 6,
+   select: { id: true, name: true, roleFa: true, role: true, avatar: true, username: true }
+ });
+
+ const team: TeamMember[] = dbUsers.map((u: any) => ({
+   name: u.name,
+   roleFa: u.roleFa || u.role,
+   avatar: u.avatar || "",
+   username: u.username
+ }));
+
  return (
  <main className="max-w-6xl mx-auto px-4 py-14" dir="rtl">
  <PageHeader
