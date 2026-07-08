@@ -38,7 +38,7 @@ function SearchInner() {
 
     setLoading(true);
     setError("");
-    fetch(`/api/search?q=${encodeURIComponent(q)}&module=${encodeURIComponent(moduleFilter)}&take=60`, { cache: "no-store" })
+    fetch(`/api/search?q=${encodeURIComponent(q)}&module=${encodeURIComponent(moduleFilter)}&take=60`)
       .then((r) => {
         if (!r.ok) throw new Error("search_failed");
         return r.json();

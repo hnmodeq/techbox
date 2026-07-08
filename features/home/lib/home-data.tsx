@@ -21,7 +21,7 @@ export function HomeDataProvider({ children }: { children: ReactNode }) {
     let mounted = true;
     setLoading(true);
     setError("");
-    fetch("/api/home", { cache: "no-store" })
+    fetch("/api/home")
       .then((r) => {
         if (!r.ok) throw new Error("home_data_unavailable");
         return r.json();

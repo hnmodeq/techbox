@@ -29,7 +29,7 @@ export function useDbPosts(module: ModuleSlug, _fallback: ContentItem[] = [], ta
     let mounted = true;
     setLoading(true);
     setError("");
-    fetch(`/api/posts?module=${encodeURIComponent(module)}&take=${take}`, { cache: "no-store" })
+    fetch(`/api/posts?module=${encodeURIComponent(module)}&take=${take}`)
       .then((r) => { if (!r.ok) throw new Error("posts_unavailable"); return r.json(); })
       .then((data) => {
         if (!mounted) return;
@@ -58,7 +58,7 @@ export function useDbPost(module: ModuleSlug, slug: string, _fallback: ContentIt
     let mounted = true;
     setLoading(true);
     setError("");
-    fetch(`/api/posts?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+    fetch(`/api/posts?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`)
       .then((r) => { if (!r.ok) throw new Error("post_unavailable"); return r.json(); })
       .then((data) => {
         if (!mounted) return;
