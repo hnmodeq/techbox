@@ -9,9 +9,10 @@ import { blurProps } from "@/lib/image-placeholder";
 import { Icon } from '@/design/icons';
 import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
+import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function MagazineRow() {
-  const { items: dbArticles } = useHomeModule('blog');
+  const { items: dbArticles, loading } = useHomeModule('blog');
   const articles = dbArticles.slice(0, 5);
 
   return (
@@ -26,7 +27,11 @@ export default function MagazineRow() {
           </Link>
         </div>
 
-        {/* Expanded grid showing items edge-to-edge */}
+        {loading ? (
+          <RowGridSkeleton count={5} />
+        ) : articles.length === 0 ? (
+          <EmptyRow>هنوز مقاله‌ای در دیتابیس ثبت نشده است.</EmptyRow>
+        ) : (
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {articles.map((art) => (
             <div
@@ -65,6 +70,7 @@ export default function MagazineRow() {
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

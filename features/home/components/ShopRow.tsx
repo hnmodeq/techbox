@@ -7,9 +7,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
+import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function ShopRow() {
-  const { items: dbProducts } = useHomeModule('shop');
+  const { items: dbProducts, loading } = useHomeModule('shop');
   const products = dbProducts.slice(0, 5);
 
   return (
@@ -24,8 +25,13 @@ export default function ShopRow() {
           </Link>
         </div>
 
+        {loading ? (
+          <RowGridSkeleton count={5} imageRatio="aspect-[4/3]" />
+        ) : products.length === 0 ? (
+          <EmptyRow>هنوز محصولی در دیتابیس ثبت نشده است.</EmptyRow>
+        ) : (
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {products.map((prod, idx) => (
+          {products.map((prod) => (
             <Link
               key={prod.slug}
               href={`/shop/${prod.slug}`}
@@ -66,6 +72,7 @@ export default function ShopRow() {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

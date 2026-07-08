@@ -9,9 +9,10 @@ import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
 import { ReviewRating } from '@/components/ui/review-rating';
+import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function ReviewRow() {
-  const { items: dbReviews } = useHomeModule('review');
+  const { items: dbReviews, loading } = useHomeModule('review');
   const reviews = dbReviews.slice(0, 5);
 
   return (
@@ -26,6 +27,11 @@ export default function ReviewRow() {
           </Link>
         </div>
 
+        {loading ? (
+          <RowGridSkeleton count={5} />
+        ) : reviews.length === 0 ? (
+          <EmptyRow>هنوز نقد و بررسی‌ای در دیتابیس ثبت نشده است.</EmptyRow>
+        ) : (
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {reviews.map((rev) => (
               <div
@@ -65,6 +71,7 @@ export default function ReviewRow() {
               </div>
             ))}
         </div>
+        )}
       </div>
     </section>
   );

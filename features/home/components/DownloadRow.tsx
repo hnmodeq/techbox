@@ -5,9 +5,10 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { DownloadMetaLine } from '@/components/ui/download-meta';
 import { DownloadAction } from '@/components/ui/download-action';
+import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function DownloadRow() {
-  const { items: dbFiles } = useHomeModule('download');
+  const { items: dbFiles, loading } = useHomeModule('download');
   const files = dbFiles.slice(0, 8);
 
   const getFileType = (title: string, category?: string, fileName?: string | null) => {
@@ -32,6 +33,11 @@ export default function DownloadRow() {
           </Link>
         </div>
 
+        {loading ? (
+          <RowGridSkeleton count={8} imageRatio="aspect-[5/2]" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" />
+        ) : files.length === 0 ? (
+          <EmptyRow>هنوز فایلی در دیتابیس ثبت نشده است.</EmptyRow>
+        ) : (
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {files.map((file) => {
             const fileType = getFileType(file.title, file.category, file.fileName ?? null);
@@ -72,6 +78,7 @@ export default function DownloadRow() {
             );
           })}
         </div>
+        )}
       </div>
     </section>
   );

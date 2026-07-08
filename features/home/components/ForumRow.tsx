@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { ForumBadge } from '@/components/ui/forum-badge';
+import { EmptyRow } from './HomeRowSkeletons';
 
 function ForumCardSkeleton() {
   return (
@@ -41,9 +42,7 @@ export default function ForumRow() {
           {loading ? (
             Array.from({ length: 6 }).map((_, index) => <ForumCardSkeleton key={index} />)
           ) : topics.length === 0 ? (
-            <div className="col-span-full rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-6 text-center paragraph-color">
-              هنوز موضوعی در دیتابیس انجمن ثبت نشده است.
-            </div>
+            <div className="col-span-full"><EmptyRow>هنوز موضوعی در دیتابیس انجمن ثبت نشده است.</EmptyRow></div>
           ) : (
             topics.map((top) => (
               <Link

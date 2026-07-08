@@ -11,9 +11,10 @@ import { LikeButton } from '@/components/ui/like-button';
 import CommentSection from '@/features/comment/components/CommentSection';
 import { zIndex } from '@/design';
 import { Icon } from '@/design/icons';
+import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function VideoReelsRow() {
-  const { items: dbVideos } = useHomeModule('media');
+  const { items: dbVideos, loading } = useHomeModule('media');
   const videos = dbVideos.slice(0, 5);
   const [active, setActive] = useState<any | null>(null);
 
@@ -24,6 +25,11 @@ export default function VideoReelsRow() {
           <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">ریلزها و ویدیوهای کوتاه زیرساخت</h2>
           <Link href="/media" className="text-sm font-bold text-[var(--media)] hover:underline flex items-center gap-1 shrink-0"><span>مشاهده همه ویدیوها</span><span>←</span></Link>
         </div>
+        {loading ? (
+          <RowGridSkeleton count={5} imageRatio="aspect-[9/16]" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5" />
+        ) : videos.length === 0 ? (
+          <EmptyRow>هنوز ویدیویی در دیتابیس ثبت نشده است.</EmptyRow>
+        ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {videos.map((vid) => (
             <button type="button" key={vid.slug} onClick={() => setActive(vid)} className="group relative w-full aspect-[9/16] rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] hover:shadow-[var(--shadow-size)] transition-all duration-[200ms] bg-[var(--card-background)] flex flex-col justify-end text-right cursor-pointer">
@@ -35,6 +41,7 @@ export default function VideoReelsRow() {
             </button>
           ))}
         </div>
+        )}
       </div>
       {active && (
         <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">

@@ -22,7 +22,7 @@ export default function NewsSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const { items: dbNews } = useHomeModule('news');
+  const { items: dbNews, loading } = useHomeModule('news');
   const newsItems = dbNews.slice(0, 15);
 
   useEffect(() => {
@@ -118,7 +118,15 @@ export default function NewsSidebar() {
 
         {/* Scrollable News List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          {newsItems.map((n) => (
+          {loading && Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="space-y-3 px-2 sm:px-3">
+              <div className="aspect-[3/1] animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+              <div className="h-4 w-3/4 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+              <div className="h-3 w-full animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+            </div>
+          ))}
+          {!loading && newsItems.length === 0 && <div className="paragraph-color text-center py-6">خبری در دیتابیس ثبت نشده است.</div>}
+          {!loading && newsItems.map((n) => (
             <Link
               key={n.slug}
               href={`/news/${n.slug}`}
