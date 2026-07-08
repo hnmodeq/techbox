@@ -27,15 +27,30 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const postModule = searchParams.get("module") || undefined;
   const slug = searchParams.get("slug") || undefined;
-  const take = Math.min(parseInt(searchParams.get("take") || "50", 10), 100);
+  const take = Math.min(parseInt(searchParams.get("take") || "50", 10), 200);
+  const includeAllPublishedStates = searchParams.get("published") === "all" || searchParams.get("admin") === "1";
 
   try {
+    let where: any = {
+      ...(includeAllPublishedStates ? {} : { published: true }),
+      ...(postModule ? { module: postModule } : {}),
+      ...(slug ? { slug } : {}),
+    };
+
+    if (includeAllPublishedStates) {
+      const user = await getSessionUser();
+      if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      if (postModule) {
+        if (!canEditModule(user as any, postModule)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+      } else if (user.role !== "super_admin") {
+        let modules: string[] = [];
+        try { modules = JSON.parse((user as any).modules || "[]"); } catch {}
+        where = { ...where, module: { in: modules } };
+      }
+    }
+
     const posts = await prisma.post.findMany({
-      where: {
-        published: true,
-        ...(postModule ? { module: postModule } : {}),
-        ...(slug ? { slug } : {}),
-      },
+      where,
       orderBy: { date: "desc" },
       take: slug ? 1 : take,
       select: {
@@ -63,6 +78,7 @@ export async function GET(req: NextRequest) {
         fileUrl: true,
         fileSize: true,
         downloadCount: true,
+        published: true,
         category: true,
         seoTitle: true,
         seoDescription: true,
@@ -77,6 +93,7 @@ export async function GET(req: NextRequest) {
         author: {
           select: {
             name: true,
+            username: true,
             role: true,
             roleFa: true,
             avatar: true,
@@ -111,6 +128,7 @@ export async function GET(req: NextRequest) {
       fileUrl: p.fileUrl,
       fileSize: p.fileSize,
       downloadCount: p.downloadCount || 0,
+      published: p.published,
       category: p.category,
       seoTitle: p.seoTitle,
       seoDescription: p.seoDescription,
@@ -123,6 +141,7 @@ export async function GET(req: NextRequest) {
       specs: safeJsonObject(p.specs),
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
+        username: p.author?.username || "",
         role: p.author?.roleFa || p.author?.role || "عضو انجمن",
         avatar: p.author?.avatar || "/assets/hooman.png",
       },
@@ -163,6 +182,7 @@ const createSchema = z.object({
   fileUrl: z.string().optional(),
   fileSize: z.string().optional(),
   downloadCount: z.number().int().min(0).optional(),
+  published: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -180,6 +200,7 @@ export async function POST(req: NextRequest) {
       specs: JSON.stringify(data.specs || {}),
       authorId: user.id,
       authorName: user.name,
+      published: data.published ?? true,
     };
 
     const post = await prisma.post.upsert({
@@ -194,6 +215,41 @@ export async function POST(req: NextRequest) {
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400 });
   }
+}
+
+
+export async function PATCH(req: NextRequest) {
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const body = await req.json();
+  const moduleKey = String(body.module || "");
+  const slug = String(body.slug || "");
+  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400 });
+  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+
+  const data: any = {};
+  if (typeof body.published === "boolean") data.published = body.published;
+  if (typeof body.solved === "boolean") data.solved = body.solved;
+  if (!Object.keys(data).length) return NextResponse.json({ error: "nothing_to_update" }, { status: 400 });
+
+  const updated = await prisma.post.update({ where: { module_slug: { module: moduleKey, slug } }, data });
+  return NextResponse.json(updated);
+}
+
+export async function DELETE(req: NextRequest) {
+  const user = await getSessionUser();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const { searchParams } = new URL(req.url);
+  const moduleKey = searchParams.get("module") || "";
+  const slug = searchParams.get("slug") || "";
+  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400 });
+  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+
+  const post = await prisma.post.findUnique({ where: { module_slug: { module: moduleKey, slug } }, select: { id: true } });
+  if (!post) return NextResponse.json({ ok: true });
+  await prisma.like.deleteMany({ where: { module: moduleKey, slug } });
+  await prisma.post.delete({ where: { id: post.id } });
+  return NextResponse.json({ ok: true });
 }
 
 export const dynamic = "force-dynamic";

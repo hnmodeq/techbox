@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { getCurrentUserClient } from "@/lib/auth";
 import { ModuleBadge } from "@/components/ui/module-badge";
@@ -81,6 +82,7 @@ function NewPostInner() {
  const [tags, setTags] = useState("");
  const [content, setContent] = useState("");
  const [image, setImage] = useState("");
+ const [published, setPublished] = useState(true);
  const [videoUrl, setVideoUrl] = useState("");
  const [videoDuration, setVideoDuration] = useState("");
  const [videoMimeType, setVideoMimeType] = useState("");
@@ -123,6 +125,7 @@ function NewPostInner() {
    setTags((it.tags || []).join(", "));
    setContent(it.content || "");
    setImage(it.image || "");
+   setPublished(typeof it.published === "boolean" ? it.published : true);
    setVideoUrl(it.videoUrl || "");
    setVideoDuration(it.videoDuration || "");
    setVideoMimeType(it.videoMimeType || "");
@@ -166,6 +169,7 @@ function NewPostInner() {
  excerpt: excerpt.trim(),
  content: content.trim(),
  image: image.trim() || undefined,
+ published,
  videoUrl: videoUrl.trim() || undefined,
  videoDuration: videoDuration.trim() || undefined,
  videoMimeType: videoMimeType.trim() || undefined,
@@ -343,6 +347,11 @@ function NewPostInner() {
  <textarea value={content} onChange={e=>setContent(e.target.value)} className="input mt-1 min-h-[260px]" placeholder="متن کامل / HTML / Markdown…" />
  </div>
 
+ <label className="flex items-center gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] p-3 text-sm paragraph-color">
+ <input type="checkbox" checked={published} onChange={(e)=>setPublished(e.target.checked)} />
+ <span>{published ? "انتشار عمومی" : "ذخیره به‌عنوان پیش‌نویس"}</span>
+ </label>
+
  <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
  <div className={`text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${statusClass}`}>
  {msg || "POST → /api/posts – RBAC server-side؛ در خطا، پیش‌نویس لوکال ذخیره می‌شود."}
@@ -350,7 +359,7 @@ function NewPostInner() {
  </div>
  <div className="flex gap-2">
  <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">انصراف</ButtonLink>
- <Button size="xs" disabled={saving || !title.trim()} type="submit">{saving ? "در حال ذخیره…" : (editSlug ? "ذخیره تغییرات" : "انتشار در تکباکس")}</Button>
+ <Button size="xs" disabled={saving || !title.trim()} type="submit">{saving ? "در حال ذخیره…" : (editSlug ? "ذخیره تغییرات" : (published ? "انتشار در تکباکس" : "ذخیره پیش‌نویس"))}</Button>
  </div>
  </div>
  </form>
@@ -368,6 +377,15 @@ function NewPostInner() {
  <div className="mt-3 flex flex-wrap gap-1">
  {parsedTags.slice(0, 8).map(t => <span key={t} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{t}</span>)}
  {parsedTags.length > 8 && <ModuleBadge module="info">+{(parsedTags.length-8).toLocaleString("fa-IR")}</ModuleBadge>}
+ </div>
+ </div>
+
+ <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden">
+ {image && <div className="relative aspect-[16/9] bg-[var(--muted-background)]"><Image src={image} alt="preview" fill sizes="300px" className="object-cover" /></div>}
+ <div className="p-4 space-y-2">
+ <div className="flex flex-wrap gap-2"><ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>{published ? <ModuleBadge module="success">منتشر می‌شود</ModuleBadge> : <ModuleBadge module="warning">پیش‌نویس</ModuleBadge>}</div>
+ <h3 className="font-black text-[var(--primary-text)] line-clamp-2">{title || "عنوان مطلب"}</h3>
+ <p className="paragraph-color text-xs line-clamp-3">{excerpt || "خلاصه مطلب اینجا دیده می‌شود."}</p>
  </div>
  </div>
 
