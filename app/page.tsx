@@ -10,7 +10,9 @@ import DownloadRow from '@/features/home/components/DownloadRow';
 import HomeTimelineRow from '@/features/home/components/HomeTimelineRow';
 import LandingStats from '@/features/home/components/LandingStats';
 import TrustSection from '@/features/home/components/TrustSection';
+import RecommendationRow from '@/features/home/components/RecommendationRow';
 import { HomeDataProvider } from '@/features/home/lib/home-data';
+import { getHomepageRecommendations } from '@/lib/recommendations';
 
 export default function Page() {
   return (
@@ -48,6 +50,12 @@ export default function Page() {
 
       {/* NEW: Trust / Social Proof Section (Step 12) */}
       <TrustSection />
+
+      {/* NEW: Recommendation Engine (Step 14) */}
+      <RecommendationRow 
+        items={getHomepageRecommendations(8)} 
+        title="پیشنهادهای هوشمند برای شما" 
+      />
 
     </main>
     </HomeDataProvider>
