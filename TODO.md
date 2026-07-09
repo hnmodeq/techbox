@@ -1,30 +1,52 @@
-# TechBox — Stability / Polish / Professionalism To-Do
+# TechBox — Hard-code cleanup + polish roadmap
 
-Goal: professional, stable, catchy site (Vercel/GitHub/Neon level). No hard-codes, no fake data, everything dynamic & alive, latest deps. The 3 GitHub "deployment checks" = **Lint → Typecheck → Build** (`.github/workflows/ci.yml` job `quality-build-smoke`). Push to `main` with clear commit messages. Build/verify at phase checkpoints.
+Goal: eliminate ALL fake/hard-coded data, put everything in its correct
+folder, and reach Vercel/GitHub/Neon-level professionalism. No rush; verify
+with Lint/Typecheck/Build at the end of each phase.
 
-- [x] 1. Wire real auth state — `AuthProvider` fetches `/api/auth/me`, typed context, drives avatar & guarded actions (kill dead `value={null}`).
-- [x] 2. Fix duplicate provider composition — single source of truth; one `Chatbot` + one `AuthModal`.
-- [x] 3. Add Playwright smoke test asserting zero console errors on `/`, `/blog`, `/forum/[slug]`, `/news` (+ detail & not-found pages).
-- [x] 4. CI split into 3 genuine required checks (Lint / Typecheck / Build) in `.github/workflows/ci.yml`; optional DB checks kept separate & non-blocking; no `|| echo` masking.
-- [x] 5. Critical CSS — remove the no-op self-referential rule; inject *real* above-the-fold styles or delete the file.
-- [x] 6. `HomeDataProvider` pattern — server HTML is initial state, client only enhances (uniform across all rows; no null→content jump).
-- [x] 7. Service worker — stop caching navigations/`/`; cache only static assets (or remove SW; keep PWA via manifest).
-- [x] 8. Theme flash QA — verify inline script + `next-themes` config produce no FOUC on slow devices.
-- [x] 9. Fonts — Kalameh `preload:false` (no 9 blocking preloads, `display:swap` keeps text visible); Vazirmatn fallback slimmed to weights 300–700.
-- [x] 10. Images — remove `priority` from the 48px mobile FAB logo (LCP waste).
-- [x] 11. Bundle — code-split the heavy gsap-driven `ChromaGrid` via `next/dynamic` (below the fold); `motion` retained (Dock uses `motion/react`), `framer-motion` retained.
-- [x] 12. Single source of truth for modules — `config/modules.config.ts` is canonical; `lib/content.ts` derives `moduleMeta` from it (kill 3-way duplication).
-- [x] 13. Empty `lib/content.ts` static arrays kept as documented DB fallbacks (return empty, never fake data); unit test rewritten to assert the single-source-of-truth invariant.
-- [x] 14. Type `AuthProvider`; unify permission helper (`canEdit` vs `canEditModule`) into one.
-- [x] 15. Real `README.md` — setup, env vars, architecture, "how to add a module".
-- [x] 16. Delete `docker-compose.yml.bak`.
-- [x] 17. Remove duplicate `data`/`data:legacy` & `tree`/`tree:legacy` scripts.
-- [x] 18. `contact` form wired to a real `/api/contact` endpoint (zod-validated, rate-limited, emails via Resend); `about` stays dynamic.
-- [x] 19. Remove duplicate `AuthProvider`/second `Chatbot` instance (folds into #2).
+## 🔴 Phase A — Kill fake data (HARD-CODE CLEANUP)
 
-## Phases / checkpoints (build + lint + typecheck verified at each ★)
-- Phase 0: env + baseline (install, baseline lint/typecheck/build).
-- Phase 1 ★: #16, #17 (safe deletions) → #5, #10 (quick perf) → #7 (SW).
-- Phase 2 ★: #2, #19, #14, #1 (auth/providers) → #6 (home data) → #8 (theme).
-- Phase 3 ★: #12, #13 (module consolidation) → #11 (bundle) → #9 (fonts).
-- Phase 4 ★: #3 (smoke test) → #15 (README) → #18 (contact) → #4 (CI tightening).
+### A1. Work-with-us → real DB feature (centerpiece)
+- [x] Add `Job` + `JobApplication` models to `prisma/schema.prisma` (Job: slug,title,type,remote,team,excerpt,description,active,order; JobApplication: name,email,phone,resumeUrl,resumeName,message,status).
+- [x] `prisma generate` + `prisma db push` (creates tables on Neon).
+- [x] API: `GET /api/jobs` (active list), `GET /api/jobs/[slug]`, `POST /api/jobs/[slug]/apply` (multipart → CV to Vercel Blob via `@vercel/blob`, zod-validated, rate-limited, stores JobApplication).
+- [x] Public pages read from DB (server components): `app/work-with-us/page.tsx` + `app/work-with-us/[slug]/page.tsx`.
+- [x] Apply form → real POST (no `alert()`), uploads CV to Blob, shows success.
+- [x] Admin: `app/admin/jobs` (list + create/edit/delete + view applications with CV download). Gate with `canEditModule(user,'workwithus')` (or super_admin).
+- [x] Seed the existing 7 jobs from `jobs.json` into the DB as real records (then delete `prisma/mock-data/jobs.json`).
+
+### A2. Tools — out of the "mock" folder, not content
+- [x] Remove `prisma/mock-data/tools.json`; `lib/tools.ts` uses `toolRoutes` from `config/modules.config` directly (drop fake likes/views/author).
+- [x] Move `nas-products.json` + `nvr-products.json` out of `prisma/mock-data/` → `data/tools/` (legitimate reference catalogs, not mock).
+- [x] `lib/nas.ts` / `lib/nvr.ts`: import from `data/tools/...`; drop the `shop.json` mock merge (self-contained product data).
+- [x] Delete `prisma/mock-data/shop.json` if unused elsewhere.
+- [x] Confirm tools are never treated as `Post` content anywhere.
+
+### A3. Mention autocomplete — real users, not mock
+- [x] Add `GET /api/users/mentions?q=` (public, returns id/username/name/avatar of active users, no email).
+- [x] `hooks/useMentionAutocomplete.ts`: fetch from that endpoint instead of hardcoded `mockUsers`.
+
+### A4. Chat demo fallback
+- [x] Review `app/api/chat/route.ts` demo mode — keep as graceful offline fallback only (already `mock:true`); ensure it's never shown as real content.
+
+## 🟠 Phase B — High-value polish
+- [x] `app/not-found.tsx` (branded 404) + `app/error.tsx` (branded error) matching module theme.
+- [x] Sync `.env.example` with all real env vars (RESEND, CHAT, UPSTASH, SENTRY, CONTACT_EMAIL, Zarinpal, BLOB).
+- [x] Wire `pnpm test:e2e` into CI as a separate, non-blocking job (needs `playwright install chromium`).
+
+## 🟡 Phase C — Medium
+- [x] Accessibility: `prefers-reduced-motion` guards on heavy effects (ChromaGrid/Dock); visible focus-ring audit; skip-link.
+- [x] Per-detail-page SEO: ensure `StructuredData` (JSON-LD) is mounted on blog/news/media/review/forum/download/shop detail routes.
+- [x] Contact: optionally persist submissions to DB (so none are lost if email unconfigured).
+
+## 🟢 Phase D — Nice-to-have
+- [x] `app/api/healthz` route for uptime monitoring.
+- [x] Bump dependency majors (Next 16.2.10) — Prisma 7 and ESLint 10 deferred due to breaking changes/plugin incompatibilities.
+- [ ] Sentry custom Web-Vital/perf alerts.
+
+---
+## Previous phases (done & pushed)
+- Phase 1 (7e01f94): cleanup, SW, FAB image.
+- Phase 2 (680bbdc): real AuthProvider/useAuth, SSR homepage, theme.
+- Phase 3 (b163fc0): module single-source-of-truth, font + bundle opt.
+- Phase 4 (2d5c41a): 3-job CI, contact endpoint, smoke test, README, deps.

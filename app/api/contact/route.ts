@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendEmail } from "@/lib/email";
+import { prisma } from "@/lib/db";
+import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,11 +19,11 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
-  const rate = await checkRateLimit(ip, "comments");
+  const rate = await checkRateLimit(ip, "contact");
   if (!rate.success) {
     return NextResponse.json(
-      { error: "too_many_requests", message: "تعداد درخواست‌ها بیش از حد مجاز است." },
-      { status: 429 }
+      { error: "too_many_requests", message: "تعداد درخواست‌ها بیش از حد مجاز است. لطفاً ساعتی دیگر تلاش کنید." },
+      { status: 429, headers: cacheHeaders(PRIVATE_NO_STORE) }
     );
   }
 
@@ -42,25 +44,34 @@ export async function POST(req: NextRequest) {
 
   const { name, email, subject, message } = parsed.data;
 
-  const html = `
-    <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color:#111;">پیام جدید از فرم ارتباط با ما</h2>
-      <p><strong>نام:</strong> ${name}</p>
-      <p><strong>ایمیل:</strong> ${email}</p>
-      <p><strong>موضوع:</strong> ${subject}</p>
-      <blockquote style="border-left:4px solid #ddd; padding-left:16px; color:#555; white-space:pre-wrap;">${message}</blockquote>
-    </div>`;
+  try {
+    // 1. Persist to DB first so we never lose the message
+    await prisma.contactSubmission.create({
+      data: { name, email, subject, message },
+    });
 
-  const result = await sendEmail({
-    to: CONTACT_TO,
-    subject: `تماس تکباکس: ${subject}`,
-    html,
-  });
+    // 2. Attempt to send email
+    const html = `
+      <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl; text-align: right;">
+        <h2 style="color:#111;">پیام جدید از فرم ارتباط با ما</h2>
+        <p><strong>نام:</strong> ${name}</p>
+        <p><strong>ایمیل:</strong> ${email}</p>
+        <p><strong>موضوع:</strong> ${subject}</p>
+        <blockquote style="border-right:4px solid #ddd; padding-right:16px; color:#555; white-space:pre-wrap; direction: rtl;">${message}</blockquote>
+      </div>`;
 
-  // Even if email delivery is not configured in this environment, we treat the
-  // submission as accepted (the message was validated) rather than faking data.
-  return NextResponse.json({
-    ok: true,
-    delivered: result.success,
-  });
+    const result = await sendEmail({
+      to: CONTACT_TO,
+      subject: `تماس تکباکس: ${subject}`,
+      html,
+    });
+
+    return NextResponse.json({
+      ok: true,
+      delivered: result.success,
+    }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error: any) {
+    console.error("Contact submission error:", error);
+    return NextResponse.json({ error: "internal_error", message: "خطایی در ثبت پیام رخ داد." }, { status: 500 });
+  }
 }

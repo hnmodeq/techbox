@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 
 interface UserSuggestion {
   id: string;
@@ -14,32 +14,27 @@ export function useMentionAutocomplete() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
   const [cursorPosition, setCursorPosition] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // In a real app, this would fetch from /api/users/search
-  // For now we use a small static list + current user
   const fetchSuggestions = async (query: string) => {
-    if (!query) {
+    if (!query || query.length < 2) {
       setSuggestions([]);
       return;
     }
 
-    // Mock suggestions (in production: fetch from API)
-    const mockUsers: UserSuggestion[] = [
-      { id: "1", username: "hoomanmodeq", name: "هومن مدق" },
-      { id: "2", username: "atiyehatami", name: "عطیه حاتمی" },
-      { id: "3", username: "behnazghaderi", name: "بهناز قادری" },
-      { id: "4", username: "farazfeizi", name: "فراز فیضی" },
-      { id: "5", username: "nastarankhodakarami", name: "نسترن خداکارمی" },
-    ];
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
-    const filtered = mockUsers
-      .filter(u => 
-        u.username.toLowerCase().includes(query.toLowerCase()) ||
-        u.name.includes(query)
-      )
-      .slice(0, 6);
-
-    setSuggestions(filtered);
+    timeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/users/mentions?q=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Mention search failed:", err);
+      }
+    }, 300);
   };
 
   const insertMention = (
@@ -50,7 +45,6 @@ export function useMentionAutocomplete() {
     const before = value.substring(0, cursorPosition);
     const after = value.substring(cursorPosition);
 
-    // Find the @ position
     const atIndex = before.lastIndexOf("@");
     if (atIndex === -1) return;
 
@@ -62,7 +56,6 @@ export function useMentionAutocomplete() {
     textarea.value = newValue;
     textarea.focus();
 
-    // Set cursor after the mention
     const newCursorPos = atIndex + username.length + 2;
     textarea.setSelectionRange(newCursorPos, newCursorPos);
 

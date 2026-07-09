@@ -1,5 +1,4 @@
 import { toolRoutes } from "@/config/modules.config";
-import toolsJson from "@/prisma/mock-data/tools.json";
 
 export type ToolMeta = {
   slug: string;
@@ -14,9 +13,7 @@ export type ToolMeta = {
 };
 
 export function getTools(): ToolMeta[] {
-  // merge config + json – json wins for editorial fields
-  const jsonMap = new Map((toolsJson as any[]).map(t => [t.slug, t]));
-  return toolRoutes.map(r => ({ ...r, ...(jsonMap.get(r.slug) || {}) })) as ToolMeta[];
+  return [...toolRoutes] as ToolMeta[];
 }
 
 export function getTool(slug: string) {

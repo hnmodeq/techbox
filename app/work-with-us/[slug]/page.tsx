@@ -1,52 +1,82 @@
-"use client";
-import jobs from "@/prisma/mock-data/jobs.json";
+import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { use } from "react";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import ApplyForm from "@/features/work-with-us/components/ApplyForm";
+import { pageMetadata } from "@/lib/seo";
+import { Metadata } from "next";
 
-export default function JobPage({ params }: { params: Promise<{slug:string}> }){
- const { slug } = use(params);
- const job = (jobs as any[]).find((j:any)=>j.slug===slug);
- if(!job) return <div className="p-10 text-center">یافت نشد</div>;
-
- return (
- <main className="max-w-3xl mx-auto px-4 py-12" dir="rtl">
- <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mb-2"><Link href="/work-with-us" className="hover:text-foreground">فرصت‌های شغلی</Link> / {job.title}</div>
- <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{job.title}</h1>
- <div className="flex flex-wrap gap-2 mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
- <Badge variant="brand">{job.type}</Badge>
- <Badge variant="secondary">{job.remote}</Badge>
- <Badge variant="outline">{job.team}</Badge>
- <span className="text-muted-foreground">{job.date_fa}</span>
- </div>
- <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] mt-6 p-5 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
- {job.description}
- <ul className="pr-5 mt-4 space-y-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" style={{listStyle:"disc"}}>
- <li>رزومه + نمونه کار</li>
- <li>مصاحبه فنی آنلاین</li>
- <li>شروع همکاری: مرداد ۱۴۰۵</li>
- </ul>
- </div>
-
- <form className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 mt-6 space-y-3" onSubmit={(e)=>{e.preventDefault(); alert("درخواست شما ثبت شد – تیم منابع انسانی تکباکس بررسی می‌کند.");}}>
- <h3 className="">ارسال درخواست</h3>
- <div className="grid sm:grid-cols-2 gap-3">
- <input className="input text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" placeholder="نام و نام خانوادگی *" required />
- <input className="input text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" placeholder="ایمیل *" type="email" required dir="ltr" />
- <input className="input text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" placeholder="تلفن" dir="ltr" />
- <input className="input text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" placeholder="لینک رزومه / لینکدین" dir="ltr" />
- </div>
- <textarea className="input min-h-[120px] text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold" placeholder="کمی درباره خودتان و چرا تکباکس…" />
- <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">آپلود CV (PDF)
- <input type="file" accept=".pdf,.doc,.docx" className="block mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
- </label>
- <div className="flex justify-end gap-2">
- <ButtonLink href="/work-with-us" variant="ghost">بازگشت</ButtonLink>
- <Button type="submit">ارسال درخواست</Button>
- </div>
- <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">با استفاده از اطلاعات پروفایل شما پر می‌شود – می‌توانید در <Link href="/account" className="text-[var(--home)] underline">حساب کاربری</Link> تکمیل کنید.</p>
- </form>
- </main>
- );
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = await params;
+  const job = await prisma.job.findUnique({ where: { slug, active: true } });
+  
+  if (!job) return pageMetadata({ title: "شغل یافت نشد", path: "/work-with-us" });
+  
+  return pageMetadata({ 
+    title: `${job.title} | تکباکس`, 
+    description: job.excerpt,
+    path: `/work-with-us/${job.slug}`
+  });
 }
+
+export default async function JobPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const job = await prisma.job.findUnique({
+    where: { slug, active: true },
+  });
+
+  if (!job) {
+    notFound();
+  }
+
+  const dateFa = new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(job.createdAt);
+
+  return (
+    <main className="max-w-3xl mx-auto px-4 py-12" dir="rtl">
+      <div className="text-sm text-muted-foreground mb-4">
+        <Link href="/work-with-us" className="hover:text-[var(--home)] transition-colors">
+          فرصت‌های شغلی
+        </Link>{" "}
+        / {job.title}
+      </div>
+
+      <h1 className="text-4xl font-extrabold text-[var(--h1-font-color)] mb-4">
+        {job.title}
+      </h1>
+
+      <div className="flex flex-wrap gap-2 mb-8">
+        <Badge variant="brand">{job.type}</Badge>
+        <Badge variant="secondary">{job.remote ? "دورکاری" : "حضوری"}</Badge>
+        <Badge variant="outline">{job.team}</Badge>
+        <span className="text-muted-foreground text-sm self-center mr-auto">
+          تاریخ انتشار: {dateFa}
+        </span>
+      </div>
+
+      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 md:p-8 mb-8">
+        <div 
+          className="prose prose-invert max-w-none text-lg leading-relaxed whitespace-pre-wrap"
+          style={{ color: 'var(--paragraph-color)' }}
+        >
+          {job.description}
+        </div>
+        
+        <div className="mt-8 pt-6 border-t border-[var(--border-color)]">
+          <h4 className="font-bold mb-4">مزایا و پیش‌نیازهای عمومی:</h4>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground list-disc pr-5">
+            <li>بیمه و مزایای کامل</li>
+            <li>محیط کاری پویا و حرفه‌ای</li>
+            <li>امکان رشد و ارتقای شغلی</li>
+            <li>دسترسی به آخرین تکنولوژی‌ها</li>
+            <li>ساعات کاری منعطف</li>
+            <li>پاداش عملکرد و هدایای مناسبتی</li>
+          </ul>
+        </div>
+      </div>
+
+      <ApplyForm jobSlug={job.slug} />
+    </main>
+  );
+}
+
+export const dynamic = "force-dynamic";

@@ -208,3 +208,27 @@ export function ForumJsonLd({ item }: { item: any }) {
     </>
   );
 }
+
+export function DownloadJsonLd({ item }: { item: any }) {
+  const base = siteUrl();
+  const url = `${base}/download/${item.slug}`;
+  return (
+    <>
+      <JsonLd
+        data={cleanObject({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: item.title,
+          description: item.excerpt,
+          applicationCategory: "InfrastructureSoftware",
+          operatingSystem: "Any",
+          downloadUrl: absoluteUrl(item.fileUrl),
+          fileSize: item.fileSize,
+          publisher: { "@type": "Organization", name: "TechBox" },
+          url,
+        })}
+      />
+      <BreadcrumbJsonLd items={[{ name: "خانه", url: "/" }, { name: "دانلود", url: "/download" }, { name: item.title, url: `/download/${item.slug}` }]} />
+    </>
+  );
+}

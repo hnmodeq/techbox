@@ -4,11 +4,14 @@ import Link from "next/link";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { DownloadMetaLine } from "@/components/ui/download-meta";
 import { DownloadAction } from "@/components/ui/download-action";
+import { DownloadJsonLd } from "@/components/seo/StructuredData";
 
 export default function DownloadDetail({ item }: { item: ContentItem }){
  const versions = Array.isArray((item as any).versions) ? (item as any).versions : [];
 
  return (
+ <>
+ <DownloadJsonLd item={item} />
  <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">
  <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground mb-2">
  <Link href="/download" className="hover:text-foreground">دانلود</Link> / <span className="text-[var(--download)]">{item.category}</span>
@@ -46,5 +49,6 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  {item.content}
  </div>
  </main>
+ </>
  );
 }

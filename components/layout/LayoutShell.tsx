@@ -26,9 +26,15 @@ export function LayoutShell({
           <StatsProvider>
             <HomeDataProvider initialData={homeData}>
               <div className="relative min-h-screen text-foreground overflow-x-hidden w-full max-w-full">
+                <a
+                  href="#main-content"
+                  className="sr-only focus:not-sr-only focus:absolute focus:z-[999] focus:p-4 focus:bg-[var(--home)] focus:text-white focus:rounded-b-lg focus:left-4"
+                >
+                  پرش به محتوای اصلی
+                </a>
                 <div className="relative z-10 flex min-h-screen w-full max-w-full">
                   <SidebarMain />
-                  <main className="min-w-0 flex-1 flex flex-col overflow-x-hidden max-w-full">
+                  <main id="main-content" className="min-w-0 flex-1 flex flex-col overflow-x-hidden max-w-full">
                     <div className="flex-1 w-full">{children}</div>
                     <FooterSection />
                   </main>

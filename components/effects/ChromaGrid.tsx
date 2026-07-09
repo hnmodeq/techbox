@@ -3,6 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export interface ChromaItem {
  image: string;
@@ -34,6 +35,7 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
  fadeOut = 0.6,
  ease = "power3.out",
 }) => {
+ const reducedMotion = useReducedMotion();
  const rootRef = useRef<HTMLDivElement>(null);
  const fadeRef = useRef<HTMLDivElement>(null);
  const setX = useRef<SetterFn | null>(null);
@@ -54,6 +56,11 @@ const ChromaGrid: React.FC<ChromaGridProps> = ({
  }, []);
 
  const moveTo = (x: number, y: number) => {
+ if (reducedMotion) {
+   setX.current?.(x);
+   setY.current?.(y);
+   return;
+ }
  gsap.to(pos.current, {
  x,
  y,

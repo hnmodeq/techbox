@@ -10,6 +10,7 @@ import {
  AnimatePresence,
 } from "motion/react";
 import React, { Children, cloneElement, useEffect, useMemo, useRef, useState } from "react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export type DockItemData = {
  icon: React.ReactNode;
@@ -60,10 +61,12 @@ function DockItem({
  orientation,
  active,
 }: DockItemProps) {
+ const reducedMotion = useReducedMotion();
  const ref = useRef<HTMLDivElement>(null);
  const isHovered = useMotionValue(0);
 
  const mouseDistance = useTransform(mousePos, (val) => {
+   if (reducedMotion) return 0;
  const rect = ref.current?.getBoundingClientRect() ?? { x: 0, y: 0, width: baseItemSize, height: baseItemSize };
  return orientation === "vertical"
  ? val - rect.y - baseItemSize / 2

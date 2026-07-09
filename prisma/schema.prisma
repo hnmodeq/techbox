@@ -296,3 +296,51 @@ model PasswordResetToken {
   @@index([token])
   @@index([expiresAt])
 }
+
+model Job {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  type        String
+  remote      Boolean  @default(false)
+  team        String
+  excerpt     String
+  description String   @db.Text
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  applications JobApplication[]
+
+  @@index([active, order])
+}
+
+model JobApplication {
+  id         String   @id @default(cuid())
+  jobId      String
+  name       String
+  email      String
+  phone      String
+  resumeUrl  String
+  resumeName String
+  message    String?  @db.Text
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([status])
+}
+
+model ContactSubmission {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String?
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

@@ -28,6 +28,8 @@ export const rateLimiters = {
   upload: createRatelimit(10, "1 m"),         // 10 uploads per minute
   chat: createRatelimit(15, "1 m"),           // 15 chat messages per minute
   views: createRatelimit(30, "1 m"),          // 30 view count increments per minute
+  jobs: createRatelimit(3, "1 h"),            // 3 job applications per hour
+  contact: createRatelimit(3, "1 h"),         // 3 contact submissions per hour
 };
 
 export async function checkRateLimit(

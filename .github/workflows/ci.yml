@@ -122,3 +122,28 @@ jobs:
       - name: Skip DB checks when DATABASE_URL is not configured
         if: ${{ env.DATABASE_URL == '' }}
         run: echo "DATABASE_URL secret is not configured; skipping optional DB/content checks."
+
+  test-e2e:
+    name: E2E Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: build
+    if: ${{ needs.build.result == 'success' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.12.1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run E2E Tests
+        run: pnpm test:smoke
