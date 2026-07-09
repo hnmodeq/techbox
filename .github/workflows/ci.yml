@@ -11,11 +11,62 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality-build-smoke:
-    name: Quality, build, smoke tests
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm run lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+  build:
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
+    env:
+      NEXT_PUBLIC_SITE_URL: https://hnmodeq-techbox.vercel.app
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,25 +86,17 @@ jobs:
         run: pnpm install
 
       - name: Generate Prisma Client
-        run: npx prisma generate || echo "Skipping Prisma generation on CI due to network"
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Typecheck
-        run: pnpm run typecheck
+        run: npx prisma generate
 
       - name: Build
-        env:
-          NEXT_PUBLIC_SITE_URL: https://hnmodeq-techbox.vercel.app
-        run: pnpm run build || echo "Build skipped/mocked due to missing Neon DB in GitHub Actions environment"
+        run: pnpm run build
 
   optional-db-checks:
     name: Optional DB/content checks
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: quality-build-smoke
-
+    needs: build
+    if: ${{ needs.build.result == 'success' }}
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BLOB_CHECK_LIMIT: 200

@@ -64,6 +64,38 @@ test.describe('public smoke tests', () => {
     await expectHealthyPage(page, '/admin/login', /ورود|ادمین|تکباکس/);
   });
 
+  test('content detail pages render without errors', async ({ page, request }) => {
+    // Prefer a real slug from the live API so the test exercises the actual
+    // detail route; fall back to a plausible slug if the API is unavailable.
+    let forumSlug = 'welcome';
+    let blogSlug = 'hello-world';
+    try {
+      const res = await request.get('/api/posts?module=forum&take=1');
+      if (res.ok()) {
+        const items = await res.json();
+        if (Array.isArray(items) && items[0]?.slug) forumSlug = items[0].slug;
+      }
+      const blogRes = await request.get('/api/posts?module=blog&take=1');
+      if (blogRes.ok()) {
+        const items = await blogRes.json();
+        if (Array.isArray(items) && items[0]?.slug) blogSlug = items[0].slug;
+      }
+    } catch {
+      // ignore — use fallbacks
+    }
+    await expectHealthyPage(page, `/forum/${forumSlug}`);
+    await expectHealthyPage(page, `/blog/${blogSlug}`);
+  });
+
+  test('unknown route shows the not-found UI without crashing', async ({ page }) => {
+    const errors = await collectFatalConsole(page);
+    const response = await page.goto('/this-route-does-not-exist-xyz', { waitUntil: 'domcontentloaded' });
+    expect(response?.status()).toBe(404);
+    await expect(page.locator('body')).toBeVisible();
+    await page.waitForTimeout(800);
+    expect(errors, 'fatal browser errors on not-found page').toEqual([]);
+  });
+
   test('robots.txt and sitemap.xml are reachable', async ({ request }) => {
     const robots = await request.get('/robots.txt');
     expect(robots.status()).toBeLessThan(400);
