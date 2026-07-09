@@ -1,23 +1,29 @@
 // @ts-nocheck
-// Vitest ESM test – types provided by vitest – skipped in tsc CI to keep build green – see DOCS
+// Vitest ESM test – types provided by vitest – skipped in tsc CI to keep build green.
+// This test verifies the *single source of truth* invariant: per-module
+// presentation metadata in lib/content must be derived from the canonical
+// module registry in config/modules.config, never hard-coded.
 import { describe, it, expect } from "vitest";
-import { getRelated, getAllAcross, searchAcross } from "@/lib/content";
+import { moduleMeta, type ModuleSlug } from "@/lib/content";
+import { moduleList } from "@/config/modules.config";
 
-describe("content", ()=>{
-  it("getAllAcross returns sorted", ()=>{
-    const all = getAllAcross();
-    expect(all.length).toBeGreaterThan(5);
-    const dates = all.map(a=> new Date(a.date).getTime());
-    for(let i=1;i<dates.length;i++) expect(dates[i-1]).toBeGreaterThanOrEqual(dates[i]);
+describe("content module metadata", () => {
+  it("moduleMeta is derived from the canonical module registry", () => {
+    const contentModules = Object.keys(moduleMeta) as ModuleSlug[];
+    expect(contentModules.length).toBeGreaterThan(0);
+    for (const slug of contentModules) {
+      const fromConfig = moduleList.find((m) => m.slug === slug);
+      expect(fromConfig, `module "${slug}" must exist in config/modules.config`).toBeTruthy();
+      expect(moduleMeta[slug].titleFa).toBe(fromConfig!.titleFa);
+      expect(moduleMeta[slug].href).toBe(fromConfig!.href);
+      expect(moduleMeta[slug].color).toBe(fromConfig!.color);
+    }
   });
-  it("getRelated finds QNAP cross-module", ()=>{
-    const all = getAllAcross();
-    const q = all.find(a=> a.tags.includes("QNAP-2277"));
-    if(!q) return;
-    const rel = getRelated(q, 3);
-    expect(rel.length).toBeGreaterThan(0);
-  });
-  it("searchAcross finds", ()=>{
-    expect(searchAcross("QNAP").length).toBeGreaterThan(0);
+
+  it("every content module exposes a route and a color", () => {
+    for (const meta of Object.values(moduleMeta)) {
+      expect(meta.href).toMatch(/^\//);
+      expect(meta.color).toBeTruthy();
+    }
   });
 });

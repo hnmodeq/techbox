@@ -1,6 +1,9 @@
 import localFont from "next/font/local";
 
-// Full Kalameh font family with all 9 weights for perfect typography
+// Kalameh is the primary Persian font. We intentionally do NOT preload every
+// weight: with 9 weights, preloading would issue 9 blocking requests on first
+// paint. Instead we rely on `display: "swap"` (no invisible text) and let the
+// browser fetch only the weights actually used in rendered text.
 export const kalameh = localFont({
   src: [
     { path: "../public/fonts/KalamehWebFaNum-Thin.woff2", weight: "100", style: "normal" },
@@ -17,5 +20,5 @@ export const kalameh = localFont({
   display: "swap",
   fallback: ["Vazirmatn", "system-ui", "Tahoma", "sans-serif"],
   adjustFontFallback: false,
-  preload: true,
+  preload: false,
 });

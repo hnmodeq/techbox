@@ -48,7 +48,7 @@ export type ContentItem = {
   versions?: Array<Record<string, unknown>>;
 };
 
-import { moduleColors } from "@/config/module-colors";
+import { moduleMap } from "@/config/modules.config";
 
 const all: Record<ModuleSlug, ContentItem[]> = {
   blog: [],
@@ -61,6 +61,17 @@ const all: Record<ModuleSlug, ContentItem[]> = {
   forum: [],
   timeline: [],
 };
+
+// Single source of truth for per-module presentation metadata. Derived from
+// config/modules.config.ts (the canonical module registry) so there is exactly
+// one place to define a module's title/color/route — not three.
+const CONTENT_MODULE_SLUGS = Object.keys(all) as ModuleSlug[];
+
+// The canonical content modules are the 9 module tiles defined in
+// config/modules.config.ts. Derive presentation metadata from there.
+const contentModuleDefs = Object.values(moduleMap).filter((m) =>
+  CONTENT_MODULE_SLUGS.includes(m.slug as ModuleSlug)
+);
 
 export function getModuleItems(module: ModuleSlug): ContentItem[] {
   return [...(all[module] || [])].sort((a, b) => +new Date(b.date) - +new Date(a.date));
@@ -124,14 +135,12 @@ export function getCommentCount(_module: string, _slug: string): number {
   return 0;
 }
 
-export const moduleMeta: Record<ModuleSlug, { title: string; titleFa: string; color: string; href: string }> = {
-  blog: { title: "blog", titleFa: "مجله", color: moduleColors.blog.active, href: "/blog" },
-  news: { title: "news", titleFa: "اخبار", color: moduleColors.news.active, href: "/news" },
-  media: { title: "media", titleFa: "رسانه", color: moduleColors.media.active, href: "/media" },
-  review: { title: "review", titleFa: "نقد و بررسی", color: moduleColors.review.active, href: "/review" },
-  tools: { title: "tools", titleFa: "ابزارها", color: moduleColors.tools.active, href: "/tools" },
-  download: { title: "download", titleFa: "دانلود", color: moduleColors.download.active, href: "/download" },
-  shop: { title: "shop", titleFa: "فروشگاه", color: moduleColors.shop.active, href: "/shop" },
-  forum: { title: "forum", titleFa: "انجمن", color: moduleColors.forum.active, href: "/forum" },
-  timeline: { title: "timeline", titleFa: "تایم‌لاین فناوری", color: moduleColors.timeline.active, href: "/timeline" },
-};
+export const moduleMeta: Record<
+  ModuleSlug,
+  { title: string; titleFa: string; color: string; href: string }
+> = Object.fromEntries(
+  contentModuleDefs.map((m) => [
+    m.slug,
+    { title: m.title, titleFa: m.titleFa, color: m.color, href: m.href },
+  ])
+) as Record<ModuleSlug, { title: string; titleFa: string; color: string; href: string }>;
