@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useRef, useState } from "react";
 import SidebarContent from "@/components/layout/SidebarContent";
 import { sidebarBase } from "@/config/sidebar.config";
@@ -103,16 +102,7 @@ export default function SidebarShell({
      className="fixed right-0 select-none rounded-l-full sm:hidden transition-all duration-[300ms] shadow-[var(--shadow-size)] cursor-pointer"
      aria-label="باز کردن منو"
    >
-     <div className="relative flex h-16 w-16 items-center justify-center rounded-l-full border-[length:var(--border-size)] border-r-0 border-[var(--border-color)] bg-[var(--card-background)]/95 bg-[url('/logo.png')] bg-[length:48px_48px] bg-center bg-no-repeat shadow-[var(--shadow-size)] backdrop-blur-md p-2">
-       <Image
-         src="/logo.png"
-         alt="لوگو تکباکس"
-         width={48}
-         height={48}
-         priority
-         className="object-contain"
-       />
-     </div>
+     <div className="relative flex h-16 w-16 items-center justify-center rounded-l-full border-[length:var(--border-size)] border-r-0 border-[var(--border-color)] bg-[var(--card-background)]/95 bg-[url('/logo.png')] bg-[length:48px_48px] bg-center bg-no-repeat shadow-[var(--shadow-size)] backdrop-blur-md" />
    </button>
  )}
 
