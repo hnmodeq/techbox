@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { defaultSeo, siteUrl } from "@/lib/seo";
+import { getHomeData } from "@/lib/home-server";
+import type { HomeData } from "@/features/home/lib/home-data";
 import * as Sentry from "@sentry/nextjs";
 
 // Critical inline styles (inlined for performance)
@@ -105,9 +107,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  let homeData: HomeData | undefined;
+  try {
+    homeData = await getHomeData();
+  } catch {
+    homeData = undefined;
+  }
   return (
     <html
       lang="fa"
@@ -122,7 +130,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased text-foreground">
         <ScrollRestoration />
-        <LayoutShell>{children}</LayoutShell>
+        <LayoutShell homeData={homeData}>{children}</LayoutShell>
         <Analytics />
         <SpeedInsights />
         {process.env.NODE_ENV === "production" ? (

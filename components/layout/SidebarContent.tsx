@@ -10,7 +10,7 @@ import { navItems, linkBase, linkInactive, isActive } from "@/config/sidebar.con
 import { SidebarContentProps, NavItem } from "@/types/sidebar.types";
 import SidebarTooltip from "@/components/layout/SidebarTooltip";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getCurrentUserClient, type AppUser } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
 import { useCart } from "@/providers/cart.provider";
 import { getAllAcross, moduleMeta, type ModuleSlug } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
@@ -73,9 +73,9 @@ export default function SidebarContent({
  const router = useRouter();
  const notifButtonRef = useRef<HTMLButtonElement | null>(null);
  const [notifPos, setNotifPos] = useState<AnchorRect | null>(null);
- const [mounted, setMounted] = useState(false);
- const [user, setUser] = useState<AppUser | null>(null);
- const [q, setQ] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
+  const [q, setQ] = useState("");
  const [now, setNow] = useState<Date | null>(null);
  const [notifOpen, setNotifOpen] = useState(false);
  const [notifications, setNotifications] = useState<any[]>([]);
@@ -91,30 +91,9 @@ export default function SidebarContent({
 
   useEffect(() => {
     setMounted(true);
- fetch("/api/auth/me")
-   .then((r) => r.json())
-   .then((d) => {
-     if (d?.user) setUser(d.user);
-     else setUser(getCurrentUserClient());
-   })
-   .catch(() => setUser(getCurrentUserClient()));
  setNow(new Date());
  const t = setInterval(() => setNow(new Date()), 1000);
  return () => clearInterval(t);
- }, []);
-
- useEffect(() => {
- const h = () => setUser(getCurrentUserClient());
- const onCustomAuth = (e: any) => {
-   if (e.detail) setUser(e.detail);
-   else fetch("/api/auth/me").then(r=>r.json()).then(d=>setUser(d?.user||null)).catch(()=>{});
- };
- window.addEventListener("storage", h);
- window.addEventListener("tb_auth_changed", onCustomAuth);
- return () => {
-   window.removeEventListener("storage", h);
-   window.removeEventListener("tb_auth_changed", onCustomAuth);
- };
  }, []);
 
  useEffect(() => {

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/design/icons";
+import { useAuth } from "@/providers/auth.provider";
 
 export function AuthModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +14,7 @@ export function AuthModal() {
   const [errorMsg, setErrorMsg] = useState("");
   const [forgotOpen, setForgotOpen] = useState(false);
   const router = useRouter();
+  const { login } = useAuth();
 
   useEffect(() => {
     const handleOpen = () => {
@@ -42,6 +44,7 @@ export function AuthModal() {
 
       if (loginRes.ok && loginData.ok) {
         setIsOpen(false);
+        login(loginData.user);
         window.dispatchEvent(new CustomEvent("tb_auth_changed", { detail: loginData.user }));
         router.refresh();
         return;
@@ -74,6 +77,7 @@ export function AuthModal() {
 
         if (regRes.ok && regData.ok) {
           setIsOpen(false);
+          login(regData.user);
           window.dispatchEvent(new CustomEvent("tb_auth_changed", { detail: regData.user }));
           router.refresh();
           return;
