@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import ChromaGrid, { type ChromaItem } from "@/components/effects/ChromaGrid";
+import dynamic from "next/dynamic";
+import type { ChromaItem } from "@/components/effects/ChromaGrid";
+
+// Code-split the heavy gsap-driven grid (below the fold) so it doesn't bloat
+// the initial homepage JavaScript bundle.
+const ChromaGrid = dynamic(
+  () => import("@/components/effects/ChromaGrid").then((m) => m.default),
+  { ssr: true, loading: () => <div className="min-h-[480px]" aria-hidden /> }
+);
 
 export type TeamMember = {
   name: string;
