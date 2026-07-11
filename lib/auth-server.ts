@@ -3,12 +3,18 @@ import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "./db";
 import bcrypt from "bcryptjs";
 
+function isDeployedEnv() {
+  return process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL_ENV);
+}
+
 function getAuthSecret(): Uint8Array {
   const envSecret = process.env.AUTH_SECRET;
 
-  // In production/preview: AUTH_SECRET must be set and at least 32 chars
-  const isDeployed = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV;
-  if (isDeployed) {
+  // In production/preview: AUTH_SECRET must be set and at least 32 chars.
+  // Keep this check lazy so importing auth helpers during `next build` does not
+  // fail while Next is collecting route/page metadata. Runtime auth operations
+  // still fail closed when the secret is missing or weak.
+  if (isDeployedEnv()) {
     if (!envSecret || envSecret.length < 32) {
       throw new Error(
         "[auth-server] AUTH_SECRET must be set and at least 32 characters in production/preview. " +
@@ -17,7 +23,8 @@ function getAuthSecret(): Uint8Array {
     }
   }
 
-  // Local dev: allow explicit opt-in fallback (not recommended)
+  // Local dev: allow fallback (not recommended) so contributors can run pages
+  // before they create a .env file. This fallback is never allowed in deploys.
   const fallback = "dev-secret-please-change-32char!";
   if (!envSecret) {
     console.warn("[auth-server] WARNING: AUTH_SECRET not set. Using dev fallback. Do NOT use in production.");
@@ -25,7 +32,6 @@ function getAuthSecret(): Uint8Array {
   return new TextEncoder().encode(envSecret || fallback);
 }
 
-const secret = getAuthSecret();
 const COOKIE = "tb_session";
 
 export async function hashPassword(p: string){ return bcrypt.hash(p, 10); }
@@ -36,7 +42,7 @@ export async function createSession(userId: string){
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
-    .sign(secret);
+    .sign(getAuthSecret());
 }
 
 export async function getSessionUser(){
@@ -47,10 +53,10 @@ export async function getSessionUser(){
 
   let sub = "";
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getAuthSecret());
     sub = String(payload.sub);
   } catch {
-    return null; // Invalid or expired token
+    return null; // Invalid, expired, or unverifiable token
   }
 
   if (!sub) return null;
@@ -83,7 +89,7 @@ export async function getSessionUserPublic(){
 
   let sub = "";
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getAuthSecret());
     sub = String(payload.sub);
   } catch {
     return null;
