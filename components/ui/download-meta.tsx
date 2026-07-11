@@ -9,12 +9,14 @@ export function DownloadMetaLine({
   fallbackFileSize = null,
   fallbackDownloadCount = 0,
   showFileName = true,
+  showFileSize = true,
 }: {
   slug: string;
   fallbackFileName?: string | null;
   fallbackFileSize?: string | null;
   fallbackDownloadCount?: number;
   showFileName?: boolean;
+  showFileSize?: boolean;
 }) {
   const { entry } = useStatEntry("download", slug);
   const fileName = entry?.fileName ?? fallbackFileName;
@@ -29,10 +31,16 @@ export function DownloadMetaLine({
           <span className="max-w-[180px] truncate text-[var(--primary-text)]" dir="ltr">{fileName}</span>
         </span>
       )}
-      <span className="inline-flex items-center gap-1" title="حجم فایل">
-        <Icon name="disk" size={15} className="text-[var(--warning)]" />
-        <span className="text-[var(--primary-text)]">{fileSize || "حجم ثبت نشده"}</span>
-      </span>
+      {showFileSize ? (
+        <span className="inline-flex items-center gap-1" title="حجم فایل">
+          <Icon name="disk" size={15} className="text-[var(--warning)]" />
+          <span className="text-[var(--primary-text)]">{fileSize || "حجم ثبت نشده"}</span>
+        </span>
+      ) : (
+        <span className="inline-flex items-center" title="فایل">
+          <Icon name="file" size={15} className="text-[var(--warning)]" />
+        </span>
+      )}
       <span className="inline-flex items-center gap-1" title="تعداد دانلود">
         <Icon name="download" size={15} className="text-[var(--download)]" />
         <span className="text-[var(--primary-text)]">{downloadCount.toLocaleString("fa-IR")}</span>

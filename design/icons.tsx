@@ -105,6 +105,7 @@ export const icons = {
   review: Star,
   // hardware (raid / subnet visuals)
   disk: HardDrive,
+  file: File,
   server: Server,
   nas: Database,
   nvr: Cctv,
