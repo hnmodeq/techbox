@@ -16,7 +16,7 @@ export default async function Page({ params }: { params: P }) {
     const target = await getSlugRedirect("shop", slug);
     if (target) redirect(`/${target.targetModule}/${target.targetSlug}`);
   }
-  return <DbProductDetail slug={slug} fallback={null} />;
+  return <DbProductDetail slug={slug} fallback={dbItem} />;
 }
 
 export async function generateMetadata({ params }: { params: P }) {

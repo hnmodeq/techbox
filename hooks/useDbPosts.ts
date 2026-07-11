@@ -38,7 +38,8 @@ export function useDbPosts(module: ModuleSlug, _fallback: ContentItem[] = [], ta
       })
       .catch(() => {
         if (!mounted) return;
-        setItems([]);
+        // Keep the server-provided fallback (static seed data) instead of
+        // blanking the grid when the database is temporarily unavailable.
         setFromDb(false);
         setError("db_unavailable");
       })
@@ -67,7 +68,9 @@ export function useDbPost(module: ModuleSlug, slug: string, _fallback: ContentIt
       })
       .catch(() => {
         if (!mounted) return;
-        setItem(null);
+        // Keep the server-provided fallback so a transient DB/API failure
+        // doesn't blank a detail page that already has content from the
+        // server render.
         setFromDb(false);
         setError("db_unavailable");
       })
