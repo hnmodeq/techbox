@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 type CommentNode = any;
+type CommentFormState = { ok: boolean; error?: string; message?: string; pending?: boolean };
 
 function nestFlat(rows: any[]): CommentNode[] {
   const map = new Map<string, any>();
@@ -47,17 +48,16 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       .catch(() => {});
   }, [load]);
 
-  const [state, formAction, isSubmitting] = useActionState(
-    async (_prev: any, formData: FormData) => {
+  const [state, formAction, isSubmitting] = useActionState<CommentFormState, FormData>(
+    async (_prev: CommentFormState, formData: FormData) => {
       if (!user) {
         return { ok: false, error: "برای ثبت نظر ابتدا باید وارد حساب کاربری شوید." };
       }
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
         startTransition(() => { load(); });
-        return { ok: true, ts: Date.now() };
       }
-      return res;
+      return res as CommentFormState;
     },
     { ok: false }
   );
@@ -165,7 +165,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           <textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="input min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
           <div className="flex justify-between items-center">
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ دیدگاه شما با موفقیت در پایگاه داده ثبت شد</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}
+              {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ {(state as any)?.message || "دیدگاه شما با موفقیت ثبت شد"}</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}
             </span>
             <Button disabled={isSubmitting || isPending} size="sm">
               {isSubmitting ? "در حال ثبت..." : "ارسال دیدگاه"}

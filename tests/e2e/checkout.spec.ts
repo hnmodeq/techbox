@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Checkout Flow', () => {
-  test('User can navigate to checkout page', async ({ page }) => {
-    // Navigating directly to checkout logic mock page
+  test('checkout page makes it clear payments are disabled', async ({ page }) => {
     await page.goto('/shop/checkout?pay=mock&amount=100000');
-    // Ensure the page renders without 500 error
-    await expect(page.locator('text=ZarinPal')).toBeVisible();
+
+    await expect(page.locator('main')).toBeVisible();
+    await expect(page.getByText('فروشگاه در حال حاضر فقط کاتالوگ است')).toBeVisible();
+    await expect(page.getByText('بازگشت به فروشگاه')).toBeVisible();
   });
 });

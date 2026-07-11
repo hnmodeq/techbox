@@ -14,6 +14,7 @@ type ConsultationModalProps = {
 
 export default function ConsultationModal({ open, onClose }: ConsultationModalProps) {
   const [orgName, setOrgName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -32,9 +33,9 @@ export default function ConsultationModal({ open, onClose }: ConsultationModalPr
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: orgName,
-          email: phone, // Use phone as contact; contact form requires email
+          email,
           subject: "درخواست مشاوره زیرساخت",
-          message: message || "درخواست مشاوره زیرساخت از فرم مشاوره",
+          message: `شماره تماس: ${phone}\n\n${message || "درخواست مشاوره زیرساخت از فرم مشاوره"}`,
         }),
       });
 
@@ -73,6 +74,14 @@ export default function ConsultationModal({ open, onClose }: ConsultationModalPr
               required
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
+            />
+            <input
+              className="input"
+              type="email"
+              placeholder="ایمیل کاری"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               className="input"

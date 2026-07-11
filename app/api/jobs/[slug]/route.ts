@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const job = await prisma.job.findUnique({
+    const job = await prisma.job.findFirst({
       where: { slug, active: true },
     });
 
