@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     try {
       await ensurePost(moduleKey, slug);
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: "post_not_found", message: "مطلب مورد نظر یافت نشد." }, { status: 404 });
     }
 
@@ -93,22 +93,26 @@ export async function POST(req: NextRequest) {
 
     let liked: boolean;
     if (existing) {
-      // Unlike: remove the user's Like row and decrement the counter.
-      await prisma.like.delete({ where: { id: existing.id } });
-      await prisma.post.updateMany({
-        where: { module: moduleKey, slug },
-        data: { likes: { decrement: 1 } },
-      });
+      // Unlike: remove the user's Like row and decrement the counter atomically.
+      await prisma.$transaction([
+        prisma.like.delete({ where: { id: existing.id } }),
+        prisma.post.updateMany({
+          where: { module: moduleKey, slug },
+          data: { likes: { decrement: 1 } },
+        }),
+      ]);
       liked = false;
     } else {
-      // Like: record the user's Like row and increment the counter.
-      await prisma.like.create({
-        data: { fingerprint: fp, userId: user.id, module: moduleKey, slug },
-      });
-      await prisma.post.updateMany({
-        where: { module: moduleKey, slug },
-        data: { likes: { increment: 1 } },
-      });
+      // Like: record the user's Like row and increment the counter atomically.
+      await prisma.$transaction([
+        prisma.like.create({
+          data: { fingerprint: fp, userId: user.id, module: moduleKey, slug },
+        }),
+        prisma.post.updateMany({
+          where: { module: moduleKey, slug },
+          data: { likes: { increment: 1 } },
+        }),
+      ]);
       liked = true;
     }
 

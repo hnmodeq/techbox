@@ -12,13 +12,12 @@ export async function GET() {
   };
 
   try {
-    // Basic DB check
     await prisma.$queryRaw`SELECT 1`;
     status.services.database = "healthy";
-  } catch (error: any) {
-    status.status = "error";
+  } catch {
+    status.status = "degraded";
     status.services.database = "unhealthy";
-    status.error = error.message;
+    // Do not expose internal error details (connection strings, hostnames, etc.)
   }
 
   return NextResponse.json(status, {

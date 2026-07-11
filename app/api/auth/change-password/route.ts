@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const pwdSchema = z.object({
   currentPassword: z.string().min(1, "رمز عبور فعلی الزامی است"),
-  newPassword: z.string().min(5, "رمز عبور جدید باید حداقل ۵ کاراکتر باشد")
+  newPassword: z.string().min(8, "رمز عبور جدید باید حداقل ۸ کاراکتر باشد")
 });
 
 export async function POST(req: NextRequest) {

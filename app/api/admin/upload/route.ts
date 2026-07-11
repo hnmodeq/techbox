@@ -13,7 +13,7 @@ const MAX_SIZE_BY_KIND: Record<string, number> = {
 };
 
 const ALLOWED_BY_KIND: Record<string, RegExp[]> = {
-  image: [/^image\/(jpeg|png|webp|gif|svg\+xml)$/],
+  image: [/^image\/(jpeg|png|webp|gif)$/],
   avatar: [/^image\/(jpeg|png|webp)$/],
   video: [/^video\/(mp4|webm|quicktime)$/],
   download: [

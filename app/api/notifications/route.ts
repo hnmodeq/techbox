@@ -4,28 +4,82 @@ import { getSessionUserPublic } from "@/lib/auth-server";
 
 const moduleFa: Record<string, string> = { blog: "مقاله", review: "نقد", media: "ویدیو", shop: "محصول", forum: "تاپیک", download: "دانلود", news: "خبر" };
 
-async function buildNotifications() {
+interface NotificationItem {
+  id: string;
+  type: "comment" | "like";
+  module: string;
+  slug: string;
+  title: string;
+  actor: string;
+  username: string;
+  avatar: string | null;
+  text: string;
+  createdAt: string;
+  label: string;
+}
+
+async function buildNotificationsForUser(userId: string): Promise<NotificationItem[]> {
+  // Find all posts authored by this user
+  const userPosts = await prisma.post.findMany({
+    where: { authorId: userId },
+    select: { id: true, module: true, slug: true, title: true },
+  });
+
+  const postIds = userPosts.map((p: { id: string }) => p.id);
+
+  if (postIds.length === 0) return [];
+
+  // Comments on the user's posts (excluding the user's own comments)
   const comments = await prisma.comment.findMany({
+    where: {
+      postId: { in: postIds },
+      authorId: { not: userId },
+    },
     take: 30,
     orderBy: { createdAt: "desc" },
-    include: { author: { select: { name: true, username: true, avatar: true } }, post: { select: { module: true, slug: true, title: true } } },
+    include: {
+      author: { select: { name: true, username: true, avatar: true } },
+      post: { select: { module: true, slug: true, title: true } },
+    },
   });
-  const likes = await prisma.like.findMany({
-    take: 30,
-    orderBy: { createdAt: "desc" },
-    where: { userId: { not: null } },
-  });
-  const likeUsers = await prisma.user.findMany({ where: { id: { in: likes.map((l: any) => l.userId!).filter(Boolean) } }, select: { id: true, name: true, username: true, avatar: true } });
-  const userMap = new Map(likeUsers.map((u: any) => [u.id, u]));
-  const likePosts = likes.length
-    ? await prisma.post.findMany({ where: { OR: likes.map((l: any) => ({ module: l.module, slug: l.slug })) }, select: { module: true, slug: true, title: true } })
+
+  // Likes on the user's posts (excluding the user's own likes)
+  const postModuleSlugs = userPosts.map((p: { module: string; slug: string }) => ({ module: p.module, slug: p.slug }));
+  const likes = postModuleSlugs.length > 0
+    ? await prisma.like.findMany({
+        take: 30,
+        orderBy: { createdAt: "desc" },
+        where: {
+          OR: postModuleSlugs,
+          userId: { not: null },
+        },
+      })
     : [];
-  const postMap = new Map(likePosts.map((p: any) => [`${p.module}:${p.slug}`, p]));
+
+  // Filter out the user's own likes
+  const otherLikes = likes.filter((l: { userId: string | null }) => l.userId !== userId);
+
+  const likeUserIds = [...new Set(otherLikes.map((l: { userId: string | null }) => l.userId).filter(Boolean))] as string[];
+  const likeUsers: { id: string; name: string; username: string; avatar: string | null }[] = likeUserIds.length
+    ? await prisma.user.findMany({
+        where: { id: { in: likeUserIds } },
+        select: { id: true, name: true, username: true, avatar: true },
+      })
+    : [];
+  const userMap = new Map(likeUsers.map((u) => [u.id, u]));
+
+  const likePosts: { module: string; slug: string; title: string }[] = otherLikes.length
+    ? await prisma.post.findMany({
+        where: { OR: otherLikes.map((l: { module: string; slug: string }) => ({ module: l.module, slug: l.slug })) },
+        select: { module: true, slug: true, title: true },
+      })
+    : [];
+  const likePostMap = new Map(likePosts.map((p) => [`${p.module}:${p.slug}`, p]));
 
   return [
     ...comments.map((c: any) => ({
       id: `comment-${c.id}`,
-      type: "comment",
+      type: "comment" as const,
       module: c.post.module,
       slug: c.post.slug,
       title: c.post.title,
@@ -36,22 +90,21 @@ async function buildNotifications() {
       createdAt: c.createdAt.toISOString(),
       label: `${moduleFa[c.post.module] || c.post.module} • ${c.author?.name || c.authorName} دیدگاه گذاشت`,
     })),
-    ...likes.map((l: any) => {
+    ...otherLikes.map((l: any) => {
       const u = userMap.get(l.userId || "");
-      const p = postMap.get(`${l.module}:${l.slug}`);
-      const userLike = u as any;
+      const p = likePostMap.get(`${l.module}:${l.slug}`);
       return {
         id: `like-${l.id}`,
-        type: "like",
+        type: "like" as const,
         module: l.module,
         slug: l.slug,
-        title: (p as any)?.title || l.slug,
-        actor: userLike?.name || "کاربر",
-        username: userLike?.username || "",
-        avatar: userLike?.avatar || null,
+        title: p?.title || l.slug,
+        actor: u?.name || "کاربر",
+        username: u?.username || "",
+        avatar: u?.avatar || null,
         text: "پسندید",
         createdAt: l.createdAt.toISOString(),
-        label: `${moduleFa[l.module] || l.module} • ${userLike?.name || "کاربر"} پسندید`,
+        label: `${moduleFa[l.module] || l.module} • ${u?.name || "کاربر"} پسندید`,
       };
     }),
   ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 30);
@@ -60,17 +113,20 @@ async function buildNotifications() {
 export async function GET() {
   try {
     const user = await getSessionUserPublic();
-    const events = await buildNotifications();
-    let lastReadAt = new Date(0);
 
-    if (user) {
-      const state = await prisma.userNotificationState.findUnique({ where: { userId: user.id } });
-      lastReadAt = state?.lastReadAt || new Date(0);
+    if (!user) {
+      return NextResponse.json({ items: [], unreadCount: 0, isLoggedIn: false });
     }
 
-    const items = events.map((event) => ({ ...event, read: !user || new Date(event.createdAt) <= lastReadAt }));
-    const unreadCount = user ? items.filter((event) => !event.read).length : 0;
-    return NextResponse.json({ items, unreadCount, lastReadAt: lastReadAt.toISOString(), isLoggedIn: Boolean(user) });
+    const events = await buildNotificationsForUser(user.id);
+    let lastReadAt = new Date(0);
+
+    const state = await prisma.userNotificationState.findUnique({ where: { userId: user.id } });
+    lastReadAt = state?.lastReadAt || new Date(0);
+
+    const items = events.map((event) => ({ ...event, read: new Date(event.createdAt) <= lastReadAt }));
+    const unreadCount = items.filter((event) => !event.read).length;
+    return NextResponse.json({ items, unreadCount, lastReadAt: lastReadAt.toISOString(), isLoggedIn: true });
   } catch {
     return NextResponse.json({ items: [], unreadCount: 0, isLoggedIn: false });
   }

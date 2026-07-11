@@ -284,10 +284,10 @@ export default function AccountPage() {
                 <input
                   required
                   type="password"
-                  minLength={5}
+                  minLength={8}
                   value={regPassword}
                   onChange={e => { setRegPassword(e.target.value); setAuthError(""); }}
-                  placeholder="حداقل ۵ کاراکتر"
+                  placeholder="حداقل ۸ کاراکتر"
                   className="input w-full"
                   dir="ltr"
                 />
