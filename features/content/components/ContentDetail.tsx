@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/ui/product-gallery";
+import VideoPlayer from "@/features/media/components/VideoPlayer";
 import { ContentJsonLd } from "@/components/seo/StructuredData";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
@@ -53,14 +54,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  {item.module === "shop" && gallery.length > 0 ? (
  <ProductGallery images={gallery} title={item.title} />
  ) : item.module === "media" && videoSrc ? (
- <div className="mt-8 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-black shadow-[var(--shadow-size)]">
- <video
- controls
- playsInline
- poster={item.image}
- className="mx-auto h-[70vh] max-h-[780px] aspect-[9/16] object-contain bg-black"
- src={videoSrc}
- />
+ <div className="mt-8 space-y-2">
+ <VideoPlayer src={videoSrc} poster={item.image} title={item.title} />
  <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex flex-wrap items-center gap-4">
  <LiveViewCounter module={item.module} slug={item.slug} showLabel />
  <LikeButton contentType={item.module} slug={item.slug} />
