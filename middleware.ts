@@ -6,8 +6,20 @@ const COOKIE = "tb_session";
 // Routes that should be accessible without authentication
 const PUBLIC_ADMIN_ROUTES = ["/admin/login"];
 
+function isDeployedEnv() {
+  return process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL_ENV);
+}
+
 function getSecret(): Uint8Array {
-  return new TextEncoder().encode(process.env.AUTH_SECRET || "dev-secret-please-change-32char!");
+  const envSecret = process.env.AUTH_SECRET;
+
+  if (isDeployedEnv() && (!envSecret || envSecret.length < 32)) {
+    throw new Error(
+      "[middleware] AUTH_SECRET must be set and at least 32 characters in production/preview."
+    );
+  }
+
+  return new TextEncoder().encode(envSecret || "dev-secret-please-change-32char!");
 }
 
 export async function middleware(req: NextRequest) {
@@ -49,7 +61,7 @@ export async function middleware(req: NextRequest) {
     // Redirect to login if token is invalid
     return NextResponse.next();
   } catch {
-    // Invalid or expired token → redirect to login
+    // Invalid, expired, or unverifiable token → redirect to login
     const loginUrl = new URL("/admin/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
