@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { sendEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const subscribeSchema = z.object({
   email: z.string().email("ایمیل معتبر نیست"),
@@ -9,6 +10,16 @@ const subscribeSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(ip, "newsletter");
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً دوباره تلاش کنید." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { email, name } = subscribeSchema.parse(body);

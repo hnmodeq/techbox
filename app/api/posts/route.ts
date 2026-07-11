@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, canEditModule } from "@/lib/auth-server";
+import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     };
 
     if (includeAllPublishedStates) {
-      const user = await getSessionUser();
+      const user = await getSessionUserPublic();
       if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
       if (postModule) {
         if (!canEditModule(user as any, postModule)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
@@ -193,7 +193,7 @@ const createSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const data = createSchema.parse(await req.json());
   if (!canEditModule(user as any, data.module)) {
@@ -230,7 +230,7 @@ export async function POST(req: NextRequest) {
 
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const body = await req.json();
   const moduleKey = String(body.module || "");
@@ -304,7 +304,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const { searchParams } = new URL(req.url);
   const moduleKey = searchParams.get("module") || "";

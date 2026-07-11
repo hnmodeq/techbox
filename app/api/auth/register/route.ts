@@ -9,7 +9,7 @@ const registerSchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ حرف باشد"),
   username: z.string().min(3, "نام کاربری باید حداقل ۳ حرف باشد").regex(/^[a-zA-Z0-9_]+$/, "نام کاربری فقط می‌تواند شامل حروف انگلیسی، عدد و آندرلاین باشد"),
   email: z.string().email("ایمیل معتبر نیست"),
-  password: z.string().min(5, "رمز عبور باید حداقل ۵ کاراکتر باشد")
+  password: z.string().min(8, "رمز عبور باید حداقل ۸ کاراکتر باشد")
 });
 
 export async function POST(req: NextRequest) {

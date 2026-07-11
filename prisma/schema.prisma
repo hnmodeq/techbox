@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -343,4 +344,14 @@ model ContactSubmission {
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // JSON string or plain value
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@index([key])
 }

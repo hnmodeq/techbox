@@ -72,8 +72,7 @@ export default async function About(){
  />
  </div>
  <div className="lg:col-span-2 space-y-3 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-muted-foreground bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5">
- <p>تماس: <span dir="ltr">021-9100xxxx</span></p>
- <p>ایمیل: info@techbox.ir</p>
+ <p>ایمیل: {process.env.CONTACT_EMAIL || "info@techbox.ir"}</p>
  <p>ساعت کاری: شنبه–چهارشنبه ۹–۱۷</p>
  <ButtonLink href="/contact" className="mt-2 w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">ارتباط با ما</ButtonLink>
  <ButtonLink href="/consultation" variant="ghost" className="w-full text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">درخواست مشاوره VIP</ButtonLink>

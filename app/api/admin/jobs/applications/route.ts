@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, canEditModule } from "@/lib/auth-server";
+import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || !canEditModule(user as any, "workwithus")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }

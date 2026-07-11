@@ -102,7 +102,7 @@
 | **SEC-001** | Blocker | `getSessionUser()` accepts spoofable `x-user-id` / `x-auth-user` → full auth bypass | `lib/auth-server.ts` |
 | **SEC-002** | Blocker | Timeline event POST/PUT/DELETE has **no auth** | `app/api/timeline/events/**` |
 | **SEC-003** | Critical | Change-password accepts hardcoded `techbox123` as current password | `app/api/auth/change-password/route.ts` |
-| **SEC-004** | Critical | Seed shared weak password + account UI defaults (`techbox123`) | `prisma/seed-blob-content.ts`, `app/account/page.tsx` |
+| **SEC-004** | Critical | Seed shared weak password (`123456xX`) + account UI defaults (`techbox123`) | `prisma/seed-blob-content.ts`, `app/account/page.tsx` |
 | **SEC-005** | Critical | Payment mock auto-verifies; client amount; no orders — **shop is catalog-only** so **disable**, don’t build full pay yet | `app/api/pay/**`, `app/shop/checkout/**` |
 | **SEC-006** | Critical | Secrets may have been exposed in chat — rotate out-of-band | ops / Vercel / Neon / etc. |
 | **SEC-007** | Critical | Fallback `AUTH_SECRET` if env missing | `lib/auth-server.ts` |
@@ -169,7 +169,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 
 ### P0 — Security & honesty blockers (do first)
 
-#### [ ] P0-1 — Rotate exposed credentials (ops, not code)
+#### [x] P0-1 — Rotate exposed credentials (ops, not code)
 
 - **IDs:** SEC-006  
 - **Why:** Secrets may have appeared outside the repo; treat as compromised.  
@@ -181,7 +181,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Tests:** Manual login, healthz, one authenticated admin GET.  
 - **Effort:** S · **Deps:** none  
 
-#### [ ] P0-2 — Remove header-based auth bypass
+#### [x] P0-2 — Remove header-based auth bypass
 
 - **IDs:** SEC-001  
 - **Files:** `lib/auth-server.ts` (and any test that assumed headers)  
@@ -195,7 +195,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Tests:** Unit/integration: spoof header fails; good cookie works; banned fails.  
 - **Effort:** S · **Deps:** none  
 
-#### [ ] P0-3 — Auth-guard timeline event mutations
+#### [x] P0-3 — Auth-guard timeline event mutations
 
 - **IDs:** SEC-002  
 - **Files:** `app/api/timeline/events/route.ts`, `app/api/timeline/events/[id]/route.ts`  
@@ -209,23 +209,23 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Tests:** API tests for 401/403/201.  
 - **Effort:** S · **Deps:** P0-2  
 
-#### [ ] P0-4 — Remove password backdoors and dev login defaults
+#### [x] P0-4 — Remove password backdoors and dev login defaults
 
 - **IDs:** SEC-003, SEC-004  
 - **Files:**  
   - `app/api/auth/change-password/route.ts`  
   - `app/account/page.tsx`  
   - `prisma/seed-blob-content.ts` (stop logging password; use env `SEED_DEFAULT_PASSWORD` only for local seed)  
-- **Why:** Hardcoded `techbox123` bypass; UI advertises default passwords; seed logs shared password.  
+- **Why:** Change-password route has `techbox123` backdoor (`if (!ok && currentPassword !== "techbox123")`); account page quick-login defaults to `techbox123` and placeholder advertises it; seed uses shared password `123456xX` for all users and logs it to console. Two different weak passwords — both dangerous.  
 - **Steps:**
-  1. Remove `currentPassword !== "techbox123"` bypass entirely.  
+  1. Remove `currentPassword !== "techbox123"` bypass entirely from change-password route.  
   2. Remove quick-login that posts `techbox123`; remove placeholder text advertising defaults.  
-  3. Seed: password from env or random; log only “seeded N users” never the secret; document local-only seed in README.  
+  3. Seed: password from env `SEED_DEFAULT_PASSWORD` or random; replace hardcoded `123456xX`; log only “seeded N users” never the secret; document local-only seed in README.  
 - **Acceptance:** Change-password requires real current password; UI has no default password hints; seed does not print secrets.  
 - **Tests:** change-password API tests.  
 - **Effort:** S · **Deps:** P0-2  
 
-#### [ ] P0-5 — Fail closed if `AUTH_SECRET` missing/weak in deployed envs
+#### [x] P0-5 — Fail closed if `AUTH_SECRET` missing/weak in deployed envs
 
 - **IDs:** SEC-007  
 - **Files:** `lib/auth-server.ts`, optionally `instrumentation.ts`  
@@ -236,7 +236,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Deploy without AUTH_SECRET does not silently sign with default.  
 - **Effort:** XS · **Deps:** none  
 
-#### [ ] P0-6 — Shop = catalog only: disable payment/checkout commerce path
+#### [x] P0-6 — Shop = catalog only: disable payment/checkout commerce path
 
 - **IDs:** SEC-005, UX-001  
 - **Files:**  
@@ -255,7 +255,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Tests:** e2e checkout shows unavailable; pay API 503.  
 - **Effort:** S · **Deps:** none  
 
-#### [ ] P0-7 — Remove fake trust brands; neutralize fake stats
+#### [x] P0-7 — Remove fake trust brands; neutralize fake stats
 
 - **IDs:** CONT-001  
 - **Files:** `features/home/components/TrustSection.tsx`, `features/home/components/LandingStats.tsx`, `app/page.tsx`  
@@ -271,7 +271,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 
 ### P1 — Required for a safe development/preview deploy
 
-#### [ ] P1-1 — Server-side admin protection
+#### [x] P1-1 — Server-side admin protection
 
 - **IDs:** SEC-008  
 - **Files:** new `middleware.ts` and/or `app/admin/layout.tsx` (server), keep API checks  
@@ -282,7 +282,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Logged-out browser cannot render admin shell content (redirect). APIs still 401/403.  
 - **Effort:** M · **Deps:** P0-2  
 
-#### [ ] P1-2 — Login: status check + uniform errors
+#### [x] P1-2 — Login: status check + uniform errors
 
 - **IDs:** SEC-009  
 - **Files:** `app/api/auth/login/route.ts`  
@@ -292,7 +292,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** No `404 not found` username oracle; banned cannot get session cookie.  
 - **Effort:** XS · **Deps:** P0-2  
 
-#### [ ] P1-3 — Rate limit: safer default + cover auth email routes
+#### [x] P1-3 — Rate limit: safer default + cover auth email routes
 
 - **IDs:** SEC-011  
 - **Files:** `lib/rate-limit.ts`; wire into `forgot-password`, `reset-password`, `newsletter/*`, pay (already disabled)  
@@ -303,7 +303,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Burst forgot-password returns 429; app still runs without Upstash.  
 - **Effort:** M · **Deps:** none  
 
-#### [ ] P1-4 — Public chat cost hardening (chat stays public)
+#### [x] P1-4 — Public chat cost hardening (chat stays public)
 
 - **IDs:** SEC-010  
 - **Files:** `app/api/chat/route.ts`, `features/chat/components/Chatbot.tsx`  
@@ -316,7 +316,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** POST with `"model":"gpt-4o"` still uses env model; oversized body → 400.  
 - **Effort:** S · **Deps:** P1-3 preferred  
 
-#### [ ] P1-5 — Env canonicalization + soft validation
+#### [x] P1-5 — Env canonicalization + soft validation
 
 - **IDs:** SEC-019, OPS-002  
 - **Files:** `.env.example`, `lib/email.ts`, sentry configs, pay (disabled), new `lib/env.ts` optional  
@@ -329,7 +329,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** With free Resend defaults, contact/welcome attempts use a valid from; example matches code.  
 - **Effort:** S · **Deps:** none  
 
-#### [ ] P1-6 — Escape user content in emails
+#### [x] P1-6 — Escape user content in emails
 
 - **IDs:** SEC-013  
 - **Files:** `lib/email.ts`, `app/api/contact/route.ts`, comment notification path  
@@ -337,7 +337,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Payload with `<script>` appears as text in email HTML source.  
 - **Effort:** S · **Deps:** P1-5 nice-to-have  
 
-#### [ ] P1-7 — Password reset UI + safer tokens
+#### [x] P1-7 — Password reset UI + safer tokens
 
 - **IDs:** SEC-014, REL-001  
 - **Files:** new `app/auth/reset-password/page.tsx` (and optional forgot UI), `app/api/auth/forgot-password/route.ts`, `reset-password/route.ts`, schema if hashing  
@@ -350,7 +350,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Full reset flow works on preview URL; raw token not stored.  
 - **Effort:** M · **Deps:** P1-3, P1-5  
 
-#### [ ] P1-8 — Site settings + comment policy + global hide
+#### [x] P1-8 — Site settings + comment policy + global hide
 
 - **IDs:** owner #6, DATA-004  
 - **Files:** `prisma/schema.prisma`, new admin settings API/UI, `app/api/comments/route.ts`, moderation pages  
@@ -366,7 +366,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Tests:** API tests for both modes + hide flag.  
 - **Effort:** M · **Deps:** P0-2, P1-1 for UI  
 
-#### [ ] P1-9 — Job resumes: less public + retention setting (default 30d)
+#### [x] P1-9 — Job resumes: less public + retention setting (default 30d)
 
 - **IDs:** SEC-012, owner #7  
 - **Files:** `app/api/jobs/[slug]/apply/route.ts`, admin applications UI, settings, optional cleanup script/route  
@@ -378,14 +378,14 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Default 30 days in settings UI; expired cleanup removes files; apply still works.  
 - **Effort:** M · **Deps:** P1-8 settings model  
 
-#### [ ] P1-10 — Honest consultation form
+#### [x] P1-10 — Honest consultation form
 
 - **IDs:** REL-002  
 - **Files:** `features/consultation/components/consultation-modal.tsx`, `app/consultation/page.tsx`  
 - **Steps:** Submit to `/api/contact` (or dedicated endpoint) with validation; real error/success. No fake “registered” without server OK.  
 - **Effort:** S · **Deps:** P1-6 preferred  
 
-#### [ ] P1-11 — Forum new topic → real API
+#### [x] P1-11 — Forum new topic → real API
 
 - **IDs:** REL-003  
 - **Files:** `features/forum/components/ForumList.tsx`, `app/api/posts/route.ts` (already supports forum module)  
@@ -396,7 +396,7 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** New topic appears after refresh for other users.  
 - **Effort:** M · **Deps:** P0-2  
 
-#### [ ] P1-12 — Prisma migrations workflow
+#### [x] P1-12 — Prisma migrations workflow
 
 - **IDs:** DATA-001  
 - **Files:** `prisma/`, README, optional `DIRECT_URL` in schema  
@@ -407,21 +407,21 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 - **Acceptance:** Fresh env can migrate to full schema without `db push`.  
 - **Effort:** M · **Deps:** settings/comments schema tasks ideally land as migrations  
 
-#### [ ] P1-13 — Sentry sampling down (free-tier friendly)
+#### [x] P1-13 — Sentry sampling down (free-tier friendly)
 
 - **IDs:** PERF-003  
 - **Files:** `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`  
 - **Steps:** `tracesSampleRate` ~0.05–0.1; keep errors; replay rates modest.  
 - **Effort:** XS · **Deps:** none  
 
-#### [ ] P1-14 — Baseline security headers
+#### [x] P1-14 — Baseline security headers
 
 - **IDs:** SEC-015  
 - **Files:** `next.config.mjs` headers or middleware  
 - **Steps:** `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `X-Frame-Options`/`frame-ancestors`, `Permissions-Policy`, practical CSP (start report-only if needed). HSTS only when HTTPS prod host stable.  
 - **Effort:** M · **Deps:** none  
 
-#### [ ] P1-15 — Editor access consistency (timeline, jobs, moderation)
+#### [x] P1-15 — Editor access consistency (timeline, jobs, moderation)
 
 - **IDs:** owner #5  
 - **Files:** timeline APIs (P0-3), `app/api/admin/jobs/**`, admin nav UI, moderation if editors should moderate comments  
@@ -436,81 +436,81 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
 
 ### P2 — Important soon (quality / integrity)
 
-#### [ ] P2-1 — Transactional like/vote counters
+#### [x] P2-1 — Transactional like/vote counters
 
 - **IDs:** DATA-002  
 - **Files:** `app/api/like/route.ts`, `app/api/comments/vote/route.ts`, timeline like  
 - **Steps:** Prisma `$transaction`; prevent negative counts.  
 - **Effort:** S  
 
-#### [ ] P2-2 — Notifications scoped to current user
+#### [x] P2-2 — Notifications scoped to current user
 
 - **IDs:** SEC-017  
 - **Files:** `app/api/notifications/route.ts`  
 - **Steps:** Require auth; only events on user’s posts / mentions.  
 - **Effort:** S  
 
-#### [ ] P2-3 — Download redirect allowlist
+#### [x] P2-3 — Download redirect allowlist
 
 - **IDs:** SEC-018  
 - **Files:** `app/api/download/[slug]/route.ts`  
 - **Steps:** Only allow Vercel Blob host(s) / configured CDN hosts.  
 - **Effort:** S  
 
-#### [ ] P2-4 — Disallow SVG admin upload (or sanitize)
+#### [x] P2-4 — Disallow SVG admin upload (or sanitize)
 
 - **IDs:** SEC-016  
 - **Files:** `app/api/admin/upload/route.ts`  
 - **Effort:** XS  
 
-#### [ ] P2-5 — `/api/stats` scalability
+#### [x] P2-5 — `/api/stats` scalability
 
 - **IDs:** PERF-001  
 - **Files:** `app/api/stats/route.ts`, `providers/stats.provider.tsx`  
 - **Steps:** Avoid loading all posts; batch by keys or cache 30–60s; or embed counts in list APIs.  
 - **Effort:** M  
 
-#### [ ] P2-6 — Timeline list payload slim
+#### [x] P2-6 — Timeline list payload slim
 
 - **IDs:** PERF-002  
 - **Files:** `app/api/timeline/events/route.ts`  
 - **Steps:** Don’t include all comments/likes on list; fetch on demand.  
 - **Effort:** S  
 
-#### [ ] P2-7 — CI: run `check:all` when secrets exist; fix unit test runner
+#### [x] P2-7 — CI: run `check:all` when secrets exist; fix unit test runner
 
 - **IDs:** REL-005, REL-006  
 - **Files:** `.github/workflows/ci.yml`, `package.json`, `tests/unit/*`  
 - **Steps:** Add vitest (or node:test); wire `pnpm test`; optional DB job actually runs checks.  
 - **Effort:** M  
 
-#### [ ] P2-8 — Stronger password policy
+#### [x] P2-8 — Stronger password policy
 
 - **IDs:** SEC-020  
 - **Files:** register/reset/change-password schemas  
 - **Steps:** Min 8+; consistent messages.  
 - **Effort:** XS  
 
-#### [ ] P2-9 — Healthz no internal DB errors
+#### [x] P2-9 — Healthz no internal DB errors
 
 - **IDs:** REL-008  
 - **Files:** `app/api/healthz/route.ts`  
 - **Effort:** XS  
 
-#### [ ] P2-10 — About page real contact or remove placeholder phone
+#### [x] P2-10 — About page real contact or remove placeholder phone
 
 - **IDs:** UX-002  
 - **Files:** `app/about/page.tsx`  
 - **Effort:** XS  
 
-#### [ ] P2-11 — Roles page honesty
+#### [x] P2-11 — Roles page honesty
 
 - **IDs:** REL-004  
 - **Files:** `app/admin/roles/page.tsx`  
 - **Steps:** Either remove localStorage fake roles UI or drive from real `User.role` + modules API.  
 - **Effort:** M  
 
-#### [ ] P2-12 — Fix or delete broken `scripts/seed-jobs.ts`
+#### [x] P2-12 — Fix or delete broken `scripts/seed-jobs.ts`
 
 - **IDs:** REL-007  
 - **Effort:** XS  

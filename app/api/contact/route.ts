@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, escapeHtml } from "@/lib/email";
 import { prisma } from "@/lib/db";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
@@ -54,10 +54,10 @@ export async function POST(req: NextRequest) {
     const html = `
       <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl; text-align: right;">
         <h2 style="color:#111;">پیام جدید از فرم ارتباط با ما</h2>
-        <p><strong>نام:</strong> ${name}</p>
-        <p><strong>ایمیل:</strong> ${email}</p>
-        <p><strong>موضوع:</strong> ${subject}</p>
-        <blockquote style="border-right:4px solid #ddd; padding-right:16px; color:#555; white-space:pre-wrap; direction: rtl;">${message}</blockquote>
+        <p><strong>نام:</strong> ${escapeHtml(name)}</p>
+        <p><strong>ایمیل:</strong> ${escapeHtml(email)}</p>
+        <p><strong>موضوع:</strong> ${escapeHtml(subject)}</p>
+        <blockquote style="border-right:4px solid #ddd; padding-right:16px; color:#555; white-space:pre-wrap; direction: rtl;">${escapeHtml(message)}</blockquote>
       </div>`;
 
     const result = await sendEmail({

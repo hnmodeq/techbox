@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
 
 const schema = z.object({
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 });
 
   const likesCount = await prisma.timelineLike.count({ where: { eventId } });
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   let liked = false;
   if (user) {
     const existing = await prisma.timelineLike.findUnique({
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) {
     return NextResponse.json({
       error: "unauthorized",

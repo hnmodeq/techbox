@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { captureUploadError } from "@/lib/sentry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -13,7 +13,7 @@ const MAX_SIZE_BY_KIND: Record<string, number> = {
 };
 
 const ALLOWED_BY_KIND: Record<string, RegExp[]> = {
-  image: [/^image\/(jpeg|png|webp|gif|svg\+xml)$/],
+  image: [/^image\/(jpeg|png|webp|gif)$/],
   avatar: [/^image\/(jpeg|png|webp)$/],
   video: [/^video\/(mp4|webm|quicktime)$/],
   download: [
@@ -74,7 +74,7 @@ function defaultFolder(kind: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || !["super_admin", "editor"].includes(user.role)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }

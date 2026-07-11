@@ -4,7 +4,13 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const BLOB = "https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com";
-const PASSWORD = "123456xX";
+const PASSWORD = process.env.SEED_DEFAULT_PASSWORD || (process.env.NODE_ENV === "production" ? undefined : "dev-only-password");
+if (!PASSWORD) {
+  console.error("SEED_DEFAULT_PASSWORD is required in production. Set it in .env or pass as environment variable.");
+  process.exit(1);
+}
+// After this point PASSWORD is guaranteed string — but TS doesn't infer process.exit narrowing
+const _PASSWORD: string = PASSWORD;
 const DRY_RUN = process.argv.includes("--dry-run");
 const ALL_MODULES = ["blog", "news", "media", "review", "download", "shop", "forum", "tools"];
 
@@ -829,7 +835,7 @@ async function seedRedirects() {
 }
 
 async function upsertUsers() {
-  const password = await bcrypt.hash(PASSWORD, 10);
+  const password = await bcrypt.hash(_PASSWORD, 10);
   for (const user of seedUsers) {
     await prisma.user.upsert({
       where: { username: user.username },
@@ -855,7 +861,7 @@ async function upsertUsers() {
       },
     });
   }
-  console.log(`Upserted ${seedUsers.length} real users. Password for all: ${PASSWORD}`);
+  console.log(`Upserted ${seedUsers.length} real users.`);
 }
 
 async function main() {

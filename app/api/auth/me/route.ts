@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 export async function GET(){
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if(!user) return NextResponse.json({ user: null });
   let modules = [];
   try { modules = JSON.parse(user.modules || "[]"); } catch {}

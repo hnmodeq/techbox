@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 /**
  * Returns the set of timeline event IDs the CURRENT user has liked, in a
@@ -11,7 +11,7 @@ import { getSessionUser } from "@/lib/auth-server";
  * included in the bulk GET /api/timeline/events payload.
  */
 export async function GET() {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) {
     return NextResponse.json({ likedEventIds: [], isLoggedIn: false });
   }
