@@ -130,9 +130,12 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
         return;
       }
 
+      const created = await res.json().catch(() => ({}));
+      const createdSlug = typeof created?.slug === "string" ? created.slug : slug;
+
       // Success — add to local list and refresh
       const nt: any = {
-        slug,
+        slug: createdSlug,
         module: "forum",
         title: title.trim(),
         excerpt: body.slice(0, 140),

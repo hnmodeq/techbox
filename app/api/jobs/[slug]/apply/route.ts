@@ -35,7 +35,7 @@ export async function POST(
   }
 
   try {
-    const job = await prisma.job.findUnique({
+    const job = await prisma.job.findFirst({
       where: { slug, active: true },
     });
 

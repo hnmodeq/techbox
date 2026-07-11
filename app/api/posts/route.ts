@@ -27,6 +27,30 @@ function safeJsonObject(value: string | null | undefined): Record<string, unknow
   }
 }
 
+function normalizeSlug(value: string, fallback: string) {
+  const base = (value || fallback)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\u0600-\u06FF]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 90);
+
+  return base || `topic-${Date.now().toString(36)}`;
+}
+
+async function uniquePostSlug(module: string, desired: string) {
+  const base = normalizeSlug(desired, module);
+  for (let index = 0; index < 20; index += 1) {
+    const slug = index === 0 ? base : `${base}-${index + 1}`;
+    const existing = await prisma.post.findUnique({
+      where: { module_slug: { module, slug } },
+      select: { id: true },
+    });
+    if (!existing) return slug;
+  }
+  return `${base}-${Date.now().toString(36)}`;
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const postModule = searchParams.get("module") || undefined;
@@ -196,10 +220,46 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const data = createSchema.parse(await req.json());
-  if (!canEditModule(user as any, data.module)) {
+  const canManageModule = canEditModule(user as any, data.module);
+
+  if (!canManageModule && data.module !== "forum") {
     return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
+
   try {
+    const dateFa = new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date());
+
+    // Normal signed-in users may create forum topics, but they must not get the
+    // full editorial upsert surface. Editors/super_admins still use the admin
+    // path below for all modules, including forum.
+    if (!canManageModule && data.module === "forum") {
+      const slug = await uniquePostSlug("forum", data.slug || data.title);
+      const content = data.content.trim();
+      const excerpt = (data.excerpt || content.slice(0, 180)).trim();
+
+      const post = await prisma.post.create({
+        data: {
+          module: "forum",
+          slug,
+          title: data.title.trim(),
+          excerpt,
+          content,
+          tags: JSON.stringify((data.tags?.length ? data.tags : ["پرسش"]).slice(0, 10)),
+          category: data.category || "پرسش",
+          authorId: user.id,
+          authorName: user.name,
+          published: true,
+          dateFa,
+        },
+      });
+
+      revalidatePath('/');
+      revalidatePath('/forum');
+      revalidatePath(`/forum/${slug}`);
+      revalidatePath('/sitemap.xml');
+      return NextResponse.json(post, { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+
     const serialized = {
       ...data,
       gallery: JSON.stringify(data.gallery || []),
@@ -215,7 +275,7 @@ export async function POST(req: NextRequest) {
       update: serialized,
       create: {
         ...serialized,
-        dateFa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
+        dateFa,
       },
     });
     revalidatePath('/');

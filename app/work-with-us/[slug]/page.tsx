@@ -8,7 +8,7 @@ import { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const { slug } = await params;
-  const job = await prisma.job.findUnique({ where: { slug, active: true } });
+  const job = await prisma.job.findFirst({ where: { slug, active: true } });
   
   if (!job) return pageMetadata({ title: "شغل یافت نشد", path: "/work-with-us" });
   
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function JobPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const job = await prisma.job.findUnique({
+  const job = await prisma.job.findFirst({
     where: { slug, active: true },
   });
 

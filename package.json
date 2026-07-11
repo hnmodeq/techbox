@@ -8,7 +8,7 @@
     "build:webpack": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit --pretty false",
+    "typecheck": "next typegen && tsc --noEmit --pretty false",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
