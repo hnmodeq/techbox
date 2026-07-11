@@ -14,7 +14,7 @@
 [ ] Download redirect only allows blob/CDN hosts
 [ ] Forum list loads
 [ ] Forum detail loads
-[ ] Forum new topic saves to database
+[x] Forum new topic saves to database
 [ ] Timeline loads
 [x] Timeline create/edit/delete is protected
 [ ] Timeline list payload does not include all comments/likes
@@ -31,7 +31,7 @@
 [ ] About page loads
 [ ] About page has no placeholder phone
 [ ] Contact form works
-[ ] Consultation form real submit works
+[x] Consultation form real submit works
 [ ] Work-with-us jobs list loads
 [ ] Job detail loads
 [ ] Job apply + resume upload works
@@ -43,27 +43,27 @@
 [ ] Account page works
 [x] Password change works without backdoor
 [ ] Password policy requires minimum 8 characters
-[ ] Password reset page works
-[ ] Password reset email/link works
+[x] Password reset page works
+[x] Password reset email/link works
 [ ] Like works when logged in
 [ ] Like/vote counters are transactionally consistent
 [ ] Rating works when logged in
-[ ] Comments follow admin policy
-[ ] Pending comments need approval when required
-[ ] Global hide comments works
-[ ] Global unhide comments works
+[x] Comments follow admin policy
+[x] Pending comments need approval when required
+[x] Global hide comments works
+[x] Global unhide comments works
 [ ] AI chat opens for public users
-[ ] AI chat does not accept client model override
+[x] AI chat does not accept client model override
 [ ] Notifications show only my activity
 [ ] Admin login works
-[ ] Admin pages blocked when logged out
+[x] Admin pages blocked when logged out
 [ ] Super admin can manage users
 [ ] Super admin can manage roles/settings
 [ ] Editor can manage allowed content
-[ ] Editor can manage timeline
-[ ] Editor can manage jobs
-[ ] Admin comment mode switch works
-[ ] Admin resume retention setting works
+[x] Editor can manage timeline
+[x] Editor can manage jobs
+[x] Admin comment mode switch works
+[x] Admin resume retention setting works
 [ ] Admin upload works
 [ ] SVG upload is blocked or sanitized
 [ ] Admin blob list works
@@ -71,16 +71,16 @@
 [ ] Admin roles page reflects real DB (not localStorage only)
 [x] Header auth bypass is fixed
 [x] AUTH_SECRET is required in deploy
-[ ] Env variable names match between code and .env.example
-[ ] Email from address is valid (not techbox.local)
-[ ] Email HTML is escaped (no raw user content rendered)
-[ ] Rate limiting works
-[ ] Rate limiting works on forgot-password/reset-password/newsletter
-[ ] Security headers present
+[x] Env variable names match between code and .env.example
+[x] Email from address is valid (not techbox.local)
+[x] Email HTML is escaped (no raw user content rendered)
+[x] Rate limiting works
+[x] Rate limiting works on forgot-password/reset-password/newsletter
+[x] Security headers present
 [ ] Health check works
 [ ] Health check does not leak internal DB errors
 [ ] Stats API does not load all posts at once
 [ ] Prisma migrations work (fresh env can migrate without db push)
-[ ] Sentry sampling rate is production-safe
+[x] Sentry sampling rate is production-safe
 [ ] Sitemap loads
 [ ] Robots.txt loads
