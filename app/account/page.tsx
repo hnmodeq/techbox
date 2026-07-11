@@ -71,7 +71,7 @@ export default function AccountPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: loginUsername.trim(), password: loginPassword || "techbox123" })
+        body: JSON.stringify({ username: loginUsername.trim(), password: loginPassword })
       });
       const data = await res.json();
       if (res.ok && data.ok) {
@@ -81,28 +81,6 @@ export default function AccountPage() {
       }
     } catch {
       setAuthError("خطا در برقراری ارتباط با سرور Neon");
-    } finally {
-      setAuthBusy(false);
-    }
-  };
-
-  const handleQuickLogin = async (username: string) => {
-    setLoginUsername(username);
-    setLoginPassword("techbox123");
-    setAuthBusy(true);
-    setAuthError("");
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password: "techbox123" })
-      });
-      const data = await res.json();
-      if (res.ok && data.ok) {
-        await loadUser();
-      } else {
-        setAuthError("خطا در ورود سریع");
-      }
     } finally {
       setAuthBusy(false);
     }
@@ -257,7 +235,7 @@ export default function AccountPage() {
                   type="password"
                   value={loginPassword}
                   onChange={e => { setLoginPassword(e.target.value); setAuthError(""); }}
-                  placeholder="پیش‌فرض: techbox123"
+                  placeholder="رمز عبور خود را وارد کنید"
                   className="input w-full"
                   dir="ltr"
                 />

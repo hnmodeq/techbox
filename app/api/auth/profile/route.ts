@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
 
 const profileSchema = z.object({
@@ -12,7 +12,7 @@ const profileSchema = z.object({
 });
 
 export async function PUT(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   try {

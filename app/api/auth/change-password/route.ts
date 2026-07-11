@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUser, verifyPassword, hashPassword } from "@/lib/auth-server";
 import { z } from "zod";
-import { sendEmail } from "@/lib/email";
 
 const pwdSchema = z.object({
   currentPassword: z.string().min(1, "رمز عبور فعلی الزامی است"),
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
     const { currentPassword, newPassword } = pwdSchema.parse(body);
 
     const ok = await verifyPassword(currentPassword, user.password).catch(() => false);
-    if (!ok && currentPassword !== "techbox123") {
+    if (!ok) {
       return NextResponse.json({ error: "رمز عبور فعلی اشتباه است" }, { status: 400 });
     }
 

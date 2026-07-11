@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, canEditModule } from "@/lib/auth-server";
+import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -19,7 +19,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || !canEditModule(user as any, "workwithus")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
@@ -44,7 +44,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || !canEditModule(user as any, "workwithus")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }

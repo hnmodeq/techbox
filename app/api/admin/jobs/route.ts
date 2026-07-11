@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, canEditModule } from "@/lib/auth-server";
+import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
 import { z } from "zod";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
@@ -17,7 +17,7 @@ const jobSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || !canEditModule(user as any, "workwithus")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || !canEditModule(user as any, "workwithus")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }

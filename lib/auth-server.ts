@@ -1,9 +1,31 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "./db";
 import bcrypt from "bcryptjs";
 
-const secret = new TextEncoder().encode(process.env.AUTH_SECRET || "dev-secret-please-change-32char!");
+function getAuthSecret(): Uint8Array {
+  const envSecret = process.env.AUTH_SECRET;
+
+  // In production/preview: AUTH_SECRET must be set and at least 32 chars
+  const isDeployed = process.env.NODE_ENV === "production" || process.env.VERCEL_ENV;
+  if (isDeployed) {
+    if (!envSecret || envSecret.length < 32) {
+      throw new Error(
+        "[auth-server] AUTH_SECRET must be set and at least 32 characters in production/preview. " +
+        "Set it in .env or Vercel environment variables."
+      );
+    }
+  }
+
+  // Local dev: allow explicit opt-in fallback (not recommended)
+  const fallback = "dev-secret-please-change-32char!";
+  if (!envSecret) {
+    console.warn("[auth-server] WARNING: AUTH_SECRET not set. Using dev fallback. Do NOT use in production.");
+  }
+  return new TextEncoder().encode(envSecret || fallback);
+}
+
+const secret = getAuthSecret();
 const COOKIE = "tb_session";
 
 export async function hashPassword(p: string){ return bcrypt.hash(p, 10); }
@@ -19,29 +41,80 @@ export async function createSession(userId: string){
 
 export async function getSessionUser(){
   const c = await cookies();
-  const h = await headers();
   const token = c.get(COOKIE)?.value;
-  const headerUserId = h.get("x-user-id") || h.get("x-auth-user");
+
+  if (!token) return null;
 
   let sub = "";
-  if (token) {
-    try {
-      const { payload } = await jwtVerify(token, secret);
-      sub = String(payload.sub);
-    } catch {}
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    sub = String(payload.sub);
+  } catch {
+    return null; // Invalid or expired token
   }
-  if (!sub && headerUserId) {
-    sub = String(headerUserId);
-  }
+
   if (!sub) return null;
 
   try {
     const user = await prisma.user.findUnique({ where: { id: sub }});
-    if (user) return user;
+    if (!user) return null;
+
+    // Reject banned/suspended users
+    if (user.status === "banned" || user.status === "suspended") return null;
+
+    return user;
   } catch (err) {
     console.error("[auth-server] Failed to fetch session user:", err);
   }
   
+  return null;
+}
+
+/**
+ * Like getSessionUser but omits the password hash from the result.
+ * Use this for general-purpose auth checks. Only use getSessionUser
+ * directly when you explicitly need the password (e.g. change-password).
+ */
+export async function getSessionUserPublic(){
+  const c = await cookies();
+  const token = c.get(COOKIE)?.value;
+
+  if (!token) return null;
+
+  let sub = "";
+  try {
+    const { payload } = await jwtVerify(token, secret);
+    sub = String(payload.sub);
+  } catch {
+    return null;
+  }
+
+  if (!sub) return null;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: sub },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        role: true,
+        roleFa: true,
+        status: true,
+        job: true,
+        birthday: true,
+        modules: true,
+        avatar: true,
+      },
+    });
+    if (!user) return null;
+    if (user.status === "banned" || user.status === "suspended") return null;
+    return user;
+  } catch (err) {
+    console.error("[auth-server] Failed to fetch session user:", err);
+  }
+
   return null;
 }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { list } from "@vercel/blob";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 const MAX_PAGES = 20;
 const PAGE_LIMIT = 1000;
@@ -64,7 +64,7 @@ function collectFolders(blobs: BlobLike[], prefix: string) {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || user.role !== "super_admin") {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
 
 const patchSchema = z.object({ id: z.string().min(1), status: z.enum(["active", "banned", "suspended"]) });
 
 async function requireSuperAdmin() {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   return user && user.role === "super_admin" ? user : null;
 }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
 
 const schema = z.object({
@@ -12,7 +12,7 @@ const schema = z.object({
 });
 
 async function requireSuperAdmin() {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   return Boolean(user && user.role === "super_admin");
 }
 

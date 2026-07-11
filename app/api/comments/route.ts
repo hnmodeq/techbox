@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
@@ -39,15 +39,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) {
     return NextResponse.json(
       { error: "unauthorized", message: "برای ثبت نظر ابتدا وارد حساب کاربری شوید." },
       { status: 401 }
     );
-  }
-  if ((user as any).status === "banned" || (user as any).status === "suspended") {
-    return NextResponse.json({ error: "forbidden", message: "حساب شما اجازه ثبت دیدگاه ندارد." }, { status: 403 });
   }
 
   const ip = getClientIp(req);

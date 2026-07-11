@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 const URL_FIELDS = ["image", "videoUrl", "fileUrl"] as const;
 
@@ -27,7 +27,7 @@ async function checkUrl(url: string): Promise<Omit<UrlStatus, "field" | "url">> 
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user || user.role !== "super_admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);

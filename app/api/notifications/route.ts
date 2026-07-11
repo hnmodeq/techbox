@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 const moduleFa: Record<string, string> = { blog: "مقاله", review: "نقد", media: "ویدیو", shop: "محصول", forum: "تاپیک", download: "دانلود", news: "خبر" };
 
@@ -59,7 +59,7 @@ async function buildNotifications() {
 
 export async function GET() {
   try {
-    const user = await getSessionUser();
+    const user = await getSessionUserPublic();
     const events = await buildNotifications();
     let lastReadAt = new Date(0);
 
@@ -77,7 +77,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   try {
     const body = await req.json().catch(() => ({}));

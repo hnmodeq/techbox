@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/lib/db";
-import { getSessionUser } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -34,7 +34,7 @@ export async function getCommentsAction(module: string, slug: string) {
 }
 
 export async function createCommentAction(prevState: any, formData: FormData) {
-  const user = await getSessionUser();
+  const user = await getSessionUserPublic();
   if (!user) {
     return { ok: false, error: "برای ثبت نظر ابتدا باید وارد حساب کاربری خود شوید." };
   }

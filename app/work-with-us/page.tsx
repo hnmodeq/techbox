@@ -23,7 +23,7 @@ export default async function WorkWithUs() {
 
       <div className="grid gap-4">
         {jobs.length > 0 ? (
-          jobs.map((j) => (
+          jobs.map((j: any) => (
             <Link 
               key={j.slug} 
               href={`/work-with-us/${j.slug}`} 

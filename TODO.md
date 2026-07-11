@@ -102,7 +102,7 @@
 | **SEC-001** | Blocker | `getSessionUser()` accepts spoofable `x-user-id` / `x-auth-user` → full auth bypass | `lib/auth-server.ts` |
 | **SEC-002** | Blocker | Timeline event POST/PUT/DELETE has **no auth** | `app/api/timeline/events/**` |
 | **SEC-003** | Critical | Change-password accepts hardcoded `techbox123` as current password | `app/api/auth/change-password/route.ts` |
-| **SEC-004** | Critical | Seed shared weak password + account UI defaults (`techbox123`) | `prisma/seed-blob-content.ts`, `app/account/page.tsx` |
+| **SEC-004** | Critical | Seed shared weak password (`123456xX`) + account UI defaults (`techbox123`) | `prisma/seed-blob-content.ts`, `app/account/page.tsx` |
 | **SEC-005** | Critical | Payment mock auto-verifies; client amount; no orders — **shop is catalog-only** so **disable**, don’t build full pay yet | `app/api/pay/**`, `app/shop/checkout/**` |
 | **SEC-006** | Critical | Secrets may have been exposed in chat — rotate out-of-band | ops / Vercel / Neon / etc. |
 | **SEC-007** | Critical | Fallback `AUTH_SECRET` if env missing | `lib/auth-server.ts` |
@@ -216,11 +216,11 @@ Legend: effort **XS** &lt;1h · **S** half-day · **M** 1–2 days · **L** mult
   - `app/api/auth/change-password/route.ts`  
   - `app/account/page.tsx`  
   - `prisma/seed-blob-content.ts` (stop logging password; use env `SEED_DEFAULT_PASSWORD` only for local seed)  
-- **Why:** Hardcoded `techbox123` bypass; UI advertises default passwords; seed logs shared password.  
+- **Why:** Change-password route has `techbox123` backdoor (`if (!ok && currentPassword !== "techbox123")`); account page quick-login defaults to `techbox123` and placeholder advertises it; seed uses shared password `123456xX` for all users and logs it to console. Two different weak passwords — both dangerous.  
 - **Steps:**
-  1. Remove `currentPassword !== "techbox123"` bypass entirely.  
+  1. Remove `currentPassword !== "techbox123"` bypass entirely from change-password route.  
   2. Remove quick-login that posts `techbox123`; remove placeholder text advertising defaults.  
-  3. Seed: password from env or random; log only “seeded N users” never the secret; document local-only seed in README.  
+  3. Seed: password from env `SEED_DEFAULT_PASSWORD` or random; replace hardcoded `123456xX`; log only “seeded N users” never the secret; document local-only seed in README.  
 - **Acceptance:** Change-password requires real current password; UI has no default password hints; seed does not print secrets.  
 - **Tests:** change-password API tests.  
 - **Effort:** S · **Deps:** P0-2  
