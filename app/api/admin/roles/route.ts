@@ -8,13 +8,17 @@ async function requireSuperAdmin() {
   return user && user.role === "super_admin" ? user : null;
 }
 
-function parseModules(value: string | null): string[] {
-  try {
-    const parsed = JSON.parse(value || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+function parseModules(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((m): m is string => typeof m === "string");
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value || "[]");
+      return Array.isArray(parsed) ? parsed.filter((m): m is string => typeof m === "string") : [];
+    } catch {
+      return [];
+    }
   }
+  return [];
 }
 
 /** GET /api/admin/roles — aggregate roles from real DB users */
@@ -120,7 +124,7 @@ export async function PATCH(req: NextRequest) {
       data.roleFa = body.roleFa ?? (body.role === "super_admin" ? "مدیر کل" : body.role === "editor" ? "ویراستار" : "کاربر عضو");
     }
     if (body.modules !== undefined) {
-      data.modules = JSON.stringify(body.modules);
+      data.modules = body.modules;
     }
 
     const updated = await prisma.user.update({

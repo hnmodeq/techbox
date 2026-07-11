@@ -133,11 +133,12 @@ export async function clearSession(){
   c.delete(COOKIE);
 }
 
-export function canEditModule(user: {role:string, modules:string}|null, module: string){
-  if(!user) return false;
-  if(user.role === "super_admin") return true;
-  try{
-    const mods: string[] = JSON.parse(user.modules || "[]");
-    return mods.includes(module);
-  }catch{ return false; }
+export function canEditModule(
+  user: { role: string; modules?: string | string[] | null } | null,
+  module: string
+) {
+  if (!user) return false;
+  if (user.role === "super_admin") return true;
+  const mods = Array.isArray(user.modules) ? (user.modules as string[]) : [];
+  return mods.includes(module);
 }

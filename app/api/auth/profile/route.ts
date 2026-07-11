@@ -64,7 +64,7 @@ export async function PUT(req: NextRequest) {
         roleFa: updated.roleFa || (updated.role === "super_admin" ? "مدیر کل" : "کاربر"),
         job: updated.job || "",
         birthday: updated.birthday || "",
-        modules: JSON.parse(updated.modules || "[]"),
+        modules: Array.isArray(updated.modules) ? updated.modules : [],
         avatar: updated.avatar || "/assets/hooman.png"
       }
     });

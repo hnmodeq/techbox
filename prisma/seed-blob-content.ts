@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -82,7 +82,7 @@ type SeedPost = {
   priceLabel?: string;
   availability?: string;
   warranty?: string;
-  specs?: Record<string, unknown>;
+  specs?: Prisma.InputJsonValue;
 };
 
 
@@ -551,8 +551,8 @@ async function upsertPosts(posts: SeedPost[]) {
         videoDuration: post.videoDuration || null,
         videoMimeType: post.videoMimeType || null,
         videoFileSize: post.videoFileSize || null,
-        gallery: JSON.stringify(post.gallery || []),
-        tags: JSON.stringify(post.tags || []),
+        gallery: post.gallery || [],
+        tags: post.tags || [],
         category: post.category || null,
         authorId: author?.id || null,
         authorName: author?.name || post.authorUsername,
@@ -572,7 +572,7 @@ async function upsertPosts(posts: SeedPost[]) {
         priceLabel: post.priceLabel || null,
         availability: post.availability || null,
         warranty: post.warranty || null,
-        specs: JSON.stringify(post.specs || {}),
+        specs: post.specs || {},
         solved: typeof post.solved === "boolean" ? post.solved : false,
         published: true,
       },
@@ -587,8 +587,8 @@ async function upsertPosts(posts: SeedPost[]) {
         videoDuration: post.videoDuration || null,
         videoMimeType: post.videoMimeType || null,
         videoFileSize: post.videoFileSize || null,
-        gallery: JSON.stringify(post.gallery || []),
-        tags: JSON.stringify(post.tags || []),
+        gallery: post.gallery || [],
+        tags: post.tags || [],
         category: post.category || null,
         authorId: author?.id || null,
         authorName: author?.name || post.authorUsername,
@@ -608,7 +608,7 @@ async function upsertPosts(posts: SeedPost[]) {
         priceLabel: post.priceLabel || null,
         availability: post.availability || null,
         warranty: post.warranty || null,
-        specs: JSON.stringify(post.specs || {}),
+        specs: post.specs || {},
         solved: typeof post.solved === "boolean" ? post.solved : false,
         published: true,
       },
@@ -760,7 +760,7 @@ async function replaceTimeline() {
         year: event.year,
         yearFa: event.yearFa,
         importance: event.importance,
-        tags: JSON.stringify(event.tags),
+        tags: event.tags,
         published: true,
       },
     });
@@ -845,7 +845,7 @@ async function upsertUsers() {
         role: user.role,
         roleFa: user.roleFa,
         job: user.job || null,
-        modules: JSON.stringify(user.modules || []),
+        modules: user.modules || [],
         avatar: user.avatar,
       },
       create: {
@@ -855,7 +855,7 @@ async function upsertUsers() {
         role: user.role,
         roleFa: user.roleFa,
         job: user.job || null,
-        modules: JSON.stringify(user.modules || []),
+        modules: user.modules || [],
         avatar: user.avatar,
         password,
       },

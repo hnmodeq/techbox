@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/ui/product-gallery";
 import VideoPlayer from "@/features/media/components/VideoPlayer";
+import MarkdownContent from "@/features/content/components/MarkdownContent";
 import { ContentJsonLd } from "@/components/seo/StructuredData";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
@@ -70,8 +71,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  </div>
  )}
 
- <div className="prose prose-invert max-w-none mt-8 text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color" dir="rtl">
- <p>{item.content || item.excerpt}</p>
+ <div className="mt-8">
+ <MarkdownContent content={item.content || item.excerpt} />
  </div>
 
  {item.module !== "media" && (

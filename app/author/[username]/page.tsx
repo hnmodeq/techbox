@@ -6,8 +6,6 @@ import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
 import { prisma } from "@/lib/db";
 
-function safeJsonArray(value: string | null | undefined): string[] { try { const p = JSON.parse(value || "[]"); return Array.isArray(p) ? p : []; } catch { return []; } }
-
 export default async function AuthorProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const cleanUser = decodeURIComponent(username).toLowerCase();

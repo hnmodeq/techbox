@@ -31,7 +31,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     return NextResponse.json({
       ...event,
-      tags: typeof event.tags === 'string' ? JSON.parse(event.tags || '[]') : event.tags,
+      tags: Array.isArray(event.tags) ? event.tags : [],
     });
   } catch (error) {
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
@@ -58,7 +58,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...parsed,
         image: parsed.image === '' ? null : parsed.image,
         dateGr: parsed.dateGr ? new Date(parsed.dateGr) : undefined,
-        tags: parsed.tags ? JSON.stringify(parsed.tags) : undefined,
+        tags: parsed.tags,
       },
     });
 

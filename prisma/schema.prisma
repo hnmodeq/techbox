@@ -18,7 +18,7 @@ model User {
   status   String  @default("active")
   job      String?
   birthday String?
-  modules  String  @default("[]")
+  modules  Json?
   avatar   String?
   password String
 
@@ -44,8 +44,8 @@ model Post {
   videoDuration String?
   videoMimeType String?
   videoFileSize String?
-  gallery    String   @default("[]")
-  tags       String   @default("[]")
+  gallery    Json?
+  tags       Json?
   category   String?
   seoTitle   String?
   seoDescription String?
@@ -55,7 +55,7 @@ model Post {
   priceLabel String?
   availability String?
   warranty   String?
-  specs      String   @default("{}")
+  specs      Json?
   authorId   String?
   authorName String   @default("تحریریه")
   date       DateTime @default(now())
@@ -213,7 +213,7 @@ model TimelineEvent {
   year        Int
   yearFa      Int
   importance  Int      @default(5)
-  tags        String   @default("[]")
+  tags        Json?
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

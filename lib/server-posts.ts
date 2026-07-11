@@ -1,26 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { ModuleSlug, ContentItem } from "@/lib/content";
 
-function safeJsonArray(value: string | null | undefined): string[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function safeJsonObject(value: string | null | undefined): Record<string, unknown> {
-  if (!value) return {};
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
 export async function getDbModulePosts(
   module: ModuleSlug,
   take: number = 50
@@ -60,8 +40,8 @@ export async function getDbModulePosts(
       videoDuration: p.videoDuration,
       videoMimeType: p.videoMimeType,
       videoFileSize: p.videoFileSize,
-      gallery: safeJsonArray(p.gallery),
-      tags: safeJsonArray(p.tags),
+      gallery: Array.isArray(p.gallery) ? (p.gallery as string[]) : [],
+      tags: Array.isArray(p.tags) ? (p.tags as string[]) : [],
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         role: p.author?.roleFa || p.author?.role || "",
@@ -82,7 +62,7 @@ export async function getDbModulePosts(
       priceLabel: p.priceLabel,
       availability: p.availability,
       warranty: p.warranty,
-      specs: safeJsonObject(p.specs),
+      specs: (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? p.specs : {},
       rating: p.rating,
       ratingCount: p.ratingCount,
       fileName: p.fileName,

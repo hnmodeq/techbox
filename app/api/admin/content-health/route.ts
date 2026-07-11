@@ -6,8 +6,8 @@ const URL_FIELDS = ["image", "videoUrl", "fileUrl"] as const;
 
 type UrlStatus = { field: string; url: string; ok: boolean; status?: number; error?: string };
 
-function safeJsonArray(value: string | null | undefined): string[] {
-  try { const p = JSON.parse(value || "[]"); return Array.isArray(p) ? p : []; } catch { return []; }
+function safeJsonArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 }
 
 function isHttpUrl(value?: string | null) {

@@ -22,13 +22,17 @@ async function requireSuperAdmin() {
   return user && user.role === "super_admin" ? user : null;
 }
 
-function safeModules(value: string | null | undefined): string[] {
-  try {
-    const parsed = JSON.parse(value || "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+function safeModules(value: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((m): m is string => typeof m === "string");
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value || "[]");
+      return Array.isArray(parsed) ? parsed.filter((m): m is string => typeof m === "string") : [];
+    } catch {
+      return [];
+    }
   }
+  return [];
 }
 
 function publicUser(user: any) {
@@ -91,7 +95,7 @@ export async function PATCH(req: NextRequest) {
     if (key in body) data[key] = body[key] || null;
   }
   if (body.role) data.roleFa = body.roleFa ?? (body.role === "super_admin" ? "مدیر کل" : body.role === "editor" ? "ویراستار" : "کاربر عضو");
-  if (body.modules) data.modules = JSON.stringify(body.modules);
+  if (body.modules) data.modules = body.modules;
   if (body.password) data.password = await hashPassword(body.password);
 
   const updated = await prisma.user.update({

@@ -7,26 +7,6 @@ import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STO
 import { createPostRevision } from "@/lib/revision";
 import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
 
-function safeJsonArray(value: string | null | undefined): string[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function safeJsonObject(value: string | null | undefined): Record<string, unknown> {
-  if (!value) return {};
-  try {
-    const parsed = JSON.parse(value);
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
 function normalizeSlug(value: string, fallback: string) {
   const base = (value || fallback)
     .trim()
@@ -72,8 +52,7 @@ export async function GET(req: NextRequest) {
       if (postModule) {
         if (!canEditModule(user as any, postModule)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
       } else if (user.role !== "super_admin") {
-        let modules: string[] = [];
-        try { modules = JSON.parse((user as any).modules || "[]"); } catch {}
+        const modules = Array.isArray((user as any).modules) ? ((user as any).modules as string[]) : [];
         where = { ...where, module: { in: modules } };
       }
     }
@@ -144,8 +123,8 @@ export async function GET(req: NextRequest) {
       videoDuration: p.videoDuration,
       videoMimeType: p.videoMimeType,
       videoFileSize: p.videoFileSize,
-      gallery: safeJsonArray(p.gallery),
-      tags: safeJsonArray(p.tags),
+      gallery: Array.isArray(p.gallery) ? p.gallery : [],
+      tags: Array.isArray(p.tags) ? p.tags : [],
       date: p.date.toISOString(),
       date_fa: p.dateFa || new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(p.date),
       dateFa: p.dateFa,
@@ -168,7 +147,7 @@ export async function GET(req: NextRequest) {
       priceLabel: p.priceLabel,
       availability: p.availability,
       warranty: p.warranty,
-      specs: safeJsonObject(p.specs),
+      specs: (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? p.specs : {},
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         username: p.author?.username || "",
@@ -207,7 +186,7 @@ const createSchema = z.object({
   priceLabel: z.string().max(100).optional(),
   availability: z.string().max(100).optional(),
   warranty: z.string().max(200).optional(),
-  specs: z.record(z.unknown()).default({}),
+  specs: z.record(z.any()).default({}),
   rating: z.number().min(0).max(5).optional(),
   ratingCount: z.number().int().min(0).optional(),
   fileName: z.string().max(200).optional(),
@@ -246,7 +225,7 @@ export async function POST(req: NextRequest) {
           title: data.title.trim(),
           excerpt,
           content,
-          tags: JSON.stringify((data.tags?.length ? data.tags : ["پرسش"]).slice(0, 10)),
+          tags: (data.tags?.length ? data.tags : ["پرسش"]).slice(0, 10),
           category: data.category || "پرسش",
           authorId: user.id,
           authorName: user.name,
@@ -265,9 +244,9 @@ export async function POST(req: NextRequest) {
 
     const serialized = {
       ...data,
-      gallery: JSON.stringify(data.gallery || []),
-      tags: JSON.stringify(data.tags),
-      specs: JSON.stringify(data.specs || {}),
+      gallery: data.gallery || [],
+      tags: data.tags,
+      specs: data.specs || {},
       authorId: user.id,
       authorName: user.name,
       published: data.published ?? true,

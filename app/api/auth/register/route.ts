@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         password: hashedPassword,
         role: "user",
         roleFa: "کاربر عضو",
-        modules: "[]",
+        modules: [],
         avatar: ""
       }
     });

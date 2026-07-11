@@ -32,7 +32,7 @@ export async function GET() {
       const transformedEvents = events.map((event: any) => ({
         ...event,
         image: event.image || null,
-        tags: typeof event.tags === 'string' ? JSON.parse(event.tags || '[]') : event.tags,
+        tags: Array.isArray(event.tags) ? event.tags : [],
       }));
       return NextResponse.json(transformedEvents);
     }
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
         year,
         yearFa,
         importance,
-        tags: JSON.stringify(tags),
+        tags,
         published: true,
       },
     });

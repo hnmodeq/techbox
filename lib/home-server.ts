@@ -12,16 +12,6 @@ const moduleTakes: Record<string, number> = {
   news: 15,
 };
 
-function safeJsonArray(value: string | null | undefined): string[] {
-  if (!value) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
 const cardSelect = {
   id: true,
   slug: true,
@@ -54,8 +44,8 @@ const cardSelect = {
   author: { select: { name: true, username: true, role: true, roleFa: true, avatar: true } },
 } as const;
 
-function firstGalleryImage(value: string | null | undefined) {
-  return safeJsonArray(value).slice(0, 3);
+function firstGalleryImage(value: unknown) {
+  return Array.isArray(value) ? value.slice(0, 3) : [];
 }
 
 function normalizeCard(p: any) {
@@ -71,7 +61,7 @@ function normalizeCard(p: any) {
     videoMimeType: p.videoMimeType,
     videoFileSize: p.videoFileSize,
     gallery: firstGalleryImage(p.gallery),
-    tags: safeJsonArray(p.tags).slice(0, 8),
+    tags: Array.isArray(p.tags) ? p.tags.slice(0, 8) : [],
     date: p.date.toISOString(),
     date_fa: p.dateFa || new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(p.date),
     dateFa: p.dateFa,

@@ -37,13 +37,11 @@ export async function advancedSearch({
           { title: { contains: normalized, mode: "insensitive" } },
           { excerpt: { contains: normalized, mode: "insensitive" } },
           { content: { contains: normalized, mode: "insensitive" } },
-          { tags: { contains: normalized, mode: "insensitive" } },
           { category: { contains: normalized, mode: "insensitive" } },
           { authorName: { contains: normalized, mode: "insensitive" } },
           ...words.flatMap((word) => [
             { title: { contains: word, mode: "insensitive" as const } },
             { excerpt: { contains: word, mode: "insensitive" as const } },
-            { tags: { contains: word, mode: "insensitive" as const } },
           ]),
         ],
       },
@@ -60,7 +58,7 @@ export async function advancedSearch({
         const title = normalizePersian(p.title || "");
         const excerpt = normalizePersian(p.excerpt || "");
         const content = normalizePersian(p.content || "");
-        const tags = (p.tags || "").toLowerCase();
+        const tags = Array.isArray(p.tags) ? p.tags.join(" ").toLowerCase() : "";
         const category = (p.category || "").toLowerCase();
         const author = (p.authorName || "").toLowerCase();
 

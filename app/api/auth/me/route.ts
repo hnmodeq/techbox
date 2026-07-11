@@ -4,8 +4,7 @@ import { getSessionUserPublic } from "@/lib/auth-server";
 export async function GET(){
   const user = await getSessionUserPublic();
   if(!user) return NextResponse.json({ user: null });
-  let modules = [];
-  try { modules = JSON.parse(user.modules || "[]"); } catch {}
+  const modules = Array.isArray(user.modules) ? user.modules : [];
   return NextResponse.json({ user: {
     id: user.id,
     name: user.name,

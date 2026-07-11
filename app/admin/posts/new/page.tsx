@@ -418,7 +418,7 @@ function NewPostInner() {
  <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden">
  {image && <div className="relative aspect-[16/9] bg-[var(--muted-background)]"><Image src={image} alt="preview" fill sizes="300px" className="object-cover" /></div>}
  <div className="p-4 space-y-2">
- <div className="flex flex-wrap gap-2"><ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>{status === "published" ? <ModuleBadge module="success">منتشر شده</ModuleBadge> : status === "review" ? <ModuleBadge module="info">در حال بررسی</ModuleBadge> : status === "archived" ? <ModuleBadge module="admin">آرشیو شده</ModuleBadge> : <ModuleBadge module="warning">پیش‌نویس</ModuleBadge>}</div>
+ <div className="flex flex-wrap gap-2"><ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>{status === "published" ? <ModuleBadge module="success">منتشر شده</ModuleBadge> : status === "review" ? <ModuleBadge module="info">در حال بررسی</ModuleBadge> : status === "archived" ? <ModuleBadge module="danger">آرشیو شده</ModuleBadge> : <ModuleBadge module="warning">پیش‌نویس</ModuleBadge>}</div>
  <h3 className="font-black text-[var(--primary-text)] line-clamp-2">{title || "عنوان مطلب"}</h3>
  <p className="paragraph-color text-xs line-clamp-3">{excerpt || "خلاصه مطلب اینجا دیده می‌شود."}</p>
  </div>
