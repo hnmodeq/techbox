@@ -70,6 +70,7 @@ model Post {
   fileSize      String?
   downloadCount Int      @default(0)
   published     Boolean  @default(true)
+  status        String   @default("published")
   deletedAt     DateTime?
   deletedBy     String?
 

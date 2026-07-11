@@ -108,6 +108,7 @@ export async function GET(req: NextRequest) {
         fileSize: true,
         downloadCount: true,
         published: true,
+        status: true,
         category: true,
         seoTitle: true,
         seoDescription: true,
@@ -214,6 +215,7 @@ const createSchema = z.object({
   fileSize: z.string().max(50).optional(),
   downloadCount: z.number().int().min(0).optional(),
   published: z.boolean().optional(),
+  status: z.enum(["draft", "review", "published", "archived"]).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -249,6 +251,7 @@ export async function POST(req: NextRequest) {
           authorId: user.id,
           authorName: user.name,
           published: true,
+          status: "published",
           dateFa,
         },
       });
@@ -268,6 +271,7 @@ export async function POST(req: NextRequest) {
       authorId: user.id,
       authorName: user.name,
       published: data.published ?? true,
+      status: data.status ?? (data.published ? "published" : "draft"),
     };
 
     const post = await prisma.post.upsert({
@@ -310,6 +314,10 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.content === "string") data.content = body.content;
   if (typeof body.image === "string") data.image = body.image;
   if (typeof body.published === "boolean") data.published = body.published;
+  if (typeof body.status === "string" && ["draft", "review", "published", "archived"].includes(body.status)) {
+    data.status = body.status;
+    data.published = body.status === "published";
+  }
   if (typeof body.solved === "boolean") data.solved = body.solved;
   if (typeof body.category === "string") data.category = body.category;
 

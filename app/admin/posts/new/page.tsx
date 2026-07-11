@@ -83,6 +83,7 @@ function NewPostInner() {
  const [content, setContent] = useState("");
  const [image, setImage] = useState("");
  const [published, setPublished] = useState(true);
+  const [status, setStatus] = useState("published");
   const [videoUrl, setVideoUrl] = useState("");
   const [videoDuration, setVideoDuration] = useState("");
 
@@ -145,6 +146,7 @@ function NewPostInner() {
    setContent(it.content || "");
    setImage(it.image || "");
    setPublished(typeof it.published === "boolean" ? it.published : true);
+   setStatus(it.status || (it.published ? "published" : "draft"));
    setVideoUrl(it.videoUrl || "");
    setVideoDuration(it.videoDuration || "");
    setVideoMimeType(it.videoMimeType || "");
@@ -189,6 +191,7 @@ function NewPostInner() {
  content: content.trim(),
  image: image.trim() || undefined,
  published,
+ status,
  videoUrl: videoUrl.trim() || undefined,
  videoDuration: videoDuration.trim() || undefined,
  videoMimeType: videoMimeType.trim() || undefined,
@@ -366,8 +369,21 @@ function NewPostInner() {
  <textarea value={content} onChange={e=>setContent(e.target.value)} className="input mt-1 min-h-[260px]" placeholder="متن کامل / HTML / Markdown…" />
  </div>
 
+ <div>
+ <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">وضعیت انتشار</label>
+ <select
+   value={status}
+   onChange={(e) => { setStatus(e.target.value); setPublished(e.target.value === "published"); }}
+   className="input mt-1"
+ >
+   <option value="published">منتشر شده</option>
+   <option value="review">در حال بررسی</option>
+   <option value="draft">پیش‌نویس</option>
+   <option value="archived">آرشیو شده</option>
+ </select>
+ </div>
  <label className="flex items-center gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] p-3 text-sm paragraph-color">
- <input type="checkbox" checked={published} onChange={(e)=>setPublished(e.target.checked)} />
+ <input type="checkbox" checked={published} onChange={(e)=>{ setPublished(e.target.checked); setStatus(e.target.checked ? "published" : "draft"); }} />
  <span>{published ? "انتشار عمومی" : "ذخیره به‌عنوان پیش‌نویس"}</span>
  </label>
 
@@ -402,7 +418,7 @@ function NewPostInner() {
  <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden">
  {image && <div className="relative aspect-[16/9] bg-[var(--muted-background)]"><Image src={image} alt="preview" fill sizes="300px" className="object-cover" /></div>}
  <div className="p-4 space-y-2">
- <div className="flex flex-wrap gap-2"><ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>{published ? <ModuleBadge module="success">منتشر می‌شود</ModuleBadge> : <ModuleBadge module="warning">پیش‌نویس</ModuleBadge>}</div>
+ <div className="flex flex-wrap gap-2"><ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>{status === "published" ? <ModuleBadge module="success">منتشر شده</ModuleBadge> : status === "review" ? <ModuleBadge module="info">در حال بررسی</ModuleBadge> : status === "archived" ? <ModuleBadge module="admin">آرشیو شده</ModuleBadge> : <ModuleBadge module="warning">پیش‌نویس</ModuleBadge>}</div>
  <h3 className="font-black text-[var(--primary-text)] line-clamp-2">{title || "عنوان مطلب"}</h3>
  <p className="paragraph-color text-xs line-clamp-3">{excerpt || "خلاصه مطلب اینجا دیده می‌شود."}</p>
  </div>
