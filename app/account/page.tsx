@@ -77,7 +77,7 @@ export default function AccountPage() {
       if (res.ok && data.ok) {
         await loadUser();
       } else {
-        setAuthError(data.error === "not found" ? "کاربری با این نام کاربری یافت نشد" : data.error === "invalid" ? "رمز عبور اشتباه است" : data.error || "خطا در ورود");
+        setAuthError(data.message || data.error || "خطا در ورود");
       }
     } catch {
       setAuthError("خطا در برقراری ارتباط با سرور Neon");

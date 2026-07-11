@@ -3,7 +3,8 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { sendEmail, emailTemplates } from "@/lib/email";
+import { sendEmail, emailTemplates, escapeHtml } from "@/lib/email";
+import { getSettings } from "@/lib/settings";
 
 const postSchema = z.object({
   postModule: z.string(),
@@ -19,6 +20,12 @@ export async function GET(req: NextRequest) {
   const slug = searchParams.get("slug");
   if (!postModule || !slug)
     return NextResponse.json({ error: "module+slug required" }, { status: 400 });
+
+  // Check if comments are hidden globally
+  const settings = await getSettings(["comments.hidden_globally"]);
+  if (settings["comments.hidden_globally"] === "true") {
+    return NextResponse.json([], { headers: { "X-Comments-Hidden": "true" } });
+  }
 
   try {
     const post = await prisma.post.findUnique({
@@ -47,6 +54,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Check if comments are hidden globally — block new comments
+  const settings = await getSettings(["comments.hidden_globally", "comments.mode"]);
+  if (settings["comments.hidden_globally"] === "true") {
+    return NextResponse.json(
+      { error: "comments_disabled", message: "دیدگاه‌ها موقتاً غیرفعال شده‌اند." },
+      { status: 403 }
+    );
+  }
+
   const ip = getClientIp(req);
   const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "comments");
 
@@ -68,6 +84,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "post_not_found", message: "مطلب مورد نظر یافت نشد." }, { status: 404 });
     }
 
+    // Determine comment status based on policy
+    const commentMode = settings["comments.mode"] || "auto_approve";
+    const status = commentMode === "require_approval" ? "pending" : "approved";
+
     const comment = await prisma.comment.create({
       data: {
         postId: post.id,
@@ -75,11 +95,12 @@ export async function POST(req: NextRequest) {
         authorId: user.id,
         authorName: user.name || user.username,
         text,
+        status,
       },
     });
 
-    // Send email notification to post author (if available)
-    if (post.authorId) {
+    // Send email notification to post author (if available) only for approved comments
+    if (status === "approved" && post.authorId) {
       const postAuthor = await prisma.user.findUnique({
         where: { id: post.authorId },
         select: { email: true, name: true },
@@ -88,7 +109,7 @@ export async function POST(req: NextRequest) {
       if (postAuthor?.email) {
         const { subject, html } = emailTemplates.newComment({
           postTitle: post.title,
-          postUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "https://techbox.local"}/${postModule}/${postSlug}`,
+          postUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/${postModule}/${postSlug}`,
           commentAuthor: user.name || user.username,
           commentText: text,
         });

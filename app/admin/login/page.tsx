@@ -26,7 +26,7 @@ export default function AdminLogin() {
         login(data.user);
         router.push("/admin");
       } else {
-        setErr(data.error === "not found" ? "نام کاربری یا رمز عبور اشتباه است" : "خطا در ورود");
+        setErr(data.message || "خطا در ورود");
       }
     } catch {
       setErr("خطا در برقراری ارتباط با سرور Neon");

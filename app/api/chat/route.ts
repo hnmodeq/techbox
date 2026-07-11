@@ -20,9 +20,16 @@ const SYSTEM_FA = `تو «دستیار تکباکس» هستی — دستیار 
 - اگر اطلاعات نداشتی بگو: «مطمئن نیستم، بهتره در انجمن /forum بپرسی.»
 - از اصطلاحات فنی انگلیسی فقط وقتی لازم است استفاده کن و ترجمه فارسی‌اش را هم بگو.`;
 
-type Msg = { role: "system"|"user"|"assistant"; content: string };
+const MAX_MESSAGES = 12;
+const MAX_CHARS_PER_MESSAGE = 2000;
+const MAX_TOTAL_CHARS = 24000; // 12 * 2000
+const SERVER_MODEL = process.env.CHAT_MODEL || "gpt-4o-mini";
+const MAX_TEMPERATURE = 1.0;
+const MIN_TEMPERATURE = 0.0;
 
-export async function POST(req: NextRequest){
+type Msg = { role: "system" | "user" | "assistant"; content: string };
+
+export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
   const rateLimit = await checkRateLimit(ip, "chat");
 
@@ -33,48 +40,71 @@ export async function POST(req: NextRequest){
     );
   }
 
- try{
- const { messages = [], model, temperature = 0.5 } : {messages: Msg[], model?:string, temperature?:number} = await req.json();
+  try {
+    const raw = await req.json();
+    const { messages = [], temperature: clientTemp }: { messages: Msg[]; temperature?: number } = raw;
 
- const apiKey = process.env.CHAT_API_KEY;
- const baseUrl = process.env.CHAT_BASE_URL || "https://api.openai.com/v1";
- const chatModel = model || process.env.CHAT_MODEL || "gpt-4o-mini";
+    // Strip any client-injected system messages — only server system prompt allowed
+    const filteredMessages = messages
+      .filter((m) => m.role !== "system")
+      .slice(0, MAX_MESSAGES); // Cap message count
 
- if (!apiKey) {
-   const last = messages.filter((m) => m.role === "user").pop()?.content || "";
-   return NextResponse.json({
-     reply: `🤖 (حالت دمو)\n\nسوال شما: «${last}»\n\nپاسخ آزمایشی تکباکس:\n• اگر منظورتان QNAP-2277 است → بررسی ویدیویی: /media/qnap-2277-review-video\n• نقد تخصصی: /review/qnap-2277-full-review\n• خرید: /shop/qnap-ts-2277\n• فریم‌ور: /download/qnap-2277-firmware\n\nبرای فعال‌سازی واقعی، CHAT_API_KEY را در .env تنظیم کنید.`,
-     mock: true,
-   });
- }
+    // Truncate individual messages that are too long
+    const sanitizedMessages: Msg[] = filteredMessages.map((m) => ({
+      role: m.role,
+      content: String(m.content).slice(0, MAX_CHARS_PER_MESSAGE),
+    }));
 
- const body = {
- model: chatModel,
- messages: [{role:"system", content: SYSTEM_FA}, ...messages],
- temperature,
- max_tokens: 900,
- stream: false,
- };
+    // Reject if total content is absurdly large
+    const totalChars = sanitizedMessages.reduce((sum, m) => sum + m.content.length, 0);
+    if (totalChars > MAX_TOTAL_CHARS) {
+      return NextResponse.json(
+        { error: "payload_too_large", message: "حجم پیام‌ها بیش از حد مجاز است." },
+        { status: 400 }
+      );
+    }
 
- const r = await fetch(`${baseUrl.replace(/\/$/,"")}/chat/completions`, {
- method: "POST",
- headers: {
- "Content-Type": "application/json",
- "Authorization": `Bearer ${apiKey}`,
- },
- body: JSON.stringify(body),
- // Next 16 – no cache
- cache: "no-store" as any,
- });
+    // Clamp temperature server-side (ignore client model entirely)
+    const temperature = Math.min(MAX_TEMPERATURE, Math.max(MIN_TEMPERATURE, clientTemp ?? 0.5));
 
- if(!r.ok){
- const txt = await r.text();
- return NextResponse.json({ error: `chat provider ${r.status}`, detail: txt.slice(0,500) }, { status: 502 });
- }
- const data = await r.json();
- const reply = data?.choices?.[0]?.message?.content || "پاسخی دریافت نشد.";
- return NextResponse.json({ reply, usage: data?.usage });
- }catch(e:any){
- return NextResponse.json({ error: e?.message || "chat_failed" }, { status: 500 });
- }
+    const apiKey = process.env.CHAT_API_KEY;
+    const baseUrl = process.env.CHAT_BASE_URL || "https://api.openai.com/v1";
+
+    if (!apiKey) {
+      const last = sanitizedMessages.filter((m) => m.role === "user").pop()?.content || "";
+      return NextResponse.json({
+        reply: `🤖 (حالت دمو)\n\nسوال شما: «${last}»\n\nپاسخ آزمایشی تکباکس:\n• اگر منظورتان QNAP-2277 است → بررسی ویدیویی: /media/qnap-2277-review-video\n• نقد تخصصی: /review/qnap-2277-full-review\n• خرید: /shop/qnap-ts-2277\n• فریم‌ور: /download/qnap-2277-firmware\n\nبرای فعال‌سازی واقعی، CHAT_API_KEY را در .env تنظیم کنید.`,
+        mock: true,
+      });
+    }
+
+    const body = {
+      model: SERVER_MODEL, // Always use server-configured model
+      messages: [{ role: "system" as const, content: SYSTEM_FA }, ...sanitizedMessages],
+      temperature,
+      max_tokens: 900,
+      stream: false,
+    };
+
+    const r = await fetch(`${baseUrl.replace(/\/$/, "")}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+      cache: "no-store" as any,
+    });
+
+    if (!r.ok) {
+      const txt = await r.text();
+      return NextResponse.json({ error: `chat provider ${r.status}`, detail: txt.slice(0, 500) }, { status: 502 });
+    }
+
+    const data = await r.json();
+    const reply = data?.choices?.[0]?.message?.content || "پاسخی دریافت نشد.";
+    return NextResponse.json({ reply, usage: data?.usage });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || "chat_failed" }, { status: 500 });
+  }
 }

@@ -91,37 +91,69 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
     return list.sort((a, b) => realViews(b) - realViews(a)); // داغ
   })();
 
-  const submitTopic = (e: FormEvent) => {
+  const [submitError, setSubmitError] = useState("");
+
+  const submitTopic = async (e: FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
+    setSubmitError("");
+
     const slug =
       title
         .toLowerCase()
         .replace(/[^a-z0-9\u0600-\u06FF]+/g, "-")
         .slice(0, 60) + "-" + Date.now().toString(36);
-    const nt: any = {
-      slug,
-      module: "forum",
-      title: title.trim(),
-      excerpt: body.slice(0, 140),
-      content: body,
-      tags: ["پرسش", "تکباکس"], // kept in data systematically, hidden in UI
-      author: { name: "شما", role: "عضو", avatar: "/assets/hooman.png" },
-      avatar: "/assets/hooman.png",
-      date: new Date().toISOString(),
-      date_fa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
-      likes: 0,
-      views: 1,
-      category: "پرسش",
-      solved: false,
-    };
-    setLocal((l) => [nt as ForumPost & { avatar: string }, ...l]);
-    setTitle("");
-    setBody("");
-    setShowNew(false);
-    const d = JSON.parse(localStorage.getItem("tb_forum_drafts") || "[]");
-    d.unshift(nt);
-    localStorage.setItem("tb_forum_drafts", JSON.stringify(d));
+
+    try {
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          module: "forum",
+          slug,
+          title: title.trim(),
+          excerpt: body.slice(0, 140),
+          content: body,
+          tags: ["پرسش", "تکباکس"],
+          category: "پرسش",
+          published: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          setSubmitError("برای ایجاد موضوع جدید باید وارد حساب کاربری شوید.");
+          return;
+        }
+        setSubmitError(data.error || "خطا در ثبت موضوع.");
+        return;
+      }
+
+      // Success — add to local list and refresh
+      const nt: any = {
+        slug,
+        module: "forum",
+        title: title.trim(),
+        excerpt: body.slice(0, 140),
+        content: body,
+        tags: ["پرسش", "تکباکس"],
+        author: { name: "شما", role: "عضو", avatar: "/assets/hooman.png" },
+        avatar: "/assets/hooman.png",
+        date: new Date().toISOString(),
+        date_fa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
+        likes: 0,
+        views: 1,
+        category: "پرسش",
+        solved: false,
+      };
+      setLocal((l) => [nt as ForumPost & { avatar: string }, ...l]);
+      setTitle("");
+      setBody("");
+      setShowNew(false);
+    } catch {
+      setSubmitError("خطا در اتصال به سرور.");
+    }
   };
 
   return (
@@ -296,8 +328,11 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
               className="input w-full min-h-[160px]"
               required
             />
+            {submitError && (
+              <p className="text-[length:var(--paragraph-font-size)] text-[var(--danger)]">{submitError}</p>
+            )}
             <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              پیش‌نویس به‌صورت خودکار در مرورگر ذخیره می‌شود.
+              برای ایجاد موضوع جدید باید وارد حساب کاربری شوید.
             </div>
             <div className="flex justify-end gap-2 pt-2 border-t-[length:var(--border-size)] border-[var(--border-color)]">
               <Button type="button" variant="ghost" onClick={() => setShowNew(false)}>

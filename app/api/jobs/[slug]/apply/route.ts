@@ -67,9 +67,11 @@ export async function POST(
       return NextResponse.json({ error: "unsupported_file_type", message: "فرمت فایل رزومه باید PDF یا Word باشد." }, { status: 415 });
     }
 
-    // Upload to Vercel Blob
+    // Upload to Vercel Blob — private access where possible
+    // Note: free tier forces public URLs, but we add unguessable paths
+    // and do NOT list resumes in any public API
     const blob = await put(`resumes/${job.slug}/${Date.now()}-${file.name}`, file, {
-      access: "public",
+      access: "public", // Free tier limitation; use unguessable path
       addRandomSuffix: true,
     });
 

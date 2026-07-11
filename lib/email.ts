@@ -1,8 +1,10 @@
 import { Resend } from "resend";
 
-const resend = process.env.RESEND_API_KEY 
-  ? new Resend(process.env.RESEND_API_KEY) 
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
   : null;
+
+const DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || "TechBox <onboarding@resend.dev>";
 
 interface SendEmailParams {
   to: string | string[];
@@ -19,7 +21,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailParams) {
 
   try {
     const result = await resend.emails.send({
-      from: from || "TechBox <no-reply@techbox.local>",
+      from: from || DEFAULT_FROM,
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
@@ -32,6 +34,18 @@ export async function sendEmail({ to, subject, html, from }: SendEmailParams) {
   }
 }
 
+/**
+ * Escape HTML special characters to prevent XSS in email templates.
+ */
+export function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 // Email templates
 export const emailTemplates = {
   newComment: (params: {
@@ -40,15 +54,15 @@ export const emailTemplates = {
     commentAuthor: string;
     commentText: string;
   }) => ({
-    subject: `دیدگاه جدید روی "${params.postTitle}"`,
+    subject: `دیدگاه جدید روی "${escapeHtml(params.postTitle)}"`,
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2 style="color: #111;">دیدگاه جدید</h2>
-        <p>کاربر <strong>${params.commentAuthor}</strong> روی پست شما دیدگاه گذاشت:</p>
+        <p>کاربر <strong>${escapeHtml(params.commentAuthor)}</strong> روی پست شما دیدگاه گذاشت:</p>
         <blockquote style="border-left: 4px solid #ddd; padding-left: 16px; color: #555;">
-          ${params.commentText}
+          ${escapeHtml(params.commentText)}
         </blockquote>
-        <a href="${params.postUrl}" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
+        <a href="${escapeHtml(params.postUrl)}" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
           مشاهده دیدگاه
         </a>
       </div>
@@ -59,7 +73,7 @@ export const emailTemplates = {
     subject: "خوش آمدید به تکباکس",
     html: `
       <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h1 style="color: #111;">خوش آمدید، ${name}!</h1>
+        <h1 style="color: #111;">خوش آمدید، ${escapeHtml(name)}!</h1>
         <p>از ثبت‌نام شما در تکباکس ممنونیم.</p>
         <p>حالا می‌توانید در بحث‌ها شرکت کنید، محتوا بخوانید و از ابزارها استفاده کنید.</p>
       </div>
@@ -72,10 +86,10 @@ export const emailTemplates = {
       <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h2>درخواست بازیابی رمز عبور</h2>
         <p>برای تنظیم رمز عبور جدید روی دکمه زیر کلیک کنید:</p>
-        <a href="${resetLink}" style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+        <a href="${escapeHtml(resetLink)}" style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 16px 0;">
           تنظیم رمز عبور جدید
         </a>
-        <p style="color: #666; font-size: 13px;">این لینک ۲۴ ساعت معتبر است.</p>
+        <p style="color: #666; font-size: 13px;">این لینک ۱ ساعت معتبر است.</p>
       </div>
     `,
   }),

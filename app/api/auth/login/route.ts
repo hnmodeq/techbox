@@ -37,11 +37,28 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({ where: { username: cleanUser } });
 
-    if (!user) return NextResponse.json({ error: "not found" }, { status: 404 });
+    // Uniform error: don't reveal whether user exists or password is wrong
+    if (!user) {
+      return NextResponse.json(
+        { error: "invalid_credentials", message: "نام کاربری یا رمز عبور اشتباه است." },
+        { status: 401 }
+      );
+    }
+
+    // Reject banned/suspended users with same generic error
+    if (user.status === "banned" || user.status === "suspended") {
+      return NextResponse.json(
+        { error: "invalid_credentials", message: "نام کاربری یا رمز عبور اشتباه است." },
+        { status: 401 }
+      );
+    }
 
     const ok = await verifyPassword(password, user.password).catch(() => false);
     if (!ok) {
-      return NextResponse.json({ error: "invalid" }, { status: 401 });
+      return NextResponse.json(
+        { error: "invalid_credentials", message: "نام کاربری یا رمز عبور اشتباه است." },
+        { status: 401 }
+      );
     }
 
     const token = await createSession(user.id);
