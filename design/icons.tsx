@@ -55,6 +55,7 @@ import {
   Server,
   Database,
   Cctv,
+  FileText,
   History,
   type LucideIcon,
   type LucideProps,
@@ -105,7 +106,7 @@ export const icons = {
   review: Star,
   // hardware (raid / subnet visuals)
   disk: HardDrive,
-  file: File,
+  file: FileText,
   server: Server,
   nas: Database,
   nvr: Cctv,
