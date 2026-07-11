@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Spinner } from "@/components/ui/spinner";
 
 type CommentNode = any;
 type CommentFormState = { ok: boolean; error?: string; message?: string; pending?: boolean };
@@ -186,7 +187,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
       <div className="space-y-1 min-h-[60px]">
         {loading ? (
-          <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color text-center py-6 animate-pulse">در حال بارگذاری دیدگاه‌ها از پایگاه داده Neon...</p>
+          <div className="flex items-center justify-center py-6"><Spinner className="h-7 w-7" /></div>
         ) : comments.length === 0 ? (
           <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (
