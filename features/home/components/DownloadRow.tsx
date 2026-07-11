@@ -73,7 +73,7 @@ export default function DownloadRow() {
                 {/* Bottom Footer without visible separator line */}
                 <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
                   <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
-                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} />
+                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} showFileSize={false} />
                 </div>
               </article>
             );
