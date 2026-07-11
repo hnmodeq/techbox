@@ -88,6 +88,17 @@ export default function SidebarContent({
 
   const [toolsExpanded, setToolsExpanded] = useState(false);
   const [toolsMenuPos, setToolsMenuPos] = useState<{ top: number; right: number } | null>(null);
+  const toolsCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const keepToolsOpen = useCallback(() => {
+    if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
+  }, []);
+  const scheduleCloseTools = useCallback(() => {
+    if (toolsCloseTimer.current) clearTimeout(toolsCloseTimer.current);
+    toolsCloseTimer.current = setTimeout(() => {
+      setToolsMenuPos(null);
+      setToolsExpanded(false);
+    }, 140);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -213,8 +224,8 @@ export default function SidebarContent({
    className="fixed w-60 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)]"
    style={{ zIndex: zIndex.popover, top: toolsMenuPos.top, right: toolsMenuPos.right }}
    dir="rtl"
-   onMouseEnter={() => setToolsExpanded(true)}
-   onMouseLeave={() => setToolsMenuPos(null)}
+   onMouseEnter={keepToolsOpen}
+   onMouseLeave={scheduleCloseTools}
  >
    <div className="px-2 pb-2 text-xs font-bold text-[var(--tools)]">ابزارهای تخصصی</div>
    {navItems.find((n) => n.children?.length)?.children?.map((child) => {
@@ -359,12 +370,13 @@ export default function SidebarContent({
             if (item.children && item.children.length > 0) {
               const openFloatingChildren = (el: HTMLElement) => {
                 if (!expanded) return;
+                keepToolsOpen();
                 const rect = el.getBoundingClientRect();
                 setToolsExpanded(true);
-                setToolsMenuPos({ top: rect.top, right: window.innerWidth - rect.left + 8 });
+                setToolsMenuPos({ top: rect.top, right: window.innerWidth - rect.left });
               };
               return (
-                <div key={item.href} className="flex flex-col" onMouseEnter={(e) => openFloatingChildren(e.currentTarget)} onMouseLeave={() => setToolsMenuPos(null)}>
+                <div key={item.href} className="flex flex-col" onMouseEnter={(e) => openFloatingChildren(e.currentTarget)} onMouseLeave={scheduleCloseTools}>
                   <SidebarTooltip label={item.title} enabled={!expanded} tooltipClassName={getTooltipColorClass(item, active)}>
                     <div className="flex items-center">
                       <Link

@@ -83,8 +83,27 @@ function NewPostInner() {
  const [content, setContent] = useState("");
  const [image, setImage] = useState("");
  const [published, setPublished] = useState(true);
- const [videoUrl, setVideoUrl] = useState("");
- const [videoDuration, setVideoDuration] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [videoDuration, setVideoDuration] = useState("");
+
+  const formatClock = (secs: number) => {
+    if (!isFinite(secs) || secs <= 0) return "";
+    const s = Math.floor(secs % 60);
+    const m = Math.floor((secs / 60) % 60);
+    const h = Math.floor(secs / 3600);
+    const mm = String(m).padStart(2, "0");
+    const ss = String(s).padStart(2, "0");
+    return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+  };
+  const captureVideoDuration = (url: string) => {
+    if (typeof window === "undefined" || !url) return;
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.src = url;
+    v.onloadedmetadata = () => {
+      if (isFinite(v.duration) && v.duration > 0) setVideoDuration(formatClock(v.duration));
+    };
+  };
  const [videoMimeType, setVideoMimeType] = useState("");
  const [videoFileSize, setVideoFileSize] = useState("");
  const [gallery, setGallery] = useState("");
@@ -303,7 +322,7 @@ function NewPostInner() {
  <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">MIME Type</span><input value={videoMimeType} onChange={e=>setVideoMimeType(e.target.value)} className="input mt-1" placeholder="video/mp4" dir="ltr" /></label>
  <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Video Size</span><input value={videoFileSize} onChange={e=>setVideoFileSize(e.target.value)} className="input mt-1" placeholder="50 MB" dir="ltr" /></label>
  </div>
- <BlobUploadField label="آپلود ویدیو" kind="video" folder="videos" accept="video/mp4,video/webm,video/quicktime" onUploaded={(r)=>{setVideoUrl(r.url); setVideoMimeType(r.contentType); setVideoFileSize(formatBytes(r.size));}} />
+                  <BlobUploadField label="آپلود ویدیو" kind="video" folder="videos" accept="video/mp4,video/webm,video/quicktime" onUploaded={(r)=>{setVideoUrl(r.url); setVideoMimeType(r.contentType); setVideoFileSize(formatBytes(r.size)); captureVideoDuration(r.url);}} />
  </div>
  )}
 

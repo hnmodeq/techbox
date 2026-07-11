@@ -48,7 +48,7 @@ export default function DownloadRow() {
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--download)]/10 text-[var(--download)] border-[length:var(--border-size)] border-[var(--download)]/30 shadow-[var(--shadow-size)]">
-                    <span className="text-[12px] font-mono font-black tracking-tight">{fileType}</span>
+                    <span className="text-[12px] font-mono font-black tracking-tight" dir="ltr">{file.fileSize || fileType}</span>
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -56,6 +56,7 @@ export default function DownloadRow() {
                       <span className="text-[10px] font-bold text-[var(--download)] bg-[var(--download)]/10 px-2 py-0.5 rounded">
                         {file.category || 'سیستم‌عامل'}
                       </span>
+                      <span className="text-[10px] font-bold text-[var(--paragraph-color)] bg-[var(--muted-background)] px-2 py-0.5 rounded" dir="ltr">{fileType}</span>
                     </div>
 
                     <Link href={`/download/${file.slug}`} className="block">

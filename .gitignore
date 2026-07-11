@@ -19,4 +19,5 @@ dev.db
 prisma/dev.db
 .local
 .pnpm-store
+.vercel/
 
