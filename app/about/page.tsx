@@ -17,9 +17,9 @@ export default async function About(){
      take: 6,
      select: { id: true, name: true, roleFa: true, role: true, avatar: true, username: true }
    });
- } catch (error) {
-   console.warn("[About Page] Database not available during prerender/build step.");
- }
+} catch {
+  // During local/offline builds the database may be unavailable.
+}
 
  const team: TeamMember[] = dbUsers.map((u: any) => ({
    name: u.name,

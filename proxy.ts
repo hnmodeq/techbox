@@ -15,14 +15,14 @@ function getSecret(): Uint8Array {
 
   if (isDeployedEnv() && (!envSecret || envSecret.length < 32)) {
     throw new Error(
-      "[middleware] AUTH_SECRET must be set and at least 32 characters in production/preview."
+      "[proxy] AUTH_SECRET must be set and at least 32 characters in production/preview."
     );
   }
 
   return new TextEncoder().encode(envSecret || "dev-secret-please-change-32char!");
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Only protect /admin/* routes
@@ -56,7 +56,7 @@ export async function middleware(req: NextRequest) {
       throw new Error("No subject in token");
     }
 
-    // We can't do a DB lookup in middleware (edge runtime),
+    // We can't do a DB lookup in proxy (edge runtime),
     // but we verify the JWT is valid. Role checks happen in API routes.
     // Redirect to login if token is invalid
     return NextResponse.next();
