@@ -32,11 +32,9 @@ export async function POST(req: NextRequest) {
     if (vote === 0) {
       if (existing) {
         const { incLikes, incDislikes } = delta(existing.vote, 0);
-        const ops: Promise<any>[] = [
-          prisma.commentVote.delete({ where: { id: existing.id } }),
-        ];
         if (incLikes !== 0 || incDislikes !== 0) {
-          ops.push(
+          await prisma.$transaction([
+            prisma.commentVote.delete({ where: { id: existing.id } }),
             prisma.comment.update({
               where: { id: commentId },
               data: {
@@ -44,18 +42,17 @@ export async function POST(req: NextRequest) {
                 dislikes: { increment: incDislikes },
               },
             }),
-          );
+          ]);
+        } else {
+          await prisma.commentVote.delete({ where: { id: existing.id } });
         }
-        await prisma.$transaction(ops);
       }
     } else {
       if (existing) {
         const { incLikes, incDislikes } = delta(existing.vote, vote);
-        const ops: Promise<any>[] = [
-          prisma.commentVote.update({ where: { id: existing.id }, data: { vote } }),
-        ];
         if (incLikes !== 0 || incDislikes !== 0) {
-          ops.push(
+          await prisma.$transaction([
+            prisma.commentVote.update({ where: { id: existing.id }, data: { vote } }),
             prisma.comment.update({
               where: { id: commentId },
               data: {
@@ -63,16 +60,15 @@ export async function POST(req: NextRequest) {
                 dislikes: { increment: incDislikes },
               },
             }),
-          );
+          ]);
+        } else {
+          await prisma.commentVote.update({ where: { id: existing.id }, data: { vote } });
         }
-        await prisma.$transaction(ops);
       } else {
         const { incLikes, incDislikes } = delta(0, vote);
-        const ops: Promise<any>[] = [
-          prisma.commentVote.create({ data: { commentId, fingerprint, vote } }),
-        ];
         if (incLikes !== 0 || incDislikes !== 0) {
-          ops.push(
+          await prisma.$transaction([
+            prisma.commentVote.create({ data: { commentId, fingerprint, vote } }),
             prisma.comment.update({
               where: { id: commentId },
               data: {
@@ -80,9 +76,10 @@ export async function POST(req: NextRequest) {
                 dislikes: { increment: incDislikes },
               },
             }),
-          );
+          ]);
+        } else {
+          await prisma.commentVote.create({ data: { commentId, fingerprint, vote } });
         }
-        await prisma.$transaction(ops);
       }
     }
 
