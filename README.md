@@ -41,7 +41,8 @@ All secrets live in `.env` (git-ignored). Required for a working app:
 | Variable | Purpose |
 |----------|---------|
 | `AUTH_SECRET` | JWT session signing secret (`openssl rand -base64 32`) |
-| `DATABASE_URL` | PostgreSQL connection string (Neon). `DIRECT_URL` if you separate pooling |
+| `DATABASE_URL` | Pooled PostgreSQL runtime URL (use Neon's `-pooler` host and the limits shown in `.env.example`) |
+| `DIRECT_URL` | Non-pooled PostgreSQL URL used only by Prisma migrations |
 | `NEXT_PUBLIC_SITE_URL` | Public site origin, e.g. `http://localhost:3000` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for images / downloads |
 
@@ -58,6 +59,36 @@ Optional (features degrade gracefully when absent):
 
 > The chat route has a built-in demo fallback that is shown **only** when
 > `CHAT_API_KEY` is not configured — it never fabricates real content.
+
+### PostgreSQL `57P01` / administrator command
+
+`57P01: terminating connection due to administrator command` is emitted by
+PostgreSQL when the server, compute endpoint, or an administrator terminates an
+existing session. It is not a Prisma schema or migration error. A short burst
+can be expected during a database restart, maintenance event, or failover;
+Prisma opens a fresh connection for later queries.
+
+If it repeats continuously:
+
+1. Check the Neon project operations/status page and confirm that the compute
+   endpoint is active. If PostgreSQL is self-hosted, inspect its service and
+   server logs (`journalctl -u postgresql`, container logs, or the managed
+   provider's database logs) for restarts, OOM kills, deploys, and calls to
+   `pg_terminate_backend`.
+2. Confirm that `DATABASE_URL` uses Neon's pooled hostname (it contains
+   `-pooler`) and that `DIRECT_URL` uses the non-pooled hostname. Do not use the
+   direct URL for the serverless application runtime.
+3. Add the runtime query parameters shown in `.env.example`, especially
+   `connection_limit=1`. Prisma otherwise derives a pool size from the host CPU
+   count for every application instance, so one database restart can produce
+   many identical log lines and serverless scale-out can exhaust connections.
+4. Update the variables in every deployment environment, redeploy/restart the
+   application so old pools are discarded, then check `GET /api/healthz`.
+   A healthy connection returns HTTP 200 with `database: "healthy"`.
+
+Do not hide the error by disabling Prisma error logs. If the health check stays
+unhealthy after the endpoint is active, verify the hostname, credentials, SSL
+settings, IP/network restrictions, and the provider's connection limit.
 
 ---
 
