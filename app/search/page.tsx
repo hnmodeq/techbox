@@ -5,6 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { type ModuleSlug, type ContentItem } from "@/lib/content";
 import { ContentCard } from "@/features/content/components/ContentCard";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { moduleMeta } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -92,15 +97,23 @@ function SearchInner() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <h1 className="mb-2 text-[length:var(--h1-font-size)] font-extrabold text-[var(--h1-font-color)]">جستجو</h1>
-      <p className="mb-6 text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] paragraph-color">
-        {q ? <>نتایج برای <b>«{q}»</b> – {loading ? "در حال جستجو…" : `${results.length.toLocaleString("fa-IR")} مورد`}</> : "یک عبارت وارد کنید"}
+      <h1 className="mb-2 text-2xl font-extrabold tracking-tight">جستجو</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
+        {q ? (
+          <>
+            نتایج برای <Badge variant="outline">«{q}»</Badge> – {loading ? "در حال جستجو…" : `${results.length.toLocaleString("fa-IR")} مورد`}
+          </>
+        ) : (
+          "یک عبارت وارد کنید"
+        )}
       </p>
 
-      <form onSubmit={submit} className="mb-4 grid gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-        <input value={input} onChange={(e) => setInput(e.target.value)} className="input" placeholder="جستجو در عنوان، متن، برچسب، دسته، نویسنده…" />
-        <Button type="submit">جستجو</Button>
-      </form>
+      <Card className="mb-4 p-3">
+        <form onSubmit={submit} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="جستجو در عنوان، متن، برچسب، دسته، نویسنده…" />
+          <Button type="submit">جستجو</Button>
+        </form>
+      </Card>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {searchableModules.map((m) => (
@@ -110,30 +123,47 @@ function SearchInner() {
         ))}
       </div>
 
-      {error && <div className="mb-4 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--warning)]/40 p-3 text-[var(--warning)]">{error}</div>}
-      {fromDb && q && <div className="mb-4 text-xs paragraph-color">نتایج از دیتابیس Neon دریافت شد.</div>}
+      {error && (
+        <Card className="mb-4 border-warning/40 bg-warning/10 p-3 text-sm text-warning">
+          <CardContent className="p-0">{error}</CardContent>
+        </Card>
+      )}
+      {fromDb && q && <div className="mb-4 text-xs text-muted-foreground">نتایج از دیتابیس Neon دریافت شد.</div>}
+
+      <Separator className="mb-6" />
 
       {loading ? (
         <div className="grid gap-3 md:grid-cols-2">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-28 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />)}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 rounded-lg" />
+          ))}
         </div>
       ) : (
         <div className="space-y-8">
           {grouped.map(([moduleKey, items]) => (
             <section key={moduleKey}>
-              <h2 className="mb-3 text-[length:var(--h3-font-size)] font-bold text-[var(--primary-text)]">{moduleMeta[moduleKey as ModuleSlug]?.titleFa || moduleKey} <span className="paragraph-color text-sm">({items.length.toLocaleString("fa-IR")})</span></h2>
+              <h2 className="mb-3 text-sm font-bold flex items-center gap-2">
+                {moduleMeta[moduleKey as ModuleSlug]?.titleFa || moduleKey}
+                <Badge variant="secondary">{items.length.toLocaleString("fa-IR")}</Badge>
+              </h2>
               <div className="grid gap-3 md:grid-cols-2">
-                {items.map((r) => <ContentCard key={r.module + r.slug} item={r} />)}
+                {items.map((r) => (
+                  <ContentCard key={r.module + r.slug} item={r} />
+                ))}
               </div>
             </section>
           ))}
         </div>
       )}
-      {q && !loading && results.length === 0 && <p className="text-[length:var(--h3-font-size)] font-semibold text-[var(--h3-font-color)] paragraph-color">نتیجه‌ای یافت نشد.</p>}
+      {q && !loading && results.length === 0 && <p className="text-sm font-semibold text-muted-foreground">نتیجه‌ای یافت نشد.</p>}
     </main>
   );
 }
 
 export default function SearchPage() {
-  return <Suspense fallback={<div className="p-10 text-center">در حال بارگذاری…</div>}><SearchInner /></Suspense>;
+  return (
+    <Suspense fallback={<div className="p-10 text-center">در حال بارگذاری…</div>}>
+      <SearchInner />
+    </Suspense>
+  );
 }
