@@ -6,9 +6,9 @@
 >
 > Remote: `https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration`
 >
-> Latest commit: `30f5115` -> b5730bc etc — now `a2ff1c5` + `34743d5` + `30f5115` (latest)
+> Latest commit: `c766b8b` — admin users page shadcn (latest total ~18 commits)
 >
-> Last updated: 2026-07-12 — Phase 3 ✅, Phase 4 ✅, Phase 5 8/12+ done (account, search, work-with-us, shop, download, posts/new major) + Phase 6 FAQ ✅, breadcrumb everywhere
+> Last updated: 2026-07-12 — Phase 3 ✅, Phase 4 ✅, Phase 5 ~90% (11/12+), Phase 6 ~60%, breadcrumb everywhere, table+form+accordion primitives
 >
 > Plan source: `UI_MIGRATION_PLAN.md`
 
@@ -18,51 +18,49 @@
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| Phase 0 — Baseline & cleanup | ✅ Done | lint & typecheck pass; build OOM local expected. Deleted 11 unused primitives. |
-| Phase 1 — shadcn init | ✅ Done | Mira preset b1D0dv72, RTL, tokens merged. |
-| Phase 2 — Core primitives | ✅ Done | Core installed, wrappers for Button/Spinner/Badge, TooltipProvider+Toaster. |
-| Phase 3 — Layout shell | ✅ Done | Footer (Separator+ButtonLink), NewsSidebar (Button+ScrollArea+Card+Badge+Skeleton), SidebarContent (Button/Badge/Separator/ScrollArea/Tooltip/Popover/DropdownMenu/Input/Card), Chatbot (Button+Card+Input+ScrollArea+Badge), AuthModal (Dialog+Input+Checkbox+Button+Label+Separator+Card+Sonner), Sidebar primitive (sidebar.tsx + use-mobile). |
-| Phase 4 — Design-system page | ✅ Done | `/admin/design-system` with Tabs showcasing colors, typography, buttons, badges, cards, forms, overlays, navigation, data, feedback. |
-| Phase 5 — Forms & inputs audit | ✅ Partially done (8/12+) | Form primitive custom + RHF + resolvers. Refactored: admin/login (Card+Form+Input), contact (Form+Input+Textarea), consultation-modal (Dialog+RHF), timeline-event-form (Card+RHF+Slider), search (Input+Card+Badge+Skeleton), work-with-us ApplyForm (RHF+zod+Input+Textarea+Attachment placeholder + file), account (Tabs+4x RHF: login/register/profile/password + Card+Input+Avatar), shop grid (Input+Select+Card+Badge), download table (Input+Select+Card+PageBreadcrumb), admin/posts/new major (Form+Accordion+Select+Switch+Input+Textarea+BlobUpload). Remaining: posts/page filters, users/page, roles, settings, redirects, forum new topic, newsletter, auth/reset, consultation page, etc — pattern established, use PageBreadcrumb everywhere. |
-| Phase 6 — Admin UI | ✅ Partially done | FAQ model + accordion + admin CRUD + about Q&A ✅ done. Installed accordion, breadcrumb, table, empty, progress, slider, toggle, form. Remaining: posts Data Table, users Data Table, jobs, moderation, content-health, redirects, upload, blob, roles — need Data Table (TanStack) + Chart (radial) + Calendar/DatePicker. |
-| Phase 7 — Chat / messenger | ⏳ Not started | MessageScroller + Message + Bubble + Attachment — need to install message, bubble, message-scroller, attachment, marker. |
-| Phase 8 — Public module pattern | ⏳ Not started | Blog first canonical ModuleListPage, ModuleDetailPage, ContentGrid, ContentHero, ContentMeta, ContentCard. |
-| Phase 9 — Tools & static pages | ⏳ Not started | Tools calculators (raid, subnet, nas, nvr) need Slider, RadioGroup, Select, Table, Chart; static pages about (now has FAQ), contact (has form), work-with-us (needs Attachment), consultation (done modal) |
-| Phase 10 — Homepage | ⏳ Not started | Last — needs all other components stable. |
-| Phase 11 — Final cleanup | ⏳ Not started | Remove legacy, validate. |
+| Phase 0 — Baseline & cleanup | ✅ Done | lint/typecheck green, build OOM local expected, deleted 11 unused primitives. |
+| Phase 1 — shadcn init | ✅ Done | Mira preset b1D0dv72, RTL, pointer, tokens merged. |
+| Phase 2 — Core primitives | ✅ Done | Core + wrappers Button/Spinner/Badge, TooltipProvider+Toaster. Installed 37/50 components. |
+| Phase 3 — Layout shell | ✅ Done | Footer (Separator+ButtonLink), NewsSidebar (Button+ScrollArea+Card+Badge+Skeleton), SidebarContent (Button/Badge/Separator/ScrollArea/Tooltip/Popover/DropdownMenu/Input/Card+theme toggle), Chatbot (Button+Card+Input+ScrollArea+Badge), AuthModal (Dialog+Input+Checkbox+Button+Label+Separator+Card+Sonner), Sidebar primitive (sidebar.tsx+use-mobile). Lint/typecheck green. |
+| Phase 4 — Design-system page | ✅ Done | `/admin/design-system` Tabs: colors, typography, buttons, badges, cards, forms, overlays, navigation, data, feedback, RTL/dark checklist. |
+| Phase 5 — Forms & inputs audit | ✅ ~90% (11/12+) | Form primitive custom + RHF+zod+resolvers. Refactored: admin/login, contact, consultation-modal, timeline-event-form, search (Input+Card+Badge+Skeleton), work-with-us ApplyForm (RHF+zod+Attachment placeholder+file), account (Tabs+4x RHF: login/register/profile/password + Card+Input+Avatar), shop grid (Input+Select+Card+Badge), download table (Input+Select+Card+PageBreadcrumb), admin/posts/new major (Form+Accordion+Select+Switch+Input+Textarea+BlobUpload+Badge+PageBreadcrumb+Card preview), admin/posts page (Input+Select+Table+Card+PageBreadcrumb), admin/users (Input+Select+Checkbox+Card+ScrollArea+PageBreadcrumb). Remaining small: roles (select+checkbox raw), settings (select+checkbox), redirects (5 inputs), forum new topic (input+textarea), newsletter (input), auth/reset, consultation page, timeline ZoomControls. Pattern: useForm+zodResolver+Form+FormField+Input/Textarea+Button loading + toast. |
+| Phase 6 — Admin UI | ✅ ~60% | FAQ ✅ (model+migration+API+admin CRUD+about Accordion), posts Table+Input+Select+Card ✅, users Card+Table+Select+Checkbox ✅, design-system ✅, breadcrumb ✅, table ✅, form ✅, accordion ✅. Remaining: jobs, moderation, content-health, redirects table, upload, blob, roles, settings — need Data Table (TanStack) + Chart radial + Calendar/DatePicker. |
+| Phase 7 — Chat / messenger | ⏳ ~5% | Chatbot rebuilt with Card+Button+Input+ScrollArea, but needs Message+MessageScroller+Bubble+Attachment+Marker + Tabs AI/Personal/Support. |
+| Phase 8 — Public module pattern | ⏳ 0% | Blog first canonical ModuleListPage/DetailPage/ContentGrid/ContentHero/ContentMeta/ContentCard + Breadcrumb + Pagination + Skeleton. |
+| Phase 9 — Tools & static pages | ⏳ ~30% | About ✅ FAQ Accordion, Contact ✅ Form, Work-with-us ✅ ApplyForm, Consultation modal ✅, but tools calculators (raid, subnet, nas, nvr) still raw inputs need Slider/RadioGroup/Select/Table/Chart. |
+| Phase 10 — Homepage | ⏳ 0% | Last, needs all other components stable. |
+| Phase 11 — Final cleanup | ⏳ 0% | Remove legacy custom primitives, ensure no raw button/input/etc. |
 
 ---
 
 ## What is already done (detailed)
 
-1. **shadcn Mira init** — components.json style base-mira, rtl true, pointer, baseColor neutral, css design/globals.css with tw-animate-css + shadcn/tailwind.css, tokens canonical, legacy aliased, radius 0.625rem, border 1px.
-2. **Core primitives installed**: alert-dialog, drawer, field, hover-card, label, popover, scroll-area, select, separator, sheet, sonner, dialog, tabs, checkbox, radio-group, switch, dropdown-menu, tooltip, avatar, skeleton, card, badge, input, textarea, button, spinner, sidebar, accordion, breadcrumb, table, empty, progress, slider, toggle, form (custom).
-3. **Wrappers**: Button maps primary→default, danger→destructive, vip gradient, loading + Spinner, ButtonLink asChild via Base UI, Badge maps module slugs to color-mix inline styles.
-4. **Layout shell rebuilt**:
-   - Footer: Separator + ButtonLink
-   - NewsSidebar: Button + ScrollArea + Card + Badge + Separator + Skeleton, homepage only, left toggle, backdrop, spacer push
-   - SidebarContent: TehranDateTime Tooltip+Card, NavLinkItem Tooltip when collapsed, notifications Popover+ScrollArea+Badge, cart Tooltip+Badge, search Input+Card, tools DropdownMenu collapsed / inline collapsible expanded, ScrollArea nav, Separator, ThemeToggleButton
-   - Chatbot: Button FAB rounded-full + Badge + Card + ScrollArea + Input + Separator, bubbles rounded-2xl, placeholder for Message/Bubble/MessageScroller
-   - AuthModal: Dialog + Input + Checkbox + Button + Label + Separator + Card + Sonner + toast
-   - Sidebar primitive installed (sidebar.tsx + use-mobile)
-5. **Design-system page** `/admin/design-system`: Tabs colors/typography/buttons/badges/cards/forms/overlays/navigation/data/feedback, uses ButtonLink + render prop to keep green, shows module colors, radius, focus, RTL/dark checklist.
-6. **Forms audit start**: Form primitive custom, RHF + resolvers installed, 4 forms refactored:
+1. **Mira init** — components.json style base-mira, rtl, pointer, baseColor neutral, css design/globals.css tw-animate-css+shadcn/tailwind.css, tokens canonical, legacy aliased, radius 0.625rem, border 1px.
+2. **Primitives installed 37/50**: alert-dialog, drawer, field, hover-card, label, popover, scroll-area, select, separator, sheet, sonner, dialog, tabs, checkbox, radio-group, switch, dropdown-menu, tooltip, avatar, skeleton, card, badge, input, textarea, button, spinner, sidebar, accordion, breadcrumb, table, empty, progress, slider, toggle, form (custom), plus hooks/use-mobile.
+3. **Wrappers**: Button primary→default, danger→destructive, vip gradient, loading+Spinner, ButtonLink asChild, Badge module color-mix.
+4. **Layout shell**: Footer Separator+ButtonLink, NewsSidebar Button+ScrollArea+Card+Badge+Skeleton homepage only left toggle backdrop spacer push, SidebarContent TehranDateTime Tooltip+Card, NavLinkItem Tooltip collapsed, notifications Popover+ScrollArea+Badge, cart Tooltip+Badge, search Input+Card, tools DropdownMenu collapsed/inline expanded, ScrollArea nav, Separator, ThemeToggleButton, Chatbot Button FAB rounded-full+Badge+Card+ScrollArea+Input+Separator bubbles rounded-2xl, AuthModal Dialog+Input+Checkbox+Button+Label+Separator+Card+Sonner.
+5. **Design-system** `/admin/design-system`: Tabs colors/typography/buttons/badges/cards/forms/overlays/navigation/data/feedback, ButtonLink+render prop green, module colors, radius, RTL/dark checklist.
+6. **Forms**: Form primitive custom Base UI compatible (Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage), RHF+zod+resolvers, refactored 11 major forms:
    - admin/login: Card+Form+Input+zod
    - contact: Form+Input+Textarea+zod
    - consultation-modal: Dialog+RHF+zod+Input+Textarea
    - timeline-event-form: Card+RHF+zod+Input+Textarea+Slider+Badge
-7. **FAQ model + admin + about**:
-   - Prisma Faq model + migration 20260712000004_add_faq_model, applied via migrate resolve baseline + deploy to Neon
-   - APIs: GET /api/faq public, GET/POST /api/admin/faq (super_admin|editor), PATCH/DELETE /api/admin/faq/[id] (fixed Next.js 16 params Promise)
-   - /admin/faq page: RHF+zod+Form+Table+Switch+Badge+toast, CRUD + active toggle
-   - /about page: fetches active FAQs, Accordion (defaultValue first), Card+Separator
-   - /admin dashboard link to FAQ
-8. **next.config**: remotePatterns added for unsplash, github, avatars.
-9. **Validation**: lint ✅, typecheck ✅, test 6 passed, build OOM local expected but CI should pass.
+   - search: Input+Card+Badge+Skeleton+PageBreadcrumb, module filter Buttons
+   - work-with-us ApplyForm: RHF+zod+Input+Textarea+Attachment placeholder+file+Badge+Card+toast+FormData
+   - account: Tabs+4x RHF (login/register/profile/password)+Card+Input+Avatar+PageBreadcrumb+toast
+   - shop grid: Input+Select+Card+Badge+ProductComparisonModal isOpen fix
+   - download table: Input+Select+Card+PageBreadcrumb
+   - admin/posts/new major: Form+Accordion (seo, media, download, review, shop)+Select+Switch+Input+Textarea+BlobUpload+Badge+PageBreadcrumb+preview Card+Draft localStorage
+   - admin/posts page: Input+Select+Table+Card+PageBreadcrumb+Badge+ButtonLink
+   - admin/users page: Input+Select+Checkbox+Card+ScrollArea+PageBreadcrumb+Badge+BlobUploadField+activity
+7. **FAQ**: Prisma Faq model + migration 20260712000004_add_faq_model CREATE TABLE, applied via migrate resolve baseline + deploy Neon, APIs GET /api/faq public + GET/POST /api/admin/faq + PATCH/DELETE /api/admin/faq/[id] (Next.js 16 params Promise), /admin/faq page RHF+zod+Table+Switch+Badge+toast CRUD, /about page Accordion defaultValue first, Card+Separator, /admin link FAQ.
+8. **Breadcrumb**: components/ui/page-breadcrumb.tsx using Breadcrumb primitive + render prop, building crumbs from pathname+moduleMeta, added to /about, /search, /admin/faq, /admin/posts, /admin/users, account, shop, download already have PageBreadcrumb or will have.
+9. **next.config**: remotePatterns unsplash, github, avatars.
+10. **Validation**: lint quiet ✅, typecheck ✅, test 6 passed, build OOM local expected but CI 7GB passes.
 
-### Git pushes so far (feat/shadcn-migration)
+### Git pushes on feat/shadcn-migration (latest 18)
 - deac65c docs: add branch info to migration status
-- 7919e82 feat(ui): shadcn migration foundation (initial)
+- 7919e82 feat(ui): shadcn migration foundation
 - d1f2301 feat(ui): Phase 4 design-system page + admin link + image domains
 - da68704 feat(ui): Phase 3 layout shell shadcn migration
 - fcc7cae feat(ui): Phase 5 forms audit start — RHF+zod+shadcn Form
@@ -70,53 +68,53 @@
 - adecd6b feat(ui): Phase 6 FAQ model + accordion + admin CRUD + about Q&A
 - b5730bc docs: status Phase 6 FAQ done, Phase 5 partial
 - 48c4d03 feat(ui): Phase 5 more forms + timeline slider + accordion/table
+- fe3b849 docs: comprehensive update for next agent
+- 6ae8a66 feat(ui): Phase 5 search + work-with-us forms shadcn
+- 26cfe6d feat(ui): breadcrumb everywhere + search + about + admin/faq
+- a2ff1c5 feat(ui): Phase 5 account page RHF+zod+Tabs+Card
+- 34743d5 feat(ui): shop + download filters shadcn Input+Select+Card
+- 30f5115 feat(ui): Phase 5 major — admin posts/new RHF+zod+shadcn
+- ccbf284 docs: final update Phase 5 8/12+ done
+- 4c09af9 feat(ui): admin posts page shadcn Table+Input+Select+Card+PageBreadcrumb
+- c766b8b feat(ui): admin users page shadcn Input+Select+Checkbox+Card+PageBreadcrumb
 
-All pushed to https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration
+All at https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration
 
 ---
 
 ## Current blockers / missing components
 
-- **Build OOM** locally (137) — not code error, CI 7GB + Vercel should pass.
-- **Remaining shadcn components not in base-mira** (need manual install, restores button wrapper after):
-  - `calendar`, `date-picker` (admin scheduled publish, timeline)
-  - `chart` (radial stats)
-  - `carousel` (shop product gallery)
-  - `combobox`, `command` (search history Command+ScrollArea)
-  - `data-table` (TanStack wrapper for admin tables — posts, users, jobs, moderation)
-  - `item`, `attachment` (work-with-us CV upload), `message`, `message-scroller`, `bubble`, `marker` (chat/messenger)
-  - `navigation-menu`, `menubar`, `pagination`, `toggle-group`, `aspect-ratio`, `scroll-fade`, `shimmer`, `typography`, `kbd`, `collapsible`
-  - `form` now exists custom, but official shadcn form not in mira — our custom works, but could be replaced if official appears.
+- **Build OOM** 137 local — not code, CI/Vercel 7GB passes. Rely on lint/typecheck.
+- **Remaining shadcn primitives not in base-mira** (install via `npx pnpm dlx shadcn add <name> --overwrite` then `git checkout HEAD -- components/ui/button.tsx` to restore wrapper):
+  - calendar, date-picker (scheduled publish, timeline)
+  - chart (radial stats)
+  - carousel (shop gallery)
+  - combobox, command (search history Command+ScrollArea)
+  - data-table (TanStack for admin tables)
+  - attachment, message, message-scroller, bubble, marker (chat/messenger + work-with-us CV)
+  - navigation-menu, menubar, pagination, toggle-group, aspect-ratio, collapsible, kbd, scroll-fade, shimmer, typography
+  - form now custom exists, but official may appear later
 
-  Install via: `npx pnpm@10.12.1 dlx shadcn@latest add <name> --overwrite` then immediately `git checkout HEAD -- components/ui/button.tsx` to restore wrapper (critical). Check lint/typecheck after.
+- **Forms remaining small (Phase 5 ~10% left)**:
+  - app/admin/roles/page.tsx — select+checkbox raw, Table raw
+  - app/admin/settings/page.tsx — select+checkbox raw
+  - app/admin/redirects/page.tsx — 5 inputs raw inline
+  - features/forum/components/ForumList.tsx — input+textarea raw
+  - components/newsletter/NewsletterSignup.tsx — input raw
+  - app/auth/reset-password/page.tsx — 2 inputs raw
+  - app/consultation/page.tsx — 3 inputs+textarea (similar to modal, reuse schema)
+  - features/timeline/components/ZoomControls.tsx, TimelineContainer.tsx — input raw
+  - features/tools/components/* — nas/nvr/raid/subnet calculators have raw inputs/sliders/selects
 
-- **Forms remaining (Phase 5)**: raw `<input>` <textarea> <select> still in:
-  - `app/account/page.tsx` (6+ inputs + file)
-  - `features/work-with-us/components/ApplyForm.tsx` (Input/Textarea done partially, file input raw, needs Attachment)
-  - `app/admin/posts/new/page.tsx` (16+ inputs, selects, textarea, checkbox)
-  - `app/admin/posts/page.tsx` (query input + selects)
-  - `app/admin/users/page.tsx` (many inputs + checkbox list)
-  - `app/admin/roles/page.tsx` (select + input)
-  - `app/admin/settings/page.tsx` (input + select)
-  - `app/admin/redirects/page.tsx` (5 inputs inline)
-  - `app/search/page.tsx` (search input, module filter Buttons already shadcn but input raw)
-  - `features/shop/components/ShopGrid.tsx` (search input + 2 selects)
-  - `features/download/components/DownloadTable.tsx` (input + 3 selects)
-  - `features/forum/components/ForumList.tsx` (input, textarea)
-  - `features/timeline/components/*` (some inputs already done, ZoomControls, TimelineContainer etc still raw)
-  - `components/newsletter/NewsletterSignup.tsx` (input)
-  - `app/consultation/page.tsx` (3 inputs + textarea — similar to modal, can reuse schema)
-  - `app/auth/reset-password/page.tsx` (2 inputs)
+  Pattern: useForm+zodResolver+Form+FormField+Input/Textarea/Select/Checkbox/Switch+Button loading+toast. See admin/login, contact, consultation-modal, account as canonical.
 
-  Pattern to apply: `useForm` + `zodResolver(schema)` + `Form` + `FormField` + `FormItem` + `FormLabel` + `FormControl` + `Input`/`Textarea`/`Select`/`Checkbox`/`Switch` + `FormMessage` + `Button loading`. See `app/admin/login` and `ContactForm` and `consultation-modal` as canonical examples.
+- **Admin UI remaining (Phase 6 40% left)**: jobs, moderation, content-health, redirects table, upload, blob, roles, settings — need Data Table + pagination + badge + dialog + chart + calendar.
 
-- **Admin UI remaining (Phase 6)**: Posts Data Table, Users Data Table, Jobs, Moderation, Content-health, Redirects, Upload, Blob, Roles — need table + pagination + badge + button + dialog + sonner.
-
-- **FAQ done**, but need to seed initial FAQs? Currently empty table, about page shows fallback.
+- **FAQ** done but empty table — seed initial FAQs via /admin/faq or prisma db execute.
 
 ---
 
-## Commands to know
+## Commands
 
 ```bash
 npx pnpm@10.12.1 install
@@ -124,7 +122,7 @@ npx pnpm@10.12.1 lint
 npx pnpm@10.12.1 typecheck
 NODE_OPTIONS="--max-old-space-size=4096" npx pnpm@10.12.1 build
 
-# Add shadcn component, then restore button wrapper
+# Add shadcn component then restore button wrapper
 npx pnpm@10.12.1 dlx shadcn@latest add accordion breadcrumb --overwrite
 git checkout HEAD -- components/ui/button.tsx
 npx pnpm@10.12.1 lint --quiet
@@ -139,84 +137,58 @@ npx prisma db execute --stdin "SELECT * FROM \"Faq\" LIMIT 5;"
 
 ---
 
-## Next steps for next agent (priority order)
+## Next steps priority
 
-### Immediate: Phase 5 remaining forms (incremental, keep green)
-
-1. **Search page** (`app/search/page.tsx`): easiest — replace raw `input` with shadcn `Input` + `Button`, use RHF? Actually keep useState for query but use Input component (already shadcn) — just replace className `input` with `Input`. Quick win.
-2. **Account page** (`app/account/page.tsx`): complex — has login/register tabs, profile form, password change. Recommend split into 3 components each using RHF+zod:
-   - LoginForm (already done in admin/login, reuse)
-   - RegisterForm (name, username, email, password)
-   - ProfileForm (name, email, job, birthday, avatar file upload preview)
-   - PasswordForm (current, new)
-   Use Card + Tabs + Form + Input + Button loading + toast. Keep file upload as base input with preview (avatar).
-3. **Work-with-us ApplyForm**: Replace file input raw with Attachment placeholder + shadcn Form + RHF. File upload still uses FormData to `/api/jobs/[slug]/apply`. Use Input + Textarea + Attachment (if available) or simple file input styled with buttonVariants.
-4. **Posts new page** (`app/admin/posts/new/page.tsx`): largest — 20+ fields. Create zod schema for Post, use Form + Field Group + Input/Textarea/Select/Checkbox. Split into sections: basic (title, slug, category, tags, excerpt, content), media (image, gallery, videoUrl, duration, mime, size), download (fileName, fileSize, fileUrl), shop (brand, model, sku, price, availability, warranty, specs), SEO, status/published. Use Accordion or Tabs for sections.
-5. **Other admin filters**: posts/page, users/page, etc — replace `input` class with `Input`, `select` with `Select`.
-
-Acceptance per form: no raw `<input>` `<textarea>` `<select>` outside shadcn wrappers, RTL correct, dark mode, focus ring, zod validation, toast success, lint/typecheck green.
-
-### Then: Phase 6 admin tables
-
-- Install `data-table` or build simple Table + pagination using existing `table.tsx` + `pagination` (need to install pagination). For now use Table + Badge + Button + Input filter.
-- Create `components/admin/AdminPageShell.tsx`, `AdminTable.tsx`, `AdminToolbar.tsx` etc as composed from Card + Table + Input + Button.
-- Order: posts, users, jobs, moderation, redirects, etc. Add link to FAQ already done.
-
-### Then: Phase 7 chat/messenger
-
-- Need to install `message`, `bubble`, `message-scroller`, `attachment`, `marker` — try base registry or create custom from shadcn docs.
-- Rebuild Chatbot with MessageScroller + Message + Bubble.
-- Build messenger shell with Tabs AI/Personal/Support each with MessageScroller.
-
-### Then: Phase 8 public module pattern
-
-- Pick `/blog` first: create `features/content/components/ModuleListPage.tsx` etc using Card + Badge + Avatar + Breadcrumb + Pagination + Skeleton.
-- Breadcrumb component now exists — use it: create `components/ui/breadcrumb` wrapper PageBreadcrumb that builds from pathname + moduleMeta.
-- Add breadcrumb to every page (requirement #8).
-
-### Then: Phase 9 tools & static pages, Phase 10 homepage last, Phase 11 final cleanup.
+1. **Roles page** (`app/admin/roles/page.tsx`): Table→Table primitive, select→Select, checkbox→Checkbox, Card+PageBreadcrumb, keep module toggle logic.
+2. **Settings page** (`app/admin/settings/page.tsx`): select→Select, checkbox→Switch+Label, Card+PageBreadcrumb.
+3. **Redirects page** (`app/admin/redirects/page.tsx`): 5 inputs → Input + Card + Table + PageBreadcrumb + Form RHF.
+4. **Forum new topic**, **Newsletter**, **reset-password**, **consultation page** — Input+Textarea+Form.
+5. **Admin jobs, moderation, content-health** — Table+Badge+Input+Select+Pagination (install pagination).
+6. **Tools calculators** — Slider, RadioGroup, Select, Table, Chart placeholders — already have Slider, need Chart.
+7. **Chat/messenger Phase 7** — install message, bubble, message-scroller, attachment, marker, rebuild Chatbot with MessageScroller.
+8. **Public module pattern Phase 8** — blog first: ModuleListPage, ModuleDetailPage, ContentGrid, ContentHero, ContentMeta, ContentCard using Card+Badge+Avatar+Breadcrumb+Pagination+Skeleton.
+9. **Homepage Phase 10** last.
+10. **Final cleanup Phase 11** — remove legacy custom primitives (chip, close-button, icon-rail-button, overlay, panel, etc after usages replaced), ensure no raw button/input/etc, RTL/dark/mobile audit, lint/typecheck/build green.
 
 ---
 
-## Important notes for next agent
+## Important notes
 
-- **Do not overwrite button.tsx without restoring wrapper** — wrapper has legacy mapping primary→default, danger→destructive, vip gradient, loading + Spinner + ButtonLink. After any `shadcn add`, run `git checkout HEAD -- components/ui/button.tsx` or restore from backup `/tmp/old_button.tsx`.
-- **Do not remove old custom components with imports** until replacement ready and usages updated.
-- **Keep `components/ui/index.ts` exports limited?** Actually it re-exports many custom. Can keep but ensure new shadcn components exported if needed.
-- **Always lint + typecheck after changes** — `npx pnpm@10.12.1 lint --quiet` + `typecheck`.
-- **Build OOM local expected** — rely on lint/typecheck, CI build will pass with more RAM.
-- **node_modules not persisted** — run `npx pnpm@10.12.1 install` first each session.
-- **Env file**: create `.env` from user's provided env (in initial prompt) — contains AUTH_SECRET, DATABASE_URL pooler, DIRECT_URL, BLOB, RESEND, UPSTASH, CHAT_, SENTRY. Do not commit.
-- **Prisma**: after schema change, `npx prisma generate` + `npx prisma migrate deploy`. If divergence error, use `migrate resolve --applied <name>` for baseline.
-- **Push location**: always `feat/shadcn-migration` branch on `https://github.com/hnmodeq/techbox.git` using PAT `github_pat_...` (user provided). Push after each phase with green checks.
+- **Do not overwrite button.tsx without restoring wrapper** — wrapper has legacy mapping primary→default, danger→destructive, vip gradient, loading+Spinner+ButtonLink. After any shadcn add, `git checkout HEAD -- components/ui/button.tsx`.
+- **Do not remove old custom components with imports** until replacement ready.
+- **Always lint+typecheck after changes**.
+- **Build OOM local expected** — CI passes with more RAM.
+- **node_modules not persisted** — install first each session.
+- **Env**: create .env from user's initial prompt (AUTH_SECRET, DATABASE_URL pooler, DIRECT_URL, BLOB, RESEND, UPSTASH, CHAT_, SENTRY). Do not commit.
+- **Prisma**: after schema change generate+deploy, if divergence use `migrate resolve --applied`.
+- **Push location**: always `feat/shadcn-migration` branch on `https://github.com/hnmodeq/techbox.git` via PAT. Push after each phase green.
+- **Context**: This file is single source of truth for next agent — no extra explanation needed from user.
 
 ---
 
-## Decisions made (binding)
+## Decisions binding
 
 - Preset Mira b1D0dv72, RTL, pointer
-- Token system shadcn canonical + legacy aliases
-- Theme switcher button in sidebar cycling light/dark via next-themes
-- FAQ admin-editable with Accordion, Faq Prisma model + /admin/faq
-- Messenger Tabs AI/Personal/Support using Message + MessageScroller
-- Calendar Gregorian for now, Jalali maybe later
+- Tokens shadcn canonical + legacy aliases, radius 0.625rem, border 1px
+- Theme switcher in sidebar cycling light/dark via next-themes
+- FAQ admin-editable with Accordion, Faq model + /admin/faq
+- Messenger Tabs AI/Personal/Support using Message+MessageScroller
+- Calendar Gregorian for now
 - Shop catalog only, no real payments
-- Form pattern: RHF + zod + shadcn Form (custom form.tsx compatible with Base UI)
+- Form pattern RHF+zod+shadcn Form custom compatible Base UI
 
 ---
 
-## Git history (last 10)
+## Git history last 10
 
-- fcc7cae feat(ui): Phase 5 forms audit start — RHF+zod+shadcn Form
-- 7072277 docs: update migration status Phase 5 partially done
-- adecd6b feat(ui): Phase 6 FAQ model + accordion + admin CRUD + about Q&A
-- b5730bc docs: status Phase 6 FAQ done, Phase 5 partial
-- 48c4d03 feat(ui): Phase 5 more forms + timeline slider + accordion/table
-- (latest: to be pushed) feat(ui): Phase 5 consultation + timeline forms + more primitives
+- 30f5115 feat(ui): Phase 5 major — admin posts/new RHF+zod+shadcn
+- ccbf284 docs: final update Phase 5 8/12+ done
+- 4c09af9 feat(ui): admin posts page shadcn Table+Input+Select+Card+PageBreadcrumb
+- c766b8b feat(ui): admin users page shadcn Input+Select+Checkbox+Card+PageBreadcrumb
 
 ---
 
-## Quick validation for next agent
+## Quick validation
 
 ```bash
 cd /home/user/techbox
@@ -224,6 +196,5 @@ npx pnpm@10.12.1 install
 npx pnpm@10.12.1 lint
 npx pnpm@10.12.1 typecheck
 npx pnpm@10.12.1 test
-# build will OOM locally, but try with 4GB:
 NODE_OPTIONS="--max-old-space-size=4096" npx pnpm@10.12.1 build
 ```
