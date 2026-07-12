@@ -3,7 +3,6 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
 import { NewspaperIcon, XIcon } from "lucide-react"
 
 import {
@@ -19,13 +18,14 @@ import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useHomeModule } from "@/features/home/lib/home-data"
 
-export function TechboxNewsSidebar() {
-  const pathname = usePathname()
+type TechboxNewsSidebarProps = {
+  open: boolean
+  onClose: () => void
+}
+
+export function TechboxNewsSidebar({ open, onClose }: TechboxNewsSidebarProps) {
   const { items: dbNews, loading } = useHomeModule("news")
   const newsItems = dbNews.slice(0, 15)
-
-  // Only show on homepage
-  if (pathname !== "/") return null
 
   return (
     <Sidebar
@@ -37,9 +37,12 @@ export function TechboxNewsSidebar() {
       <SidebarHeader>
         <div className="flex items-center justify-between px-2 py-1">
           <div className="flex items-center gap-2">
-            <NewspaperIcon className="size-4 text-[var(--news)]" />
-            <span className="text-sm font-bold text-[var(--news)]">اخبار زنده تکباکس</span>
+            <NewspaperIcon className="size-4 text-muted-foreground" />
+            <span className="text-sm font-bold text-foreground">اخبار زنده تکباکس</span>
           </div>
+          <Button variant="ghost" size="icon-xs" onClick={onClose}>
+            <XIcon className="size-4" />
+          </Button>
         </div>
       </SidebarHeader>
       <SidebarContent>

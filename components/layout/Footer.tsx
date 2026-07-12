@@ -4,12 +4,15 @@ import { Separator } from "@/components/ui/separator";
 import { ButtonLink } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 
 const navigation = {
   main: [
-    { name: "ارتباط با ما", href: "/contact", hover: "hover:text-[var(--contact)]" },
-    { name: "درباره ما", href: "/about", hover: "hover:text-[var(--about)]" },
-    { name: "فرصت‌های شغلی", href: "/work-with-us", hover: "hover:text-[var(--workwithus)]" },
+    { name: "ارتباط با ما", href: "/contact" },
+    { name: "درباره ما", href: "/about" },
+    { name: "فرصت‌های شغلی", href: "/work-with-us" },
+    { name: "پشتیبانی", href: "/support" },
+    { name: "بازخورد", href: "/feedback" },
   ],
   social: [
     {
@@ -46,23 +49,29 @@ const navigation = {
   ],
 };
 
-// Rebuilt with shadcn primitives: Separator + ButtonLink + buttonVariants
+// Rebuilt with shadcn primitives: 3-column footer with newsletter, links, social
 export default function FooterSection() {
   return (
-    <footer className="border-t bg-card/40">
-      <div className="mx-auto max-w-7xl px-6 pb-8 pt-8">
-        <div className="flex flex-row justify-around gap-12 md:gap-24">
-          {/* Quick links */}
+    <footer className="border-t bg-card/40 mt-auto">
+      <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
+        <div className="grid gap-8 md:grid-cols-3">
+          {/* Newsletter - Right column */}
           <div className="text-right">
-            <h4 className="text-sm font-semibold text-foreground">لینک‌های سریع</h4>
-            <div className="mt-4 flex flex-col gap-1">
+            <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
+            <NewsletterSignup compact />
+          </div>
+
+          {/* Quick links - Middle column */}
+          <div className="text-right">
+            <h4 className="text-sm font-semibold text-foreground mb-4">لینک‌های سریع</h4>
+            <div className="flex flex-col gap-2">
               {navigation.main.map((item) => (
                 <ButtonLink
                   key={item.name}
                   href={item.href}
                   variant="ghost"
                   size="sm"
-                  className={cn("justify-start font-semibold text-muted-foreground", item.hover)}
+                  className="justify-start font-normal text-muted-foreground hover:text-foreground"
                 >
                   {item.name}
                 </ButtonLink>
@@ -70,10 +79,10 @@ export default function FooterSection() {
             </div>
           </div>
 
-          {/* Social */}
+          {/* Social - Left column */}
           <div className="text-right">
-            <h4 className="text-sm font-semibold text-foreground">شبکه‌های اجتماعی</h4>
-            <div className="mt-4 flex gap-1">
+            <h4 className="text-sm font-semibold text-foreground mb-4">شبکه‌های اجتماعی</h4>
+            <div className="flex gap-2">
               {navigation.social.map((item) => (
                 <a
                   key={item.name}
@@ -86,7 +95,7 @@ export default function FooterSection() {
                     "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  <item.icon className="size-8 sm:size-9 transition-transform hover:scale-110" />
+                  <item.icon className="size-5 transition-transform hover:scale-110" />
                 </a>
               ))}
             </div>
@@ -105,7 +114,7 @@ export default function FooterSection() {
               href="https://www.bumimstudio.ir/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-bold text-[var(--warning)] hover:underline"
+              className="font-bold text-foreground hover:underline"
             >
               بومیم
             </a>

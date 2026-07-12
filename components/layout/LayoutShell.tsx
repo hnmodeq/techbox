@@ -7,6 +7,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { TechboxAppSidebar } from "./techbox-app-sidebar"
 import { TechboxNewsSidebar } from "./techbox-news-sidebar"
 import { SiteHeader } from "./site-header"
+import { LiveNewsButton } from "./live-news-button"
 import FooterSection from "@/components/layout/Footer"
 import { CartProvider } from "@/providers/cart.provider"
 import { StatsProvider } from "@/providers/stats.provider"
@@ -58,10 +59,7 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
 }
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
-  const [newsOpen, setNewsOpen] = React.useState(() => {
-    if (typeof window === "undefined") return false
-    return localStorage.getItem("techbox-news-sidebar-open") === "true"
-  })
+  const [newsOpen, setNewsOpen] = React.useState(false)
 
   const { items: dbNews } = useHomeModule("news")
   const hasUnreadNews = dbNews.length > 0
@@ -69,15 +67,10 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="[--header-height:calc(var(--spacing)*14)]">
       <SidebarProvider className="flex flex-col" defaultOpen={true}>
-        <SiteHeader
-          onNewsToggle={() => setNewsOpen((prev) => !prev)}
-          hasUnreadNews={hasUnreadNews}
-        />
+        <SiteHeader hasUnreadNews={hasUnreadNews} />
         <div className="flex flex-1">
+          <TechboxNewsSidebar open={newsOpen} onClose={() => setNewsOpen(false)} />
           <TechboxAppSidebar />
-          <SidebarProvider defaultOpen={newsOpen} onOpenChange={setNewsOpen}>
-            <TechboxNewsSidebar />
-          </SidebarProvider>
           <SidebarInset>
             <main id="main-content" className="flex flex-col min-h-screen">
               <div className="flex-1 w-full">{children}</div>
@@ -85,6 +78,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
             </main>
           </SidebarInset>
         </div>
+        <LiveNewsButton onClick={() => setNewsOpen(true)} hasUnread={hasUnreadNews} />
       </SidebarProvider>
     </div>
   )

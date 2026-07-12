@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/collapsible"
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
@@ -28,7 +27,6 @@ export function TechboxNavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>ماژول‌ها</SidebarGroupLabel>
       <SidebarMenu>
         {navItems.map((item) => {
           const active = isActive(pathname, item.href)
@@ -43,7 +41,6 @@ export function TechboxNavMain() {
                 isActive={active}
                 tooltip={item.title}
                 render={<Link href={item.href} />}
-                className={item.iconActiveClassName}
               >
                 <Icon className="size-4" />
                 <span>{item.title}</span>

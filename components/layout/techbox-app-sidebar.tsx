@@ -15,7 +15,7 @@ import {
 import { TechboxNavMain } from "./techbox-nav-main"
 import { TechboxNavSecondary } from "./techbox-nav-secondary"
 import { TechboxNavUser } from "./techbox-nav-user"
-import { HomeIcon } from "lucide-react"
+import Image from "next/image"
 
 export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -28,12 +28,12 @@ export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Side
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/" />}>
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <HomeIcon className="size-4" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                <Image src="/logo.png" alt="تکباکس" width={32} height={32} className="object-contain" />
               </div>
               <div className="grid flex-1 text-start text-sm leading-tight">
                 <span className="truncate font-bold">تکباکس</span>
-                <span className="truncate text-xs text-muted-foreground">زیرساخت و فناوری اطلاعات</span>
+                <span className="truncate text-xs text-muted-foreground">پاتوق بچه‌های فناوری اطلاعات</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

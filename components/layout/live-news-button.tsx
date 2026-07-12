@@ -15,21 +15,15 @@ export function LiveNewsButton({ hasUnread = false, onClick }: LiveNewsButtonPro
       onClick={onClick}
       aria-label="اخبار زنده تکباکس"
       title="اخبار زنده تکباکس"
-      className="relative flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:bg-red-700 hover:shadow-lg active:scale-95"
+      className="fixed left-4 top-20 z-40 flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white shadow-lg transition-all hover:bg-red-700 hover:shadow-xl active:scale-95"
     >
-      {/* Pulse animation dot */}
+      {/* Single pulse animation dot */}
       <span className="relative flex h-2 w-2">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
         <span className="relative inline-flex h-2 w-2 rounded-full bg-white"></span>
       </span>
       <NewspaperIcon className="size-3.5" />
       <span className="hidden sm:inline">اخبار زنده</span>
-      {hasUnread && (
-        <span className="absolute -top-1 -right-1 flex h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-white ring-2 ring-red-600"></span>
-        </span>
-      )}
     </button>
   )
 }

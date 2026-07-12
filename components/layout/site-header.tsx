@@ -4,7 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 
 import { SearchForm } from "./search-form"
-import { LiveNewsButton } from "./live-news-button"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,6 +18,8 @@ import { useSidebar } from "@/components/ui/sidebar"
 import { PanelLeftIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { moduleMeta } from "@/lib/content"
+import { useTheme } from "next-themes"
+import { MoonIcon, SunIcon } from "lucide-react"
 
 type Crumb = {
   label: string
@@ -80,12 +81,27 @@ function TechboxBreadcrumb() {
   )
 }
 
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === "dark"
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon-sm"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label="تغییر تم"
+    >
+      {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+    </Button>
+  )
+}
+
 type SiteHeaderProps = {
-  onNewsToggle: () => void
   hasUnreadNews?: boolean
 }
 
-export function SiteHeader({ onNewsToggle, hasUnreadNews = false }: SiteHeaderProps) {
+export function SiteHeader({ hasUnreadNews = false }: SiteHeaderProps) {
   const { toggleSidebar } = useSidebar()
 
   return (
@@ -109,7 +125,7 @@ export function SiteHeader({ onNewsToggle, hasUnreadNews = false }: SiteHeaderPr
           orientation="vertical"
           className="mx-1 data-vertical:h-4 data-vertical:self-auto"
         />
-        <LiveNewsButton onClick={onNewsToggle} hasUnread={hasUnreadNews} />
+        <ThemeToggle />
       </div>
     </header>
   )
