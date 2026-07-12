@@ -3,6 +3,7 @@
 import PageHeader from "@/components/effects/PageHeader";
 import { ButtonLink } from "@/components/ui/button";
 import { BlobUploadField, type BlobUploadResult } from "@/components/admin/BlobUploadField";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { useState } from "react";
 
 export default function AdminUploadPage() {
@@ -10,6 +11,7 @@ export default function AdminUploadPage() {
   return (
     <main className="min-h-dvh px-4 py-10" dir="rtl">
       <section className="mx-auto max-w-5xl space-y-6">
+        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="آپلود فایل به Vercel Blob" titleClassName="text-[var(--admin)]" description="آپلود امن برای تصاویر، ویدیوها، دانلودها و آواتارها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
@@ -27,9 +29,9 @@ export default function AdminUploadPage() {
         </div>
 
         {last && (
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4">
-            <div className="mb-2 font-bold text-[var(--primary-text)]">آخرین فایل آپلودشده</div>
-            <pre className="overflow-x-auto rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-3 text-xs" dir="ltr">{JSON.stringify(last, null, 2)}</pre>
+          <div className="rounded-lg border bg-card p-4">
+            <div className="mb-2 font-bold">آخرین فایل آپلودشده</div>
+            <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs" dir="ltr">{JSON.stringify(last, null, 2)}</pre>
           </div>
         )}
       </section>

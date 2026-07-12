@@ -1,5 +1,7 @@
 "use client";
 
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import PageHeader from "@/components/effects/PageHeader";
@@ -331,6 +333,7 @@ export default function AdminBlobPage() {
   return (
     <main className="min-h-dvh px-4 py-10" dir="rtl">
       <section className="mx-auto max-w-7xl space-y-6">
+        <PageBreadcrumb />
         <PageHeader
           colorVar="--admin"
           title="فایل‌های Vercel Blob"
