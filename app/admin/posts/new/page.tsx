@@ -1,452 +1,752 @@
 "use client";
 import { useEffect, useMemo, useState, Suspense } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { getCurrentUserClient } from "@/lib/auth";
 import { ModuleBadge } from "@/components/ui/module-badge";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 export const dynamic = "force-dynamic";
 
-async function getMe(){
- try{
- const r = await fetch("/api/auth/me", {cache:"no-store"});
- const j = await r.json();
- return j.user || getCurrentUserClient();
- }catch{
- return getCurrentUserClient();
- }
+async function getMe() {
+  try {
+    const r = await fetch("/api/auth/me", { cache: "no-store" });
+    const j = await r.json();
+    return j.user || getCurrentUserClient();
+  } catch {
+    return getCurrentUserClient();
+  }
 }
 
 function slugify(input: string) {
- return input
- .trim()
- .toLowerCase()
- .replace(/[^\w\u0600-\u06FF]+/g,"-")
- .replace(/^-|-$/g,"")
- .slice(0, 90);
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\u0600-\u06FF]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 90);
 }
 
 function linesToArray(input: string) {
- return input.split("\n").map((x) => x.trim()).filter(Boolean);
+  return input.split("\n").map((x) => x.trim()).filter(Boolean);
 }
 
 function formatBytes(bytes: number) {
- if (!Number.isFinite(bytes) || bytes <= 0) return "";
- const units = ["B", "KB", "MB", "GB"];
- let value = bytes;
- let unit = 0;
- while (value >= 1024 && unit < units.length - 1) { value /= 1024; unit += 1; }
- return `${value >= 10 || unit === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unit]}`;
+  if (!Number.isFinite(bytes) || bytes <= 0) return "";
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${value >= 10 || unit === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unit]}`;
 }
 
 function parseSpecs(input: string) {
- const trimmed = input.trim();
- if (!trimmed) return {};
- try {
-   const parsed = JSON.parse(trimmed);
-   return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
- } catch {
-   return Object.fromEntries(trimmed.split("\n").map((line) => line.split(":"))
-     .filter(([k, v]) => k?.trim() && v?.trim())
-     .map(([k, ...rest]) => [k.trim(), rest.join(":").trim()]));
- }
+  const trimmed = input.trim();
+  if (!trimmed) return {};
+  try {
+    const parsed = JSON.parse(trimmed);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return Object.fromEntries(
+      trimmed
+        .split("\n")
+        .map((line) => line.split(":"))
+        .filter(([k, v]) => k?.trim() && v?.trim())
+        .map(([k, ...rest]) => [k.trim(), rest.join(":").trim()])
+    );
+  }
 }
 
 const categoryHints: Record<ModuleSlug, string[]> = {
- blog: ["امنیت", "شبکه", "ذخیره‌سازی", "مجازی‌سازی", "مانیتورینگ"],
- news: ["زیرساخت", "امنیت", "شبکه", "سخت‌افزار", "هوش مصنوعی"],
- media: ["آموزش ویدیویی", "بررسی ویدیویی", "پادکست", "دموی عملی"],
- review: ["سرور", "شبکه", "ذخیره‌سازی", "امنیت", "برق و رک"],
- tools: ["شبکه", "ذخیره‌سازی", "ابزار"],
- download: ["سیستم‌عامل", "فریم‌ور", "درایور", "ابزار", "مانیتورینگ"],
- shop: ["سرور", "شبکه", "NAS", "امنیت", "برق و رک"],
- forum: ["پرسش", "شبکه", "امنیت", "بکاپ", "مانیتورینگ"],
- timeline: ["تاریخچه", "رویداد", "معماری", "سخت‌افزار", "نرم‌افزار"],
+  blog: ["امنیت", "شبکه", "ذخیره‌سازی", "مجازی‌سازی", "مانیتورینگ"],
+  news: ["زیرساخت", "امنیت", "شبکه", "سخت‌افزار", "هوش مصنوعی"],
+  media: ["آموزش ویدیویی", "بررسی ویدیویی", "پادکست", "دموی عملی"],
+  review: ["سرور", "شبکه", "ذخیره‌سازی", "امنیت", "برق و رک"],
+  tools: ["شبکه", "ذخیره‌سازی", "ابزار"],
+  download: ["سیستم‌عامل", "فریم‌ور", "درایور", "ابزار", "مانیتورینگ"],
+  shop: ["سرور", "شبکه", "NAS", "امنیت", "برق و رک"],
+  forum: ["پرسش", "شبکه", "امنیت", "بکاپ", "مانیتورینگ"],
+  timeline: ["تاریخچه", "رویداد", "معماری", "سخت‌افزار", "نرم‌افزار"],
 };
 
+const postSchema = z.object({
+  module: z.string().min(1),
+  category: z.string().max(100).optional(),
+  title: z.string().min(3, "عنوان حداقل ۳ کاراکتر").max(300),
+  slug: z.string().max(120).optional(),
+  excerpt: z.string().max(500).optional(),
+  tags: z.string().max(500).optional(),
+  image: z.string().max(1000).optional(),
+  content: z.string().max(20000).optional(),
+  seoTitle: z.string().max(200).optional(),
+  seoDescription: z.string().max(500).optional(),
+  videoUrl: z.string().max(1000).optional(),
+  videoDuration: z.string().max(20).optional(),
+  videoMimeType: z.string().max(100).optional(),
+  videoFileSize: z.string().max(100).optional(),
+  gallery: z.string().max(2000).optional(),
+  fileName: z.string().max(300).optional(),
+  fileUrl: z.string().max(1000).optional(),
+  fileSize: z.string().max(100).optional(),
+  rating: z.string().max(10).optional(),
+  ratingCount: z.string().max(10).optional(),
+  brand: z.string().max(100).optional(),
+  model: z.string().max(100).optional(),
+  sku: z.string().max(100).optional(),
+  priceLabel: z.string().max(100).optional(),
+  availability: z.string().max(100).optional(),
+  warranty: z.string().max(100).optional(),
+  specs: z.string().max(5000).optional(),
+  status: z.enum(["published", "review", "draft", "archived"]).default("published"),
+  published: z.boolean().default(true),
+});
+
+type PostValues = z.infer<typeof postSchema>;
+
 function NewPostInner() {
- const sp = useSearchParams();
- const router = useRouter();
- const modParam = (sp.get("module") as ModuleSlug) || "blog";
- const editSlug = sp.get("edit");
- const [user, setUser] = useState<any>(null);
- const [module, setModule] = useState<ModuleSlug>(modParam);
- const [title, setTitle] = useState("");
- const [slug, setSlug] = useState("");
- const [excerpt, setExcerpt] = useState("");
- const [category, setCategory] = useState("");
- const [tags, setTags] = useState("");
- const [content, setContent] = useState("");
- const [image, setImage] = useState("");
- const [published, setPublished] = useState(true);
-  const [status, setStatus] = useState("published");
-  const [videoUrl, setVideoUrl] = useState("");
-  const [videoDuration, setVideoDuration] = useState("");
+  const sp = useSearchParams();
+  const router = useRouter();
+  const modParam = (sp.get("module") as ModuleSlug) || "blog";
+  const editSlug = sp.get("edit");
+  const [user, setUser] = useState<any>(null);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [lastDraftKey, setLastDraftKey] = useState("");
 
-  const formatClock = (secs: number) => {
-    if (!isFinite(secs) || secs <= 0) return "";
-    const s = Math.floor(secs % 60);
-    const m = Math.floor((secs / 60) % 60);
-    const h = Math.floor(secs / 3600);
-    const mm = String(m).padStart(2, "0");
-    const ss = String(s).padStart(2, "0");
-    return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
-  };
-  const captureVideoDuration = (url: string) => {
-    if (typeof window === "undefined" || !url) return;
-    const v = document.createElement("video");
-    v.preload = "metadata";
-    v.src = url;
-    v.onloadedmetadata = () => {
-      if (isFinite(v.duration) && v.duration > 0) setVideoDuration(formatClock(v.duration));
+  const form = useForm<any>({
+    resolver: zodResolver(postSchema as any),
+    defaultValues: {
+      module: modParam,
+      category: "",
+      title: "",
+      slug: "",
+      excerpt: "",
+      tags: "",
+      image: "",
+      content: "",
+      seoTitle: "",
+      seoDescription: "",
+      videoUrl: "",
+      videoDuration: "",
+      videoMimeType: "",
+      videoFileSize: "",
+      gallery: "",
+      fileName: "",
+      fileUrl: "",
+      fileSize: "",
+      rating: "",
+      ratingCount: "",
+      brand: "",
+      model: "",
+      sku: "",
+      priceLabel: "",
+      availability: "",
+      warranty: "",
+      specs: "",
+      status: "published",
+      published: true,
+    },
+  });
+
+  const moduleWatch = form.watch("module") as ModuleSlug;
+  const titleWatch = form.watch("title");
+  const tagsWatch = form.watch("tags");
+  const excerptWatch = form.watch("excerpt");
+  const contentWatch = form.watch("content");
+  const imageWatch = form.watch("image");
+  const statusWatch = form.watch("status");
+  const publishedWatch = form.watch("published");
+
+  const parsedTags = useMemo(() => (tagsWatch || "").split(",").map((t: any) => t.trim()).filter(Boolean), [tagsWatch]);
+  const resolvedSlug = (form.watch("slug") || "").trim() || slugify(titleWatch || "");
+
+  useEffect(() => {
+    getMe().then(setUser);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadEdit() {
+      if (!editSlug) return;
+      let it: any = null;
+      try {
+        const res = await fetch(`/api/posts?module=${encodeURIComponent(moduleWatch)}&slug=${encodeURIComponent(editSlug)}`, { cache: "no-store" });
+        if (res.ok) it = await res.json();
+      } catch {}
+      if (!it) it = getBySlug(moduleWatch, editSlug);
+      if (!mounted || !it) return;
+      form.reset({
+        module: moduleWatch,
+        title: it.title || "",
+        slug: it.slug || "",
+        excerpt: it.excerpt || "",
+        category: it.category || "",
+        tags: (it.tags || []).join(", "),
+        content: it.content || "",
+        image: it.image || "",
+        published: typeof it.published === "boolean" ? it.published : true,
+        status: it.status || (it.published ? "published" : "draft"),
+        videoUrl: it.videoUrl || "",
+        videoDuration: it.videoDuration || "",
+        videoMimeType: it.videoMimeType || "",
+        videoFileSize: it.videoFileSize || "",
+        gallery: (it.gallery || []).join("\n"),
+        fileName: it.fileName || "",
+        fileUrl: it.fileUrl || "",
+        fileSize: it.fileSize || "",
+        rating: typeof it.rating === "number" ? String(it.rating) : "",
+        ratingCount: typeof it.ratingCount === "number" ? String(it.ratingCount) : "",
+        seoTitle: it.seoTitle || "",
+        seoDescription: it.seoDescription || "",
+        brand: it.brand || "",
+        model: it.model || "",
+        sku: it.sku || "",
+        priceLabel: it.priceLabel || "",
+        availability: it.availability || "",
+        warranty: it.warranty || "",
+        specs: it.specs ? JSON.stringify(it.specs, null, 2) : "",
+      });
+    }
+    loadEdit();
+    return () => {
+      mounted = false;
     };
+  }, [editSlug, moduleWatch]);
+
+  if (!user)
+    return (
+      <main className="p-10 text-center" dir="rtl">
+        ابتدا{" "}
+        <Link className="text-primary underline" href="/admin/login">
+          وارد شوید
+        </Link>
+      </main>
+    );
+
+  const canEdit = user.role === "super_admin" || (user.modules || []).includes(moduleWatch);
+  if (!canEdit)
+    return (
+      <main className="p-10 text-center text-destructive" dir="rtl">
+        دسترسی به ماژول {moduleMeta[moduleWatch]?.titleFa} ندارید.
+      </main>
+    );
+
+  const allowed: ModuleSlug[] = user.role === "super_admin" ? (Object.keys(moduleMeta) as ModuleSlug[]) : user.modules || [];
+
+  const onSubmit = async (values: PostValues) => {
+    if (!values.title.trim()) {
+      setMsg("عنوان الزامی است");
+      return;
+    }
+    setSaving(true);
+    setMsg("");
+    setLastDraftKey("");
+    const payload = {
+      module: values.module,
+      slug: (values.slug || "").trim() || slugify(values.title),
+      title: values.title.trim(),
+      excerpt: (values.excerpt || "").trim(),
+      content: (values.content || "").trim(),
+      image: (values.image || "").trim() || undefined,
+      published: values.published,
+      status: values.status,
+      videoUrl: (values.videoUrl || "").trim() || undefined,
+      videoDuration: (values.videoDuration || "").trim() || undefined,
+      videoMimeType: (values.videoMimeType || "").trim() || undefined,
+      videoFileSize: (values.videoFileSize || "").trim() || undefined,
+      gallery: linesToArray(values.gallery || ""),
+      tags: parsedTags,
+      category: (values.category || "").trim() || undefined,
+      rating: (values.rating || "").trim() ? Number(values.rating) : undefined,
+      ratingCount: (values.ratingCount || "").trim() ? Number(values.ratingCount) : undefined,
+      fileName: (values.fileName || "").trim() || undefined,
+      fileUrl: (values.fileUrl || "").trim() || undefined,
+      fileSize: (values.fileSize || "").trim() || undefined,
+      seoTitle: (values.seoTitle || "").trim() || undefined,
+      seoDescription: (values.seoDescription || "").trim() || undefined,
+      brand: (values.brand || "").trim() || undefined,
+      model: (values.model || "").trim() || undefined,
+      sku: (values.sku || "").trim() || undefined,
+      priceLabel: (values.priceLabel || "").trim() || undefined,
+      availability: (values.availability || "").trim() || undefined,
+      warranty: (values.warranty || "").trim() || undefined,
+      specs: parseSpecs(values.specs || ""),
+    };
+
+    try {
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "save_failed");
+      setMsg("منتشر شد ✓ در حال انتقال به لیست محتوا…");
+      toast.success("منتشر شد");
+      setTimeout(() => router.push(`/admin/posts?module=${values.module}`), 650);
+    } catch (err: any) {
+      const key = `tb_drafts_${values.module}`;
+      const drafts = JSON.parse(localStorage.getItem(key) || "[]");
+      const draft = {
+        ...payload,
+        savedAt: new Date().toISOString(),
+        savedAtFa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium", timeStyle: "short" }).format(new Date()),
+        apiError: err.message,
+      };
+      drafts.unshift(draft);
+      localStorage.setItem(key, JSON.stringify(drafts.slice(0, 30)));
+      setLastDraftKey(key);
+      setMsg("API در دسترس نبود؛ پیش‌نویس امن در مرورگر ذخیره شد.");
+      toast.error("API در دسترس نبود — پیش‌نویس ذخیره شد");
+    } finally {
+      setSaving(false);
+    }
   };
- const [videoMimeType, setVideoMimeType] = useState("");
- const [videoFileSize, setVideoFileSize] = useState("");
- const [gallery, setGallery] = useState("");
- const [fileName, setFileName] = useState("");
- const [fileUrl, setFileUrl] = useState("");
- const [fileSize, setFileSize] = useState("");
- const [rating, setRating] = useState("");
- const [ratingCount, setRatingCount] = useState("");
- const [seoTitle, setSeoTitle] = useState("");
- const [seoDescription, setSeoDescription] = useState("");
- const [brand, setBrand] = useState("");
- const [model, setModel] = useState("");
- const [sku, setSku] = useState("");
- const [priceLabel, setPriceLabel] = useState("");
- const [availability, setAvailability] = useState("");
- const [warranty, setWarranty] = useState("");
- const [specs, setSpecs] = useState("");
- const [saving,setSaving] = useState(false);
- const [msg,setMsg] = useState("");
- const [lastDraftKey, setLastDraftKey] = useState("");
 
- useEffect(()=>{ getMe().then(setUser); },[]);
- useEffect(()=>{
- let mounted = true;
- async function loadEdit() {
-   if (!editSlug) return;
-   let it: any = null;
-   try {
-     const res = await fetch(`/api/posts?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(editSlug)}`, { cache: "no-store" });
-     if (res.ok) it = await res.json();
-   } catch {}
-   if (!it) it = getBySlug(module, editSlug);
-   if (!mounted || !it) return;
-   setTitle(it.title || "");
-   setSlug(it.slug || "");
-   setExcerpt(it.excerpt || "");
-   setCategory(it.category || "");
-   setTags((it.tags || []).join(", "));
-   setContent(it.content || "");
-   setImage(it.image || "");
-   setPublished(typeof it.published === "boolean" ? it.published : true);
-   setStatus(it.status || (it.published ? "published" : "draft"));
-   setVideoUrl(it.videoUrl || "");
-   setVideoDuration(it.videoDuration || "");
-   setVideoMimeType(it.videoMimeType || "");
-   setVideoFileSize(it.videoFileSize || "");
-   setGallery((it.gallery || []).join("\n"));
-   setFileName(it.fileName || "");
-   setFileUrl(it.fileUrl || "");
-   setFileSize(it.fileSize || "");
-   setRating(typeof it.rating === "number" ? String(it.rating) : "");
-   setRatingCount(typeof it.ratingCount === "number" ? String(it.ratingCount) : "");
-   setSeoTitle(it.seoTitle || "");
-   setSeoDescription(it.seoDescription || "");
-   setBrand(it.brand || "");
-   setModel(it.model || "");
-   setSku(it.sku || "");
-   setPriceLabel(it.priceLabel || "");
-   setAvailability(it.availability || "");
-   setWarranty(it.warranty || "");
-   setSpecs(it.specs ? JSON.stringify(it.specs, null, 2) : "");
- }
- loadEdit();
- return () => { mounted = false; };
- }, [editSlug, module]);
+  const isSuccess = msg.includes("✓");
+  const isDraft = msg.includes("پیش‌نویس");
+  const statusClass = isSuccess ? "text-green-600" : isDraft ? "text-amber-600" : "text-muted-foreground";
 
- const parsedTags = useMemo(() => tags.split(",").map(t=>t.trim()).filter(Boolean), [tags]);
- const resolvedSlug = slug.trim() || slugify(title);
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
+      <Toaster dir="rtl" />
+      <PageBreadcrumb />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <ModuleBadge module={moduleWatch as ModuleSlug}>{moduleMeta[moduleWatch as ModuleSlug]?.titleFa}</ModuleBadge>
+            {editSlug && <Badge variant="outline">حالت ویرایش</Badge>}
+          </div>
+          <h1 className="text-2xl font-extrabold tracking-tight">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {user.name} • {user.role === "super_admin" ? "مدیر کل" : "ویراستار"}
+          </p>
+        </div>
+        <ButtonLink href={`/admin/posts?module=${moduleWatch}`} variant="ghost" size="sm">
+          بازگشت به مدیریت محتوا
+        </ButtonLink>
+      </div>
 
- if (!user) return <main className="p-10 text-center" dir="rtl">ابتدا <Link className="text-[var(--home)] underline" href="/admin/login">وارد شوید</Link></main>;
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
+            <Card className="p-5 space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control as any}
+                  name="module"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ماژول *</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {allowed.map((m) => (
+                            <SelectItem key={m} value={m}>
+                              {moduleMeta[m]?.titleFa} – /{m}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control as any}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>دسته‌بندی</FormLabel>
+                      <FormControl>
+                        <Input list="category-hints" placeholder="مثلا امنیت، شبکه…" {...field} />
+                      </FormControl>
+                      <datalist id="category-hints">
+                        {categoryHints[moduleWatch as ModuleSlug]?.map((c) => (
+                          <option key={c} value={c} />
+                        ))}
+                      </datalist>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
- const canEdit = user.role==="super_admin" || (user.modules||[]).includes(module);
- if (!canEdit) return <main className="p-10 text-center text-[var(--danger)]" dir="rtl">دسترسی به ماژول {moduleMeta[module]?.titleFa} ندارید.</main>;
+              <FormField
+                control={form.control as any}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>عنوان *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="عنوان مطلب" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
- const save = async (e: React.FormEvent) => {
- e.preventDefault();
- if (!title.trim()) { setMsg("عنوان الزامی است"); return; }
- setSaving(true); setMsg(""); setLastDraftKey("");
- const payload = {
- module,
- slug: resolvedSlug,
- title: title.trim(),
- excerpt: excerpt.trim(),
- content: content.trim(),
- image: image.trim() || undefined,
- published,
- status,
- videoUrl: videoUrl.trim() || undefined,
- videoDuration: videoDuration.trim() || undefined,
- videoMimeType: videoMimeType.trim() || undefined,
- videoFileSize: videoFileSize.trim() || undefined,
- gallery: linesToArray(gallery),
- tags: parsedTags,
- category: category.trim() || undefined,
- rating: rating.trim() ? Number(rating) : undefined,
- ratingCount: ratingCount.trim() ? Number(ratingCount) : undefined,
- fileName: fileName.trim() || undefined,
- fileUrl: fileUrl.trim() || undefined,
- fileSize: fileSize.trim() || undefined,
- seoTitle: seoTitle.trim() || undefined,
- seoDescription: seoDescription.trim() || undefined,
- brand: brand.trim() || undefined,
- model: model.trim() || undefined,
- sku: sku.trim() || undefined,
- priceLabel: priceLabel.trim() || undefined,
- availability: availability.trim() || undefined,
- warranty: warranty.trim() || undefined,
- specs: parseSpecs(specs),
- };
- try{
- const res = await fetch("/api/posts", {
- method:"POST", headers:{"Content-Type":"application/json"},
- body: JSON.stringify(payload),
- credentials:"include"
- });
- const data = await res.json();
- if(!res.ok) throw new Error(data.error || "save_failed");
- setMsg("منتشر شد ✓ در حال انتقال به لیست محتوا…");
- setTimeout(()=> router.push(`/admin/posts?module=${module}`), 650);
- }catch(err:any){
- // fallback local draft – keeps admin usable offline
- const key = `tb_drafts_${module}`;
- const drafts = JSON.parse(localStorage.getItem(key) || "[]");
- const draft = {
- ...payload,
- savedAt: new Date().toISOString(),
- savedAtFa: new Intl.DateTimeFormat("fa-IR", { dateStyle:"medium", timeStyle:"short" }).format(new Date()),
- apiError: err.message,
- };
- drafts.unshift(draft);
- localStorage.setItem(key, JSON.stringify(drafts.slice(0, 30)));
- setLastDraftKey(key);
- setMsg("API در دسترس نبود؛ پیش‌نویس امن در مرورگر ذخیره شد.");
- }finally{ setSaving(false); }
- };
+              <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                <FormField
+                  control={form.control as any}
+                  name="slug"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>اسلاگ</FormLabel>
+                      <FormControl>
+                        <Input placeholder="auto از عنوان" dir="ltr" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="button" variant="ghost" size="sm" onClick={() => form.setValue("slug", slugify(titleWatch || ""))} disabled={!titleWatch?.trim()}>
+                  ساخت اسلاگ
+                </Button>
+              </div>
 
- const allowed: ModuleSlug[] = user.role==="super_admin" ? Object.keys(moduleMeta) as ModuleSlug[] : (user.modules||[]);
- const isSuccess = msg.includes("✓");
- const isDraft = msg.includes("پیش‌نویس");
- const statusClass = isSuccess ? "text-[var(--success)]" : isDraft ? "text-[var(--warning)]" : "paragraph-color";
- 
- return (
- <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
- <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
- <div>
- <div className="mb-2 flex flex-wrap items-center gap-2">
- <ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>
- {editSlug && <ModuleBadge module="warning">حالت ویرایش</ModuleBadge>}
- </div>
- <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{editSlug ? "ویرایش مطلب" : "مطلب جدید"}</h1>
- <p className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{user.name} • {user.role==="super_admin"?"مدیر کل":"ویراستار"}</p>
- </div>
- <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">بازگشت به مدیریت محتوا</ButtonLink>
- </div>
+              <FormField
+                control={form.control as any}
+                name="excerpt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>خلاصه</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="خلاصه کوتاه برای کارت‌ها، فیدها و سئو…" className="min-h-[80px]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
- <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
- <form onSubmit={save} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] space-y-4 p-5">
- <div className="grid gap-4 md:grid-cols-2">
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">ماژول *</label>
- <select value={module} onChange={e=>setModule(e.target.value as ModuleSlug)} className="input mt-1" required>
- {allowed.map(m => <option key={m} value={m}>{moduleMeta[m].titleFa} – /{m}</option>)}
- </select>
- </div>
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">دسته‌بندی</label>
- <input value={category} onChange={e=>setCategory(e.target.value)} list="category-hints" className="input mt-1" placeholder="مثلا امنیت، شبکه، فریم‌ور…" />
- <datalist id="category-hints">
- {categoryHints[module].map(c => <option key={c} value={c} />)}
- </datalist>
- </div>
- </div>
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="md:col-span-2">
+                  <FormField
+                    control={form.control as any}
+                    name="tags"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>برچسب‌ها – با , جدا کنید</FormLabel>
+                        <FormControl>
+                          <Input placeholder="QNAP-2277, nas, storage" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <FormField
+                  control={form.control as any}
+                  name="image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>تصویر شاخص URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://..." dir="ltr" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">عنوان *</label>
- <input value={title} onChange={e=>setTitle(e.target.value)} className="input mt-1" required />
- </div>
+              <BlobUploadField
+                label="آپلود تصویر شاخص"
+                kind="image"
+                folder={moduleWatch === "review" ? "review-images" : moduleWatch === "news" ? "news-images" : "article-images"}
+                accept="image/*"
+                onUploaded={(r) => form.setValue("image", r.url)}
+              />
+            </Card>
 
- <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">اسلاگ</label>
- <input value={slug} onChange={e=>setSlug(e.target.value)} className="input mt-1" placeholder="auto از عنوان" dir="ltr" />
- </div>
- <Button type="button" variant="ghost" size="xs" onClick={()=>setSlug(slugify(title))} disabled={!title.trim()}>
- ساخت اسلاگ
- </Button>
- </div>
+            <Accordion className="w-full space-y-4">
+              <AccordionItem value="seo">
+                <Card className="p-0">
+                  <AccordionTrigger className="p-4">
+                    <span className="font-bold">سئو و متادیتا</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-4 pt-0 space-y-4">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <FormField
+                        control={form.control as any}
+                        name="seoTitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SEO Title</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control as any}
+                        name="seoDescription"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SEO Description</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </AccordionContent>
+                </Card>
+              </AccordionItem>
 
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">خلاصه</label>
- <textarea value={excerpt} onChange={e=>setExcerpt(e.target.value)} className="input mt-1 min-h-[80px]" placeholder="خلاصه کوتاه برای کارت‌ها، فیدها و سئو…" />
- </div>
+              {moduleWatch === "media" && (
+                <AccordionItem value="media">
+                  <Card className="p-0">
+                    <AccordionTrigger className="p-4">ویدیو</AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0 space-y-3">
+                      <FormField
+                        control={form.control as any}
+                        name="videoUrl"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Video URL</FormLabel>
+                            <FormControl>
+                              <Input dir="ltr" {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid gap-3 md:grid-cols-3">
+                        <FormField control={form.control as any} name="videoDuration" render={({ field }) => (
+                          <FormItem><FormLabel>Duration</FormLabel><FormControl><Input placeholder="08:35" dir="ltr" {...field} /></FormControl></FormItem>
+                        )} />
+                        <FormField control={form.control as any} name="videoMimeType" render={({ field }) => (
+                          <FormItem><FormLabel>MIME</FormLabel><FormControl><Input placeholder="video/mp4" dir="ltr" {...field} /></FormControl></FormItem>
+                        )} />
+                        <FormField control={form.control as any} name="videoFileSize" render={({ field }) => (
+                          <FormItem><FormLabel>Size</FormLabel><FormControl><Input placeholder="50 MB" dir="ltr" {...field} /></FormControl></FormItem>
+                        )} />
+                      </div>
+                      <BlobUploadField
+                        label="آپلود ویدیو"
+                        kind="video"
+                        folder="videos"
+                        accept="video/mp4,video/webm,video/quicktime"
+                        onUploaded={(r) => {
+                          form.setValue("videoUrl", r.url);
+                          form.setValue("videoMimeType", r.contentType);
+                          form.setValue("videoFileSize", formatBytes(r.size));
+                        }}
+                      />
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              )}
 
- <div className="grid gap-3 md:grid-cols-3">
- <div className="md:col-span-2">
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">برچسب‌ها – با , جدا کنید</label>
- <input value={tags} onChange={e=>setTags(e.target.value)} className="input mt-1" placeholder="QNAP-2277, nas, storage" />
- </div>
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">تصویر شاخص URL</label>
- <input value={image} onChange={e=>setImage(e.target.value)} className="input mt-1" placeholder="https://..." dir="ltr" />
- </div>
- </div>
- <BlobUploadField label="آپلود تصویر شاخص" kind="image" folder={module === "review" ? "review-images" : module === "news" ? "news-images" : "article-images"} accept="image/*" onUploaded={(r) => setImage(r.url)} />
+              {moduleWatch === "download" && (
+                <AccordionItem value="download">
+                  <Card className="p-0">
+                    <AccordionTrigger className="p-4">فایل دانلود</AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0 space-y-3">
+                      <div className="grid gap-3 md:grid-cols-3">
+                        <FormField control={form.control as any} name="fileName" render={({ field }) => (<FormItem><FormLabel>File Name</FormLabel><FormControl><Input dir="ltr" {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="fileSize" render={({ field }) => (<FormItem><FormLabel>File Size</FormLabel><FormControl><Input dir="ltr" {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="fileUrl" render={({ field }) => (<FormItem><FormLabel>File URL</FormLabel><FormControl><Input dir="ltr" {...field} /></FormControl></FormItem>)} />
+                      </div>
+                      <BlobUploadField label="آپلود فایل" kind="download" folder="archive/uploads" onUploaded={(r) => { form.setValue("fileUrl", r.url); form.setValue("fileName", r.fileName); form.setValue("fileSize", formatBytes(r.size)); }} />
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              )}
 
- <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]/40 p-4 space-y-4">
- <h2 className="font-bold text-[var(--primary-text)]">فیلدهای حرفه‌ای محتوا</h2>
- <div className="grid gap-3 md:grid-cols-2">
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">SEO Title</span><input value={seoTitle} onChange={e=>setSeoTitle(e.target.value)} className="input mt-1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">SEO Description</span><input value={seoDescription} onChange={e=>setSeoDescription(e.target.value)} className="input mt-1" /></label>
- </div>
+              {moduleWatch === "review" && (
+                <AccordionItem value="review">
+                  <Card className="p-0">
+                    <AccordionTrigger className="p-4">امتیاز</AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0 grid gap-3 md:grid-cols-2">
+                      <FormField control={form.control as any} name="rating" render={({ field }) => (<FormItem><FormLabel>Rating</FormLabel><FormControl><Input type="number" min="0" max="5" step="0.1" {...field} /></FormControl></FormItem>)} />
+                      <FormField control={form.control as any} name="ratingCount" render={({ field }) => (<FormItem><FormLabel>Rating Count</FormLabel><FormControl><Input type="number" min="0" {...field} /></FormControl></FormItem>)} />
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              )}
 
- {module === "media" && (
- <div className="space-y-3 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Video URL</span><input value={videoUrl} onChange={e=>setVideoUrl(e.target.value)} className="input mt-1" dir="ltr" /></label>
- <div className="grid gap-3 md:grid-cols-3">
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Duration</span><input value={videoDuration} onChange={e=>setVideoDuration(e.target.value)} className="input mt-1" placeholder="مثلاً 08:35" dir="ltr" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">MIME Type</span><input value={videoMimeType} onChange={e=>setVideoMimeType(e.target.value)} className="input mt-1" placeholder="video/mp4" dir="ltr" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Video Size</span><input value={videoFileSize} onChange={e=>setVideoFileSize(e.target.value)} className="input mt-1" placeholder="50 MB" dir="ltr" /></label>
- </div>
-                  <BlobUploadField label="آپلود ویدیو" kind="video" folder="videos" accept="video/mp4,video/webm,video/quicktime" onUploaded={(r)=>{setVideoUrl(r.url); setVideoMimeType(r.contentType); setVideoFileSize(formatBytes(r.size)); captureVideoDuration(r.url);}} />
- </div>
- )}
+              {moduleWatch === "shop" && (
+                <AccordionItem value="shop">
+                  <Card className="p-0">
+                    <AccordionTrigger className="p-4">فروشگاه</AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0 space-y-4">
+                      <div className="grid gap-3 md:grid-cols-3">
+                        <FormField control={form.control as any} name="brand" render={({ field }) => (<FormItem><FormLabel>Brand</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="model" render={({ field }) => (<FormItem><FormLabel>Model</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="sku" render={({ field }) => (<FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="priceLabel" render={({ field }) => (<FormItem><FormLabel>Price Label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="availability" render={({ field }) => (<FormItem><FormLabel>Availability</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="warranty" render={({ field }) => (<FormItem><FormLabel>Warranty</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                      </div>
+                      <FormField control={form.control as any} name="gallery" render={({ field }) => (<FormItem><FormLabel>Gallery URLs (one per line)</FormLabel><FormControl><Textarea className="min-h-[90px]" dir="ltr" {...field} /></FormControl></FormItem>)} />
+                      <BlobUploadField label="افزودن تصویر به گالری" kind="image" folder="products" accept="image/*" onUploaded={(r) => form.setValue("gallery", [form.getValues("gallery")?.trim(), r.url].filter(Boolean).join("\n"))} />
+                      <FormField control={form.control as any} name="specs" render={({ field }) => (<FormItem><FormLabel>Specs JSON یا key:value</FormLabel><FormControl><Textarea className="min-h-[110px] font-mono" dir="ltr" placeholder={'{"cpu":"..."}'} {...field} /></FormControl></FormItem>)} />
+                    </AccordionContent>
+                  </Card>
+                </AccordionItem>
+              )}
+            </Accordion>
 
- {module === "download" && (
- <div className="space-y-3 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
- <div className="grid gap-3 md:grid-cols-3">
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">File Name</span><input value={fileName} onChange={e=>setFileName(e.target.value)} className="input mt-1" dir="ltr" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">File Size</span><input value={fileSize} onChange={e=>setFileSize(e.target.value)} className="input mt-1" dir="ltr" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">File URL</span><input value={fileUrl} onChange={e=>setFileUrl(e.target.value)} className="input mt-1" dir="ltr" /></label>
- </div>
- <BlobUploadField label="آپلود فایل دانلود" kind="download" folder="archive/uploads" onUploaded={(r)=>{setFileUrl(r.url); setFileName(r.fileName); setFileSize(formatBytes(r.size));}} />
- </div>
- )}
+            <Card className="p-5 space-y-4">
+              <FormField
+                control={form.control as any}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>محتوا</FormLabel>
+                    <FormControl>
+                      <Textarea className="min-h-[260px]" placeholder="متن کامل / HTML / Markdown…" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
- {module === "review" && (
- <div className="grid gap-3 md:grid-cols-2 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Rating</span><input value={rating} onChange={e=>setRating(e.target.value)} className="input mt-1" type="number" min="0" max="5" step="0.1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Rating Count</span><input value={ratingCount} onChange={e=>setRatingCount(e.target.value)} className="input mt-1" type="number" min="0" /></label>
- </div>
- )}
+              <div className="grid gap-3 md:grid-cols-2">
+                <FormField
+                  control={form.control as any}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>وضعیت انتشار</FormLabel>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="published">منتشر شده</SelectItem>
+                          <SelectItem value="review">در حال بررسی</SelectItem>
+                          <SelectItem value="draft">پیش‌نویس</SelectItem>
+                          <SelectItem value="archived">آرشیو شده</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control as any}
+                  name="published"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>انتشار عمومی</FormLabel>
+                        <FormDescription>{field.value ? "قابل مشاهده برای عموم" : "ذخیره به‌عنوان پیش‌نویس"}</FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
- {module === "shop" && (
- <div className="space-y-3 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
- <div className="grid gap-3 md:grid-cols-3">
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Brand</span><input value={brand} onChange={e=>setBrand(e.target.value)} className="input mt-1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Model</span><input value={model} onChange={e=>setModel(e.target.value)} className="input mt-1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">SKU</span><input value={sku} onChange={e=>setSku(e.target.value)} className="input mt-1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Price Label</span><input value={priceLabel} onChange={e=>setPriceLabel(e.target.value)} className="input mt-1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Availability</span><input value={availability} onChange={e=>setAvailability(e.target.value)} className="input mt-1" /></label>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Warranty</span><input value={warranty} onChange={e=>setWarranty(e.target.value)} className="input mt-1" /></label>
- </div>
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Gallery URLs (one per line)</span><textarea value={gallery} onChange={e=>setGallery(e.target.value)} className="input mt-1 min-h-[90px]" dir="ltr" /></label>
- <BlobUploadField label="افزودن تصویر به گالری" kind="image" folder="products" accept="image/*" onUploaded={(r)=>setGallery(g => [g.trim(), r.url].filter(Boolean).join("\n"))} />
- <label className="block"><span className="text-[length:var(--paragraph-font-size)] paragraph-color">Specs JSON یا key:value هر خط</span><textarea value={specs} onChange={e=>setSpecs(e.target.value)} className="input mt-1 min-h-[110px] font-mono" dir="ltr" placeholder={'{"cpu":"..."}'} /></label>
- </div>
- )}
- </div>
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <div className={`text-sm ${statusClass}`}>
+                  {msg || "POST → /api/posts – RBAC server-side؛ در خطا، پیش‌نویس لوکال ذخیره می‌شود."}
+                  {lastDraftKey && <span className="block text-xs">کلید پیش‌نویس: <code>{lastDraftKey}</code></span>}
+                </div>
+                <div className="flex gap-2">
+                  <ButtonLink href={`/admin/posts?module=${moduleWatch}`} variant="ghost" size="sm">انصراف</ButtonLink>
+                  <Button size="sm" disabled={saving || !titleWatch?.trim()} type="submit" loading={saving}>
+                    {saving ? "در حال ذخیره…" : editSlug ? "ذخیره تغییرات" : publishedWatch ? "انتشار" : "ذخیره پیش‌نویس"}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </form>
+        </Form>
 
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">محتوا</label>
- <textarea value={content} onChange={e=>setContent(e.target.value)} className="input mt-1 min-h-[260px]" placeholder="متن کامل / HTML / Markdown…" />
- </div>
+        <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <Card className="p-4">
+            <h2 className="text-sm font-bold">پیش‌نمایش منبع</h2>
+            <div className="mt-3 space-y-2 text-xs text-muted-foreground">
+              <div>مسیر: <code dir="ltr">/{moduleWatch}/{resolvedSlug || "slug"}</code></div>
+              <div>دسته: {form.watch("category") || "—"}</div>
+              <div>برچسب‌ها: {parsedTags.length.toLocaleString("fa-IR")}</div>
+              <div>خلاصه: {(excerptWatch || "").length.toLocaleString("fa-IR")} کاراکتر</div>
+              <div>محتوا: {(contentWatch || "").length.toLocaleString("fa-IR")} کاراکتر</div>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-1">
+              {parsedTags.slice(0, 8).map((t: any) => (
+                <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
+              ))}
+              {parsedTags.length > 8 && <Badge variant="secondary">+{(parsedTags.length - 8).toLocaleString("fa-IR")}</Badge>}
+            </div>
+          </Card>
 
- <div>
- <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">وضعیت انتشار</label>
- <select
-   value={status}
-   onChange={(e) => { setStatus(e.target.value); setPublished(e.target.value === "published"); }}
-   className="input mt-1"
- >
-   <option value="published">منتشر شده</option>
-   <option value="review">در حال بررسی</option>
-   <option value="draft">پیش‌نویس</option>
-   <option value="archived">آرشیو شده</option>
- </select>
- </div>
- <label className="flex items-center gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] p-3 text-sm paragraph-color">
- <input type="checkbox" checked={published} onChange={(e)=>{ setPublished(e.target.checked); setStatus(e.target.checked ? "published" : "draft"); }} />
- <span>{published ? "انتشار عمومی" : "ذخیره به‌عنوان پیش‌نویس"}</span>
- </label>
+          <Card className="overflow-hidden p-0">
+            {imageWatch && (
+              <div className="relative aspect-[16/9] bg-muted">
+                <Image src={imageWatch} alt="preview" fill sizes="320px" className="object-cover" />
+              </div>
+            )}
+            <CardContent className="p-4 space-y-2">
+              <div className="flex flex-wrap gap-2">
+                <ModuleBadge module={moduleWatch as ModuleSlug}>{moduleMeta[moduleWatch as ModuleSlug]?.titleFa}</ModuleBadge>
+                <Badge variant={statusWatch === "published" ? "default" : statusWatch === "review" ? "secondary" : statusWatch === "archived" ? "destructive" : "outline"}>
+                  {statusWatch}
+                </Badge>
+              </div>
+              <h3 className="font-black line-clamp-2">{titleWatch || "عنوان مطلب"}</h3>
+              <p className="text-xs text-muted-foreground line-clamp-3">{excerptWatch || "خلاصه مطلب اینجا دیده می‌شود."}</p>
+            </CardContent>
+          </Card>
 
- <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
- <div className={`text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${statusClass}`}>
- {msg || "POST → /api/posts – RBAC server-side؛ در خطا، پیش‌نویس لوکال ذخیره می‌شود."}
- {lastDraftKey && <span className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">کلید پیش‌نویس: <code>{lastDraftKey}</code></span>}
- </div>
- <div className="flex gap-2">
- <ButtonLink href={`/admin/posts?module=${module}`} variant="ghost" size="xs">انصراف</ButtonLink>
- <Button size="xs" disabled={saving || !title.trim()} type="submit">{saving ? "در حال ذخیره…" : (editSlug ? "ذخیره تغییرات" : (published ? "انتشار در تکباکس" : "ذخیره پیش‌نویس"))}</Button>
- </div>
- </div>
- </form>
+          <Card className="p-4 text-xs text-muted-foreground">
+            <b className="text-foreground">راهنمای CMS</b>
+            <br />• اسلاگ اگر خالی باشد از عنوان ساخته می‌شود.
+            <br />• برچسب‌های فارسی/انگلیسی باعث بهتر شدن جستجو و مطالب مرتبط می‌شوند.
+            <br />• اگر API/Prisma آماده نباشد، پیش‌نویس در مرورگر ذخیره می‌شود.
+          </Card>
+        </aside>
+      </div>
 
- <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
- <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
- <h2 className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ">پیش‌نمایش منبع</h2>
- <div className="mt-3 space-y-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- <div>مسیر: <code dir="ltr">/{module}/{resolvedSlug || "slug"}</code></div>
- <div>دسته: {category || "—"}</div>
- <div>برچسب‌ها: {parsedTags.length.toLocaleString("fa-IR")}</div>
- <div>خلاصه: {excerpt.length.toLocaleString("fa-IR")} کاراکتر</div>
- <div>محتوا: {content.length.toLocaleString("fa-IR")} کاراکتر</div>
- </div>
- <div className="mt-3 flex flex-wrap gap-1">
- {parsedTags.slice(0, 8).map(t => <span key={t} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] px-2 py-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{t}</span>)}
- {parsedTags.length > 8 && <ModuleBadge module="info">+{(parsedTags.length-8).toLocaleString("fa-IR")}</ModuleBadge>}
- </div>
- </div>
-
- <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden">
- {image && <div className="relative aspect-[16/9] bg-[var(--muted-background)]"><Image src={image} alt="preview" fill sizes="300px" className="object-cover" /></div>}
- <div className="p-4 space-y-2">
- <div className="flex flex-wrap gap-2"><ModuleBadge module={module}>{moduleMeta[module].titleFa}</ModuleBadge>{status === "published" ? <ModuleBadge module="success">منتشر شده</ModuleBadge> : status === "review" ? <ModuleBadge module="info">در حال بررسی</ModuleBadge> : status === "archived" ? <ModuleBadge module="danger">آرشیو شده</ModuleBadge> : <ModuleBadge module="warning">پیش‌نویس</ModuleBadge>}</div>
- <h3 className="font-black text-[var(--primary-text)] line-clamp-2">{title || "عنوان مطلب"}</h3>
- <p className="paragraph-color text-xs line-clamp-3">{excerpt || "خلاصه مطلب اینجا دیده می‌شود."}</p>
- </div>
- </div>
-
- <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- <b className="text-[var(--primary-text)]">راهنمای CMS</b><br/>
- • اسلاگ اگر خالی باشد از عنوان ساخته می‌شود.<br/>
- • دسته‌بندی اختیاری است ولی برای فیلتر و جدول مفید است.<br/>
- • برچسب‌های فارسی/انگلیسی باعث بهتر شدن جستجو و مطالب مرتبط می‌شوند.<br/>
- • اگر API/Prisma آماده نباشد، پیش‌نویس در مرورگر ذخیره می‌شود.
- </div>
- </aside>
- </div>
-
- <p className="mt-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- دسترسی شما:
- <span className="mx-1 inline-flex flex-wrap justify-center gap-1 align-middle">{allowed.map(m=><ModuleBadge key={m} module={m}>{moduleMeta[m]?.titleFa}</ModuleBadge>)}</span>
- – نقش توسط مدیر کل در <Link href="/admin/roles" className="text-[var(--home)] underline">/admin/roles</Link> قابل تغییر است.
- </p>
- </main>
- );
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        دسترسی شما:{" "}
+        <span className="mx-1 inline-flex flex-wrap justify-center gap-1 align-middle">
+          {allowed.map((m) => (
+            <ModuleBadge key={m} module={m as ModuleSlug}>{moduleMeta[m as ModuleSlug]?.titleFa}</ModuleBadge>
+          ))}
+        </span>
+      </p>
+    </main>
+  );
 }
 
-export default function NewPostPage(){
- return (
- <Suspense fallback={<div className="p-10 text-center">در حال بارگذاری…</div>}>
- <NewPostInner />
- </Suspense>
- );
+export default function NewPostPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">در حال بارگذاری…</div>}>
+      <NewPostInner />
+    </Suspense>
+  );
 }
