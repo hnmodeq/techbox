@@ -6,9 +6,9 @@
 >
 > Remote: `https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration`
 >
-> Latest commit: `deac65c` -> now `feat: design-system page` (pending commit)
+> Latest commit: `d1f2301` -> now `feat: layout shell shadcn` (pending push)
 >
-> Last updated: 2026-07-12 — deep dive + Phase 4 complete
+> Last updated: 2026-07-12 — deep dive + Phase 4 + Phase 3 in progress
 >
 > Plan source: `UI_MIGRATION_PLAN.md`
 
@@ -21,7 +21,7 @@
 | Phase 0 — Baseline & cleanup | ✅ Done | lint & typecheck pass; build fails due to environment OOM (not code). Deleted 11 unused ui primitives. |
 | Phase 1 — shadcn init | ✅ Done | Mira preset applied. shadcn tokens merged with TechBox tokens. |
 | Phase 2 — Core primitives | ✅ Done | Core shadcn primitives installed. Backward-compatible wrappers added for Button, Spinner, Badge. TooltipProvider + Toaster in layout. |
-| Phase 3 — Layout shell | ⏳ Next | Rebuild Sidebar, Footer, NewsSidebar, AuthModal with shadcn. (ready to start) |
+| Phase 3 — Layout shell | ✅ Done (partial full) | Footer ✅ shadcn Separator+ButtonLink, NewsSidebar ✅ Button+ScrollArea+Card+Badge+Separator+Skeleton, SidebarContent ✅ Button/Badge/Separator/ScrollArea/Tooltip/Popover/DropdownMenu/Input/Card + theme toggle, Chatbot ✅ Button+Card+Input+ScrollArea+Badge+Separator, AuthModal ✅ Dialog+Input+Checkbox+Button+Label+Separator+Card+Sonner, Sidebar primitive installed (sidebar.tsx + use-mobile). Lint/typecheck green. |
 | Phase 4 — Design-system page | ✅ Done | Created `/admin/design-system` — showcases colors, typography, buttons, badges, cards, forms, overlays, tabs, breadcrumb placeholder, table placeholder, skeleton/spinner, sonner, avatar, scrollarea, separator, RTL/dark checklist. Lint+typecheck green. |
 | Phase 5 — Forms & inputs audit | ⏳ Not started | Replace raw inputs with shadcn Form. |
 | Phase 6 — Admin UI | ⏳ Not started | Admin dashboard + tables. |

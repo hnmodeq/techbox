@@ -3,12 +3,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHomeModule } from '@/features/home/lib/home-data';
 import Link from 'next/link';
-import { Icon } from '@/design/icons';
 import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { usePathname } from 'next/navigation';
 import { zIndex } from '@/design';
-import { sidebarBase } from '@/config/sidebar.config';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button, ButtonLink } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Newspaper, ChevronLeft, Clock3 } from 'lucide-react';
 import { CardStats } from '@/components/ui/card-stats';
 
 const NEWS_SIDEBAR_OPEN_KEY = 'techbox-news-sidebar-open';
@@ -18,6 +23,8 @@ function readSavedOpenState() {
   return localStorage.getItem(NEWS_SIDEBAR_OPEN_KEY) === 'true';
 }
 
+// Rebuilt with shadcn: Button + ScrollArea + Card + Badge + Separator + Skeleton
+// Keeps original behavior: homepage only, left-edge toggle, mobile backdrop, desktop spacer that pushes <main>
 export default function NewsSidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -42,7 +49,7 @@ export default function NewsSidebar() {
     }
   };
 
-  // Close when clicking outside ONLY on mobile devices (sm: hidden)
+  // Close when clicking outside ONLY on mobile
   useEffect(() => {
     if (!open) return;
     const handleOutsideClick = (e: MouseEvent) => {
@@ -55,23 +62,23 @@ export default function NewsSidebar() {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [open]);
 
-  // Only active on homepage per user request
   if (pathname !== '/') return null;
 
   return (
     <>
-      {/* Floating Left Edge Toggle Button */}
+      {/* Left Edge Toggle — shadcn Button */}
       {!open && (
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="icon"
           onClick={() => setPersistedOpen(true)}
           style={{ zIndex: zIndex.mobileFab }}
-          className="news-sidebar-toggle fixed left-0 top-6 select-none rounded-r-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-l-0 border-[var(--border-color)] p-2.5 text-[var(--news)] shadow-[var(--shadow-size)] transition-all duration-[300ms] hover:bg-[var(--muted-background)] cursor-pointer"
-          title="اخبار زنده تکباکس"
+          className="news-sidebar-toggle fixed left-0 top-6 select-none rounded-r-lg bg-card border-l-0 text-[var(--news)] shadow-md"
           aria-label="اخبار زنده تکباکس"
+          title="اخبار زنده تکباکس"
         >
-          <Icon name="news" className="h-6 w-6" />
-        </button>
+          <Newspaper className="size-5" />
+        </Button>
       )}
 
       {/* Mobile Backdrop */}
@@ -83,97 +90,97 @@ export default function NewsSidebar() {
         />
       )}
 
-      {/* Desktop Layout Width Spacer (Compresses <main> width smoothly when open) */}
+      {/* Desktop Spacer — pushes main */}
       <div
-        className={`news-sidebar-spacer hidden shrink-0 sm:block transition-[width] duration-[300ms] ease-[ease] ${
+        className={`news-sidebar-spacer hidden shrink-0 sm:block transition-[width] duration-300 ease-[ease] ${
           open ? 'w-80' : 'w-0'
         }`}
         aria-hidden="true"
       />
 
-      {/* Fixed Left Sidebar Panel */}
+      {/* Fixed Left Sidebar Panel — now using Card + ScrollArea */}
       <aside
         ref={sidebarRef}
-        className={`news-sidebar-panel fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden transition-transform duration-[300ms] ease-[ease] ${sidebarBase} ${
+        className={`news-sidebar-panel fixed left-0 top-0 h-screen w-80 flex flex-col overflow-hidden bg-sidebar border-e shadow-sm transition-transform duration-300 ease-[ease] ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ zIndex: zIndex.sidebar }}
         dir="rtl"
       >
-        {/* Clean Header WITHOUT background fill and WITHOUT X button */}
-        <div className="p-5 border-b-[length:var(--border-size)] border-[var(--border-color)] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <Icon name="news" className="h-5 w-5 text-[var(--news)]" />
-            <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black text-[var(--primary-text)]">اخبار زنده تکباکس</h3>
-          </div>
-          <button
-            type="button"
-            onClick={() => setPersistedOpen(false)}
-            className="p-1.5 paragraph-color hover:text-[var(--news)] transition-colors cursor-pointer"
-            title="بستن"
-          >
-            <Icon name="chevronLeft" className="h-5 w-5 rtl:rotate-180" />
-          </button>
-        </div>
-
-        {/* Scrollable News List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
-          {loading && Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="space-y-3 px-2 sm:px-3">
-              <div className="aspect-[3/1] animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-              <div className="h-4 w-3/4 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-              <div className="h-3 w-full animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 shrink-0 border-b">
+          <div className="flex items-center gap-2">
+            <div className="flex size-8 items-center justify-center rounded-md bg-[color-mix(in_oklch,var(--news)_12%,var(--muted))] text-[var(--news)]">
+              <Newspaper className="size-4" />
             </div>
-          ))}
-          {!loading && newsItems.length === 0 && <div className="paragraph-color text-center py-6">خبری در دیتابیس ثبت نشده است.</div>}
-          {!loading && newsItems.map((n) => (
-            <Link
-              key={n.slug}
-              href={`/news/${n.slug}`}
-              onClick={() => setPersistedOpen(false)}
-              className="group block px-2 sm:px-3"
-            >
-              {/* Wide Banner Image */}
-              <div className="relative aspect-[3/1] w-full rounded-[var(--corner-radius)] overflow-hidden bg-[var(--muted-background)] mb-3 border-[length:var(--border-size)] border-[var(--border-color)]/50">
-                <Image
-                  src={n.image || '/assets/blog-1.jpg'}
-                  alt={n.title}
-                  fill
-                  className="object-cover"
-                  sizes="320px"
-                  {...blurProps(n.image || '/assets/blog-1.jpg')}
-                />
-              </div>
-
-              {/* Date & Time */}
-              <div className="text-[11px] paragraph-color mb-1 font-bold">
-                <span>{n.date_fa} {n.time || ''}</span>
-              </div>
-
-              <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--news)] transition-colors line-clamp-2 leading-6">
-                {n.title}
-              </h4>
-
-              {/* News Description */}
-              <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mt-1.5 line-clamp-2 leading-5">
-                {n.excerpt}
-              </p>
-              <div className="mt-2">
-                <CardStats module="news" slug={n.slug} showComments={true} />
-              </div>
-            </Link>
-          ))}
+            <h3 className="text-sm font-bold text-foreground">اخبار زنده تکباکس</h3>
+            <Badge variant="news" className="ms-1">Live</Badge>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setPersistedOpen(false)}
+            aria-label="بستن"
+          >
+            <ChevronLeft className="size-4 rtl:rotate-180" />
+          </Button>
         </div>
 
-        {/* Footer Link */}
-        <div className="p-3.5 border-t-[length:var(--border-size)] border-[var(--border-color)] text-center shrink-0">
-          <Link
-            href="/news"
-            onClick={() => setPersistedOpen(false)}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40 w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--news)] font-bold"
-          >
+        {/* Scrollable List — shadcn ScrollArea */}
+        <ScrollArea className="flex-1">
+          <div className="p-3 space-y-4">
+            {loading &&
+              Array.from({ length: 5 }).map((_, index) => (
+                <Card key={index} className="p-0 overflow-hidden">
+                  <CardContent className="p-3 space-y-3">
+                    <Skeleton className="aspect-[3/1] w-full rounded-md" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+
+            {!loading && newsItems.length === 0 && (
+              <div className="text-center py-10 text-sm text-muted-foreground">خبری در دیتابیس ثبت نشده است.</div>
+            )}
+
+            {!loading &&
+              newsItems.map((n) => (
+                <Card key={n.slug} className="group overflow-hidden p-0 hover:bg-accent/50 transition-colors">
+                  <Link href={`/news/${n.slug}`} onClick={() => setPersistedOpen(false)} className="block">
+                    <div className="relative aspect-[3/1] w-full overflow-hidden bg-muted">
+                      <Image
+                        src={n.image || '/assets/blog-1.jpg'}
+                        alt={n.title}
+                        fill
+                        className="object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                        sizes="320px"
+                        {...blurProps(n.image || '/assets/blog-1.jpg')}
+                      />
+                    </div>
+                    <CardContent className="p-3 space-y-2">
+                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                        <Clock3 className="size-3" />
+                        <span>{n.date_fa} {n.time || ''}</span>
+                      </div>
+                      <h4 className="text-[13px] font-semibold leading-6 line-clamp-2 group-hover:text-[var(--news)] transition-colors">
+                        {n.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground line-clamp-2 leading-5">{n.excerpt}</p>
+                      <Separator className="my-1" />
+                      <CardStats module="news" slug={n.slug} showComments={true} />
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))}
+          </div>
+        </ScrollArea>
+
+        {/* Footer */}
+        <div className="p-3 border-t shrink-0 bg-card">
+          <ButtonLink href="/news" variant="outline" size="sm" className="w-full justify-center text-[var(--news)]" onClick={() => setPersistedOpen(false)}>
             مشاهده آرشیو کامل اخبار ←
-          </Link>
+          </ButtonLink>
         </div>
       </aside>
     </>
