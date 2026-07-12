@@ -2,6 +2,11 @@
 
 import * as React from "react";
 import { Icon } from "@/design/icons";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import {
   defaultSelectorState,
   estimateUsableCapacity,
@@ -64,32 +69,21 @@ function ToggleCard({
   icon?: "check" | "server" | "disk" | "shield";
 }) {
   return (
-    <button
-      type="button"
+    <Card
       onClick={onClick}
-      className={cn(
-        "group relative flex min-h-[92px] w-full items-start gap-3 rounded-[var(--corner-radius)] border p-4 text-right transition-all duration-[200ms] ease-[ease]",
-        selected
-          ? "border-[color-mix(in_oklch,var(--home)_48%,var(--border-color))] bg-[color-mix(in_oklch,var(--home)_10%,var(--card-background))] shadow-[var(--shadow-size)]"
-          : "border-[var(--border-color)] bg-[var(--card-background)] hover:-translate-y-0.5 hover:bg-[var(--muted-background)]",
-      )}
-      aria-pressed={selected}
+      className={`group relative flex min-h-[92px] w-full cursor-pointer flex-col items-start gap-3 p-4 text-right transition-all ${selected ? "border-primary/50 bg-primary/10 shadow-sm" : "hover:-translate-y-0.5 hover:bg-muted"}`}
     >
-      <span
-        className={cn(
-          "mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border",
-          selected
-            ? "border-[color-mix(in_oklch,var(--home)_35%,transparent)] bg-[var(--home)] text-[#ffffff]"
-            : "border-[var(--border-color)] bg-[var(--muted-background)] paragraph-color",
-        )}
-      >
-        <Icon name={icon} className="h-4 w-4" />
-      </span>
-      <span className="min-w-0">
-        <span className="block text-[14px] font-black text-[var(--primary-text)]">{title}</span>
-        {desc ? <span className="mt-1 block text-[12px] leading-6 paragraph-color">{desc}</span> : null}
-      </span>
-    </button>
+      <div className="flex w-full items-start gap-3">
+        <div className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border ${selected ? "border-primary/35 bg-primary text-primary-foreground" : "border-border bg-muted text-muted-foreground"}`}>
+          <Icon name={icon} className="h-4 w-4" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="block text-[14px] font-black">{title}</div>
+          {desc ? <div className="mt-1 block text-[12px] leading-6 text-muted-foreground">{desc}</div> : null}
+        </div>
+        {selected && <Badge variant="default" className="ms-auto">انتخاب</Badge>}
+      </div>
+    </Card>
   );
 }
 
@@ -110,26 +104,25 @@ function RangeField({
   suffix?: string;
   onChange: (next: number) => void;
 }) {
-  const percent = ((value - min) / (max - min)) * 100;
   return (
-    <label className="block rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4">
-      <span className="flex items-center justify-between gap-3">
-        <span className="text-[13px] font-extrabold text-[var(--primary-text)]">{label}</span>
-        <span className="badge bg-[color-mix(in_oklch,var(--home)_10%,var(--muted-background))] text-[var(--primary-text)]">
+    <Card className="p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <Label className="text-[13px] font-extrabold">{label}</Label>
+        <Badge variant="secondary">
           {persianNumber(value)} {suffix}
-        </span>
-      </span>
-      <input
-        className="mt-4 h-2 w-full cursor-pointer appearance-none rounded-full bg-[var(--muted-background)] accent-[var(--home)]"
-        style={{ background: `linear-gradient(to left, var(--home) ${percent}%, var(--muted-background) ${percent}%)` }}
-        type="range"
+        </Badge>
+      </div>
+      <Slider
         min={min}
         max={max}
         step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.currentTarget.value))}
+        value={[value]}
+        onValueChange={(v: any) => {
+          const val = Array.isArray(v) ? v[0] : v;
+          onChange(Number(val));
+        }}
       />
-    </label>
+    </Card>
   );
 }
 
@@ -217,17 +210,17 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
   const rows = [2, 4, 6, 8, 12];
   const raids: RaidType[] = ["raid1", "raid5", "raid6", "raid10"];
   return (
-    <div className="overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)]">
-      <div className="flex items-center justify-between gap-3 border-b-[length:var(--border-size)] border-[var(--border-color)] p-4">
+    <Card className="overflow-hidden p-0">
+      <CardHeader className="flex flex-row items-center justify-between gap-3 border-b p-4">
         <div>
-          <h3 className="text-[15px] font-black">جدول سریع ظرفیت قابل استفاده</h3>
-          <p className="mt-1 text-[12px] leading-6 paragraph-color">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
+          <CardTitle className="text-[15px]">جدول سریع ظرفیت قابل استفاده</CardTitle>
+          <p className="mt-1 text-[12px] text-muted-foreground">بر اساس دیسک {persianNumber(state.driveTb)} ترابایت</p>
         </div>
-        <Icon name="disk" className="h-5 w-5 text-[var(--home)]" />
-      </div>
-      <div className="overflow-x-auto">
+        <Icon name="disk" className="h-5 w-5 text-primary" />
+      </CardHeader>
+      <CardContent className="p-0 overflow-x-auto">
         <table className="w-full min-w-[520px] border-collapse text-center text-[12px]">
-          <thead className="bg-[var(--muted-background)] paragraph-color">
+          <thead className="bg-muted text-muted-foreground">
             <tr>
               <th className="p-3 font-black">Bay</th>
               {raids.map((raid) => (
@@ -237,13 +230,13 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
           </thead>
           <tbody>
             {rows.map((bays) => (
-              <tr key={bays} className="border-t-[length:var(--border-size)] border-[var(--border-color)]">
-                <td className="p-3 font-black text-[var(--primary-text)]">{persianNumber(bays)}</td>
+              <tr key={bays} className="border-t">
+                <td className="p-3 font-black">{persianNumber(bays)}</td>
                 {raids.map((raid) => {
                   const value = estimateUsableCapacity(bays, state.driveTb, raid);
                   const active = state.raid === raid && value >= state.usableTb;
                   return (
-                    <td key={raid} className={cn("p-3", active && "bg-[color-mix(in_oklch,var(--success)_16%,transparent)] font-black text-[var(--primary-text)]")}>
+                    <td key={raid} className={cn("p-3", active && "bg-green-500/10 font-black")}>
                       {value > 0 ? `${persianNumber(value)} TB` : "—"}
                     </td>
                   );
@@ -252,302 +245,129 @@ function CapacityMatrix({ state }: { state: SelectorState }) {
             ))}
           </tbody>
         </table>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function NasSelector({ products, initialState, onProductSelect, compareHref, consultationHref, className }: NasSelectorProps) {
+  const [state, setState] = React.useState<SelectorState>({ ...defaultSelectorState, ...initialState });
+
+  const update = <K extends keyof SelectorState>(key: K, value: SelectorState[K]) => {
+    setState((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const toggleWorkload = (workload: NasWorkload) => {
+    setState((prev) => ({
+      ...prev,
+      workloads: prev.workloads.includes(workload) ? prev.workloads.filter((w) => w !== workload) : [...prev.workloads, workload],
+    }));
+  };
+
+  const scored = React.useMemo(() => {
+    return products.map((p) => scoreProduct(p, state)).sort((a, b) => b.match - a.match);
+  }, [products, state]);
+
+  const top = scored[0];
+
+  return (
+    <div className={cn("space-y-6", className)} dir="rtl">
+      <Card className="p-5 space-y-4">
+        <CardTitle>انتخاب‌گر NAS — نیازسنجی هوشمند</CardTitle>
+        <p className="text-sm text-muted-foreground">پرسونای کاری، حجم کاربران و سرویس‌ها را انتخاب کنید تا بهترین NAS پیشنهاد شود.</p>
+
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {personas.map((persona) => (
+            <ToggleCard
+              key={persona}
+              selected={state.persona === persona}
+              title={personaLabels[persona].title}
+              desc={personaLabels[persona].desc}
+              onClick={() => update("persona", persona)}
+              icon="server"
+            />
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-4 space-y-3">
+          <CardTitle className="text-sm">نوع کاربری</CardTitle>
+          <div className="grid grid-cols-2 gap-2">
+            {workloads.map((w) => (
+              <Button key={w} variant={state.workloads.includes(w) ? "secondary" : "ghost"} size="sm" onClick={() => toggleWorkload(w)} className="justify-start">
+                {workloadLabels[w].title}
+              </Button>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-4 space-y-3">
+          <CardTitle className="text-sm">RAID مورد نظر</CardTitle>
+          <div className="grid grid-cols-2 gap-2">
+            {raidTypes.map((r) => (
+              <Button key={r} variant={state.raid === r ? "secondary" : "ghost"} size="sm" onClick={() => update("raid", r)} className="justify-start">
+                {raidLabels[r].title}
+              </Button>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <RangeField label="تعداد کاربران همزمان" value={state.users} min={1} max={120} suffix="کاربر" onChange={(v) => update("users", v)} />
+        <RangeField label="ظرفیت قابل استفاده موردنیاز" value={state.usableTb} min={2} max={160} step={2} suffix="TB" onChange={(v) => update("usableTb", v)} />
+        <RangeField label="تعداد دوربین‌ها" value={state.cameras} min={0} max={64} suffix="دوربین" onChange={(v) => update("cameras", v)} />
+        <RangeField label="بودجه هدف" value={state.budgetTier} min={1} max={5} suffix="از ۵" onChange={(v) => update("budgetTier", v as SelectorState["budgetTier"])} />
+      </div>
+
+      <CapacityMatrix state={state} />
+
+      {top && (
+        <Card className="p-5 border-primary/30 bg-primary/5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <Badge variant="default">بهترین پیشنهاد — {top.match}% تطابق</Badge>
+              <h3 className="mt-2 text-lg font-black">{top.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{top.bays} Bay • {persianNumber(top.usableTb)} TB قابل استفاده • {top.cpuTier} CPU Tier</p>
+              <div className="mt-3 flex flex-wrap gap-1">
+                {top.reasons.map((r, i) => (
+                  <Badge key={i} variant="secondary" className="text-[11px]">{r}</Badge>
+                ))}
+              </div>
+              {top.warnings.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1">
+                  {top.warnings.map((w, i) => (
+                    <Badge key={i} variant="destructive" className="text-[11px]">{w}</Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+            <Button
+              onClick={() => onProductSelect?.(top, state)}
+              size="sm"
+            >
+              انتخاب
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {scored.slice(0, 6).map((p) => (
+          <Card key={p.id} className="p-4 hover:shadow-md transition-shadow">
+            <div className="flex justify-between items-start gap-2">
+              <h4 className="font-bold text-sm">{p.title}</h4>
+              <Badge variant={p.match > 70 ? "default" : "secondary"}>{p.match}%</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">{p.bays} Bay • {p.formFactor} • {persianNumber(p.usableTb)} TB usable</p>
+            <div className="mt-3 flex gap-2">
+              <Button size="xs" variant="outline" onClick={() => onProductSelect?.(p, state)}>جزئیات</Button>
+              {compareHref && <a href={compareHref} className="inline-flex h-6 items-center justify-center rounded-md px-2 text-xs hover:bg-muted">مقایسه</a>}
+            </div>
+          </Card>
+        ))}
       </div>
     </div>
   );
 }
-
-function ProductCard({
-  product,
-  rank,
-  selected,
-  onToggleCompare,
-  onSelect,
-}: {
-  product: ScoredProduct;
-  rank: number;
-  selected: boolean;
-  onToggleCompare: () => void;
-  onSelect?: () => void;
-}) {
-  const targetHref = product.shopSlug ? `/shop/${product.shopSlug}` : product.href || `/shop/${product.id}`;
-
-  const renderPrice = () => {
-    if (!product.price || product.price === "مشاوره خرید") {
-      return "مشاوره خرید";
-    }
-    if (typeof product.price === "number") {
-      return `${persianNumber(product.price.toLocaleString("fa-IR"))} تومان`;
-    }
-    return product.price;
-  };
-
-  return (
-    <article className="relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] transition-all duration-[200ms] hover:-translate-y-1 hover:shadow-[var(--shadow-size)] flex flex-col justify-between">
-      <div>
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklch,var(--home)_20%,transparent),transparent_45%),var(--muted-background)]">
-              <Icon name={product.formFactor === "rackmount" ? "server" : "disk"} className="h-7 w-7 text-[var(--home)]" />
-            </div>
-            <div>
-              <h3 className="text-[16px] font-black text-[var(--primary-text)]">{product.title}</h3>
-              <p className="mt-0.5 text-[12px] paragraph-color">{product.subtitle}</p>
-            </div>
-          </div>
-          {rank === 0 ? (
-            <span className="shrink-0 rounded-full bg-[linear-gradient(135deg,var(--home),var(--vip))] px-3 py-1 text-[11px] font-black text-[#ffffff] shadow-[var(--shadow-size)]">
-              بهترین پیشنهاد
-            </span>
-          ) : null}
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {product.tags.map((tag) => <span key={tag} className="badge">{tag}</span>)}
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {[
-            ["Bay", persianNumber(product.bays)],
-            ["ظرفیت RAID", `${persianNumber(product.usableTb)} TB`],
-            ["RAM", `${persianNumber(product.maxRamGb)} GB`],
-            ["شبکه", `${persianNumber(product.networkGbE)} GbE`],
-          ].map(([label, value]) => (
-            <div key={label as string} className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2.5 text-center">
-              <div className="text-[11px] paragraph-color">{label}</div>
-              <div className="mt-1 text-[13px] font-black text-[var(--primary-text)]">{value}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-center gap-3">
-          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[var(--muted-background)]">
-            <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--success),var(--home))]" style={{ width: `${product.match}%` }} />
-          </div>
-          <span className="text-[13px] font-black text-[var(--primary-text)]">{persianNumber(product.match)}٪ تطابق</span>
-        </div>
-
-        <div className="mt-4 space-y-2">
-          {product.reasons.map((reason) => (
-            <div key={reason} className="flex items-start gap-2 text-[12px] leading-6 text-[var(--paragraph-color)]">
-              <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-[var(--success)]" />
-              <span>{reason}</span>
-            </div>
-          ))}
-          {product.warnings.map((warning) => (
-            <div key={warning} className="flex items-start gap-2 text-[12px] leading-6 paragraph-color">
-              <Icon name="shield" className="mt-1 h-4 w-4 shrink-0 text-[var(--warning)]" />
-              <span>{warning}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-5 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
-        <div className="text-[14px] font-bold text-[var(--shop)]">
-          {renderPrice()}
-        </div>
-        <div className="flex gap-2 flex-1 sm:flex-none">
-          <a href={targetHref} onClick={onSelect} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-5">مشاهده در فروشگاه</a>
-          <button type="button" onClick={onToggleCompare} className={cn("inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40", selected && "bg-[var(--muted-background)] text-[var(--home)]")}>
-            {selected ? "حذف از مقایسه" : "مقایسه"}
-          </button>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-export function NasSelector({
-  products,
-  initialState,
-  onProductSelect,
-  compareHref = "/shop/compare",
-  consultationHref = "/consultation",
-  className,
-}: NasSelectorProps) {
-  const [state, setState] = React.useState<SelectorState>({ ...defaultSelectorState, ...initialState });
-  const [compareIds, setCompareIds] = React.useState<string[]>([]);
-
-  const isOptionSelected = Boolean(state.persona || state.workloads.length > 0);
-
-  const minBays = React.useMemo(() => minimumBaysForCapacity(state.usableTb, state.driveTb, state.raid), [state.usableTb, state.driveTb, state.raid]);
-  const recommendations = React.useMemo(
-    () => products.map((product) => scoreProduct(product, state)).sort((a, b) => b.match - a.match),
-    [products, state],
-  );
-  const top = recommendations[0];
-
-  const update = <K extends keyof SelectorState>(key: K, value: SelectorState[K]) => setState((prev) => ({ ...prev, [key]: value }));
-  const toggleWorkload = (workload: NasWorkload) => {
-    setState((prev) => {
-      const exists = prev.workloads.includes(workload);
-      const next = exists ? prev.workloads.filter((item) => item !== workload) : [...prev.workloads, workload];
-      return { ...prev, workloads: next };
-    });
-  };
-  const toggleCompare = (id: string) => {
-    setCompareIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : prev.length >= 3 ? [...prev.slice(1), id] : [...prev, id]));
-  };
-
-  return (
-    <section dir="rtl" className={cn("font-sans text-[var(--primary-text)]", className)}>
-      <div className="relative overflow-hidden rounded-[calc(var(--corner-radius)+8px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,color-mix(in_oklch,var(--home)_18%,transparent),transparent_32%),radial-gradient(circle_at_85%_15%,color-mix(in_oklch,var(--vip)_14%,transparent),transparent_30%)]" />
-        <div className="relative flex flex-col gap-8 p-4 sm:p-6 lg:p-8">
-          <div>
-            <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">NAS مناسب خود را در چند دقیقه پیدا کنید</h1>
-            <p className="mt-3 max-w-2xl text-[14px] leading-8 paragraph-color">
-              نیازها، ظرفیت، RAID، تعداد کاربران و سرویس‌ها را انتخاب کنید؛ ابزار به‌صورت زنده بهترین مدل‌های موجود در فروشگاه را رتبه‌بندی می‌کند.
-            </p>
-
-            <div className="mt-6 grid gap-5">
-              <section className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <h2 className="text-[16px] font-black">۱. نوع استفاده</h2>
-                  <span className="text-[12px] paragraph-color">سناریوی اصلی را مشخص کنید</span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {personas.map((persona) => (
-                    <ToggleCard
-                      key={persona}
-                      selected={state.persona === persona}
-                      title={personaLabels[persona].title}
-                      desc={personaLabels[persona].desc}
-                      icon={persona === "enterprise" ? "server" : "disk"}
-                      onClick={() => update("persona", persona)}
-                    />
-                  ))}
-                </div>
-              </section>
-
-              <section className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <h2 className="text-[16px] font-black">۲. سرویس‌ها و بار کاری</h2>
-                  <span className="text-[12px] paragraph-color">چند گزینه قابل انتخاب است</span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  {workloads.map((workload) => (
-                    <ToggleCard
-                      key={workload}
-                      selected={state.workloads.includes(workload)}
-                      title={workloadLabels[workload].title}
-                      desc={workloadLabels[workload].desc}
-                      icon={workload === "surveillance" || workload === "highAvailability" ? "shield" : "check"}
-                      onClick={() => toggleWorkload(workload)}
-                    />
-                  ))}
-                </div>
-              </section>
-
-              <section className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)]">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <h2 className="text-[16px] font-black">۳. ظرفیت، RAID و عملکرد</h2>
-                  <span className="badge">حداقل پیشنهادی: {persianNumber(minBays)} Bay</span>
-                </div>
-                <div className="grid gap-3 md:grid-cols-2">
-                  <RangeField label="تعداد کاربران همزمان" value={state.users} min={1} max={120} suffix="کاربر" onChange={(v) => update("users", v)} />
-                  <RangeField label="ظرفیت قابل استفاده موردنیاز" value={state.usableTb} min={2} max={160} step={2} suffix="TB" onChange={(v) => update("usableTb", v)} />
-                  <RangeField label="تعداد دوربین‌ها" value={state.cameras} min={0} max={64} suffix="دوربین" onChange={(v) => update("cameras", v)} />
-                  <RangeField label="بودجه هدف" value={state.budgetTier} min={1} max={5} suffix="از ۵" onChange={(v) => update("budgetTier", v as SelectorState["budgetTier"])} />
-                </div>
-
-                <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
-                  <div>
-                    <div className="mb-2 text-[13px] font-extrabold">ظرفیت هر هارد</div>
-                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3">
-                      {driveSizes.map((size) => (
-                        <button key={size} type="button" onClick={() => update("driveTb", size)} className={cn("inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40", state.driveTb === size && "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)] text-[var(--home)]")}>{persianNumber(size)} TB</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-2 text-[13px] font-extrabold">نوع RAID</div>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {raidTypes.map((raid) => (
-                        <button key={raid} type="button" onClick={() => update("raid", raid)} className={cn("rounded-[var(--corner-radius)] border p-3 text-right transition", state.raid === raid ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
-                          <span className="block text-[12px] font-black">{raidLabels[raid].title}</span>
-                          <span className="mt-1 block text-[11px] leading-5 paragraph-color">{raidLabels[raid].desc}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <label className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4">
-                    <span className="text-[13px] font-extrabold">حداقل شبکه</span>
-                    <select className="input mt-3" value={state.networkGbE} onChange={(e) => update("networkGbE", Number(e.currentTarget.value))}>
-                      <option value={1}>1GbE</option>
-                      <option value={2.5}>2.5GbE</option>
-                      <option value={10}>10GbE</option>
-                    </select>
-                  </label>
-                  <button type="button" onClick={() => update("nvme", !state.nvme)} className={cn("rounded-[var(--corner-radius)] border p-4 text-right transition", state.nvme ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
-                    <span className="block text-[13px] font-extrabold">نیاز به NVMe / SSD Cache</span>
-                    <span className="mt-2 block text-[12px] paragraph-color">برای دیتابیس، VM یا فایل‌های پرتکرار</span>
-                  </button>
-                  <button type="button" onClick={() => update("rackmount", !state.rackmount)} className={cn("rounded-[var(--corner-radius)] border p-4 text-right transition", state.rackmount ? "border-[var(--home)] bg-[color-mix(in_oklch,var(--home)_10%,transparent)]" : "border-[var(--border-color)] bg-[var(--card-background)] hover:bg-[var(--muted-background)]")}>
-                    <span className="block text-[13px] font-extrabold">فرم‌فکتور Rackmount</span>
-                    <span className="mt-2 block text-[12px] paragraph-color">برای رک، اتاق سرور و دیتاسنتر</span>
-                  </button>
-                </div>
-              </section>
-
-              <CapacityMatrix state={state} />
-            </div>
-          </div>
-
-          {/* Results section positioned BELOW the tool */}
-          <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-8">
-            <div className="rounded-[calc(var(--corner-radius)+6px)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[color-mix(in_oklch,var(--card-background)_88%,transparent)] p-6 shadow-[var(--shadow-size)] backdrop-blur-[0px]">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-4">
-                <div>
-                  <h2 className="text-[20px] font-black">نتایج و مدل‌های پیشنهادی فروشگاه</h2>
-                  <p className="mt-1 text-[13px] paragraph-color">رتبه‌بندی زنده بر اساس امتیاز تطابق با نیازهای انتخابی شما</p>
-                </div>
-                {isOptionSelected && top ? <span className="badge text-[var(--home)]">{persianNumber(top.match)}٪ بهترین انتخاب</span> : null}
-              </div>
-
-              {!isOptionSelected ? (
-                <div className="my-10 text-center p-8 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
-                  <Icon name="server" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
-                  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ گزینه‌ای انتخاب نشده است</p>
-                  <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
-                    لطفاً ابتدا نوع استفاده یا حداقل یک سرویس را از گزینه‌های بالا انتخاب کنید تا بهترین دستگاه‌های NAS موجود در فروشگاه محاسبه و نمایش داده شوند.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-6 grid gap-6 md:grid-cols-2">
-                  {recommendations.slice(0, 4).map((product, index) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      rank={index}
-                      selected={compareIds.includes(product.id)}
-                      onToggleCompare={() => toggleCompare(product.id)}
-                      onSelect={() => onProductSelect?.(product, state)}
-                    />
-                  ))}
-                </div>
-              )}
-
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
-                <div className="flex gap-2">
-                  <a href={`${compareHref}?ids=${compareIds.join(",")}`} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">مقایسه محصولات {compareIds.length ? `(${persianNumber(compareIds.length)})` : ""}</a>
-                  <a href={consultationHref} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">درخواست مشاوره تخصصی</a>
-                </div>
-                <p className="text-[12px] paragraph-color">
-                  ظرفیت RAID تقریبی است و باید با محدودیت فایل‌سیستم و سیاست بکاپ نهایی شود.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export default NasSelector;
-export type { ScoredProduct };
