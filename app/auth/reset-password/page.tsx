@@ -2,57 +2,61 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
+
+const resetSchema = z.object({
+  newPassword: z.string().min(8, "حداقل ۸ کاراکتر"),
+  confirmPassword: z.string().min(8),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "رمز عبور و تکرار مطابقت ندارند",
+  path: ["confirmPassword"],
+});
+
+type ResetValues = z.infer<typeof resetSchema>;
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
 
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  // Missing token/email = invalid link
+  const form = useForm<ResetValues>({
+    resolver: zodResolver(resetSchema),
+    defaultValues: { newPassword: "", confirmPassword: "" },
+  });
+
   if (!token || !email) {
     return (
-      <main className="max-w-md mx-auto px-4 py-20 text-center" dir="rtl">
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 space-y-4">
-          <h1 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">لینک نامعتبر</h1>
-          <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-            لینک بازیابی رمز عبور معتبر نیست یا ناقص است. لطفاً دوباره درخواست بازیابی بدهید.
-          </p>
-          <a href="/account" className="inline-block text-[var(--home)] underline">
-            بازگشت به حساب کاربری
-          </a>
-        </div>
+      <main className="max-w-md mx-auto px-4 py-20 space-y-4" dir="rtl">
+        <PageBreadcrumb />
+        <Card className="p-8 space-y-4 text-center">
+          <CardTitle>لینک نامعتبر</CardTitle>
+          <CardDescription>لینک بازیابی رمز عبور معتبر نیست یا ناقص است. لطفاً دوباره درخواست بازیابی بدهید.</CardDescription>
+          <ButtonLink href="/account" className="mt-4">بازگشت به حساب کاربری</ButtonLink>
+        </Card>
       </main>
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (values: ResetValues) => {
     setMessage("");
-
-    if (newPassword.length < 8) {
-      setMessage("رمز عبور باید حداقل ۸ کاراکتر باشد.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setMessage("رمز عبور و تکرار آن مطابقت ندارند.");
-      return;
-    }
-
     setStatus("loading");
     try {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, token, newPassword }),
+        body: JSON.stringify({ email, token, newPassword: values.newPassword }),
       });
       const data = await res.json();
-
       if (res.ok && data.ok) {
         setStatus("success");
         setMessage("رمز عبور با موفقیت تغییر کرد. اکنون می‌توانید وارد شوید.");
@@ -67,63 +71,58 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <main className="max-w-md mx-auto px-4 py-20" dir="rtl">
-      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">بازیابی رمز عبور</h1>
-          <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-            رمز عبور جدید خود را وارد کنید.
-          </p>
-        </div>
+    <main className="max-w-md mx-auto px-4 py-20 space-y-6" dir="rtl">
+      <PageBreadcrumb />
+      <Card className="p-6 sm:p-8 space-y-6">
+        <CardHeader className="p-0 text-center">
+          <CardTitle>بازیابی رمز عبور</CardTitle>
+          <CardDescription>رمز عبور جدید خود را وارد کنید.</CardDescription>
+        </CardHeader>
 
         {status === "success" ? (
-          <div className="rounded-[var(--corner-radius)] bg-[var(--success)]/15 text-[var(--success)] border-[length:var(--border-size)] border-[var(--success)]/30 p-4 text-center space-y-3">
-            <p>{message}</p>
-            <a href="/account" className="inline-block text-[var(--home)] underline">
-              ورود به حساب
-            </a>
-          </div>
+          <Card className="p-4 bg-green-500/10 border-green-500/30 text-center space-y-3">
+            <p className="text-sm text-green-600">{message}</p>
+            <ButtonLink href="/account" className="w-full">ورود به حساب</ButtonLink>
+          </Card>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">رمز عبور جدید</label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="حداقل ۸ کاراکتر"
-                className="input w-full"
-                dir="ltr"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>رمز عبور جدید</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="حداقل ۸ کاراکتر" dir="ltr" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">تکرار رمز عبور</label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="تکرار رمز عبور"
-                className="input w-full"
-                dir="ltr"
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تکرار رمز عبور</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="تکرار رمز عبور" dir="ltr" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {message && (
-              <div className="rounded-[var(--corner-radius)] bg-[var(--danger)]/15 text-[var(--danger)] border-[length:var(--border-size)] border-[var(--danger)]/30 p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
-                {message}
-              </div>
-            )}
+              {message && <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3 text-center text-sm text-destructive">{message}</div>}
 
-            <Button type="submit" disabled={status === "loading"} className="w-full justify-center">
-              {status === "loading" ? "در حال تغییر..." : "تغییر رمز عبور"}
-            </Button>
-          </form>
+              <Button type="submit" disabled={status === "loading"} loading={form.formState.isSubmitting} className="w-full">
+                {status === "loading" ? "در حال تغییر..." : "تغییر رمز عبور"}
+              </Button>
+            </form>
+          </Form>
         )}
-      </div>
+      </Card>
     </main>
   );
 }

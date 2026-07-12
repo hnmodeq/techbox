@@ -1,92 +1,102 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
+
+const newsletterSchema = z.object({
+  name: z.string().max(100).optional(),
+  email: z.string().email("ایمیل نامعتبر").max(200),
+});
+
+type NewsletterValues = z.infer<typeof newsletterSchema>;
 
 export default function NewsletterSignup() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
+  const form = useForm<NewsletterValues>({
+    resolver: zodResolver(newsletterSchema),
+    defaultValues: { name: "", email: "" },
+  });
 
+  const handleSubmit = async (values: NewsletterValues) => {
     setStatus("loading");
-
     try {
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name: name || undefined }),
+        body: JSON.stringify({ email: values.email, name: values.name || undefined }),
       });
-
       const data = await res.json();
-
       if (res.ok) {
         setStatus("success");
         setMessage(data.message || "با موفقیت عضو شدید!");
-        setEmail("");
-        setName("");
+        form.reset();
       } else {
         setStatus("error");
         setMessage(data.error || "خطا در ثبت‌نام");
       }
-    } catch (err) {
+    } catch {
       setStatus("error");
       setMessage("خطا در ارتباط با سرور");
     }
   };
 
   return (
-    <div className="rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] p-8">
-      <div className="max-w-md">
-        <h3 className="text-2xl font-black text-[var(--primary-text)] mb-2">
-          خبرنامه تکباکس
-        </h3>
-        <p className="paragraph-color mb-6">
-          آخرین مقالات، اخبار و محتوای تخصصی زیرساخت را مستقیماً در ایمیل خود دریافت کنید.
-        </p>
-
+    <Card className="p-6 max-w-md mx-auto">
+      <CardHeader className="p-0 pb-4">
+        <CardTitle className="flex items-center gap-2">
+          خبرنامه تکباکس <Badge variant="secondary">رایگان</Badge>
+        </CardTitle>
+        <CardDescription>آخرین مقالات، اخبار و محتوای تخصصی زیرساخت را مستقیماً در ایمیل خود دریافت کنید.</CardDescription>
+      </CardHeader>
+      <CardContent className="p-0">
         {status === "success" ? (
-          <div className="rounded-lg bg-[var(--success)]/10 border border-[var(--success)]/30 p-4 text-[var(--success)]">
-            {message}
-          </div>
+          <div className="rounded-lg bg-green-500/10 border border-green-500/30 p-4 text-sm text-green-600">{message}</div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                type="text"
-                placeholder="نام (اختیاری)"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="input w-full"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نام (اختیاری)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="نام شما" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <input
-                type="email"
-                placeholder="ایمیل شما"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="input w-full"
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ایمیل</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="ایمیل شما" dir="ltr" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={status === "loading"}
-            >
-              {status === "loading" ? "در حال ثبت..." : "عضویت در خبرنامه"}
-            </Button>
-            {status === "error" && (
-              <p className="text-sm text-[var(--danger)]">{message}</p>
-            )}
-          </form>
+              <Button type="submit" className="w-full" loading={form.formState.isSubmitting} disabled={status === "loading"}>
+                {status === "loading" ? "در حال ثبت..." : "عضویت در خبرنامه"}
+              </Button>
+              {status === "error" && <p className="text-sm text-destructive">{message}</p>}
+            </form>
+          </Form>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
