@@ -68,11 +68,11 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
     <div className="[--header-height:calc(var(--spacing)*14)]">
       <SidebarProvider className="flex flex-col" defaultOpen={true}>
         <SiteHeader hasUnreadNews={hasUnreadNews} />
-        <div className="flex flex-1" dir="rtl">
+        <div className="flex flex-1 overflow-hidden" dir="rtl">
           <TechboxAppSidebar />
-          <SidebarInset>
+          <SidebarInset className="overflow-auto">
             <main id="main-content" className="flex flex-col min-h-screen">
-              <div className="flex-1 w-full">{children}</div>
+              <div className="flex-1 w-full max-w-full">{children}</div>
               <FooterSection />
             </main>
           </SidebarInset>
