@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 type Settings = {
   "comments.mode": string;
@@ -65,8 +72,9 @@ export default function AdminSettingsPage() {
   const commentsHidden = settings["comments.hidden_globally"] === "true";
 
   return (
-    <main className="min-h-dvh px-4 py-10" dir="rtl">
+    <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-4xl space-y-6">
+        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="تنظیمات سایت" titleClassName="text-[var(--admin)]" description="سیاست دیدگاه‌ها و نگهداری رزومه‌ها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
@@ -74,68 +82,67 @@ export default function AdminSettingsPage() {
           </div>
         </PageHeader>
 
-        <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <Card className="p-5 space-y-5">
+          <CardHeader className="p-0 flex flex-row items-center justify-between">
             <div>
-              <h2 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">دیدگاه‌ها</h2>
-              <p className="paragraph-color text-[length:var(--paragraph-font-size)]">کنترل تأیید دیدگاه‌ها و مخفی‌سازی سراسری.</p>
+              <CardTitle>دیدگاه‌ها</CardTitle>
+              <CardDescription>کنترل تأیید دیدگاه‌ها و مخفی‌سازی سراسری.</CardDescription>
             </div>
-            <Badge variant={commentsHidden ? "danger" : "success"}>{commentsHidden ? "مخفی سراسری" : "فعال"}</Badge>
-          </div>
+            <Badge variant={commentsHidden ? "destructive" : "default"}>{commentsHidden ? "مخفی سراسری" : "فعال"}</Badge>
+          </CardHeader>
+          <CardContent className="p-0 space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label>سیاست ثبت دیدگاه</Label>
+              <Select value={settings["comments.mode"]} onValueChange={(v) => setSettings((prev) => ({ ...prev, "comments.mode": v as string }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto_approve">تأیید خودکار</SelectItem>
+                  <SelectItem value="require_approval">نیازمند تأیید مدیر</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <label className="block space-y-2">
-            <span className="text-[length:var(--paragraph-font-size)] font-semibold text-[var(--primary-text)]">سیاست ثبت دیدگاه</span>
-            <select
-              className="input"
-              value={settings["comments.mode"]}
-              onChange={(event) => setSettings((prev) => ({ ...prev, "comments.mode": event.target.value }))}
-            >
-              <option value="auto_approve">تأیید خودکار</option>
-              <option value="require_approval">نیازمند تأیید مدیر</option>
-            </select>
-          </label>
+            <Card className="p-3 bg-muted/20">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <Label>مخفی‌سازی همه دیدگاه‌ها</Label>
+                  <p className="text-xs text-muted-foreground">وقتی فعال باشد، دیدگاه‌ها در سایت نمایش داده نمی‌شوند و ارسال دیدگاه جدید متوقف می‌شود.</p>
+                </div>
+                <Switch
+                  checked={commentsHidden}
+                  onCheckedChange={(checked) => setSettings((prev) => ({ ...prev, "comments.hidden_globally": checked ? "true" : "false" }))}
+                />
+              </div>
+            </Card>
+          </CardContent>
+        </Card>
 
-          <label className="flex items-start gap-3 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] p-3">
-            <input
-              type="checkbox"
-              checked={commentsHidden}
-              onChange={(event) => setSettings((prev) => ({ ...prev, "comments.hidden_globally": event.target.checked ? "true" : "false" }))}
-              className="mt-1"
-            />
-            <span>
-              <span className="block font-semibold text-[var(--primary-text)]">مخفی‌سازی همه دیدگاه‌ها</span>
-              <span className="paragraph-color text-[length:var(--paragraph-font-size)]">وقتی فعال باشد، دیدگاه‌ها در سایت نمایش داده نمی‌شوند و ارسال دیدگاه جدید متوقف می‌شود.</span>
-            </span>
-          </label>
-        </div>
+        <Card className="p-5 space-y-4">
+          <CardHeader className="p-0">
+            <CardTitle>رزومه‌ها</CardTitle>
+            <CardDescription>رزومه‌های قدیمی هنگام مشاهده لیست درخواست‌های شغلی پاک‌سازی می‌شوند.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="space-y-2">
+              <Label>مدت نگهداری رزومه‌ها (روز)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={365}
+                value={settings["jobs.resume_retention_days"]}
+                onChange={(event) => setSettings((prev) => ({ ...prev, "jobs.resume_retention_days": event.target.value }))}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] space-y-4">
-          <div>
-            <h2 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">رزومه‌ها</h2>
-            <p className="paragraph-color text-[length:var(--paragraph-font-size)]">رزومه‌های قدیمی هنگام مشاهده لیست درخواست‌های شغلی پاک‌سازی می‌شوند.</p>
-          </div>
-          <label className="block space-y-2">
-            <span className="text-[length:var(--paragraph-font-size)] font-semibold text-[var(--primary-text)]">مدت نگهداری رزومه‌ها (روز)</span>
-            <input
-              className="input"
-              type="number"
-              min={1}
-              max={365}
-              value={settings["jobs.resume_retention_days"]}
-              onChange={(event) => setSettings((prev) => ({ ...prev, "jobs.resume_retention_days": event.target.value }))}
-            />
-          </label>
-        </div>
-
-        {message && (
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-3 text-[length:var(--paragraph-font-size)] paragraph-color">
-            {message}
-          </div>
-        )}
+        {message && <Card className="p-3 text-sm text-muted-foreground">{message}</Card>}
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={load} disabled={loading || saving}>انصراف</Button>
-          <Button type="button" onClick={save} disabled={loading || saving}>{saving ? "در حال ذخیره..." : "ذخیره تنظیمات"}</Button>
+          <Button type="button" onClick={save} disabled={loading || saving} loading={saving}>
+            {saving ? "در حال ذخیره..." : "ذخیره تنظیمات"}
+          </Button>
         </div>
       </section>
     </main>
