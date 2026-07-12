@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { LikeButton } from '@/components/ui/like-button';
+import { Button } from '@/components/ui/button';
 import CommentSection from '@/features/comment/components/CommentSection';
 import { zIndex } from '@/design';
 import { Icon } from '@/design/icons';
@@ -32,24 +33,24 @@ export default function VideoReelsRow() {
         ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {videos.map((vid) => (
-            <button type="button" key={vid.slug} onClick={() => setActive(vid)} className="group relative w-full aspect-[9/16] rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] hover:shadow-[var(--shadow-size)] transition-all duration-[200ms] bg-[var(--card-background)] flex flex-col justify-end text-right cursor-pointer">
+            <Button type="button" key={vid.slug} onClick={() => setActive(vid)} variant="ghost" className="group relative w-full h-auto aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="260px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
               {(vid as any).videoDuration && <span className="absolute left-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white" dir="ltr">{(vid as any).videoDuration}</span>}
               <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none"><div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-md flex items-center justify-center text-white transition-transform group-hover:scale-125 shadow-[var(--shadow-size)]">▶</div></div>
               <div className="relative z-30 p-3.5 text-white w-full"><h3 className="text-xs sm:text-sm font-bold leading-5 line-clamp-2 text-white group-hover:text-[var(--media)] transition-colors">{vid.title}</h3><div className="mt-1 flex flex-wrap gap-2 text-[10px] text-white/75">{(vid as any).videoFileSize && <span dir="ltr">{(vid as any).videoFileSize}</span>}{(vid as any).videoMimeType && <span dir="ltr">{(vid as any).videoMimeType}</span>}</div><div className="mt-2.5"><CardStats module="media" slug={vid.slug} showComments={true} /></div></div>
-            </button>
+            </Button>
           ))}
         </div>
         )}
       </div>
       {active && (
         <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
-          <button type="button" className="absolute inset-0" onClick={() => setActive(null)} aria-label="بستن" />
+          <Button type="button" variant="ghost" className="absolute inset-0 w-full h-full opacity-0" onClick={() => setActive(null)} aria-label="بستن" />
           <div className="relative z-10 grid w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] lg:grid-cols-[minmax(320px,420px)_1fr]">
             <div className="bg-black flex h-[82vh] max-h-[82vh] items-center justify-center p-3"><video src={active.videoUrl || undefined} poster={active.image} controls autoPlay playsInline className="h-full aspect-[9/16] object-contain bg-black" /></div>
             <div className="min-w-0 h-[82vh] max-h-[82vh] overflow-y-auto p-4 space-y-4">
-              <div className="flex items-start justify-between gap-3"><div><h3 className="font-black text-[var(--primary-text)] text-lg">{active.title}</h3><p className="paragraph-color mt-1 text-sm">{active.excerpt}</p><div className="mt-2 flex flex-wrap gap-2 text-xs paragraph-color">{active.videoDuration && <span dir="ltr">{active.videoDuration}</span>}{active.videoFileSize && <span dir="ltr">{active.videoFileSize}</span>}{active.videoMimeType && <span dir="ltr">{active.videoMimeType}</span>}</div></div><button onClick={() => setActive(null)} className="paragraph-color hover:text-[var(--primary-text)]"><Icon name="close" size={22}/></button></div>
+              <div className="flex items-start justify-between gap-3"><div><h3 className="font-black text-[var(--primary-text)] text-lg">{active.title}</h3><p className="paragraph-color mt-1 text-sm">{active.excerpt}</p><div className="mt-2 flex flex-wrap gap-2 text-xs paragraph-color">{active.videoDuration && <span dir="ltr">{active.videoDuration}</span>}{active.videoFileSize && <span dir="ltr">{active.videoFileSize}</span>}{active.videoMimeType && <span dir="ltr">{active.videoMimeType}</span>}</div></div><Button variant="ghost" size="icon" onClick={() => setActive(null)} className="text-muted-foreground hover:text-foreground"><Icon name="close" size={22}/></Button></div>
               <div className="flex flex-wrap items-center gap-4"><CardStats module="media" slug={active.slug} showComments={true} /><LikeButton contentType="media" slug={active.slug} /></div>
               <CommentSection module="media" slug={active.slug} />
             </div>

@@ -2,6 +2,13 @@
 
 import React, { useMemo, useState } from "react";
 import { Icon } from "@/design/icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
 import type { NvrFilterState, NvrModel } from "./nvr-selector-data";
 import { defaultNvrFilter, estimateNvrStorageTb, nvrResolutions } from "./nvr-selector-data";
 
@@ -57,12 +64,13 @@ export function NvrSelector({
     <div className={["w-full max-w-[1100px] mx-auto", className].filter(Boolean).join(" ")} dir="rtl">
       {/* Header */}
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 mb-3">
-          <div className="px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--nvr)_12%,transparent)] text-[var(--nvr)] text-xs font-bold flex items-center gap-1.5 border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--nvr)_22%,var(--border-color))]">
-            <Icon name="nvr" className="w-3.5 h-3.5" />
-            ماژول انتخاب ان‌وی‌آر
-          </div>
-        </div>
+        <Badge
+          variant="outline"
+          className="mb-3 border-[color-mix(in_oklch,var(--nvr)_35%,var(--border))] bg-[color-mix(in_oklch,var(--nvr)_12%,transparent)] text-[var(--nvr)]"
+        >
+          <Icon name="nvr" className="w-3.5 h-3.5" />
+          ماژول انتخاب ان‌وی‌آر
+        </Badge>
         <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold mb-2">انتخابگر ان‌وی‌آر</h2>
         <p className="paragraph-color max-w-md mx-auto text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold">
           تعداد دوربین، رزولوشن و مدت زمان ضبط را مشخص کنید تا بهترین مدل‌های موجود در فروشگاه را پیدا کنید
@@ -72,122 +80,120 @@ export function NvrSelector({
       {/* Stack layout: tool options top, results below */}
       <div className="flex flex-col gap-8">
         {/* Filters Panel */}
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8">
+        <Card className="p-6 sm:p-8">
           <div className="flex items-center gap-3 mb-6">
             <Icon name="tools" className="w-5 h-5 text-[var(--home)]" />
             <h3 className="font-black text-[17px]">مشخصات مورد نیاز پروژه</h3>
           </div>
 
           <div className="grid md:grid-cols-2 gap-7">
-            {/* Cameras */}
-            <div>
-              <div className="flex justify-between items-baseline mb-2">
-                <label className="text-[13px] font-extrabold">تعداد دوربین‌ها</label>
+            {/* Cameras Slider */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-baseline">
+                <Label className="text-[13px] font-extrabold">تعداد دوربین‌ها</Label>
                 <div className="font-black text-[20px] tabular-nums text-[var(--home)]">
                   {fa.format(filters.cameras)} عدد
                 </div>
               </div>
-              <input
-                type="range"
-                min="1"
-                max="64"
-                step="1"
-                value={filters.cameras}
-                onChange={(e) => handleFilterChange("cameras", parseInt(e.target.value))}
-                className="w-full accent-[var(--home)]"
+              <Slider
+                value={[filters.cameras]}
+                onValueChange={(v: any) => handleFilterChange("cameras", Array.isArray(v) ? v[0] : v)}
+                min={1}
+                max={64}
+                step={1}
+                className="w-full"
               />
-              <div className="flex justify-between text-[10px] paragraph-color mt-1">
+              <div className="flex justify-between text-[10px] paragraph-color">
                 <span>۱ دوربین</span>
                 <span>۶۴ دوربین</span>
               </div>
             </div>
 
-            {/* Recording Days */}
-            <div>
-              <div className="flex justify-between items-baseline mb-2">
-                <label className="text-[13px] font-extrabold">مدت زمان ضبط پیوسته</label>
+            {/* Recording Days Slider */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-baseline">
+                <Label className="text-[13px] font-extrabold">مدت زمان ضبط پیوسته</Label>
                 <div className="font-black text-[20px] tabular-nums text-[var(--home)]">
                   {fa.format(filters.days)} روز
                 </div>
               </div>
-              <input
-                type="range"
-                min="7"
-                max="90"
-                step="1"
-                value={filters.days}
-                onChange={(e) => handleFilterChange("days", parseInt(e.target.value))}
-                className="w-full accent-[var(--home)]"
+              <Slider
+                value={[filters.days]}
+                onValueChange={(v: any) => handleFilterChange("days", Array.isArray(v) ? v[0] : v)}
+                min={7}
+                max={90}
+                step={1}
+                className="w-full"
               />
-              <div className="flex justify-between text-[10px] paragraph-color mt-1">
+              <div className="flex justify-between text-[10px] paragraph-color">
                 <span>۷ روز</span>
                 <span>۹۰ روز</span>
               </div>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-7 mt-6 pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)] items-center">
-            {/* Resolution */}
+          <Separator className="my-6" />
+
+          <div className="grid md:grid-cols-2 gap-7 items-center">
+            {/* Resolution Buttons */}
             <div>
-              <label className="block text-[13px] font-extrabold mb-2.5">رزولوشن میانگین دوربین‌ها</label>
+              <Label className="block text-[13px] font-extrabold mb-2.5">رزولوشن میانگین دوربین‌ها</Label>
               <div className="flex flex-wrap gap-2">
                 {nvrResolutions.map((res) => (
-                  <button
+                  <Button
                     key={res}
+                    variant={filters.resolution === res ? "secondary" : "ghost"}
+                    size="sm"
                     onClick={() => handleFilterChange("resolution", res)}
-                    className={`px-5 py-2 text-sm rounded-[var(--corner-radius)] border transition-all font-bold ${
-                      filters.resolution === res
-                        ? "bg-[var(--home)] text-[#ffffff] border-[var(--home)] shadow-[var(--shadow-size)]"
-                        : "border-[var(--border-color)] hover:bg-[var(--muted-background)]"
-                    }`}
+                    className="font-bold"
                   >
                     {res}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
 
             {/* AI Toggle */}
-            <div className="flex items-center justify-between bg-[var(--muted-background)] px-5 py-4 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)]">
-              <div>
-                <div className="font-extrabold text-[14px]">تحلیل هوش مصنوعی و آنالیتیک</div>
-                <div className="text-[12px] paragraph-color mt-0.5">تشخیص چهره، پلاک و رویدادهای هوشمند</div>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
+            <Card className="border-border/60 bg-muted/50 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-extrabold text-[14px]">تحلیل هوش مصنوعی و آنالیتیک</div>
+                  <div className="text-[12px] paragraph-color mt-0.5">تشخیص چهره، پلاک و رویدادهای هوشمند</div>
+                </div>
+                <Switch
                   checked={filters.aiEnabled}
-                  onChange={(e) => handleFilterChange("aiEnabled", e.target.checked)}
-                  className="sr-only peer"
+                  onCheckedChange={(checked) => handleFilterChange("aiEnabled", checked)}
                 />
-                <div className="w-11 h-6 bg-[var(--border-color)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--home)]"></div>
-              </label>
-            </div>
+              </div>
+            </Card>
           </div>
 
-          {/* Storage Estimate Footer inside filter card */}
-          <div className="mt-6 pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center justify-between gap-4">
+          {/* Storage Estimate Footer */}
+          <Separator className="my-6" />
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="paragraph-color text-[13px]">حجم ذخیره‌سازی تخمینی پروژه:</span>
               <span className="font-black tabular-nums text-[20px] text-[var(--nvr)]">
                 {fa.format(storageTB)} <span className="text-[12px] font-semibold paragraph-color">ترابایت</span>
               </span>
             </div>
-            <a href={consultationHref} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">مشاوره تخصصی زیرساخت نظارت تصویری</a>
+            <Button variant="outline" onClick={() => { window.location.href = consultationHref; }}>
+              مشاوره تخصصی زیرساخت نظارت تصویری
+            </Button>
           </div>
-        </div>
+        </Card>
 
-        {/* Results Section Positioned BELOW the tool */}
-        <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
+        {/* Results Section */}
+        <div className="border-t border-border pt-4">
           <div className="flex items-center justify-between mb-4 px-1">
             <div>
               <span className="font-black text-[18px]">مدل‌های NVR پیشنهادی فروشگاه</span>
               <span className="text-[13px] paragraph-color mr-2">({fa.format(filteredModels.length)} مدل موجود)</span>
             </div>
             {recommendedModel && (
-              <div className="text-[12px] px-3 py-1 rounded-full bg-[color-mix(in_oklch,var(--success)_14%,transparent)] text-[var(--success)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_24%,transparent)] flex items-center gap-1 font-bold">
+              <Badge variant="outline" className="border-[color-mix(in_oklch,var(--success)_40%,var(--border))] bg-[color-mix(in_oklch,var(--success)_14%,transparent)] text-[var(--success)]">
                 <Icon name="check" className="w-3.5 h-3.5" /> بهترین انتخاب برای این پروژه
-              </div>
+              </Badge>
             )}
           </div>
 
@@ -199,38 +205,38 @@ export function NvrSelector({
                 const targetHref = model.shopSlug ? `/shop/${model.shopSlug}` : model.href || `/shop/${model.id}`;
 
                 return (
-                  <div
+                  <Card
                     key={model.id}
+                    className={`p-5 cursor-pointer transition-all hover:shadow-md flex flex-col justify-between ${
+                      isSelected ? "ring-2 ring-primary" : ""
+                    } ${isRecommended ? "border-[color-mix(in_oklch,var(--nvr)_45%,var(--border))]" : ""}`}
                     onClick={() => setSelectedModel(model.id)}
-                    className={`card p-5 cursor-pointer transition-all hover:shadow-[var(--shadow-size)] flex flex-col justify-between ${
-                      isSelected ? "ring-2 ring-[var(--home)]" : ""
-                    } ${isRecommended ? "border-[color-mix(in_oklch,var(--nvr)_45%,var(--border-color))]" : ""}`}
                   >
                     <div>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <div className="font-black text-[17px] text-[var(--primary-text)]">{model.nameFa}</div>
+                          <div className="font-black text-[17px] text-foreground">{model.nameFa}</div>
                           <div className="text-[12px] paragraph-color mt-0.5">{model.name}</div>
                         </div>
                         {isRecommended && (
-                          <div className="badge !bg-[color-mix(in_oklch,var(--success)_12%,transparent)] !text-[var(--success)] !border-[color-mix(in_oklch,var(--success)_22%,transparent)]">پیشنهادی</div>
+                          <Badge variant="outline" className="border-[color-mix(in_oklch,var(--success)_35%,var(--border))] bg-[color-mix(in_oklch,var(--success)_12%,transparent)] text-[var(--success)]">پیشنهادی</Badge>
                         )}
                       </div>
 
                       <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[12px]">
-                        <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
+                        <div className="rounded-md bg-muted p-2">
                           <div className="paragraph-color text-[11px]">حداکثر دوربین</div>
                           <div className="font-extrabold tabular-nums mt-0.5">{fa.format(model.maxCameras)} کانال</div>
                         </div>
-                        <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
+                        <div className="rounded-md bg-muted p-2">
                           <div className="paragraph-color text-[11px]">بِی هارد دیسک</div>
                           <div className="font-extrabold mt-0.5">{fa.format(model.storageBays)} بِی</div>
                         </div>
-                        <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
+                        <div className="rounded-md bg-muted p-2">
                           <div className="paragraph-color text-[11px]">رزولوشن</div>
                           <div className="font-extrabold mt-0.5">{model.maxResolution}</div>
                         </div>
-                        <div className="rounded-[var(--corner-radius)] bg-[var(--muted-background)] p-2">
+                        <div className="rounded-md bg-muted p-2">
                           <div className="paragraph-color text-[11px]">پشتیبانی RAID</div>
                           <div className="font-extrabold mt-0.5">{model.raidSupport}</div>
                         </div>
@@ -239,27 +245,23 @@ export function NvrSelector({
                       <p className="mt-4 text-[13px] paragraph-color leading-6">{model.descriptionFa}</p>
                     </div>
 
-                    <div className="mt-5 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)] flex flex-wrap items-center justify-between gap-3">
+                    <div className="mt-5 pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3">
                       <div className="text-[15px] font-black text-[var(--shop)]">
                         {renderPrice(model)}
                       </div>
 
-                      <a
-                        href={targetHref}
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] px-5 text-[13px]"
-                      >
+                      <Button variant="secondary" size="sm" onClick={(e: React.MouseEvent) => { e.stopPropagation(); window.location.href = targetHref; }}>
                         مشاهده در فروشگاه
-                      </a>
+                      </Button>
                     </div>
-                  </div>
+                  </Card>
                 );
               })
             ) : (
-              <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 text-center md:col-span-2">
+              <Card className="p-8 text-center md:col-span-2">
                 <p className="paragraph-color font-bold">مدلی با این مشخصات پیدا نشد.</p>
                 <p className="text-[12px] mt-1 paragraph-color">لطفاً تعداد دوربین‌ها یا الزامات هوش مصنوعی را تغییر دهید.</p>
-              </div>
+              </Card>
             )}
           </div>
         </div>

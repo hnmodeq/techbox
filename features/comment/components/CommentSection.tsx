@@ -5,6 +5,7 @@ import { getCommentsAction, createCommentAction } from "@/features/comment/actio
 import { CommentVote } from "@/components/ui/like-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { Icon } from "@/design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -116,7 +117,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <input type="hidden" name="module" value={module} />
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="parentId" value={c.id} />
-              <textarea name="text" required className="input min-h-[80px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" placeholder={`پاسخ شما به ${(c as any).authorName}…`} />
+              <Textarea name="text" required className="min-h-[80px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" placeholder={`پاسخ شما به ${(c as any).authorName}…`} />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
                 <Button disabled={isSubmitting || isPending} size="xs">
@@ -163,7 +164,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
             </div>
             <Badge variant="info" className="ms-auto text-xs">حساب متصل</Badge>
           </div>
-          <textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="input min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
+          <Textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
           <div className="flex justify-between items-center">
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
               {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ {(state as any)?.message || "دیدگاه شما با موفقیت ثبت شد"}</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}

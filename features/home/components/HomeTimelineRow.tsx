@@ -4,6 +4,8 @@ import React, { useState, useCallback } from 'react';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { Icon } from '@/design/icons';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
 
@@ -83,7 +85,9 @@ export default function HomeTimelineRow() {
                 <Icon name="timeline" className="w-11 h-11 text-[var(--timeline)]" />
                 <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)]">نمای سریع تایم‌لاین تاریخ فناوری</h3>
                 <p className="text-xs sm:text-sm paragraph-color max-w-lg leading-6">پیش‌نمایش سبک از کارت‌های تایم‌لاین. نسخه تعاملی با کلیک شما فعال می‌شود.</p>
-                <button type="button" onClick={() => setActive(true)} className="inline-flex items-center justify-center gap-2 rounded-[var(--corner-radius)] bg-[var(--timeline)] px-8 py-3 text-sm font-black text-slate-950 shadow-[var(--shadow-size)] hover:opacity-90 transition-opacity cursor-pointer">بارگذاری تایم‌لاین تعاملی ←</button>
+                <Button onClick={() => setActive(true)} className="bg-[var(--timeline)] text-slate-950 hover:opacity-90 font-black px-8">
+                  بارگذاری تایم‌لاین تعاملی ←
+                </Button>
               </div>
             </div>
           ) : (

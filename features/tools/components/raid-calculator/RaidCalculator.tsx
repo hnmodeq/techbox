@@ -2,6 +2,14 @@
 
 import React, { useMemo, useState } from "react";
 import { Icon } from "@/design/icons";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { MinusIcon, PlusIcon, XIcon } from "lucide-react";
 
 export type RaidKey =
   | "basic"
@@ -57,7 +65,7 @@ export const RAID_OPTIONS: RaidOption[] = [
   { key: "shr2", label: "SHR-2", short: "SHR2", minDisks: 4, protected: true, description: "SHR با تحمل خرابی دو دیسک؛ مناسب ظرفیت‌های بالا و آرایه‌های حساس.", faultTolerance: "خرابی ۲ دیسک" },
 ];
 
-const QUICK_SIZES = [1, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24];
+const DRIVE_SIZE_OPTIONS = [2, 4, 8, 12, 16, 24, 32];
 const DEFAULT_DRIVES: Drive[] = [
   { id: "d-1", sizeTb: 8 },
   { id: "d-2", sizeTb: 8 },
@@ -121,18 +129,9 @@ export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount: num
   const option = RAID_OPTIONS.find((item) => item.key === raidKey);
   if (!option) {
     return {
-      usableTb: 0,
-      protectionTb: 0,
-      unusedTb: 0,
-      rawTb: 0,
-      activeRawTb: 0,
-      spareTb: 0,
-      valid: false,
-      minDisks: 0,
-      warnings: [],
-      description: "",
-      faultTolerance: "انتخاب نشده",
-      efficiency: 0,
+      usableTb: 0, protectionTb: 0, unusedTb: 0, rawTb: 0, activeRawTb: 0, spareTb: 0,
+      valid: false, minDisks: 0, warnings: [], description: "",
+      faultTolerance: "انتخاب نشده", efficiency: 0,
     };
   }
 
@@ -227,18 +226,9 @@ export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount: num
   const efficiency = activeRawTb > 0 ? (usableTb / activeRawTb) * 100 : 0;
 
   return {
-    usableTb,
-    protectionTb,
-    unusedTb,
-    rawTb,
-    activeRawTb,
-    spareTb,
-    valid,
-    minDisks: option.minDisks,
-    warnings,
-    description: option.description,
-    faultTolerance: option.faultTolerance,
-    efficiency,
+    usableTb, protectionTb, unusedTb, rawTb, activeRawTb, spareTb,
+    valid, minDisks: option.minDisks, warnings, description: option.description,
+    faultTolerance: option.faultTolerance, efficiency,
   };
 }
 
@@ -252,13 +242,15 @@ function StatCard({ label, value, hint, tone = "default" }: { label: string; val
     tone === "accent" ? "text-[var(--raid)]"
     : tone === "success" ? "text-[var(--success)]"
     : tone === "warning" ? "text-[var(--warning)]"
-    : "text-[var(--primary-text)]";
+    : "text-foreground";
   return (
-    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)]/70 p-4">
-      <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{label}</div>
-      <div className={`mt-2 text-2xl font-black leading-none ${toneClass}`}>{value}</div>
-      <div className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{hint}</div>
-    </div>
+    <Card>
+      <CardContent className="p-4">
+        <div className="text-[length:var(--paragraph-font-size)] paragraph-color">{label}</div>
+        <div className={`mt-2 text-2xl font-black leading-none ${toneClass}`}>{value}</div>
+        <div className="mt-2 text-[length:var(--paragraph-font-size)] paragraph-color">{hint}</div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -289,166 +281,210 @@ export default function RaidCalculator() {
   }
 
   return (
-    <section dir="rtl" className="w-full font-sans text-[var(--primary-text)]">
-      <div className="relative overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
-
-        {/* Vertical stack or wide split: Top panel for tool options, bottom panel for results */}
+    <section dir="rtl" className="w-full font-sans text-foreground">
+      <Card className="overflow-hidden">
         <div className="relative grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(420px,0.85fr)] lg:p-8">
+          {/* Left column — Tool inputs */}
           <div className="space-y-6">
             <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
-                <div className="badge mb-3 border-[color-mix(in_oklch,var(--raid)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--raid)_12%,var(--muted-background))] text-[var(--primary-text)]">
+                <Badge
+                  variant="outline"
+                  className="mb-3 border-[color-mix(in_oklch,var(--raid)_35%,var(--border))] bg-[color-mix(in_oklch,var(--raid)_12%,var(--muted))] text-foreground"
+                >
                   <Icon name="server" className="h-3.5 w-3.5 text-[var(--raid)]" />
                   ابزار محاسبه RAID
-                </div>
+                </Badge>
                 <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">ماشین حساب RAID و SHR</h2>
                 <p className="mt-3 max-w-2xl text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
                   ظرفیت قابل استفاده، افزونگی، فضای بلااستفاده و Hot Spare را برای RAIDهای کلاسیک و Synology Hybrid RAID با دیسک‌های هم‌اندازه یا ترکیبی محاسبه کنید.
                 </p>
               </div>
-              <button type="button" onClick={() => applyPreset(8, 4)} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40 shrink-0">
-                بازنشانی نمونه ۴ دیسک ۸ ترابایت
-              </button>
+              <Button variant="outline" size="sm" onClick={() => applyPreset(8, 4)} className="shrink-0">
+                بازنشانی نمونه ۴×۸ ترابایت
+              </Button>
             </header>
 
-            <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 shadow-[var(--shadow-size)]">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black">انتخاب دیسک‌ها</h3>
-                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">برای افزودن دیسک جدید روی دکمه + کلیک کنید و ظرفیت مورد نظر را از منو انتخاب نمایید.</p>
+            {/* Drives Selection Card */}
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <CardTitle className="text-[length:var(--h2-font-size)]">انتخاب دیسک‌ها</CardTitle>
+                    <CardDescription>برای افزودن دیسک جدید روی دکمه + کلیک کنید و ظرفیت مورد نظر را از منو انتخاب نمایید.</CardDescription>
+                  </div>
+                  <Badge variant="secondary">{nf.format(drives.length)} دیسک فعال</Badge>
                 </div>
-                <div className="badge">{nf.format(drives.length)} دیسک فعال</div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center">
-                {drives.map((drive, index) => (
-                  <div key={drive.id} className="group rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-3.5 transition hover:border-[color-mix(in_oklch,var(--raid)_42%,var(--border-color))]">
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 font-black">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-[var(--corner-radius)] bg-[color-mix(in_oklch,var(--raid)_15%,var(--muted-background))] text-[var(--raid)]">
-                          <Icon name="disk" className="h-4.5 w-4.5" />
-                        </span>
-                        دیسک {nf.format(index + 1)}
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center">
+                  {drives.map((drive, index) => (
+                    <Card key={drive.id} className="group p-3.5 transition hover:border-[color-mix(in_oklch,var(--raid)_42%,var(--border))]">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 font-black text-sm">
+                          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[color-mix(in_oklch,var(--raid)_15%,var(--muted))] text-[var(--raid)]">
+                            <Icon name="disk" className="h-4 w-4" />
+                          </span>
+                          دیسک {nf.format(index + 1)}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          disabled={!canRemove}
+                          onClick={() => removeDrive(drive.id)}
+                          className="h-7 w-7"
+                          aria-label="حذف دیسک"
+                        >
+                          <XIcon className="h-3.5 w-3.5" />
+                        </Button>
                       </div>
-                      <button
-                        type="button"
-                        disabled={!canRemove}
-                        onClick={() => removeDrive(drive.id)}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer h-7 w-7 disabled:cursor-not-allowed disabled:opacity-40"
-                        aria-label="حذف دیسک"
+                      <Select
+                        value={String(drive.sizeTb)}
+                        onValueChange={(v) => updateDrive(drive.id, Number(v))}
                       >
-                        <Icon name="close" className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <select
-                        className="input w-full font-black [direction:ltr]"
-                        value={drive.sizeTb}
-                        onChange={(event) => updateDrive(drive.id, Number(event.target.value))}
-                        aria-label={`ظرفیت دیسک ${index + 1}`}
-                      >
-                        {[2, 4, 8, 12, 16, 24, 32].map(sz => (
-                          <option key={sz} value={sz}>{sz} TB</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Big Plus Button to Add Disk */}
-                <button
-                  type="button"
-                  onClick={() => addDrive(8)}
-                  className="h-full min-h-[110px] rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-dashed border-[var(--raid)]/50 bg-[var(--raid)]/5 hover:bg-[var(--raid)]/15 transition-all flex flex-col items-center justify-center gap-2 text-[var(--raid)] font-black p-4 cursor-pointer hover:scale-[1.02]"
-                >
-                  <Icon name="plus" className="h-8 w-8 stroke-[3]" />
-                  <span className="text-sm">افزودن دیسک جدید</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 shadow-[var(--shadow-size)]">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-black">انتخاب نوع RAID</h3>
-                  <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">معماری و نوع آرایه دیسک را از منوی کشویی انتخاب کنید.</p>
-                </div>
-              </div>
-
-              <div className="max-w-xl">
-                <select
-                  value={raid}
-                  onChange={(e) => setRaid(e.target.value as RaidKey)}
-                  className="input w-full !h-12 font-bold text-base"
-                >
-                  <option value="">-- انتخاب نوع آرایه RAID یا SHR --</option>
-                  {RAID_OPTIONS.map((option) => (
-                    <option key={option.key} value={option.key}>
-                      {option.label} — حداقل {nf.format(option.minDisks)} دیسک · {option.faultTolerance}
-                    </option>
+                        <SelectTrigger className="font-black [direction:ltr]" aria-label={`ظرفیت دیسک ${index + 1}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DRIVE_SIZE_OPTIONS.map((sz) => (
+                            <SelectItem key={sz} value={String(sz)}>{sz} TB</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Card>
                   ))}
-                </select>
-                {selectedOption && (
-                  <div className="mt-3.5 p-3.5 rounded-[var(--corner-radius)] bg-[var(--muted-background)] border-[length:var(--border-size)] border-[var(--border-color)] text-sm leading-6 text-[var(--primary-text)]">
-                    <span className="font-extrabold text-[var(--raid)]">{selectedOption.label}: </span>
-                    {selectedOption.description}
-                  </div>
-                )}
-              </div>
 
-              <div className="mt-5 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)]/60 p-4">
-                <label className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <span>
-                    <span className="block font-black">دیسک رزرو (Hot Spare)</span>
-                    <span className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">بزرگ‌ترین دیسک‌ها به‌عنوان Spare رزرو می‌شوند و وارد ظرفیت Volume نمی‌شوند.</span>
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer" onClick={() => setSpareCount((value) => clamp(value - 1, 0, effectiveSpareMax))}>
-                      <Icon name="minus" className="h-4 w-4" />
-                    </button>
-                    <input
-                      className="input w-20 text-center font-black"
-                      type="number"
-                      min={0}
-                      max={effectiveSpareMax}
-                      value={spareCount}
-                      onChange={(event) => setSpareCount(clamp(Number(event.target.value), 0, effectiveSpareMax))}
-                    />
-                    <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--corner-radius)] text-[var(--paragraph-color)] hover:bg-[var(--muted-background)] hover:text-[var(--primary-text)] transition-colors cursor-pointer" onClick={() => setSpareCount((value) => clamp(value + 1, 0, effectiveSpareMax))}>
-                      <Icon name="plus" className="h-4 w-4" />
-                    </button>
-                  </span>
-                </label>
-              </div>
-            </div>
+                  {/* Add Drive Button */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => addDrive(8)}
+                    className="h-full min-h-[110px] border-dashed border-[var(--raid)]/50 bg-[var(--raid)]/5 hover:bg-[var(--raid)]/15 flex-col gap-2 text-[var(--raid)] font-black"
+                  >
+                    <PlusIcon className="h-8 w-8 stroke-[3]" />
+                    <span className="text-sm">افزودن دیسک جدید</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* RAID Type + Spare Card */}
+            <Card>
+              <CardHeader className="pb-3">
+                <div>
+                  <CardTitle className="text-[length:var(--h2-font-size)]">انتخاب نوع RAID</CardTitle>
+                  <CardDescription>معماری و نوع آرایه دیسک را از منوی کشویی انتخاب کنید.</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="max-w-xl">
+                  <Select
+                    value={raid}
+                    onValueChange={(v) => setRaid(v as RaidKey)}
+                  >
+                    <SelectTrigger className="w-full !h-12 font-bold text-base">
+                      <SelectValue placeholder="-- انتخاب نوع آرایه RAID یا SHR --" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RAID_OPTIONS.map((option) => (
+                        <SelectItem key={option.key} value={option.key}>
+                          {option.label} — حداقل {nf.format(option.minDisks)} دیسک · {option.faultTolerance}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedOption && (
+                    <div className="mt-3.5 p-3.5 rounded-md bg-muted border border-border text-sm leading-6">
+                      <span className="font-extrabold text-[var(--raid)]">{selectedOption.label}: </span>
+                      {selectedOption.description}
+                    </div>
+                  )}
+                </div>
+
+                <Separator />
+
+                {/* Hot Spare with Slider */}
+                <div className="rounded-md border border-border bg-muted/60 p-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <Label className="font-black text-base">دیسک رزرو (Hot Spare)</Label>
+                      <p className="text-[length:var(--paragraph-font-size)] paragraph-color mt-1">
+                        بزرگ‌ترین دیسک‌ها به‌عنوان Spare رزرو می‌شوند و وارد ظرفیت Volume نمی‌شوند.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setSpareCount((v) => clamp(v - 1, 0, effectiveSpareMax))}
+                        className="h-9 w-9"
+                      >
+                        <MinusIcon className="h-4 w-4" />
+                      </Button>
+                      <div className="w-32">
+                        <Slider
+                          value={[spareCount]}
+                          onValueChange={(v: any) => setSpareCount(Array.isArray(v) ? v[0] : v)}
+                          min={0}
+                          max={effectiveSpareMax}
+                          step={1}
+                        />
+                        <div className="text-center font-black text-lg mt-1">{nf.format(spareCount)}</div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setSpareCount((v) => clamp(v + 1, 0, effectiveSpareMax))}
+                        className="h-9 w-9"
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Results section positioned BELOW the tool */}
-          <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-4">
+          {/* Right column — Results */}
+          <div className="border-t border-border lg:border-t-0 lg:border-s lg:pt-0 lg:ps-6 pt-4">
             {!raid || !selectedOption ? (
-              <div className="my-6 text-center p-8 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-dashed border-[var(--border-color)] bg-[var(--muted-background)]/40">
-                <Icon name="disk" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
-                <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)]">هیچ نوع RAID انتخاب نشده است</p>
-                <p className="mt-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
-                  لطفاً برای مشاهده نتیجه محاسبه، نقشه ظرفیت و تحلیل راندمان، یکی از انواع RAID یا SHR را از گزینه‌های بالا انتخاب کنید.
-                </p>
-              </div>
+              <Card className="my-6 border-dashed bg-muted/40">
+                <CardContent className="p-8 text-center">
+                  <Icon name="disk" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
+                  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold">هیچ نوع RAID انتخاب نشده است</p>
+                  <p className="mt-2 text-[length:var(--paragraph-font-size)] paragraph-color max-w-md mx-auto">
+                    لطفاً برای مشاهده نتیجه محاسبه، نقشه ظرفیت و تحلیل راندمان، یکی از انواع RAID یا SHR را از گزینه‌های بالا انتخاب کنید.
+                  </p>
+                </CardContent>
+              </Card>
             ) : (
-              <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] overflow-hidden p-0 shadow-[var(--shadow-size)]">
-                <div className="border-b-[length:var(--border-size)] border-[var(--border-color)] bg-[color-mix(in_oklch,var(--raid)_10%,var(--card-background))] p-6">
+              <Card className="overflow-hidden">
+                {/* Result header */}
+                <div className="border-b border-border bg-[color-mix(in_oklch,var(--raid)_10%,var(--card))] p-6">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold paragraph-color">نتیجه نهایی محاسبه برای</div>
+                      <div className="paragraph-color font-bold">نتیجه نهایی محاسبه برای</div>
                       <div className="mt-1 text-3xl font-black text-[var(--raid)]">{selectedOption.label}</div>
                     </div>
-                    <div className={`badge ${result.valid ? "border-[color-mix(in_oklch,var(--success)_40%,var(--border-color))] text-[var(--success)]" : "border-[color-mix(in_oklch,var(--danger)_40%,var(--border-color))] text-[var(--danger)]"}`}>
+                    <Badge
+                      variant="outline"
+                      className={result.valid
+                        ? "border-[color-mix(in_oklch,var(--success)_40%,var(--border))] text-[var(--success)] bg-[color-mix(in_oklch,var(--success)_12%,transparent)]"
+                        : "border-[color-mix(in_oklch,var(--danger)_40%,var(--border))] text-[var(--danger)] bg-[color-mix(in_oklch,var(--danger)_12%,transparent)]"
+                      }
+                    >
                       {result.valid ? "پیکربندی معتبر" : "نیازمند اصلاح دیسک‌ها"}
-                    </div>
+                    </Badge>
                   </div>
-                  <p className="mt-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{result.description}</p>
+                  <p className="mt-3 paragraph-color">{result.description}</p>
                 </div>
 
-                <div className="space-y-6 p-6">
+                <CardContent className="space-y-6 p-6">
+                  {/* Stats grid */}
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard label="ظرفیت قابل استفاده" value={formatTb(result.usableTb)} hint="فضای نهایی Volume" tone="accent" />
                     <StatCard label="بازده ظرفیت" value={`${pf.format(result.efficiency)}٪`} hint="نسبت به دیسک‌های فعال" tone="success" />
@@ -456,69 +492,74 @@ export default function RaidCalculator() {
                     <StatCard label="بلااستفاده + Spare" value={formatTb(result.unusedTb + result.spareTb)} hint="فضای رزرو یا غیرقابل استفاده" tone="warning" />
                   </div>
 
+                  {/* Capacity bar */}
                   <div>
-                    <div className="mb-2 flex items-center justify-between text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold">
+                    <div className="mb-2 flex items-center justify-between text-sm paragraph-color font-bold">
                       <span>نقشه توزیع ظرفیت</span>
                       <span className="paragraph-color">ظرفیت خام کل: {formatTb(result.rawTb)}</span>
                     </div>
-                    <div className="flex h-6 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)] shadow-[var(--shadow-size)]" aria-label="نمودار ظرفیت RAID">
+                    <div className="flex h-6 overflow-hidden rounded-md border border-border bg-muted" aria-label="نمودار ظرفیت RAID">
                       <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--raid)]" />
                       <Segment label="حفاظت" value={result.protectionTb} total={barTotal} className="bg-[var(--success)]" />
                       <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--warning)]" />
-                      <Segment label="Hot Spare" value={result.spareTb} total={barTotal} className="bg-[var(--paragraph-color)]" />
+                      <Segment label="Hot Spare" value={result.spareTb} total={barTotal} className="bg-muted-foreground" />
                     </div>
-                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm paragraph-color">
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--raid)]" /> قابل استفاده</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--success)]" /> حفاظت</span>
                       <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--warning)]" /> بلااستفاده</span>
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--paragraph-color)]" /> Spare</span>
+                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-muted-foreground" /> Spare</span>
                     </div>
                   </div>
 
-                  <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)]/60 p-5">
-                    <div className="mb-3 flex items-center gap-2 font-black text-[16px]">
-                      <Icon name="shield" className="h-5 w-5 text-[var(--raid)]" />
-                      خلاصه فنی پیکربندی
-                    </div>
-                    <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
-                      <div>
-                        <dt className="paragraph-color">دیسک فعال</dt>
-                        <dd className="mt-1 font-black text-[16px]">{nf.format(drives.length - spareCount)} عدد</dd>
+                  {/* Technical summary */}
+                  <Card className="bg-muted/60">
+                    <CardContent className="p-5">
+                      <div className="mb-3 flex items-center gap-2 font-black text-base">
+                        <Icon name="shield" className="h-5 w-5 text-[var(--raid)]" />
+                        خلاصه فنی پیکربندی
                       </div>
-                      <div>
-                        <dt className="paragraph-color">Hot Spare</dt>
-                        <dd className="mt-1 font-black text-[16px]">{nf.format(spareCount)} عدد</dd>
-                      </div>
-                      <div>
-                        <dt className="paragraph-color">ظرفیت خام فعال</dt>
-                        <dd className="mt-1 font-black text-[16px]">{formatTb(result.activeRawTb)}</dd>
-                      </div>
-                      <div>
-                        <dt className="paragraph-color">تحمل خرابی</dt>
-                        <dd className="mt-1 font-black text-[16px]">{result.faultTolerance}</dd>
-                      </div>
-                    </dl>
-                  </div>
+                      <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm paragraph-color">
+                        <div>
+                          <dt className="paragraph-color">دیسک فعال</dt>
+                          <dd className="mt-1 font-black text-base text-foreground">{nf.format(drives.length - spareCount)} عدد</dd>
+                        </div>
+                        <div>
+                          <dt className="paragraph-color">Hot Spare</dt>
+                          <dd className="mt-1 font-black text-base text-foreground">{nf.format(spareCount)} عدد</dd>
+                        </div>
+                        <div>
+                          <dt className="paragraph-color">ظرفیت خام فعال</dt>
+                          <dd className="mt-1 font-black text-base text-foreground">{formatTb(result.activeRawTb)}</dd>
+                        </div>
+                        <div>
+                          <dt className="paragraph-color">تحمل خرابی</dt>
+                          <dd className="mt-1 font-black text-base text-foreground">{result.faultTolerance}</dd>
+                        </div>
+                      </dl>
+                    </CardContent>
+                  </Card>
 
+                  {/* Warnings */}
                   {result.warnings.length > 0 ? (
                     <div className="space-y-2">
                       {result.warnings.map((warning) => (
-                        <div key={warning} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--warning)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--warning)_11%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)]">
+                        <div key={warning} className="rounded-md border border-[color-mix(in_oklch,var(--warning)_35%,var(--border))] bg-[color-mix(in_oklch,var(--warning)_11%,var(--card))] p-3.5 text-sm">
                           {warning}
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_35%,var(--border-color))] bg-[color-mix(in_oklch,var(--success)_10%,var(--card-background))] p-3.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] font-bold">
+                    <div className="rounded-md border border-[color-mix(in_oklch,var(--success)_35%,var(--border))] bg-[color-mix(in_oklch,var(--success)_10%,var(--card))] p-3.5 text-sm font-bold text-foreground">
                       این چیدمان از نظر تعداد دیسک معتبر است و ظرفیت بدون هیچ هشداری محاسبه شد.
                     </div>
                   )}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
-      </div>
+      </Card>
     </section>
   );
 }

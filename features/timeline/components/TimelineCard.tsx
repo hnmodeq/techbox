@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Send } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useTimelineLiked } from '@/providers/timeline-likes.provider';
 
 interface TimelineCardProps {
@@ -207,7 +208,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         >
           <form onSubmit={handleAddComment} className="flex flex-col gap-2 shrink-0">
             <div className="flex gap-1.5 items-center">
-              <input
+              <Input
                 type="text"
                 value={newCommentText}
                 onChange={(e) => {
@@ -215,20 +216,21 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   setCommentError('');
                 }}
                 placeholder="نظر یا تجربه خود را بنویسید..."
-                className="input !h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-slate-900 !text-white !border-slate-700"
+                className="!h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-slate-900 !text-white !border-slate-700"
               />
-              <button
+              <Button
                 type="submit"
-                className="h-9 px-3 rounded-[var(--corner-radius)] bg-[var(--timeline)] text-slate-950 font-bold flex items-center justify-center transition-opacity hover:opacity-90 cursor-pointer shrink-0"
+                size="sm"
+                className="h-9 bg-[var(--timeline)] text-slate-950 hover:opacity-90 shrink-0"
                 title="ارسال نظر"
               >
                 <Send size={14} className="rtl:rotate-180" />
-              </button>
+              </Button>
             </div>
             {commentError && (
               <div className="text-[11px] text-red-400 bg-red-950/40 p-1.5 rounded border-[length:var(--border-size)] border-red-800 flex justify-between items-center">
                 <span>{commentError}</span>
-                <button type="button" onClick={() => router.push('/account')} className="underline font-bold text-white">ورود</button>
+                <Button size="xs" variant="link" onClick={() => router.push('/account')} className="text-white underline">ورود</Button>
               </div>
             )}
           </form>

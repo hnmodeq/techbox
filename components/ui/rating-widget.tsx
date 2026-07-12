@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Icon } from "@/design/icons";
+import { Button } from "@/components/ui/button";
 
 export function RatingWidget({ module, slug }: { module: string; slug: string }) {
   const [rating, setRating] = useState<number | null>(null);
@@ -12,5 +13,5 @@ export function RatingWidget({ module, slug }: { module: string; slug: string })
     if(res.status===401){ window.dispatchEvent(new CustomEvent('tb_open_auth')); return; }
     if(res.ok){ const d=await res.json(); setRating(d.rating); setCount(d.ratingCount); setMine(d.myRating); window.dispatchEvent(new CustomEvent('tb_stats_update',{detail:{module,slug,rating:d.rating,ratingCount:d.ratingCount}})); }
   };
-  return <div className="flex flex-wrap items-center gap-2"><span className="paragraph-color text-xs">امتیاز شما:</span>{[1,2,3,4,5].map(v=><button key={v} type="button" onClick={()=>submit(v)} className={v <= (mine||0) ? 'text-[var(--warning)]' : 'paragraph-color hover:text-[var(--warning)]'}><Icon name="star" size={20} className={v <= (mine||0) ? 'fill-current' : ''}/></button>)}<span className="text-xs paragraph-color">{rating ? `${rating.toFixed(1)} (${count.toLocaleString('fa-IR')})` : 'بدون امتیاز'}</span></div>;
+  return <div className="flex flex-wrap items-center gap-2"><span className="paragraph-color text-xs">امتیاز شما:</span>{[1,2,3,4,5].map(v=><Button key={v} type="button" variant="ghost" size="icon-xs" onClick={()=>submit(v)} className={v <= (mine||0) ? 'text-[var(--warning)] hover:text-[var(--warning)]' : 'text-muted-foreground hover:text-[var(--warning)]'}><Icon name="star" size={20} className={v <= (mine||0) ? 'fill-current' : ''}/></Button>)}<span className="text-xs paragraph-color">{rating ? `${rating.toFixed(1)} (${count.toLocaleString('fa-IR')})` : 'بدون امتیاز'}</span></div>;
 }
