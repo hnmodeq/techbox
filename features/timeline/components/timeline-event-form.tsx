@@ -1,66 +1,101 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { TimelineEvent } from '@/types/timeline';
 import { gregorianToJalali, formatJalaliDate } from '@/lib/jalali';
 import { X } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 
 interface TimelineEventFormProps {
   event?: TimelineEvent | null;
   onClose: () => void;
 }
 
+const timelineSchema = z.object({
+  title: z.string().min(3, 'حداقل ۳ کاراکتر').max(200),
+  description: z.string().min(5, 'حداقل ۵ کاراکتر').max(2000),
+  image: z.string().url('آدرس تصویر نامعتبر').optional().or(z.literal('')),
+  dateGr: z.string().min(1, 'تاریخ الزامی است'),
+  importance: z.number().min(1).max(10),
+  tags: z.string().max(500).optional(),
+});
+
+type TimelineValues = z.infer<typeof timelineSchema>;
+
 export default function TimelineEventForm({ event, onClose }: TimelineEventFormProps) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
-  const [dateGr, setDateGr] = useState('');
-  const [importance, setImportance] = useState(5);
-  const [tags, setTags] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [dateFa, setDateFa] = useState('');
+  const [dateFa, setDateFa] = React.useState('');
+
+  const form = useForm<TimelineValues>({
+    resolver: zodResolver(timelineSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      image: '',
+      dateGr: '',
+      importance: 5,
+      tags: '',
+    },
+  });
+
+  const dateGrWatch = form.watch('dateGr');
+  const importanceWatch = form.watch('importance');
 
   useEffect(() => {
     if (event) {
-      setTitle(event.title);
-      setDescription(event.description);
-      setImage(event.image || '');
-      setDateGr(new Date(event.dateGr).toISOString().split('T')[0]);
-      setImportance(event.importance);
-      setTags(event.tags?.join(', ') || '');
+      form.reset({
+        title: event.title,
+        description: event.description,
+        image: event.image || '',
+        dateGr: new Date(event.dateGr).toISOString().split('T')[0],
+        importance: event.importance,
+        tags: event.tags?.join(', ') || '',
+      });
       setDateFa(event.dateFa);
     }
   }, [event]);
 
   useEffect(() => {
-    if (dateGr) {
-      const date = new Date(dateGr);
-      const jalali = gregorianToJalali(date);
-      setDateFa(formatJalaliDate(jalali.year, jalali.month, jalali.day));
+    if (dateGrWatch) {
+      const date = new Date(dateGrWatch);
+      if (!isNaN(date.getTime())) {
+        const jalali = gregorianToJalali(date);
+        setDateFa(formatJalaliDate(jalali.year, jalali.month, jalali.day));
+      }
     }
-  }, [dateGr]);
+  }, [dateGrWatch]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsLoading(true);
-
+  const onSubmit = async (values: TimelineValues) => {
     try {
       const method = event ? 'PUT' : 'POST';
       const url = event ? `/api/timeline/events/${event.id}` : '/api/timeline/events';
+      const date = new Date(values.dateGr);
+      const jalali = gregorianToJalali(date);
 
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title,
-          description,
-          image: image || null,
-          dateGr,
-          dateFa,
-          year: new Date(dateGr).getFullYear(),
-          yearFa: gregorianToJalali(new Date(dateGr)).year,
-          importance,
-          tags: tags.split(',').map(t => t.trim()).filter(t => t),
+          title: values.title,
+          description: values.description,
+          image: values.image || null,
+          dateGr: values.dateGr,
+          dateFa: dateFa || formatJalaliDate(jalali.year, jalali.month, jalali.day),
+          year: date.getFullYear(),
+          yearFa: jalali.year,
+          importance: values.importance,
+          tags: values.tags ? values.tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
         }),
       });
 
@@ -68,102 +103,134 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
       onClose();
     } catch (error) {
       console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-white">
-          {event ? 'Edit Event' : 'New Event'}
-        </h2>
-        <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
-          <X size={24} />
-        </button>
-      </div>
+    <Card className="w-full max-w-lg max-h-[90vh] overflow-auto">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center gap-2">
+          {event ? 'ویرایش رویداد' : 'رویداد جدید'}
+          <Badge variant="outline">{dateFa || 'تاریخ شمسی'}</Badge>
+        </CardTitle>
+        <Button variant="ghost" size="icon-sm" onClick={onClose}>
+          <X className="size-4" />
+        </Button>
+      </CardHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>عنوان *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="عنوان رویداد" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label className="block text-white mb-2 font-medium">Title *</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
-          placeholder="Event title"
-        />
-      </div>
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>توضیحات *</FormLabel>
+                  <FormControl>
+                    <Textarea rows={4} placeholder="توضیحات" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label className="block text-white mb-2 font-medium">Description *</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          rows={4}
-          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
-          placeholder="Description"
-        />
-      </div>
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>آدرس تصویر</FormLabel>
+                  <FormControl>
+                    <Input type="url" placeholder="https://..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label className="block text-white mb-2 font-medium">Image URL</label>
-        <input
-          type="url"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
-        />
-      </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="dateGr"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تاریخ میلادی *</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="space-y-2">
+                <Label>تاریخ شمسی</Label>
+                <Input value={dateFa} disabled placeholder="خودکار از میلادی" />
+              </div>
+            </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-white mb-2 font-medium">Date *</label>
-          <input
-            type="date"
-            value={dateGr}
-            onChange={(e) => setDateGr(e.target.value)}
-            required
-            className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
-          />
-        </div>
-        <div>
-          <label className="block text-white mb-2 font-medium">Solar Hijri</label>
-          <input
-            type="text"
-            value={dateFa}
-            disabled
-            className="w-full bg-slate-700 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-slate-300"
-          />
-        </div>
-      </div>
+            <FormField
+              control={form.control}
+              name="importance"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>اهمیت: {importanceWatch}/10</FormLabel>
+                  <FormControl>
+                    <Slider
+                      min={1}
+                      max={10}
+                      step={1}
+                      value={[field.value as number]}
+                      onValueChange={(val: any) => {
+                        const v = Array.isArray(val) ? val[0] : val;
+                        field.onChange(v);
+                      }}
+                      className="py-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-      <div>
-        <label className="block text-white mb-2 font-medium">Importance: {importance}/10</label>
-        <input type="range" min="1" max="10" value={importance} onChange={(e) => setImportance(parseInt(e.target.value))} className="w-full" />
-      </div>
-
-      <div>
-        <label className="block text-white mb-2 font-medium">Tags</label>
-        <input
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          className="w-full bg-slate-800 border-[length:var(--border-size)] border-slate-600 rounded px-3 py-2 text-white"
-          placeholder="tag1, tag2"
-        />
-      </div>
-
-      <div className="flex gap-2 pt-4">
-        <button type="submit" disabled={isLoading} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-medium">
-          {isLoading ? 'Saving...' : 'Save'}
-        </button>
-        <button type="button" onClick={onClose} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded font-medium">
-          Cancel
-        </button>
-      </div>
-    </form>
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>برچسب‌ها</FormLabel>
+                  <FormControl>
+                    <Input placeholder="tag1, tag2" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+          <Separator />
+          <CardFooter className="flex gap-2 pt-4">
+            <Button type="submit" loading={form.formState.isSubmitting} className="flex-1">
+              {form.formState.isSubmitting ? 'در حال ذخیره...' : 'ذخیره'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              انصراف
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
+    </Card>
   );
 }

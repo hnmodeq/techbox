@@ -1,110 +1,154 @@
 "use client";
 
+import * as React from "react";
 import { useState } from "react";
-import { zIndex } from "@/design";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { CloseButton } from "@/components/ui/close-button";
-import { OverlayBackdrop } from "@/components/ui/overlay";
-import { Panel } from "@/components/ui/panel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
 
 type ConsultationModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
+const consultationSchema = z.object({
+  orgName: z.string().min(2, "نام سازمان حداقل ۲ کاراکتر").max(200),
+  email: z.string().email("ایمیل نامعتبر").max(200),
+  phone: z.string().min(7, "تلفن نامعتبر").max(20),
+  message: z.string().max(2000).optional(),
+});
+
+type ConsultationValues = z.infer<typeof consultationSchema>;
+
 export default function ConsultationModal({ open, onClose }: ConsultationModalProps) {
-  const [orgName, setOrgName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  if (!open) return null;
+  const form = useForm<ConsultationValues>({
+    resolver: zodResolver(consultationSchema),
+    defaultValues: { orgName: "", email: "", phone: "", message: "" },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: ConsultationValues) => {
     setStatus("loading");
     setErrorMsg("");
-
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: orgName,
-          email,
+          name: values.orgName,
+          email: values.email,
           subject: "درخواست مشاوره زیرساخت",
-          message: `شماره تماس: ${phone}\n\n${message || "درخواست مشاوره زیرساخت از فرم مشاوره"}`,
+          message: `شماره تماس: ${values.phone}\n\n${values.message || "درخواست مشاوره زیرساخت از فرم مشاوره"}`,
         }),
       });
-
       const data = await res.json();
-
       if (res.ok && data.ok) {
         setStatus("success");
+        toast.success("درخواست شما ثبت شد");
+        form.reset();
       } else {
         setStatus("error");
-        setErrorMsg(data.error || "خطا در ارسال درخواست. لطفاً دوباره تلاش کنید.");
+        setErrorMsg(data.error || "خطا در ارسال درخواست");
       }
     } catch {
       setStatus("error");
-      setErrorMsg("خطا در اتصال به سرور.");
+      setErrorMsg("خطا در اتصال به سرور");
+    }
+  };
+
+  const handleOpenChange = (o: boolean) => {
+    if (!o) {
+      onClose();
+      if (status === "success") {
+        setStatus("idle");
+      }
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: zIndex.modal }} dir="rtl">
-      <OverlayBackdrop onClick={onClose} />
-      <Panel className="relative w-full max-w-md space-y-4" style={{ zIndex: zIndex.modalContent }}>
-        <div className="flex items-center justify-between">
-          <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--consultation)]">درخواست مشاوره زیرساخت</h3>
-          <CloseButton onClick={onClose} label="بستن" />
-        </div>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-md" dir="rtl">
+        <DialogHeader>
+          <DialogTitle className="text-[var(--consultation)]">درخواست مشاوره زیرساخت</DialogTitle>
+          <DialogDescription>کارشناسان تکباکس به‌زودی با شما تماس می‌گیرند</DialogDescription>
+        </DialogHeader>
 
         {status === "success" ? (
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--success)]/30 bg-[var(--success)]/15 p-4 text-center text-[length:var(--paragraph-font-size)] text-[var(--success)]">
+          <Card className="p-4 bg-[color-mix(in_oklch,var(--success)_10%,transparent)] border-[color-mix(in_oklch,var(--success)_30%,transparent)] text-center text-sm text-[var(--success)]">
             درخواست شما ثبت شد. کارشناسان تکباکس به‌زودی با شما تماس می‌گیرند.
-          </div>
+          </Card>
         ) : (
-          <form className="space-y-3" onSubmit={handleSubmit}>
-            <input
-              className="input"
-              placeholder="نام سازمان"
-              required
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
-            />
-            <input
-              className="input"
-              type="email"
-              placeholder="ایمیل کاری"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              className="input"
-              placeholder="تلفن"
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <textarea
-              className="input min-h-[110px]"
-              placeholder="نیاز شما؟ سرور، شبکه، ذخیره‌سازی…"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            {status === "error" && (
-              <p className="text-[length:var(--paragraph-font-size)] text-[var(--danger)]">{errorMsg}</p>
-            )}
-            <Button type="submit" disabled={status === "loading"} className="w-full">
-              {status === "loading" ? "در حال ارسال..." : "ارسال درخواست"}
-            </Button>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="orgName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نام سازمان</FormLabel>
+                    <FormControl>
+                      <Input placeholder="نام سازمان" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ایمیل کاری</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="ایمیل کاری" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>تلفن</FormLabel>
+                    <FormControl>
+                      <Input placeholder="تلفن" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نیاز شما؟</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="سرور، شبکه، ذخیره‌سازی…" className="min-h-[110px]" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {status === "error" && <p className="text-sm text-destructive">{errorMsg}</p>}
+              <Button type="submit" loading={form.formState.isSubmitting} className="w-full">
+                {status === "loading" ? "در حال ارسال..." : "ارسال درخواست"}
+              </Button>
+            </form>
+          </Form>
         )}
-      </Panel>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
