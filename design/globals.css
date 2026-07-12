@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   color-scheme: light;
@@ -31,13 +35,19 @@
   --h3-font-color: light-dark(oklch(0.2 0 0), oklch(0.9 0 0));
 
   --paragraph-font-size: 0.9375rem;
-  --paragraph-color: light-dark(oklch(0.48 0 0), oklch(0.68 0 0));
+  --paragraph-color: var(--muted-foreground);
 
-  --main-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
-  --card-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
-  --button-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
-  --modal-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
-  --sidebar-background: light-dark(oklch(100% 0.00011 271.152), oklch(0% 0 0));
+  /* Legacy TechBox tokens aliased to shadcn tokens during migration */
+  --main-background: var(--background);
+  --card-background: var(--card);
+  --button-background: var(--secondary);
+  --modal-background: var(--popover);
+  --sidebar-background: var(--sidebar);
+  --primary-text: var(--foreground);
+  --border-color: var(--border);
+  --ring-color: var(--ring);
+  --corner-radius: var(--radius);
+  --border-size: 1px;
 
   --blog: light-dark(oklch(0.7 0.17 52), #fb923c);
   --news: light-dark(oklch(0.64 0.22 25), #fb7185);
@@ -52,7 +62,7 @@
   --forum: light-dark(oklch(0.78 0.16 5), #fda4af);
   --review: light-dark(oklch(0.7 0.17 240), #38bdf8);
   --download: light-dark(oklch(0.72 0.2 350), #f472b6);
-  --home: light-dark(oklch(0.62 0.22 290), #a78bfa);
+  --home: var(--primary);
   --account: light-dark(oklch(0.8 0.12 15), #fca5a5);
   --admin: light-dark(oklch(0.66 0.22 300), #e879f9);
   --about: light-dark(oklch(0.72 0.16 230), #7dd3fc);
@@ -65,16 +75,78 @@
   --warning: light-dark(oklch(0.82 0.15 85), #fcd34d);
   --info: light-dark(oklch(0.72 0.16 230), #7dd3fc);
 
-
   --font-kalameh-stack: var(--font-kalameh), "KalamehWebFaNum", Vazirmatn, system-ui, Tahoma, sans-serif;
   --font-sans: var(--font-kalameh-stack);
   --font-techbox-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
   color-scheme: dark;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 }
-
 
 html {
   font-family: var(--font-kalameh-stack);
@@ -91,7 +163,6 @@ body {
   line-height: 1.75;
 }
 
-
 .font-sans {
   font-family: var(--font-kalameh-stack) !important;
 }
@@ -99,7 +170,6 @@ body {
 .font-mono, code, kbd, pre, samp {
   font-family: var(--font-techbox-mono) !important;
 }
-
 
 h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, select, label, li, summary, figcaption {
   font-family: inherit;
@@ -110,7 +180,6 @@ h2 { font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; }
 h3 { font-weight: 600; line-height: 1.35; }
 p, li { line-height: 1.9; }
 strong, b { font-weight: 700; }
-
 
 .font-thin    { font-weight: 100; }
 .font-extralight { font-weight: 200; }
@@ -125,12 +194,60 @@ strong, b { font-weight: 700; }
 @theme inline {
   --font-sans: var(--font-kalameh-stack);
   --font-mono: var(--font-techbox-mono);
+  --font-heading: var(--font-kalameh-stack);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 /* Theme transition animations (Step 11) ---------------------------------- */
 :root {
   --theme-transition-duration: 280ms;
   --theme-transition-ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* shadcn/typeset with Kalameh font stack ---------------------------------- */
+@layer components {
+  .typeset {
+    --typeset-font-body: var(--font-kalameh-stack);
+    --typeset-font-heading: var(--font-kalameh-stack);
+    --typeset-font-mono: var(--font-techbox-mono);
+  }
 }
 
 html {
@@ -191,7 +308,6 @@ html.theme-transitioning * {
   }
 }
 
-
 /* Sidebar first-paint state ------------------------------------------------ */
 html.main-sidebar-booting .main-sidebar-spacer,
 html.main-sidebar-booting .main-sidebar-panel,
@@ -231,4 +347,19 @@ html[data-news-sidebar-open="false"] .news-sidebar-panel {
 
 html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   display: none !important;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
 }
