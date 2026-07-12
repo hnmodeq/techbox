@@ -46,21 +46,23 @@ export function TechboxNavUser() {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="aria-expanded:bg-muted aria-expanded:text-foreground cursor-pointer"
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
-                <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
-                <span className="truncate text-xs text-muted-foreground">{user?.email || "ورود به حساب"}</span>
-              </div>
-              <ChevronsUpDownIcon className="ms-auto size-4" />
-            </SidebarMenuButton>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size="lg"
+                className="aria-expanded:bg-muted aria-expanded:text-foreground cursor-pointer"
+              />
+            }
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
+              <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-start text-sm leading-tight">
+              <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
+              <span className="truncate text-xs text-muted-foreground">{user?.email || "ورود به حساب"}</span>
+            </div>
+            <ChevronsUpDownIcon className="ms-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="min-w-56 rounded-lg"
@@ -84,18 +86,14 @@ export function TechboxNavUser() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem asChild>
-                    <Link href="/account">
-                      <UserIcon className="size-4" />
-                      حساب کاربری
-                    </Link>
+                  <DropdownMenuItem onClick={() => window.location.href = "/account"}>
+                    <UserIcon className="size-4" />
+                    حساب کاربری
                   </DropdownMenuItem>
                   {user.role === "super_admin" && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/admin">
-                        <ShieldIcon className="size-4" />
-                        پنل مدیریت
-                      </Link>
+                    <DropdownMenuItem onClick={() => window.location.href = "/admin"}>
+                      <ShieldIcon className="size-4" />
+                      پنل مدیریت
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuGroup>
