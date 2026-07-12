@@ -3,18 +3,6 @@ import { useEffect, useState } from "react";
 import { Icon } from "@/design/icons";
 import { useStatEntry } from "@/providers/stats.provider";
 
-const moduleIconColors: Record<string, string> = {
-  blog: "text-[var(--blog)]",
-  news: "text-[var(--news)]",
-  media: "text-[var(--media)]",
-  review: "text-[var(--review)]",
-  tools: "text-[var(--tools)]",
-  download: "text-[var(--download)]",
-  shop: "text-[var(--shop)]",
-  forum: "text-[var(--forum)]",
-  timeline: "text-[var(--timeline)]"
-};
-
 export function CardStats({
   module,
   slug,
@@ -86,23 +74,21 @@ export function CardStats({
     return () => window.removeEventListener("tb_stats_update", handleUpdate);
   }, [module, slug]);
 
-  const iconColor = moduleIconColors[module] || "text-[var(--home)]";
-
   return (
-    <div className="flex items-center gap-3 text-xs paragraph-color font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
+    <div className="flex items-center gap-3 text-xs text-muted-foreground font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
       <span className="inline-flex items-center gap-1" title="بازدید">
-        <Icon name="view" size={16} strokeWidth={2} className={iconColor} />
-        <span className="text-[var(--primary-text)]">{views.toLocaleString("fa-IR")}</span>
+        <Icon name="view" size={16} strokeWidth={2} className="text-muted-foreground" />
+        <span className="text-foreground">{views.toLocaleString("fa-IR")}</span>
         {showLabel && <span className="font-normal ms-0.5">بازدید</span>}
       </span>
       <span className="inline-flex items-center gap-1" title="پسند">
-        <Icon name="like" size={16} strokeWidth={2} className="text-red-400 fill-current" />
-        <span className="text-[var(--primary-text)]">{likes.toLocaleString("fa-IR")}</span>
+        <Icon name="like" size={16} strokeWidth={2} className="text-muted-foreground" />
+        <span className="text-foreground">{likes.toLocaleString("fa-IR")}</span>
       </span>
       {showComments && (
         <span className="inline-flex items-center gap-1" title="دیدگاه">
-          <Icon name="comment" size={16} strokeWidth={2} className="text-cyan-400" />
-          <span className="text-[var(--primary-text)]">{comments.toLocaleString("fa-IR")}</span>
+          <Icon name="comment" size={16} strokeWidth={2} className="text-muted-foreground" />
+          <span className="text-foreground">{comments.toLocaleString("fa-IR")}</span>
         </span>
       )}
     </div>
