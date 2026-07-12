@@ -6,9 +6,9 @@
 >
 > Remote: `https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration`
 >
-> Latest commit: `fcc7cae` -> now `feat: forms audit RHF`
+> Latest commit: `adecd6b` -> now `feat: FAQ + accordion`
 >
-> Last updated: 2026-07-12 — deep dive + Phase 4 + Phase 3 ✅ + Phase 5 partial
+> Last updated: 2026-07-12 — Phase 3/4/5 partial/6 FAQ ✅
 >
 > Plan source: `UI_MIGRATION_PLAN.md`
 
@@ -24,7 +24,7 @@
 | Phase 3 — Layout shell | ✅ Done (partial full) | Footer ✅ shadcn Separator+ButtonLink, NewsSidebar ✅ Button+ScrollArea+Card+Badge+Separator+Skeleton, SidebarContent ✅ Button/Badge/Separator/ScrollArea/Tooltip/Popover/DropdownMenu/Input/Card + theme toggle, Chatbot ✅ Button+Card+Input+ScrollArea+Badge+Separator, AuthModal ✅ Dialog+Input+Checkbox+Button+Label+Separator+Card+Sonner, Sidebar primitive installed (sidebar.tsx + use-mobile). Lint/typecheck green. |
 | Phase 4 — Design-system page | ✅ Done | Created `/admin/design-system` — showcases colors, typography, buttons, badges, cards, forms, overlays, tabs, breadcrumb placeholder, table placeholder, skeleton/spinner, sonner, avatar, scrollarea, separator, RTL/dark checklist. Lint+typecheck green. |
 | Phase 5 — Forms & inputs audit | ✅ Partially done (2/12) | Started: added Form primitive (custom base-ui compatible), installed RHF + resolvers, refactored admin/login (Card+Form+Input+zod+toast) and contact (Form+Input+Textarea+Card+zod+toast). Pattern established: useForm + zodResolver + Form + FormField + FormItem + FormLabel + FormControl + FormMessage + Input/Textarea + Button loading. Remaining: account, work-with-us, consultation, timeline-event-form, posts/new, posts page filters, redirects, users, settings, search, shop, download, forum, newsletter, etc. |
-| Phase 6 — Admin UI | ⏳ Not started | Admin dashboard + tables. |
+| Phase 6 — Admin UI | ✅ Partially done | FAQ model + accordion + admin CRUD + about Q&A ✅ done (Faq Prisma + migration + API + /admin/faq page with Table + Form + Switch + Badge + RHF+zod + toast, /about with Accordion). Remaining admin tables (posts, users, jobs, moderation, etc) need Data Table + Chart etc. |
 | Phase 7 — Chat / messenger | ⏳ Not started | MessageScroller + Message. |
 | Phase 8 — Public module pattern | ⏳ Not started | Blog first, then others. |
 | Phase 9 — Tools & static pages | ⏳ Not started | Tools, about, contact, etc. |
