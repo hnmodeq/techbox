@@ -2,6 +2,11 @@
 
 import React from 'react';
 import { RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 interface ZoomControlsProps {
   zoom: number;
@@ -11,73 +16,74 @@ interface ZoomControlsProps {
 
 export function ZoomControls({ zoom, onReset, onZoomChange }: ZoomControlsProps) {
   return (
-    <div
-      className="absolute bottom-8 right-8 flex items-center gap-3 z-50 bg-[var(--card-background)]/95 backdrop-blur-md border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] px-4 py-2.5 shadow-[var(--shadow-size)] select-none"
+    <Card
+      className="absolute bottom-8 right-8 flex items-center gap-2 z-50 p-2.5 backdrop-blur-md select-none"
       onPointerDown={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
     >
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon-sm"
         onClick={(e) => {
           e.stopPropagation();
           onZoomChange?.(Math.max(0.1, zoom - 0.2));
         }}
-        className="p-1.5 paragraph-color hover:text-[var(--timeline)] transition-colors cursor-pointer"
         title="کوچک‌نمایی (-)"
         aria-label="Zoom Out"
       >
-        <ZoomOut size={18} />
-      </button>
+        <ZoomOut className="size-4" />
+      </Button>
 
-      {/* Horizontal Range Slider with direct pointer ownership */}
-      <div className="flex items-center gap-2">
-        <input
-          type="range"
-          min="0.1"
-          max="6.0"
-          step="0.05"
-          value={zoom}
+      <div className="flex items-center gap-2 w-32 sm:w-44">
+        <Slider
+          min={0.1}
+          max={6.0}
+          step={0.05}
+          value={[zoom]}
+          onValueChange={(val: any) => {
+            const v = Array.isArray(val) ? val[0] : val;
+            onZoomChange?.(parseFloat(String(v)));
+          }}
           onPointerDown={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          onChange={(e) => onZoomChange?.(parseFloat(e.target.value))}
-          onInput={(e) => onZoomChange?.(parseFloat(e.currentTarget.value))}
-          className="w-32 sm:w-44 h-2.5 cursor-pointer appearance-none rounded-full bg-[var(--muted-background)] accent-[var(--timeline)]"
-          title="تنظیم بزرگ‌نمایی"
-          aria-label="تنظیم بزرگ‌نمایی"
+          className="flex-1"
         />
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon-sm"
         onClick={(e) => {
           e.stopPropagation();
           onZoomChange?.(Math.min(6.0, zoom + 0.2));
         }}
-        className="p-1.5 paragraph-color hover:text-[var(--timeline)] transition-colors cursor-pointer"
         title="بزرگ‌نمایی (+)"
         aria-label="Zoom In"
       >
-        <ZoomIn size={18} />
-      </button>
+        <ZoomIn className="size-4" />
+      </Button>
 
-      <div className="min-w-[48px] font-mono text-xs font-bold text-[var(--timeline)] text-center border-l-[length:var(--border-size)] border-[var(--border-color)] pl-2">
+      <Separator orientation="vertical" className="h-6" />
+
+      <Badge variant="secondary" className="min-w-[48px] font-mono text-xs justify-center">
         {(zoom * 100).toFixed(0)}%
-      </div>
+      </Badge>
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon-sm"
         onClick={(e) => {
           e.stopPropagation();
           onReset();
         }}
-        className="p-1.5 paragraph-color hover:text-[var(--primary-text)] transition-colors cursor-pointer"
         title="بازنشانی دید (100%)"
         aria-label="Reset View"
       >
-        <RotateCcw size={17} />
-      </button>
-    </div>
+        <RotateCcw className="size-4" />
+      </Button>
+    </Card>
   );
 }
