@@ -54,9 +54,6 @@ export default function DownloadRow() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-[var(--download)] bg-[var(--download)]/10 px-2 py-0.5 rounded">
-                        {file.category || 'سیستم‌عامل'}
-                      </span>
                       <span className="text-[10px] font-bold text-[var(--paragraph-color)] bg-[var(--muted-background)] px-2 py-0.5 rounded" dir="ltr">{fileType}</span>
                     </div>
 
