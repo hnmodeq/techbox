@@ -8,7 +8,6 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { Separator } from "@/components/ui/separator";
 
 type ModerationComment = {
@@ -119,7 +118,6 @@ export default function ModerationPage() {
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-7xl space-y-6">
-        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="Moderation / مدیریت گفتگو" titleClassName="text-[var(--admin)]" description="مدیریت دیدگاه‌ها، اسپم، مخفی‌سازی و وضعیت کاربران">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>

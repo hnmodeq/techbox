@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { moduleMeta } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
@@ -98,7 +97,6 @@ function SearchInner() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <PageBreadcrumb />
       <h1 className="mb-2 text-2xl font-extrabold tracking-tight">جستجو</h1>
       <p className="mb-6 text-sm text-muted-foreground">
         {q ? (

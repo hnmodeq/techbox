@@ -24,46 +24,47 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/providers/auth.provider"
-import { ThemeToggleButton } from "@/components/ui/theme-toggle-button"
+import { Button } from "@/components/ui/button"
 import {
   ChevronsUpDownIcon,
   UserIcon,
   ShieldIcon,
   LogOutIcon,
   LogInIcon,
+  MoonIcon,
+  SunIcon,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 
 export function TechboxNavUser() {
   const { isMobile } = useSidebar()
   const { user, logout } = useAuth()
-  const { theme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const isDark = theme === "dark"
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                size="lg"
-                className="aria-expanded:bg-muted aria-expanded:text-foreground"
-              />
-            }
-          >
-            <Avatar>
-              <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
-              <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-start text-sm leading-tight">
-              <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
-              <span className="truncate text-xs">{user?.email || "ورود به حساب"}</span>
-            </div>
-            <ChevronsUpDownIcon className="ms-auto size-4" />
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              className="aria-expanded:bg-muted aria-expanded:text-foreground cursor-pointer"
+            >
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
+                <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-start text-sm leading-tight">
+                <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
+                <span className="truncate text-xs text-muted-foreground">{user?.email || "ورود به حساب"}</span>
+              </div>
+              <ChevronsUpDownIcon className="ms-auto size-4" />
+            </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? "bottom" : "left"}
             align="end"
             sideOffset={4}
           >
@@ -71,35 +72,39 @@ export function TechboxNavUser() {
               <>
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
-                    <Avatar>
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatar} alt={user.name} />
                       <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-start text-sm leading-tight">
                       <span className="truncate font-medium">{user.name}</span>
-                      <span className="truncate text-xs">{user.email}</span>
+                      <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem render={<Link href="/account" />}>
-                    <UserIcon className="size-4" />
-                    حساب کاربری
+                  <DropdownMenuItem asChild>
+                    <Link href="/account">
+                      <UserIcon className="size-4" />
+                      حساب کاربری
+                    </Link>
                   </DropdownMenuItem>
                   {user.role === "super_admin" && (
-                    <DropdownMenuItem render={<Link href="/admin" />}>
-                      <ShieldIcon className="size-4" />
-                      پنل مدیریت
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin">
+                        <ShieldIcon className="size-4" />
+                        پنل مدیریت
+                      </Link>
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <div className="flex items-center justify-between px-2 py-1.5">
-                    <span className="text-xs text-muted-foreground">تم</span>
-                    <ThemeToggleButton theme={theme === "dark" ? "dark" : "light"} expanded={false} />
-                  </div>
+                  <DropdownMenuItem onClick={() => setTheme(isDark ? "light" : "dark")}>
+                    {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+                    {isDark ? "حالت روشن" : "حالت تاریک"}
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
@@ -110,10 +115,10 @@ export function TechboxNavUser() {
             ) : (
               <>
                 <DropdownMenuGroup>
-                  <div className="flex items-center justify-between px-2 py-1.5">
-                    <span className="text-xs text-muted-foreground">تم</span>
-                    <ThemeToggleButton theme={theme === "dark" ? "dark" : "light"} expanded={false} />
-                  </div>
+                  <DropdownMenuItem onClick={() => setTheme(isDark ? "light" : "dark")}>
+                    {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+                    {isDark ? "حالت روشن" : "حالت تاریک"}
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))}>

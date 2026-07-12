@@ -12,7 +12,6 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ModuleBadge } from "@/components/ui/module-badge";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 export const dynamic = "force-dynamic";
 
@@ -155,7 +154,6 @@ function AdminPostsInner() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
-      <PageBreadcrumb />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">مدیریت محتوا</h1>

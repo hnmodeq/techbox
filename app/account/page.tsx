@@ -14,7 +14,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/design/icons";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -216,7 +215,6 @@ export default function AccountPage() {
     return (
       <main className="max-w-xl mx-auto px-4 py-12" dir="rtl">
         <Toaster dir="rtl" />
-        <PageBreadcrumb />
         <Card className="p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-xl font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
@@ -337,7 +335,6 @@ export default function AccountPage() {
   return (
     <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
       <Toaster dir="rtl" />
-      <PageBreadcrumb />
       <PageHeader colorVar="--account" title="پروفایل و حساب کاربری" titleClassName="text-[var(--account)]">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Badge>{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>

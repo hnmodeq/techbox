@@ -10,7 +10,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 type Settings = {
   "comments.mode": string;
@@ -74,7 +73,6 @@ export default function AdminSettingsPage() {
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-4xl space-y-6">
-        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="تنظیمات سایت" titleClassName="text-[var(--admin)]" description="سیاست دیدگاه‌ها و نگهداری رزومه‌ها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>

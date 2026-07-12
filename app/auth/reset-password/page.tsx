@@ -9,7 +9,6 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 const resetSchema = z.object({
   newPassword: z.string().min(8, "حداقل ۸ کاراکتر"),
@@ -37,7 +36,6 @@ export default function ResetPasswordPage() {
   if (!token || !email) {
     return (
       <main className="max-w-md mx-auto px-4 py-20 space-y-4" dir="rtl">
-        <PageBreadcrumb />
         <Card className="p-8 space-y-4 text-center">
           <CardTitle>لینک نامعتبر</CardTitle>
           <CardDescription>لینک بازیابی رمز عبور معتبر نیست یا ناقص است. لطفاً دوباره درخواست بازیابی بدهید.</CardDescription>
@@ -72,7 +70,6 @@ export default function ResetPasswordPage() {
 
   return (
     <main className="max-w-md mx-auto px-4 py-20 space-y-6" dir="rtl">
-      <PageBreadcrumb />
       <Card className="p-6 sm:p-8 space-y-6">
         <CardHeader className="p-0 text-center">
           <CardTitle>بازیابی رمز عبور</CardTitle>

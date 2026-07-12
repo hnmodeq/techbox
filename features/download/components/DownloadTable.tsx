@@ -8,7 +8,6 @@ import { CardStats } from "@/components/ui/card-stats";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 export default function DownloadTable({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("download");
@@ -35,7 +34,6 @@ export default function DownloadTable({ serverItems }: { serverItems?: ContentIt
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <PageBreadcrumb />
       <ModuleHeader module="download" title="مرکز دانلود تکباکس" description="ISO • Firmware • Driver – لینک مستقیم داخل ایران" count={`${filtered.length.toLocaleString("fa-IR")} فایل`} />
 
       <Card className="p-4 mb-6">

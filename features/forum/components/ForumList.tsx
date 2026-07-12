@@ -14,7 +14,6 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 import { ForumBadge } from "@/components/ui/forum-badge";
@@ -164,7 +163,6 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
-      <PageBreadcrumb />
       <ModuleHeader module="forum" title="انجمن تکباکس" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={loadingTopics ? "در حال دریافت…" : `${all.length.toLocaleString("fa-IR")} موضوع`}>
         <div className="flex gap-2">
           <Input placeholder="جستجو در انجمن…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-56" />

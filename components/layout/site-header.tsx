@@ -15,11 +15,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
-import { PanelLeftIcon } from "lucide-react"
+import { PanelLeftIcon, MoonIcon, SunIcon, ClockIcon, BellIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { moduleMeta } from "@/lib/content"
 import { useTheme } from "next-themes"
-import { MoonIcon, SunIcon } from "lucide-react"
 
 type Crumb = {
   label: string
@@ -81,6 +80,37 @@ function TechboxBreadcrumb() {
   )
 }
 
+function DateTimeDisplay() {
+  const [now, setNow] = React.useState(new Date())
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const timeStr = now.toLocaleTimeString("fa-IR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+
+  const dateStr = now.toLocaleDateString("fa-IR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
+
+  return (
+    <div className="hidden md:flex items-center gap-2 text-xs text-muted-foreground">
+      <ClockIcon className="size-3.5" />
+      <span>{timeStr}</span>
+      <span className="text-muted-foreground/50">•</span>
+      <span>{dateStr}</span>
+    </div>
+  )
+}
+
 function ThemeToggle() {
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
@@ -91,6 +121,7 @@ function ThemeToggle() {
       size="icon-sm"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label="تغییر تم"
+      title={isDark ? "حالت روشن" : "حالت تاریک"}
     >
       {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
     </Button>
@@ -120,12 +151,29 @@ export function SiteHeader({ hasUnreadNews = false }: SiteHeaderProps) {
           className="me-2 data-vertical:h-4 data-vertical:self-auto"
         />
         <TechboxBreadcrumb />
-        <SearchForm className="w-full sm:ms-auto sm:w-auto" />
+        <div className="flex-1" />
+        <SearchForm className="w-full sm:w-64" />
         <Separator
           orientation="vertical"
           className="mx-1 data-vertical:h-4 data-vertical:self-auto"
         />
+        <DateTimeDisplay />
         <ThemeToggle />
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          className="relative"
+          aria-label="اعلان‌ها"
+          title="اعلان‌ها"
+        >
+          <BellIcon className="size-4" />
+          {hasUnreadNews && (
+            <span className="absolute top-1 right-1 flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
+            </span>
+          )}
+        </Button>
       </div>
     </header>
   )

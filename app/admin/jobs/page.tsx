@@ -7,7 +7,6 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 function AdminJobsInner() {
   const [user, setUser] = useState<AppUser | null>(null);
@@ -74,7 +73,6 @@ function AdminJobsInner() {
   if (!canEdit(user, "workwithus")) {
     return (
       <main className="p-10 text-center space-y-4" dir="rtl">
-        <PageBreadcrumb />
         <p className="text-destructive">شما دسترسی به مدیریت مشاغل ندارید.</p>
       </main>
     );
@@ -82,7 +80,6 @@ function AdminJobsInner() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
-      <PageBreadcrumb />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">مدیریت مشاغل (Work with us)</h1>

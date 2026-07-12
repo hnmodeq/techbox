@@ -7,7 +7,6 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 type Health = {
   summary: { posts: number; users: number; redirects: number; postsWithIssues: number; usersWithIssues: number; checkedUrls: number; brokenUrls: number };
@@ -70,7 +69,6 @@ export default function ContentHealthPage() {
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-7xl space-y-6">
-        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="سلامت محتوا" titleClassName="text-[var(--admin)]" description="بررسی کمبودهای محتوا، URLهای خراب Blob و وضعیت redirectها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>

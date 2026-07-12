@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 type RedirectRow = { id: string; sourceModule: string; sourceSlug: string; targetModule: string; targetSlug: string; reason?: string };
 
@@ -42,7 +41,6 @@ export default function RedirectsAdminPage() {
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-6xl space-y-6">
-        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="مدیریت Redirect اسلاگ‌ها" titleClassName="text-[var(--admin)]" description="برای جلوگیری از 404 بعد از حذف/تغییر اسلاگ‌ها">
           <div className="flex gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>

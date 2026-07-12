@@ -17,7 +17,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { getCurrentUserClient } from "@/lib/auth";
 import { ModuleBadge } from "@/components/ui/module-badge";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
@@ -332,7 +331,6 @@ function NewPostInner() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
       <Toaster dir="rtl" />
-      <PageBreadcrumb />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">

@@ -3,7 +3,6 @@
 import PageHeader from "@/components/effects/PageHeader";
 import { ButtonLink } from "@/components/ui/button";
 import { BlobUploadField, type BlobUploadResult } from "@/components/admin/BlobUploadField";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { useState } from "react";
 
 export default function AdminUploadPage() {
@@ -11,7 +10,6 @@ export default function AdminUploadPage() {
   return (
     <main className="min-h-dvh px-4 py-10" dir="rtl">
       <section className="mx-auto max-w-5xl space-y-6">
-        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="آپلود فایل به Vercel Blob" titleClassName="text-[var(--admin)]" description="آپلود امن برای تصاویر، ویدیوها، دانلودها و آواتارها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>

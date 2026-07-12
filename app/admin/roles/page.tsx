@@ -9,7 +9,6 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
@@ -103,7 +102,6 @@ export default function RolesPage() {
   if (loading) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
-        <PageBreadcrumb />
         <p className="text-sm text-muted-foreground">در حال بارگذاری...</p>
       </main>
     );
@@ -112,7 +110,6 @@ export default function RolesPage() {
   if (error) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-10 space-y-4" dir="rtl">
-        <PageBreadcrumb />
         <p className="text-sm text-destructive">{error}</p>
         <Button onClick={fetchRoles} size="sm">تلاش مجدد</Button>
       </main>
@@ -121,7 +118,6 @@ export default function RolesPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
-      <PageBreadcrumb />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">مدیریت نقش‌ها – RBAC</h1>

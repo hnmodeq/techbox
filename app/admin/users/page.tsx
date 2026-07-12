@@ -13,7 +13,6 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 
@@ -140,7 +139,6 @@ export default function AdminUsersPage() {
 
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
-      <PageBreadcrumb />
       <section className="mx-auto max-w-7xl space-y-6">
         <PageHeader colorVar="--admin" title="مدیریت کاربران" titleClassName="text-[var(--admin)]" description="ویرایش پروفایل، نقش، دسترسی ماژول‌ها، وضعیت حساب و مشاهده فعالیت کاربران">
           <div className="flex flex-wrap gap-2">
