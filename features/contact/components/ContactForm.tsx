@@ -1,94 +1,125 @@
 "use client";
 
 import * as React from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
 
-type Status = "idle" | "sending" | "success" | "error";
+const contactSchema = z.object({
+  name: z.string().min(2, "نام حداقل ۲ کاراکتر").max(100),
+  email: z.string().email("ایمیل نامعتبر").max(200),
+  subject: z.string().max(200).optional(),
+  message: z.string().min(5, "پیام حداقل ۵ کاراکتر").max(2000),
+});
+
+type ContactValues = z.infer<typeof contactSchema>;
 
 export default function ContactForm() {
-  const [name, setName] = React.useState("");
-  const [email, setEmail] = React.useState("");
-  const [subject, setSubject] = React.useState("");
-  const [message, setMessage] = React.useState("");
-  const [status, setStatus] = React.useState<Status>("idle");
-  const [error, setError] = React.useState("");
+  const [success, setSuccess] = React.useState(false);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("sending");
-    setError("");
+  const form = useForm<ContactValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: { name: "", email: "", subject: "", message: "" },
+  });
+
+  const onSubmit = async (values: ContactValues) => {
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify(values),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.ok) {
-        setStatus("success");
-        setName("");
-        setEmail("");
-        setSubject("");
-        setMessage("");
+        setSuccess(true);
+        toast.success("پیام شما ارسال شد");
+        form.reset();
       } else {
-        setStatus("error");
-        setError(data?.message || "ارسال با خطا مواجه شد. لطفاً دوباره تلاش کنید.");
+        toast.error(data?.message || "ارسال با خطا مواجه شد");
       }
     } catch {
-      setStatus("error");
-      setError("ارتباط با سرور برقرار نشد.");
+      toast.error("ارتباط با سرور برقرار نشد");
     }
   };
 
-  if (status === "success") {
+  if (success) {
     return (
-      <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--muted-background)] p-4 text-center text-[var(--primary-text)]">
-        پیام شما با موفقیت ارسال شد. با تشکر از همراهی شما.
-      </div>
+      <Card className="p-4 text-center">
+        <CardContent className="pt-2 text-sm">پیام شما با موفقیت ارسال شد. با تشکر از همراهی شما.</CardContent>
+      </Card>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <div className="grid md:grid-cols-2 gap-4">
-        <input
-          className="input"
-          placeholder="نام"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          minLength={2}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <div className="grid md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>نام</FormLabel>
+                <FormControl>
+                  <Input placeholder="نام شما" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>ایمیل</FormLabel>
+                <FormControl>
+                  <Input placeholder="email@example.com" type="email" dir="ltr" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>موضوع</FormLabel>
+              <FormControl>
+                <Input placeholder="موضوع پیام" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        <input
-          className="input"
-          placeholder="ایمیل"
-          type="email"
-          dir="ltr"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
+
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>پیام</FormLabel>
+              <FormControl>
+                <Textarea placeholder="پیام شما…" className="min-h-[140px]" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <input
-        className="input"
-        placeholder="موضوع"
-        value={subject}
-        onChange={(e) => setSubject(e.target.value)}
-      />
-      <textarea
-        className="input min-h-[140px]"
-        placeholder="پیام شما…"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        required
-        minLength={5}
-      />
-      {status === "error" && (
-        <p className="text-sm font-bold text-red-400">{error}</p>
-      )}
-      <Button type="submit" disabled={status === "sending"}>
-        {status === "sending" ? "در حال ارسال…" : "ارسال"}
-      </Button>
-    </form>
+
+        <Button type="submit" loading={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "در حال ارسال…" : "ارسال"}
+        </Button>
+      </form>
+    </Form>
   );
 }

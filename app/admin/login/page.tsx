@@ -1,76 +1,101 @@
 "use client";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+
+const loginSchema = z.object({
+  username: z.string().min(2, "نام کاربری حداقل ۲ کاراکتر").max(50),
+  password: z.string().min(6, "رمز حداقل ۶ کاراکتر").max(100),
+});
+
+type LoginValues = z.infer<typeof loginSchema>;
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [err, setErr] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [serverError, setServerError] = useState("");
   const router = useRouter();
 
-  const doServerAndClientLogin = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    setBusy(true);
-    setErr("");
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { username: "", password: "" },
+  });
+
+  const onSubmit = async (values: LoginValues) => {
+    setServerError("");
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), password })
+        body: JSON.stringify({ username: values.username.trim(), password: values.password }),
       });
       const data = await res.json();
       if (res.ok && data.user) {
         login(data.user);
+        toast.success("ورود موفق");
         router.push("/admin");
       } else {
-        setErr(data.message || "خطا در ورود");
+        setServerError(data.message || "خطا در ورود");
       }
     } catch {
-      setErr("خطا در برقراری ارتباط با سرور Neon");
-    } finally {
-      setBusy(false);
+      setServerError("خطا در برقراری ارتباط با سرور Neon");
     }
   };
 
   return (
     <main className="flex min-h-[70vh] items-center justify-center px-4 py-10" dir="rtl">
-      <form onSubmit={doServerAndClientLogin} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] w-full max-w-sm space-y-5 p-6">
-        <div>
-          <h1 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mb-2">ورود به پنل تکباکس</h1>
-        </div>
-
-        <div>
-          <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1 block">نام کاربری</label>
-          <input 
-            value={username} 
-            onChange={e => { setUsername(e.target.value); setErr(""); }} 
-            className="input w-full" 
-            placeholder="username" 
-            dir="ltr" 
-            required 
-          />
-        </div>
-        
-        <div>
-          <label className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1 block">رمز عبور</label>
-          <input 
-            type="password"
-            value={password} 
-            onChange={e => { setPassword(e.target.value); setErr(""); }} 
-            className="input w-full" 
-            placeholder="••••••••" 
-            dir="ltr" 
-            required 
-          />
-        </div>
-
-        {err && <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--danger)]">{err}</p>}
-        
-        <Button className="w-full" disabled={busy}>{busy ? "در حال ورود..." : "ورود"}</Button>
-      </form>
+      <Toaster dir="rtl" />
+      <Card className="w-full max-w-sm shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-lg">ورود به پنل تکباکس</CardTitle>
+          <CardDescription>برای دسترسی به مدیریت وارد شوید</CardDescription>
+        </CardHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>نام کاربری</FormLabel>
+                    <FormControl>
+                      <Input placeholder="username" dir="ltr" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>رمز عبور</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" dir="ltr" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {serverError && <p className="text-sm text-destructive">{serverError}</p>}
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" className="w-full" loading={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "در حال ورود..." : "ورود"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
     </main>
   );
 }
