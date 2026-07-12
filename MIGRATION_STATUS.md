@@ -6,9 +6,9 @@
 >
 > Remote: `https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration`
 >
-> Latest commit: `48c4d03` -> now `b5730bc` + new pushes (see git log)
+> Latest commit: `30f5115` -> b5730bc etc — now `a2ff1c5` + `34743d5` + `30f5115` (latest)
 >
-> Last updated: 2026-07-12 — Phase 3/4/5 partial (4 forms) + Phase 6 FAQ ✅ + extra primitives
+> Last updated: 2026-07-12 — Phase 3 ✅, Phase 4 ✅, Phase 5 8/12+ done (account, search, work-with-us, shop, download, posts/new major) + Phase 6 FAQ ✅, breadcrumb everywhere
 >
 > Plan source: `UI_MIGRATION_PLAN.md`
 
@@ -23,7 +23,7 @@
 | Phase 2 — Core primitives | ✅ Done | Core installed, wrappers for Button/Spinner/Badge, TooltipProvider+Toaster. |
 | Phase 3 — Layout shell | ✅ Done | Footer (Separator+ButtonLink), NewsSidebar (Button+ScrollArea+Card+Badge+Skeleton), SidebarContent (Button/Badge/Separator/ScrollArea/Tooltip/Popover/DropdownMenu/Input/Card), Chatbot (Button+Card+Input+ScrollArea+Badge), AuthModal (Dialog+Input+Checkbox+Button+Label+Separator+Card+Sonner), Sidebar primitive (sidebar.tsx + use-mobile). |
 | Phase 4 — Design-system page | ✅ Done | `/admin/design-system` with Tabs showcasing colors, typography, buttons, badges, cards, forms, overlays, navigation, data, feedback. |
-| Phase 5 — Forms & inputs audit | ✅ Partially done (4/12+) | Added Form primitive (custom base-ui compatible) + RHF + resolvers. Refactored: admin/login (Card+Form+Input+zod), contact (Form+Input+Textarea+zod), consultation-modal (Dialog+RHF+zod+Input+Textarea), timeline-event-form (Card+RHF+zod+Input+Textarea+Slider+Badge). Pattern: useForm + zodResolver + Form + FormField + FormItem + FormLabel + FormControl + FormMessage. Remaining: account (complex, 6+ inputs + avatar), work-with-us ApplyForm (file upload + Attachment placeholder), posts/new (many inputs + select), posts filters, users, settings, redirects, search, shop grid, download table, forum new topic, newsletter, etc. |
+| Phase 5 — Forms & inputs audit | ✅ Partially done (8/12+) | Form primitive custom + RHF + resolvers. Refactored: admin/login (Card+Form+Input), contact (Form+Input+Textarea), consultation-modal (Dialog+RHF), timeline-event-form (Card+RHF+Slider), search (Input+Card+Badge+Skeleton), work-with-us ApplyForm (RHF+zod+Input+Textarea+Attachment placeholder + file), account (Tabs+4x RHF: login/register/profile/password + Card+Input+Avatar), shop grid (Input+Select+Card+Badge), download table (Input+Select+Card+PageBreadcrumb), admin/posts/new major (Form+Accordion+Select+Switch+Input+Textarea+BlobUpload). Remaining: posts/page filters, users/page, roles, settings, redirects, forum new topic, newsletter, auth/reset, consultation page, etc — pattern established, use PageBreadcrumb everywhere. |
 | Phase 6 — Admin UI | ✅ Partially done | FAQ model + accordion + admin CRUD + about Q&A ✅ done. Installed accordion, breadcrumb, table, empty, progress, slider, toggle, form. Remaining: posts Data Table, users Data Table, jobs, moderation, content-health, redirects, upload, blob, roles — need Data Table (TanStack) + Chart (radial) + Calendar/DatePicker. |
 | Phase 7 — Chat / messenger | ⏳ Not started | MessageScroller + Message + Bubble + Attachment — need to install message, bubble, message-scroller, attachment, marker. |
 | Phase 8 — Public module pattern | ⏳ Not started | Blog first canonical ModuleListPage, ModuleDetailPage, ContentGrid, ContentHero, ContentMeta, ContentCard. |
