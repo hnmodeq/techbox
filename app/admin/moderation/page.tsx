@@ -6,6 +6,10 @@ import Link from "next/link";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
+import { Separator } from "@/components/ui/separator";
 
 type ModerationComment = {
   id: string;
@@ -39,6 +43,13 @@ function statusLabel(status: string) {
   return map[status] || status;
 }
 
+function statusVariant(status: string) {
+  if (status === "approved" || status === "active") return "default" as const;
+  if (status === "spam" || status === "banned") return "destructive" as const;
+  if (status === "hidden" || status === "suspended") return "secondary" as const;
+  return "outline" as const;
+}
+
 export default function ModerationPage() {
   const [tab, setTab] = useState<"comments" | "users">("comments");
   const [status, setStatus] = useState("all");
@@ -53,19 +64,26 @@ export default function ModerationPage() {
       const res = await fetch(`/api/admin/moderation/comments?status=${status}`, { cache: "no-store" });
       const data = await res.json();
       if (Array.isArray(data)) setComments(data);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, [status]);
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/moderation/users", { cache: "no-store" });
+      const res = await fetch(`/api/admin/moderation/users`, { cache: "no-store" });
       const data = await res.json();
       if (Array.isArray(data)) setUsers(data);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => { if (tab === "comments") loadComments(); else loadUsers(); }, [tab, loadComments, loadUsers]);
+  useEffect(() => {
+    if (tab === "comments") loadComments();
+    else loadUsers();
+  }, [tab, loadComments, loadUsers]);
 
   const setCommentStatus = async (id: string, nextStatus: string) => {
     setMsg("");
@@ -88,87 +106,110 @@ export default function ModerationPage() {
     loadUsers();
   };
 
-  const counts = useMemo(() => ({
-    comments: comments.length,
-    users: users.length,
-    hidden: comments.filter((c) => c.status === "hidden").length,
-    spam: comments.filter((c) => c.status === "spam").length,
-  }), [comments, users]);
+  const counts = useMemo(
+    () => ({
+      comments: comments.length,
+      users: users.length,
+      hidden: comments.filter((c) => c.status === "hidden").length,
+      spam: comments.filter((c) => c.status === "spam").length,
+    }),
+    [comments, users]
+  );
 
   return (
-    <main className="min-h-dvh px-4 py-10" dir="rtl">
+    <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-7xl space-y-6">
+        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="Moderation / مدیریت گفتگو" titleClassName="text-[var(--admin)]" description="مدیریت دیدگاه‌ها، اسپم، مخفی‌سازی و وضعیت کاربران">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
-            <Button type="button" size="sm" onClick={() => tab === "comments" ? loadComments() : loadUsers()}>به‌روزرسانی</Button>
+            <Button type="button" size="sm" onClick={() => (tab === "comments" ? loadComments() : loadUsers())}>به‌روزرسانی</Button>
           </div>
         </PageHeader>
 
         <div className="grid gap-3 sm:grid-cols-4">
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">دیدگاه‌ها</div><b>{counts.comments.toLocaleString("fa-IR")}</b></div>
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">کاربران</div><b>{counts.users.toLocaleString("fa-IR")}</b></div>
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">مخفی</div><b>{counts.hidden.toLocaleString("fa-IR")}</b></div>
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">اسپم</div><b>{counts.spam.toLocaleString("fa-IR")}</b></div>
+          <Card className="p-4"><div className="text-xs text-muted-foreground">دیدگاه‌ها</div><div className="font-bold text-lg">{counts.comments.toLocaleString("fa-IR")}</div></Card>
+          <Card className="p-4"><div className="text-xs text-muted-foreground">کاربران</div><div className="font-bold text-lg">{counts.users.toLocaleString("fa-IR")}</div></Card>
+          <Card className="p-4"><div className="text-xs text-muted-foreground">مخفی</div><div className="font-bold text-lg">{counts.hidden.toLocaleString("fa-IR")}</div></Card>
+          <Card className="p-4"><div className="text-xs text-muted-foreground">اسپم</div><div className="font-bold text-lg">{counts.spam.toLocaleString("fa-IR")}</div></Card>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant={tab === "comments" ? "primary" : "ghost"} onClick={() => setTab("comments")}>دیدگاه‌ها</Button>
-          <Button type="button" variant={tab === "users" ? "primary" : "ghost"} onClick={() => setTab("users")}>کاربران</Button>
-          {tab === "comments" && commentStatuses.map((s) => <Button key={s} type="button" size="xs" variant={status === s ? "primary" : "ghost"} onClick={() => setStatus(s)}>{s === "all" ? "همه" : statusLabel(s)}</Button>)}
-        </div>
+        <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+          <TabsList>
+            <TabsTrigger value="comments">دیدگاه‌ها</TabsTrigger>
+            <TabsTrigger value="users">کاربران</TabsTrigger>
+          </TabsList>
 
-        {msg && <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] p-3 paragraph-color">{msg}</div>}
-        {loading && <div className="paragraph-color">در حال دریافت…</div>}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {tab === "comments" &&
+              commentStatuses.map((s) => (
+                <Button key={s} type="button" size="xs" variant={status === s ? "secondary" : "ghost"} onClick={() => setStatus(s)}>
+                  {s === "all" ? "همه" : statusLabel(s)}
+                </Button>
+              ))}
+          </div>
 
-        {tab === "comments" && (
-          <div className="space-y-3">
+          {msg && <Card className="p-3 text-sm text-muted-foreground mt-4">{msg}</Card>}
+          {loading && <div className="text-sm text-muted-foreground mt-4">در حال دریافت…</div>}
+
+          <TabsContent value="comments" className="space-y-3 mt-4">
             {comments.map((comment) => (
-              <article key={comment.id} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4 shadow-[var(--shadow-size)]">
+              <Card key={comment.id} className="p-4 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
                     {comment.author?.avatar && <Image src={comment.author.avatar} width={40} height={40} alt={comment.authorName} className="h-10 w-10 rounded-full object-cover" />}
                     <div>
-                      <div className="font-bold text-[var(--primary-text)]">{comment.author?.name || comment.authorName}</div>
-                      <div className="font-mono text-xs paragraph-color" dir="ltr">@{comment.author?.username || "guest"}</div>
+                      <div className="font-bold text-sm">{comment.author?.name || comment.authorName}</div>
+                      <div className="font-mono text-xs text-muted-foreground" dir="ltr">@{comment.author?.username || "guest"}</div>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={comment.status === "approved" ? "success" : comment.status === "spam" ? "danger" : "warning"}>{statusLabel(comment.status)}</Badge>
-                    <span className="text-xs paragraph-color">{new Date(comment.createdAt).toLocaleString("fa-IR")}</span>
+                    <Badge variant={statusVariant(comment.status)}>{statusLabel(comment.status)}</Badge>
+                    <span className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleString("fa-IR")}</span>
                   </div>
                 </div>
-                <p className="mt-3 whitespace-pre-wrap paragraph-color">{comment.text}</p>
-                <div className="mt-3 text-xs paragraph-color">
-                  روی <Link href={`/${comment.post.module}/${comment.post.slug}`} target="_blank" className="text-[var(--admin)] hover:underline">{comment.post.title}</Link>
+                <p className="whitespace-pre-wrap text-sm text-muted-foreground">{comment.text}</p>
+                <div className="text-xs text-muted-foreground">
+                  روی{" "}
+                  <Link href={`/${comment.post.module}/${comment.post.slug}`} target="_blank" className="text-primary hover:underline">
+                    {comment.post.title}
+                  </Link>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {(["approved", "pending", "hidden", "spam"] as const).map((s) => <Button key={s} size="xs" variant={comment.status === s ? "primary" : "ghost"} onClick={() => setCommentStatus(comment.id, s)}>{statusLabel(s)}</Button>)}
-                  <Button size="xs" variant="ghost" onClick={() => deleteComment(comment.id)}>حذف</Button>
+                <Separator />
+                <div className="flex flex-wrap gap-2">
+                  {(["approved", "pending", "hidden", "spam"] as const).map((s) => (
+                    <Button key={s} size="xs" variant={comment.status === s ? "secondary" : "ghost"} onClick={() => setCommentStatus(comment.id, s)}>{statusLabel(s)}</Button>
+                  ))}
+                  <Button size="xs" variant="ghost" onClick={() => deleteComment(comment.id)} className="text-destructive hover:text-destructive">حذف</Button>
                 </div>
-              </article>
+              </Card>
             ))}
-            {!comments.length && !loading && <div className="paragraph-color p-6">دیدگاهی برای این فیلتر وجود ندارد.</div>}
-          </div>
-        )}
+            {!comments.length && !loading && <Card className="p-6 text-center text-sm text-muted-foreground">دیدگاهی برای این فیلتر وجود ندارد.</Card>}
+          </TabsContent>
 
-        {tab === "users" && (
-          <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] overflow-hidden">
-            {users.map((user) => (
-              <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-color)]/30 p-4 last:border-0">
-                <div className="flex items-center gap-3">
-                  {user.avatar && <Image src={user.avatar} width={42} height={42} alt={user.name} className="h-10 w-10 rounded-full object-cover" />}
-                  <div><div className="font-bold text-[var(--primary-text)]">{user.name}</div><div className="font-mono text-xs paragraph-color" dir="ltr">@{user.username}</div></div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={user.status === "active" ? "success" : user.status === "banned" ? "danger" : "warning"}>{statusLabel(user.status)}</Badge>
-                  <span className="text-xs paragraph-color">{user._count.posts} posts • {user._count.comments} comments • {user._count.ratings} ratings</span>
-                  {userStatuses.map((s) => <Button key={s} size="xs" variant={user.status === s ? "primary" : "ghost"} onClick={() => setUserStatus(user.id, s)}>{statusLabel(s)}</Button>)}
-                </div>
+          <TabsContent value="users" className="mt-4">
+            <Card className="p-0 overflow-hidden">
+              <div className="divide-y divide-border/30">
+                {users.map((user) => (
+                  <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                    <div className="flex items-center gap-3">
+                      {user.avatar && <Image src={user.avatar} width={42} height={42} alt={user.name} className="h-10 w-10 rounded-full object-cover" />}
+                      <div><div className="font-bold text-sm">{user.name}</div><div className="font-mono text-xs text-muted-foreground" dir="ltr">@{user.username}</div></div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant={statusVariant(user.status)}>{statusLabel(user.status)}</Badge>
+                      <span className="text-xs text-muted-foreground">{user._count.posts} posts • {user._count.comments} comments • {user._count.ratings} ratings</span>
+                      {userStatuses.map((s) => (
+                        <Button key={s} size="xs" variant={user.status === s ? "secondary" : "ghost"} onClick={() => setUserStatus(user.id, s)}>{statusLabel(s)}</Button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {!users.length && !loading && <div className="p-6 text-center text-sm text-muted-foreground">کاربری یافت نشد.</div>}
               </div>
-            ))}
-          </div>
-        )}
+            </Card>
+          </TabsContent>
+        </Tabs>
       </section>
     </main>
   );
