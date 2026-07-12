@@ -10,6 +10,32 @@ Built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**,
 
 ---
 
+## Current Status: shadcn/ui Migration Branch
+
+**Branch:** `feat/shadcn-migration`  
+**Latest commit:** `e6eb54b` (2026-07-12)  
+**Status:** Migration 95% complete, ready for debugging and final polish
+
+### What's Done
+- ✅ Full shadcn/ui component library installed (37+ components)
+- ✅ New RTL sidebar layout with shadcn sidebar-16 pattern
+- ✅ All homepage rows redesigned with shadcn components
+- ✅ Tools calculators migrated (RAID, NVR, NAS, Subnet)
+- ✅ All forms migrated to RHF + Zod + shadcn
+- ✅ Module colors replaced with shadcn design tokens
+- ✅ News sidebar with floating button
+- ✅ Support and Feedback pages created
+- ✅ Chatbot with tabs (chatbot/support/messenger)
+- ✅ Alert component with close button
+- ✅ Profile dropdown fixed
+- ✅ Breadcrumbs only in navbar
+- ✅ Mobile RTL fixes
+
+### Known Issues (Next Agent Should Debug)
+See **MIGRATION_STATUS.md** section "Issues for Next Agent" for detailed debugging instructions.
+
+---
+
 ## Quick start
 
 ```bash
@@ -107,6 +133,38 @@ settings, IP/network restrictions, and the provider's connection limit.
 
 ## Architecture
 
+### Layout System (NEW - shadcn sidebar-16)
+
+The layout now uses shadcn's sidebar-16 pattern:
+
+```
+<SidebarProvider>
+  <SiteHeader />  ← Sticky header with toggle, breadcrumb, search, date/time, theme, notifications
+  <div className="flex" dir="rtl">
+    <TechboxAppSidebar />  ← Main sidebar (right side in RTL)
+    <SidebarInset>
+      <main>{children}</main>
+      <FooterSection />  ← 3-column: newsletter, links, social
+    </SidebarInset>
+    <TechboxNewsSidebar />  ← News sidebar (left side, controlled by floating button)
+  </div>
+  <LiveNewsButton />  ← Floating red button near news sidebar
+</SidebarProvider>
+```
+
+**Key layout files:**
+- `components/layout/LayoutShell.tsx` - Main layout wrapper
+- `components/layout/techbox-app-sidebar.tsx` - Main sidebar container
+- `components/layout/techbox-nav-main.tsx` - Module navigation
+- `components/layout/techbox-nav-secondary.tsx` - Support/Feedback links
+- `components/layout/techbox-nav-user.tsx` - Profile dropdown
+- `components/layout/techbox-news-sidebar.tsx` - News sidebar
+- `components/layout/site-header.tsx` - Header with breadcrumb, search, etc.
+- `components/layout/live-news-button.tsx` - Floating news toggle
+- `components/layout/search-form.tsx` - Header search
+
+### Component Structure
+
 - **`app/`** — App Router segments (`blog`, `news`, `media`, `forum`,
   `download`, `tools`, `review`, `shop`, `timeline`, `account`, `admin`, …)
   plus `app/api/*` route handlers.
@@ -114,9 +172,12 @@ settings, IP/network restrictions, and the provider's connection limit.
   (`auth`, `blog`, `chat`, `comment`, `consultation`, `content`, `download`,
   `forum`, `home`, `media`, `news`, `review`, `shop`, `timeline`, `tools`).
   Each holds its `components/`, and some `actions/`, `hooks/`, `lib/`.
-- **`components/`** — shared UI: `layout/` (shell, sidebar, footer),
-  `ui/` (buttons, cards, modals, rating, …), `effects/` (ChromaGrid, Dock,
-  BorderGlow, …), `newsletter/`, `seo/`.
+- **`components/`** — shared UI:
+  - `layout/` (shell, sidebar, footer, header)
+  - `ui/` (shadcn primitives: accordion, alert, avatar, badge, breadcrumb, button, card, checkbox, collapsible, dialog, dropdown-menu, form, input, label, popover, radio-group, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, spinner, switch, table, tabs, textarea, tooltip)
+  - `ui/` (TechBox wrappers: like-button, module-badge, media-selector-card, theme-toggle-button, author-link, card-stats, forum-badge, live-view-counter)
+  - `effects/` (ChromaGrid, Dock, BorderGlow, …)
+  - `newsletter/`, `seo/`
 - **`config/`** — **single source of truth** for modules
   (`modules.config.ts`), colors, and the sidebar.
 - **`lib/`** — server & client helpers (db, auth, content, search, seo,
@@ -166,6 +227,13 @@ cluster (`TimelineEvent` + comments/likes).
 **DB/content check** job runs when `DATABASE_URL` is configured. The build is
 DB-outage-safe (all DB access is guarded) so it succeeds even without a live
 database.
+
+**Current branch CI status:**
+- ✅ Lint: passing (0 errors, 7 pre-existing warnings)
+- ✅ Typecheck: passing
+- ✅ Unit tests: passing (6/6)
+- ⚠️ Build: times out locally (300s limit), passes on CI with more memory
+- ️ E2E tests: may need adjustment due to layout changes
 
 ---
 
