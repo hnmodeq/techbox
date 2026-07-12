@@ -1,38 +1,73 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/design/icons";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
+
+const loginSchema = z.object({
+  username: z.string().min(2),
+  password: z.string().min(6),
+});
+
+const registerSchema = z.object({
+  name: z.string().min(2, "نام حداقل ۲").max(100),
+  username: z.string().min(3).max(30),
+  email: z.string().email(),
+  password: z.string().min(8, "حداقل ۸ کاراکتر"),
+});
+
+const profileSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  job: z.string().max(100).optional(),
+  birthday: z.string().max(20).optional(),
+});
+
+const passwordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(5, "حداقل ۵"),
+});
 
 export default function AccountPage() {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Auth form state (if not logged in)
   const [tab, setTab] = useState<"login" | "register">("login");
-  const [loginUsername, setLoginUsername] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [regName, setRegName] = useState("");
-  const [regUsername, setRegUsername] = useState("");
-  const [regEmail, setRegEmail] = useState("");
-  const [regPassword, setRegPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
-
-  // Profile form state (if logged in)
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [job, setJob] = useState("");
-  const [birthday, setBirthday] = useState("");
   const [avatar, setAvatar] = useState<string>("");
   const [saveStatus, setSaveStatus] = useState<{ ok: boolean; msg: string } | null>(null);
-
-  // Password change state
-  const [curPassword, setCurPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [pwdStatus, setPwdStatus] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const loginForm = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { username: "", password: "" },
+  });
+  const registerForm = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: "", username: "", email: "", password: "" },
+  });
+  const profileForm = useForm<z.infer<typeof profileSchema>>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { name: "", email: "", job: "", birthday: "" },
+  });
+  const passwordForm = useForm<z.infer<typeof passwordSchema>>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { currentPassword: "", newPassword: "" },
+  });
 
   const loadUser = async () => {
     setLoading(true);
@@ -42,11 +77,13 @@ export default function AccountPage() {
         const data = await res.json();
         if (data.user) {
           setUser(data.user);
-          setName(data.user.name || "");
-          setEmail(data.user.email || "");
-          setJob(data.user.job || "");
-          setBirthday(data.user.birthday || "");
           setAvatar(data.user.avatar ?? "");
+          profileForm.reset({
+            name: data.user.name || "",
+            email: data.user.email || "",
+            job: data.user.job || "",
+            birthday: data.user.birthday || "",
+          });
           localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
           setLoading(false);
           return;
@@ -62,53 +99,47 @@ export default function AccountPage() {
     loadUser();
   }, []);
 
-  const handleLogin = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!loginUsername.trim()) return;
+  const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setAuthBusy(true);
     setAuthError("");
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: loginUsername.trim(), password: loginPassword })
+        body: JSON.stringify({ username: values.username.trim(), password: values.password }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         await loadUser();
+        toast.success("ورود موفق");
       } else {
         setAuthError(data.message || data.error || "خطا در ورود");
       }
     } catch {
-      setAuthError("خطا در برقراری ارتباط با سرور Neon");
+      setAuthError("خطا در ارتباط با سرور Neon");
     } finally {
       setAuthBusy(false);
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async (values: z.infer<typeof registerSchema>) => {
     setAuthBusy(true);
     setAuthError("");
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: regName.trim(),
-          username: regUsername.trim(),
-          email: regEmail.trim(),
-          password: regPassword
-        })
+        body: JSON.stringify(values),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         await loadUser();
+        toast.success("ثبت‌نام موفق");
       } else {
         setAuthError(data.error || "خطا در ثبت‌نام");
       }
     } catch {
-      setAuthError("خطا در برقراری ارتباط با سرور Neon");
+      setAuthError("خطا در ارتباط با سرور Neon");
     } finally {
       setAuthBusy(false);
     }
@@ -122,47 +153,46 @@ export default function AccountPage() {
     r.readAsDataURL(f);
   };
 
-  const saveProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const saveProfile = async (values: z.infer<typeof profileSchema>) => {
     setSaveStatus(null);
     try {
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, job, birthday, avatar })
+        body: JSON.stringify({ ...values, avatar }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         setUser(data.user);
         localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
-        setSaveStatus({ ok: true, msg: "پروفایل با موفقیت در پایگاه داده Neon ذخیره شد ✓" });
+        setSaveStatus({ ok: true, msg: "پروفایل ذخیره شد ✓" });
+        toast.success("پروفایل ذخیره شد");
       } else {
-        setSaveStatus({ ok: false, msg: data.error || "خطا در ذخیره پروفایل" });
+        setSaveStatus({ ok: false, msg: data.error || "خطا در ذخیره" });
       }
     } catch {
-      setSaveStatus({ ok: false, msg: "خطا در اتصال به سرور" });
+      setSaveStatus({ ok: false, msg: "خطا در اتصال" });
     }
   };
 
-  const changePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const changePassword = async (values: z.infer<typeof passwordSchema>) => {
     setPwdStatus(null);
     try {
       const res = await fetch("/api/auth/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentPassword: curPassword, newPassword })
+        body: JSON.stringify({ currentPassword: values.currentPassword, newPassword: values.newPassword }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         setPwdStatus({ ok: true, msg: data.message });
-        setCurPassword("");
-        setNewPassword("");
+        passwordForm.reset();
+        toast.success("رمز عبور تغییر کرد");
       } else {
-        setPwdStatus({ ok: false, msg: data.error || "خطا در تغییر رمز عبور" });
+        setPwdStatus({ ok: false, msg: data.error || "خطا" });
       }
     } catch {
-      setPwdStatus({ ok: false, msg: "خطا در اتصال به سرور" });
+      setPwdStatus({ ok: false, msg: "خطا در اتصال" });
     }
   };
 
@@ -175,9 +205,9 @@ export default function AccountPage() {
   if (loading) {
     return (
       <main className="max-w-md mx-auto px-5 py-20 text-center" dir="rtl">
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-8 space-y-4 animate-pulse">
-          <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">در حال بررسی اطلاعات حساب در Neon...</p>
-        </div>
+        <Card className="p-8 animate-pulse">
+          <p className="text-sm text-muted-foreground">در حال بررسی اطلاعات حساب در Neon...</p>
+        </Card>
       </main>
     );
   }
@@ -185,239 +215,276 @@ export default function AccountPage() {
   if (!user) {
     return (
       <main className="max-w-xl mx-auto px-4 py-12" dir="rtl">
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 space-y-6">
+        <Toaster dir="rtl" />
+        <PageBreadcrumb />
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
-            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              برای ثبت دیدگاه، پسندیدن مطالب (لایک) و مدیریت پروفایل وارد حساب خود شوید.
-            </p>
+            <h1 className="text-xl font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
+            <p className="text-sm text-muted-foreground">برای ثبت دیدگاه، لایک و مدیریت پروفایل وارد شوید.</p>
           </div>
 
-          <div className="flex rounded-[var(--corner-radius)] bg-[var(--card-background)] p-1">
-            <button
-              type="button"
-              onClick={() => { setTab("login"); setAuthError(""); }}
-              className={`flex-1 py-2 text-center rounded-[var(--corner-radius)] transition-colors text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${tab === "login" ? "bg-[var(--home)] text-white shadow-[var(--shadow-size)]" : "paragraph-color hover:text-[var(--primary-text)]"}`}
-            >
-              ورود به حساب
-            </button>
-            <button
-              type="button"
-              onClick={() => { setTab("register"); setAuthError(""); }}
-              className={`flex-1 py-2 text-center rounded-[var(--corner-radius)] transition-colors text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${tab === "register" ? "bg-[var(--home)] text-white shadow-[var(--shadow-size)]" : "paragraph-color hover:text-[var(--primary-text)]"}`}
-            >
-              ثبت‌نام جدید
-            </button>
-          </div>
+          <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+            <TabsList className="w-full grid grid-cols-2">
+              <TabsTrigger value="login">ورود</TabsTrigger>
+              <TabsTrigger value="register">ثبت‌نام</TabsTrigger>
+            </TabsList>
 
-          {authError && (
-            <div className="rounded-[var(--corner-radius)] bg-[var(--danger)]/10 border-[length:var(--border-size)] border-[var(--danger)]/30 p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--danger)]">
-              {authError}
-            </div>
-          )}
+            {authError && <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3 text-center text-sm text-destructive">{authError}</div>}
 
-          {tab === "login" ? (
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">نام کاربری</label>
-                <input
-                  required
-                  value={loginUsername}
-                  onChange={e => { setLoginUsername(e.target.value); setAuthError(""); }}
-                  placeholder="مثلا: admin یا sara یا nima"
-                  className="input w-full"
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">رمز عبور</label>
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={e => { setLoginPassword(e.target.value); setAuthError(""); }}
-                  placeholder="رمز عبور خود را وارد کنید"
-                  className="input w-full"
-                  dir="ltr"
-                />
-              </div>
-              <Button disabled={authBusy} className="w-full justify-center">
-                {authBusy ? "در حال ورود..." : "ورود به حساب تکباکس"}
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div>
-                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">نام و نام خانوادگی</label>
-                <input
-                  required
-                  value={regName}
-                  onChange={e => { setRegName(e.target.value); setAuthError(""); }}
-                  placeholder="مثلا: علیرضا محمدی"
-                  className="input w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">نام کاربری انگلیسی</label>
-                <input
-                  required
-                  value={regUsername}
-                  onChange={e => { setRegUsername(e.target.value); setAuthError(""); }}
-                  placeholder="alireza_m"
-                  className="input w-full"
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">ایمیل معتبر</label>
-                <input
-                  required
-                  type="email"
-                  value={regEmail}
-                  onChange={e => { setRegEmail(e.target.value); setAuthError(""); }}
-                  placeholder="alireza@example.com"
-                  className="input w-full"
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1">رمز عبور انتخابی</label>
-                <input
-                  required
-                  type="password"
-                  minLength={8}
-                  value={regPassword}
-                  onChange={e => { setRegPassword(e.target.value); setAuthError(""); }}
-                  placeholder="حداقل ۸ کاراکتر"
-                  className="input w-full"
-                  dir="ltr"
-                />
-              </div>
-              <Button disabled={authBusy} className="w-full justify-center">
-                {authBusy ? "در حال ثبت‌نام در Neon..." : "ایجاد حساب کاربری جدید"}
-              </Button>
-            </form>
-          )}
-        </div>
+            <TabsContent value="login" className="space-y-4 pt-4">
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>نام کاربری</FormLabel>
+                        <FormControl>
+                          <Input placeholder="مثلا admin" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>رمز عبور</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="رمز عبور" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
+                    ورود
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+
+            <TabsContent value="register" className="space-y-4 pt-4">
+              <Form {...registerForm}>
+                <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+                  <FormField
+                    control={registerForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>نام و نام خانوادگی</FormLabel>
+                        <FormControl>
+                          <Input placeholder="علیرضا محمدی" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>نام کاربری انگلیسی</FormLabel>
+                        <FormControl>
+                          <Input placeholder="alireza_m" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ایمیل</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="alireza@example.com" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={registerForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>رمز عبور</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="حداقل ۸ کاراکتر" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
+                    ایجاد حساب
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+          </Tabs>
+        </Card>
       </main>
     );
   }
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
-      <PageHeader
-        colorVar="--account"
-        title="پروفایل و حساب کاربری واقعی"
-        titleClassName="text-[var(--account)]"
-      >
-        <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-          <Badge variant="info">{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>
+      <Toaster dir="rtl" />
+      <PageBreadcrumb />
+      <PageHeader colorVar="--account" title="پروفایل و حساب کاربری" titleClassName="text-[var(--account)]">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Badge>{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>
           <span>•</span>
-          <span>شناسه Neon: <span className="font-mono text-xs">{user.id}</span></span>
+          <span className="font-mono text-xs">Neon: {user.id.slice(0, 8)}…</span>
         </div>
       </PageHeader>
 
-      <form onSubmit={saveProfile} className="grid lg:grid-cols-3 gap-6 mt-6">
-        {/* avatar card */}
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-4 h-fit">
+      <div className="grid lg:grid-cols-3 gap-6 mt-6">
+        <Card className="p-6 text-center space-y-4 h-fit">
           <div className="relative w-32 h-32 mx-auto">
             {avatar && avatar !== "/assets/hooman.png" ? (
-              <Image
-                src={avatar}
-                width={128}
-                height={128}
-                className="h-32 w-32 rounded-[var(--corner-radius)] object-cover ring-2 ring-[var(--border-color)] shadow-[var(--shadow-size)]"
-                alt={user?.name || "کاربر"}
-              />
+              <Image src={avatar} width={128} height={128} className="h-32 w-32 rounded-xl object-cover ring-2 ring-border shadow" alt={user?.name || "کاربر"} />
             ) : (
-              <div className="h-32 w-32 rounded-[var(--corner-radius)] bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] flex items-center justify-center paragraph-color shadow-[var(--shadow-size)]">
+              <div className="h-32 w-32 rounded-xl bg-muted border flex items-center justify-center text-muted-foreground">
                 <Icon name="user" size={48} />
               </div>
             )}
-            <label className="absolute bottom-1 left-1 cursor-pointer rounded-[var(--corner-radius)] bg-[var(--home)] px-2.5 py-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-white shadow-[var(--shadow-size)] hover:opacity-90">
+            <label className="absolute bottom-1 left-1 cursor-pointer rounded-md bg-primary text-primary-foreground px-2.5 py-1 text-xs shadow hover:opacity-90">
               تغییر تصویر
               <input type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </label>
           </div>
           <div>
-            <div className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold ">{name}</div>
-            <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-mono" dir="ltr">@{user.username}</div>
+            <div className="font-bold">{profileForm.watch("name") || user.name}</div>
+            <div className="font-mono text-xs text-muted-foreground" dir="ltr">
+              @{user.username}
+            </div>
           </div>
-          {job && <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] rounded-[var(--corner-radius)] bg-[var(--card-background)] py-1.5 px-3">{job}</div>}
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-full text-[var(--danger)] hover:bg-[var(--danger)]/10 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] mt-4"
-          >
-            خروج از حساب کاربری
+          <Button type="button" variant="ghost" onClick={handleLogout} className="w-full text-destructive hover:bg-destructive/10">
+            خروج از حساب
           </Button>
-        </div>
+        </Card>
 
-        {/* profile form */}
-        <div className="lg:col-span-2 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 space-y-6">
-          {saveStatus && (
-            <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${saveStatus.ok ? "bg-[var(--success)]/15 text-[var(--success)] border-[length:var(--border-size)] border-[var(--success)]/30" : "bg-[var(--danger)]/15 text-[var(--danger)] border-[length:var(--border-size)] border-[var(--danger)]/30"}`}>
-              {saveStatus.msg}
-            </div>
-          )}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="p-6">
+            <CardHeader className="px-0 pt-0">
+              <CardTitle className="text-base">ویرایش پروفایل</CardTitle>
+            </CardHeader>
+            {saveStatus && (
+              <div className={`rounded-md p-3 text-center text-sm mb-4 ${saveStatus.ok ? "bg-green-500/15 text-green-600 border border-green-500/30" : "bg-destructive/15 text-destructive border border-destructive/30"}`}>
+                {saveStatus.msg}
+              </div>
+            )}
+            <Form {...profileForm}>
+              <form onSubmit={profileForm.handleSubmit(saveProfile)} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={profileForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>نام و نام خانوادگی</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="space-y-2">
+                    <FormLabel>نام کاربری (غیرقابل تغییر)</FormLabel>
+                    <Input value={user.username} disabled dir="ltr" className="opacity-70" />
+                  </div>
+                  <FormField
+                    control={profileForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ایمیل</FormLabel>
+                        <FormControl>
+                          <Input type="email" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={profileForm.control}
+                    name="job"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>سمت شغلی</FormLabel>
+                        <FormControl>
+                          <Input placeholder="مثلا کارشناس زیرساخت" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button type="submit" loading={profileForm.formState.isSubmitting}>
+                    ذخیره
+                  </Button>
+                </div>
+              </form>
+            </Form>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">نام و نام خانوادگی</label>
-              <input value={name} onChange={e => setName(e.target.value)} className="input w-full" />
-            </div>
-            <div>
-              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">نام کاربری (غیرقابل تغییر)</label>
-              <input value={user.username} disabled className="input w-full bg-[var(--card-background)] opacity-70 cursor-not-allowed" dir="ltr" />
-            </div>
-            <div>
-              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">ایمیل</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input w-full" dir="ltr" />
-            </div>
-            <div>
-              <label className="block text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-1.5">سمت شغلی یا تخصص</label>
-              <input value={job} onChange={e => setJob(e.target.value)} placeholder="مثلا: کارشناس زیرساخت شبکه" className="input w-full" />
-            </div>
-          </div>
+            <Separator className="my-6" />
 
-          <div className="flex justify-end pt-2">
-            <Button type="submit">ذخیره</Button>
-          </div>
-
-          {/* password section */}
-          <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-6 space-y-4">
-            <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold ">تغییر رمز عبور واقعی</h4>
+            <h4 className="font-semibold mb-4">تغییر رمز عبور</h4>
             {pwdStatus && (
-              <div className={`rounded-[var(--corner-radius)] p-3 text-center text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] ${pwdStatus.ok ? "bg-[var(--success)]/15 text-[var(--success)]" : "bg-[var(--danger)]/15 text-[var(--danger)]"}`}>
+              <div className={`rounded-md p-3 text-center text-sm mb-4 ${pwdStatus.ok ? "bg-green-500/15 text-green-600" : "bg-destructive/15 text-destructive"}`}>
                 {pwdStatus.msg}
               </div>
             )}
-            <div className="grid sm:grid-cols-2 gap-3">
-              <input
-                type="password"
-                placeholder="رمز عبور فعلی"
-                value={curPassword}
-                onChange={e => setCurPassword(e.target.value)}
-                className="input"
-                dir="ltr"
-              />
-              <input
-                type="password"
-                placeholder="رمز عبور جدید (حداقل ۵ حرف)"
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-                className="input"
-                dir="ltr"
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button type="button" variant="secondary" size="sm" onClick={changePassword}>
-                به‌روزرسانی رمز عبور
-              </Button>
-            </div>
-          </div>
+            <Form {...passwordForm}>
+              <form onSubmit={passwordForm.handleSubmit(changePassword)} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <FormField
+                    control={passwordForm.control}
+                    name="currentPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>رمز فعلی</FormLabel>
+                        <FormControl>
+                          <Input type="password" dir="ltr" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={passwordForm.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>رمز جدید</FormLabel>
+                        <FormControl>
+                          <Input type="password" dir="ltr" placeholder="حداقل ۵ حرف" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <Button type="submit" variant="secondary" size="sm" loading={passwordForm.formState.isSubmitting}>
+                    به‌روزرسانی رمز
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </Card>
         </div>
-      </form>
+      </div>
     </main>
   );
 }
