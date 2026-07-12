@@ -5,6 +5,9 @@ import Link from "next/link";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 
 type Health = {
   summary: { posts: number; users: number; redirects: number; postsWithIssues: number; usersWithIssues: number; checkedUrls: number; brokenUrls: number };
@@ -29,7 +32,9 @@ const issueLabels: Record<string, string> = {
   missing_name: "نام ندارد",
 };
 
-function labelIssue(issue: string) { return issueLabels[issue] || issue; }
+function labelIssue(issue: string) {
+  return issueLabels[issue] || issue;
+}
 
 export default function ContentHealthPage() {
   const [data, setData] = useState<Health | null>(null);
@@ -54,15 +59,18 @@ export default function ContentHealthPage() {
     }
   };
 
-  useEffect(() => { load(false); }, []);
+  useEffect(() => {
+    load(false);
+  }, []);
 
   const postsWithIssues = useMemo(() => data?.postIssues.filter((p) => p.issues.length) ?? [], [data]);
   const usersWithIssues = useMemo(() => data?.userIssues.filter((u) => u.issues.length) ?? [], [data]);
   const brokenUrls = useMemo(() => data?.urlStatuses.filter((u) => !u.ok) ?? [], [data]);
 
   return (
-    <main className="min-h-dvh px-4 py-10" dir="rtl">
+    <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-7xl space-y-6">
+        <PageBreadcrumb />
         <PageHeader colorVar="--admin" title="سلامت محتوا" titleClassName="text-[var(--admin)]" description="بررسی کمبودهای محتوا، URLهای خراب Blob و وضعیت redirectها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
@@ -72,8 +80,8 @@ export default function ContentHealthPage() {
           </div>
         </PageHeader>
 
-        {error && <div className="rounded-[var(--corner-radius)] border border-[var(--danger)]/40 p-4 text-[var(--danger)]">{error}</div>}
-        {loading && <div className="paragraph-color p-6">در حال دریافت گزارش…</div>}
+        {error && <Card className="p-4 border-destructive/40 text-destructive text-sm">{error}</Card>}
+        {loading && <Card className="p-6 text-sm text-muted-foreground">در حال دریافت گزارش…</Card>}
 
         {data && (
           <>
@@ -86,47 +94,92 @@ export default function ContentHealthPage() {
                 ["کاربر ناقص", data.summary.usersWithIssues],
                 ["URL خراب", data.summary.brokenUrls],
               ].map(([label, value]) => (
-                <div key={label as string} className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4">
-                  <div className="paragraph-color text-xs">{label}</div>
-                  <div className="mt-1 text-xl font-black text-[var(--primary-text)]">{Number(value).toLocaleString("fa-IR")}</div>
-                </div>
+                <Card key={label as string} className="p-4"><div className="text-xs text-muted-foreground">{label}</div><div className="mt-1 text-xl font-black">{Number(value).toLocaleString("fa-IR")}</div></Card>
               ))}
             </div>
 
-            <section className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] overflow-hidden">
-              <div className="border-b-[length:var(--border-size)] border-[var(--border-color)] p-4 font-bold">محتواهای دارای مسئله</div>
-              {postsWithIssues.length ? postsWithIssues.map((p) => (
-                <div key={p.id} className="border-b border-[var(--border-color)]/30 p-4 last:border-0">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <Link href={`/${p.module}/${p.slug}`} className="font-bold text-[var(--primary-text)] hover:text-[var(--admin)]">{p.title}</Link>
-                    <span className="font-mono text-xs paragraph-color" dir="ltr">/{p.module}/{p.slug}</span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">{p.issues.map((issue) => <Badge key={issue} variant="warning">{labelIssue(issue)}</Badge>)}</div>
-                </div>
-              )) : <div className="p-4 paragraph-color">مشکلی در محتواها پیدا نشد.</div>}
-            </section>
+            <Card className="p-0 overflow-hidden">
+              <CardHeader className="border-b p-4"><CardTitle className="text-base">محتواهای دارای مسئله</CardTitle></CardHeader>
+              <CardContent className="p-0">
+                {postsWithIssues.length ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">عنوان</TableHead>
+                        <TableHead className="text-right">مسیر</TableHead>
+                        <TableHead className="text-right">مشکلات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {postsWithIssues.map((p) => (
+                        <TableRow key={p.id}>
+                          <TableCell><Link href={`/${p.module}/${p.slug}`} className="font-bold hover:text-primary text-sm">{p.title}</Link></TableCell>
+                          <TableCell className="font-mono text-xs" dir="ltr">/{p.module}/{p.slug}</TableCell>
+                          <TableCell><div className="flex flex-wrap gap-1">{p.issues.map((issue) => <Badge key={issue} variant="secondary" className="text-[10px]">{labelIssue(issue)}</Badge>)}</div></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="p-4 text-sm text-muted-foreground">مشکلی در محتواها پیدا نشد.</div>
+                )}
+              </CardContent>
+            </Card>
 
-            <section className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] overflow-hidden">
-              <div className="border-b-[length:var(--border-size)] border-[var(--border-color)] p-4 font-bold">کاربران دارای مسئله</div>
-              {usersWithIssues.length ? usersWithIssues.map((u) => (
-                <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-color)]/30 p-4 last:border-0">
-                  <div><b>{u.name}</b> <span className="font-mono paragraph-color" dir="ltr">@{u.username}</span></div>
-                  <div className="flex gap-2">{u.issues.map((issue) => <Badge key={issue} variant="warning">{labelIssue(issue)}</Badge>)}</div>
-                </div>
-              )) : <div className="p-4 paragraph-color">مشکلی در کاربران پیدا نشد.</div>}
-            </section>
+            <Card className="p-0 overflow-hidden">
+              <CardHeader className="border-b p-4"><CardTitle className="text-base">کاربران دارای مسئله</CardTitle></CardHeader>
+              <CardContent className="p-0">
+                {usersWithIssues.length ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-right">کاربر</TableHead>
+                        <TableHead className="text-right">مشکلات</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {usersWithIssues.map((u) => (
+                        <TableRow key={u.id}>
+                          <TableCell><b>{u.name}</b> <span className="font-mono text-xs text-muted-foreground" dir="ltr">@{u.username}</span></TableCell>
+                          <TableCell><div className="flex gap-1 flex-wrap">{u.issues.map((issue) => <Badge key={issue} variant="outline" className="text-[10px]">{labelIssue(issue)}</Badge>)}</div></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="p-4 text-sm text-muted-foreground">مشکلی در کاربران پیدا نشد.</div>
+                )}
+              </CardContent>
+            </Card>
 
             {data.urlStatuses.length > 0 && (
-              <section className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] overflow-hidden">
-                <div className="border-b-[length:var(--border-size)] border-[var(--border-color)] p-4 font-bold">URLهای خراب</div>
-                {brokenUrls.length ? brokenUrls.map((u) => (
-                  <div key={`${u.field}-${u.url}`} className="border-b border-[var(--border-color)]/30 p-4 last:border-0">
-                    <div className="font-bold text-[var(--danger)]">{u.field} • {u.module}/{u.slug}</div>
-                    <div className="mt-1 truncate font-mono text-xs paragraph-color" dir="ltr">{u.url}</div>
-                    <div className="mt-1 text-xs paragraph-color">status: {u.status || "—"} {u.error || ""}</div>
-                  </div>
-                )) : <div className="p-4 paragraph-color">همه URLهای بررسی‌شده سالم هستند.</div>}
-              </section>
+              <Card className="p-0 overflow-hidden">
+                <CardHeader className="border-b p-4"><CardTitle className="text-base">URLهای خراب</CardTitle></CardHeader>
+                <CardContent className="p-0">
+                  {brokenUrls.length ? (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-right">فیلد</TableHead>
+                          <TableHead className="text-right">URL</TableHead>
+                          <TableHead className="text-right">وضعیت</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {brokenUrls.map((u) => (
+                          <TableRow key={`${u.field}-${u.url}`}>
+                            <TableCell className="text-xs"><Badge variant="destructive">{u.field}</Badge> {u.module}/{u.slug}</TableCell>
+                            <TableCell className="font-mono text-xs truncate max-w-[300px]" dir="ltr">{u.url}</TableCell>
+                            <TableCell className="text-xs text-muted-foreground">status: {u.status || "—"} {u.error || ""}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div className="p-4 text-sm text-muted-foreground">همه URLهای بررسی‌شده سالم هستند.</div>
+                  )}
+                </CardContent>
+              </Card>
             )}
           </>
         )}
