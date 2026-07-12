@@ -1,15 +1,18 @@
 "use client";
 
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
 export function CardSkeleton({ imageRatio = "aspect-[16/10]" }: { imageRatio?: string }) {
   return (
-    <div className="overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)]">
-      <div className={`${imageRatio} animate-pulse bg-[var(--muted-background)]`} />
-      <div className="space-y-3 p-4">
-        <div className="h-4 w-2/3 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-        <div className="h-4 w-full animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-        <div className="h-4 w-1/2 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-      </div>
-    </div>
+    <Card className="overflow-hidden">
+      <Skeleton className={`${imageRatio} w-full`} />
+      <CardContent className="p-4 space-y-3">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-1/2" />
+      </CardContent>
+    </Card>
   );
 }
 
@@ -23,8 +26,8 @@ export function RowGridSkeleton({ count = 5, imageRatio = "aspect-[16/10]", clas
 
 export function EmptyRow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-6 text-center paragraph-color">
+    <Card className="p-6 text-center text-muted-foreground">
       {children}
-    </div>
+    </Card>
   );
 }

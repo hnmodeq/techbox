@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
 import { CardStats } from "@/components/ui/card-stats";
 import type { ContentItem } from "@/lib/content";
 
@@ -16,13 +19,13 @@ export default function RecommendationRow({
   if (!items.length) return null;
 
   return (
-    <section className="w-full py-12 border-t border-[var(--border-color)] bg-[var(--main-background)]" dir="rtl">
+    <section className="w-full py-12 border-t border-border bg-background" dir="rtl">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-black text-[var(--primary-text)]">{title}</h2>
-          <Link href="/search" className="text-sm font-bold text-[var(--primary)] hover:underline">
+          <h2 className="text-2xl font-black text-foreground">{title}</h2>
+          <ButtonLink variant="link" size="sm" className="font-bold shrink-0" href="/search">
             مشاهده همه ←
-          </Link>
+          </ButtonLink>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -33,38 +36,34 @@ export default function RecommendationRow({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.03 }}
             >
-              <Link
-                href={`/${item.module}/${item.slug}`}
-                className="group block overflow-hidden rounded-[var(--corner-radius)] border border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-size)]"
-              >
-                <div className="relative aspect-[16/10] overflow-hidden bg-[var(--muted-background)]">
-                  <Image
-                    src={item.image || "/assets/blog-1.jpg"}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform group-hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 20vw"
-                  />
-                  <div className="absolute top-3 right-3 rounded bg-black/60 px-2 py-0.5 text-xs font-bold text-white">
-                    {item.module}
+              <Link href={`/${item.module}/${item.slug}`} className="group block h-full">
+                <Card className="h-full overflow-hidden hover:shadow-md transition-all group-hover:-translate-y-0.5">
+                  <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+                    <Image
+                      src={item.image || "/assets/blog-1.jpg"}
+                      alt={item.title}
+                      fill
+                      className="object-cover transition-transform group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 20vw"
+                    />
+                    <Badge variant="secondary" className="absolute top-3 right-3 bg-black/60 text-white border-none text-[10px]">
+                      {item.module}
+                    </Badge>
                   </div>
-                </div>
+                  <CardContent className="p-4">
+                    <h3 className="line-clamp-2 font-bold text-foreground group-hover:text-[var(--home)] transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                      {item.excerpt}
+                    </p>
 
-                <div className="p-4">
-                  <h3 className="line-clamp-2 font-bold text-[var(--primary-text)] group-hover:text-[var(--home)]">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 line-clamp-2 text-sm paragraph-color">
-                    {item.excerpt}
-                  </p>
-
-                  <div className="mt-4 flex items-center justify-between text-xs">
-                    <div className="paragraph-color">
-                      {item.date_fa?.split(" ")[0]}
+                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+                      <div>{item.date_fa?.split(" ")[0]}</div>
+                      <CardStats module={item.module} slug={item.slug} showComments={false} />
                     </div>
-                    <CardStats module={item.module} slug={item.slug} showComments={false} />
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </Link>
             </motion.div>
           ))}
