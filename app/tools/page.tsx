@@ -14,7 +14,7 @@ export default function ToolsPage() {
       <ToolPageHeader
         title="ابزارهای TechBox"
         subtitle="انتخاب‌گر NAS و NVR، محاسبه RAID/SHR و ساب‌نت"
-        accent="var(--tools)"
+        accent="primary"
         breadcrumbs={[{ label: "خانه", href: "/" }, { label: "ابزارها" }]}
       />
 
@@ -22,17 +22,17 @@ export default function ToolsPage() {
         <ToolsGrid />
       </div>
 
-      <section className="mt-12 bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6">
-        <h2 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mb-2">توضیحات ابزارها</h2>
-        <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
+      <section className="mt-12 bg-card text-foreground border border-border rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-bold mb-2">توضیحات ابزارها</h2>
+        <p className="text-sm text-muted-foreground">
           ابزارهای انتخاب‌گر به صورت زنده از کاتالوگ محصولات تخصصی در <code className="text-[11px]">/data/tools/</code> استفاده می‌کنند.
           این ابزارها برای کمک به مهندسین در انتخاب بهینه‌ترین سخت‌افزار بر اساس نیازهای پروژه طراحی شده‌اند.
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-[12px]">
-          <Link href="/tools/nas-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">NAS Selector</Link>
-          <Link href="/tools/nvr-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-[var(--button-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]" style={{ background: "var(--raid)" }}>NVR Selector</Link>
-          <Link href="/tools/raid-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">RAID Calculator v2</Link>
-          <Link href="/tools/subnet-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-[var(--corner-radius)] font-semibold transition-all cursor-pointer bg-transparent text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:bg-[var(--button-background)]/40">Subnet Calculator</Link>
+          <Link href="/tools/nas-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-muted text-foreground border border-border hover:bg-muted/80">NAS Selector</Link>
+          <Link href="/tools/nvr-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-primary text-primary-foreground border border-border hover:bg-primary/90">NVR Selector</Link>
+          <Link href="/tools/raid-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-transparent text-foreground border border-border hover:bg-muted/50">RAID Calculator v2</Link>
+          <Link href="/tools/subnet-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-transparent text-foreground border border-border hover:bg-muted/50">Subnet Calculator</Link>
         </div>
       </section>
     </main>
