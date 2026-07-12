@@ -21,6 +21,7 @@ export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Side
   return (
     <Sidebar
       side="right"
+      dir="rtl"
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       {...props}
     >

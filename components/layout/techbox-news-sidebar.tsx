@@ -12,24 +12,22 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useHomeModule } from "@/features/home/lib/home-data"
 
-type TechboxNewsSidebarProps = {
-  open: boolean
-  onClose: () => void
-}
-
-export function TechboxNewsSidebar({ open, onClose }: TechboxNewsSidebarProps) {
+export function TechboxNewsSidebar() {
+  const { setOpen } = useSidebar()
   const { items: dbNews, loading } = useHomeModule("news")
   const newsItems = dbNews.slice(0, 15)
 
   return (
     <Sidebar
       side="left"
+      dir="rtl"
       variant="sidebar"
       collapsible="offcanvas"
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -40,7 +38,7 @@ export function TechboxNewsSidebar({ open, onClose }: TechboxNewsSidebarProps) {
             <NewspaperIcon className="size-4 text-muted-foreground" />
             <span className="text-sm font-bold text-foreground">اخبار زنده تکباکس</span>
           </div>
-          <Button variant="ghost" size="icon-xs" onClick={onClose}>
+          <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)}>
             <XIcon className="size-4" />
           </Button>
         </div>

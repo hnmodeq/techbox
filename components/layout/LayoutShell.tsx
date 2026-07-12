@@ -68,8 +68,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
     <div className="[--header-height:calc(var(--spacing)*14)]">
       <SidebarProvider className="flex flex-col" defaultOpen={true}>
         <SiteHeader hasUnreadNews={hasUnreadNews} />
-        <div className="flex flex-1">
-          <TechboxNewsSidebar open={newsOpen} onClose={() => setNewsOpen(false)} />
+        <div className="flex flex-1" dir="rtl">
           <TechboxAppSidebar />
           <SidebarInset>
             <main id="main-content" className="flex flex-col min-h-screen">
@@ -77,6 +76,9 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <FooterSection />
             </main>
           </SidebarInset>
+          <SidebarProvider open={newsOpen} onOpenChange={setNewsOpen}>
+            <TechboxNewsSidebar />
+          </SidebarProvider>
         </div>
         <LiveNewsButton onClick={() => setNewsOpen(true)} hasUnread={hasUnreadNews} />
       </SidebarProvider>
