@@ -54,7 +54,7 @@ export default function DownloadRow() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-[var(--paragraph-color)] bg-[var(--muted-background)] px-2 py-0.5 rounded" dir="ltr">{fileType}</span>
+                      <span className="inline-flex items-center rounded-full border border-[color-mix(in_oklch,var(--download)_30%,transparent)] bg-[color-mix(in_oklch,var(--download)_12%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--download)]" dir="ltr">{fileType}</span>
                     </div>
 
                     <Link href={`/download/${file.slug}`} className="block">
@@ -71,7 +71,7 @@ export default function DownloadRow() {
                 {/* Bottom Footer without visible separator line */}
                 <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
                   <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
-                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={true} showFileSize={true} />
+                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} showFileSize={true} />
                 </div>
               </article>
             );
