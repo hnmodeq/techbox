@@ -2,6 +2,12 @@
 
 > This file tracks progress so the next agent can continue without asking.
 >
+> Branch: `feat/shadcn-migration`
+>
+> Remote: `https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration`
+>
+> Latest commit: `7919e82`
+>
 > Last updated: 2026-07-12
 >
 > Plan source: `UI_MIGRATION_PLAN.md`
