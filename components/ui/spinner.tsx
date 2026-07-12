@@ -1,29 +1,27 @@
-export function Spinner({
-  className = "h-8 w-8",
-  label = "در حال بارگذاری",
-}: {
-  className?: string;
-  label?: string;
-}) {
+import { cn } from "@/lib/utils";
+import { Loader2Icon } from "lucide-react";
+
+function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
   return (
-    <span
-      className={`${className} animate-spin rounded-full border-[3px] border-[var(--border-color)] border-t-[var(--home)]`}
+    <Loader2Icon
+      data-slot="spinner"
       role="status"
-      aria-label={label}
+      aria-label="Loading"
+      className={cn("size-4 animate-spin", className)}
+      {...props}
     />
   );
 }
 
-export function SpinnerCenter({
-  className,
-  label,
-}: {
-  className?: string;
-  label?: string;
-}) {
+function SpinnerCenter({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className="flex w-full items-center justify-center py-16" dir="rtl">
-      <Spinner className={className} label={label} />
+    <div
+      className={cn("flex items-center justify-center p-4", className)}
+      {...props}
+    >
+      <Spinner />
     </div>
   );
 }
+
+export { Spinner, SpinnerCenter };

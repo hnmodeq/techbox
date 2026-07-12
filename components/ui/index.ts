@@ -4,11 +4,6 @@ export * from "./textarea";
 export * from "./card";
 export * from "./badge";
 export * from "./chip";
-export * from "./dropdown";
-export * from "./search-bar";
-export * from "./tabs";
-export * from "./tooltip";
-export * from "./switch";
 export * from "./like-button";
 
 // Re-export design tokens for TS usage
@@ -23,12 +18,6 @@ export * from "./floating-action-button";
 export * from "./media-selector-card";
 export * from "./theme-toggle-button";
 export * from "./author-link";
-export * from "./avatar";
 export * from "./card-stats";
-export * from "./checkbox";
 export * from "./forum-badge";
-export * from "./icon-button";
 export * from "./live-view-counter";
-export * from "./modal";
-export * from "./radio";
-export * from "./skeleton";

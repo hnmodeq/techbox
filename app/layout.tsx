@@ -14,6 +14,9 @@ import { defaultSeo, siteUrl } from "@/lib/seo";
 import { getHomeData } from "@/lib/home-server";
 import type { HomeData } from "@/features/home/lib/home-data";
 import * as Sentry from "@sentry/nextjs";
+import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
@@ -124,7 +127,7 @@ export default async function RootLayout({
     <html
       lang="fa"
       dir="rtl"
-      className={`${kalameh.variable} ${kalameh.className}`}
+      className={cn(kalameh.variable, kalameh.className, "font-sans")}
       suppressHydrationWarning
     >
       <head>
@@ -133,10 +136,13 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans antialiased text-foreground">
-        <ScrollRestoration />
-        <LayoutShell homeData={homeData}>{children}</LayoutShell>
-        <Analytics />
-        <SpeedInsights />
+        <TooltipProvider>
+          <ScrollRestoration />
+          <LayoutShell homeData={homeData}>{children}</LayoutShell>
+          <Analytics />
+          <SpeedInsights />
+          <Toaster />
+        </TooltipProvider>
         {process.env.NODE_ENV === "production" ? (
           <script src="/register-sw.js?v=3" defer />
         ) : (
