@@ -5,7 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 
@@ -43,9 +51,9 @@ const statusOptions = [
 ];
 
 function statusVariant(status: string) {
-  if (status === "active") return "success" as const;
-  if (status === "banned") return "danger" as const;
-  return "warning" as const;
+  if (status === "active") return "default" as const;
+  if (status === "banned") return "destructive" as const;
+  return "secondary" as const;
 }
 
 export default function AdminUsersPage() {
@@ -77,8 +85,12 @@ export default function AdminUsersPage() {
     }
   };
 
-  useEffect(() => { loadUsers(); }, []);
-  useEffect(() => { if (selectedId) loadUser(selectedId); }, [selectedId]);
+  useEffect(() => {
+    loadUsers();
+  }, []);
+  useEffect(() => {
+    if (selectedId) loadUser(selectedId);
+  }, [selectedId]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -86,17 +98,19 @@ export default function AdminUsersPage() {
     return users.filter((u) => `${u.name} ${u.username} ${u.email} ${u.role} ${u.status}`.toLowerCase().includes(q));
   }, [users, query]);
 
-  const updateSelected = (patch: Partial<AdminUser>) => setSelected((prev) => prev ? { ...prev, ...patch } : prev);
-  const toggleModule = (module: string) => {
+  const updateSelected = (patch: Partial<AdminUser>) => setSelected((prev) => (prev ? { ...prev, ...patch } : prev));
+  const toggleModule = (mod: string) => {
     if (!selected) return;
     const set = new Set(selected.modules || []);
-    if (set.has(module)) set.delete(module); else set.add(module);
+    if (set.has(mod)) set.delete(mod);
+    else set.add(mod);
     updateSelected({ modules: [...set] });
   };
 
   const save = async () => {
     if (!selected) return;
-    setBusy(true); setMsg("");
+    setBusy(true);
+    setMsg("");
     const payload: any = {
       id: selected.id,
       name: selected.name,
@@ -125,7 +139,8 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <main className="min-h-dvh px-4 py-10" dir="rtl">
+    <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
+      <PageBreadcrumb />
       <section className="mx-auto max-w-7xl space-y-6">
         <PageHeader colorVar="--admin" title="مدیریت کاربران" titleClassName="text-[var(--admin)]" description="ویرایش پروفایل، نقش، دسترسی ماژول‌ها، وضعیت حساب و مشاهده فعالیت کاربران">
           <div className="flex flex-wrap gap-2">
@@ -136,83 +151,160 @@ export default function AdminUsersPage() {
         </PageHeader>
 
         <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
-          <aside className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] shadow-[var(--shadow-size)] overflow-hidden lg:sticky lg:top-24 lg:self-start">
-            <div className="p-3 border-b-[length:var(--border-size)] border-[var(--border-color)]">
-              <input value={query} onChange={(e) => setQuery(e.target.value)} className="input" placeholder="جستجوی کاربر…" />
-            </div>
-            <div className="max-h-[70vh] overflow-y-auto">
-              {filtered.map((u) => (
-                <button key={u.id} type="button" onClick={() => setSelectedId(u.id)} className={`flex w-full items-center gap-3 p-3 text-right hover:bg-[var(--muted-background)]/30 border-b border-[var(--border-color)]/30 ${selectedId === u.id ? "bg-[var(--muted-background)]/40" : ""}`}>
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[var(--muted-background)]">
-                    {u.avatar ? <Image src={u.avatar} alt={u.name} fill sizes="40px" className="object-cover" /> : null}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="font-bold text-[var(--primary-text)] truncate">{u.name}</div>
-                    <div className="text-xs paragraph-color font-mono" dir="ltr">@{u.username}</div>
-                  </div>
-                  <Badge variant={statusVariant(u.status)}>{u.status}</Badge>
-                </button>
-              ))}
-              {!filtered.length && <div className="p-4 text-center paragraph-color">کاربری پیدا نشد.</div>}
-            </div>
-          </aside>
+          <Card className="overflow-hidden lg:sticky lg:top-24 lg:self-start p-0">
+            <CardHeader className="p-3 border-b">
+              <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="جستجوی کاربر…" />
+            </CardHeader>
+            <ScrollArea className="max-h-[70vh]">
+              <div className="divide-y divide-border/30">
+                {filtered.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => setSelectedId(u.id)}
+                    className={`flex w-full items-center gap-3 p-3 text-right hover:bg-muted/30 ${selectedId === u.id ? "bg-muted/40" : ""}`}
+                  >
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-muted">
+                      {u.avatar ? <Image src={u.avatar} alt={u.name} fill sizes="40px" className="object-cover" /> : null}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-bold truncate">{u.name}</div>
+                      <div className="text-xs text-muted-foreground font-mono" dir="ltr">@{u.username}</div>
+                    </div>
+                    <Badge variant={statusVariant(u.status)}>{u.status}</Badge>
+                  </button>
+                ))}
+                {!filtered.length && <div className="p-4 text-center text-sm text-muted-foreground">کاربری پیدا نشد.</div>}
+              </div>
+            </ScrollArea>
+          </Card>
 
           <section className="space-y-5">
             {!selected ? (
-              <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-8 text-center paragraph-color">یک کاربر را انتخاب کنید.</div>
+              <Card className="p-8 text-center text-sm text-muted-foreground">یک کاربر را انتخاب کنید.</Card>
             ) : (
               <>
-                <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] space-y-4">
+                <Card className="p-5 space-y-4">
                   <div className="flex flex-wrap items-center gap-4">
-                    <div className="relative h-20 w-20 overflow-hidden rounded-full bg-[var(--muted-background)]">
+                    <div className="relative h-20 w-20 overflow-hidden rounded-full bg-muted">
                       {selected.avatar ? <Image src={selected.avatar} alt={selected.name} fill sizes="80px" className="object-cover" /> : null}
                     </div>
                     <div>
-                      <h2 className="text-xl font-black text-[var(--primary-text)]">{selected.name}</h2>
-                      <div className="font-mono text-xs paragraph-color" dir="ltr">@{selected.username}</div>
-                      <div className="mt-2 flex gap-2"><Badge variant={statusVariant(selected.status)}>{selected.status}</Badge><Badge variant="secondary">{selected.role}</Badge></div>
+                      <h2 className="text-xl font-black">{selected.name}</h2>
+                      <div className="font-mono text-xs text-muted-foreground" dir="ltr">@{selected.username}</div>
+                      <div className="mt-2 flex gap-2">
+                        <Badge variant={statusVariant(selected.status)}>{selected.status}</Badge>
+                        <Badge variant="secondary">{selected.role}</Badge>
+                      </div>
                     </div>
                   </div>
 
+                  <Separator />
+
                   <div className="grid gap-3 md:grid-cols-2">
-                    <label><span className="paragraph-color text-sm">نام</span><input className="input mt-1" value={selected.name} onChange={(e)=>updateSelected({ name: e.target.value })} /></label>
-                    <label><span className="paragraph-color text-sm">ایمیل</span><input className="input mt-1" value={selected.email} onChange={(e)=>updateSelected({ email: e.target.value })} dir="ltr" /></label>
-                    <label><span className="paragraph-color text-sm">عنوان نقش فارسی</span><input className="input mt-1" value={selected.roleFa || ""} onChange={(e)=>updateSelected({ roleFa: e.target.value })} /></label>
-                    <label><span className="paragraph-color text-sm">شغل/توضیح</span><input className="input mt-1" value={selected.job || ""} onChange={(e)=>updateSelected({ job: e.target.value })} /></label>
-                    <label><span className="paragraph-color text-sm">تاریخ تولد</span><input className="input mt-1" value={selected.birthday || ""} onChange={(e)=>updateSelected({ birthday: e.target.value })} /></label>
-                    <label><span className="paragraph-color text-sm">آواتار URL</span><input className="input mt-1" value={selected.avatar || ""} onChange={(e)=>updateSelected({ avatar: e.target.value })} dir="ltr" /></label>
-                    <label><span className="paragraph-color text-sm">نقش</span><select className="input mt-1" value={selected.role} onChange={(e)=>updateSelected({ role: e.target.value })}>{roleOptions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}</select></label>
-                    <label><span className="paragraph-color text-sm">وضعیت</span><select className="input mt-1" value={selected.status} onChange={(e)=>updateSelected({ status: e.target.value })}>{statusOptions.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></label>
+                    <div className="space-y-1"><Label className="text-xs">نام</Label><Input value={selected.name} onChange={(e) => updateSelected({ name: e.target.value })} /></div>
+                    <div className="space-y-1"><Label className="text-xs">ایمیل</Label><Input value={selected.email} onChange={(e) => updateSelected({ email: e.target.value })} dir="ltr" /></div>
+                    <div className="space-y-1"><Label className="text-xs">عنوان نقش فارسی</Label><Input value={selected.roleFa || ""} onChange={(e) => updateSelected({ roleFa: e.target.value })} /></div>
+                    <div className="space-y-1"><Label className="text-xs">شغل/توضیح</Label><Input value={selected.job || ""} onChange={(e) => updateSelected({ job: e.target.value })} /></div>
+                    <div className="space-y-1"><Label className="text-xs">تاریخ تولد</Label><Input value={selected.birthday || ""} onChange={(e) => updateSelected({ birthday: e.target.value })} /></div>
+                    <div className="space-y-1"><Label className="text-xs">آواتار URL</Label><Input value={selected.avatar || ""} onChange={(e) => updateSelected({ avatar: e.target.value })} dir="ltr" /></div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">نقش</Label>
+                      <Select value={selected.role} onValueChange={(v) => updateSelected({ role: v as string })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {roleOptions.map((r) => (
+                            <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">وضعیت</Label>
+                      <Select value={selected.status} onValueChange={(v) => updateSelected({ status: v as string })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((s) => (
+                            <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <BlobUploadField label="آپلود آواتار" kind="avatar" folder="avatars" accept="image/jpeg,image/png,image/webp" onUploaded={(r)=>updateSelected({ avatar: r.url })} />
+                  <BlobUploadField label="آپلود آواتار" kind="avatar" folder="avatars" accept="image/jpeg,image/png,image/webp" onUploaded={(r) => updateSelected({ avatar: r.url })} />
 
                   <div>
-                    <div className="mb-2 font-bold text-[var(--primary-text)]">دسترسی ماژول‌ها</div>
+                    <div className="mb-2 font-bold text-sm">دسترسی ماژول‌ها</div>
                     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                      {allModules.map(m => <label key={m} className="flex items-center gap-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] p-2"><input type="checkbox" checked={selected.modules.includes(m)} onChange={()=>toggleModule(m)} /> <span>{moduleMeta[m].titleFa}</span></label>)}
+                      {allModules.map((m) => (
+                        <Label key={m} className="flex items-center gap-2 rounded-md border p-2 cursor-pointer hover:bg-muted/30">
+                          <Checkbox checked={selected.modules.includes(m)} onCheckedChange={() => toggleModule(m)} />
+                          <span className="text-xs">{moduleMeta[m].titleFa}</span>
+                        </Label>
+                      ))}
                     </div>
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-                    <label><span className="paragraph-color text-sm">Reset password</span><input type="password" className="input mt-1" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="حداقل ۶ کاراکتر" /></label>
-                    <Button type="button" onClick={save} disabled={busy}>{busy ? "در حال ذخیره…" : "ذخیره کاربر"}</Button>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Reset password</Label>
+                      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="حداقل ۶ کاراکتر" />
+                    </div>
+                    <Button type="button" onClick={save} disabled={busy} loading={busy}>
+                      ذخیره کاربر
+                    </Button>
                   </div>
-                  {msg && <div className="paragraph-color">{msg}</div>}
-                </div>
+                  {msg && <div className="text-sm text-muted-foreground">{msg}</div>}
+                </Card>
 
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">محتوا</div><b>{(selected.counts?.posts || 0).toLocaleString("fa-IR")}</b></div>
-                  <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">دیدگاه</div><b>{(selected.counts?.comments || 0).toLocaleString("fa-IR")}</b></div>
-                  <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><div className="paragraph-color">امتیاز</div><b>{(selected.counts?.ratings || 0).toLocaleString("fa-IR")}</b></div>
+                  <Card className="p-4"><div className="text-xs text-muted-foreground">محتوا</div><b>{(selected.counts?.posts || 0).toLocaleString("fa-IR")}</b></Card>
+                  <Card className="p-4"><div className="text-xs text-muted-foreground">دیدگاه</div><b>{(selected.counts?.comments || 0).toLocaleString("fa-IR")}</b></Card>
+                  <Card className="p-4"><div className="text-xs text-muted-foreground">امتیاز</div><b>{(selected.counts?.ratings || 0).toLocaleString("fa-IR")}</b></Card>
                 </div>
 
                 {activity && (
                   <div className="grid gap-5 lg:grid-cols-2">
-                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><h3 className="font-bold mb-3">آخرین محتواها</h3>{activity.posts.map(p => <div key={p.id} className="border-b border-[var(--border-color)]/30 py-2"><Link href={`/${p.module}/${p.slug}`} target="_blank" className="font-bold hover:text-[var(--home)]">{p.title}</Link><div className="text-xs paragraph-color">{p.module} • {p.published ? "منتشر" : "پیش‌نویس"} • {p.views} views</div></div>)}{!activity.posts.length && <div className="paragraph-color">محتوایی ندارد.</div>}</div>
-                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><h3 className="font-bold mb-3">آخرین دیدگاه‌ها</h3>{activity.comments.map(c => <div key={c.id} className="border-b border-[var(--border-color)]/30 py-2"><Link href={`/${c.post.module}/${c.post.slug}`} target="_blank" className="font-bold hover:text-[var(--home)]">{c.post.title}</Link><p className="text-xs paragraph-color line-clamp-2">{c.text}</p></div>)}{!activity.comments.length && <div className="paragraph-color">دیدگاهی ندارد.</div>}</div>
-                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><h3 className="font-bold mb-3">آخرین امتیازها</h3>{activity.ratings.map(r => <div key={r.id} className="border-b border-[var(--border-color)]/30 py-2"><Link href={`/${r.post.module}/${r.post.slug}`} target="_blank" className="font-bold hover:text-[var(--home)]">{r.post.title}</Link><div className="text-xs paragraph-color">امتیاز: {r.value}</div></div>)}{!activity.ratings.length && <div className="paragraph-color">امتیازی ندارد.</div>}</div>
-                    <div className="rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-4"><h3 className="font-bold mb-3">آخرین پسندها</h3>{activity.likes.map(l => <div key={l.id} className="border-b border-[var(--border-color)]/30 py-2"><Link href={`/${l.module}/${l.slug}`} target="_blank" className="font-bold hover:text-[var(--home)]">/{l.module}/{l.slug}</Link></div>)}{!activity.likes.length && <div className="paragraph-color">پسندی ندارد.</div>}</div>
+                    <Card className="p-4">
+                      <CardTitle className="text-sm mb-3">آخرین محتواها</CardTitle>
+                      {activity.posts.map((p) => (
+                        <div key={p.id} className="border-b border-border/30 py-2">
+                          <Link href={`/${p.module}/${p.slug}`} target="_blank" className="font-bold hover:text-primary text-sm">{p.title}</Link>
+                          <div className="text-xs text-muted-foreground">{p.module} • {p.published ? "منتشر" : "پیش‌نویس"} • {p.views} views</div>
+                        </div>
+                      ))}
+                      {!activity.posts.length && <div className="text-sm text-muted-foreground">محتوایی ندارد.</div>}
+                    </Card>
+                    <Card className="p-4">
+                      <CardTitle className="text-sm mb-3">آخرین دیدگاه‌ها</CardTitle>
+                      {activity.comments.map((c) => (
+                        <div key={c.id} className="border-b border-border/30 py-2">
+                          <Link href={`/${c.post.module}/${c.post.slug}`} target="_blank" className="font-bold hover:text-primary text-sm">{c.post.title}</Link>
+                          <p className="text-xs text-muted-foreground line-clamp-2">{c.text}</p>
+                        </div>
+                      ))}
+                      {!activity.comments.length && <div className="text-sm text-muted-foreground">دیدگاهی ندارد.</div>}
+                    </Card>
+                    <Card className="p-4">
+                      <CardTitle className="text-sm mb-3">آخرین امتیازها</CardTitle>
+                      {activity.ratings.map((r) => (
+                        <div key={r.id} className="border-b border-border/30 py-2">
+                          <Link href={`/${r.post.module}/${r.post.slug}`} target="_blank" className="font-bold hover:text-primary text-sm">{r.post.title}</Link>
+                          <div className="text-xs text-muted-foreground">امتیاز: {r.value}</div>
+                        </div>
+                      ))}
+                      {!activity.ratings.length && <div className="text-sm text-muted-foreground">امتیازی ندارد.</div>}
+                    </Card>
+                    <Card className="p-4">
+                      <CardTitle className="text-sm mb-3">آخرین پسندها</CardTitle>
+                      {activity.likes.map((l) => (
+                        <div key={l.id} className="border-b border-border/30 py-2">
+                          <Link href={`/${l.module}/${l.slug}`} target="_blank" className="font-bold hover:text-primary text-sm">/{l.module}/{l.slug}</Link>
+                        </div>
+                      ))}
+                      {!activity.likes.length && <div className="text-sm text-muted-foreground">پسندی ندارد.</div>}
+                    </Card>
                   </div>
                 )}
               </>
