@@ -8,6 +8,10 @@ const nextConfig = {
       { protocol: "https", hostname: "cdn.zarinpal.com" },
       { protocol: "https", hostname: "gasy0aqpxehqiy8d.public.blob.vercel-storage.com" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "github.com" },
+      { protocol: "https", hostname: "*.githubusercontent.com" },
+      { protocol: "https", hostname: "avatars.githubusercontent.com" },
     ],
     // Optimized device sizes for better caching & responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],

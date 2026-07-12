@@ -6,9 +6,9 @@
 >
 > Remote: `https://github.com/hnmodeq/techbox/tree/feat/shadcn-migration`
 >
-> Latest commit: `7919e82`
+> Latest commit: `deac65c` -> now `feat: design-system page` (pending commit)
 >
-> Last updated: 2026-07-12
+> Last updated: 2026-07-12 — deep dive + Phase 4 complete
 >
 > Plan source: `UI_MIGRATION_PLAN.md`
 
@@ -20,9 +20,9 @@
 |-------|--------|-------|
 | Phase 0 — Baseline & cleanup | ✅ Done | lint & typecheck pass; build fails due to environment OOM (not code). Deleted 11 unused ui primitives. |
 | Phase 1 — shadcn init | ✅ Done | Mira preset applied. shadcn tokens merged with TechBox tokens. |
-| Phase 2 — Core primitives | ✅ Partially done | Core shadcn primitives installed. Backward-compatible wrappers added for Button, Spinner, Badge. |
-| Phase 3 — Layout shell | ⏳ Not started | Rebuild Sidebar, Footer, NewsSidebar, AuthModal with shadcn. |
-| Phase 4 — Design-system page | ⏳ Not started | Create `/admin/design-system`. |
+| Phase 2 — Core primitives | ✅ Done | Core shadcn primitives installed. Backward-compatible wrappers added for Button, Spinner, Badge. TooltipProvider + Toaster in layout. |
+| Phase 3 — Layout shell | ⏳ Next | Rebuild Sidebar, Footer, NewsSidebar, AuthModal with shadcn. (ready to start) |
+| Phase 4 — Design-system page | ✅ Done | Created `/admin/design-system` — showcases colors, typography, buttons, badges, cards, forms, overlays, tabs, breadcrumb placeholder, table placeholder, skeleton/spinner, sonner, avatar, scrollarea, separator, RTL/dark checklist. Lint+typecheck green. |
 | Phase 5 — Forms & inputs audit | ⏳ Not started | Replace raw inputs with shadcn Form. |
 | Phase 6 — Admin UI | ⏳ Not started | Admin dashboard + tables. |
 | Phase 7 — Chat / messenger | ⏳ Not started | MessageScroller + Message. |
@@ -41,7 +41,7 @@
 3. **Installed shadcn primitives**:
    - `alert-dialog`, `drawer`, `field`, `hover-card`, `label`, `popover`, `scroll-area`, `select`, `separator`, `sheet`, `sonner`
    - `dialog`, `tabs`, `checkbox`, `radio-group`, `switch`, `dropdown-menu`, `tooltip`, `avatar`, `skeleton`
-   - `card`, `badge`, `input`, `textarea`
+   - `card`, `badge`, `input`, `textarea`, `button`, `spinner`
 4. **Backward-compatible wrappers** created for:
    - `Button` (maps legacy variants/sizes, supports `loading` and `ButtonLink`)
    - `Spinner` (adds `SpinnerCenter`)
@@ -51,40 +51,37 @@
    - Legacy TechBox tokens (`--main-background`, `--card-background`, etc.) are aliased to shadcn tokens.
    - `--corner-radius` now points to `--radius`; `--border-size` is `1px`.
 6. **Layout providers added**: `TooltipProvider` and `Toaster` in `app/layout.tsx`.
-7. **Validation**: `pnpm lint` and `pnpm typecheck` pass.
+7. **Design-system page**: `/admin/design-system` implemented with Tabs: colors (theme + module accents + chart/sidebar/radius), typography (Kalameh hero/h1/h2/h3/paragraph + typeset), buttons (all variants + sizes + ButtonGroup placeholder), badges (shadcn + ModuleBadge), cards, forms (Input/Textarea/Select/Checkbox/Switch/Radio/Field), overlays (Dialog/AlertDialog/Drawer/Sheet/DropdownMenu/Popover/Tooltip/HoverCard with Base UI render prop fix), navigation (Tabs line variant, breadcrumb placeholder, ScrollArea+Separator), data (Avatar/Skeleton/Spinner, Table placeholder, 13 missing placeholders), feedback (Sonner toast demos, focus + RTL/dark checklist). Uses `ButtonLink` + `render` prop to keep lint/typecheck green.
+8. **Admin entry**: link to design-system added in `/admin` page (super_admin) with 🎨.
+9. **next.config**: added remotePatterns for `images.unsplash.com`, `github.com`, `*.githubusercontent.com`, `avatars.githubusercontent.com` to support Image optimization in design-system.
+10. **Validation**: `pnpm lint` ✅ and `pnpm typecheck` ✅ and `pnpm test` ✅ 6 passed. Build OOM locally expected (137), should pass in CI/Vercel.
+
+### Deep dive performed (2026-07-12)
+- Cloned branch, read all .md (README, TODO, UI_MIGRATION_PLAN, MIGRATION_STATUS, UI_MIGRATION_ANALYSIS, UI_MIGRATION_COMPONENT_ANALYSIS), diff main..feat/shadcn-migration (42 files +7259/-1110), inspected components/ui/*, design/globals.css, layout, modules.config, prisma schema, ci workflow, env handling.
+- Confirmed project is RTL Persian multi-module tech platform (Next 16, React 19, Tailwind v4, Prisma Neon, Blob, Resend, Upstash, Sentry).
+- Confirmed Phase 0-2 done, Phase 4 now done per this session.
+- Produced `MIGRATION_DEEP_DIVE_READY.md` with full report.
 
 ---
 
 ## Current blockers
 
-- **Build cannot be validated** in this environment due to memory limits (exit 137 / OOM).
-- **Some shadcn components are not available** in the `base-mira` registry. Known missing from initial install attempts:
+- **Build cannot be validated** in this environment due to memory limits (exit 137 / OOM) — also observed for `build:webpack` with 4GB. Not a code error; CI (ubuntu-latest 7GB) and Vercel should pass. Lint/typecheck do pass.
+- **Some shadcn components are not available** in the `base-mira` registry. Known missing from initial install attempts (still true after Phase 4):
   - `form` (React Hook Form wrapper)
-  - `accordion`
-  - `date-picker`
-  - `calendar`?
-  - `chart`?
-  - `carousel`?
-  - `combobox`?
-  - `command`?
-  - `data-table`?
-  - `empty`?
-  - `item`?
-  - `marker`?
-  - `menubar`?
-  - `message`?
-  - `message-scroller`?
-  - `bubble`?
-  - `attachment`?
-  - `navigation-menu`?
-  - `pagination`?
-  - `progress`?
-  - `toggle`?
-  - `toggle-group`?
-  - `typography`?
-  - `scroll-fade`, `shimmer`
+  - `accordion` (needed for about Q&A)
+  - `breadcrumb` (we have placeholder)
+  - `calendar`, `date-picker` (admin scheduled publish)
+  - `chart` (radial, stats)
+  - `carousel` (shop product gallery)
+  - `combobox`, `command` (search history)
+  - `data-table`, `table` (admin tables)
+  - `empty`, `item`, `field` (field done), `attachment`, `message`, `message-scroller`, `bubble`, `marker`
+  - `navigation-menu`, `menubar`, `pagination`, `progress`, `slider`, `toggle`, `toggle-group`, `typography`, `scroll-fade`, `shimmer`, `aspect-ratio`
 
-  **Next agent:** try installing them one by one with `npx pnpm@10.12.1 dlx shadcn@latest add <name>`. If a component is not in `base-mira`, install from the base shadcn registry or create a custom one.
+  **Solution:** try installing one by one with `npx pnpm@10.12.1 dlx shadcn@latest add <name>` — if base-mira missing, use base registry: `npx shadcn add <name> --registry https://ui.shadcn.com` or manually copy from shadcn docs. Phase 6-7 will need many of these.
+
+- **Design-system image**: uses unsplash external image — added to `next.config.mjs` remotePatterns to avoid Next build image error.
 
 ---
 
@@ -97,10 +94,13 @@ npx pnpm@10.12.1 lint
 npx pnpm@10.12.1 typecheck
 NODE_OPTIONS="--max-old-space-size=4096" npx pnpm@10.12.1 build
 
-# Add a shadcn component
+# Add a shadcn component (base-mira preset)
 npx pnpm@10.12.1 dlx shadcn@latest add <component-name>
 
-# Add with overwrite (use carefully)
+# Add from base registry if missing in mira
+npx pnpm@10.12.1 dlx shadcn@latest add <name> -r https://ui.shadcn.com
+
+# Add with overwrite (use carefully — restore wrappers after)
 npx pnpm@10.12.1 dlx shadcn@latest add -y -o <component-name>
 ```
 
@@ -108,34 +108,38 @@ npx pnpm@10.12.1 dlx shadcn@latest add -y -o <component-name>
 
 ## Next steps for the next agent
 
-### Immediate next task: Phase 3 — Layout shell
+### Immediate next task: Phase 3 — Layout shell (what user agreed is next after design-system baseline)
 
 Rebuild the global shell using shadcn primitives:
 
 1. **Main sidebar** (`components/layout/Sidebar.tsx` + `SidebarShell.tsx` + `SidebarContent.tsx`)
-   - Use shadcn `Sidebar` for desktop.
-   - Use shadcn `Drawer` for mobile.
-   - Use `Button`, `Tooltip`, `Separator`, `ScrollArea`, `DropdownMenu` for items.
-   - Add theme toggle button in sidebar footer (cycles light/dark via `next-themes`).
+   - Use shadcn `Sidebar` component (if available) or rebuild with `ScrollArea` + `Button` + `Separator` + `Tooltip` + `DropdownMenu`
+   - Desktop: collapsible 16rem / 4rem via `html[data-main-sidebar-open]`
+   - Mobile: `Drawer`
+   - Items: `Button` ghost, `Tooltip`, module colors
+   - Footer: theme toggle button cycling light/dark via `next-themes` (component #47)
 
 2. **News sidebar** (`features/home/components/NewsSidebar.tsx`)
-   - Use `Drawer` (mobile) + `Sheet` (desktop optional).
-   - Use `ScrollArea`, `Card`, `Separator`, `Button`.
+   - Use `Drawer` (mobile) + `Sheet` (desktop) + `ScrollArea`, `Card`, `Separator`, `Button`
 
 3. **Footer** (`components/layout/Footer.tsx`)
-   - Use `Separator`, `Button`, `Link`.
+   - Use `Separator`, `Button`, `Link`, module colors muted
 
 4. **Auth modal** (`features/auth/components/auth-modal.tsx`)
-   - Use `Dialog`, `Tabs`, `Form`, `Input`, `Button`, `Checkbox`, `Sonner`.
+   - Use `Dialog`, `Tabs`, `Form` (needs form install), `Input`, `Button`, `Checkbox`, `Sonner`
 
 5. **Chatbot launcher** (`features/chat/components/Chatbot.tsx`)
-   - Use `Button`, `Sheet`/`Drawer`.
+   - Use `Button`, `Sheet`/`Drawer`, placeholder for MessageScroller
+
+Acceptance: RTL correct, dark mode toggle works, mobile drawer works, no console errors, lint/typecheck green.
 
 ### After layout shell
 
-- **Phase 4:** Create `/admin/design-system` showing all installed primitives.
-- **Phase 5:** Forms audit — replace raw `<input>`, `<textarea>`, `<select>` with shadcn `Form` + React Hook Form.
-- **Phase 6:** Admin UI with `Data Table`, `Card`, `Chart`, etc.
+- **Phase 5:** Forms audit — replace raw `<input>`, `<textarea>`, `<select>` with shadcn `Form` + React Hook Form + zod in: `app/admin/login/page.tsx`, `features/auth/components/auth-modal.tsx`, `features/contact`, `features/work-with-us`, `features/consultation`, `features/timeline`, `app/account`, `app/admin/posts/new`, etc.
+- **Phase 6:** Admin UI + Faq model (`Faq` Prisma table + `/admin/faq` Data Table + Form)
+- **Phase 7:** Chat / messenger — install `message`, `bubble`, `message-scroller`, `attachment`, `marker`, build messenger Tabs AI/Personal/Support
+- **Phase 8:** Public module pattern — blog first canonical, then news/media/review/download/shop/forum/timeline
+- **Phase 9-11:** Tools, homepage last, final cleanup.
 
 ---
 
