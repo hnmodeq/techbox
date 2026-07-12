@@ -133,6 +133,7 @@ export default function AdminPage() {
             {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/settings" variant="ghost" size="sm">تنظیمات</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/users" variant="ghost" size="sm">کاربران</ButtonLink>}
+            {user.role === "super_admin" && <ButtonLink href="/admin/faq" variant="ghost" size="sm">FAQ</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/design-system" variant="ghost" size="sm">🎨 دیزاین سیستم</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/upload" variant="ghost" size="sm">آپلود Blob</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/blob" variant="ghost" size="sm">فایل‌های Blob</ButtonLink>}
