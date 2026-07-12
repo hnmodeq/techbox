@@ -1,9 +1,0 @@
-1-videos is not playable.
-
-2-videos doesn't show correct duration of the clip, the real duration should get receive from database
-
-3-in homepage Download Row file size: PDF which is wrong it should get a number from database as file size and show it here. 
-
-4-in main sidebar tools have a submenu which it's get open but when you want to hover on items in submenu the submenu get disappear which should not.
-
-5-before anything get open we have a loading message like "در حال دریافت اطلاعات" but i want this message get replace with a loading circle (not full screen, only a simple animated circle center of the page)
