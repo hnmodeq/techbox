@@ -112,7 +112,7 @@ export function TimelineContainer({
         <div
           className="w-full h-full"
           style={{
-            backgroundImage: 'linear-gradient(90deg, var(--timeline) 1px, transparent 1px), linear-gradient(var(--timeline) 1px, transparent 1px)',
+            backgroundImage: 'linear-gradient(90deg, hsl(var(--muted-foreground) / 0.3) 1px, transparent 1px), linear-gradient(hsl(var(--muted-foreground) / 0.3) 1px, transparent 1px)',
             backgroundSize: `${50 * zoom}px 50px`,
             backgroundPosition: `${clampedPanX}px ${pan.y}px`,
           }}
@@ -129,7 +129,7 @@ export function TimelineContainer({
       >
         {/* Prominent Glowing Horizontal Timeline Axis Line running continuously across the track */}
         <div
-          className="absolute h-2.5 bg-[var(--timeline)] rounded-full z-10"
+          className="absolute h-2.5 bg-primary rounded-full z-10"
           style={{
             left: `${clampedPanX - 100}px`,
             top: `calc(35% + ${pan.y}px)`,
@@ -155,7 +155,7 @@ export function TimelineContainer({
           >
             {/* Title Above Line */}
             <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 w-64 text-center">
-              <span className="badge !bg-[var(--timeline)] !text-slate-950 font-black mb-1.5 shadow-[var(--shadow-size)]">
+              <span className="badge !bg-primary !text-primary-foreground font-black mb-1.5 shadow-sm">
                 آغاز خط تایم‌لاین تکباکس
               </span>
               <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-black text-[var(--primary-text)] leading-6">
@@ -219,7 +219,7 @@ export function TimelineContainer({
               >
                 {/* 1. Title & Date Section STRICTLY ABOVE THE LINE */}
                 <div className="absolute bottom-[calc(100%+14px)] left-1/2 -translate-x-1/2 w-64 sm:w-72 text-center flex flex-col items-center gap-1">
-                  <div className="text-sm sm:text-base font-black text-[var(--timeline)] font-sans">{persianDate}</div>
+                  <div className="text-sm sm:text-base font-black text-primary font-sans">{persianDate}</div>
                   <div className="text-xs sm:text-sm font-bold text-[var(--paragraph-color)] font-sans tracking-wide" dir="ltr">{globalDate}</div>
                   <div className="text-xs font-extrabold text-[var(--warning)] mt-0.5">
                     {timeAgo}
@@ -227,7 +227,7 @@ export function TimelineContainer({
                 </div>
 
                 {/* 2. Milestone Dot sitting directly on the axis line */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-[var(--timeline)] rounded-full border-[length:var(--border-size)] border-[var(--main-background)] shadow-[var(--shadow-size)] transition-transform hover:scale-125" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-6 h-6 bg-primary rounded-full border-2 border-background shadow-sm transition-transform hover:scale-125" />
 
                 {/* 3. Card hanging BELOW THE LINE top-aligned (top: 32px) with generous padding beneath line */}
                 <div className="absolute top-[32px] left-1/2 -translate-x-1/2 flex justify-center z-10">

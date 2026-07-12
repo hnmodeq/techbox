@@ -25,7 +25,7 @@ export function DownloadAction({
   return (
     <a
       href={`/api/download/${encodeURIComponent(slug)}`}
-      className={`inline-flex items-center justify-center gap-2 rounded-[var(--corner-radius)] bg-[var(--button-background)] px-4 py-2 text-xs font-bold text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] hover:text-[var(--download)] transition-colors ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-md bg-muted px-4 py-2 text-xs font-bold text-foreground border border-border hover:bg-muted/80 transition-colors ${className}`}
     >
       دانلود فایل ↓
     </a>

@@ -135,7 +135,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   return (
     <div style={style} className={`${widthClass} select-none shrink-0 group flex flex-col justify-start relative`}>
       {/* TIER 1: STRICTLY FIXED HEIGHT CARD BOX */}
-      <div className="relative h-[340px] sm:h-[360px] w-full rounded-[var(--corner-radius)] overflow-hidden shadow-[var(--shadow-size)] border-[length:var(--border-size)] border-[var(--border-color)] hover:border-[var(--timeline)] transition-colors duration-[200ms] flex flex-col justify-end bg-slate-950">
+      <div className="relative h-[340px] sm:h-[360px] w-full rounded-lg overflow-hidden shadow-sm border border-border hover:border-primary transition-colors duration-[200ms] flex flex-col justify-end bg-slate-950">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {event.image ? (
             <Image
@@ -146,7 +146,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               sizes="(max-width: 768px) 100vw, 320px"
             />
           ) : (
-            <div className="h-full w-full bg-[radial-gradient(circle_at_top,var(--timeline),transparent_38%),linear-gradient(145deg,#020617,#0f172a)]" />
+            <div className="h-full w-full bg-[radial-gradient(circle_at_top,hsl(var(--primary) / 0.3),transparent_38%),linear-gradient(145deg,#020617,#0f172a)]" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent" />
         </div>
@@ -221,7 +221,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               <Button
                 type="submit"
                 size="sm"
-                className="h-9 bg-[var(--timeline)] text-slate-950 hover:opacity-90 shrink-0"
+                className="h-9 bg-primary text-primary-foreground hover:opacity-90 shrink-0"
                 title="ارسال نظر"
               >
                 <Send size={14} className="rtl:rotate-180" />

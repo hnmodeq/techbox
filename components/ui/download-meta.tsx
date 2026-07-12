@@ -27,7 +27,7 @@ export function DownloadMetaLine({
     <div className="flex flex-wrap items-center gap-3 text-xs paragraph-color font-bold" style={{ fontVariantNumeric: "tabular-nums" }}>
       {showFileName && fileName && (
         <span className="inline-flex min-w-0 items-center gap-1" title="نام فایل">
-          <Icon name="download" size={15} className="text-[var(--download)]" />
+          <Icon name="download" size={15} className="text-muted-foreground" />
           <span className="max-w-[180px] truncate text-[var(--primary-text)]" dir="ltr">{fileName}</span>
         </span>
       )}
@@ -42,7 +42,7 @@ export function DownloadMetaLine({
         </span>
       )}
       <span className="inline-flex items-center gap-1" title="تعداد دانلود">
-        <Icon name="download" size={15} className="text-[var(--download)]" />
+        <Icon name="download" size={15} className="text-muted-foreground" />
         <span className="text-[var(--primary-text)]">{downloadCount.toLocaleString("fa-IR")}</span>
         <span className="font-normal">دانلود</span>
       </span>
