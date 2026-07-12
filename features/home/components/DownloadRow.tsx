@@ -3,9 +3,12 @@
 import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ButtonLink } from '@/components/ui/button';
+import { Icon } from '@/design/icons';
 import { DownloadMetaLine } from '@/components/ui/download-meta';
 import { DownloadAction } from '@/components/ui/download-action';
-import { Icon } from '@/design/icons';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function DownloadRow() {
@@ -23,15 +26,13 @@ export default function DownloadRow() {
   };
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.downloadMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.downloadMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
-        {/* Simple Text More Button positioned ABOVE items inside the header */}
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
-          <Link href="/download" className="text-sm font-bold text-[var(--download)] hover:underline flex items-center gap-1 shrink-0">
-            <span>ورود به مرکز دانلود</span>
-            <span>←</span>
-          </Link>
+          <h2 className="text-xl sm:text-2xl font-black text-foreground">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
+          <ButtonLink variant="link" size="sm" className="text-[var(--download)] font-bold shrink-0" href="/download">
+            ورود به مرکز دانلود ←
+          </ButtonLink>
         </div>
 
         {loading ? (
@@ -43,37 +44,37 @@ export default function DownloadRow() {
           {files.map((file) => {
             const fileType = getFileType(file.title, file.category, file.fileName ?? null);
             return (
-              <article
-                key={file.slug}
-                className="group bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 hover:bg-[var(--muted-background)]/40 transition-all duration-[200ms] flex flex-col justify-between gap-3"
-              >
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--download)]/10 text-[var(--download)] border-[length:var(--border-size)] border-[var(--download)]/30 shadow-[var(--shadow-size)]">
-                    <Icon name="file" size={26} className="text-[var(--download)]" />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="inline-flex items-center rounded-full border border-[color-mix(in_oklch,var(--download)_30%,transparent)] bg-[color-mix(in_oklch,var(--download)_12%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--download)]" dir="ltr">{fileType}</span>
+              <Card key={file.slug} className="group p-4 hover:shadow-md transition-all duration-200">
+                <CardContent className="p-0 flex flex-col justify-between gap-3">
+                  <div className="flex items-start gap-3.5 min-w-0">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--download)]/10 text-[var(--download)] border border-[var(--download)]/30">
+                      <Icon name="file" size={26} className="text-[var(--download)]" />
                     </div>
 
-                    <Link href={`/download/${file.slug}`} className="block">
-                      <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-[var(--primary-text)] group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
-                        {file.title}
-                      </h3>
-                    </Link>
-                    <div className="text-xs paragraph-color mt-1 line-clamp-1">
-                      {file.excerpt || 'سرورهای Enterprise و مجازی‌سازی'}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="outline" className="border-[color-mix(in_oklch,var(--download)_30%,var(--border))] bg-[color-mix(in_oklch,var(--download)_12%,transparent)] text-[var(--download)] text-[11px]" dir="ltr">
+                          {fileType}
+                        </Badge>
+                      </div>
+
+                      <Link href={`/download/${file.slug}`} className="block">
+                        <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
+                          {file.title}
+                        </h3>
+                      </Link>
+                      <div className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                        {file.excerpt || 'سرورهای Enterprise و مجازی‌سازی'}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Bottom Footer without visible separator line */}
-                <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
-                  <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
-                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} showFileSize={true} />
-                </div>
-              </article>
+                  <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
+                    <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
+                    <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} showFileSize={true} />
+                  </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
