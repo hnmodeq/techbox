@@ -4,6 +4,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import TeamChromaSection, { type TeamMember } from "@/features/home/components/TeamChromaSection";
 import PageHeader from "@/components/effects/PageHeader";
 
@@ -44,6 +45,7 @@ export default async function About() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-14 space-y-14" dir="rtl">
+      <PageBreadcrumb />
       <PageHeader
         colorVar="--about"
         title="درباره تکباکس"

@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { getCurrentUserClient } from "@/lib/auth";
@@ -131,6 +132,7 @@ export default function AdminFaqPage() {
     <main className="min-h-dvh bg-background p-4 md:p-8" dir="rtl">
       <Toaster dir="rtl" />
       <div className="mx-auto max-w-5xl space-y-6">
+        <PageBreadcrumb />
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-extrabold">مدیریت FAQ — درباره ما</h1>
