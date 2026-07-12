@@ -5,6 +5,7 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import { DownloadMetaLine } from '@/components/ui/download-meta';
 import { DownloadAction } from '@/components/ui/download-action';
+import { Icon } from '@/design/icons';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
 export default function DownloadRow() {
@@ -48,7 +49,7 @@ export default function DownloadRow() {
               >
                 <div className="flex items-start gap-3.5 min-w-0">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--corner-radius)] bg-[var(--download)]/10 text-[var(--download)] border-[length:var(--border-size)] border-[var(--download)]/30 shadow-[var(--shadow-size)]">
-                    <span className="text-[12px] font-mono font-black tracking-tight" dir="ltr">{file.fileSize || fileType}</span>
+                    <Icon name="file" size={26} className="text-[var(--download)]" />
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -73,7 +74,7 @@ export default function DownloadRow() {
                 {/* Bottom Footer without visible separator line */}
                 <div className="flex flex-wrap items-center justify-between gap-3 w-full mt-3">
                   <DownloadAction slug={file.slug} fallbackFileName={file.fileName ?? null} />
-                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={false} showFileSize={false} />
+                  <DownloadMetaLine slug={file.slug} fallbackFileName={file.fileName ?? null} fallbackFileSize={file.fileSize ?? null} fallbackDownloadCount={file.downloadCount ?? 0} showFileName={true} showFileSize={true} />
                 </div>
               </article>
             );
