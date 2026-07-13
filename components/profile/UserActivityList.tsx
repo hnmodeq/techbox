@@ -30,15 +30,14 @@ export type UserActivity = {
   createdAt: string
 }
 
-type ActivityGroup = {
+type ActivityRow = {
   key: string
+  type: "like" | "comment"
   module: string
   slug: string
   title: string
   image?: string | null
-  hasLike: boolean
-  likedAt?: string
-  comments: Array<{ id: string; text: string; createdAt: string }>
+  text?: string | null
   createdAt: string
 }
 
@@ -67,72 +66,52 @@ function relativeTime(input: string) {
   return `${years.toLocaleString("fa-IR")} سال پیش`
 }
 
-function groupActivities(activities: UserActivity[]) {
-  const map = new Map<string, ActivityGroup>()
-
+function toRows(activities: UserActivity[]) {
+  const grouped = new Map<string, { like?: UserActivity; comments: UserActivity[] }>()
   for (const activity of activities) {
     const key = `${activity.module}:${activity.slug}`
-    const current = map.get(key) || {
-      key,
-      module: activity.module,
-      slug: activity.slug,
-      title: activity.title,
-      image: activity.image,
-      hasLike: false,
-      comments: [],
-      createdAt: activity.createdAt,
-    }
+    const group = grouped.get(key) || { comments: [] }
+    if (activity.type === "comment") group.comments.push(activity)
+    else group.like = activity
+    grouped.set(key, group)
+  }
 
-    if (activity.type === "like") {
-      current.hasLike = true
-      current.likedAt = activity.createdAt
-    } else {
-      current.comments.push({
-        id: activity.id,
-        text: activity.text || "دیدگاه بدون متن",
-        createdAt: activity.createdAt,
+  const rows: ActivityRow[] = []
+  for (const [key, group] of grouped) {
+    if (group.comments.length > 0) {
+      const latestComment = [...group.comments].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))[0]
+      rows.push({
+        key,
+        type: "comment",
+        module: latestComment.module,
+        slug: latestComment.slug,
+        title: latestComment.title,
+        image: latestComment.image,
+        text: latestComment.text,
+        createdAt: latestComment.createdAt,
+      })
+    } else if (group.like) {
+      rows.push({
+        key,
+        type: "like",
+        module: group.like.module,
+        slug: group.like.slug,
+        title: group.like.title,
+        image: group.like.image,
+        createdAt: group.like.createdAt,
       })
     }
-
-    current.createdAt = [...current.comments.map((comment) => comment.createdAt), current.likedAt].filter(Boolean).sort((a, b) => +new Date(b!) - +new Date(a!))[0] || activity.createdAt
-    map.set(key, current)
   }
-
-  return Array.from(map.values()).map((group) => ({
-    ...group,
-    comments: [...group.comments].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)),
-  }))
+  return rows.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
 }
 
-function activitySentence(group: ActivityGroup) {
-  const latestComment = group.comments[0]
-  if (group.hasLike && latestComment) {
-    return (
-      <>
-        <span className="text-foreground">این کاربر این محتوا را پسندیده و گفته است:</span>{" "}
-        <span className="text-muted-foreground">{latestComment.text}</span>
-        {group.comments.length > 1 && <span className="text-muted-foreground"> ({(group.comments.length - 1).toLocaleString("fa-IR")} دیدگاه دیگر)</span>}
-      </>
-    )
-  }
-  if (latestComment) return <span className="text-muted-foreground">{latestComment.text}</span>
-  return <span className="text-muted-foreground">این کاربر این محتوا را پسندیده است.</span>
-}
-
-export function UserActivityList({ activities }: { activities: UserActivity[] }) {
+export function UserActivityList({ activities, className = "" }: { activities: UserActivity[]; className?: string }) {
   const [filter, setFilter] = React.useState<"all" | "like" | "comment">("all")
   const [page, setPage] = React.useState(1)
   const pageSize = 10
 
-  const grouped = React.useMemo(() => groupActivities(activities), [activities])
-  const filtered = React.useMemo(() => {
-    const items = grouped.filter((group) => {
-      if (filter === "like") return group.hasLike
-      if (filter === "comment") return group.comments.length > 0
-      return true
-    })
-    return [...items].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-  }, [grouped, filter])
+  const rows = React.useMemo(() => toRows(activities), [activities])
+  const filtered = React.useMemo(() => rows.filter((row) => filter === "all" || row.type === filter), [rows, filter])
 
   React.useEffect(() => setPage(1), [filter])
 
@@ -140,7 +119,7 @@ export function UserActivityList({ activities }: { activities: UserActivity[] })
   const pageItems = filtered.slice((page - 1) * pageSize, page * pageSize)
 
   return (
-    <section className="mt-10 space-y-4">
+    <section className={`space-y-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
         <div>
           <h2 className="text-xl font-black text-foreground">فعالیت‌های کاربر</h2>
@@ -160,60 +139,44 @@ export function UserActivityList({ activities }: { activities: UserActivity[] })
       </div>
 
       {pageItems.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center text-muted-foreground">برای این بخش هنوز فعالیتی ثبت نشده است.</CardContent>
-        </Card>
+        <Card><CardContent className="p-8 text-center text-muted-foreground">برای این بخش هنوز فعالیتی ثبت نشده است.</CardContent></Card>
       ) : (
         <div className="space-y-2">
-          {pageItems.map((group) => {
-            const latestComment = group.comments[0]
-            const timeBasis = latestComment?.createdAt || group.likedAt || group.createdAt
-            return (
-              <Link key={group.key} href={`/${group.module}/${group.slug}`} className="block">
-                <Card className="p-0 transition-colors hover:bg-muted/40">
-                  <CardContent className="grid min-h-24 grid-cols-[82px_minmax(92px,0.38fr)_minmax(0,1fr)] gap-3 p-3 max-sm:grid-cols-[76px_minmax(0,1fr)]">
-                    <div className="relative row-span-2 overflow-hidden rounded-lg bg-muted">
-                      {group.image ? (
-                        <Image src={group.image} alt={group.title} fill sizes="82px" className="object-cover" {...blurProps(group.image)} />
-                      ) : (
-                        <div className="flex h-full min-h-20 w-full items-center justify-center text-muted-foreground">
-                          {group.comments.length > 0 ? <MessageCircleIcon className="size-6" /> : <HeartIcon className="size-6" />}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex min-w-0 flex-col justify-center gap-1 max-sm:col-start-2">
-                      <Badge variant="outline" className="w-fit">{moduleLabels[group.module] || group.module}</Badge>
-                      <span className="text-xs text-muted-foreground">{relativeTime(timeBasis)}</span>
-                    </div>
-
-                    <div className="flex min-w-0 items-center text-sm leading-7 max-sm:col-span-2 max-sm:col-start-1">
-                      <p className="line-clamp-2">{activitySentence(group)}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            )
-          })}
+          {pageItems.map((row) => (
+            <Link key={row.key} href={`/${row.module}/${row.slug}`} className="block">
+              <Card className="p-0 transition-colors hover:bg-muted/40">
+                <CardContent className="grid min-h-[76px] grid-cols-[76px_minmax(0,1fr)] gap-3 p-2.5 sm:grid-cols-[84px_minmax(0,1fr)]">
+                  <div className="relative row-span-2 overflow-hidden rounded-lg bg-muted">
+                    {row.image ? (
+                      <Image src={row.image} alt={row.title} fill sizes="84px" className="object-cover" {...blurProps(row.image)} />
+                    ) : (
+                      <div className="flex h-full min-h-[72px] w-full items-center justify-center text-muted-foreground">
+                        {row.type === "comment" ? <MessageCircleIcon className="size-5" /> : <HeartIcon className="size-5" />}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Badge variant="outline" className="shrink-0">{moduleLabels[row.module] || row.module}</Badge>
+                    <span className="truncate text-xs text-muted-foreground">{relativeTime(row.createdAt)}</span>
+                  </div>
+                  <p className="line-clamp-2 min-w-0 text-sm leading-6 text-muted-foreground">
+                    {row.type === "comment" ? row.text || "دیدگاه بدون متن" : "این کاربر این محتوا را پسندیده است."}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       )}
 
       {totalPages > 1 && (
         <Pagination className="pt-3">
           <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))} />
-            </PaginationItem>
+            <PaginationItem><PaginationPrevious disabled={page === 1} onClick={() => setPage((current) => Math.max(1, current - 1))} /></PaginationItem>
             {Array.from({ length: totalPages }, (_, index) => index + 1).map((item) => (
-              <PaginationItem key={item}>
-                <PaginationLink isActive={page === item} onClick={() => setPage(item)}>
-                  {item.toLocaleString("fa-IR")}
-                </PaginationLink>
-              </PaginationItem>
+              <PaginationItem key={item}><PaginationLink isActive={page === item} onClick={() => setPage(item)}>{item.toLocaleString("fa-IR")}</PaginationLink></PaginationItem>
             ))}
-            <PaginationItem>
-              <PaginationNext disabled={page === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))} />
-            </PaginationItem>
+            <PaginationItem><PaginationNext disabled={page === totalPages} onClick={() => setPage((current) => Math.min(totalPages, current + 1))} /></PaginationItem>
           </PaginationContent>
         </Pagination>
       )}

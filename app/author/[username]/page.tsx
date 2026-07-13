@@ -1,125 +1,39 @@
 import Image from "next/image";
-import Link from "next/link";
 import PageHeader from "@/components/effects/PageHeader";
 import { Icon } from "@/design/icons";
-import { CardStats } from "@/components/ui/card-stats";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { blurProps } from "@/lib/image-placeholder";
 import { ensureSavedContentTable } from "@/lib/saved-content-table";
-import { UserActivityList, type UserActivity } from "@/components/profile/UserActivityList";
-
-const contentModules = ["blog", "review", "media", "forum", "news"];
-
-function PostGrid({ posts, title, empty }: { posts: any[]; title: string; empty: string }) {
-  return (
-    <section className="mt-10 space-y-4">
-      <h2 className="border-b pb-3 text-xl font-black text-foreground">{title}</h2>
-      {posts.length === 0 ? (
-        <Card><CardContent className="p-8 text-center text-muted-foreground">{empty}</CardContent></Card>
-      ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post: any) => (
-            <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/40">
-              <div className="relative aspect-[16/10] bg-muted">
-                {post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" {...blurProps(post.image)} />}
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-muted-foreground">{post.dateFa || post.date_fa} • {post.category || post.module}</div>
-                <h3 className="mt-2 line-clamp-2 font-bold text-foreground">{post.title}</h3>
-                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{post.excerpt}</p>
-                <div className="mt-3 border-t pt-3"><CardStats module={post.module} slug={post.slug} showComments /></div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
+import { getSessionUserPublic } from "@/lib/auth-server";
+import { getUserActivities, PROFILE_CONTENT_MODULES } from "@/lib/user-activity";
+import { ProfileTabs } from "@/components/profile/ProfileTabs";
 
 export default async function AuthorProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const cleanUser = decodeURIComponent(username).toLowerCase();
-  const user = await prisma.user.findFirst({ where: { OR: [{ username: cleanUser }, { name: cleanUser }] } }).catch(() => null);
+  const [user, viewer] = await Promise.all([
+    prisma.user.findFirst({ where: { OR: [{ username: cleanUser }, { name: cleanUser }] } }).catch(() => null),
+    getSessionUserPublic().catch(() => null),
+  ]);
 
   if (!user) return <main className="mx-auto max-w-3xl px-4 py-16 text-center text-muted-foreground" dir="rtl">کاربر پیدا نشد.</main>;
 
   const authoredPosts = await prisma.post.findMany({
-    where: { published: true, deletedAt: null, module: { in: contentModules }, OR: [{ authorId: user.id }, { authorName: user.name }] },
+    where: { published: true, deletedAt: null, module: { in: PROFILE_CONTENT_MODULES }, OR: [{ authorId: user.id }, { authorName: user.name }] },
     orderBy: { date: "desc" },
     include: { comments: true },
   }).catch(() => []);
   const isAuthor = authoredPosts.length > 0 || ["super_admin", "admin", "editor"].includes(user.role);
+  const isSelf = viewer?.id === user.id;
 
   const totalViews = authoredPosts.reduce((acc: number, p: any) => acc + (p.views || 0), 0);
   const totalLikes = authoredPosts.reduce((acc: number, p: any) => acc + (p.likes || 0), 0);
   const totalComments = authoredPosts.reduce((acc: number, p: any) => acc + (p.comments?.length || 0), 0);
 
-  let activities: UserActivity[] = [];
+  const activities = await getUserActivities(user.id);
   let savedPosts: any[] = [];
-
-  if (!isAuthor) {
-    const likes = await prisma.like.findMany({
-      where: {
-        OR: [{ userId: user.id }, { fingerprint: user.id }],
-        module: { in: contentModules },
-        deletedAt: null,
-      },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    }).catch(() => []);
-
-    const likedPostMap = new Map<string, any>();
-    if (likes.length) {
-      const likedPosts = await prisma.post.findMany({
-        where: { published: true, deletedAt: null, OR: likes.map((like: any) => ({ module: like.module, slug: like.slug })) },
-      }).catch(() => []);
-      likedPosts.forEach((post: any) => likedPostMap.set(`${post.module}:${post.slug}`, post));
-    }
-
-    const likeActivities: UserActivity[] = likes
-      .map((like: any) => {
-        const post = likedPostMap.get(`${like.module}:${like.slug}`);
-        if (!post) return null;
-        return {
-          id: `like-${like.id}`,
-          type: "like" as const,
-          module: post.module,
-          slug: post.slug,
-          title: post.title,
-          image: post.image,
-          excerpt: post.excerpt,
-          createdAt: like.createdAt.toISOString(),
-        };
-      })
-      .filter(Boolean) as UserActivity[];
-
-    const comments = await prisma.comment.findMany({
-      where: {
-        authorId: user.id,
-        deletedAt: null,
-        post: { module: { in: contentModules }, published: true, deletedAt: null },
-      },
-      include: { post: true },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    }).catch(() => []);
-
-    const commentActivities: UserActivity[] = comments.map((comment: any) => ({
-      id: `comment-${comment.id}`,
-      type: "comment" as const,
-      module: comment.post.module,
-      slug: comment.post.slug,
-      title: comment.post.title,
-      image: comment.post.image,
-      excerpt: comment.post.excerpt,
-      text: comment.text,
-      createdAt: comment.createdAt.toISOString(),
-    }));
-
-    activities = [...likeActivities, ...commentActivities].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-
+  if (isSelf) {
     try {
       await ensureSavedContentTable();
       const savedRows = await prisma.$queryRawUnsafe(`SELECT "module", "slug" FROM "SavedContent" WHERE "userId"=$1 ORDER BY "createdAt" DESC LIMIT 60`, user.id);
@@ -152,14 +66,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         </CardContent>
       </Card>
 
-      {isAuthor ? (
-        <PostGrid posts={authoredPosts} title="محتواهای منتشرشده" empty="هنوز محتوایی ثبت نشده است." />
-      ) : (
-        <>
-          <UserActivityList activities={activities} />
-          <PostGrid posts={savedPosts} title="محتواهای ذخیره‌شده" empty="هنوز محتوایی ذخیره نشده است." />
-        </>
-      )}
+      <ProfileTabs isAuthor={isAuthor} authoredPosts={authoredPosts} activities={activities} savedPosts={savedPosts} isSelf={isSelf} />
     </main>
   );
 }

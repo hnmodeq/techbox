@@ -16,6 +16,7 @@ import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/design/icons";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { AccountProfileTabs } from "@/components/profile/AccountProfileTabs";
 
 const loginSchema = z.object({
   username: z.string().min(2),
@@ -370,10 +371,11 @@ export default function AccountPage() {
         </Card>
 
         <div className="lg:col-span-2 space-y-6">
-          <Card className="p-6">
-            <CardHeader className="px-0 pt-0">
-              <CardTitle className="text-base">ویرایش پروفایل</CardTitle>
-            </CardHeader>
+          <AccountProfileTabs profileEditor={
+            <Card className="p-6">
+              <CardHeader className="px-0 pt-0">
+                <CardTitle className="text-base">ویرایش پروفایل</CardTitle>
+              </CardHeader>
             {saveStatus && (
               <div className={`rounded-md p-3 text-center text-sm mb-4 ${saveStatus.ok ? "bg-green-500/15 text-green-600 border border-green-500/30" : "bg-destructive/15 text-destructive border border-destructive/30"}`}>
                 {saveStatus.msg}
@@ -479,7 +481,9 @@ export default function AccountPage() {
                 </div>
               </form>
             </Form>
-          </Card>
+            </Card>
+          }
+          />
         </div>
       </div>
     </main>
