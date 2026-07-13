@@ -24,23 +24,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/providers/auth.provider"
-import { Button } from "@/components/ui/button"
 import {
   ChevronsUpDownIcon,
   UserIcon,
   ShieldIcon,
   LogOutIcon,
   LogInIcon,
-  MoonIcon,
-  SunIcon,
 } from "lucide-react"
-import { useTheme } from "next-themes"
 
 export function TechboxNavUser() {
   const { isMobile } = useSidebar()
   const { user, logout } = useAuth()
-  const { theme, setTheme } = useTheme()
-  const isDark = theme === "dark"
 
   return (
     <SidebarMenu>
@@ -98,13 +92,6 @@ export function TechboxNavUser() {
                   )}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => setTheme(isDark ? "light" : "dark")}>
-                    {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
-                    {isDark ? "حالت روشن" : "حالت تاریک"}
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                   <LogOutIcon className="size-4" />
                   خروج از حساب
@@ -112,13 +99,6 @@ export function TechboxNavUser() {
               </>
             ) : (
               <>
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => setTheme(isDark ? "light" : "dark")}>
-                    {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
-                    {isDark ? "حالت روشن" : "حالت تاریک"}
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))}>
                   <LogInIcon className="size-4" />
                   ورود / ثبت‌نام

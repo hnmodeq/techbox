@@ -64,13 +64,14 @@ export function TechboxNewsSidebar() {
                     className="h-auto py-3 px-2"
                   >
                     <div className="flex items-start gap-3 w-full">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
                         <Image
                           src={news.image || "/assets/blog-1.jpg"}
                           alt={news.title}
                           fill
                           className="object-cover"
-                          sizes="48px"
+                          sizes="(min-width: 768px) 80px, 96px"
+                          quality={95}
                         />
                       </div>
                       <div className="flex-1 min-w-0 text-start">

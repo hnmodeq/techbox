@@ -31,6 +31,7 @@ export function TechboxNavMain() {
         {navItems.map((item) => {
           const active = isActive(pathname, item.href)
           const Icon = item.icon
+          const hasChildren = Boolean(item.children?.length)
           return (
             <Collapsible
               key={item.title}
@@ -40,7 +41,7 @@ export function TechboxNavMain() {
               <SidebarMenuButton
                 isActive={active}
                 tooltip={item.title}
-                render={<Link href={item.href} />}
+                render={hasChildren ? <CollapsibleTrigger /> : <Link href={item.href} />}
               >
                 <Icon className="size-4" />
                 <span>{item.title}</span>
