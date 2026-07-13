@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 
 const DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve",
@@ -12,6 +13,7 @@ const DEFAULTS: Record<string, string> = {
  */
 export async function getSetting(key: string): Promise<string> {
   try {
+    await ensureSiteSettingsTable();
     const row = await prisma.siteSetting.findUnique({ where: { key } });
     return row?.value ?? DEFAULTS[key] ?? "";
   } catch {
@@ -24,6 +26,7 @@ export async function getSetting(key: string): Promise<string> {
  */
 export async function getSettings(keys: string[]): Promise<Record<string, string>> {
   try {
+    await ensureSiteSettingsTable();
     const rows = await prisma.siteSetting.findMany({ where: { key: { in: keys } } });
     const map: Record<string, string> = {};
     for (const key of keys) {

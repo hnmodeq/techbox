@@ -33,7 +33,7 @@ export default function VideoReelsRow() {
         ) : (
         <div className="responsive-card-grid-sm grid gap-5">
           {videos.map((vid) => (
-            <Button type="button" key={vid.slug} onClick={() => setActive(vid)} variant="ghost" className="group relative w-full h-auto aspect-[16/9] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
+            <Button type="button" key={vid.slug} onClick={() => setActive(vid)} variant="ghost" className="group relative w-full h-auto aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="260px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
               {(vid as any).videoDuration && <span className="absolute left-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white" dir="ltr">{(vid as any).videoDuration}</span>}

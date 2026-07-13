@@ -31,7 +31,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Array<{ authorName: string; text: string; createdAt: string }>>(
     Array.isArray(event.comments)
-      ? event.comments.map((c: any) => ({ authorName: c.authorName || 'کاربر', text: c.text, createdAt: 'لحظاتی پیش' }))
+      ? event.comments.filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]')).map((c: any) => ({ authorName: c.authorName || 'کاربر', text: c.text, createdAt: 'لحظاتی پیش' }))
       : []
   );
   const [newCommentText, setNewCommentText] = useState('');
@@ -50,13 +50,15 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   // Keep local comments/likes state in sync if the `event` prop itself is
   // refreshed (e.g. parent re-fetches the timeline).
   useEffect(() => {
-    if (Array.isArray(event.comments) && event.comments.length > 0) {
+    if (Array.isArray(event.comments)) {
       setComments(
-        event.comments.map((c: any) => ({
-          authorName: c.authorName || 'عضو تکباکس',
-          text: c.text,
-          createdAt: 'لحظاتی پیش',
-        }))
+        event.comments
+          .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
+          .map((c: any) => ({
+            authorName: c.authorName || 'عضو تکباکس',
+            text: c.text,
+            createdAt: 'لحظاتی پیش',
+          }))
       );
     }
   }, [event.comments]);

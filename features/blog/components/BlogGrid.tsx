@@ -6,9 +6,9 @@ import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardStats } from "@/components/ui/card-stats";
+import { AuthorLink } from "@/components/ui/author-link";
 
 export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("blog");
@@ -46,7 +46,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
               href={`/blog/${p.slug}`}
               className="group block"
             >
-              <Card className="h-full overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+              <Card className="h-full gap-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
                 <div className="relative aspect-square overflow-hidden bg-muted">
                   <Image
                     src={p.image || "/assets/blog-1.jpg"}
@@ -70,17 +70,9 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                     {p.excerpt}
                   </p>
                   <div className="flex items-center justify-between mt-4 pt-3 border-t">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7">
-                        <AvatarImage src={p.author.avatar} alt={p.author.name} />
-                        <AvatarFallback className="text-xs">
-                          {p.author.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="text-xs">
-                        <div className="font-medium">{p.author.name}</div>
-                        <div className="text-muted-foreground">{p.date_fa}</div>
-                      </div>
+                    <div className="flex flex-col gap-1">
+                      <AuthorLink name={p.author.name} avatar={p.author.avatar} username={(p.author as any).username} />
+                      <div className="text-xs text-muted-foreground">{p.date_fa}</div>
                     </div>
                     <CardStats module="blog" slug={p.slug} showComments={true} />
                   </div>

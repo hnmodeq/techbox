@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
+import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve", // "auto_approve" | "require_approval"
@@ -20,6 +21,7 @@ export async function GET() {
   }
 
   try {
+    await ensureSiteSettingsTable();
     const settings = await prisma.siteSetting.findMany();
     const map: Record<string, string> = { ...SETTINGS_DEFAULTS };
     for (const s of settings) {
@@ -38,6 +40,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
+    await ensureSiteSettingsTable();
     const body = await req.json();
     const updates = updateSchema.parse(body);
 
