@@ -35,7 +35,7 @@ export default function ReviewRow() {
         ) : reviews.length === 0 ? (
           <EmptyRow>هنوز نقد و بررسی‌ای در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="responsive-card-grid grid gap-6">
           {reviews.map((rev) => (
             <Link key={rev.slug} href={`/review/${rev.slug}`} className="group block">
               <Card className="h-full !p-0 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all duration-200">

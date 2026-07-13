@@ -28,7 +28,7 @@ export default function RecommendationRow({
           </ButtonLink>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="responsive-card-grid grid gap-6">
           {items.map((item, index) => (
             <motion.div
               key={item.slug}

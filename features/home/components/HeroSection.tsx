@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { moduleColors } from "@/config/module-colors";
 import { HOME_ROW_SIZES } from "./HomeRowConfig";
+
+const MagicRings = dynamic(() => import("@/components/effects/MagicRings"), { ssr: false });
 
 const items: { text: string; href: string; module: keyof typeof moduleColors }[] = [
   { text: "اخبار تکنولوژی رو با تکباکس دنبال کن", href: "/news", module: "news" },
@@ -29,10 +32,31 @@ export default function HeroSection() {
   const item = items[index];
 
   return (
-    <section className={`relative w-full max-w-full overflow-hidden bg-[var(--main-background)] border-0 ${HOME_ROW_SIZES.heroMinHeight} flex flex-col justify-center items-center px-4 py-16 text-center`} dir="rtl">
+    <section className={`relative w-full max-w-full overflow-hidden bg-background border-0 ${HOME_ROW_SIZES.heroMinHeight} flex flex-col justify-center items-center px-4 py-16 text-center`} dir="rtl">
+      <div className="absolute inset-0 opacity-70 dark:opacity-85">
+        <MagicRings
+          color="#fc42ff"
+          colorTwo="#42fcff"
+          speed={0.75}
+          ringCount={7}
+          attenuation={9}
+          lineThickness={2.4}
+          baseRadius={0.26}
+          radiusStep={0.075}
+          scaleRate={0.16}
+          opacity={0.75}
+          noiseAmount={0.04}
+          rotation={-18}
+          followMouse
+          mouseInfluence={0.09}
+          hoverScale={1.06}
+          parallax={0.025}
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/75 to-background" />
       <div className="relative z-10 flex flex-col items-center w-full max-w-3xl">
-        <h1 className="text-[length:var(--hero-font-size)] text-[var(--hero-font-color)] font-black font-black tracking-tight">تکباکس</h1>
-        <p className="mt-2 text-sm sm:text-base paragraph-color font-bold">پلتفرم جامع زیرساخت و فناوری اطلاعات</p>
+        <h1 className="text-[length:var(--hero-font-size)] text-foreground font-black tracking-tight">تکباکس</h1>
+        <p className="mt-2 text-sm sm:text-base text-muted-foreground font-bold">پلتفرم جامع زیرساخت و فناوری اطلاعات</p>
         <div className="hero-rotator mt-6 w-full">
           <AnimatePresence mode="wait">
             <motion.div

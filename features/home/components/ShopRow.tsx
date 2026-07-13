@@ -32,7 +32,7 @@ export default function ShopRow() {
         ) : products.length === 0 ? (
           <EmptyRow>هنوز محصولی در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="responsive-card-grid grid gap-6">
           {products.map((prod) => (
             <Card key={prod.slug} className="group !p-0 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all duration-200">
               <Link href={`/shop/${prod.slug}`} className="block flex-1">

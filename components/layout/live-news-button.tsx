@@ -14,7 +14,7 @@ export function LiveNewsButton({ hasUnread = false, onClick }: LiveNewsButtonPro
       type="button"
       onClick={onClick}
       aria-label="اخبار زنده تکباکس"
-      title={hasUnread ? "خبر خوانده‌نشده دارید" : "خبر جدیدی ندارید"}
+      title={hasUnread ? "خبر جدید" : "خبر جدیدی نیست"}
       className="fixed left-4 top-20 z-40 flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-bold text-white shadow-lg transition-all hover:bg-red-700 hover:shadow-xl active:scale-95"
     >
       {hasUnread && <span className="h-2 w-2 rounded-full bg-white" />}

@@ -4,6 +4,14 @@ import { useDbPosts } from "@/hooks/useDbPosts";
 import { MediaSelectorCard } from "@/components/ui/media-selector-card";
 import { useState, useMemo } from "react";
 import ModuleHeader from "@/components/effects/ModuleHeader";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export default function MediaGallery({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = useMemo(() => getModuleItems("media"), []);
@@ -11,7 +19,6 @@ export default function MediaGallery({ serverItems }: { serverItems?: ContentIte
 
   const allItems = serverItems && serverItems.length > 0 ? serverItems : dbItems;
 
-  // Pagination state
   const [page, setPage] = useState(1);
   const itemsPerPage = 6;
   const totalPages = Math.max(1, Math.ceil(allItems.length / itemsPerPage));
@@ -21,7 +28,7 @@ export default function MediaGallery({ serverItems }: { serverItems?: ContentIte
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
       <ModuleHeader module="media" title="رسانه ویدیویی تکباکس" count={`${allItems.length.toLocaleString("fa-IR")} ویدیو`} />
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <div className="responsive-card-grid-sm grid gap-6 mt-8">
         {displayedItems.map((v, idx) => (
           <MediaSelectorCard
             key={`${v.slug}-${idx}`}
@@ -37,23 +44,30 @@ export default function MediaGallery({ serverItems }: { serverItems?: ContentIte
         ))}
       </div>
 
-      {/* Numeric Pagination (1 2 3 4) */}
       {totalPages > 1 && (
-        <div className="mt-12 flex items-center justify-center gap-2">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`h-10 w-10 rounded-[var(--corner-radius)] border font-bold transition-all ${
-                page === p
-                  ? "bg-[var(--media)] text-[#ffffff] border-[var(--media)] shadow-[var(--shadow-size)] scale-105"
-                  : "border-[var(--border-color)] bg-[var(--card-background)] text-[var(--primary-text)] hover:border-[var(--media)] hover:text-[var(--media)]"
-              }`}
-            >
-              {p.toLocaleString("fa-IR")}
-            </button>
-          ))}
-        </div>
+        <Pagination className="mt-12">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                disabled={page === 1}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+              />
+            </PaginationItem>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <PaginationItem key={p}>
+                <PaginationLink isActive={page === p} onClick={() => setPage(p)}>
+                  {p.toLocaleString("fa-IR")}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                disabled={page === totalPages}
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
     </main>
   );

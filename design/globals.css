@@ -294,11 +294,23 @@ html.theme-transitioning * {
 
 @keyframes techbox-ticker-scroll {
   from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
     transform: translate3d(-50%, 0, 0);
   }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.responsive-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.responsive-card-grid-sm {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+}
+
+.responsive-card-grid-lg {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 }
 
 @media (prefers-reduced-motion: reduce) {

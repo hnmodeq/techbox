@@ -34,7 +34,7 @@ export default function MagazineRow() {
         ) : articles.length === 0 ? (
           <EmptyRow>هنوز مقاله‌ای در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="responsive-card-grid grid gap-6">
           {articles.map((art) => (
             <Card key={art.slug} className="group !p-0 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all duration-200">
               <Link href={`/blog/${art.slug}`} className="block flex-1">

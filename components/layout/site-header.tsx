@@ -25,13 +25,6 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -271,6 +264,12 @@ function NotificationsButton() {
   }, [loadNotifications])
 
   React.useEffect(() => {
+    const openNotifications = () => setOpen(true)
+    window.addEventListener("tb_open_notifications", openNotifications)
+    return () => window.removeEventListener("tb_open_notifications", openNotifications)
+  }, [])
+
+  React.useEffect(() => {
     if (!open || unreadCount === 0) return
     fetch("/api/notifications", {
       method: "POST",
@@ -282,17 +281,20 @@ function NotificationsButton() {
   }, [open, unreadCount])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={setOpen}>
       <Tooltip>
         <TooltipTrigger
           render={
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="relative"
-              aria-label="اعلان‌ها"
-              onClick={() => setOpen(true)}
+            <PopoverTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="relative"
+                  aria-label="اعلان‌ها"
+                />
+              }
             />
           }
         >
@@ -305,42 +307,44 @@ function NotificationsButton() {
           {unreadCount > 0 ? "you have unread messages" : "اعلان جدیدی ندارید"}
         </TooltipContent>
       </Tooltip>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>اعلان‌ها</DialogTitle>
-          <DialogDescription>آخرین دیدگاه‌ها و واکنش‌ها به نوشته‌های شما</DialogDescription>
-        </DialogHeader>
-        <ScrollArea className="max-h-[55vh] pe-2">
-          <div className="space-y-2">
-            {loading ? (
-              <div className="rounded-lg border bg-muted/40 p-4 text-center text-muted-foreground">
-                در حال دریافت اعلان‌ها…
-              </div>
-            ) : items.length === 0 ? (
-              <div className="rounded-lg border bg-muted/40 p-4 text-center text-muted-foreground">
-                هنوز اعلانی برای نمایش وجود ندارد.
-              </div>
-            ) : (
-              items.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/${item.module}/${item.slug}`}
-                  onClick={() => setOpen(false)}
-                  className="block rounded-lg border bg-card p-3 transition-colors hover:bg-muted/60"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold">{item.label}</span>
-                    {!item.read && <span className="h-2 w-2 rounded-full bg-red-500" />}
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-muted-foreground">{item.title}</p>
-                  {item.text && <p className="mt-1 line-clamp-2 text-xs">{item.text}</p>}
-                </Link>
-              ))
-            )}
+      <PopoverContent className="w-[min(24rem,calc(100vw-2rem))] p-2" align="end">
+        <div className="space-y-2" dir="rtl">
+          <div className="px-2 py-1">
+            <div className="text-sm font-bold">اعلان‌ها</div>
+            <div className="text-xs text-muted-foreground">آخرین دیدگاه‌ها و واکنش‌ها</div>
           </div>
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+          <ScrollArea className="max-h-80 pe-2">
+            <div className="space-y-2">
+              {loading ? (
+                <div className="rounded-lg border bg-muted/40 p-4 text-center text-muted-foreground">
+                  در حال دریافت اعلان‌ها…
+                </div>
+              ) : items.length === 0 ? (
+                <div className="rounded-lg border bg-muted/40 p-4 text-center text-muted-foreground">
+                  هنوز اعلانی برای نمایش وجود ندارد.
+                </div>
+              ) : (
+                items.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/${item.module}/${item.slug}`}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg border bg-card p-3 transition-colors hover:bg-muted/60"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold">{item.label}</span>
+                      {!item.read && <span className="h-2 w-2 rounded-full bg-red-500" />}
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-muted-foreground">{item.title}</p>
+                    {item.text && <p className="mt-1 line-clamp-2 text-xs">{item.text}</p>}
+                  </Link>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -356,7 +360,7 @@ export function SiteHeader({
   onToggleNews,
 }: SiteHeaderProps) {
   const { toggleSidebar, state } = useSidebar()
-  const sidebarTooltip = state === "expanded" ? "closing the side menu" : "open the side menu"
+  const sidebarTooltip = state === "expanded" ? "بستن منو" : "باز کردن منو"
 
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
@@ -408,7 +412,7 @@ export function SiteHeader({
                 <NewspaperIcon className="size-4" />
                 <span className="hidden sm:inline">اخبار</span>
               </TooltipTrigger>
-              <TooltipContent>{hasUnreadNews ? "unreaded news" : "no new news"}</TooltipContent>
+              <TooltipContent>{hasUnreadNews ? "خبر جدید" : "خبر جدیدی نیست"}</TooltipContent>
             </Tooltip>
           )}
         </div>

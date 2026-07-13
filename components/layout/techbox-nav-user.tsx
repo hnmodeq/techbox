@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 
 import {
   Avatar,
@@ -25,11 +24,14 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/providers/auth.provider"
 import {
+  BadgeCheckIcon,
+  BellIcon,
   ChevronsUpDownIcon,
-  UserIcon,
-  ShieldIcon,
-  LogOutIcon,
+  CreditCardIcon,
   LogInIcon,
+  LogOutIcon,
+  ShieldIcon,
+  SparklesIcon,
 } from "lucide-react"
 
 export function TechboxNavUser() {
@@ -60,9 +62,9 @@ export function TechboxNavUser() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "left"}
+            side={isMobile ? "bottom" : "top"}
             align="end"
-            sideOffset={4}
+            sideOffset={8}
           >
             {user ? (
               <>
@@ -81,8 +83,23 @@ export function TechboxNavUser() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem onClick={() => window.location.href = "/account"}>
-                    <UserIcon className="size-4" />
+                    <SparklesIcon className="size-4" />
+                    ارتقا حساب
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={() => window.location.href = "/account"}>
+                    <BadgeCheckIcon className="size-4" />
                     حساب کاربری
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.location.href = "/shop/checkout"}>
+                    <CreditCardIcon className="size-4" />
+                    پرداخت و سفارش‌ها
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_notifications"))}>
+                    <BellIcon className="size-4" />
+                    اعلان‌ها
                   </DropdownMenuItem>
                   {user.role === "super_admin" && (
                     <DropdownMenuItem onClick={() => window.location.href = "/admin"}>
@@ -98,12 +115,10 @@ export function TechboxNavUser() {
                 </DropdownMenuItem>
               </>
             ) : (
-              <>
-                <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))}>
-                  <LogInIcon className="size-4" />
-                  ورود / ثبت‌نام
-                </DropdownMenuItem>
-              </>
+              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))}>
+                <LogInIcon className="size-4" />
+                ورود / ثبت‌نام
+              </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

@@ -36,11 +36,11 @@ export default function DownloadRow() {
         </div>
 
         {loading ? (
-          <RowGridSkeleton count={8} imageRatio="aspect-[5/2]" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4" />
+          <RowGridSkeleton count={8} imageRatio="aspect-[5/2]" className="responsive-card-grid-sm grid gap-4" />
         ) : files.length === 0 ? (
           <EmptyRow>هنوز فایلی در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="responsive-card-grid-sm grid gap-4">
           {files.map((file) => {
             const fileType = getFileType(file.title, file.category, file.fileName ?? null);
             return (
