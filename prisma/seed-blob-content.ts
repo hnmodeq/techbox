@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -82,7 +82,7 @@ type SeedPost = {
   priceLabel?: string;
   availability?: string;
   warranty?: string;
-  specs?: Prisma.InputJsonValue;
+  specs?: Record<string, string>;
 };
 
 

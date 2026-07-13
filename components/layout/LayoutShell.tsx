@@ -7,14 +7,14 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { TechboxAppSidebar } from "./techbox-app-sidebar"
 import { TechboxNewsSidebar } from "./techbox-news-sidebar"
 import { SiteHeader } from "./site-header"
-import { LiveNewsButton } from "./live-news-button"
 import FooterSection from "@/components/layout/Footer"
 import { CartProvider } from "@/providers/cart.provider"
 import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
 import { AuthProvider } from "@/providers/auth.provider"
 import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
-import { useHomeModule } from "@/features/home/lib/home-data"
+import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
+import NewsTicker from "@/features/news/components/NewsTicker"
 
 // Lightweight placeholder that mirrors the chat launcher
 const ChatLauncherFallback = () => (
@@ -24,7 +24,7 @@ const ChatLauncherFallback = () => (
     tabIndex={-1}
     className="fixed bottom-5 left-5 rounded-full bg-card border border-border px-4 py-2.5 text-foreground shadow-md flex items-center gap-2 text-xs sm:text-sm"
   >
-    <span>پشتیبانی</span>
+    <span>چت تکباکس</span>
   </button>
 )
 
@@ -34,6 +34,8 @@ const Chatbot = dynamic(() => import("@/features/chat/components/Chatbot"), {
 })
 
 import { AuthModal } from "@/features/auth/components/auth-modal"
+
+const READ_NEWS_STORAGE_KEY = "techbox-read-news-slugs"
 
 type LayoutShellProps = {
   children: React.ReactNode
@@ -60,27 +62,68 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = React.useState(false)
+  const [readNewsSlugs, setReadNewsSlugs] = React.useState<string[]>([])
 
   const { items: dbNews } = useHomeModule("news")
-  const hasUnreadNews = dbNews.length > 0
+  const { items: tickerItems } = useHomeTicker()
+  const newsSlugs = React.useMemo(() => dbNews.map((item) => item.slug).filter(Boolean), [dbNews])
+  const hasUnreadNews = newsSlugs.some((slug) => !readNewsSlugs.includes(slug))
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem(READ_NEWS_STORAGE_KEY)
+      if (stored) setReadNewsSlugs(JSON.parse(stored))
+    } catch {}
+  }, [])
+
+  React.useEffect(() => {
+    try {
+      document.documentElement.dataset.newsSidebarOpen = String(newsOpen)
+      localStorage.setItem("techbox-news-sidebar-open", String(newsOpen))
+    } catch {}
+  }, [newsOpen])
+
+  React.useEffect(() => {
+    if (!newsOpen || newsSlugs.length === 0) return
+    setReadNewsSlugs((current) => {
+      const merged = Array.from(new Set([...current, ...newsSlugs])).slice(-200)
+      try {
+        localStorage.setItem(READ_NEWS_STORAGE_KEY, JSON.stringify(merged))
+      } catch {}
+      return merged
+    })
+  }, [newsOpen, newsSlugs])
 
   return (
     <div className="[--header-height:calc(var(--spacing)*14)]">
-      <SidebarProvider className="flex flex-col" defaultOpen={true}>
-        <SiteHeader hasUnreadNews={hasUnreadNews} />
-        <div className="flex flex-1 overflow-hidden" dir="rtl">
+      <SidebarProvider className="min-h-svh w-full" defaultOpen={true}>
+        <div className="flex min-h-svh w-full overflow-x-hidden" dir="rtl">
           <TechboxAppSidebar />
-          <SidebarInset className="overflow-auto">
-            <main id="main-content" className="flex flex-col min-h-screen">
-              <div className="flex-1 w-full max-w-full">{children}</div>
+          <SidebarInset className="min-w-0 overflow-visible">
+            <SiteHeader
+              hasUnreadNews={hasUnreadNews}
+              newsOpen={newsOpen}
+              onToggleNews={() => setNewsOpen((open) => !open)}
+            />
+            {tickerItems.length > 0 && (
+              <div className="border-b bg-background/95">
+                <NewsTicker items={tickerItems} className="py-0" />
+              </div>
+            )}
+            <main id="main-content" className="flex min-h-[calc(100svh-var(--header-height))] flex-col">
+              <div className="w-full max-w-full flex-1">{children}</div>
               <FooterSection />
             </main>
           </SidebarInset>
-          <SidebarProvider open={newsOpen} onOpenChange={setNewsOpen}>
+          <SidebarProvider
+            open={newsOpen}
+            onOpenChange={setNewsOpen}
+            className="contents"
+            style={{ display: "contents", "--sidebar-width": "20rem" } as React.CSSProperties}
+          >
             <TechboxNewsSidebar />
           </SidebarProvider>
         </div>
-        <LiveNewsButton onClick={() => setNewsOpen(true)} hasUnread={hasUnreadNews} />
       </SidebarProvider>
     </div>
   )
