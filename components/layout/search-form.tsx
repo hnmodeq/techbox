@@ -20,6 +20,12 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const [open, setOpen] = React.useState(false)
   const [recent, setRecent] = React.useState<string[]>([])
 
+  const query = value.trim().toLowerCase()
+  const filteredRecent = React.useMemo(
+    () => (query ? recent.filter((item) => item.toLowerCase().includes(query)) : recent),
+    [query, recent]
+  )
+
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem(RECENT_SEARCHES_KEY)
@@ -38,8 +44,8 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   }, [])
 
   const goSearch = React.useCallback(
-    (query: string) => {
-      const q = query.trim()
+    (searchQuery: string) => {
+      const q = searchQuery.trim()
       if (!q) return
       saveSearch(q)
       setOpen(false)
@@ -55,7 +61,12 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
 
   return (
     <form onSubmit={handleSubmit} {...props}>
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover
+        open={open && (value.trim() === "" || filteredRecent.length > 0)}
+        onOpenChange={(nextOpen) => {
+          if (nextOpen) setOpen(true)
+        }}
+      >
         <PopoverTrigger
           render={
             <div className="relative">
@@ -67,22 +78,33 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
                 placeholder="جستجو در تکباکس..."
                 className="h-8 ps-7"
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={(e) => {
+                  const nextValue = e.target.value
+                  setValue(nextValue)
+                  const nextQuery = nextValue.trim().toLowerCase()
+                  setOpen(!nextQuery || recent.some((item) => item.toLowerCase().includes(nextQuery)))
+                }}
                 onFocus={() => setOpen(true)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") setOpen(false)
+                }}
               />
               <SearchIcon className="pointer-events-none absolute top-1/2 start-2 size-4 -translate-y-1/2 opacity-50 select-none" />
             </div>
           }
         />
-        <PopoverContent className="w-[min(28rem,calc(100vw-2rem))] p-2" align="center">
+        <PopoverContent
+          className="w-[min(28rem,calc(100vw-2rem))] p-2"
+          align="center"
+        >
           <div className="space-y-2" dir="rtl">
             <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
               <HistoryIcon className="size-3.5" />
               جستجوهای اخیر
             </div>
-            {recent.length > 0 ? (
+            {filteredRecent.length > 0 ? (
               <div className="space-y-1">
-                {recent.map((item) => (
+                {filteredRecent.map((item) => (
                   <button
                     key={item}
                     type="button"

@@ -27,11 +27,11 @@ export default function VideoReelsRow() {
           <Link href="/media" className="text-sm font-bold text-[var(--media)] hover:underline flex items-center gap-1 shrink-0"><span>مشاهده همه ویدیوها</span><span>←</span></Link>
         </div>
         {loading ? (
-          <RowGridSkeleton count={5} imageRatio="aspect-[9/16]" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5" />
+          <RowGridSkeleton count={5} imageRatio="aspect-[9/16]" className="responsive-card-grid-sm grid gap-5" />
         ) : videos.length === 0 ? (
           <EmptyRow>هنوز ویدیویی در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+        <div className="responsive-card-grid-sm grid gap-5">
           {videos.map((vid) => (
             <Button type="button" key={vid.slug} onClick={() => setActive(vid)} variant="ghost" className="group relative w-full h-auto aspect-[16/9] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="260px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />

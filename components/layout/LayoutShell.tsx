@@ -96,15 +96,15 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="[--header-height:calc(var(--spacing)*14)]">
-      <SidebarProvider className="min-h-svh w-full" defaultOpen={true}>
-        <div className="flex min-h-svh w-full overflow-x-hidden" dir="rtl">
+      <SidebarProvider className="min-h-svh w-full flex-col" defaultOpen={true}>
+        <SiteHeader
+          hasUnreadNews={hasUnreadNews}
+          newsOpen={newsOpen}
+          onToggleNews={() => setNewsOpen((open) => !open)}
+        />
+        <div className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden" dir="rtl">
           <TechboxAppSidebar />
           <SidebarInset className="min-w-0 overflow-visible">
-            <SiteHeader
-              hasUnreadNews={hasUnreadNews}
-              newsOpen={newsOpen}
-              onToggleNews={() => setNewsOpen((open) => !open)}
-            />
             {tickerItems.length > 0 && (
               <div className="border-b bg-background/95">
                 <NewsTicker items={tickerItems} className="py-0" />

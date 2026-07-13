@@ -22,7 +22,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
       <ModuleHeader module="blog" title="مجله تکباکس" description={`مقالات تخصصی زیرساخت • ${items.length.toLocaleString("fa-IR")} مطلب`} />
       
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="responsive-card-grid-lg grid gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="overflow-hidden">
               <Skeleton className="aspect-square w-full" />
@@ -39,7 +39,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="responsive-card-grid-lg grid gap-6">
           {items.map((p) => (
             <Link
               key={p.slug}
