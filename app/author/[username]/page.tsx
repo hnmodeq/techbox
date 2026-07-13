@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { blurProps } from "@/lib/image-placeholder";
 import { ensureSavedContentTable } from "@/lib/saved-content-table";
+import { UserActivityList, type UserActivity } from "@/components/profile/UserActivityList";
 
 const contentModules = ["blog", "review", "media", "forum", "news"];
 
@@ -55,31 +56,76 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   const totalLikes = authoredPosts.reduce((acc: number, p: any) => acc + (p.likes || 0), 0);
   const totalComments = authoredPosts.reduce((acc: number, p: any) => acc + (p.comments?.length || 0), 0);
 
-  let likedPosts: any[] = [];
-  let commentedPosts: any[] = [];
+  let activities: UserActivity[] = [];
   let savedPosts: any[] = [];
 
   if (!isAuthor) {
-    const likes = await prisma.like.findMany({ where: { userId: user.id, module: { in: contentModules }, deletedAt: null }, orderBy: { createdAt: "desc" }, take: 60 }).catch(() => []);
+    const likes = await prisma.like.findMany({
+      where: {
+        OR: [{ userId: user.id }, { fingerprint: user.id }],
+        module: { in: contentModules },
+        deletedAt: null,
+      },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    }).catch(() => []);
+
+    const likedPostMap = new Map<string, any>();
     if (likes.length) {
-      likedPosts = await prisma.post.findMany({ where: { published: true, deletedAt: null, OR: likes.map((l: any) => ({ module: l.module, slug: l.slug })) }, orderBy: { date: "desc" } }).catch(() => []);
+      const likedPosts = await prisma.post.findMany({
+        where: { published: true, deletedAt: null, OR: likes.map((like: any) => ({ module: like.module, slug: like.slug })) },
+      }).catch(() => []);
+      likedPosts.forEach((post: any) => likedPostMap.set(`${post.module}:${post.slug}`, post));
     }
 
-    const comments = await prisma.comment.findMany({ where: { authorId: user.id, deletedAt: null, post: { module: { in: contentModules }, published: true, deletedAt: null } }, include: { post: true }, orderBy: { createdAt: "desc" }, take: 60 }).catch(() => []);
-    const seen = new Set<string>();
-    commentedPosts = comments.map((c: any) => c.post).filter((post: any) => {
-      const key = `${post.module}:${post.slug}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    const likeActivities: UserActivity[] = likes
+      .map((like: any) => {
+        const post = likedPostMap.get(`${like.module}:${like.slug}`);
+        if (!post) return null;
+        return {
+          id: `like-${like.id}`,
+          type: "like" as const,
+          module: post.module,
+          slug: post.slug,
+          title: post.title,
+          image: post.image,
+          excerpt: post.excerpt,
+          createdAt: like.createdAt.toISOString(),
+        };
+      })
+      .filter(Boolean) as UserActivity[];
+
+    const comments = await prisma.comment.findMany({
+      where: {
+        authorId: user.id,
+        deletedAt: null,
+        post: { module: { in: contentModules }, published: true, deletedAt: null },
+      },
+      include: { post: true },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+    }).catch(() => []);
+
+    const commentActivities: UserActivity[] = comments.map((comment: any) => ({
+      id: `comment-${comment.id}`,
+      type: "comment" as const,
+      module: comment.post.module,
+      slug: comment.post.slug,
+      title: comment.post.title,
+      image: comment.post.image,
+      excerpt: comment.post.excerpt,
+      text: comment.text,
+      createdAt: comment.createdAt.toISOString(),
+    }));
+
+    activities = [...likeActivities, ...commentActivities].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
     try {
       await ensureSavedContentTable();
       const savedRows = await prisma.$queryRawUnsafe(`SELECT "module", "slug" FROM "SavedContent" WHERE "userId"=$1 ORDER BY "createdAt" DESC LIMIT 60`, user.id);
-      const savedRowsList = savedRows as Array<{ module: string; slug: string }>
+      const savedRowsList = savedRows as Array<{ module: string; slug: string }>;
       if (savedRowsList.length) {
-        savedPosts = await prisma.post.findMany({ where: { published: true, deletedAt: null, OR: savedRowsList.map((s: any) => ({ module: s.module, slug: s.slug })) }, orderBy: { date: "desc" } }).catch(() => []);
+        savedPosts = await prisma.post.findMany({ where: { published: true, deletedAt: null, OR: savedRowsList.map((saved: any) => ({ module: saved.module, slug: saved.slug })) }, orderBy: { date: "desc" } }).catch(() => []);
       }
     } catch {}
   }
@@ -102,7 +148,14 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         </CardContent>
       </Card>
 
-      {isAuthor ? <PostGrid posts={authoredPosts} title="محتواهای منتشرشده" empty="هنوز محتوایی ثبت نشده است." /> : <><PostGrid posts={likedPosts} title="محتواهای پسندیده‌شده" empty="هنوز محتوایی پسندیده نشده است." /><PostGrid posts={commentedPosts} title="دیدگاه‌ها روی محتواها" empty="هنوز دیدگاهی روی محتواها ثبت نشده است." /><PostGrid posts={savedPosts} title="محتواهای ذخیره‌شده" empty="هنوز محتوایی ذخیره نشده است." /></>}
+      {isAuthor ? (
+        <PostGrid posts={authoredPosts} title="محتواهای منتشرشده" empty="هنوز محتوایی ثبت نشده است." />
+      ) : (
+        <>
+          <UserActivityList activities={activities} />
+          <PostGrid posts={savedPosts} title="محتواهای ذخیره‌شده" empty="هنوز محتوایی ذخیره نشده است." />
+        </>
+      )}
     </main>
   );
 }
