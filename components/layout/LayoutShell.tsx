@@ -63,6 +63,7 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
 function LayoutInner({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [readNewsSlugs, setReadNewsSlugs] = React.useState<string[]>([])
+  const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
@@ -86,6 +87,8 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (!newsOpen || newsSlugs.length === 0) return
     setReadNewsSlugs((current) => {
+      const unreadAtOpen = newsSlugs.filter((slug) => !current.includes(slug))
+      setOpenedUnreadNewsSlugs(unreadAtOpen)
       const merged = Array.from(new Set([...current, ...newsSlugs])).slice(-200)
       try {
         localStorage.setItem(READ_NEWS_STORAGE_KEY, JSON.stringify(merged))
@@ -93,6 +96,10 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
       return merged
     })
   }, [newsOpen, newsSlugs])
+
+  React.useEffect(() => {
+    if (!newsOpen) setOpenedUnreadNewsSlugs([])
+  }, [newsOpen])
 
   return (
     <div className="[--header-height:calc(var(--spacing)*14)]">
@@ -121,7 +128,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
             className="contents"
             style={{ display: "contents", "--sidebar-width": "20rem" } as React.CSSProperties}
           >
-            <TechboxNewsSidebar unreadSlugs={readNewsSlugs.length ? newsSlugs.filter((slug) => !readNewsSlugs.includes(slug)) : newsSlugs} />
+            <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
           </SidebarProvider>
         </div>
       </SidebarProvider>

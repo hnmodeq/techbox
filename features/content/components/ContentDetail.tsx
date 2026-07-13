@@ -10,6 +10,7 @@ import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ShareButton } from "@/components/ui/share-button";
+import { SaveButton } from "@/components/ui/save-button";
 import { AuthorLink } from "@/components/ui/author-link";
 import { ProductGallery } from "@/components/ui/product-gallery";
 import VideoPlayer from "@/features/media/components/VideoPlayer";
@@ -80,6 +81,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="mt-8 flex flex-wrap items-center gap-3">
  <LikeButton contentType={item.module} slug={item.slug} />
+ <SaveButton module={item.module} slug={item.slug} />
  <ShareButton />
  </div>
 

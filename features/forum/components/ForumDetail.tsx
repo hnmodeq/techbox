@@ -9,6 +9,7 @@ import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { ForumJsonLd } from "@/components/seo/StructuredData";
 import { ShareButton } from "@/components/ui/share-button";
+import { SaveButton } from "@/components/ui/save-button";
 import { AuthorLink } from "@/components/ui/author-link";
 
 type ForumDetailProps = {
@@ -132,6 +133,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
 
           <div className="flex items-center gap-2">
             <LikeButton contentType="forum" slug={item.slug} />
+            <SaveButton module="forum" slug={item.slug} />
             <ShareButton />
           </div>
         </header>

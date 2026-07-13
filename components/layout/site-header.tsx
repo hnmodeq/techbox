@@ -72,7 +72,7 @@ type NotificationItem = {
   read?: boolean
 }
 
-function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: string | null): Crumb[] {
+function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: string | null, authorCrumbs?: { parent: string; name: string }): Crumb[] {
   const parts = pathname.split("/").filter(Boolean)
   if (parts.length === 0) return [{ label: "خانه" }]
 
@@ -85,7 +85,11 @@ function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: stri
     const isCurrent = i === parts.length - 1
     const meta = moduleMeta[part as ModuleSlug]
 
-    if (meta) {
+    if (part === "author" && authorCrumbs) {
+      crumbs.push({ label: authorCrumbs.parent, href: isCurrent ? undefined : accumulated })
+    } else if (parts[0] === "author" && i === 1 && authorCrumbs) {
+      crumbs.push({ label: authorCrumbs.name })
+    } else if (meta) {
       crumbs.push({ label: meta.titleFa || meta.title || part, href: isCurrent ? undefined : accumulated })
     } else if (part === "search") {
       crumbs.push({ label: searchQuery ? `جستجو: ${searchQuery}` : "جستجو", href: isCurrent ? undefined : accumulated })
@@ -103,6 +107,7 @@ function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: stri
 function TechboxBreadcrumb() {
   const pathname = usePathname()
   const [dynamicTitle, setDynamicTitle] = React.useState<string>("")
+  const [authorCrumbs, setAuthorCrumbs] = React.useState<{ parent: string; name: string } | undefined>()
   const [searchQuery, setSearchQuery] = React.useState<string | null>(null)
 
   React.useEffect(() => {
@@ -115,8 +120,24 @@ function TechboxBreadcrumb() {
 
   React.useEffect(() => {
     const parts = pathname.split("/").filter(Boolean)
-    const moduleKey = parts[0] as ModuleSlug | undefined
+    const firstPart = parts[0]
+    const moduleKey = firstPart as ModuleSlug | undefined
     const slug = parts[1]
+    setAuthorCrumbs(undefined)
+
+    if (firstPart === "author" && slug) {
+      let cancelled = false
+      fetch(`/api/users/public/${encodeURIComponent(slug)}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((profile) => {
+          if (!cancelled && profile) setAuthorCrumbs({ parent: profile.breadcrumbParent || "حساب کاربری", name: profile.name || slug })
+        })
+        .catch(() => {
+          if (!cancelled) setAuthorCrumbs(undefined)
+        })
+      return () => { cancelled = true }
+    }
+
     if (!moduleKey || !slug || !contentModules.includes(moduleKey)) {
       setDynamicTitle("")
       return
@@ -137,7 +158,7 @@ function TechboxBreadcrumb() {
     }
   }, [pathname])
 
-  const crumbs = React.useMemo(() => buildCrumbs(pathname, dynamicTitle, searchQuery), [pathname, dynamicTitle, searchQuery])
+  const crumbs = React.useMemo(() => buildCrumbs(pathname, dynamicTitle, searchQuery, authorCrumbs), [pathname, dynamicTitle, searchQuery, authorCrumbs])
 
   if (crumbs.length <= 1) return null
 
@@ -305,6 +326,7 @@ function NotificationsButton() {
   const [open, setOpen] = React.useState(false)
   const [items, setItems] = React.useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = React.useState(0)
+  const [unreadIdsOnOpen, setUnreadIdsOnOpen] = React.useState<string[]>([])
   const [loading, setLoading] = React.useState(false)
 
   const loadNotifications = React.useCallback(async () => {
@@ -334,14 +356,21 @@ function NotificationsButton() {
 
   React.useEffect(() => {
     if (!open || unreadCount === 0) return
+    setUnreadIdsOnOpen(items.filter((item) => !item.read).map((item) => item.id))
     fetch("/api/notifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ lastReadAt: new Date().toISOString() }),
     }).catch(() => {})
     setUnreadCount(0)
-    setItems((prev) => prev.map((item) => ({ ...item, read: true })))
-  }, [open, unreadCount])
+  }, [open, unreadCount, items])
+
+  React.useEffect(() => {
+    if (!open) {
+      setUnreadIdsOnOpen([])
+      setItems((prev) => prev.map((item) => ({ ...item, read: true })))
+    }
+  }, [open])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -363,7 +392,7 @@ function NotificationsButton() {
         >
           <BellIcon className="size-4" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
+            <span className="absolute top-1 right-1 flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" /></span>
           )}
         </TooltipTrigger>
         <TooltipContent>
@@ -396,7 +425,7 @@ function NotificationsButton() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-bold">{item.label}</span>
-                      {!item.read && <span className="h-2 w-2 rounded-full bg-red-500" />}
+                      {(!item.read || unreadIdsOnOpen.includes(item.id)) && <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />}
                     </div>
                     <p className="mt-1 line-clamp-2 text-muted-foreground">{item.title}</p>
                     {item.text && <p className="mt-1 line-clamp-2 text-xs">{item.text}</p>}

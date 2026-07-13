@@ -9,6 +9,7 @@ import { LikeButton } from "@/components/ui/like-button";
 import { ReviewRating } from "@/components/ui/review-rating";
 import { RatingWidget } from "@/components/ui/rating-widget";
 import { ShareButton } from "@/components/ui/share-button";
+import { SaveButton } from "@/components/ui/save-button";
 import { AuthorLink } from "@/components/ui/author-link";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { ReviewJsonLd } from "@/components/seo/StructuredData";
@@ -56,6 +57,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
             <div className="flex items-center gap-3">
               <LiveViewCounter module="review" slug={item.slug} showLabel={true} />
               <LikeButton contentType="review" slug={item.slug} />
+              <SaveButton module="review" slug={item.slug} />
               <ShareButton />
             </div>
           </div>
