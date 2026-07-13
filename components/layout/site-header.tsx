@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
   BellIcon,
@@ -37,13 +37,29 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { moduleMeta } from "@/lib/content"
+import { moduleMeta, type ModuleSlug } from "@/lib/content"
 import { cn } from "@/lib/utils"
 
 type Crumb = {
   label: string
   href?: string
 }
+
+const pageTitleFa: Record<string, string> = {
+  search: "جستجو",
+  about: "درباره ما",
+  account: "حساب کاربری",
+  admin: "مدیریت",
+  contact: "تماس با ما",
+  consultation: "مشاوره",
+  feedback: "بازخورد",
+  support: "پشتیبانی",
+  timeline: "تایم‌لاین",
+  tools: "ابزارها",
+  "work-with-us": "همکاری با ما",
+}
+
+const contentModules: ModuleSlug[] = ["blog", "news", "media", "review", "download", "shop", "forum", "tools"]
 
 type NotificationItem = {
   id: string
@@ -56,7 +72,7 @@ type NotificationItem = {
   read?: boolean
 }
 
-function buildCrumbs(pathname: string): Crumb[] {
+function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: string | null): Crumb[] {
   const parts = pathname.split("/").filter(Boolean)
   if (parts.length === 0) return [{ label: "خانه" }]
 
@@ -66,17 +82,18 @@ function buildCrumbs(pathname: string): Crumb[] {
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i]
     accumulated += `/${part}`
-    // @ts-expect-error dynamic module lookup
-    const meta = moduleMeta[part]
+    const isCurrent = i === parts.length - 1
+    const meta = moduleMeta[part as ModuleSlug]
+
     if (meta) {
-      crumbs.push({ label: meta.titleFa || meta.title || part, href: accumulated })
+      crumbs.push({ label: meta.titleFa || meta.title || part, href: isCurrent ? undefined : accumulated })
+    } else if (part === "search") {
+      crumbs.push({ label: searchQuery ? `جستجو: ${searchQuery}` : "جستجو", href: isCurrent ? undefined : accumulated })
+    } else if (dynamicTitle && isCurrent) {
+      crumbs.push({ label: dynamicTitle })
     } else {
-      const label = decodeURIComponent(part).replace(/-/g, " ")
-      if (i === parts.length - 1) {
-        crumbs.push({ label })
-      } else {
-        crumbs.push({ label, href: accumulated })
-      }
+      const label = pageTitleFa[part] || decodeURIComponent(part).replace(/-/g, " ")
+      crumbs.push({ label, href: isCurrent ? undefined : accumulated })
     }
   }
 
@@ -85,7 +102,35 @@ function buildCrumbs(pathname: string): Crumb[] {
 
 function TechboxBreadcrumb() {
   const pathname = usePathname()
-  const crumbs = React.useMemo(() => buildCrumbs(pathname), [pathname])
+  const searchParams = useSearchParams()
+  const [dynamicTitle, setDynamicTitle] = React.useState<string>("")
+  const searchQuery = searchParams.get("q")
+
+  React.useEffect(() => {
+    const parts = pathname.split("/").filter(Boolean)
+    const moduleKey = parts[0] as ModuleSlug | undefined
+    const slug = parts[1]
+    if (!moduleKey || !slug || !contentModules.includes(moduleKey)) {
+      setDynamicTitle("")
+      return
+    }
+
+    let cancelled = false
+    fetch(`/api/posts?module=${encodeURIComponent(moduleKey)}&slug=${encodeURIComponent(slug)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((post) => {
+        if (!cancelled) setDynamicTitle(post?.title || "")
+      })
+      .catch(() => {
+        if (!cancelled) setDynamicTitle("")
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [pathname])
+
+  const crumbs = React.useMemo(() => buildCrumbs(pathname, dynamicTitle, searchQuery), [pathname, dynamicTitle, searchQuery])
 
   if (crumbs.length <= 1) return null
 
@@ -172,6 +217,17 @@ function MonthCalendar({ date }: { date: Date }) {
 function DateTimeDisplay() {
   const [now, setNow] = React.useState(new Date())
   const [open, setOpen] = React.useState(false)
+  const closeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const keepOpen = React.useCallback(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    setOpen(true)
+  }, [])
+
+  const closeSoon = React.useCallback(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => setOpen(false), 180)
+  }, [])
 
   React.useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000)
@@ -198,10 +254,10 @@ function DateTimeDisplay() {
           <button
             type="button"
             className="hidden items-center gap-2 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted md:flex"
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
-            onFocus={() => setOpen(true)}
-            onBlur={() => setOpen(false)}
+            onMouseEnter={keepOpen}
+            onMouseLeave={closeSoon}
+            onFocus={keepOpen}
+            onBlur={closeSoon}
           />
         }
       >
@@ -212,8 +268,8 @@ function DateTimeDisplay() {
       </PopoverTrigger>
       <PopoverContent
         className="w-72"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        onMouseEnter={keepOpen}
+        onMouseLeave={closeSoon}
       >
         <MonthCalendar date={now} />
       </PopoverContent>

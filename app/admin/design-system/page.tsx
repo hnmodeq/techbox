@@ -32,6 +32,7 @@ import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { ModuleBadge } from "@/components/ui/module-badge";
+import { HeroMagicRingsSettings } from "@/components/admin/HeroMagicRingsSettings";
 import { getCurrentUserClient } from "@/lib/auth";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 
@@ -170,6 +171,7 @@ export default function DesignSystemPage() {
             <TabsTrigger value="navigation">ناوبری</TabsTrigger>
             <TabsTrigger value="data">داده</TabsTrigger>
             <TabsTrigger value="feedback">فیدبک</TabsTrigger>
+            <TabsTrigger value="hero">هیرو</TabsTrigger>
           </TabsList>
 
           {/* COLORS */}
@@ -556,6 +558,11 @@ export default function DesignSystemPage() {
                 <li>✅ lint + typecheck green؟</li>
               </ul>
             </DSSection>
+          </TabsContent>
+
+          {/* HERO */}
+          <TabsContent value="hero" className="space-y-6 pt-4">
+            <HeroMagicRingsSettings />
           </TabsContent>
         </Tabs>
 

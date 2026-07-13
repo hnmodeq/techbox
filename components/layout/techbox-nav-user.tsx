@@ -16,13 +16,10 @@ import { useAuth } from "@/providers/auth.provider"
 import { cn } from "@/lib/utils"
 import {
   BadgeCheckIcon,
-  BellIcon,
   ChevronsUpDownIcon,
-  CreditCardIcon,
   LogInIcon,
   LogOutIcon,
   ShieldIcon,
-  SparklesIcon,
 } from "lucide-react"
 
 function MenuButton({
@@ -73,10 +70,6 @@ export function TechboxNavUser() {
   const openAuth = () => {
     setOpen(false)
     window.dispatchEvent(new CustomEvent("tb_open_auth"))
-  }
-  const openNotifications = () => {
-    setOpen(false)
-    window.dispatchEvent(new CustomEvent("tb_open_notifications"))
   }
   const go = (href: string) => {
     setOpen(false)
@@ -134,21 +127,8 @@ export function TechboxNavUser() {
                 </div>
                 <div className="-mx-1 my-1 h-px bg-border/50" />
                 <MenuButton onClick={() => go("/account")}>
-                  <SparklesIcon className="size-4" />
-                  Upgrade to Pro
-                </MenuButton>
-                <div className="-mx-1 my-1 h-px bg-border/50" />
-                <MenuButton onClick={() => go("/account")}>
                   <BadgeCheckIcon className="size-4" />
-                  Profile
-                </MenuButton>
-                <MenuButton onClick={() => go("/shop/checkout")}>
-                  <CreditCardIcon className="size-4" />
-                  Billing
-                </MenuButton>
-                <MenuButton onClick={openNotifications}>
-                  <BellIcon className="size-4" />
-                  Notifications
+                  حساب کاربری
                 </MenuButton>
                 {user.role === "super_admin" && (
                   <MenuButton onClick={() => go("/admin")}>

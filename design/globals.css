@@ -315,33 +315,33 @@ html.theme-transitioning * {
   }
 }
 
-@container (min-width: 56rem) {
+@container (min-width: 68rem) {
   .responsive-card-grid,
   .responsive-card-grid-sm {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@container (min-width: 62rem) {
+@container (min-width: 72rem) {
   .responsive-card-grid-lg {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@container (min-width: 82rem) {
+@container (min-width: 96rem) {
   .responsive-card-grid,
   .responsive-card-grid-sm {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-@container (min-width: 92rem) {
+@container (min-width: 104rem) {
   .responsive-card-grid-lg {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-@container (min-width: 112rem) {
+@container (min-width: 128rem) {
   .responsive-card-grid,
   .responsive-card-grid-sm {
     grid-template-columns: repeat(5, minmax(0, 1fr));

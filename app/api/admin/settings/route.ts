@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
+import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve", // "auto_approve" | "require_approval"
   "comments.hidden_globally": "false", // "true" | "false"
   "jobs.resume_retention_days": "30",
+  ...HERO_MAGIC_DEFAULTS,
 };
 
 const updateSchema = z.record(z.string(), z.string());
