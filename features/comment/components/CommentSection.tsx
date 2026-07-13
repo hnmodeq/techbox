@@ -10,6 +10,7 @@ import { Icon } from "@/design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
+import { AuthorLink } from "@/components/ui/author-link";
 
 type CommentNode = any;
 type CommentFormState = { ok: boolean; error?: string; message?: string; pending?: boolean };
@@ -79,17 +80,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
         <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
           <div className="flex justify-between items-start gap-3">
-            <div className="flex min-w-0 items-center gap-2">
-              {(c as any).author?.avatar ? (
-                <Image src={(c as any).author.avatar} width={34} height={34} alt={(c as any).authorName || "کاربر"} className="h-8.5 w-8.5 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
-              ) : (
-                <div className="h-8 w-8 rounded-full bg-[var(--muted-background)] flex items-center justify-center"><Icon name="user" size={15} /></div>
-              )}
-              <div className="min-w-0">
-                <div className="text-[length:var(--paragraph-font-size)] font-semibold text-[var(--primary-text)] truncate">{(c as any).authorName || "کاربر"}</div>
-                {(c as any).author?.username && <div className="text-[11px] paragraph-color" dir="ltr">@{(c as any).author.username}</div>}
-              </div>
-            </div>
+            <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
             <div className="text-[length:var(--paragraph-font-size)] paragraph-color shrink-0">
               {new Date((c as any).createdAt).toLocaleString("fa-IR", { dateStyle: "medium", timeStyle: "short" })}
             </div>

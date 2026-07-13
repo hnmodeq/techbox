@@ -367,7 +367,7 @@ html.news-sidebar-booting .news-sidebar-toggle {
 @media (min-width: 640px) {
   html[data-main-sidebar-open="true"] .main-sidebar-spacer,
   html[data-main-sidebar-open="true"] .main-sidebar-panel {
-    width: 16rem !important;
+    width: 14rem !important;
   }
 
   html[data-main-sidebar-open="false"] .main-sidebar-spacer,

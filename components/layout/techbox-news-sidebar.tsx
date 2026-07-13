@@ -19,7 +19,7 @@ import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useHomeModule } from "@/features/home/lib/home-data"
 
-export function TechboxNewsSidebar() {
+export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[] }) {
   const { setOpen } = useSidebar()
   const { items: dbNews, loading } = useHomeModule("news")
   const newsItems = dbNews.slice(0, 15)
@@ -57,8 +57,10 @@ export function TechboxNewsSidebar() {
                 هنوز خبری ثبت نشده است.
               </SidebarMenuItem>
             ) : (
-              newsItems.map((news) => (
-                <SidebarMenuItem key={news.slug}>
+              newsItems.map((news) => {
+                const isUnread = unreadSlugs.includes(news.slug)
+                return (
+                <SidebarMenuItem key={news.slug} className={isUnread ? "animate-pulse rounded-lg bg-red-500/10" : undefined}>
                   <SidebarMenuButton
                     render={<Link href={`/news/${news.slug}`} />}
                     className="h-auto py-3 px-2"
@@ -86,7 +88,8 @@ export function TechboxNewsSidebar() {
                   </SidebarMenuButton>
                   <Separator className="my-1" />
                 </SidebarMenuItem>
-              ))
+                )
+              })
             )}
           </SidebarMenu>
         </ScrollArea>

@@ -41,7 +41,7 @@ export default function HomeTimelineRow() {
   const [active, setActive] = useState(false);
 
   return (
-    <section className={`w-full py-12 bg-background border-0 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-8 bg-background border-0 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full px-4 sm:px-6 lg:px-8 space-y-6`}>
         <div className="flex items-center justify-between gap-4 mb-2">
           <h2 className="text-xl sm:text-2xl font-black text-foreground">تاریخچه تحولات، رویدادها و نقاط عطف دیتاسنتر</h2>
@@ -74,12 +74,12 @@ export default function HomeTimelineRow() {
                   setActive(true);
                 }
               }}
-              className="group min-h-[420px] cursor-pointer overflow-hidden border bg-card p-0 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+              className="group min-h-[320px] cursor-pointer overflow-hidden border bg-card p-0 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="بارگذاری تایم‌لاین تعاملی"
             >
               <CardContent className="relative p-6 sm:p-10">
                 <div className="pointer-events-none absolute inset-0 bg-muted/25" />
-                <div className="relative mx-auto flex min-h-[300px] max-w-5xl items-center justify-center [perspective:1200px]">
+                <div className="relative mx-auto flex min-h-[230px] max-w-5xl items-center justify-center [perspective:1200px]">
                   {[
                     ['timeline1.jpg','-translate-x-44 -rotate-6 scale-90 opacity-75'],
                     ['timeline5.jpg','-translate-x-24 rotate-3 scale-95 opacity-85'],

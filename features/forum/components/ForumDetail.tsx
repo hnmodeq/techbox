@@ -8,6 +8,8 @@ import { ForumBadge } from "@/components/ui/forum-badge";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { ForumJsonLd } from "@/components/seo/StructuredData";
+import { ShareButton } from "@/components/ui/share-button";
+import { AuthorLink } from "@/components/ui/author-link";
 
 type ForumDetailProps = {
   slug: string;
@@ -109,13 +111,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
       <article className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 space-y-6">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6">
           <div className="flex items-center gap-4">
-            <Image
-              src={item.author?.avatar || "/assets/hooman.png"}
-              alt={item.author?.name || "نویسنده"}
-              width={56}
-              height={56}
-              className="h-14 w-14 rounded-full object-cover ring-2 ring-[var(--border-color)]"
-            />
+            <AuthorLink name={item.author?.name || "کاربر انجمن"} username={item.author?.username} avatar={item.author?.avatar || "/assets/hooman.png"} />
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{item.title}</h1>
@@ -136,6 +132,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
 
           <div className="flex items-center gap-2">
             <LikeButton contentType="forum" slug={item.slug} />
+            <ShareButton />
           </div>
         </header>
 

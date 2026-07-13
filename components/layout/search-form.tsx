@@ -16,6 +16,7 @@ const RECENT_SEARCHES_KEY = "techbox-recent-searches"
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const router = useRouter()
+  const rootRef = React.useRef<HTMLFormElement | null>(null)
   const [value, setValue] = React.useState("")
   const [open, setOpen] = React.useState(false)
   const [recent, setRecent] = React.useState<string[]>([])
@@ -25,6 +26,15 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     () => (query ? recent.filter((item) => item.toLowerCase().includes(query)) : recent),
     [query, recent]
   )
+
+  React.useEffect(() => {
+    if (!open) return
+    const onPointerDown = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener("pointerdown", onPointerDown)
+    return () => document.removeEventListener("pointerdown", onPointerDown)
+  }, [open])
 
   React.useEffect(() => {
     try {
@@ -60,7 +70,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   }
 
   return (
-    <form onSubmit={handleSubmit} {...props}>
+    <form ref={rootRef} onSubmit={handleSubmit} {...props}>
       <Popover
         open={open && (value.trim() === "" || filteredRecent.length > 0)}
         onOpenChange={(nextOpen) => {

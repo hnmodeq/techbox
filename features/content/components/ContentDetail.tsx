@@ -8,8 +8,9 @@ import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ShareButton } from "@/components/ui/share-button";
+import { AuthorLink } from "@/components/ui/author-link";
 import { ProductGallery } from "@/components/ui/product-gallery";
 import VideoPlayer from "@/features/media/components/VideoPlayer";
 import MarkdownContent from "@/features/content/components/MarkdownContent";
@@ -39,13 +40,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="flex flex-wrap items-center gap-3 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {item.module !== "media" && (
- <div className="flex items-center gap-2">
- {item.author?.avatar && <Image src={item.author.avatar} width={32} height={32} className="h-8 w-8 rounded-[var(--corner-radius)] object-cover ring-1 ring-[var(--border-color)]" alt={item.author.name || "نویسنده"} {...blurProps(item.author.avatar)} />}
- <div>
- <div className=" text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{item.author?.name || "تکباکس"}</div>
- <div className="paragraph-color text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{item.author?.role || "تحریریه"}</div>
- </div>
- </div>
+ <AuthorLink name={item.author?.name} avatar={item.author?.avatar} className="text-foreground" />
  )}
  <div className="ms-auto flex items-center gap-2 paragraph-color">
  <LiveViewCounter module={item.module} slug={item.slug} />
@@ -85,7 +80,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="mt-8 flex flex-wrap items-center gap-3">
  <LikeButton contentType={item.module} slug={item.slug} />
- <Button variant="ghost" size="sm">اشتراک‌گذاری</Button>
+ <ShareButton />
  </div>
 
  <SuggestionGrid current={item} />

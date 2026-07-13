@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTimelineLiked } from '@/providers/timeline-likes.provider';
 
 interface TimelineCardProps {
@@ -135,7 +136,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   return (
     <div style={style} className={`${widthClass} select-none shrink-0 group flex flex-col justify-start relative`}>
       {/* TIER 1: STRICTLY FIXED HEIGHT CARD BOX */}
-      <div className="relative h-[340px] sm:h-[360px] w-full rounded-lg overflow-hidden shadow-sm border border-border hover:border-primary transition-colors duration-[200ms] flex flex-col justify-end bg-slate-950">
+      <div className="relative h-[340px] sm:h-[360px] w-full rounded-lg overflow-hidden shadow-sm border border-border hover:border-primary transition-colors duration-[200ms] flex flex-col justify-end bg-card">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {event.image ? (
             <Image
@@ -146,17 +147,17 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               sizes="(max-width: 768px) 100vw, 320px"
             />
           ) : (
-            <div className="h-full w-full bg-[radial-gradient(circle_at_top,hsl(var(--primary) / 0.3),transparent_38%),linear-gradient(145deg,#020617,#0f172a)]" />
+            <div className="h-full w-full bg-muted" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-transparent" />
         </div>
 
-        <div className="relative z-10 p-4.5 flex flex-col justify-end h-full text-white">
+        <div className="relative z-10 p-4.5 flex flex-col justify-end h-full text-foreground">
           <div className="flex-1 flex flex-col justify-end overflow-hidden mb-4">
-            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-white mb-2 line-clamp-2 leading-7">
+            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-foreground mb-2 line-clamp-2 leading-7">
               {event.title}
             </h3>
-            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 line-clamp-4 leading-6">
+            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground line-clamp-4 leading-6">
               {event.description}
             </p>
           </div>
@@ -166,15 +167,15 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               <button
                 type="button"
                 onClick={handleLikeToggle}
-                className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 hover:text-red-400 transition-colors cursor-pointer font-bold"
+                className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-destructive transition-colors cursor-pointer font-bold"
               >
-                <Heart size={16} className={liked ? 'fill-current text-red-500' : ''} />
+                <Heart size={16} className={liked ? 'fill-current text-destructive' : ''} />
                 <span>{likesCount.toLocaleString('fa-IR')}</span>
               </button>
 
               {showLoginPrompt && (
-                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-900 p-2.5 shadow-[var(--shadow-size)] text-center">
-                  <p className="text-xs text-white mb-2">برای پسندیدن رویداد ابتدا وارد شوید.</p>
+                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-popover p-2.5 shadow-[var(--shadow-size)] text-center">
+                  <p className="text-xs text-foreground mb-2">برای پسندیدن رویداد ابتدا وارد شوید.</p>
                   <div className="flex justify-center gap-1.5">
                     <Button size="xs" onClick={() => router.push('/account')}>ورود / عضویت</Button>
                     <Button variant="ghost" size="xs" onClick={() => setShowLoginPrompt(false)}>بستن</Button>
@@ -189,7 +190,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                 e.stopPropagation();
                 setShowComments(!showComments);
               }}
-              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-300 hover:text-cyan-400 transition-colors cursor-pointer font-bold"
+              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
             >
               <MessageCircle size={16} />
               <span>{comments.length.toLocaleString('fa-IR')} نظر</span>
@@ -201,7 +202,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       {/* TIER 2: EXPANDING COMMENT DRAWER */}
       {showComments && (
         <div
-          className="w-full mt-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-slate-950/95 p-3.5 shadow-[var(--shadow-size)] flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
+          className="w-full mt-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-card/95 p-3.5 shadow-[var(--shadow-size)] flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onWheel={(e) => e.stopPropagation()}
@@ -215,8 +216,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   setNewCommentText(e.target.value);
                   setCommentError('');
                 }}
-                placeholder="نظر یا تجربه خود را بنویسید..."
-                className="!h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-slate-900 !text-white !border-slate-700"
+                placeholder="به نظر شما بعد از این چه اتفاقی می‌افتد؟"
+                className="!h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-background !text-foreground !border-border"
               />
               <Button
                 type="submit"
@@ -228,32 +229,32 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               </Button>
             </div>
             {commentError && (
-              <div className="text-[11px] text-red-400 bg-red-950/40 p-1.5 rounded border-[length:var(--border-size)] border-red-800 flex justify-between items-center">
+              <div className="text-[11px] text-destructive bg-destructive/10 p-1.5 rounded border-[length:var(--border-size)] border-destructive/30 flex justify-between items-center">
                 <span>{commentError}</span>
-                <Button size="xs" variant="link" onClick={() => router.push('/account')} className="text-white underline">ورود</Button>
+                <Button size="xs" variant="link" onClick={() => router.push('/account')} className="text-foreground underline">ورود</Button>
               </div>
             )}
           </form>
 
-          <ul className="space-y-2 text-right">
+          <ScrollArea className="h-44"><ul className="space-y-2 pe-2 text-right">
             {comments.length === 0 && (
-              <li className="rounded-[var(--corner-radius)] bg-slate-900/70 p-2.5 text-xs text-slate-400 border-[length:var(--border-size)] border-slate-700/60">
+              <li className="rounded-[var(--corner-radius)] bg-muted/60 p-2.5 text-xs text-muted-foreground border-[length:var(--border-size)] border-border">
                 هنوز نظری برای این رویداد ثبت نشده است.
               </li>
             )}
             {comments.map((comment, idx) => (
               <li
                 key={idx}
-                className="rounded-[var(--corner-radius)] bg-slate-900/90 p-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-slate-200 border-[length:var(--border-size)] border-slate-700/60 leading-5"
+                className="rounded-[var(--corner-radius)] bg-muted/40 p-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-foreground border-[length:var(--border-size)] border-border leading-5"
               >
-                <div className="flex items-center justify-between text-[11px] text-cyan-400 mb-1">
+                <div className="flex items-center justify-between text-[11px] text-primary mb-1">
                   <span className="font-bold">{comment.authorName}</span>
-                  <span className="text-slate-400">{comment.createdAt}</span>
+                  <span className="text-muted-foreground">{comment.createdAt}</span>
                 </div>
                 <p className="text-xs">{comment.text}</p>
               </li>
             ))}
-          </ul>
+          </ul></ScrollArea>
         </div>
       )}
     </div>

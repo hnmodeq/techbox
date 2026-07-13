@@ -121,7 +121,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
             className="contents"
             style={{ display: "contents", "--sidebar-width": "20rem" } as React.CSSProperties}
           >
-            <TechboxNewsSidebar />
+            <TechboxNewsSidebar unreadSlugs={readNewsSlugs.length ? newsSlugs.filter((slug) => !readNewsSlugs.includes(slug)) : newsSlugs} />
           </SidebarProvider>
         </div>
       </SidebarProvider>

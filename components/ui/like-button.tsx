@@ -1,15 +1,14 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { Heart, Eye } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function LikeButton({ contentType, slug, initial = 0 }: { contentType: string; slug: string; initial?: number }) {
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     let active = true;
@@ -72,18 +71,23 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
 
   return (
     <div className="relative inline-flex items-center">
-      <Button
-        onClick={toggle}
-        disabled={busy}
-        variant="ghost"
-        size="sm"
-        className={`gap-2 text-[length:var(--paragraph-font-size)] disabled:opacity-60 ${liked ? "text-red-500" : "text-[var(--paragraph-color)]"}`}
-        aria-pressed={liked}
-      >
-        <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-red-500" : ""} aria-hidden />
-        <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
-        <span className="hidden sm:inline">پسندیدم</span>
-      </Button>
+      <Tooltip>
+        <TooltipTrigger render={
+          <Button
+            onClick={toggle}
+            disabled={busy}
+            variant="ghost"
+            size="sm"
+            className={`gap-2 text-[length:var(--paragraph-font-size)] disabled:opacity-60 ${liked ? "text-red-500" : "text-[var(--paragraph-color)]"}`}
+            aria-pressed={liked}
+          />
+        }>
+          <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-red-500" : ""} aria-hidden />
+          <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
+          <span className="hidden sm:inline">پسندیدم</span>
+        </TooltipTrigger>
+        <TooltipContent>تعداد پسندها</TooltipContent>
+      </Tooltip>
 
       {showLoginPrompt && (
         <div className="absolute bottom-full mb-2 right-0 z-50 w-64 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-3 shadow-[var(--shadow-size)] text-center animate-in fade-in zoom-in-95">

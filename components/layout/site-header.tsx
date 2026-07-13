@@ -139,7 +139,7 @@ function TechboxBreadcrumb() {
       <BreadcrumbList>
         {crumbs.map((crumb, index) => {
           const isCurrent = index === crumbs.length - 1
-          const tooltipText = isCurrent ? "you're here" : `Going to ${crumb.label}`
+          const tooltipText = isCurrent ? "اینجا هستید" : `رفتن به ${crumb.label}`
 
           return (
             <React.Fragment key={index}>
@@ -248,7 +248,7 @@ function DateTimeDisplay() {
   })
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(nextOpen) => { if (nextOpen) setOpen(true) }}>
       <PopoverTrigger
         render={
           <button
@@ -369,7 +369,7 @@ function NotificationsButton() {
             <div className="text-sm font-bold">اعلان‌ها</div>
             <div className="text-xs text-muted-foreground">آخرین دیدگاه‌ها و واکنش‌ها</div>
           </div>
-          <ScrollArea className="max-h-80 pe-2">
+          <ScrollArea className="h-80 pe-2">
             <div className="space-y-2">
               {loading ? (
                 <div className="rounded-lg border bg-muted/40 p-4 text-center text-muted-foreground">
@@ -464,7 +464,7 @@ export function SiteHeader({
                   />
                 }
               >
-                {hasUnreadNews && <span className="h-2 w-2 rounded-full bg-red-500" />}
+                {hasUnreadNews && <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" /></span>}
                 <NewspaperIcon className="size-4" />
                 <span className="hidden sm:inline">اخبار</span>
               </TooltipTrigger>

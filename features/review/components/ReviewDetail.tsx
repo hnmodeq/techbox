@@ -8,6 +8,8 @@ import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { LikeButton } from "@/components/ui/like-button";
 import { ReviewRating } from "@/components/ui/review-rating";
 import { RatingWidget } from "@/components/ui/rating-widget";
+import { ShareButton } from "@/components/ui/share-button";
+import { AuthorLink } from "@/components/ui/author-link";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { ReviewJsonLd } from "@/components/seo/StructuredData";
 
@@ -49,24 +51,12 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           </h1>
 
           <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
-            <div className="flex items-center gap-3">
-              <Image
-                src={item.author?.avatar || "/assets/hooman.png"}
-                alt={item.author?.name || "نویسنده"}
-                width={48}
-                height={48}
-                className="h-12 w-12 rounded-full object-cover ring-1 ring-[var(--border-color)]"
-                {...blurProps(item.author?.avatar || "/assets/hooman.png")}
-              />
-              <div>
-                <div className="font-bold text-[var(--primary-text)]">{item.author?.name || "نویسنده تکباکس"}</div>
-                <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.author?.role || "تحلیلگر سخت‌افزار"}</div>
-              </div>
-            </div>
+            <AuthorLink name={item.author?.name || "نویسنده تکباکس"} avatar={item.author?.avatar || "/assets/hooman.png"} />
 
             <div className="flex items-center gap-3">
               <LiveViewCounter module="review" slug={item.slug} showLabel={true} />
               <LikeButton contentType="review" slug={item.slug} />
+              <ShareButton />
             </div>
           </div>
         </header>

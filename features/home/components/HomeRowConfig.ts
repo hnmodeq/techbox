@@ -11,6 +11,6 @@ export const HOME_ROW_SIZES = {
   reviewMinHeight: 'min-h-[45vh]',     // ردیف نقد و بررسی آزمایشگاهی
   downloadMinHeight: 'min-h-[35vh]',   // ردیف مرکز دانلود
   toolsMinHeight: 'min-h-[50vh]',      // ردیف ابزارهای محاسباتی (ماشین حساب RAID)
-  timelineMinHeight: 'min-h-[50vh]',   // ردیف تایم‌لاین کامل تعاملی
+  timelineMinHeight: 'min-h-[38vh]',   // ردیف تایم‌لاین کامل تعاملی
   containerMaxWidth: 'max-w-[full]', // عرض کانتینر ردیف‌ها برای نمایش حداکثری آیتم‌ها از چپ به راست
 };
