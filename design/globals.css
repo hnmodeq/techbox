@@ -301,16 +301,51 @@ html.theme-transitioning * {
   }
 }
 
-.responsive-card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-}
-
-.responsive-card-grid-sm {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
-}
-
+.responsive-card-grid,
+.responsive-card-grid-sm,
 .responsive-card-grid-lg {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 34rem) {
+  .responsive-card-grid,
+  .responsive-card-grid-sm,
+  .responsive-card-grid-lg {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 56rem) {
+  .responsive-card-grid,
+  .responsive-card-grid-sm {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 62rem) {
+  .responsive-card-grid-lg {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 82rem) {
+  .responsive-card-grid,
+  .responsive-card-grid-sm {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 92rem) {
+  .responsive-card-grid-lg {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 112rem) {
+  .responsive-card-grid,
+  .responsive-card-grid-sm {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

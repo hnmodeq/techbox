@@ -18,11 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/providers/auth.provider"
+import { cn } from "@/lib/utils"
 import {
   BadgeCheckIcon,
   BellIcon,
@@ -35,8 +35,11 @@ import {
 } from "lucide-react"
 
 export function TechboxNavUser() {
-  const { isMobile } = useSidebar()
+  const { isMobile, state } = useSidebar()
   const { user, logout } = useAuth()
+
+  const openAuth = () => window.dispatchEvent(new CustomEvent("tb_open_auth"))
+  const openNotifications = () => window.dispatchEvent(new CustomEvent("tb_open_notifications"))
 
   return (
     <SidebarMenu>
@@ -44,22 +47,25 @@ export function TechboxNavUser() {
         <DropdownMenu>
           <DropdownMenuTrigger
             render={
-              <SidebarMenuButton
-                size="lg"
-                className="aria-expanded:bg-muted aria-expanded:text-foreground cursor-pointer"
-              />
+              <button
+                type="button"
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-[calc(var(--radius-sm)+2px)] p-2 text-start text-xs ring-sidebar-ring outline-hidden transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 aria-expanded:bg-muted aria-expanded:text-foreground",
+                  state === "collapsed" && "size-8 justify-center p-0"
+                )}
+              >
+                <Avatar className="h-8 w-8 shrink-0">
+                  <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
+                  <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
+                  <span className="truncate text-xs text-muted-foreground">{user?.email || "ورود به حساب"}</span>
+                </div>
+                <ChevronsUpDownIcon className="ms-auto size-4 group-data-[collapsible=icon]:hidden" />
+              </button>
             }
-          >
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
-              <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-start text-sm leading-tight">
-              <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
-              <span className="truncate text-xs text-muted-foreground">{user?.email || "ورود به حساب"}</span>
-            </div>
-            <ChevronsUpDownIcon className="ms-auto size-4" />
-          </DropdownMenuTrigger>
+          />
           <DropdownMenuContent
             className="min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "top"}
@@ -84,38 +90,38 @@ export function TechboxNavUser() {
                 <DropdownMenuGroup>
                   <DropdownMenuItem onClick={() => window.location.href = "/account"}>
                     <SparklesIcon className="size-4" />
-                    ارتقا حساب
+                    Upgrade to Pro
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem onClick={() => window.location.href = "/account"}>
                     <BadgeCheckIcon className="size-4" />
-                    حساب کاربری
+                    Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => window.location.href = "/shop/checkout"}>
                     <CreditCardIcon className="size-4" />
-                    پرداخت و سفارش‌ها
+                    Billing
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_notifications"))}>
+                  <DropdownMenuItem onClick={openNotifications}>
                     <BellIcon className="size-4" />
-                    اعلان‌ها
+                    Notifications
                   </DropdownMenuItem>
                   {user.role === "super_admin" && (
                     <DropdownMenuItem onClick={() => window.location.href = "/admin"}>
                       <ShieldIcon className="size-4" />
-                      پنل مدیریت
+                      Admin Panel
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
+                <DropdownMenuItem variant="destructive" onClick={logout}>
                   <LogOutIcon className="size-4" />
-                  خروج از حساب
+                  Log Out
                 </DropdownMenuItem>
               </>
             ) : (
-              <DropdownMenuItem onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))}>
+              <DropdownMenuItem onClick={openAuth}>
                 <LogInIcon className="size-4" />
                 ورود / ثبت‌نام
               </DropdownMenuItem>
