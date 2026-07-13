@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import {
   BellIcon,
@@ -102,9 +102,16 @@ function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: stri
 
 function TechboxBreadcrumb() {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const [dynamicTitle, setDynamicTitle] = React.useState<string>("")
-  const searchQuery = searchParams.get("q")
+  const [searchQuery, setSearchQuery] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    if (pathname !== "/search") {
+      setSearchQuery(null)
+      return
+    }
+    setSearchQuery(new URLSearchParams(window.location.search).get("q"))
+  }, [pathname])
 
   React.useEffect(() => {
     const parts = pathname.split("/").filter(Boolean)
