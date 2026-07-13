@@ -104,7 +104,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         />
         <div className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden" dir="rtl">
           <TechboxAppSidebar />
-          <SidebarInset className="min-w-0 overflow-visible">
+          <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size]">
             {tickerItems.length > 0 && (
               <div className="border-b bg-background/95">
                 <NewsTicker items={tickerItems} className="py-0" />
