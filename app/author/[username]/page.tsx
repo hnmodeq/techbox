@@ -132,17 +132,21 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <PageHeader colorVar="--home" title={`${isAuthor ? "پروفایل نویسنده" : "حساب کاربری"}: ${user.name}`} titleClassName="text-foreground">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground"><span>@{user.username}</span></div>
-      </PageHeader>
+      <PageHeader colorVar="--home" title={isAuthor ? "پروفایل نویسنده" : "حساب کاربری"} titleClassName="text-foreground" />
       <Card className="mt-8 p-0">
         <CardContent className="grid gap-6 p-6 sm:p-8 md:grid-cols-[160px_1fr] md:items-center">
           <div className="relative mx-auto h-32 w-32 overflow-hidden rounded-full border shadow-sm">
             <Image src={user.avatar || "/logo.png"} alt={user.name} fill className="object-cover" sizes="128px" {...blurProps(user.avatar || "/logo.png")} />
           </div>
           <div className="space-y-4 text-right">
-            <div><span className="inline-flex rounded-md bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">{isAuthor ? (user.job || user.roleFa || user.role) : "کاربر تکباکس"}</span><h1 className="mt-2 text-2xl font-black text-foreground sm:text-3xl">{user.name}</h1></div>
-            <p className="text-muted-foreground">{user.job || (isAuthor ? "عضو تحریریه تکباکس" : "عضو جامعه تکباکس")}</p>
+            <div>
+              <span className="inline-flex rounded-md bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
+                {isAuthor ? (user.job || user.roleFa || user.role) : (user.roleFa || "کاربر تکباکس")}
+              </span>
+              <h1 className="mt-2 text-2xl font-black text-foreground sm:text-3xl">{user.name}</h1>
+              <div className="mt-1 font-mono text-xs text-muted-foreground" dir="ltr">@{user.username}</div>
+            </div>
+            {isAuthor && <p className="text-muted-foreground">{user.job || "عضو تحریریه تکباکس"}</p>}
             {isAuthor && <div className="flex flex-wrap items-center gap-6 border-t pt-3 text-xs font-bold text-muted-foreground sm:text-sm"><span className="flex items-center gap-1.5 text-foreground"><Icon name="blog" size={18} /> محتوا: <b>{authoredPosts.length.toLocaleString("fa-IR")}</b></span><span className="flex items-center gap-1.5 text-foreground"><Icon name="view" size={18} /> بازدید: <b>{totalViews.toLocaleString("fa-IR")}</b></span><span className="flex items-center gap-1.5 text-foreground"><Icon name="like" size={18} /> پسند: <b>{totalLikes.toLocaleString("fa-IR")}</b></span><span className="flex items-center gap-1.5 text-foreground"><Icon name="comment" size={18} /> دیدگاه: <b>{totalComments.toLocaleString("fa-IR")}</b></span></div>}
           </div>
         </CardContent>
