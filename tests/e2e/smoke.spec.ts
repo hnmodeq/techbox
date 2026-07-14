@@ -54,8 +54,9 @@ test.describe('public smoke tests', () => {
 
   test('search page renders and can submit a query', async ({ page }) => {
     await expectHealthyPage(page, '/search');
-    await page.getByPlaceholder('جستجو در عنوان، متن، برچسب، دسته، نویسنده…').first().fill('backup');
-    await page.getByRole('button', { name: /جستجو/ }).first().click();
+    const searchForm = page.locator('main form').first();
+    await searchForm.getByPlaceholder('جستجو در عنوان، متن، برچسب، دسته، نویسنده…').fill('backup');
+    await searchForm.getByRole('button', { name: 'جستجو', exact: true }).click();
     await expect(page).toHaveURL(/\/search\?q=backup/);
     await expect(page.locator('main').first()).toBeVisible();
   });
