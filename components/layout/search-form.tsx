@@ -78,6 +78,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         }}
       >
         <PopoverTrigger
+          nativeButton={false}
           render={
             <div className="relative">
               <Label htmlFor="search" className="sr-only">
