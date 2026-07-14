@@ -243,7 +243,10 @@ function MonthCalendar({ date }: { date: Date }) {
 }
 
 function DateTimeDisplay() {
-  const [now, setNow] = React.useState(new Date())
+  // Do not render the current time during SSR. The CI server and the browser can
+  // use different time zones (and even different seconds), which would make the
+  // first client render differ from the server HTML and trigger hydration errors.
+  const [now, setNow] = React.useState<Date | null>(null)
   const [open, setOpen] = React.useState(false)
   const closeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -258,21 +261,28 @@ function DateTimeDisplay() {
   }, [])
 
   React.useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000)
-    return () => clearInterval(timer)
+    const updateNow = () => setNow(new Date())
+    updateNow()
+    const timer = setInterval(updateNow, 1000)
+    return () => {
+      clearInterval(timer)
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
   }, [])
 
-  const timeStr = now.toLocaleTimeString("fa-IR", {
+  const timeStr = now?.toLocaleTimeString("fa-IR", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: false,
+    timeZone: "Asia/Tehran",
   })
 
-  const dateStr = now.toLocaleDateString("fa-IR", {
+  const dateStr = now?.toLocaleDateString("fa-IR", {
     year: "numeric",
     month: "short",
     day: "numeric",
+    timeZone: "Asia/Tehran",
   })
 
   return (
@@ -290,16 +300,20 @@ function DateTimeDisplay() {
         }
       >
         <ClockIcon className="size-3.5" />
-        <span>{timeStr}</span>
+        <span className="tabular-nums">{timeStr ?? "--:--:--"}</span>
         <span className="text-muted-foreground/50">•</span>
-        <span>{dateStr}</span>
+        <span>{dateStr ?? "—"}</span>
       </PopoverTrigger>
       <PopoverContent
         className="w-72"
         onMouseEnter={keepOpen}
         onMouseLeave={closeSoon}
       >
-        <MonthCalendar date={now} />
+        {now ? (
+          <MonthCalendar date={now} />
+        ) : (
+          <div className="h-52 animate-pulse rounded-md bg-muted/40" aria-hidden="true" />
+        )}
       </PopoverContent>
     </Popover>
   )

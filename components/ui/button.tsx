@@ -155,16 +155,9 @@ export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
   ({ className, variant = "primary", size = "md", children, ...props }, ref) => {
     const mappedVariant = mapVariant(variant);
     const mappedSize = mapSize(size);
-    const Primitive = ButtonPrimitive as React.ComponentType<
-      React.PropsWithChildren<{
-        asChild?: boolean;
-        className?: string;
-        "data-slot"?: string;
-      }>
-    >;
     return (
-      <Primitive
-        asChild
+      <Link
+        ref={ref}
         data-slot="button"
         className={cn(
           buttonVariants({ variant: mappedVariant, size: mappedSize }),
@@ -172,11 +165,10 @@ export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
             "bg-gradient-to-br from-[var(--home)] to-[var(--admin)] text-white hover:opacity-90",
           className
         )}
+        {...props}
       >
-        <Link ref={ref} {...props}>
-          {children}
-        </Link>
-      </Primitive>
+        {children}
+      </Link>
     );
   }
 );

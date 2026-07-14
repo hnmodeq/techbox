@@ -17,6 +17,7 @@ import * as Sentry from "@sentry/nextjs";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import Script from "next/script";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
@@ -132,8 +133,16 @@ export default async function RootLayout({
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
-        <script dangerouslySetInnerHTML={{ __html: sidebarStateScript }} />
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Script
+          id="techbox-sidebar-state"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: sidebarStateScript }}
+        />
+        <Script
+          id="techbox-theme"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeScript }}
+        />
       </head>
       <body className="font-sans antialiased text-foreground">
         <TooltipProvider>
@@ -144,9 +153,13 @@ export default async function RootLayout({
           <Toaster />
         </TooltipProvider>
         {process.env.NODE_ENV === "production" ? (
-          <script src="/register-sw.js?v=3" defer />
+          <Script src="/register-sw.js?v=3" strategy="afterInteractive" />
         ) : (
-          <script dangerouslySetInnerHTML={{ __html: localServiceWorkerCleanupScript }} />
+          <Script
+            id="techbox-local-service-worker-cleanup"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{ __html: localServiceWorkerCleanupScript }}
+          />
         )}
       </body>
     </html>

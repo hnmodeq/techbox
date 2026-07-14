@@ -77,32 +77,38 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           if (nextOpen) setOpen(true)
         }}
       >
-        <PopoverTrigger
-          render={
-            <div className="relative">
-              <Label htmlFor="search" className="sr-only">
-                جستجو
-              </Label>
-              <SidebarInput
-                id="search"
-                placeholder="جستجو در تکباکس..."
-                className="h-8 ps-7"
-                value={value}
-                onChange={(e) => {
-                  const nextValue = e.target.value
-                  setValue(nextValue)
-                  const nextQuery = nextValue.trim().toLowerCase()
-                  setOpen(!nextQuery || recent.some((item) => item.toLowerCase().includes(nextQuery)))
-                }}
-                onFocus={() => setOpen(true)}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") setOpen(false)
-                }}
-              />
-              <SearchIcon className="pointer-events-none absolute top-1/2 start-2 size-4 -translate-y-1/2 opacity-50 select-none" />
-            </div>
-          }
-        />
+        <div className="relative">
+          <Label htmlFor="search" className="sr-only">
+            جستجو
+          </Label>
+          <SidebarInput
+            id="search"
+            placeholder="جستجو در تکباکس..."
+            className="h-8 ps-7"
+            value={value}
+            onChange={(e) => {
+              const nextValue = e.target.value
+              setValue(nextValue)
+              const nextQuery = nextValue.trim().toLowerCase()
+              setOpen(!nextQuery || recent.some((item) => item.toLowerCase().includes(nextQuery)))
+            }}
+            onFocus={() => setOpen(true)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setOpen(false)
+            }}
+          />
+          <PopoverTrigger
+            render={
+              <button
+                type="button"
+                aria-label="نمایش جستجوهای اخیر"
+                className="absolute top-1/2 start-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+              >
+                <SearchIcon className="size-4" />
+              </button>
+            }
+          />
+        </div>
         <PopoverContent
           className="w-[min(28rem,calc(100vw-2rem))] p-2"
           align="center"
