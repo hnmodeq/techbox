@@ -20,4 +20,5 @@ prisma/dev.db
 .local
 .pnpm-store
 .vercel/
+txt.txt
 
