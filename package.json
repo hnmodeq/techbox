@@ -19,6 +19,7 @@
     "tree": "node scripts/tree.cjs",
     "prisma:generate": "prisma generate",
     "db:backfill-metadata": "tsx prisma/backfill-metadata.ts",
+    "db:fix-future-dates": "tsx prisma/fix-future-post-dates.ts",
     "db:seed-blob-content": "tsx prisma/seed-blob-content.ts",
     "check:content": "tsx scripts/checks/content.ts",
     "check:blob": "tsx scripts/checks/blob.ts",

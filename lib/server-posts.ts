@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { ModuleSlug, ContentItem } from "@/lib/content";
+import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 
 export async function getDbModulePosts(
   module: ModuleSlug,
@@ -13,6 +14,7 @@ export async function getDbModulePosts(
         module,
         published: true,
         deletedAt: null,
+        date: publicPostDateWhere(),
       },
       orderBy: { date: "desc" },
       take,
@@ -48,7 +50,7 @@ export async function getDbModulePosts(
         avatar: p.author?.avatar || "",
       },
       date: p.date.toISOString(),
-      date_fa: p.dateFa || new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(p.date),
+      date_fa: formatPostDateFa(p.date),
       time: undefined,
       source: undefined,
       likes: p.likes,

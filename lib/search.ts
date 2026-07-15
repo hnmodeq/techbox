@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 
 function normalizePersian(text: string): string {
   return text
@@ -32,6 +33,7 @@ export async function advancedSearch({
       where: {
         published: true,
         deletedAt: null,
+        date: publicPostDateWhere(),
         ...(moduleKey && moduleKey !== "all" ? { module: moduleKey } : {}),
         OR: [
           { title: { contains: normalized, mode: "insensitive" } },
@@ -100,7 +102,7 @@ export async function advancedSearch({
           ...p,
           score,
           date: p.date.toISOString(),
-          date_fa: p.dateFa,
+          date_fa: formatPostDateFa(p.date),
           author: {
             name: p.author?.name || p.authorName || "",
             username: p.author?.username || "",

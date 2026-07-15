@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getHomeData } from "@/lib/home-server";
+import { publicPostDateWhere } from "@/lib/post-date";
 
 export async function GET() {
   const [homeData, stats] = await Promise.all([
@@ -17,7 +18,7 @@ export async function GET() {
 async function getHomeStats() {
   try {
     const [postCount, userCount] = await Promise.all([
-      prisma.post.count({ where: { published: true, deletedAt: null } }),
+      prisma.post.count({ where: { published: true, deletedAt: null, date: publicPostDateWhere() } }),
       prisma.user.count({ where: { status: "active" } }),
     ]);
 

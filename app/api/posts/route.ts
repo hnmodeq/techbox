@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 import { createPostRevision } from "@/lib/revision";
 import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
+import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 
 function normalizeSlug(value: string, fallback: string) {
   const base = (value || fallback)
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
 
   try {
     let where: any = {
-      ...(includeAllPublishedStates ? {} : { published: true }),
+      ...(includeAllPublishedStates ? {} : { published: true, date: publicPostDateWhere() }),
       ...(postModule ? { module: postModule } : {}),
       ...(slug ? { slug } : {}),
       deletedAt: null, // soft delete filter
@@ -126,8 +127,8 @@ export async function GET(req: NextRequest) {
       gallery: Array.isArray(p.gallery) ? p.gallery : [],
       tags: Array.isArray(p.tags) ? p.tags : [],
       date: p.date.toISOString(),
-      date_fa: p.dateFa || new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(p.date),
-      dateFa: p.dateFa,
+      date_fa: formatPostDateFa(p.date),
+      dateFa: formatPostDateFa(p.date),
       likes: p.likes,
       views: p.views,
       rating: p.rating ?? null,
