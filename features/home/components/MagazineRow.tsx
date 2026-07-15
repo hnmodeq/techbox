@@ -19,6 +19,10 @@ function excerptWithEllipsis(value?: string) {
   return text.endsWith('...') || text.endsWith('…') ? text : `${text}...`;
 }
 
+function compactReadingTimeLabel(value?: string) {
+  return (value || '').replace(/\s*مطالعه\s*$/, '');
+}
+
 export default function MagazineRow() {
   const { items: dbArticles, loading } = useHomeModule('blog');
   const articles = dbArticles.slice(0, 5);
@@ -59,12 +63,15 @@ export default function MagazineRow() {
                       {art.title}
                     </h3>
                     {art.readingTimeLabel && (
-                      <span className="shrink-0 pt-1 text-[10px] font-medium text-muted-foreground/80 sm:text-xs">
-                        {art.readingTimeLabel}
-                      </span>
+                      <Tooltip>
+                        <TooltipTrigger render={<span className="shrink-0 pt-1 text-[10px] font-medium text-muted-foreground/80 sm:text-xs" />}>
+                          {compactReadingTimeLabel(art.readingTimeLabel)}
+                        </TooltipTrigger>
+                        <TooltipContent>زمان مطالعه</TooltipContent>
+                      </Tooltip>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-4 leading-6">
+                  <p className="text-xs text-muted-foreground mt-2 line-clamp-3 leading-6">
                     {excerptWithEllipsis(art.excerpt)}
                   </p>
                 </CardContent>
@@ -75,7 +82,7 @@ export default function MagazineRow() {
                   <AuthorLink name={art.author?.name} avatar={art.author?.avatar} username={art.author?.username} role={art.author?.job || art.author?.role} />
                   <div className="flex shrink-0 flex-col items-end gap-1 text-left">
                     <Tooltip>
-                      <TooltipTrigger render={<span className="cursor-help text-muted-foreground" />}>
+                      <TooltipTrigger render={<span className="text-muted-foreground" />}>
                         {art.date_fa}
                       </TooltipTrigger>
                       <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
