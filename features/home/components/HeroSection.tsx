@@ -48,7 +48,7 @@ export default function HeroSection() {
 
   return (
     <section className={`relative w-full max-w-full overflow-hidden bg-background border-0 ${HOME_ROW_SIZES.heroMinHeight} flex flex-col justify-center items-center px-4 py-16 text-center`} dir="rtl">
-      <div className="absolute inset-0 opacity-70 dark:opacity-85">
+      <div className="absolute inset-0">
         <MagicRings
           color={magicSettings["hero.magic.color"]}
           colorTwo={magicSettings["hero.magic.colorTwo"]}
@@ -73,11 +73,9 @@ export default function HeroSection() {
           clickBurst={toBooleanSetting(magicSettings, "hero.magic.clickBurst")}
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/75 to-background" />
       <div className="relative z-10 flex flex-col items-center w-full max-w-3xl">
         <h1 className="text-[length:var(--hero-font-size)] text-foreground font-black tracking-tight">تکباکس</h1>
-        <p className="mt-2 text-sm sm:text-base text-muted-foreground font-bold">پلتفرم جامع زیرساخت و فناوری اطلاعات</p>
-        <div className="hero-rotator mt-6 w-full">
+        <div className="hero-rotator mt-5 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={item.text}
@@ -87,7 +85,7 @@ export default function HeroSection() {
               transition={{ duration: 0.35 }}
               className="hero-item"
             >
-              <Link href={item.href} className={`hero-rotator-text font-black text-lg sm:text-2xl transition-colors ${moduleColors[item.module].active} hover:opacity-85`}>
+              <Link href={item.href} className={`hero-rotator-text text-sm font-medium leading-7 transition-colors sm:text-lg sm:font-semibold ${moduleColors[item.module].active} hover:opacity-85`}>
                 {item.text} ←
               </Link>
             </motion.div>
