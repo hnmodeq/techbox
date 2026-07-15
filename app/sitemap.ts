@@ -34,6 +34,7 @@ const staticRoutes = [
   { path: "/tools/subnet-calculator", priority: 0.65, changeFrequency: "monthly" as const },
   { path: "/about", priority: 0.5, changeFrequency: "monthly" as const },
   { path: "/contact", priority: 0.5, changeFrequency: "monthly" as const },
+  { path: "/terms", priority: 0.3, changeFrequency: "yearly" as const },
   { path: "/work-with-us", priority: 0.45, changeFrequency: "monthly" as const },
 ];
 
