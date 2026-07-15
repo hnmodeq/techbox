@@ -58,6 +58,7 @@ function normalizeCard(p: any) {
     module: p.module,
     title: p.title,
     excerpt: p.excerpt,
+    content: p.content,
     image: p.image,
     videoUrl: p.videoUrl,
     videoDuration: p.videoDuration,

@@ -101,25 +101,23 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                       </Tooltip>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2 leading-7">
+                  <p className="text-sm text-muted-foreground line-clamp-3 min-h-[5.25rem] mt-2 leading-7">
                     {articlePreview(p)}
                   </p>
                 </CardContent>
               </Link>
-              <div className="mt-auto space-y-3 border-t px-4 pb-4 pt-3">
+              <div className="mt-auto border-t px-4 pb-4 pt-3">
                 <div className="flex items-start justify-between gap-3">
                   <AuthorLink name={p.author.name} avatar={p.author.avatar} username={p.author.username} role={p.author.job || p.author.role} />
-                  <div className="flex shrink-0 flex-col items-end gap-1 text-left text-xs text-muted-foreground">
+                  <div className="flex shrink-0 flex-col items-end gap-2 text-left text-xs text-muted-foreground">
                     <Tooltip>
                       <TooltipTrigger render={<span />}>
                         {p.date_fa}
                       </TooltipTrigger>
                       <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                     </Tooltip>
+                    <CardStats module="blog" slug={p.slug} showComments={true} />
                   </div>
-                </div>
-                <div className="flex justify-end">
-                  <CardStats module="blog" slug={p.slug} showComments={true} />
                 </div>
               </div>
             </Card>

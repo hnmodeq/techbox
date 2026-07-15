@@ -93,26 +93,24 @@ export default function MagazineRow() {
                       </Tooltip>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-3 leading-6">
+                  <p className="text-xs text-muted-foreground mt-2 line-clamp-3 min-h-[4.5rem] leading-6">
                     {articlePreview(art)}
                   </p>
                 </CardContent>
               </Link>
 
-              <div className="px-4 pb-4 pt-3 border-t text-xs text-muted-foreground font-bold space-y-3">
+              <div className="px-4 pb-4 pt-3 border-t text-xs text-muted-foreground font-bold">
                 <div className="flex items-start justify-between gap-3">
                   <AuthorLink name={art.author?.name} avatar={art.author?.avatar} username={art.author?.username} role={art.author?.job || art.author?.role} />
-                  <div className="flex shrink-0 flex-col items-end gap-1 text-left">
+                  <div className="flex shrink-0 flex-col items-end gap-2 text-left">
                     <Tooltip>
                       <TooltipTrigger render={<span className="text-muted-foreground" />}>
                         {art.date_fa}
                       </TooltipTrigger>
                       <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                     </Tooltip>
+                    <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
                   </div>
-                </div>
-                <div className="flex justify-end">
-                  <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
                 </div>
               </div>
             </Card>
