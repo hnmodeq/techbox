@@ -34,7 +34,7 @@ export function TechboxNavMain() {
           const hasChildren = Boolean(item.children?.length)
           return (
             <Collapsible
-              key={item.title}
+              key={`${item.title}-${active}`}
               defaultOpen={active}
               render={<SidebarMenuItem />}
             >

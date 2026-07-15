@@ -37,8 +37,8 @@ export default function ReviewRow() {
         ) : (
         <div className="responsive-card-grid grid gap-6">
           {reviews.map((rev) => (
-            <Link key={rev.slug} href={`/review/${rev.slug}`} className="group block">
-              <Card className="h-full !p-0 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all duration-200">
+            <Card key={rev.slug} className="group h-full !p-0 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all duration-200">
+              <Link href={`/review/${rev.slug}`} className="block flex-1">
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
                   <Image
                     src={rev.image || '/assets/blog-1.jpg'}
@@ -65,13 +65,13 @@ export default function ReviewRow() {
                     {rev.excerpt}
                   </p>
                 </CardContent>
+              </Link>
 
-                <div className="px-4 pb-4 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground font-bold">
-                  <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
-                  <CardStats module="review" slug={rev.slug} showComments={true} />
-                </div>
-              </Card>
-            </Link>
+              <div className="px-4 pb-4 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground font-bold">
+                <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
+                <CardStats module="review" slug={rev.slug} showComments={true} />
+              </div>
+            </Card>
           ))}
         </div>
         )}
