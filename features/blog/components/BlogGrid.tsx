@@ -21,18 +21,15 @@ function stripPreviewText(value?: string) {
 }
 
 function articlePreview(item: { excerpt?: string; content?: string }) {
-  const excerpt = stripPreviewText(item.excerpt);
   const content = stripPreviewText(item.content);
-  let text = excerpt;
+  const excerpt = stripPreviewText(item.excerpt);
 
-  if (content) {
-    const normalizedExcerpt = excerpt.replace(/\s+/g, ' ').trim();
-    const normalizedContent = content.replace(/\s+/g, ' ').trim();
-    const extra = normalizedExcerpt && normalizedContent.startsWith(normalizedExcerpt)
-      ? normalizedContent.slice(normalizedExcerpt.length).trim()
-      : normalizedContent;
+  // The card preview should be article body text, not just the short excerpt.
+  // If body content is unavailable, fall back to the DB excerpt.
+  let text = content || excerpt;
 
-    if (extra && text.length < 180) text = `${text} ${extra}`.trim();
+  if (content && excerpt && content.length < 220 && !content.includes(excerpt)) {
+    text = `${content} ${excerpt}`.trim();
   }
 
   if (!text) return '';
