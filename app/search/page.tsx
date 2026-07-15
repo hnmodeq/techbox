@@ -89,13 +89,14 @@ function SearchInner() {
     return [...map.entries()];
   }, [results]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const query = input.trim();
+    const formData = new FormData(e.currentTarget);
+    const query = String(formData.get("q") || input).trim();
     const params = new URLSearchParams();
     if (query) params.set("q", query);
     if (moduleFilter !== "all") params.set("module", moduleFilter);
-    router.push(`/search?${params.toString()}`);
+    router.push(params.size ? `/search?${params.toString()}` : "/search");
   };
 
   const setModule = (nextModule: "all" | ModuleSlug) => {
@@ -120,7 +121,7 @@ function SearchInner() {
 
       <Card className="mb-4 p-3">
         <form onSubmit={submit} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="جستجو در عنوان، متن، برچسب، دسته، نویسنده…" />
+          <Input name="q" value={input} onChange={(e) => setInput(e.target.value)} placeholder="جستجو در عنوان، متن، برچسب، دسته، نویسنده…" />
           <Button type="submit">جستجو</Button>
         </form>
       </Card>

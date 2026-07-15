@@ -365,9 +365,13 @@ function DateTimeDisplay() {
 }
 
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const isDark = theme === "dark"
-  const label = isDark ? "حالت روشن" : "حالت تاریک"
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => setMounted(true), [])
+
+  const isDark = mounted && resolvedTheme === "dark"
+  const label = !mounted ? "تغییر تم" : isDark ? "حالت روشن" : "حالت تاریک"
 
   return (
     <Tooltip>

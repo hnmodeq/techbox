@@ -60,14 +60,14 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
+  const userId = user?.id ?? ""
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
-  const newsSlugs = React.useMemo(() => dbNews.map((item) => item.slug).filter(Boolean), [dbNews])
-  const newsSlugsKey = React.useMemo(() => newsSlugs.join(","), [newsSlugs])
+  const newsSlugsKey = dbNews.map((item) => item.slug).filter(Boolean).join(",")
   const hasUnreadNews = unreadNewsSlugs.length > 0
 
   React.useEffect(() => {
@@ -80,38 +80,42 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     let cancelled = false
 
-    if (!user || newsSlugs.length === 0) {
-      setUnreadNewsSlugs([])
+    if (!userId || !newsSlugsKey) {
+      setUnreadNewsSlugs((current) => (current.length ? [] : current))
       return
     }
 
     fetch(`/api/news/read-state?slugs=${encodeURIComponent(newsSlugsKey)}`, { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (!cancelled) setUnreadNewsSlugs(Array.isArray(data?.unreadSlugs) ? data.unreadSlugs : [])
+        if (!cancelled) {
+          const next = Array.isArray(data?.unreadSlugs) ? data.unreadSlugs : []
+          setUnreadNewsSlugs((current) => (current.join(",") === next.join(",") ? current : next))
+        }
       })
       .catch(() => {
-        if (!cancelled) setUnreadNewsSlugs([])
+        if (!cancelled) setUnreadNewsSlugs((current) => (current.length ? [] : current))
       })
 
     return () => {
       cancelled = true
     }
-  }, [user, newsSlugs, newsSlugsKey])
+  }, [userId, newsSlugsKey])
 
   React.useEffect(() => {
-    if (!newsOpen || !user || newsSlugs.length === 0 || unreadNewsSlugs.length === 0) return
+    if (!newsOpen || !userId || !newsSlugsKey || unreadNewsSlugs.length === 0) return
 
-    const unreadAtOpen = newsSlugs.filter((slug) => unreadNewsSlugs.includes(slug))
+    const slugs = newsSlugsKey.split(",").filter(Boolean)
+    const unreadAtOpen = slugs.filter((slug) => unreadNewsSlugs.includes(slug))
     setOpenedUnreadNewsSlugs(unreadAtOpen)
     setUnreadNewsSlugs([])
 
     fetch("/api/news/read-state", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slugs: newsSlugs }),
+      body: JSON.stringify({ slugs }),
     }).catch(() => {})
-  }, [newsOpen, user, newsSlugs, unreadNewsSlugs])
+  }, [newsOpen, userId, newsSlugsKey, unreadNewsSlugs])
 
   React.useEffect(() => {
     if (!newsOpen) setOpenedUnreadNewsSlugs([])

@@ -9,6 +9,7 @@ import {
   useReducedMotion,
   useSpring,
 } from "framer-motion";
+import { moduleColors } from "@/config/module-colors";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useHomeTicker } from "@/features/home/lib/home-data";
 
@@ -50,13 +51,13 @@ function getModuleCopy(module: ModuleSlug) {
   return moduleCopy[module] ?? { type: moduleMeta[module]?.titleFa || module, place: moduleMeta[module]?.titleFa || module, action: "منتشر شد" };
 }
 
-function formatRelativeDate(value?: string) {
-  if (!value) return "";
+function formatRelativeDate(value: string | undefined, nowMs: number | null) {
+  if (!value || nowMs === null) return "";
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
 
-  const diffMs = Date.now() - date.getTime();
+  const diffMs = nowMs - date.getTime();
   if (diffMs < 60_000) return "همین حالا";
 
   const minutes = Math.floor(diffMs / 60_000);
@@ -80,12 +81,20 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const live = liveItems.length ? liveItems : items;
   const filtered = useMemo(() => live.filter((item) => item.module !== "news").slice(0, 30), [live]);
   const shouldReduceMotion = useReducedMotion();
+  const [nowMs, setNowMs] = useState<number | null>(null);
   const x = useMotionValue(0);
   const targetSpeed = useMotionValue(NORMAL_SPEED);
   const speed = useSpring(targetSpeed, { stiffness: 45, damping: 18, mass: 0.8 });
   const groupWidthRef = useRef(0);
   const [groupNode, setGroupNode] = useState<HTMLDivElement | null>(null);
   const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const updateNow = () => setNowMs(Date.now());
+    updateNow();
+    const timer = window.setInterval(updateNow, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!groupNode) return;
@@ -129,22 +138,24 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
       {filtered.map((item, index) => {
         const itemModule = getModule(item);
         const copy = getModuleCopy(itemModule);
-        const relativeDate = formatRelativeDate(item.date);
+        const relativeDate = formatRelativeDate(item.date, nowMs);
+        const tone = moduleColors[itemModule].active;
+        const hoverTone = moduleColors[itemModule].hover;
 
         return (
           <Link
             key={`${groupIndex}-${item.module}-${item.slug}-${index}`}
             href={`/${itemModule}/${item.slug}`}
             tabIndex={groupIndex > 0 ? -1 : undefined}
-            className="ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-semibold text-foreground transition-colors duration-200 hover:text-primary"
+            className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-semibold text-foreground transition-colors duration-200 ${hoverTone}`}
             dir="rtl"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70 transition-transform group-hover:scale-125" />
             <span>
-              <span className="font-bold text-primary">{copy.type}</span>{" "}
+              <span className={`font-bold ${tone}`}>{copy.type}</span>{" "}
               <span>{item.title}</span>{" "}
               <span className="text-muted-foreground">در</span>{" "}
-              <span className="font-bold text-primary">{copy.place}</span>{" "}
+              <span className={`font-bold ${tone}`}>{copy.place}</span>{" "}
               <span className="text-muted-foreground">{copy.action}.</span>
             </span>
             {relativeDate && <span className="text-muted-foreground">{relativeDate}</span>}
