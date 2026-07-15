@@ -36,7 +36,7 @@
     "@base-ui/react": "^1.6.0",
     "@fontsource/vazirmatn": "^5.2.8",
     "@hookform/resolvers": "^5.4.0",
-    "@prisma/client": "^6.19.3",
+    "@prisma/client": "6.19.3",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.10",
     "@sentry/nextjs": "^10.64.0",
