@@ -14,7 +14,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select"
 import { SidebarInput } from "@/components/ui/sidebar"
 import { SearchIcon, HistoryIcon } from "lucide-react"
@@ -56,6 +55,10 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     [query, recent]
   )
   const shouldShowRecent = open && (value.trim() === "" || filteredRecent.length > 0)
+  const selectedModuleLabel = React.useMemo(
+    () => searchModules.find((item) => item.value === module)?.label || "همه",
+    [module]
+  )
 
   React.useEffect(() => {
     if (pathname !== "/search") return
@@ -121,6 +124,16 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     <form ref={rootRef} onSubmit={handleSubmit} {...props}>
       <Popover open={shouldShowRecent} onOpenChange={setOpen}>
         <div className="relative">
+          <PopoverTrigger
+            render={
+              <button
+                type="button"
+                tabIndex={-1}
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 top-0 h-8 w-full opacity-0"
+              />
+            }
+          />
           <Label htmlFor="search" className="sr-only">
             جستجو
           </Label>
@@ -136,7 +149,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
                 aria-label="محدوده جستجو"
                 className="h-6 max-w-[6.5rem] border-transparent bg-background/70 px-1.5 shadow-none hover:bg-muted"
               >
-                <SelectValue />
+                <span className="truncate">{selectedModuleLabel}</span>
               </SelectTrigger>
               <SelectContent align="start" className="min-w-36">
                 {searchModules.map((item) => (
@@ -165,20 +178,17 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
               if (event.key === "Escape") setOpen(false)
             }}
           />
-          <PopoverTrigger
-            render={
-              <button
-                type="button"
-                aria-label="نمایش جستجوهای اخیر"
-                className="absolute top-1/2 end-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-              >
-                <SearchIcon className="size-4" />
-              </button>
-            }
-          />
+          <button
+            type="button"
+            aria-label="نمایش جستجوهای اخیر"
+            className="absolute top-1/2 end-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+            onClick={() => setOpen(true)}
+          >
+            <SearchIcon className="size-4" />
+          </button>
         </div>
         <PopoverContent
-          className="w-[min(28rem,calc(100vw-2rem))] p-2"
+          className="w-(--anchor-width) max-w-[calc(100vw-2rem)] p-2"
           align="center"
           onPointerDown={(event) => event.stopPropagation()}
         >
