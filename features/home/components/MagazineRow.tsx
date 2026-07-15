@@ -9,7 +9,6 @@ import { blurProps } from "@/lib/image-placeholder";
 import { Card, CardContent } from '@/components/ui/card';
 import { ButtonLink } from '@/components/ui/button';
 import { CardStats } from '@/components/ui/card-stats';
-import { AuthorLink } from '@/components/ui/author-link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
@@ -40,6 +39,38 @@ function articlePreview(item: { excerpt?: string; content?: string }) {
 }
 function compactReadingTimeLabel(value?: string) {
   return (value || '').replace(/\s*مطالعه\s*$/, '');
+}
+
+function getAuthorSlug(author?: { name?: string; username?: string }) {
+  const value = author?.username || author?.name || 'editorial';
+  return value.trim().toLowerCase().replace(/[^a-z0-9_\u0600-\u06FF]+/g, '-');
+}
+
+function ArticleAuthorMeta({ author, className = '' }: { author?: { name?: string; username?: string; avatar?: string; job?: string; role?: string }; className?: string }) {
+  const name = author?.name || 'تحریریه';
+  const job = author?.job || author?.role || '';
+  const slug = getAuthorSlug(author);
+
+  return (
+    <Link
+      href={`/author/${encodeURIComponent(slug)}`}
+      onClick={(event) => event.stopPropagation()}
+      className={`grid grid-cols-[minmax(0,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 ${className}`}
+      dir="ltr"
+    >
+      <div className="col-start-1 row-start-1 min-w-0 self-end truncate text-xs font-extrabold text-foreground sm:text-sm" dir="rtl">
+        {name}
+      </div>
+      {job && (
+        <div className="col-start-1 row-start-2 min-w-0 self-start truncate text-[10px] text-muted-foreground sm:text-[11px]" dir="rtl">
+          {job}
+        </div>
+      )}
+      <div className="relative col-start-2 row-span-2 row-start-1 size-8 overflow-hidden rounded-full ring-1 ring-border transition-all group-hover:ring-primary">
+        <Image src={author?.avatar || '/assets/hooman.png'} alt={name} fill sizes="32px" className="object-cover" />
+      </div>
+    </Link>
+  );
 }
 
 export default function MagazineRow() {
@@ -96,18 +127,18 @@ export default function MagazineRow() {
                 </CardContent>
               </Link>
 
-              <div className="px-4 pb-4 pt-3 border-t text-xs text-muted-foreground font-bold">
-                <div className="flex items-start justify-between gap-3">
-                  <AuthorLink name={art.author?.name} avatar={art.author?.avatar} username={art.author?.username} role={art.author?.job || art.author?.role} />
-                  <div className="flex shrink-0 flex-col items-end gap-2 text-left">
-                    <Tooltip>
-                      <TooltipTrigger render={<span className="text-muted-foreground" />}>
-                        {art.date_fa}
-                      </TooltipTrigger>
-                      <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
-                    </Tooltip>
+              <div className="border-t px-4 pb-4 pt-3" dir="ltr">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] grid-rows-2 items-center gap-x-3 gap-y-1">
+                  <Tooltip>
+                    <TooltipTrigger render={<span className="col-start-1 row-start-1 justify-self-start text-xs font-bold text-muted-foreground" dir="rtl" />}>
+                      {art.date_fa}
+                    </TooltipTrigger>
+                    <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
+                  </Tooltip>
+                  <div className="col-start-1 row-start-2 justify-self-start">
                     <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
                   </div>
+                  <ArticleAuthorMeta author={art.author} className="col-start-2 row-span-2 row-start-1" />
                 </div>
               </div>
             </Card>
