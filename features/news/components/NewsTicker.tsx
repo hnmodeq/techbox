@@ -58,6 +58,7 @@ function formatRelativeDate(value: string | undefined, nowMs: number | null) {
   if (Number.isNaN(date.getTime())) return "";
 
   const diffMs = nowMs - date.getTime();
+  if (diffMs < 0) return "";
   if (diffMs < 60_000) return "همین حالا";
 
   const minutes = Math.floor(diffMs / 60_000);

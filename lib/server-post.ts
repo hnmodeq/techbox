@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { ModuleSlug } from "@/lib/content";
+import { formatPostDateFa, isPublicPostDate } from "@/lib/post-date";
 
 export async function getDbPost(module: ModuleSlug, slug: string) {
   if (!process.env.DATABASE_URL) return null;
@@ -8,7 +9,7 @@ export async function getDbPost(module: ModuleSlug, slug: string) {
       where: { module_slug: { module, slug } },
       include: { author: { select: { name: true, role: true, roleFa: true, avatar: true, username: true } } },
     });
-    if (!p || !p.published || p.deletedAt !== null) return null;
+    if (!p || !p.published || p.deletedAt !== null || !isPublicPostDate(p.date)) return null;
     return {
       id: p.id,
       slug: p.slug,
@@ -25,7 +26,7 @@ export async function getDbPost(module: ModuleSlug, slug: string) {
       tags: Array.isArray(p.tags) ? p.tags.filter((t: unknown): t is string => typeof t === "string") : [],
       author: { name: p.author?.name || p.authorName, role: p.author?.roleFa || p.author?.role || "", avatar: p.author?.avatar || "", username: p.author?.username || "" },
       date: p.date.toISOString(),
-      date_fa: p.dateFa,
+      date_fa: formatPostDateFa(p.date),
       likes: p.likes,
       views: p.views,
       category: p.category || undefined,

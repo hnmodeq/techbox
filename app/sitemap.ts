@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
+import { publicPostDateWhere } from "@/lib/post-date";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
@@ -48,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
       const [posts, timeline] = await Promise.all([
         prisma.post.findMany({
-          where: { published: true },
+          where: { published: true, deletedAt: null, date: publicPostDateWhere() },
           select: { module: true, slug: true, date: true },
           orderBy: { date: "desc" },
           take: 5000,

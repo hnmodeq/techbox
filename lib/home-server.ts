@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import type { HomeData } from "@/features/home/lib/home-data";
+import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 
 const moduleTakes: Record<string, number> = {
   blog: 5,
@@ -63,8 +64,8 @@ function normalizeCard(p: any) {
     gallery: firstGalleryImage(p.gallery),
     tags: Array.isArray(p.tags) ? p.tags.slice(0, 8) : [],
     date: p.date.toISOString(),
-    date_fa: p.dateFa || new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(p.date),
-    dateFa: p.dateFa,
+    date_fa: formatPostDateFa(p.date),
+    dateFa: formatPostDateFa(p.date),
     likes: p.likes,
     views: p.views,
     rating: p.rating ?? null,
@@ -90,7 +91,7 @@ function normalizeCard(p: any) {
 
 async function findPosts(module: string, take: number) {
   const posts = await prisma.post.findMany({
-    where: { module, published: true, deletedAt: null },
+    where: { module, published: true, deletedAt: null, date: publicPostDateWhere() },
     orderBy: { date: "desc" },
     take,
     select: cardSelect,
@@ -105,7 +106,7 @@ async function getHomeDataUncached(): Promise<HomeData> {
   const modules = Object.fromEntries(entries) as HomeData["modules"];
 
   const tickerPosts = await prisma.post.findMany({
-    where: { published: true, deletedAt: null },
+    where: { published: true, deletedAt: null, date: publicPostDateWhere() },
     orderBy: { date: "desc" },
     take: 30,
     select: cardSelect,
