@@ -545,7 +545,9 @@ export function SiteHeader({
         </div>
 
         <div className="flex flex-[1.2] justify-center px-2">
-          <SearchForm className="w-full max-w-md" />
+          <React.Suspense fallback={<div className="h-8 w-full max-w-md rounded-md bg-muted/30" aria-hidden="true" />}>
+            <SearchForm className="w-full max-w-md" />
+          </React.Suspense>
         </div>
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1">
