@@ -152,7 +152,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
           >
             <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70 transition-transform group-hover:scale-125" />
             <span>
-              <span className={`font-bold ${tone}`}>{copy.type}</span>{" "}
+              <span className="font-bold text-foreground">{copy.type}</span>{" "}
               <span>{item.title}</span>{" "}
               <span className="text-muted-foreground">در</span>{" "}
               <span className={`font-bold ${tone}`}>{copy.place}</span>{" "}
