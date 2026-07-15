@@ -54,9 +54,16 @@ export default function MagazineRow() {
                 </div>
 
                 <CardContent className="p-4">
-                  <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--blog)] transition-colors duration-300 line-clamp-2 leading-7">
-                    {art.title}
-                  </h3>
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--blog)] transition-colors duration-300 line-clamp-2 leading-7">
+                      {art.title}
+                    </h3>
+                    {art.readingTimeLabel && (
+                      <span className="shrink-0 pt-1 text-[10px] font-medium text-muted-foreground/80 sm:text-xs">
+                        {art.readingTimeLabel}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-4 leading-6">
                     {excerptWithEllipsis(art.excerpt)}
                   </p>
@@ -71,12 +78,13 @@ export default function MagazineRow() {
                       <TooltipTrigger render={<span className="cursor-help text-muted-foreground" />}>
                         {art.date_fa}
                       </TooltipTrigger>
-                      <TooltipContent>تاریخ ساخته شدن این پرسش</TooltipContent>
+                      <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                     </Tooltip>
-                    {art.readingTimeLabel && <span className="font-medium text-muted-foreground/80">{art.readingTimeLabel}</span>}
                   </div>
                 </div>
-                <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
+                <div className="flex justify-end">
+                  <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
+                </div>
               </div>
             </Card>
           ))}

@@ -62,9 +62,16 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                   />
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors duration-300 group-hover:text-[var(--blog)]">
-                    {p.title}
-                  </h3>
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors duration-300 group-hover:text-[var(--blog)]">
+                      {p.title}
+                    </h3>
+                    {p.readingTimeLabel && (
+                      <span className="shrink-0 pt-1 text-xs font-medium text-muted-foreground">
+                        {p.readingTimeLabel}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground line-clamp-4 mt-2 leading-7">
                     {excerptWithEllipsis(p.excerpt)}
                   </p>
@@ -78,12 +85,13 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                       <TooltipTrigger render={<span className="cursor-help" />}>
                         {p.date_fa}
                       </TooltipTrigger>
-                      <TooltipContent>تاریخ ساخته شدن این پرسش</TooltipContent>
+                      <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                     </Tooltip>
-                    {p.readingTimeLabel && <span>{p.readingTimeLabel}</span>}
                   </div>
                 </div>
-                <CardStats module="blog" slug={p.slug} showComments={true} />
+                <div className="flex justify-end">
+                  <CardStats module="blog" slug={p.slug} showComments={true} />
+                </div>
               </div>
             </Card>
           ))}
