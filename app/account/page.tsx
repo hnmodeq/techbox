@@ -419,7 +419,7 @@ export default function AccountPage() {
                     name="job"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>سمت شغلی</FormLabel>
+                        <FormLabel>مهارت شغلی</FormLabel>
                         <FormControl>
                           <Input placeholder="مثلا کارشناس زیرساخت" {...field} />
                         </FormControl>

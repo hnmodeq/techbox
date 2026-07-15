@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import type { HomeData } from "@/features/home/lib/home-data";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
+import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 
 const moduleTakes: Record<string, number> = {
   blog: 5,
@@ -19,6 +20,7 @@ const cardSelect = {
   module: true,
   title: true,
   excerpt: true,
+  content: true,
   image: true,
   videoUrl: true,
   videoDuration: true,
@@ -42,7 +44,7 @@ const cardSelect = {
   priceLabel: true,
   availability: true,
   authorName: true,
-  author: { select: { name: true, username: true, role: true, roleFa: true, avatar: true } },
+  author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true } },
 } as const;
 
 function firstGalleryImage(value: unknown) {
@@ -70,6 +72,8 @@ function normalizeCard(p: any) {
     views: p.views,
     rating: p.rating ?? null,
     ratingCount: p.ratingCount || 0,
+    readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
+    readingTimeLabel: formatReadingTime(estimateReadingMinutes(p.title, p.excerpt, p.content)),
     solved: p.solved ?? false,
     fileName: p.fileName,
     fileSize: p.fileSize,
@@ -84,6 +88,7 @@ function normalizeCard(p: any) {
       name: p.author?.name || p.authorName || "کاربر تکباکس",
       username: p.author?.username || "",
       role: p.author?.roleFa || p.author?.role || "عضو انجمن",
+      job: p.author?.job || "",
       avatar: p.author?.avatar || "",
     },
   };

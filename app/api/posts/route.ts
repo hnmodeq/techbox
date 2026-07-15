@@ -7,6 +7,7 @@ import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STO
 import { createPostRevision } from "@/lib/revision";
 import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
+import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 
 function normalizeSlug(value: string, fallback: string) {
   const base = (value || fallback)
@@ -106,6 +107,7 @@ export async function GET(req: NextRequest) {
             username: true,
             role: true,
             roleFa: true,
+            job: true,
             avatar: true,
           },
         },
@@ -133,6 +135,8 @@ export async function GET(req: NextRequest) {
       views: p.views,
       rating: p.rating ?? null,
       ratingCount: p.ratingCount || 0,
+      readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
+      readingTimeLabel: formatReadingTime(estimateReadingMinutes(p.title, p.excerpt, p.content)),
       solved: p.solved ?? false,
       fileName: p.fileName,
       fileUrl: p.fileUrl,
@@ -153,6 +157,7 @@ export async function GET(req: NextRequest) {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         username: p.author?.username || "",
         role: p.author?.roleFa || p.author?.role || "عضو انجمن",
+        job: p.author?.job || "",
         avatar: p.author?.avatar || "/assets/hooman.png",
       },
     }));

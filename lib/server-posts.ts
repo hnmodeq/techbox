@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import type { ModuleSlug, ContentItem } from "@/lib/content";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
+import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 
 export async function getDbModulePosts(
   module: ModuleSlug,
@@ -25,6 +26,7 @@ export async function getDbModulePosts(
             username: true,
             role: true,
             roleFa: true,
+            job: true,
             avatar: true,
           },
         },
@@ -47,6 +49,8 @@ export async function getDbModulePosts(
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         role: p.author?.roleFa || p.author?.role || "",
+        job: p.author?.job || "",
+        username: p.author?.username || "",
         avatar: p.author?.avatar || "",
       },
       date: p.date.toISOString(),
@@ -67,6 +71,8 @@ export async function getDbModulePosts(
       specs: (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? p.specs : {},
       rating: p.rating,
       ratingCount: p.ratingCount,
+      readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
+      readingTimeLabel: formatReadingTime(estimateReadingMinutes(p.title, p.excerpt, p.content)),
       fileName: p.fileName,
       fileUrl: p.fileUrl,
       fileSize: p.fileSize,

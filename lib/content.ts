@@ -22,7 +22,9 @@ export type ContentItem = {
   videoFileSize?: string | null;
   gallery?: string[];
   tags: string[];
-  author: { name: string; role?: string; avatar?: string };
+  author: { name: string; role?: string; job?: string; avatar?: string; username?: string };
+  readingTime?: number;
+  readingTimeLabel?: string;
   date: string; // ISO
   date_fa: string;
   time?: string;

@@ -16,6 +16,7 @@ import { ProductGallery } from "@/components/ui/product-gallery";
 import VideoPlayer from "@/features/media/components/VideoPlayer";
 import MarkdownContent from "@/features/content/components/MarkdownContent";
 import { ContentJsonLd } from "@/components/seo/StructuredData";
+import { getReadingTimeLabel } from "@/lib/reading-time";
 
 export default function ContentDetail({ item }: { item: ContentItem }) {
  const meta = moduleMeta[item.module];
@@ -24,6 +25,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  const videoMimeType = (item as any).videoMimeType;
  const videoFileSize = (item as any).videoFileSize;
  const gallery = Array.isArray((item as any).gallery) ? (item as any).gallery : [];
+ const readingTime = item.readingTimeLabel || getReadingTimeLabel(item.title, item.excerpt, item.content);
  return (
  <>
  <ContentJsonLd item={item} />
@@ -34,6 +36,12 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <span>{item.date_fa}</span>
  <span>•</span>
  <span>{item.category}</span>
+ {item.module === "blog" && (
+ <>
+ <span>•</span>
+ <span>{readingTime}</span>
+ </>
+ )}
  </div>
 
         <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">{item.title}</h1>
@@ -41,7 +49,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="flex flex-wrap items-center gap-3 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {item.module !== "media" && (
- <AuthorLink name={item.author?.name} avatar={item.author?.avatar} className="text-foreground" />
+ <AuthorLink name={item.author?.name} avatar={item.author?.avatar} username={item.author?.username} role={item.author?.job || item.author?.role} className="text-foreground" />
  )}
  <div className="ms-auto flex items-center gap-2 paragraph-color">
  <LiveViewCounter module={item.module} slug={item.slug} />

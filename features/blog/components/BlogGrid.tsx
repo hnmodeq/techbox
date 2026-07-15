@@ -5,10 +5,16 @@ import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardStats } from "@/components/ui/card-stats";
 import { AuthorLink } from "@/components/ui/author-link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+function excerptWithEllipsis(value?: string) {
+  const text = (value || "").trim();
+  if (!text) return "";
+  return text.endsWith("...") || text.endsWith("…") ? text : `${text}...`;
+}
 
 export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("blog");
@@ -43,7 +49,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
           {items.map((p) => (
             <Card
               key={p.slug}
-              className="group h-full gap-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
+              className="group h-full gap-0 overflow-hidden p-0 transition-all duration-500 ease-out hover:-translate-y-0.5 hover:shadow-md"
             >
               <Link href={`/blog/${p.slug}`} className="block">
                 <div className="relative aspect-square overflow-hidden bg-muted">
@@ -52,28 +58,30 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                     alt={p.title}
                     fill
                     sizes="(min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
-                  <Badge
-                    variant="secondary"
-                    className="absolute top-3 right-3 bg-[var(--blog)]/90 text-white border-none"
-                  >
-                    مقاله
-                  </Badge>
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors group-hover:text-[var(--blog)]">
+                  <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors duration-300 group-hover:text-[var(--blog)]">
                     {p.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2">
-                    {p.excerpt}
+                  <p className="text-sm text-muted-foreground line-clamp-4 mt-2 leading-7">
+                    {excerptWithEllipsis(p.excerpt)}
                   </p>
                 </CardContent>
               </Link>
-              <div className="mt-auto flex items-center justify-between border-t px-4 pb-4 pt-3">
-                <div className="flex flex-col gap-1">
-                  <AuthorLink name={p.author.name} avatar={p.author.avatar} username={(p.author as any).username} />
-                  <div className="text-xs text-muted-foreground">{p.date_fa}</div>
+              <div className="mt-auto space-y-3 border-t px-4 pb-4 pt-3">
+                <div className="flex items-start justify-between gap-3">
+                  <AuthorLink name={p.author.name} avatar={p.author.avatar} username={p.author.username} role={p.author.job || p.author.role} />
+                  <div className="flex shrink-0 flex-col items-end gap-1 text-left text-xs text-muted-foreground">
+                    <Tooltip>
+                      <TooltipTrigger render={<span className="cursor-help" />}>
+                        {p.date_fa}
+                      </TooltipTrigger>
+                      <TooltipContent>تاریخ ساخته شدن این پرسش</TooltipContent>
+                    </Tooltip>
+                    {p.readingTimeLabel && <span>{p.readingTimeLabel}</span>}
+                  </div>
                 </div>
                 <CardStats module="blog" slug={p.slug} showComments={true} />
               </div>

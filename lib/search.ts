@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
+import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 
 function normalizePersian(text: string): string {
   return text
@@ -48,7 +49,7 @@ export async function advancedSearch({
         ],
       },
       include: {
-        author: { select: { name: true, username: true, role: true, roleFa: true, avatar: true } },
+        author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true } },
         _count: { select: { comments: true } },
       },
       orderBy: [{ date: "desc" }, { views: "desc" }],
@@ -103,10 +104,13 @@ export async function advancedSearch({
           score,
           date: p.date.toISOString(),
           date_fa: formatPostDateFa(p.date),
+          readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
+          readingTimeLabel: formatReadingTime(estimateReadingMinutes(p.title, p.excerpt, p.content)),
           author: {
             name: p.author?.name || p.authorName || "",
             username: p.author?.username || "",
             role: p.author?.roleFa || p.author?.role || "",
+            job: p.author?.job || "",
             avatar: p.author?.avatar || "",
           },
           comments: p._count.comments,
