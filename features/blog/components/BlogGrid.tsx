@@ -41,12 +41,11 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
       ) : (
         <div className="responsive-card-grid-lg grid gap-6">
           {items.map((p) => (
-            <Link
+            <Card
               key={p.slug}
-              href={`/blog/${p.slug}`}
-              className="group block"
+              className="group h-full gap-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
             >
-              <Card className="h-full gap-0 overflow-hidden p-0 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+              <Link href={`/blog/${p.slug}`} className="block">
                 <div className="relative aspect-square overflow-hidden bg-muted">
                   <Image
                     src={p.image || "/assets/blog-1.jpg"}
@@ -62,23 +61,23 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                     مقاله
                   </Badge>
                 </div>
-                <CardContent className="p-4 flex flex-col h-[calc(100%-16rem)]">
+                <CardContent className="p-4">
                   <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors group-hover:text-[var(--blog)]">
                     {p.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2 flex-1">
+                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2">
                     {p.excerpt}
                   </p>
-                  <div className="flex items-center justify-between mt-4 pt-3 border-t">
-                    <div className="flex flex-col gap-1">
-                      <AuthorLink name={p.author.name} avatar={p.author.avatar} username={(p.author as any).username} />
-                      <div className="text-xs text-muted-foreground">{p.date_fa}</div>
-                    </div>
-                    <CardStats module="blog" slug={p.slug} showComments={true} />
-                  </div>
                 </CardContent>
-              </Card>
-            </Link>
+              </Link>
+              <div className="mt-auto flex items-center justify-between border-t px-4 pb-4 pt-3">
+                <div className="flex flex-col gap-1">
+                  <AuthorLink name={p.author.name} avatar={p.author.avatar} username={(p.author as any).username} />
+                  <div className="text-xs text-muted-foreground">{p.date_fa}</div>
+                </div>
+                <CardStats module="blog" slug={p.slug} showComments={true} />
+              </div>
+            </Card>
           ))}
         </div>
       )}

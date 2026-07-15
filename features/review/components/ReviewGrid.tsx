@@ -47,7 +47,7 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
                 {/* Author & stats footer */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                   <div className="flex items-center gap-3">
-                    <Image src={r.author?.avatar || "/assets/hooman.png"} width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" alt={r.author?.name || "نویسنده"} {...blurProps(r.author?.avatar || "/assets/hooman.png")} />
+                    <Image src={r.author?.avatar || "/assets/hooman.png"} width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" alt={r.author?.name || "نویسنده"} />
                     <div>
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{r.author?.name || "نویسنده تکباکس"}</div>
                       <div className="text-[11px] paragraph-color">{r.author?.role || "تحلیلگر سخت‌افزار"}</div>
