@@ -11,7 +11,7 @@ import FooterSection from "@/components/layout/Footer"
 import { CartProvider } from "@/providers/cart.provider"
 import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
-import { AuthProvider } from "@/providers/auth.provider"
+import { AuthProvider, useAuth } from "@/providers/auth.provider"
 import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
 import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
@@ -34,8 +34,6 @@ const Chatbot = dynamic(() => import("@/features/chat/components/Chatbot"), {
 })
 
 import { AuthModal } from "@/features/auth/components/auth-modal"
-
-const READ_NEWS_STORAGE_KEY = "techbox-read-news-slugs"
 
 type LayoutShellProps = {
   children: React.ReactNode
@@ -61,21 +59,16 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
 }
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
   const [newsOpen, setNewsOpen] = React.useState(false)
-  const [readNewsSlugs, setReadNewsSlugs] = React.useState<string[]>([])
+  const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
   const newsSlugs = React.useMemo(() => dbNews.map((item) => item.slug).filter(Boolean), [dbNews])
-  const hasUnreadNews = newsSlugs.some((slug) => !readNewsSlugs.includes(slug))
-
-  React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem(READ_NEWS_STORAGE_KEY)
-      if (stored) setReadNewsSlugs(JSON.parse(stored))
-    } catch {}
-  }, [])
+  const newsSlugsKey = React.useMemo(() => newsSlugs.join(","), [newsSlugs])
+  const hasUnreadNews = unreadNewsSlugs.length > 0
 
   React.useEffect(() => {
     try {
@@ -85,17 +78,40 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   }, [newsOpen])
 
   React.useEffect(() => {
-    if (!newsOpen || newsSlugs.length === 0) return
-    setReadNewsSlugs((current) => {
-      const unreadAtOpen = newsSlugs.filter((slug) => !current.includes(slug))
-      setOpenedUnreadNewsSlugs(unreadAtOpen)
-      const merged = Array.from(new Set([...current, ...newsSlugs])).slice(-200)
-      try {
-        localStorage.setItem(READ_NEWS_STORAGE_KEY, JSON.stringify(merged))
-      } catch {}
-      return merged
-    })
-  }, [newsOpen, newsSlugs])
+    let cancelled = false
+
+    if (!user || newsSlugs.length === 0) {
+      setUnreadNewsSlugs([])
+      return
+    }
+
+    fetch(`/api/news/read-state?slugs=${encodeURIComponent(newsSlugsKey)}`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled) setUnreadNewsSlugs(Array.isArray(data?.unreadSlugs) ? data.unreadSlugs : [])
+      })
+      .catch(() => {
+        if (!cancelled) setUnreadNewsSlugs([])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [user, newsSlugs, newsSlugsKey])
+
+  React.useEffect(() => {
+    if (!newsOpen || !user || newsSlugs.length === 0 || unreadNewsSlugs.length === 0) return
+
+    const unreadAtOpen = newsSlugs.filter((slug) => unreadNewsSlugs.includes(slug))
+    setOpenedUnreadNewsSlugs(unreadAtOpen)
+    setUnreadNewsSlugs([])
+
+    fetch("/api/news/read-state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slugs: newsSlugs }),
+    }).catch(() => {})
+  }, [newsOpen, user, newsSlugs, unreadNewsSlugs])
 
   React.useEffect(() => {
     if (!newsOpen) setOpenedUnreadNewsSlugs([])

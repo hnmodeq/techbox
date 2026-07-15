@@ -26,6 +26,7 @@ model User {
   comments Comment[]
   ratings  Rating[]
   notificationState UserNotificationState?
+  newsReads UserNewsRead[]
   passwordResetTokens PasswordResetToken[]
 
   @@index([role, status], name: "user_role_status_idx")
@@ -100,6 +101,19 @@ model UserNotificationState {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([lastReadAt], name: "user_notification_last_read_idx")
+}
+
+model UserNewsRead {
+  id     String   @id @default(cuid())
+  userId String
+  slug   String
+  readAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, slug], name: "userId_slug")
+  @@index([userId, readAt], name: "user_news_read_user_read_idx")
+  @@index([slug], name: "user_news_read_slug_idx")
 }
 
 model Rating {

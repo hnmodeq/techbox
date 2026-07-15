@@ -6,7 +6,7 @@ const moduleFa: Record<string, string> = { blog: "مقاله", review: "نقد",
 
 interface NotificationItem {
   id: string;
-  type: "comment" | "like";
+  type: "comment" | "reply" | "like";
   module: string;
   slug: string;
   title: string;
@@ -21,7 +21,7 @@ interface NotificationItem {
 async function buildNotificationsForUser(userId: string): Promise<NotificationItem[]> {
   // Find all posts authored by this user
   const userPosts = await prisma.post.findMany({
-    where: { authorId: userId },
+    where: { authorId: userId, deletedAt: null },
     select: { id: true, module: true, slug: true, title: true },
   });
 
@@ -34,6 +34,8 @@ async function buildNotificationsForUser(userId: string): Promise<NotificationIt
     where: {
       postId: { in: postIds },
       authorId: { not: userId },
+      status: "approved",
+      deletedAt: null,
     },
     take: 30,
     orderBy: { createdAt: "desc" },
@@ -52,6 +54,7 @@ async function buildNotificationsForUser(userId: string): Promise<NotificationIt
         where: {
           OR: postModuleSlugs,
           userId: { not: null },
+          deletedAt: null,
         },
       })
     : [];
@@ -76,7 +79,32 @@ async function buildNotificationsForUser(userId: string): Promise<NotificationIt
     : [];
   const likePostMap = new Map(likePosts.map((p) => [`${p.module}:${p.slug}`, p]));
 
-  return [
+  // Replies to comments written by this user, even when the parent post belongs
+  // to someone else. This is an interaction with the user and should create a
+  // real notification.
+  const userComments = await prisma.comment.findMany({
+    where: { authorId: userId, deletedAt: null },
+    select: { id: true },
+  });
+  const userCommentIds = userComments.map((comment) => comment.id);
+  const replies = userCommentIds.length
+    ? await prisma.comment.findMany({
+        where: {
+          parentId: { in: userCommentIds },
+          authorId: { not: userId },
+          status: "approved",
+          deletedAt: null,
+        },
+        take: 30,
+        orderBy: { createdAt: "desc" },
+        include: {
+          author: { select: { name: true, username: true, avatar: true } },
+          post: { select: { module: true, slug: true, title: true } },
+        },
+      })
+    : [];
+
+  const events = [
     ...comments.map((c: any) => ({
       id: `comment-${c.id}`,
       type: "comment" as const,
@@ -89,6 +117,19 @@ async function buildNotificationsForUser(userId: string): Promise<NotificationIt
       text: c.text,
       createdAt: c.createdAt.toISOString(),
       label: `${moduleFa[c.post.module] || c.post.module} • ${c.author?.name || c.authorName} دیدگاه گذاشت`,
+    })),
+    ...replies.map((c: any) => ({
+      id: `reply-${c.id}`,
+      type: "reply" as const,
+      module: c.post.module,
+      slug: c.post.slug,
+      title: c.post.title,
+      actor: c.author?.name || c.authorName,
+      username: c.author?.username || "",
+      avatar: c.author?.avatar || null,
+      text: c.text,
+      createdAt: c.createdAt.toISOString(),
+      label: `${moduleFa[c.post.module] || c.post.module} • ${c.author?.name || c.authorName} پاسخ داد`,
     })),
     ...otherLikes.map((l: any) => {
       const u = userMap.get(l.userId || "");
@@ -107,7 +148,11 @@ async function buildNotificationsForUser(userId: string): Promise<NotificationIt
         label: `${moduleFa[l.module] || l.module} • ${u?.name || "کاربر"} پسندید`,
       };
     }),
-  ].sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)).slice(0, 30);
+  ];
+
+  return Array.from(new Map(events.map((event) => [event.id, event])).values())
+    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+    .slice(0, 30);
 }
 
 export async function GET() {

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { Label } from "@/components/ui/label"
 import {
@@ -9,15 +9,44 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { SidebarInput } from "@/components/ui/sidebar"
 import { SearchIcon, HistoryIcon } from "lucide-react"
+import type { ModuleSlug } from "@/lib/content"
 
 const RECENT_SEARCHES_KEY = "techbox-recent-searches"
 
+type SearchModule = "all" | Extract<ModuleSlug, "news" | "blog" | "media" | "shop" | "forum" | "review" | "download">
+
+const searchModules: Array<{ value: SearchModule; label: string }> = [
+  { value: "all", label: "همه" },
+  { value: "news", label: "اخبار" },
+  { value: "blog", label: "مجله" },
+  { value: "media", label: "ویدیوهای کوتاه" },
+  { value: "shop", label: "فروشگاه" },
+  { value: "forum", label: "انجمن" },
+  { value: "review", label: "نقد و بررسی" },
+  { value: "download", label: "دانلود" },
+]
+
+function isSearchModule(value: string | null): value is SearchModule {
+  return Boolean(value && searchModules.some((module) => module.value === value))
+}
+
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const rootRef = React.useRef<HTMLFormElement | null>(null)
+  const suppressFocusUntilRef = React.useRef(0)
   const [value, setValue] = React.useState("")
+  const [module, setModule] = React.useState<SearchModule>("all")
   const [open, setOpen] = React.useState(false)
   const [recent, setRecent] = React.useState<string[]>([])
 
@@ -26,6 +55,14 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     () => (query ? recent.filter((item) => item.toLowerCase().includes(query)) : recent),
     [query, recent]
   )
+  const shouldShowRecent = open && (value.trim() === "" || filteredRecent.length > 0)
+
+  React.useEffect(() => {
+    if (pathname !== "/search") return
+    setValue(searchParams.get("q") || "")
+    const nextModule = searchParams.get("module")
+    setModule(isSearchModule(nextModule) ? nextModule : "all")
+  }, [pathname, searchParams])
 
   React.useEffect(() => {
     if (!open) return
@@ -35,6 +72,15 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     document.addEventListener("pointerdown", onPointerDown)
     return () => document.removeEventListener("pointerdown", onPointerDown)
   }, [open])
+
+  React.useEffect(() => {
+    const closeSearch = () => {
+      suppressFocusUntilRef.current = Date.now() + 600
+      setOpen(false)
+    }
+    window.addEventListener("tb_auth_changed", closeSearch)
+    return () => window.removeEventListener("tb_auth_changed", closeSearch)
+  }, [])
 
   React.useEffect(() => {
     try {
@@ -54,14 +100,16 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   }, [])
 
   const goSearch = React.useCallback(
-    (searchQuery: string) => {
+    (searchQuery: string, selectedModule: SearchModule = module) => {
       const q = searchQuery.trim()
       if (!q) return
       saveSearch(q)
       setOpen(false)
-      router.push(`/search?q=${encodeURIComponent(q)}`)
+      const params = new URLSearchParams({ q })
+      if (selectedModule !== "all") params.set("module", selectedModule)
+      router.push(`/search?${params.toString()}`)
     },
-    [router, saveSearch]
+    [module, router, saveSearch]
   )
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,20 +119,38 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
 
   return (
     <form ref={rootRef} onSubmit={handleSubmit} {...props}>
-      <Popover
-        open={open && (value.trim() === "" || filteredRecent.length > 0)}
-        onOpenChange={(nextOpen) => {
-          if (nextOpen) setOpen(true)
-        }}
-      >
+      <Popover open={shouldShowRecent} onOpenChange={setOpen}>
         <div className="relative">
           <Label htmlFor="search" className="sr-only">
             جستجو
           </Label>
+          <div className="absolute top-1/2 start-1 z-10 -translate-y-1/2">
+            <Select
+              value={module}
+              onValueChange={(nextValue) => {
+                if (isSearchModule(nextValue)) setModule(nextValue)
+              }}
+            >
+              <SelectTrigger
+                size="sm"
+                aria-label="محدوده جستجو"
+                className="h-6 max-w-[6.5rem] border-transparent bg-background/70 px-1.5 shadow-none hover:bg-muted"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="start" className="min-w-36">
+                {searchModules.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <SidebarInput
             id="search"
-            placeholder="جستجو در تکباکس..."
-            className="h-8 ps-7"
+            placeholder="دنبال چی میگردی؟"
+            className="h-8 ps-[7.25rem] pe-8"
             value={value}
             onChange={(e) => {
               const nextValue = e.target.value
@@ -92,7 +158,9 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
               const nextQuery = nextValue.trim().toLowerCase()
               setOpen(!nextQuery || recent.some((item) => item.toLowerCase().includes(nextQuery)))
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              if (Date.now() > suppressFocusUntilRef.current) setOpen(true)
+            }}
             onKeyDown={(event) => {
               if (event.key === "Escape") setOpen(false)
             }}
@@ -102,7 +170,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
               <button
                 type="button"
                 aria-label="نمایش جستجوهای اخیر"
-                className="absolute top-1/2 start-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+                className="absolute top-1/2 end-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
               >
                 <SearchIcon className="size-4" />
               </button>
@@ -112,11 +180,12 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         <PopoverContent
           className="w-[min(28rem,calc(100vw-2rem))] p-2"
           align="center"
+          onPointerDown={(event) => event.stopPropagation()}
         >
           <div className="space-y-2" dir="rtl">
             <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
               <HistoryIcon className="size-3.5" />
-              جستجوهای اخیر
+              جستجوهای اخیر شما
             </div>
             {filteredRecent.length > 0 ? (
               <div className="space-y-1">

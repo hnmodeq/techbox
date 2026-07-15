@@ -14,7 +14,17 @@ import { moduleMeta } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 
-const searchableModules: Array<"all" | ModuleSlug> = ["all", "blog", "news", "media", "review", "download", "shop", "forum"];
+const searchableModules: Array<"all" | ModuleSlug> = ["all", "news", "blog", "media", "shop", "forum", "review", "download"];
+const searchModuleLabels: Partial<Record<"all" | ModuleSlug, string>> = {
+  all: "همه",
+  news: "اخبار",
+  blog: "مجله",
+  media: "ویدیوهای کوتاه",
+  shop: "فروشگاه",
+  forum: "انجمن",
+  review: "نقد و بررسی",
+  download: "دانلود",
+};
 
 type SearchResult = ContentItem & { comments?: number };
 
@@ -118,7 +128,7 @@ function SearchInner() {
       <div className="mb-6 flex flex-wrap gap-2">
         {searchableModules.map((m) => (
           <Button key={m} type="button" size="xs" variant={moduleFilter === m ? "primary" : "ghost"} onClick={() => setModule(m)}>
-            {m === "all" ? "همه" : moduleMeta[m]?.titleFa || m}
+            {searchModuleLabels[m] || moduleMeta[m as ModuleSlug]?.titleFa || m}
           </Button>
         ))}
       </div>

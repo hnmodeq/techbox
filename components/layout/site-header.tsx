@@ -7,7 +7,6 @@ import { useTheme } from "next-themes"
 import {
   BellIcon,
   CalendarDaysIcon,
-  ClockIcon,
   MoonIcon,
   NewspaperIcon,
   PanelLeftIcon,
@@ -38,6 +37,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { moduleMeta, type ModuleSlug } from "@/lib/content"
+import {
+  getDaysInJalaliMonth,
+  getPersianDayName,
+  getPersianMonthName,
+  gregorianToJalali,
+  jalaliToGregorian,
+} from "@/lib/jalali"
 import { cn } from "@/lib/utils"
 
 type Crumb = {
@@ -196,12 +202,82 @@ function TechboxBreadcrumb() {
   )
 }
 
-function MonthCalendar({ date }: { date: Date }) {
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const today = new Date()
-  const firstDay = new Date(year, month, 1)
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
+type TehranJalaliSnapshot = {
+  gregorianYear: number
+  gregorianMonth: number
+  gregorianDay: number
+  hour: number
+  minute: number
+  second: number
+  jalaliYear: number
+  jalaliMonth: number
+  jalaliDay: number
+  dayIndex: number
+}
+
+const persianDigits = (value: number | string) =>
+  String(value).replace(/\d/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)] ?? digit)
+
+function getTehranParts(date: Date) {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tehran",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: false,
+  })
+  const parts = Object.fromEntries(formatter.formatToParts(date).map((part) => [part.type, part.value]))
+  const hour = Number(parts.hour || 0)
+
+  return {
+    year: Number(parts.year),
+    month: Number(parts.month),
+    day: Number(parts.day),
+    hour: hour === 24 ? 0 : hour,
+    minute: Number(parts.minute || 0),
+    second: Number(parts.second || 0),
+  }
+}
+
+function getTehranJalaliSnapshot(date: Date): TehranJalaliSnapshot {
+  const tehran = getTehranParts(date)
+  const wallDate = new Date(tehran.year, tehran.month - 1, tehran.day)
+  const jalali = gregorianToJalali(wallDate)
+
+  return {
+    gregorianYear: tehran.year,
+    gregorianMonth: tehran.month,
+    gregorianDay: tehran.day,
+    hour: tehran.hour,
+    minute: tehran.minute,
+    second: tehran.second,
+    jalaliYear: jalali.year,
+    jalaliMonth: jalali.month,
+    jalaliDay: jalali.day,
+    dayIndex: wallDate.getDay(),
+  }
+}
+
+function formatSnapshotTime(snapshot: TehranJalaliSnapshot) {
+  const time = [snapshot.hour, snapshot.minute, snapshot.second]
+    .map((part) => String(part).padStart(2, "0"))
+    .join(":")
+  return persianDigits(time)
+}
+
+function formatSnapshotDate(snapshot: TehranJalaliSnapshot) {
+  return `${getPersianDayName(snapshot.dayIndex)} ${persianDigits(snapshot.jalaliDay)} ${getPersianMonthName(snapshot.jalaliMonth)} ${persianDigits(snapshot.jalaliYear)}`
+}
+
+const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: TehranJalaliSnapshot }) {
+  const year = today.jalaliYear
+  const month = today.jalaliMonth
+  const firstGregorian = jalaliToGregorian(year, month, 1)
+  const firstDay = new Date(firstGregorian.year, firstGregorian.month - 1, firstGregorian.day)
+  const daysInMonth = getDaysInJalaliMonth(month, year)
   const leadingDays = (firstDay.getDay() + 1) % 7 // Persian week starts on Saturday.
   const cells = Array.from({ length: leadingDays + daysInMonth }, (_, index) =>
     index < leadingDays ? null : index - leadingDays + 1
@@ -211,7 +287,7 @@ function MonthCalendar({ date }: { date: Date }) {
     <div className="space-y-3" dir="rtl">
       <div className="flex items-center justify-between">
         <div className="font-bold">
-          {date.toLocaleDateString("fa-IR", { month: "long", year: "numeric" })}
+          {getPersianMonthName(month)} {persianDigits(year)}
         </div>
         <CalendarDaysIcon className="size-4 text-muted-foreground" />
       </div>
@@ -222,8 +298,7 @@ function MonthCalendar({ date }: { date: Date }) {
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-xs">
         {cells.map((day, index) => {
-          const isToday =
-            day === today.getDate() && month === today.getMonth() && year === today.getFullYear()
+          const isToday = day === today.jalaliDay
           return (
             <span
               key={index}
@@ -233,14 +308,18 @@ function MonthCalendar({ date }: { date: Date }) {
                 isToday && "bg-primary text-primary-foreground font-bold"
               )}
             >
-              {day ? new Intl.NumberFormat("fa-IR").format(day) : ""}
+              {day ? persianDigits(day) : ""}
             </span>
           )
         })}
       </div>
     </div>
   )
-}
+}, (prev, next) =>
+  prev.today.jalaliYear === next.today.jalaliYear &&
+  prev.today.jalaliMonth === next.today.jalaliMonth &&
+  prev.today.jalaliDay === next.today.jalaliDay
+)
 
 function DateTimeDisplay() {
   // Do not render the current time during SSR. The CI server and the browser can
@@ -248,69 +327,35 @@ function DateTimeDisplay() {
   // first client render differ from the server HTML and trigger hydration errors.
   const [now, setNow] = React.useState<Date | null>(null)
   const [open, setOpen] = React.useState(false)
-  const closeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const keepOpen = React.useCallback(() => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
-    setOpen(true)
-  }, [])
-
-  const closeSoon = React.useCallback(() => {
-    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
-    closeTimerRef.current = setTimeout(() => setOpen(false), 180)
-  }, [])
 
   React.useEffect(() => {
     const updateNow = () => setNow(new Date())
     updateNow()
     const timer = setInterval(updateNow, 1000)
-    return () => {
-      clearInterval(timer)
-      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
-    }
+    return () => clearInterval(timer)
   }, [])
 
-  const timeStr = now?.toLocaleTimeString("fa-IR", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Tehran",
-  })
-
-  const dateStr = now?.toLocaleDateString("fa-IR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "Asia/Tehran",
-  })
+  const snapshot = React.useMemo(() => (now ? getTehranJalaliSnapshot(now) : null), [now])
+  const timeStr = snapshot ? formatSnapshotTime(snapshot) : "--:--:--"
+  const dateStr = snapshot ? formatSnapshotDate(snapshot) : "—"
 
   return (
-    <Popover open={open} onOpenChange={(nextOpen) => { if (nextOpen) setOpen(true) }}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
           <button
             type="button"
-            className="hidden items-center gap-2 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted md:flex"
-            onMouseEnter={keepOpen}
-            onMouseLeave={closeSoon}
-            onFocus={keepOpen}
-            onBlur={closeSoon}
+            className="hidden h-8 min-w-[16.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted md:flex"
           />
         }
       >
-        <ClockIcon className="size-3.5" />
-        <span className="tabular-nums">{timeStr ?? "--:--:--"}</span>
+        <span className="tabular-nums">{timeStr}</span>
         <span className="text-muted-foreground/50">•</span>
-        <span>{dateStr ?? "—"}</span>
+        <span>{dateStr}</span>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-72"
-        onMouseEnter={keepOpen}
-        onMouseLeave={closeSoon}
-      >
-        {now ? (
-          <MonthCalendar date={now} />
+      <PopoverContent className="w-72">
+        {snapshot ? (
+          <MonthCalendar today={snapshot} />
         ) : (
           <div className="h-52 animate-pulse rounded-md bg-muted/40" aria-hidden="true" />
         )}
@@ -322,17 +367,24 @@ function DateTimeDisplay() {
 function ThemeToggle() {
   const { theme, setTheme } = useTheme()
   const isDark = theme === "dark"
+  const label = isDark ? "حالت روشن" : "حالت تاریک"
 
   return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label="تغییر تم"
-      title={isDark ? "حالت روشن" : "حالت تاریک"}
-    >
-      {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            aria-label="تغییر تم"
+          />
+        }
+      >
+        {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -410,7 +462,7 @@ function NotificationsButton() {
           )}
         </TooltipTrigger>
         <TooltipContent>
-          {unreadCount > 0 ? "you have unread messages" : "اعلان جدیدی ندارید"}
+          {unreadCount > 0 ? "اعلان خوانده‌نشده دارید" : "اعلان جدیدی ندارید"}
         </TooltipContent>
       </Tooltip>
       <PopoverContent className="w-[min(24rem,calc(100vw-2rem))] p-2" align="end">
@@ -505,7 +557,7 @@ export function SiteHeader({
                 render={
                   <Button
                     type="button"
-                    variant={newsOpen ? "secondary" : "ghost"}
+                    variant="primary"
                     size="sm"
                     className="relative gap-1.5"
                     onClick={onToggleNews}
@@ -514,7 +566,12 @@ export function SiteHeader({
                   />
                 }
               >
-                {hasUnreadNews && <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" /></span>}
+                {hasUnreadNews && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+                  </span>
+                )}
                 <NewspaperIcon className="size-4" />
                 <span className="hidden sm:inline">اخبار</span>
               </TooltipTrigger>
