@@ -13,12 +13,34 @@ import { AuthorLink } from '@/components/ui/author-link';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
-function excerptWithEllipsis(value?: string) {
-  const text = (value || '').trim();
+function stripPreviewText(value?: string) {
+  return (value || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#>*_`~\-[\]()]/g, ' ')
+    .replace(/&[a-zA-Z0-9#]+;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function articlePreview(item: { excerpt?: string; content?: string }) {
+  const excerpt = stripPreviewText(item.excerpt);
+  const content = stripPreviewText(item.content);
+  let text = excerpt;
+
+  if (content) {
+    const normalizedExcerpt = excerpt.replace(/\s+/g, ' ').trim();
+    const normalizedContent = content.replace(/\s+/g, ' ').trim();
+    const extra = normalizedExcerpt && normalizedContent.startsWith(normalizedExcerpt)
+      ? normalizedContent.slice(normalizedExcerpt.length).trim()
+      : normalizedContent;
+
+    if (extra && text.length < 180) text = `${text} ${extra}`.trim();
+  }
+
   if (!text) return '';
   return text.endsWith('...') || text.endsWith('…') ? text : `${text}...`;
 }
-
 function compactReadingTimeLabel(value?: string) {
   return (value || '').replace(/\s*مطالعه\s*$/, '');
 }
@@ -72,7 +94,7 @@ export default function MagazineRow() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-3 leading-6">
-                    {excerptWithEllipsis(art.excerpt)}
+                    {articlePreview(art)}
                   </p>
                 </CardContent>
               </Link>

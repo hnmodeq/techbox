@@ -10,12 +10,34 @@ import { CardStats } from "@/components/ui/card-stats";
 import { AuthorLink } from "@/components/ui/author-link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-function excerptWithEllipsis(value?: string) {
-  const text = (value || "").trim();
-  if (!text) return "";
-  return text.endsWith("...") || text.endsWith("…") ? text : `${text}...`;
+function stripPreviewText(value?: string) {
+  return (value || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#>*_`~\-[\]()]/g, ' ')
+    .replace(/&[a-zA-Z0-9#]+;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
+function articlePreview(item: { excerpt?: string; content?: string }) {
+  const excerpt = stripPreviewText(item.excerpt);
+  const content = stripPreviewText(item.content);
+  let text = excerpt;
+
+  if (content) {
+    const normalizedExcerpt = excerpt.replace(/\s+/g, ' ').trim();
+    const normalizedContent = content.replace(/\s+/g, ' ').trim();
+    const extra = normalizedExcerpt && normalizedContent.startsWith(normalizedExcerpt)
+      ? normalizedContent.slice(normalizedExcerpt.length).trim()
+      : normalizedContent;
+
+    if (extra && text.length < 180) text = `${text} ${extra}`.trim();
+  }
+
+  if (!text) return '';
+  return text.endsWith('...') || text.endsWith('…') ? text : `${text}...`;
+}
 function compactReadingTimeLabel(value?: string) {
   return (value || '').replace(/\s*مطالعه\s*$/, '');
 }
@@ -80,7 +102,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-3 mt-2 leading-7">
-                    {excerptWithEllipsis(p.excerpt)}
+                    {articlePreview(p)}
                   </p>
                 </CardContent>
               </Link>
