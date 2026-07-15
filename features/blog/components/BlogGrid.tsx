@@ -16,6 +16,10 @@ function excerptWithEllipsis(value?: string) {
   return text.endsWith("...") || text.endsWith("…") ? text : `${text}...`;
 }
 
+function compactReadingTimeLabel(value?: string) {
+  return (value || '').replace(/\s*مطالعه\s*$/, '');
+}
+
 export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("blog");
   const { items: dbItems, loading } = useDbPosts("blog", fallbackItems, 100);
@@ -67,12 +71,15 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                       {p.title}
                     </h3>
                     {p.readingTimeLabel && (
-                      <span className="shrink-0 pt-1 text-xs font-medium text-muted-foreground">
-                        {p.readingTimeLabel}
-                      </span>
+                      <Tooltip>
+                        <TooltipTrigger render={<span className="shrink-0 pt-1 text-xs font-medium text-muted-foreground" />}>
+                          {compactReadingTimeLabel(p.readingTimeLabel)}
+                        </TooltipTrigger>
+                        <TooltipContent>زمان مطالعه</TooltipContent>
+                      </Tooltip>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-4 mt-2 leading-7">
+                  <p className="text-sm text-muted-foreground line-clamp-3 mt-2 leading-7">
                     {excerptWithEllipsis(p.excerpt)}
                   </p>
                 </CardContent>
@@ -82,7 +89,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                   <AuthorLink name={p.author.name} avatar={p.author.avatar} username={p.author.username} role={p.author.job || p.author.role} />
                   <div className="flex shrink-0 flex-col items-end gap-1 text-left text-xs text-muted-foreground">
                     <Tooltip>
-                      <TooltipTrigger render={<span className="cursor-help" />}>
+                      <TooltipTrigger render={<span />}>
                         {p.date_fa}
                       </TooltipTrigger>
                       <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
