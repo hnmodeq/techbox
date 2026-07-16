@@ -16,6 +16,7 @@ import { LikeButton } from '@/components/ui/like-button';
 import { SaveButton } from '@/components/ui/save-button';
 import { ShareButton } from '@/components/ui/share-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function VideoReelsRow() {
   const { items: dbVideos, loading } = useHomeModule('media');
@@ -166,9 +167,9 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-      {/* Fix #3: Prev/Next buttons positioned relative to modal, not page edges */}
-      {/* Fix #5: Slide/push transition on content change */}
-      <div className="relative z-10 animate-in fade-in duration-200">
+      {/* Prev/Next as flex siblings — no overlap with modal */}
+      {/* In RTL flex-row: first child → right, last child → left */}
+      <div className="relative z-10 animate-in fade-in duration-200 flex items-center gap-1">
         {/* Inline keyframes for slide direction */}
         <style>{`
           @keyframes slideFromRight {
@@ -187,28 +188,12 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
             <button
               type="button"
               onClick={onPrev}
-              className="absolute right-[2px] top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+              className="shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
             />
           }>
             <Icon name="chevronRight" size={24} />
           </TooltipTrigger>
-          {/* Fix #4: Swapped tooltip text */}
           <TooltipContent>رفتن به ویدیوی بعدی</TooltipContent>
-        </Tooltip>
-
-        {/* Next button (left side in RTL) */}
-        <Tooltip>
-          <TooltipTrigger render={
-            <button
-              type="button"
-              onClick={onNext}
-              className="absolute left-[2px] top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
-            />
-          }>
-            <Icon name="chevronLeft" size={24} />
-          </TooltipTrigger>
-          {/* Fix #4: Swapped tooltip text */}
-          <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
         </Tooltip>
 
         {/* Modal content */}
@@ -235,29 +220,47 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
             />
           </div>
 
-          {/* Fix #1: Wider info section for more room for comments */}
-          <div className="min-w-0 sm:min-w-[340px] sm:max-w-[520px] sm:flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 max-h-[42vh] sm:max-h-none">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
-                <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
-              </div>
-              <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
-                <Icon name="close" size={22} />
-              </Button>
-            </div>
+          {/* Info section with ScrollArea */}
+          <div className="min-w-0 sm:min-w-[340px] sm:max-w-[520px] sm:flex-1 max-h-[42vh] sm:max-h-none overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="p-4 sm:p-5 space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
+                    <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
+                    <Icon name="close" size={22} />
+                  </Button>
+                </div>
 
-            <div className="flex items-center justify-between" dir="ltr">
-              <div className="flex items-center gap-3">
-                <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
-                <SaveButton module="media" slug={video.slug} />
-                <ShareButton />
-              </div>
-            </div>
+                <div className="flex items-center justify-between" dir="ltr">
+                  <div className="flex items-center gap-3">
+                    <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
+                    <SaveButton module="media" slug={video.slug} />
+                    <ShareButton />
+                  </div>
+                </div>
 
-            <CommentSection module="media" slug={video.slug} />
+                <CommentSection module="media" slug={video.slug} />
+              </div>
+            </ScrollArea>
           </div>
         </div>
+
+        {/* Next button (left side in RTL) */}
+        <Tooltip>
+          <TooltipTrigger render={
+            <button
+              type="button"
+              onClick={onNext}
+              className="shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+            />
+          }>
+            <Icon name="chevronLeft" size={24} />
+          </TooltipTrigger>
+          <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );
