@@ -60,7 +60,7 @@ export default function RecommendationRow({
 
                     <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                       <div>{item.date_fa?.split(" ")[0]}</div>
-                      <CardStats module={item.module} slug={item.slug} showComments={false} />
+                      <CardStats module={item.module} slug={item.slug} initialViews={item.views} initialLikes={item.likes} showComments={false} />
                     </div>
                   </CardContent>
                 </Card>

@@ -12,6 +12,7 @@ import { AuthorLink } from "@/components/ui/author-link";
 import { gregorianToJalali, getPersianMonthName } from "@/lib/jalali";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { useAuth } from "@/providers/auth.provider";
 
 type CommentNode = any;
 
@@ -51,11 +52,34 @@ function formatCommentDate(dateStr: string): string {
   return "لحظاتی پیش";
 }
 
+/** Skeleton that mimics a comment card shape while auth/comments load */
+function CommentSkeleton() {
+  return (
+    <div className="space-y-3 animate-pulse">
+      {[1, 2].map((i) => (
+        <div key={i} className="bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-[var(--muted-background)]" />
+            <div className="h-3 w-24 rounded bg-[var(--muted-background)]" />
+            <div className="h-3 w-16 rounded bg-[var(--muted-background)] mr-auto" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 w-full rounded bg-[var(--muted-background)]" />
+            <div className="h-3 w-3/4 rounded bg-[var(--muted-background)]" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function CommentSection({ module, slug }: { module: string; slug: string }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Use the shared AuthProvider — reads user from localStorage instantly
+  const { user, loading: authLoading } = useAuth();
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -69,10 +93,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   useEffect(() => {
     load();
-    fetch("/api/auth/me")
-      .then(r => r.json())
-      .then(d => setUser(d?.user || null))
-      .catch(() => {});
   }, [load]);
 
   // ─── Top-level comment form state ───────────────────────────
@@ -105,6 +125,14 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   // ─── Reply form state ───────────────────────────────────────
   const [replyOpen, setReplyOpen] = React.useState<string | null>(null);
   const [replySubmitting, setReplySubmitting] = React.useState(false);
+
+  const handleReplyClick = (commentId: string) => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent("tb_open_auth"));
+      return;
+    }
+    setReplyOpen(replyOpen === commentId ? null : commentId);
+  };
 
   const handleReplySubmit = async (e: React.FormEvent<HTMLFormElement>, parentId: string) => {
     e.preventDefault();
@@ -197,14 +225,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const isSoftDeleted = (c: CommentNode) => !!(c as any).deletedAt;
 
-  const handleReplyClick = (commentId: string) => {
-    if (!user) {
-      window.dispatchEvent(new CustomEvent("tb_open_auth"));
-      return;
-    }
-    setReplyOpen(replyOpen === commentId ? null : commentId);
-  };
-
   const renderNode = (c: CommentNode, depth = 0) => {
     const deleted = isSoftDeleted(c);
     const isOwner = user && (c as any).authorId === user.id;
@@ -216,7 +236,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
         <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 20 : 0 }}>
           <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative">
-            {/* Deleting overlay */}
             {isDeleting && (
               <div className="absolute inset-0 bg-[var(--card-background)]/60 rounded-[var(--corner-radius)] flex items-center justify-center z-10">
                 <Spinner className="h-5 w-5" />
@@ -376,7 +395,22 @@ export default function CommentSection({ module, slug }: { module: string; slug:
         <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">دیدگاه شما <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
       </div>
 
-      {user ? (
+      {authLoading ? (
+        /* Show skeleton while auth resolves — prevents "not logged in" flash */
+        <div className="mb-8">
+          <div className="bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] p-5 space-y-4 animate-pulse">
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-9 rounded-full bg-[var(--muted-background)]" />
+              <div className="space-y-2">
+                <div className="h-3 w-20 rounded bg-[var(--muted-background)]" />
+                <div className="h-3 w-14 rounded bg-[var(--muted-background)]" />
+              </div>
+            </div>
+            <div className="h-24 rounded bg-[var(--muted-background)]" />
+            <div className="flex justify-end"><div className="h-8 w-28 rounded bg-[var(--muted-background)]" /></div>
+          </div>
+        </div>
+      ) : user ? (
         <form onSubmit={handleTopSubmit} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8">
           <input type="hidden" name="module" value={module} />
           <input type="hidden" name="slug" value={slug} />
@@ -423,7 +457,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
       <div className="space-y-1 min-h-[60px]">
         {loading ? (
-          <div className="flex items-center justify-center py-6"><Spinner className="h-7 w-7" /></div>
+          <CommentSkeleton />
         ) : comments.length === 0 ? (
           <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (

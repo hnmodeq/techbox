@@ -87,7 +87,7 @@ export default function VideoReelsRow() {
               <div className="relative z-30 p-3 text-white w-full">
                 <h3 className="text-[11px] sm:text-xs font-bold leading-4 line-clamp-2 text-white group-hover:text-[var(--media)] transition-colors">{vid.title}</h3>
                 <div className="mt-2 flex items-center justify-start" dir="ltr">
-                  <CardStats module="media" slug={vid.slug} showComments={true} />
+                  <CardStats module="media" slug={vid.slug} initialViews={vid.views} initialLikes={vid.likes} showComments={true} />
                 </div>
               </div>
             </button>
@@ -218,7 +218,7 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
 
           <div className="flex items-center justify-between" dir="ltr">
             <div className="flex items-center gap-3">
-              <LikeButton contentType="media" slug={video.slug} tooltipLabel="پسند کردن این ویدیو" />
+              <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
               <SaveButton module="media" slug={video.slug} />
               <ShareButton />
             </div>

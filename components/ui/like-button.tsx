@@ -4,8 +4,45 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
+// ─── Liked-state cache (localStorage) ─────────────────────────
+// Persists liked state across page loads so the heart appears red
+// instantly without waiting for /api/like to respond.
+const LIKED_CACHE_KEY = "tb_liked";
+
+function getLikedCache(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(LIKED_CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function setLikedCache(module: string, slug: string, liked: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    const cache = getLikedCache();
+    const key = `${module}:${slug}`;
+    if (liked) {
+      cache[key] = true;
+    } else {
+      delete cache[key];
+    }
+    localStorage.setItem(LIKED_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // localStorage might be full or disabled
+  }
+}
+
+function getCachedLiked(module: string, slug: string): boolean | undefined {
+  const cache = getLikedCache();
+  return cache[`${module}:${slug}`];
+}
+
 export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { contentType: string; slug: string; initial?: number; tooltipLabel?: string }) {
-  const [liked, setLiked] = useState(false);
+  // Read liked from localStorage cache synchronously for instant render
+  const cachedLiked = getCachedLiked(contentType, slug);
+  const [liked, setLiked] = useState(cachedLiked ?? false);
   const [count, setCount] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
@@ -18,6 +55,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
         if (active && typeof data.likes === "number") {
           setCount(data.likes);
           setLiked(data.liked);
+          setLikedCache(contentType, slug, data.liked);
         }
       })
       .catch(() => {});
@@ -34,6 +72,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
     const nextLiked = !liked;
     setLiked(nextLiked);
     setCount(c => nextLiked ? c + 1 : Math.max(0, c - 1));
+    setLikedCache(contentType, slug, nextLiked);
 
     try {
       const res = await fetch("/api/like", {
@@ -45,6 +84,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
       if (res.status === 401) {
         setLiked(prevLiked);
         setCount(prevCount);
+        setLikedCache(contentType, slug, prevLiked);
         setShowLoginPrompt(true);
         setBusy(false);
         return;
@@ -54,16 +94,19 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
         const data = await res.json();
         setLiked(data.liked);
         setCount(data.likes);
+        setLikedCache(contentType, slug, data.liked);
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("tb_stats_update", { detail: { module: contentType, slug, likes: data.likes } }));
         }
       } else {
         setLiked(prevLiked);
         setCount(prevCount);
+        setLikedCache(contentType, slug, prevLiked);
       }
     } catch {
       setLiked(prevLiked);
       setCount(prevCount);
+      setLikedCache(contentType, slug, prevLiked);
     } finally {
       setBusy(false);
     }
@@ -143,7 +186,6 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
         body: JSON.stringify({ commentId: id, vote: next })
       });
       if (res.status === 401) {
-        // Revert — user not logged in
         setV(prevV);
         setL(prevL);
         setNeedLogin(true);
@@ -152,16 +194,13 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
       }
       if (res.ok) {
         const data = await res.json();
-        // Sync with server truth
         setL(data.likes);
         setV(next === 0 ? null : "up");
       } else {
-        // Revert on error
         setV(prevV);
         setL(prevL);
       }
     } catch {
-      // Revert on network error
       setV(prevV);
       setL(prevL);
     } finally {

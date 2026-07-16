@@ -132,7 +132,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
           </div>
 
           <div className="flex items-center gap-2">
-            <LikeButton contentType="forum" slug={item.slug} />
+            <LikeButton contentType="forum" slug={item.slug} initial={item.likes || 0} />
             <SaveButton module="forum" slug={item.slug} />
             <ShareButton />
           </div>

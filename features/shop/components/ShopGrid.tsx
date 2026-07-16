@@ -167,7 +167,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 </Button>
               </div>
               <div className="mt-3 pt-3 border-t flex items-center justify-between">
-                <CardStats module="shop" slug={p.slug} showComments={true} />
+                <CardStats module="shop" slug={p.slug} initialViews={p.views} initialLikes={p.likes} showComments={true} />
                 <Button
                   size="xs"
                   variant={isInComparison(p.slug) ? "secondary" : "ghost"}

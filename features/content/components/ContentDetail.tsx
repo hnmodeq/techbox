@@ -63,7 +63,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <VideoPlayer src={videoSrc} poster={item.image} title={item.title} />
  <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex flex-wrap items-center gap-4">
  <LiveViewCounter module={item.module} slug={item.slug} showLabel />
- <LikeButton contentType={item.module} slug={item.slug} />
+ <LikeButton contentType={item.module} slug={item.slug} initial={item.likes || 0} />
  {videoDuration && <span dir="ltr">{videoDuration}</span>}
  {videoFileSize && <span dir="ltr">{videoFileSize}</span>}
  {videoMimeType && <span dir="ltr">{videoMimeType}</span>}
@@ -88,7 +88,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  )}
 
  <div className="mt-8 flex flex-wrap items-center gap-3">
- <LikeButton contentType={item.module} slug={item.slug} />
+ <LikeButton contentType={item.module} slug={item.slug} initial={item.likes || 0} />
  <SaveButton module={item.module} slug={item.slug} />
  <ShareButton />
  </div>
