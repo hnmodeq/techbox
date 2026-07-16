@@ -54,7 +54,7 @@ export default function VideoReelsRow() {
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="200px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
 
-              {/* Date & Duration overlay - same style as article cards */}
+              {/* Date & Duration overlay */}
               <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-3 py-3 z-30">
                 <Tooltip>
                   <TooltipTrigger render={<span className="text-[10px] font-bold text-white/90 sm:text-xs" dir="rtl" />}>
@@ -96,12 +96,7 @@ export default function VideoReelsRow() {
         )}
       </div>
       {activeIndex !== null && activeIndex < videos.length && (
-        <VideoModal
-          video={videos[activeIndex]}
-          onClose={() => setActiveIndex(null)}
-          onPrev={goToPrev}
-          onNext={goToNext}
-        />
+        <VideoModal video={videos[activeIndex]} onClose={() => setActiveIndex(null)} onPrev={goToPrev} onNext={goToNext} />
       )}
     </section>
   );
@@ -144,19 +139,20 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
   }, [video.slug]);
 
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
+  const aspectRatio = videoDimensions ? videoDimensions.width / videoDimensions.height : 9 / 16;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
+    <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-      {/* Previous button - right side in RTL */}
+      {/* Previous button */}
       <Tooltip>
         <TooltipTrigger render={
           <button
             type="button"
             onClick={onPrev}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
           />
         }>
           <Icon name="chevronRight" size={24} />
@@ -164,13 +160,13 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
         <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
       </Tooltip>
 
-      {/* Next button - left side in RTL */}
+      {/* Next button */}
       <Tooltip>
         <TooltipTrigger render={
           <button
             type="button"
             onClick={onNext}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
           />
         }>
           <Icon name="chevronLeft" size={24} />
@@ -178,12 +174,13 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
         <TooltipContent>رفتن به ویدیوی بعدی</TooltipContent>
       </Tooltip>
 
-      {/* Modal content */}
-      <div className="relative z-10 flex w-[95vw] sm:w-[90vw] lg:w-auto overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
-        style={{ maxHeight: '92vh', maxWidth: isPortrait ? '64rem' : '80rem' }}
+      {/* Modal content - responsive flex */}
+      <div
+        className="relative z-10 flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
+        style={{ maxWidth: isPortrait ? '64rem' : '80rem' }}
       >
-        {/* Video section - right side */}
-        <div className="bg-black shrink-0 flex items-center justify-center">
+        {/* Video section */}
+        <div className="bg-black shrink-0 flex items-center justify-center sm:overflow-hidden">
           <video
             ref={videoRef}
             key={video.slug}
@@ -192,15 +189,12 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
             controls
             autoPlay
             playsInline
-            className="block bg-black"
-            style={{
-              height: '92vh',
-              aspectRatio: videoDimensions ? `${videoDimensions.width} / ${videoDimensions.height}` : '9 / 16',
-            }}
+            className="block bg-black w-auto max-h-[50vh] sm:max-h-[92vh]"
+            style={{ aspectRatio: `${aspectRatio}` }}
           />
         </div>
-        {/* Info section - left side, scrollable */}
-        <div className="min-w-[280px] flex-1 overflow-y-auto p-5 space-y-4" style={{ maxHeight: '92vh' }}>
+        {/* Info section - scrollable */}
+        <div className="min-w-0 sm:min-w-[280px] sm:flex-1 overflow-y-auto p-4 sm:p-5 space-y-4" style={{ maxHeight: '92vh' }}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
@@ -217,7 +211,6 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
               <SaveButton module="media" slug={video.slug} />
               <ShareButton />
             </div>
-            <span className="text-xs text-muted-foreground" dir="rtl">{video.date_fa}</span>
           </div>
 
           <CommentSection module="media" slug={video.slug} />

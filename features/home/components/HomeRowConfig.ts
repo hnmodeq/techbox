@@ -3,7 +3,7 @@
  * تمام ارتفاع‌ها و ابعاد ردیف‌های صفحه اصلی از این فایل کنترل می‌شود.
  */
 export const HOME_ROW_SIZES = {
-  heroMinHeight: 'min-h-[70vh]',       // ارتفاع بخش هیرو افزایش یافته
+  heroMinHeight: 'min-h-[30vh]',       // ارتفاع بخش هیرو
   magazineMinHeight: 'min-h-[45vh]',   // ردیف مجله و مقالات
   mediaMinHeight: 'min-h-[45vh]',      // ردیف ویدیوهای ریلز عمودی
   shopMinHeight: 'min-h-[45vh]',       // ردیف فروشگاه زیرساخت

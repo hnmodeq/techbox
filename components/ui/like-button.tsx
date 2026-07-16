@@ -141,9 +141,14 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
 
   return (
     <div className="relative inline-flex items-center gap-2 text-[length:var(--paragraph-font-size)] paragraph-color">
-      <Button onClick={vote} variant="link" size="xs" className={v === "up" ? "text-red-500" : "paragraph-color hover:text-red-500"}>
-        <Heart size={16} fill={v === "up" ? "currentColor" : "none"} strokeWidth={2} /> {(l ?? 0).toLocaleString("fa-IR")}
-      </Button>
+      <Tooltip>
+        <TooltipTrigger render={
+          <Button onClick={vote} variant="link" size="xs" className={v === "up" ? "text-red-500" : "paragraph-color hover:text-red-500"} />
+        }>
+          <Heart size={16} fill={v === "up" ? "currentColor" : "none"} strokeWidth={2} /> {(l ?? 0).toLocaleString("fa-IR")}
+        </TooltipTrigger>
+        <TooltipContent>پسندیدن این دیدگاه</TooltipContent>
+      </Tooltip>
       {needLogin && (
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)] text-center">
           <p className="text-xs text-[var(--primary-text)] mb-1.5">برای پسندیدن نظر ابتدا وارد شوید</p>

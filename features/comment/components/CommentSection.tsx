@@ -84,9 +84,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const [state, formAction, isSubmitting] = useActionState<CommentFormState, FormData>(
     async (_prev: CommentFormState, formData: FormData) => {
-      if (!user) {
-        return { ok: false, error: "برای ثبت نظر ابتدا باید وارد حساب کاربری خود شوید." };
-      }
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
         startTransition(() => { load(); });
@@ -98,7 +95,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const [replyOpen, setReplyOpen] = React.useState<string | null>(null);
 
-  const handleReplyClick = (commentId: string, authorName?: string) => {
+  const handleReplyClick = (commentId: string) => {
     if (!user) {
       window.dispatchEvent(new CustomEvent("tb_open_auth"));
       return;
@@ -147,7 +144,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <input type="hidden" name="module" value={module} />
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="parentId" value={c.id} />
-              <Textarea name="text" required className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]" defaultValue={`@${(c as any).authorName || "کاربر"} `} />
+              <Textarea name="text" required className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]" defaultValue={`@${(c as any).author?.username || (c as any).authorName || "کاربر"} `} />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
                 <Button disabled={isSubmitting || isPending} size="xs">
