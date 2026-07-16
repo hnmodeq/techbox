@@ -8,6 +8,28 @@ const schema = z.object({
   vote: z.union([z.literal(1), z.literal(-1), z.literal(0)])
 });
 
+export async function GET(req: NextRequest) {
+  const user = await getSessionUserPublic();
+  if (!user) {
+    return NextResponse.json({ voted: false });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const commentId = searchParams.get("commentId");
+  if (!commentId) {
+    return NextResponse.json({ error: "commentId required" }, { status: 400 });
+  }
+
+  try {
+    const existing = await prisma.commentVote.findUnique({
+      where: { fingerprint_commentId: { fingerprint: user.id, commentId } },
+    });
+    return NextResponse.json({ voted: existing?.vote === 1 });
+  } catch {
+    return NextResponse.json({ voted: false });
+  }
+}
+
 export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) {

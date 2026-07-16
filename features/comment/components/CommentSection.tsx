@@ -4,13 +4,13 @@ import { useActionState, useEffect, useTransition, useState } from "react";
 import { getCommentsAction, createCommentAction } from "@/features/comment/actions/comments";
 import { CommentVote } from "@/components/ui/like-button";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Icon } from "@/design/icons";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
+import { gregorianToJalali, getPersianMonthName } from "@/lib/jalali";
 
 type CommentNode = any;
 type CommentFormState = { ok: boolean; error?: string; message?: string; pending?: boolean };
@@ -24,6 +24,36 @@ function nestFlat(rows: any[]): CommentNode[] {
     else roots.push(n);
   });
   return roots;
+}
+
+/**
+ * Smart date formatter for comments:
+ * - Within 7 days: relative ("۲ ساعت پیش", "۳ روز پیش")
+ * - After 7 days: "۱۴۰۵ تیر ۱۷"
+ */
+function formatCommentDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  const toFa = (n: number) => n.toLocaleString("fa-IR");
+
+  if (diffDays >= 7) {
+    const jalali = gregorianToJalali(date);
+    const monthName = getPersianMonthName(jalali.month);
+    return `${toFa(jalali.year)} ${monthName} ${toFa(jalali.day)}`;
+  }
+
+  if (diffDays >= 1) return `${toFa(diffDays)} روز پیش`;
+  if (diffHours >= 1) return `${toFa(diffHours)} ساعت پیش`;
+  if (diffMinutes >= 1) return `${toFa(diffMinutes)} دقیقه پیش`;
+  return "لحظاتی پیش";
 }
 
 export default function CommentSection({ module, slug }: { module: string; slug: string }) {
@@ -54,7 +84,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   const [state, formAction, isSubmitting] = useActionState<CommentFormState, FormData>(
     async (_prev: CommentFormState, formData: FormData) => {
       if (!user) {
-        return { ok: false, error: "برای ثبت نظر ابتدا باید وارد حساب کاربری شوید." };
+        return { ok: false, error: "برای ثبت نظر ابتدا باید وارد حساب کاربری خود شوید." };
       }
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
@@ -67,7 +97,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const [replyOpen, setReplyOpen] = React.useState<string | null>(null);
 
-  const handleReplyClick = (commentId: string) => {
+  const handleReplyClick = (commentId: string, authorName?: string) => {
     if (!user) {
       window.dispatchEvent(new CustomEvent("tb_open_auth"));
       return;
@@ -82,7 +112,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           <div className="flex justify-between items-start gap-3">
             <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
             <div className="text-[length:var(--paragraph-font-size)] paragraph-color shrink-0">
-              {new Date((c as any).createdAt).toLocaleString("fa-IR", { dateStyle: "medium", timeStyle: "short" })}
+              {formatCommentDate((c as any).createdAt)}
             </div>
           </div>
           <p className="mt-2 whitespace-pre-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{depth > 0 && (c as any).author?.username ? <span className="text-[var(--home)]" dir="ltr">@{(c as any).author.username} </span> : null}{(c as any).text}</p>
@@ -93,7 +123,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               initialDislikes={(c as any).dislikes ?? 0}
             />
             <Button
-              onClick={() => handleReplyClick(c.id)}
+              onClick={() => handleReplyClick(c.id, (c as any).authorName)}
               variant="link"
               size="xs"
               className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
@@ -108,7 +138,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <input type="hidden" name="module" value={module} />
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="parentId" value={c.id} />
-              <Textarea name="text" required className="min-h-[80px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" placeholder={`پاسخ شما به ${(c as any).authorName}…`} />
+              <Textarea name="text" required className="min-h-[80px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" defaultValue={`@${(c as any).authorName || "کاربر"} `} />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
                 <Button disabled={isSubmitting || isPending} size="xs">
@@ -132,8 +162,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   return (
     <section className="mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold font-bold">دیدگاه‌ها و گفتگو <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
-        <Badge variant="secondary" className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">ذخیره در Neon PostgreSQL</Badge>
+        <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">دیدگاه شما <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
       </div>
 
       {user ? (
@@ -153,7 +182,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-semibold">{user.name}</div>
               <div className="text-xs paragraph-color font-mono" dir="ltr">@{user.username}</div>
             </div>
-            <Badge variant="info" className="ms-auto text-xs">حساب متصل</Badge>
           </div>
           <Textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
           <div className="flex justify-between items-center">

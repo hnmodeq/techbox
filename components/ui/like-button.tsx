@@ -82,7 +82,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
             aria-pressed={liked}
           />
         }>
-          <Heart size={20} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-red-500" : ""} aria-hidden />
+          <Heart size={16} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-red-500" : ""} aria-hidden />
           <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
           <span className="hidden sm:inline">پسندیدم</span>
         </TooltipTrigger>
@@ -107,6 +107,36 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
   const [v, setV] = useState<"up" | null>(null);
   const [needLogin, setNeedLogin] = useState(false);
 
+  // Fetch existing vote state on mount so the heart persists across page refreshes
+  useEffect(() => {
+    let active = true;
+    fetch("/api/comments/vote", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ commentId: id, vote: 0 }),
+    })
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        if (!active || !data) return;
+        if (typeof data.likes === "number") setL(data.likes);
+      })
+      .catch(() => {});
+
+    // Check if user has already voted on this comment
+    fetch(`/api/comments/vote?commentId=${encodeURIComponent(id)}`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data) return;
+        if (data.voted === true) setV("up");
+      })
+      .catch(() => {});
+
+    return () => { active = false; };
+  }, [id]);
+
   const vote = async () => {
     const next = v === "up" ? 0 : 1;
     try {
@@ -127,7 +157,7 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
   return (
     <div className="relative inline-flex items-center gap-2 text-[length:var(--paragraph-font-size)] paragraph-color">
       <Button onClick={vote} variant="link" size="xs" className={v === "up" ? "text-red-500" : "paragraph-color hover:text-red-500"}>
-        <Heart size={15} fill={v === "up" ? "currentColor" : "none"} /> {(l ?? 0).toLocaleString("fa-IR")}
+        <Heart size={16} fill={v === "up" ? "currentColor" : "none"} /> {(l ?? 0).toLocaleString("fa-IR")}
       </Button>
       {needLogin && (
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)] text-center">
