@@ -105,7 +105,7 @@ export default function MagazineRow() {
                     sizes="(max-width: 768px) 100vw, 300px"
                     {...blurProps(art.image || '/assets/blog-1.jpg')}
                   />
-                  <div className="absolute inset-x-0 top-0 flex items-center gap-2 bg-gradient-to-b from-black/60 to-transparent px-3 py-2">
+                  <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-3 py-2">
                     <Tooltip>
                       <TooltipTrigger render={<span className="text-[10px] font-bold text-white/90 sm:text-xs" dir="rtl" />}>
                         {art.date_fa}
