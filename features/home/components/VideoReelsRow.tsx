@@ -107,38 +107,33 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
   }, []);
 
   // Default to 9:16 (portrait) for shorts/reels content
-  const aspectRatio = videoDimensions ? videoDimensions.width / videoDimensions.height : 9 / 16;
-
-  // For portrait video: the video column is narrower, info column wider
-  // For landscape video: the video column is wider, info column narrower
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
 
   return (
     <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
       <Button type="button" variant="ghost" className="absolute inset-0 w-full h-full opacity-0" onClick={onClose} aria-label="بستن" />
-      <div className="relative z-10 grid w-full max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
-        style={{
-          maxWidth: isPortrait ? '56rem' : '72rem',
-          gridTemplateColumns: isPortrait ? 'minmax(200px, 320px) minmax(280px, 1fr)' : '1fr minmax(320px, 420px)',
-        }}
+      <div className="relative z-10 flex w-full overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
+        style={{ maxHeight: '92vh', maxWidth: isPortrait ? '56rem' : '72rem' }}
       >
-        {/* Video section - right side */}
-        <div className="bg-black flex items-center justify-center overflow-hidden">
-          <div className="w-full h-full flex items-center justify-center" style={{ maxHeight: '92vh' }}>
-            <video
-              ref={videoRef}
-              src={video.videoUrl || undefined}
-              poster={video.image}
-              controls
-              autoPlay
-              playsInline
-              className="max-w-full max-h-[92vh] bg-black"
-              style={{ aspectRatio: `${aspectRatio}` }}
-            />
-          </div>
+        {/* Video section - right side, sized by the video */}
+        <div className="bg-black shrink-0">
+          <video
+            ref={videoRef}
+            src={video.videoUrl || undefined}
+            poster={video.image}
+            controls
+            autoPlay
+            playsInline
+            className="block bg-black"
+            style={{
+              height: '92vh',
+              aspectRatio: videoDimensions ? `${videoDimensions.width} / ${videoDimensions.height}` : '9 / 16',
+              maxWidth: isPortrait ? '420px' : 'none',
+            }}
+          />
         </div>
-        {/* Info section - left side, scrollable */}
-        <div className="h-full max-h-[92vh] overflow-y-auto p-4 space-y-4">
+        {/* Info section - left side, takes remaining space, scrollable */}
+        <div className="min-w-[280px] flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: '92vh' }}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-black text-[var(--primary-text)] text-lg">{video.title}</h3>
