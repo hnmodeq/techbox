@@ -176,11 +176,11 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
 
       {/* Modal content - responsive flex */}
       <div
-        className="relative z-10 flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
+        className="relative z-10 flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] w-full sm:w-auto"
         style={{ maxWidth: isPortrait ? '64rem' : '80rem' }}
       >
-        {/* Video section */}
-        <div className="bg-black shrink-0 flex items-center justify-center sm:overflow-hidden">
+        {/* Video section - constrained to fit */}
+        <div className="bg-black shrink-0 flex items-center justify-center">
           <video
             ref={videoRef}
             key={video.slug}
@@ -189,12 +189,11 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
             controls
             autoPlay
             playsInline
-            className="block bg-black w-auto max-h-[50vh] sm:max-h-[92vh]"
-            style={{ aspectRatio: `${aspectRatio}` }}
+            className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
           />
         </div>
         {/* Info section - scrollable */}
-        <div className="min-w-0 sm:min-w-[280px] sm:flex-1 overflow-y-auto p-4 sm:p-5 space-y-4" style={{ maxHeight: '92vh' }}>
+        <div className="min-w-0 sm:min-w-[280px] sm:max-w-[420px] sm:flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 max-h-[42vh] sm:max-h-none">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>

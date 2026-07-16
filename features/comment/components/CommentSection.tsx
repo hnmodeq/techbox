@@ -126,7 +126,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
             <Tooltip>
               <TooltipTrigger render={
                 <Button
-                  onClick={() => handleReplyClick(c.id, (c as any).authorName)}
+                  onClick={() => handleReplyClick(c.id)}
                   variant="link"
                   size="xs"
                   className="text-[11px] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
