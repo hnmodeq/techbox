@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
@@ -17,10 +17,28 @@ import { SaveButton } from '@/components/ui/save-button';
 import { ShareButton } from '@/components/ui/share-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
+function compactReadingTimeLabel(value?: string) {
+  return (value || '').replace(/\s*مطالعه\s*$/, '');
+}
+
 export default function VideoReelsRow() {
   const { items: dbVideos, loading } = useHomeModule('media');
   const videos = dbVideos.slice(0, 5);
-  const [active, setActive] = useState<any | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const goToPrev = useCallback(() => {
+    setActiveIndex(prev => {
+      if (prev === null) return null;
+      return prev > 0 ? prev - 1 : videos.length - 1;
+    });
+  }, [videos.length]);
+
+  const goToNext = useCallback(() => {
+    setActiveIndex(prev => {
+      if (prev === null) return null;
+      return prev < videos.length - 1 ? prev + 1 : 0;
+    });
+  }, [videos.length]);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
@@ -35,35 +53,37 @@ export default function VideoReelsRow() {
           <EmptyRow>هنوز ویدیویی در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
         <div className="grid grid-cols-5 gap-4">
-          {videos.map((vid) => (
-            <button type="button" key={vid.slug} onClick={() => setActive(vid)} className="group relative w-full aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
+          {videos.map((vid, idx) => (
+            <button type="button" key={vid.slug} onClick={() => setActiveIndex(idx)} className="group relative w-full aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="200px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
 
-              {/* Duration - top right */}
-              {(vid as any).videoDuration && (
+              {/* Date & Duration overlay - same style as article cards */}
+              <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-3 py-3 z-30">
                 <Tooltip>
-                  <TooltipTrigger render={<span className="absolute right-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white" dir="ltr" />}>
-                    {(vid as any).videoDuration}
+                  <TooltipTrigger render={<span className="text-[10px] font-bold text-white/90 sm:text-xs" dir="rtl" />}>
+                    {vid.date_fa}
                   </TooltipTrigger>
-                  <TooltipContent>مدت زمان ویدیو</TooltipContent>
+                  <TooltipContent>تاریخ انتشار ویدیو</TooltipContent>
                 </Tooltip>
-              )}
+                {(vid as any).videoDuration && (
+                  <Tooltip>
+                    <TooltipTrigger render={<span className="text-[10px] font-medium text-white/75 sm:text-xs" dir="ltr" />}>
+                      {(vid as any).videoDuration}
+                    </TooltipTrigger>
+                    <TooltipContent>مدت زمان ویدیو</TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
 
-              {/* Date - top left */}
-              <Tooltip>
-                <TooltipTrigger render={<span className="absolute left-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white" dir="rtl" />}>
-                  {vid.date_fa}
-                </TooltipTrigger>
-                <TooltipContent>تاریخ انتشار ویدیو</TooltipContent>
-              </Tooltip>
-
-              {/* Play icon with smooth transition */}
+              {/* Play icon with morph effect */}
               <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                <div className="relative flex items-center justify-center">
-                  <Icon name="play" size={32} className="text-white drop-shadow-lg absolute transition-all duration-300 ease-out opacity-100 group-hover:opacity-0 group-hover:scale-75" />
-                  <span className="text-white text-xs font-bold drop-shadow-lg transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0">
-                    پخش ویدیو
+                <div className="relative flex items-center justify-center w-20 h-10">
+                  <span className="absolute inset-0 flex items-center justify-center transition-all duration-400 ease-out group-hover:rotate-90 group-hover:scale-0 group-hover:opacity-0">
+                    <Icon name="play" size={32} className="text-white drop-shadow-lg" />
+                  </span>
+                  <span className="absolute inset-0 flex items-center justify-center transition-all duration-400 ease-out -rotate-90 scale-0 opacity-0 group-hover:rotate-0 group-hover:scale-100 group-hover:opacity-100">
+                    <span className="text-white text-xs font-bold drop-shadow-lg">پخش ویدیو</span>
                   </span>
                 </div>
               </div>
@@ -79,18 +99,43 @@ export default function VideoReelsRow() {
         </div>
         )}
       </div>
-      {active && (
-        <VideoModal video={active} onClose={() => setActive(null)} />
+      {activeIndex !== null && activeIndex < videos.length && (
+        <VideoModal
+          video={videos[activeIndex]}
+          onClose={() => setActiveIndex(null)}
+          onPrev={goToPrev}
+          onNext={goToNext}
+          currentIndex={activeIndex}
+          totalCount={videos.length}
+        />
       )}
     </section>
   );
 }
 
-function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
+function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }: {
+  video: any;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+  currentIndex: number;
+  totalCount: number;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') onNext();
+      if (e.key === 'ArrowRight') onPrev();
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onPrev, onNext, onClose]);
+
+  useEffect(() => {
+    setVideoDimensions(null);
     const vid = videoRef.current;
     if (!vid) return;
 
@@ -104,21 +149,52 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
 
     vid.addEventListener('loadedmetadata', handleLoadedMetadata);
     return () => vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
-  }, []);
+  }, [video.slug]);
 
-  // Default to 9:16 (portrait) for shorts/reels content
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
 
   return (
-    <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
-      <Button type="button" variant="ghost" className="absolute inset-0 w-full h-full opacity-0" onClick={onClose} aria-label="بستن" />
-      <div className="relative z-10 flex w-full overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
-        style={{ maxHeight: '92vh', maxWidth: isPortrait ? '56rem' : '72rem' }}
+    <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/80" onClick={onClose} />
+
+      {/* Previous button */}
+      <Tooltip>
+        <TooltipTrigger render={
+          <button
+            type="button"
+            onClick={onPrev}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+          />
+        }>
+          <Icon name="chevronRight" size={24} />
+        </TooltipTrigger>
+        <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
+      </Tooltip>
+
+      {/* Next button */}
+      <Tooltip>
+        <TooltipTrigger render={
+          <button
+            type="button"
+            onClick={onNext}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+          />
+        }>
+          <Icon name="chevronLeft" size={24} />
+        </TooltipTrigger>
+        <TooltipContent>رفتن به ویدیوی بعدی</TooltipContent>
+      </Tooltip>
+
+      {/* Modal content */}
+      <div className="relative z-10 flex overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
+        style={{ maxHeight: '92vh', maxWidth: isPortrait ? '64rem' : '80rem' }}
       >
-        {/* Video section - right side, sized by the video */}
-        <div className="bg-black shrink-0">
+        {/* Video section - right side */}
+        <div className="bg-black shrink-0 flex items-center justify-center">
           <video
             ref={videoRef}
+            key={video.slug}
             src={video.videoUrl || undefined}
             poster={video.image}
             controls
@@ -128,15 +204,14 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
             style={{
               height: '92vh',
               aspectRatio: videoDimensions ? `${videoDimensions.width} / ${videoDimensions.height}` : '9 / 16',
-              maxWidth: isPortrait ? '420px' : 'none',
             }}
           />
         </div>
-        {/* Info section - left side, takes remaining space, scrollable */}
-        <div className="min-w-[280px] flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: '92vh' }}>
+        {/* Info section - left side, scrollable */}
+        <div className="min-w-[320px] flex-1 overflow-y-auto p-5 space-y-4" style={{ maxHeight: '92vh' }}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="font-black text-[var(--primary-text)] text-lg">{video.title}</h3>
+              <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
               <p className="paragraph-color mt-1 text-sm">{video.excerpt}</p>
               {video.videoDuration && (
                 <span className="mt-1 inline-block text-xs paragraph-color" dir="ltr">{video.videoDuration}</span>
