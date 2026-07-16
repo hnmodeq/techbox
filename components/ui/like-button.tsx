@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ─── Liked-state cache (localStorage) ─────────────────────────
-// Persists liked state across page loads so the heart appears red
-// instantly without waiting for /api/like to respond.
 const LIKED_CACHE_KEY = "tb_liked";
 
 function getLikedCache(): Record<string, boolean> {
@@ -29,18 +27,43 @@ function setLikedCache(module: string, slug: string, liked: boolean) {
       delete cache[key];
     }
     localStorage.setItem(LIKED_CACHE_KEY, JSON.stringify(cache));
-  } catch {
-    // localStorage might be full or disabled
-  }
+  } catch {}
 }
 
 function getCachedLiked(module: string, slug: string): boolean | undefined {
-  const cache = getLikedCache();
-  return cache[`${module}:${slug}`];
+  return getLikedCache()[`${module}:${slug}`];
+}
+
+// ─── Comment-vote cache (localStorage) ────────────────────────
+const VOTE_CACHE_KEY = "tb_comment_vote";
+
+function getVoteCache(): Record<string, boolean> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(VOTE_CACHE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function setVoteCache(commentId: string, voted: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    const cache = getVoteCache();
+    if (voted) {
+      cache[commentId] = true;
+    } else {
+      delete cache[commentId];
+    }
+    localStorage.setItem(VOTE_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
+
+function getCachedVote(commentId: string): boolean | undefined {
+  return getVoteCache()[commentId];
 }
 
 export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { contentType: string; slug: string; initial?: number; tooltipLabel?: string }) {
-  // Read liked from localStorage cache synchronously for instant render
   const cachedLiked = getCachedLiked(contentType, slug);
   const [liked, setLiked] = useState(cachedLiked ?? false);
   const [count, setCount] = useState(initial);
@@ -146,19 +169,27 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
 }
 
 export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes?: number; initialDislikes?: number }) {
+  // Read voted state from localStorage cache synchronously for instant render
+  const cachedVoted = getCachedVote(id);
   const [l, setL] = useState(initialLikes);
-  const [v, setV] = useState<"up" | null>(null);
+  const [v, setV] = useState<"up" | null>(cachedVoted ? "up" : null);
   const [busy, setBusy] = useState(false);
   const [needLogin, setNeedLogin] = useState(false);
 
-  // Fetch existing vote state on mount so the heart persists across page refreshes
+  // Fetch existing vote state on mount to confirm cache and get accurate count
   useEffect(() => {
     let active = true;
     fetch(`/api/comments/vote?commentId=${encodeURIComponent(id)}`, { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!active || !data) return;
-        if (data.voted === true) setV("up");
+        if (data.voted === true) {
+          setV("up");
+          setVoteCache(id, true);
+        } else {
+          setV(null);
+          setVoteCache(id, false);
+        }
         if (typeof data.likes === "number") setL(data.likes);
       })
       .catch(() => {});
@@ -177,6 +208,7 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
     const nextLiked = next === 1;
     setV(nextLiked ? "up" : null);
     setL(nextLiked ? l + 1 : Math.max(0, l - 1));
+    setVoteCache(id, nextLiked);
     setNeedLogin(false);
 
     try {
@@ -188,6 +220,7 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
       if (res.status === 401) {
         setV(prevV);
         setL(prevL);
+        setVoteCache(id, prevV === "up");
         setNeedLogin(true);
         setBusy(false);
         return;
@@ -195,14 +228,18 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
       if (res.ok) {
         const data = await res.json();
         setL(data.likes);
-        setV(next === 0 ? null : "up");
+        const serverVoted = next === 1;
+        setV(serverVoted ? "up" : null);
+        setVoteCache(id, serverVoted);
       } else {
         setV(prevV);
         setL(prevL);
+        setVoteCache(id, prevV === "up");
       }
     } catch {
       setV(prevV);
       setL(prevL);
+      setVoteCache(id, prevV === "up");
     } finally {
       setBusy(false);
     }

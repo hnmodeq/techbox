@@ -55,7 +55,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
             <AuthorLink name={item.author?.name || "نویسنده تکباکس"} avatar={item.author?.avatar || "/assets/hooman.png"} />
 
             <div className="flex items-center gap-3">
-              <LiveViewCounter module="review" slug={item.slug} showLabel={true} />
+              <LiveViewCounter module="review" slug={item.slug} initialViews={item.views || 0} showLabel={true} />
               <LikeButton contentType="review" slug={item.slug} initial={item.likes || 0} />
               <SaveButton module="review" slug={item.slug} />
               <ShareButton />
@@ -117,7 +117,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           {item.content || item.excerpt}
         </div>
 
-        <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-5"><RatingWidget module="review" slug={item.slug} /></div>
+        <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-5"><RatingWidget module="review" slug={item.slug} initialRating={item.rating} initialCount={item.ratingCount} /></div>
         <CommentSection module="review" slug={item.slug} />
       </article>
     </main>

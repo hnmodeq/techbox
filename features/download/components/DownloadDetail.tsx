@@ -18,7 +18,7 @@ export default function DownloadDetail({ item }: { item: ContentItem }){
  </div>
  <h1 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold md:text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold ">{item.title}</h1>
  <div className="mt-3 flex flex-wrap items-center gap-4">
-   <LiveViewCounter module="download" slug={item.slug} showLabel />
+   <LiveViewCounter module="download" slug={item.slug} initialViews={item.views || 0} showLabel />
    <DownloadMetaLine slug={item.slug} fallbackFileName={item.fileName ?? null} fallbackFileSize={item.fileSize ?? null} fallbackDownloadCount={item.downloadCount ?? 0} />
  </div>
  <div className="mt-5">
