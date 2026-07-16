@@ -52,24 +52,29 @@ function ArticleAuthorMeta({ author, className = '' }: { author?: { name?: strin
   const slug = getAuthorSlug(author);
 
   return (
-    <Link
-      href={`/author/${encodeURIComponent(slug)}`}
-      onClick={(event) => event.stopPropagation()}
-      className={`grid grid-cols-[minmax(0,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 ${className}`}
-      dir="ltr"
-    >
-      <div className="col-start-1 row-start-1 min-w-0 self-end truncate text-xs font-extrabold text-foreground sm:text-sm" dir="rtl">
-        {name}
-      </div>
-      {job && (
-        <div className="col-start-1 row-start-2 min-w-0 self-start truncate text-[10px] text-muted-foreground sm:text-[11px]" dir="rtl">
-          {job}
+    <Tooltip>
+      <TooltipTrigger render={
+        <Link
+          href={`/author/${encodeURIComponent(slug)}`}
+          onClick={(event) => event.stopPropagation()}
+          className={`grid grid-cols-[minmax(0,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 ${className}`}
+          dir="ltr"
+        />
+      }>
+        <div className="col-start-1 row-start-1 min-w-0 self-end truncate text-xs font-extrabold text-foreground sm:text-sm" dir="rtl">
+          {name}
         </div>
-      )}
-      <div className="relative col-start-2 row-span-2 row-start-1 size-8 overflow-hidden rounded-full ring-1 ring-border transition-all group-hover:ring-primary">
-        <Image src={author?.avatar || '/assets/hooman.png'} alt={name} fill sizes="32px" className="object-cover" />
-      </div>
-    </Link>
+        {job && (
+          <div className="col-start-1 row-start-2 min-w-0 self-start truncate text-[10px] text-muted-foreground sm:text-[11px]" dir="rtl">
+            {job}
+          </div>
+        )}
+        <div className="relative col-start-2 row-span-2 row-start-1 size-8 overflow-hidden rounded-full ring-1 ring-border transition-all group-hover:ring-primary">
+          <Image src={author?.avatar || '/assets/hooman.png'} alt={name} fill sizes="32px" className="object-cover" />
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>بازدید از حساب کاربری {name}</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -105,7 +110,7 @@ export default function MagazineRow() {
                     sizes="(max-width: 768px) 100vw, 300px"
                     {...blurProps(art.image || '/assets/blog-1.jpg')}
                   />
-                  <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent px-3 py-2">
+                  <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-3 py-3">
                     <Tooltip>
                       <TooltipTrigger render={<span className="text-[10px] font-bold text-white/90 sm:text-xs" dir="rtl" />}>
                         {art.date_fa}
@@ -114,7 +119,7 @@ export default function MagazineRow() {
                     </Tooltip>
                     {art.readingTimeLabel && (
                       <Tooltip>
-                        <TooltipTrigger render={<span className="text-[10px] font-medium text-white/75 sm:text-xs" />}>
+                        <TooltipTrigger render={<span className="text-[10px] font-medium text-white/75 sm:text-xs" dir="rtl" />}>
                           {compactReadingTimeLabel(art.readingTimeLabel)}
                         </TooltipTrigger>
                         <TooltipContent>زمان مطالعه</TooltipContent>
