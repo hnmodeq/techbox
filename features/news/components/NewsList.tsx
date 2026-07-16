@@ -35,7 +35,7 @@ export default function NewsList({ serverItems }: { serverItems?: ContentItem[] 
                     <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mt-2 transition-colors group-hover:text-[var(--news)]">{n.title}</h3>
                     <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] line-clamp-2 mt-2 paragraph-color">{n.excerpt}</p>
                     <div className="mt-3 pt-2 border-t-[length:var(--border-size)] border-[var(--border-color)]/50">
-                      <CardStats module="news" slug={n.slug} initialViews={n.views} initialLikes={n.likes} showComments={true} />
+                      <CardStats module="news" slug={n.slug} initialViews={n.views} initialLikes={n.likes} initialComments={n.comments || 0} showComments={true} />
                     </div>
                   </div>
                 </Link>

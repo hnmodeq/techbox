@@ -84,7 +84,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <CardStats module="shop" slug={item.slug} initialViews={item.views} initialLikes={item.likes} showComments />
+            <CardStats module="shop" slug={item.slug} initialViews={item.views} initialLikes={item.likes} initialComments={item.comments || 0} showComments />
             <LikeButton contentType="shop" slug={item.slug} initial={item.likes || 0} />
           </div>
 

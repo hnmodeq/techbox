@@ -27,7 +27,7 @@ function AuthorPosts({ posts, title = "محتواهای منتشرشده" }: { p
                 <div className="text-xs text-muted-foreground">{post.dateFa || post.date_fa} • {post.category || post.module}</div>
                 <h3 className="mt-2 line-clamp-2 font-bold text-foreground">{post.title}</h3>
                 <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{post.excerpt}</p>
-                <div className="mt-3 border-t pt-3"><CardStats module={post.module} slug={post.slug} initialViews={post.views} initialLikes={post.likes} showComments /></div>
+                <div className="mt-3 border-t pt-3"><CardStats module={post.module} slug={post.slug} initialViews={post.views} initialLikes={post.likes} initialComments={post.comments || 0} showComments /></div>
               </div>
             </Link>
           ))}

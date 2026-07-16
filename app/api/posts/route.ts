@@ -133,6 +133,7 @@ export async function GET(req: NextRequest) {
       dateFa: formatPostDateFa(p.date),
       likes: p.likes,
       views: p.views,
+      comments: 0, // placeholder, filled in below
       rating: p.rating ?? null,
       ratingCount: p.ratingCount || 0,
       readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
@@ -161,6 +162,27 @@ export async function GET(req: NextRequest) {
         avatar: p.author?.avatar || "/assets/hooman.png",
       },
     }));
+
+    // Attach comment counts in bulk
+    try {
+      const postIds = posts.map((p: any) => p.id);
+      if (postIds.length > 0) {
+        const commentCounts = await prisma.comment.groupBy({
+          by: ["postId"],
+          _count: { _all: true },
+          where: { postId: { in: postIds }, status: "approved" },
+        });
+        const commentMap = new Map(
+          commentCounts.map((c: any) => [c.postId, c._count._all || 0])
+        );
+        for (const item of out) {
+          const post = posts.find((p: any) => p.slug === item.slug);
+          if (post) item.comments = commentMap.get(post.id) || 0;
+        }
+      }
+    } catch {
+      // Comment counts are non-critical; leave as 0
+    }
 
     return NextResponse.json(slug ? (out[0] ?? null) : out, {
       headers: cacheHeaders(includeAllPublishedStates ? PRIVATE_NO_STORE : (slug ? PUBLIC_DETAIL_CACHE : PUBLIC_CONTENT_CACHE)),

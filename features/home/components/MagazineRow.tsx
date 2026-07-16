@@ -140,7 +140,7 @@ export default function MagazineRow() {
 
               <div className="border-t px-4 pb-4 pt-3" dir="ltr">
                 <div className="flex items-center justify-between gap-2">
-                  <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views} initialLikes={art.likes} showComments={true} />
+                  <CardStats module={art.module || 'blog'} slug={art.slug} initialViews={art.views} initialLikes={art.likes} initialComments={art.comments || 0} showComments={true} />
                   <div className="shrink-0">
                     <ArticleAuthorMeta author={art.author} />
                   </div>
