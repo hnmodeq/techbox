@@ -71,6 +71,7 @@ function normalizeCard(p: any) {
     dateFa: formatPostDateFa(p.date),
     likes: p.likes,
     views: p.views,
+    comments: 0, // filled in after by findPosts
     rating: p.rating ?? null,
     ratingCount: p.ratingCount || 0,
     readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
@@ -102,7 +103,28 @@ async function findPosts(module: string, take: number) {
     take,
     select: cardSelect,
   });
-  return posts.map(normalizeCard);
+  const normalized = posts.map(normalizeCard);
+
+  // Fetch comment counts in bulk for this module's posts
+  try {
+    const postIds = posts.map(p => p.id);
+    const commentCounts = await prisma.comment.groupBy({
+      by: ["postId"],
+      _count: { _all: true },
+      where: { postId: { in: postIds }, status: "approved" },
+    });
+    const commentMap = new Map(
+      commentCounts.map(c => [c.postId, c._count._all || 0])
+    );
+    for (const item of normalized) {
+      const post = posts.find(p => p.slug === item.slug);
+      if (post) (item as any).comments = commentMap.get(post.id) || 0;
+    }
+  } catch {
+    // If comment count fetch fails, just leave it at 0
+  }
+
+  return normalized;
 }
 
 async function getHomeDataUncached(): Promise<HomeData> {

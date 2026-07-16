@@ -143,7 +143,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                     <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                   </Tooltip>
                   <div className="col-start-1 row-start-2 justify-self-start">
-                    <CardStats module="blog" slug={p.slug} initialViews={p.views} initialLikes={p.likes} showComments={true} />
+                    <CardStats module="blog" slug={p.slug} initialViews={p.views} initialLikes={p.likes} initialComments={p.comments || 0} showComments={true} />
                   </div>
                   <ArticleAuthorMeta author={p.author} className="col-start-2 row-span-2 row-start-1" />
                 </div>

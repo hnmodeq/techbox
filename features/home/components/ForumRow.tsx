@@ -73,7 +73,7 @@ export default function ForumRow() {
 
                       <div className="mt-3 pt-3 border-t flex items-center justify-between text-[11px] text-muted-foreground">
                         <span>{top.date_fa}</span>
-                        <CardStats module="forum" slug={top.slug} initialViews={top.views} initialLikes={top.likes} showComments={true} />
+                        <CardStats module="forum" slug={top.slug} initialViews={top.views} initialLikes={top.likes} initialComments={top.comments || 0} showComments={true} />
                       </div>
                     </div>
                   </CardContent>

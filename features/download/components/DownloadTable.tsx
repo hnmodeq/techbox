@@ -93,7 +93,7 @@ export default function DownloadTable({ serverItems }: { serverItems?: ContentIt
               {f.date_fa}
             </div>
             <div className="col-span-2 flex justify-end">
-              <CardStats module="download" slug={f.slug} initialViews={f.views} initialLikes={f.likes} showComments={true} />
+              <CardStats module="download" slug={f.slug} initialViews={f.views} initialLikes={f.likes} initialComments={f.comments || 0} showComments={true} />
             </div>
           </Link>
         ))}

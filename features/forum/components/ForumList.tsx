@@ -213,7 +213,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                 </div>
               </div>
               <div className="col-span-12 sm:col-span-4 flex items-center justify-end">
-                <CardStats module="forum" slug={t.slug} initialViews={t.views} initialLikes={t.likes} showComments={true} />
+                <CardStats module="forum" slug={t.slug} initialViews={t.views} initialLikes={t.likes} initialComments={t.comments || 0} showComments={true} />
               </div>
               <div className="hidden sm:block col-span-1 text-left text-xs text-muted-foreground">{t.date_fa.split(" ")[0]}<br />{t.author?.name.split(" ")[0]}</div>
             </Link>

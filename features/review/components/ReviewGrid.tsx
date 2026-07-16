@@ -54,7 +54,7 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
                     </div>
                   </div>
 
-                  <CardStats module="review" slug={r.slug} initialViews={r.views} initialLikes={r.likes} showComments={true} />
+                  <CardStats module="review" slug={r.slug} initialViews={r.views} initialLikes={r.likes} initialComments={r.comments || 0} showComments={true} />
                 </div>
               </div>
             </Link>

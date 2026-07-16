@@ -69,7 +69,7 @@ export default function ReviewRow() {
 
               <div className="px-4 pb-4 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground font-bold">
                 <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
-                <CardStats module="review" slug={rev.slug} initialViews={rev.views} initialLikes={rev.likes} showComments={true} />
+                <CardStats module="review" slug={rev.slug} initialViews={rev.views} initialLikes={rev.likes} initialComments={rev.comments || 0} showComments={true} />
               </div>
             </Card>
           ))}

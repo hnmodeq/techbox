@@ -31,6 +31,7 @@ export type ContentItem = {
   source?: string;
   likes: number;
   views: number;
+  comments?: number;
   category?: string;
   seoTitle?: string | null;
   seoDescription?: string | null;
