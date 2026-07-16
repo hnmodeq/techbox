@@ -12,11 +12,10 @@ import CommentSection from '@/features/comment/components/CommentSection';
 import { zIndex } from '@/design';
 import { Icon } from '@/design/icons';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { LikeButton } from '@/components/ui/like-button';
 import { SaveButton } from '@/components/ui/save-button';
 import { ShareButton } from '@/components/ui/share-button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function VideoReelsRow() {
   const { items: dbVideos, loading } = useHomeModule('media');
@@ -40,20 +39,39 @@ export default function VideoReelsRow() {
             <button type="button" key={vid.slug} onClick={() => setActive(vid)} className="group relative w-full h-auto aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="260px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
-              {(vid as any).videoDuration && <span className="absolute left-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white" dir="ltr">{(vid as any).videoDuration}</span>}
+
+              {/* Duration - top right */}
+              {(vid as any).videoDuration && (
+                <Tooltip>
+                  <TooltipTrigger render={<span className="absolute right-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white" dir="ltr" />}>
+                    {(vid as any).videoDuration}
+                  </TooltipTrigger>
+                  <TooltipContent>مدت زمان ویدیو</TooltipContent>
+                </Tooltip>
+              )}
+
+              {/* Date - top left */}
+              <Tooltip>
+                <TooltipTrigger render={<span className="absolute left-2 top-2 z-30 rounded-[var(--corner-radius)] bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white" dir="rtl" />}>
+                  {vid.date_fa}
+                </TooltipTrigger>
+                <TooltipContent>تاریخ انتشار ویدیو</TooltipContent>
+              </Tooltip>
+
+              {/* Play icon with smooth transition */}
               <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                <div className="group-hover:hidden">
-                  <Icon name="play" size={40} className="text-white drop-shadow-lg" />
-                </div>
-                <div className="hidden group-hover:flex items-center text-white text-sm font-bold drop-shadow-lg transition-all duration-200">
-                  پخش ویدیو
+                <div className="relative flex items-center justify-center">
+                  <Icon name="play" size={40} className="text-white drop-shadow-lg absolute transition-all duration-300 ease-out opacity-100 group-hover:opacity-0 group-hover:scale-75" />
+                  <span className="text-white text-sm font-bold drop-shadow-lg transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0">
+                    پخش ویدیو
+                  </span>
                 </div>
               </div>
+
               <div className="relative z-30 p-3.5 text-white w-full">
                 <h3 className="text-xs sm:text-sm font-bold leading-5 line-clamp-2 text-white group-hover:text-[var(--media)] transition-colors">{vid.title}</h3>
-                <div className="mt-2.5 flex items-center justify-between" dir="ltr">
+                <div className="mt-2.5 flex items-center justify-start" dir="ltr">
                   <CardStats module="media" slug={vid.slug} showComments={true} />
-                  <span className="text-[10px] text-white/75" dir="rtl">{vid.date_fa}</span>
                 </div>
               </div>
             </button>
@@ -80,7 +98,6 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
       setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
     };
 
-    // In case metadata is already loaded
     if (vid.readyState >= 1) {
       setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
     }
@@ -89,15 +106,19 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
     return () => vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
   }, []);
 
-  const aspectRatio = videoDimensions ? videoDimensions.width / videoDimensions.height : 16 / 9;
+  // Default to 9:16 (portrait) for reels/shorts — most likely ratio for this content
+  const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
+  const aspectRatio = videoDimensions ? videoDimensions.width / videoDimensions.height : 9 / 16;
 
-  return (
-    <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
-      <Button type="button" variant="ghost" className="absolute inset-0 w-full h-full opacity-0" onClick={onClose} aria-label="بستن" />
-      <div className="relative z-10 grid w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] lg:grid-cols-[1fr_minmax(320px,420px)]">
-        {/* Video section */}
-        <div className="bg-black flex items-center justify-center">
-          <AspectRatio ratio={aspectRatio} className="w-full max-h-[92vh]">
+  // For portrait videos: stack vertically (video on top, info below)
+  // For landscape videos: side by side (video left, info right)
+  if (isPortrait) {
+    return (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
+        <Button type="button" variant="ghost" className="absolute inset-0 w-full h-full opacity-0" onClick={onClose} aria-label="بستن" />
+        <div className="relative z-10 flex flex-col w-full max-w-lg max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">
+          {/* Video - sized to its natural aspect ratio */}
+          <div className="relative w-full shrink-0" style={{ aspectRatio: `${aspectRatio}`, maxHeight: '70vh' }}>
             <video
               ref={videoRef}
               src={video.videoUrl || undefined}
@@ -105,18 +126,15 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
               controls
               autoPlay
               playsInline
-              className="w-full h-full object-contain bg-black"
+              className="w-full h-full object-cover bg-black"
             />
-          </AspectRatio>
-        </div>
-        {/* Info section - scrollable */}
-        <ScrollArea className="h-full max-h-[92vh]">
-          <div className="p-4 space-y-4">
-            {/* Title + close */}
+          </div>
+          {/* Info section - scrollable, fills remaining space */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-black text-[var(--primary-text)] text-lg">{video.title}</h3>
-                <p className="paragraph-color mt-1 text-sm">{video.excerpt}</p>
+                <p className="paragraph-color mt-1 text-sm line-clamp-2">{video.excerpt}</p>
                 {video.videoDuration && (
                   <span className="mt-1 inline-block text-xs paragraph-color" dir="ltr">{video.videoDuration}</span>
                 )}
@@ -126,7 +144,6 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
               </Button>
             </div>
 
-            {/* Date + like/save/share row */}
             <div className="flex items-center justify-between" dir="ltr">
               <div className="flex items-center gap-3">
                 <LikeButton contentType="media" slug={video.slug} />
@@ -138,7 +155,54 @@ function VideoModal({ video, onClose }: { video: any; onClose: () => void }) {
 
             <CommentSection module="media" slug={video.slug} />
           </div>
-        </ScrollArea>
+        </div>
+      </div>
+    );
+  }
+
+  // Landscape video layout
+  return (
+    <div className="fixed inset-0 bg-black/80 p-3 sm:p-6 flex items-center justify-center" style={{ zIndex: zIndex.modal }} dir="rtl">
+      <Button type="button" variant="ghost" className="absolute inset-0 w-full h-full opacity-0" onClick={onClose} aria-label="بستن" />
+      <div className="relative z-10 grid w-full max-w-6xl max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] lg:grid-cols-[1fr_minmax(320px,420px)]">
+        <div className="bg-black flex items-center justify-center">
+          <div className="w-full" style={{ aspectRatio: `${aspectRatio}`, maxHeight: '92vh' }}>
+            <video
+              ref={videoRef}
+              src={video.videoUrl || undefined}
+              poster={video.image}
+              controls
+              autoPlay
+              playsInline
+              className="w-full h-full object-contain bg-black"
+            />
+          </div>
+        </div>
+        <div className="h-full max-h-[92vh] overflow-y-auto p-4 space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="font-black text-[var(--primary-text)] text-lg">{video.title}</h3>
+              <p className="paragraph-color mt-1 text-sm">{video.excerpt}</p>
+              {video.videoDuration && (
+                <span className="mt-1 inline-block text-xs paragraph-color" dir="ltr">{video.videoDuration}</span>
+              )}
+            </div>
+            <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
+              <Icon name="close" size={22} />
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-between" dir="ltr">
+            <div className="flex items-center gap-3">
+              <LikeButton contentType="media" slug={video.slug} />
+              <SaveButton module="media" slug={video.slug} />
+              <ShareButton />
+            </div>
+            <span className="text-xs text-muted-foreground" dir="rtl">{video.date_fa}</span>
+          </div>
+
+          <CommentSection module="media" slug={video.slug} />
+        </div>
       </div>
     </div>
   );
