@@ -34,13 +34,15 @@ export async function GET(req: NextRequest) {
     });
     if (!post) return NextResponse.json([]);
 
+    // Include soft-deleted comments so the nesting structure is preserved.
+    // Client renders "این نظر حذف شده است" for soft-deleted comments.
     const comments = await prisma.comment.findMany({
-      where: { postId: post.id, parentId: null, status: "approved", deletedAt: null },
+      where: { postId: post.id, parentId: null, status: "approved" },
       orderBy: { createdAt: "asc" },
       include: {
         author: { select: { name: true, username: true, avatar: true } },
         replies: {
-          where: { status: "approved", deletedAt: null },
+          where: { status: "approved" },
           orderBy: { createdAt: "asc" },
           include: { author: { select: { name: true, username: true, avatar: true } } },
         },

@@ -6,7 +6,6 @@ import { CommentVote } from "@/components/ui/like-button";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Icon } from "@/design/icons";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
@@ -62,7 +61,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any | null>(null);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const load = React.useCallback(async () => {
     setLoading(true);
@@ -86,6 +84,8 @@ export default function CommentSection({ module, slug }: { module: string; slug:
     async (_prev: CommentFormState, formData: FormData) => {
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
+        // Fix #2: Close the reply form after successful submission
+        setReplyOpen(null);
         startTransition(() => { load(); });
       }
       return res as CommentFormState;
@@ -93,7 +93,12 @@ export default function CommentSection({ module, slug }: { module: string; slug:
     { ok: false }
   );
 
+  // Track which comment's reply form is open
   const [replyOpen, setReplyOpen] = React.useState<string | null>(null);
+
+  // Track which comment is being edited
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [editText, setEditText] = React.useState("");
 
   const handleReplyClick = (commentId: string) => {
     if (!user) {
@@ -103,67 +108,227 @@ export default function CommentSection({ module, slug }: { module: string; slug:
     setReplyOpen(replyOpen === commentId ? null : commentId);
   };
 
-  const renderNode = (c: CommentNode, depth = 0) => (
-    <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
-      <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 12 : 0 }}>
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
-          <div className="flex justify-between items-start gap-3">
-            <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
-            <Tooltip>
-              <TooltipTrigger render={<span className="text-[11px] paragraph-color shrink-0 cursor-default" />}>
-                {formatCommentDate((c as any).createdAt)}
-              </TooltipTrigger>
-              <TooltipContent>تاریخ انتشار این دیدگاه</TooltipContent>
-            </Tooltip>
-          </div>
-          <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--paragraph-color)] paragraph-color leading-7">{depth > 0 && (c as any).author?.username ? <span className="text-[var(--home)]" dir="ltr">@{(c as any).author.username} </span> : null}{(c as any).text}</p>
-          <div className="flex items-center gap-4 mt-3">
-            <CommentVote
-              id={c.id}
-              initialLikes={(c as any).likes ?? 0}
-              initialDislikes={(c as any).dislikes ?? 0}
-            />
-            <Tooltip>
-              <TooltipTrigger render={
-                <Button
-                  onClick={() => handleReplyClick(c.id)}
-                  variant="link"
-                  size="xs"
-                  className="text-[11px] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
-                  type="button"
-                />
-              }>
-                {replyOpen === c.id ? "بستن" : "پاسخ"}
-              </TooltipTrigger>
-              <TooltipContent>پاسخ به این دیدگاه</TooltipContent>
-            </Tooltip>
-          </div>
+  const handleEditClick = (commentId: string, currentText: string) => {
+    setEditingId(commentId);
+    setEditText(currentText);
+  };
 
-          {replyOpen === c.id && (
-            <form action={formAction} className="mt-3 space-y-2 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-3">
-              <input type="hidden" name="module" value={module} />
-              <input type="hidden" name="slug" value={slug} />
-              <input type="hidden" name="parentId" value={c.id} />
-              <Textarea name="text" required className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]" defaultValue={`@${(c as any).author?.username || (c as any).authorName || "کاربر"} `} />
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
-            <Button type="submit" disabled={isSubmitting || isPending} size="xs">
-              {isSubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
-            </Button>
+  const handleEditCancel = () => {
+    setEditingId(null);
+    setEditText("");
+  };
+
+  const handleEditSave = async (commentId: string) => {
+    if (!editText.trim() || editText.trim().length < 2) return;
+    try {
+      const res = await fetch("/api/comments/edit", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commentId, text: editText.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setEditingId(null);
+        setEditText("");
+        startTransition(() => { load(); });
+      } else {
+        alert(data.message || "خطا در ویرایش دیدگاه");
+      }
+    } catch {
+      alert("خطا در ارتباط با سرور");
+    }
+  };
+
+  const handleDelete = async (commentId: string) => {
+    if (!confirm("آیا از حذف این دیدگاه مطمئن هستید؟")) return;
+    try {
+      const res = await fetch("/api/comments/delete", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commentId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        startTransition(() => { load(); });
+      } else {
+        alert(data.message || "خطا در حذف دیدگاه");
+      }
+    } catch {
+      alert("خطا در ارتباط با سرور");
+    }
+  };
+
+  const isSoftDeleted = (c: CommentNode) => !!(c as any).deletedAt;
+
+  const renderNode = (c: CommentNode, depth = 0) => {
+    const deleted = isSoftDeleted(c);
+    const isOwner = user && (c as any).authorId === user.id;
+    const hasBeenEdited = !!(c as any).editedAt;
+    const isEditing = editingId === (c as any).id;
+
+    return (
+      <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
+        {/* Fix #3: More padding between the border line and reply content */}
+        <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 20 : 0 }}>
+          <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
+            {deleted ? (
+              /* Soft-deleted comment: show placeholder message */
+              <div className="flex items-center gap-2 py-2 paragraph-color">
+                <Icon name="trash" size={16} className="shrink-0 opacity-50" />
+                <span className="text-sm italic opacity-60">این نظر حذف شده است</span>
               </div>
-            </form>
+            ) : isEditing ? (
+              /* Edit mode */
+              <>
+                <div className="flex justify-between items-start gap-3 mb-3">
+                  <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
+                </div>
+                <Textarea
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]"
+                  autoFocus
+                />
+                <div className="flex justify-end gap-2 mt-2">
+                  <Button type="button" variant="ghost" size="xs" onClick={handleEditCancel}>انصراف</Button>
+                  <Button type="button" size="xs" onClick={() => handleEditSave((c as any).id)}>
+                    ذخیره تغییرات
+                  </Button>
+                </div>
+              </>
+            ) : (
+              /* Normal comment display */
+              <>
+                <div className="flex justify-between items-start gap-3">
+                  <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
+                  <div className="flex items-center gap-2 shrink-0">
+                    {hasBeenEdited && (
+                      <Tooltip>
+                        <TooltipTrigger render={<span className="text-[11px] paragraph-color cursor-default italic" />}>
+                          (ویرایش شده)
+                        </TooltipTrigger>
+                        <TooltipContent>ویرایش شده در {formatCommentDate((c as any).editedAt)}</TooltipContent>
+                      </Tooltip>
+                    )}
+                    <Tooltip>
+                      <TooltipTrigger render={<span className="text-[11px] paragraph-color shrink-0 cursor-default" />}>
+                        {formatCommentDate((c as any).createdAt)}
+                      </TooltipTrigger>
+                      <TooltipContent>تاریخ انتشار این دیدگاه</TooltipContent>
+                    </Tooltip>
+                  </div>
+                </div>
+                {/*
+                  Fix #1: Removed auto-prepended @author.username from reply text.
+                  The mention is already embedded in the comment text itself when the user
+                  writes a reply. Showing the author's username separately is meaningless.
+                */}
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--paragraph-color)] paragraph-color leading-7">
+                  {(c as any).text}
+                </p>
+                <div className="flex items-center gap-4 mt-3">
+                  <CommentVote
+                    id={c.id}
+                    initialLikes={(c as any).likes ?? 0}
+                    initialDislikes={(c as any).dislikes ?? 0}
+                  />
+                  <Tooltip>
+                    <TooltipTrigger render={
+                      <Button
+                        onClick={() => handleReplyClick(c.id)}
+                        variant="link"
+                        size="xs"
+                        className="text-[11px] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
+                        type="button"
+                      />
+                    }>
+                      {replyOpen === c.id ? "بستن" : "پاسخ"}
+                    </TooltipTrigger>
+                    <TooltipContent>پاسخ به این دیدگاه</TooltipContent>
+                  </Tooltip>
+
+                  {/* Fix #4: Edit/Remove buttons for own comments */}
+                  {isOwner && (
+                    <>
+                      <Tooltip>
+                        <TooltipTrigger render={
+                          <Button
+                            onClick={() => handleEditClick((c as any).id, (c as any).text)}
+                            variant="link"
+                            size="xs"
+                            className="text-[11px] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
+                            type="button"
+                          />
+                        }>
+                          ویرایش
+                        </TooltipTrigger>
+                        <TooltipContent>ویرایش این دیدگاه</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger render={
+                          <Button
+                            onClick={() => handleDelete((c as any).id)}
+                            variant="link"
+                            size="xs"
+                            className="text-[11px] text-[var(--danger)] hover:text-[var(--danger)]"
+                            type="button"
+                          />
+                        }>
+                          حذف
+                        </TooltipTrigger>
+                        <TooltipContent>حذف این دیدگاه</TooltipContent>
+                      </Tooltip>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Reply form — only for non-deleted comments */}
+            {!deleted && replyOpen === c.id && (
+              <form
+                action={formAction}
+                className="mt-3 space-y-2 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-3"
+              >
+                <input type="hidden" name="module" value={module} />
+                <input type="hidden" name="slug" value={slug} />
+                <input type="hidden" name="parentId" value={c.id} />
+                {/*
+                  Fix #1: Pre-populate with @username of the person being replied to,
+                  NOT the current user's own username.
+                */}
+                <Textarea
+                  name="text"
+                  required
+                  className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]"
+                  defaultValue={`@${(c as any).author?.username || (c as any).authorName || "کاربر"} `}
+                  key={`reply-${c.id}-${replyOpen}`} // Fix #2: re-mount on open so textarea resets
+                />
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
+                  <Button type="submit" disabled={isSubmitting || isPending} size="xs">
+                    {isSubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
+                  </Button>
+                </div>
+              </form>
+            )}
+          </div>
+          {c.replies && c.replies.length > 0 && (
+            <div className="mt-2 space-y-2">
+              {c.replies.map((r: any) => renderNode(r, depth + 1))}
+            </div>
           )}
         </div>
-        {c.replies && c.replies.length > 0 && (
-          <div className="mt-2 space-y-2">
-            {c.replies.map((r: any) => renderNode(r, depth + 1))}
-          </div>
-        )}
       </div>
-    </div>
-  );
+    );
+  };
 
-  const totalCount = comments.reduce((s, c: any) => s + 1 + ((c.replies?.length) || 0), 0);
+  const totalCount = comments.reduce((s, c: any) => {
+    // Don't count soft-deleted comments in total
+    if (isSoftDeleted(c)) return s;
+    const replyCount = (c.replies || []).filter((r: any) => !isSoftDeleted(r)).length;
+    return s + 1 + replyCount;
+  }, 0);
 
   return (
     <section className="mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10">

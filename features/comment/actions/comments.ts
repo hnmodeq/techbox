@@ -23,15 +23,14 @@ export async function getCommentsAction(module: string, slug: string) {
       select: { id: true },
     });
     if (!post) {
-      // Post exists in the DB only after it has been seeded/created; until then
-      // there are simply no comments yet (we no longer fabricate mock ones).
       return [];
     }
 
-    // Return a flat list. CommentSection nests it client-side, which avoids
-    // duplicate replies appearing both as root comments and nested replies.
+    // Return a flat list including soft-deleted comments (deletedAt !== null)
+    // so the nesting structure is preserved. The client will render
+    // "این نظر حذف شده است" for soft-deleted comments.
     return await prisma.comment.findMany({
-      where: { postId: post.id, status: "approved", deletedAt: null },
+      where: { postId: post.id, status: "approved" },
       orderBy: { createdAt: "asc" },
       include: { author: { select: { name: true, username: true, avatar: true } } },
     });

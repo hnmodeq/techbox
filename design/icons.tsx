@@ -57,6 +57,8 @@ import {
   Cctv,
   FileText,
   History,
+  Trash2,
+  Pencil,
   type LucideIcon,
   type LucideProps,
 } from "lucide-react";
@@ -111,6 +113,8 @@ export const icons = {
   nas: Database,
   nvr: Cctv,
   timeline: History,
+  trash: Trash2,
+  edit: Pencil,
 } as const;
 
 export type IconName = keyof typeof icons;

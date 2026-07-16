@@ -144,8 +144,9 @@ model Comment {
   likes      Int      @default(0)
   dislikes   Int      @default(0)
   createdAt  DateTime @default(now())
-  deletedAt     DateTime?
-  deletedBy     String?
+  editedAt   DateTime?
+  deletedAt  DateTime?
+  deletedBy  String?
 
   post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   author  User?     @relation(fields: [authorId], references: [id])
