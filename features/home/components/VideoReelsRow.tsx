@@ -172,11 +172,11 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
         {/* Inline keyframes for slide direction */}
         <style>{`
           @keyframes slideFromRight {
-            from { transform: translateX(-40px); opacity: 0.5; }
+            from { transform: translateX(40px); opacity: 0.5; }
             to { transform: translateX(0); opacity: 1; }
           }
           @keyframes slideFromLeft {
-            from { transform: translateX(40px); opacity: 0.5; }
+            from { transform: translateX(-40px); opacity: 0.5; }
             to { transform: translateX(0); opacity: 1; }
           }
         `}</style>
@@ -187,7 +187,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
             <button
               type="button"
               onClick={onPrev}
-              className="absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+              className="absolute right-[2px] top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
             />
           }>
             <Icon name="chevronRight" size={24} />
@@ -202,7 +202,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
             <button
               type="button"
               onClick={onNext}
-              className="absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+              className="absolute left-[2px] top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
             />
           }>
             <Icon name="chevronLeft" size={24} />
