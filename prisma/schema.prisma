@@ -384,3 +384,14 @@ model Faq {
   @@index([isActive, order])
   @@index([order])
 }
+
+model SavedContent {
+  id        String   @id @default(cuid())
+  userId    String
+  module    String
+  slug      String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, module, slug], name: "SavedContent_user_module_slug_key")
+  @@index([userId, createdAt], name: "SavedContent_user_created_idx")
+}
