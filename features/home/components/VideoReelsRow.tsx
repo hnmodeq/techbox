@@ -242,7 +242,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
                   </div>
                 </div>
 
-                <CommentSection module="media" slug={video.slug} />
+                <CommentSection module="media" slug={video.slug} initialComments={video.comments || 0} />
               </div>
             </ScrollArea>
           </div>

@@ -53,7 +53,7 @@ function formatCommentDate(dateStr: string): string {
   return "لحظاتی پیش";
 }
 
-export default function CommentSection({ module, slug }: { module: string; slug: string }) {
+export default function CommentSection({ module, slug, initialComments }: { module: string; slug: string; initialComments?: number }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
@@ -338,7 +338,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
                 <input type="hidden" name="parentId" value={c.id} />
                 <Textarea
                   name="text"
-                  required
                   className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]"
                   defaultValue={`@${(c as any).author?.username || (c as any).authorName || "کاربر"} `}
                   key={`reply-${c.id}-${replyOpen}`}
@@ -372,7 +371,15 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   return (
     <section className="mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">دیدگاه شما <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">({(totalCount ?? 0).toLocaleString("fa-IR")})</span></h3>
+        <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
+          دیدگاه شما{" "}
+          <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+            ({loading && initialComments === undefined
+              ? <Skeleton className="inline-block h-4 w-6 align-middle" />
+              : (loading && initialComments !== undefined ? initialComments : totalCount).toLocaleString("fa-IR")
+            })
+          </span>
+        </h3>
       </div>
 
       {authLoading ? (
@@ -397,7 +404,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
           </div>
           <Textarea
             name="text"
-            required
             placeholder="دیدگاه خود را درباره این مطلب بنویسید..."
             className="min-h-[100px] w-full text-sm text-[var(--paragraph-color)]"
             value={topText}

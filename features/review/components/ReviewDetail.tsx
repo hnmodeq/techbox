@@ -118,7 +118,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
         </div>
 
         <div className="border-t-[length:var(--border-size)] border-[var(--border-color)] pt-5"><RatingWidget module="review" slug={item.slug} initialRating={item.rating} initialCount={item.ratingCount} /></div>
-        <CommentSection module="review" slug={item.slug} />
+        <CommentSection module="review" slug={item.slug} initialComments={item.comments || 0} />
       </article>
     </main>
     </>

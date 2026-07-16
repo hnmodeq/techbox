@@ -147,7 +147,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
       {/* Replies & Solutions Section — backed by the database, so replies and
           new answers persist across refreshes (no more mock data / local-only
           state). */}
-      <CommentSection module="forum" slug={item.slug} />
+      <CommentSection module="forum" slug={item.slug} initialComments={item.comments || 0} />
     </main>
     </>
   );

@@ -100,7 +100,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
         <SpecsTable specs={item.specs} />
       </section>
 
-      <CommentSection module="shop" slug={item.slug} />
+      <CommentSection module="shop" slug={item.slug} initialComments={item.comments || 0} />
     </main>
     </>
   );
