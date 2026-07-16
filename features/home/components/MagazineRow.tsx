@@ -80,7 +80,7 @@ function ArticleAuthorMeta({ author, className = '' }: { author?: { name?: strin
 
 export default function MagazineRow() {
   const { items: dbArticles, loading } = useHomeModule('blog');
-  const articles = dbArticles.slice(0, 5);
+  const articles = dbArticles.slice(0, 3);
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`} dir="rtl">
@@ -93,7 +93,7 @@ export default function MagazineRow() {
         </div>
 
         {loading ? (
-          <RowGridSkeleton count={5} />
+          <RowGridSkeleton count={3} />
         ) : articles.length === 0 ? (
           <EmptyRow>هنوز مقاله‌ای در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
