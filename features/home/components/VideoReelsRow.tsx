@@ -21,8 +21,13 @@ export default function VideoReelsRow() {
   const { items: dbVideos, loading } = useHomeModule('media');
   const videos = dbVideos.slice(0, 5);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [slideKey, setSlideKey] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('left');
 
   const goToPrev = useCallback(() => {
+    // RTL: previous video is to the right
+    setSlideDirection('right');
+    setSlideKey(k => k + 1);
     setActiveIndex(prev => {
       if (prev === null) return null;
       return prev > 0 ? prev - 1 : videos.length - 1;
@@ -30,6 +35,9 @@ export default function VideoReelsRow() {
   }, [videos.length]);
 
   const goToNext = useCallback(() => {
+    // RTL: next video is to the left
+    setSlideDirection('left');
+    setSlideKey(k => k + 1);
     setActiveIndex(prev => {
       if (prev === null) return null;
       return prev < videos.length - 1 ? prev + 1 : 0;
@@ -96,17 +104,25 @@ export default function VideoReelsRow() {
         )}
       </div>
       {activeIndex !== null && activeIndex < videos.length && (
-        <VideoModal video={videos[activeIndex]} onClose={() => setActiveIndex(null)} onPrev={goToPrev} onNext={goToNext} />
+        <VideoModal
+          key={slideKey}
+          video={videos[activeIndex]}
+          onClose={() => setActiveIndex(null)}
+          onPrev={goToPrev}
+          onNext={goToNext}
+          slideDirection={slideDirection}
+        />
       )}
     </section>
   );
 }
 
-function VideoModal({ video, onClose, onPrev, onNext }: {
+function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
   video: any;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  slideDirection: 'left' | 'right';
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -137,7 +153,6 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
     vid.addEventListener('loadedmetadata', handleLoadedMetadata);
     return () => {
       vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      // Properly clean up video to prevent AbortError on unmount
       vid.pause();
       vid.removeAttribute('src');
       vid.load();
@@ -145,86 +160,103 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
   }, [video.slug]);
 
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
-  const aspectRatio = videoDimensions ? videoDimensions.width / videoDimensions.height : 9 / 16;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-6" style={{ zIndex: zIndex.modal }} dir="rtl">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-      {/* Previous button */}
-      <Tooltip>
-        <TooltipTrigger render={
-          <button
-            type="button"
-            onClick={onPrev}
-            className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
-          />
-        }>
-          <Icon name="chevronRight" size={24} />
-        </TooltipTrigger>
-        <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
-      </Tooltip>
+      {/* Fix #3: Prev/Next buttons positioned relative to modal, not page edges */}
+      {/* Fix #5: Slide/push transition on content change */}
+      <div className="relative z-10 animate-in fade-in duration-200">
+        {/* Inline keyframes for slide direction */}
+        <style>{`
+          @keyframes slideFromRight {
+            from { transform: translateX(-40px); opacity: 0.5; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+          @keyframes slideFromLeft {
+            from { transform: translateX(40px); opacity: 0.5; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+        `}</style>
 
-      {/* Next button */}
-      <Tooltip>
-        <TooltipTrigger render={
-          <button
-            type="button"
-            onClick={onNext}
-            className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
-          />
-        }>
-          <Icon name="chevronLeft" size={24} />
-        </TooltipTrigger>
-        <TooltipContent>رفتن به ویدیوی بعدی</TooltipContent>
-      </Tooltip>
+        {/* Previous button (right side in RTL) */}
+        <Tooltip>
+          <TooltipTrigger render={
+            <button
+              type="button"
+              onClick={onPrev}
+              className="absolute -right-3 sm:-right-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+            />
+          }>
+            <Icon name="chevronRight" size={24} />
+          </TooltipTrigger>
+          {/* Fix #4: Swapped tooltip text */}
+          <TooltipContent>رفتن به ویدیوی بعدی</TooltipContent>
+        </Tooltip>
 
-      {/* Modal content - responsive flex */}
-      <div
-        className="relative z-10 flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] w-full sm:w-auto"
-        style={{ maxWidth: isPortrait ? '64rem' : '80rem' }}
-      >
-        {/* Video section - constrained to fit */}
-        <div className="bg-black shrink-0 flex items-center justify-center">
-          <video
-            ref={videoRef}
-            key={video.slug}
-            src={video.videoUrl || undefined}
-            poster={video.image}
-            controls
-            autoPlay
-            playsInline
-            preload="metadata"
-            onError={(e) => {
-              // Suppress AbortError — this fires when the user closes the modal
-              // or switches video while the current one is still loading.
-              // It's normal browser behavior, not a real error.
-            }}
-            className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
-          />
-        </div>
-        {/* Info section - scrollable */}
-        <div className="min-w-0 sm:min-w-[280px] sm:max-w-[420px] sm:flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 max-h-[42vh] sm:max-h-none">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
-              <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
-            </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
-              <Icon name="close" size={22} />
-            </Button>
+        {/* Next button (left side in RTL) */}
+        <Tooltip>
+          <TooltipTrigger render={
+            <button
+              type="button"
+              onClick={onNext}
+              className="absolute -left-3 sm:-left-6 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
+            />
+          }>
+            <Icon name="chevronLeft" size={24} />
+          </TooltipTrigger>
+          {/* Fix #4: Swapped tooltip text */}
+          <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
+        </Tooltip>
+
+        {/* Modal content */}
+        <div
+          className="flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] w-full sm:w-auto"
+          style={{
+            maxWidth: isPortrait ? '80rem' : '100rem',
+            animation: `${slideDirection === 'right' ? 'slideFromRight' : 'slideFromLeft'} 250ms ease-out`,
+          }}
+        >
+          {/* Video section */}
+          <div className="bg-black shrink-0 flex items-center justify-center">
+            <video
+              ref={videoRef}
+              key={video.slug}
+              src={video.videoUrl || undefined}
+              poster={video.image}
+              controls
+              autoPlay
+              playsInline
+              preload="metadata"
+              onError={() => {}}
+              className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
+            />
           </div>
 
-          <div className="flex items-center justify-between" dir="ltr">
-            <div className="flex items-center gap-3">
-              <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
-              <SaveButton module="media" slug={video.slug} />
-              <ShareButton />
+          {/* Fix #1: Wider info section for more room for comments */}
+          <div className="min-w-0 sm:min-w-[340px] sm:max-w-[520px] sm:flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 max-h-[42vh] sm:max-h-none">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
+                <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
+                <Icon name="close" size={22} />
+              </Button>
             </div>
-          </div>
 
-          <CommentSection module="media" slug={video.slug} />
+            <div className="flex items-center justify-between" dir="ltr">
+              <div className="flex items-center gap-3">
+                <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
+                <SaveButton module="media" slug={video.slug} />
+                <ShareButton />
+              </div>
+            </div>
+
+            <CommentSection module="media" slug={video.slug} />
+          </div>
         </div>
       </div>
     </div>
