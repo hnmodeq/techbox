@@ -427,17 +427,16 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  animation: shimmer 2s ease-in-out infinite;
+  animation: shimmer 1.8s ease-in-out infinite;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(127, 127, 127, 0.08) 25%,
-    rgba(127, 127, 127, 0.18) 50%,
-    rgba(127, 127, 127, 0.08) 75%,
+    rgba(0, 0, 0, 0.03) 20%,
+    rgba(0, 0, 0, 0.12) 50%,
+    rgba(0, 0, 0, 0.03) 80%,
     transparent 100%
   );
   z-index: 1;
-  mix-blend-mode: overlay;
 }
 
 @keyframes shimmer {
