@@ -57,7 +57,7 @@ function ArticleAuthorMeta({ author, className = '' }: { author?: { name?: strin
         <Link
           href={`/author/${encodeURIComponent(slug)}`}
           onClick={(event) => event.stopPropagation()}
-          className={`grid grid-cols-[minmax(0,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 ${className}`}
+          className={`grid grid-cols-[minmax(60px,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 min-w-[120px] ${className}`}
           dir="ltr"
         />
       }>
@@ -83,7 +83,7 @@ export default function MagazineRow() {
   const articles = dbArticles.slice(0, 3);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-8 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-foreground">آخرین مقالات منتشر شده</h2>
@@ -97,7 +97,7 @@ export default function MagazineRow() {
         ) : articles.length === 0 ? (
           <EmptyRow>هنوز مقاله‌ای در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="responsive-card-grid grid gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {articles.map((art) => (
             <Card key={art.slug} className="group !p-0 overflow-hidden flex flex-col justify-between transition-all duration-500 ease-out hover:-translate-y-0.5 hover:shadow-md">
               <Link href={`/blog/${art.slug}`} className="block flex-1">
@@ -139,9 +139,11 @@ export default function MagazineRow() {
               </Link>
 
               <div className="border-t px-4 pb-4 pt-3" dir="ltr">
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
+                <div className="flex items-center justify-between gap-2">
                   <CardStats module={art.module || 'blog'} slug={art.slug} showComments={true} />
-                  <ArticleAuthorMeta author={art.author} className="col-start-2" />
+                  <div className="shrink-0">
+                    <ArticleAuthorMeta author={art.author} />
+                  </div>
                 </div>
               </div>
             </Card>

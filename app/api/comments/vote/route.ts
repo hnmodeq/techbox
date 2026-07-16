@@ -24,7 +24,14 @@ export async function GET(req: NextRequest) {
     const existing = await prisma.commentVote.findUnique({
       where: { fingerprint_commentId: { fingerprint: user.id, commentId } },
     });
-    return NextResponse.json({ voted: existing?.vote === 1 });
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { likes: true },
+    });
+    return NextResponse.json({
+      voted: existing?.vote === 1,
+      likes: Math.max(0, comment?.likes ?? 0),
+    });
   } catch {
     return NextResponse.json({ voted: false });
   }

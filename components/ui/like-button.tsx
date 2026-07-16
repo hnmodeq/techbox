@@ -4,7 +4,7 @@ import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-export function LikeButton({ contentType, slug, initial = 0 }: { contentType: string; slug: string; initial?: number }) {
+export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { contentType: string; slug: string; initial?: number; tooltipLabel?: string }) {
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -86,7 +86,7 @@ export function LikeButton({ contentType, slug, initial = 0 }: { contentType: st
           <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
           <span className="hidden sm:inline">پسندیدم</span>
         </TooltipTrigger>
-        <TooltipContent>تعداد پسندها</TooltipContent>
+        <TooltipContent>{tooltipLabel || "پسندیدن"}</TooltipContent>
       </Tooltip>
 
       {showLoginPrompt && (
@@ -110,27 +110,12 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
   // Fetch existing vote state on mount so the heart persists across page refreshes
   useEffect(() => {
     let active = true;
-    fetch("/api/comments/vote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ commentId: id, vote: 0 }),
-    })
-      .then((res) => {
-        if (!res.ok) return null;
-        return res.json();
-      })
-      .then((data) => {
-        if (!active || !data) return;
-        if (typeof data.likes === "number") setL(data.likes);
-      })
-      .catch(() => {});
-
-    // Check if user has already voted on this comment
     fetch(`/api/comments/vote?commentId=${encodeURIComponent(id)}`, { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!active || !data) return;
         if (data.voted === true) setV("up");
+        if (typeof data.likes === "number") setL(data.likes);
       })
       .catch(() => {});
 
@@ -157,7 +142,7 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
   return (
     <div className="relative inline-flex items-center gap-2 text-[length:var(--paragraph-font-size)] paragraph-color">
       <Button onClick={vote} variant="link" size="xs" className={v === "up" ? "text-red-500" : "paragraph-color hover:text-red-500"}>
-        <Heart size={16} fill={v === "up" ? "currentColor" : "none"} /> {(l ?? 0).toLocaleString("fa-IR")}
+        <Heart size={16} fill={v === "up" ? "currentColor" : "none"} strokeWidth={2} /> {(l ?? 0).toLocaleString("fa-IR")}
       </Button>
       {needLogin && (
         <div className="absolute bottom-full mb-1 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-2 shadow-[var(--shadow-size)] text-center">

@@ -17,10 +17,6 @@ import { SaveButton } from '@/components/ui/save-button';
 import { ShareButton } from '@/components/ui/share-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
-function compactReadingTimeLabel(value?: string) {
-  return (value || '').replace(/\s*مطالعه\s*$/, '');
-}
-
 export default function VideoReelsRow() {
   const { items: dbVideos, loading } = useHomeModule('media');
   const videos = dbVideos.slice(0, 5);
@@ -41,7 +37,7 @@ export default function VideoReelsRow() {
   }, [videos.length]);
 
   return (
-    <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-8 px-4 sm:px-6 lg:px-8 bg-[var(--main-background)] ${HOME_ROW_SIZES.mediaMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
           <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">آخرین ویدیوهای کوتاه تکباکسی</h2>
@@ -52,7 +48,7 @@ export default function VideoReelsRow() {
         ) : videos.length === 0 ? (
           <EmptyRow>هنوز ویدیویی در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {videos.map((vid, idx) => (
             <button type="button" key={vid.slug} onClick={() => setActiveIndex(idx)} className="group relative w-full aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-[200ms] bg-card flex flex-col justify-end text-right cursor-pointer">
               <Image src={vid.image || '/assets/blog-1.jpg'} alt={vid.title} fill className="object-cover" sizes="200px" {...blurProps(vid.image || '/assets/blog-1.jpg')} />
@@ -76,13 +72,13 @@ export default function VideoReelsRow() {
                 )}
               </div>
 
-              {/* Play icon with morph effect */}
+              {/* Play icon with morph/dissolve effect */}
               <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-                <div className="relative flex items-center justify-center w-20 h-10">
-                  <span className="absolute inset-0 flex items-center justify-center transition-all duration-400 ease-out group-hover:rotate-90 group-hover:scale-0 group-hover:opacity-0">
+                <div className="relative flex items-center justify-center overflow-hidden h-8">
+                  <span className="absolute flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:blur-sm group-hover:scale-75 group-hover:opacity-0">
                     <Icon name="play" size={32} className="text-white drop-shadow-lg" />
                   </span>
-                  <span className="absolute inset-0 flex items-center justify-center transition-all duration-400 ease-out -rotate-90 scale-0 opacity-0 group-hover:rotate-0 group-hover:scale-100 group-hover:opacity-100">
+                  <span className="absolute flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] blur-sm scale-75 opacity-0 group-hover:blur-0 group-hover:scale-100 group-hover:opacity-100">
                     <span className="text-white text-xs font-bold drop-shadow-lg">پخش ویدیو</span>
                   </span>
                 </div>
@@ -105,21 +101,17 @@ export default function VideoReelsRow() {
           onClose={() => setActiveIndex(null)}
           onPrev={goToPrev}
           onNext={goToNext}
-          currentIndex={activeIndex}
-          totalCount={videos.length}
         />
       )}
     </section>
   );
 }
 
-function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }: {
+function VideoModal({ video, onClose, onPrev, onNext }: {
   video: any;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
-  currentIndex: number;
-  totalCount: number;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
@@ -158,7 +150,7 @@ function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-      {/* Previous button */}
+      {/* Previous button - right side in RTL */}
       <Tooltip>
         <TooltipTrigger render={
           <button
@@ -172,7 +164,7 @@ function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }
         <TooltipContent>رفتن به ویدیوی قبلی</TooltipContent>
       </Tooltip>
 
-      {/* Next button */}
+      {/* Next button - left side in RTL */}
       <Tooltip>
         <TooltipTrigger render={
           <button
@@ -187,7 +179,7 @@ function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }
       </Tooltip>
 
       {/* Modal content */}
-      <div className="relative z-10 flex overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
+      <div className="relative z-10 flex w-[95vw] sm:w-[90vw] lg:w-auto overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]"
         style={{ maxHeight: '92vh', maxWidth: isPortrait ? '64rem' : '80rem' }}
       >
         {/* Video section - right side */}
@@ -208,14 +200,11 @@ function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }
           />
         </div>
         {/* Info section - left side, scrollable */}
-        <div className="min-w-[320px] flex-1 overflow-y-auto p-5 space-y-4" style={{ maxHeight: '92vh' }}>
+        <div className="min-w-[280px] flex-1 overflow-y-auto p-5 space-y-4" style={{ maxHeight: '92vh' }}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
-              <p className="paragraph-color mt-1 text-sm">{video.excerpt}</p>
-              {video.videoDuration && (
-                <span className="mt-1 inline-block text-xs paragraph-color" dir="ltr">{video.videoDuration}</span>
-              )}
+              <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
               <Icon name="close" size={22} />
@@ -224,7 +213,7 @@ function VideoModal({ video, onClose, onPrev, onNext, currentIndex, totalCount }
 
           <div className="flex items-center justify-between" dir="ltr">
             <div className="flex items-center gap-3">
-              <LikeButton contentType="media" slug={video.slug} />
+              <LikeButton contentType="media" slug={video.slug} tooltipLabel="پسند کردن این ویدیو" />
               <SaveButton module="media" slug={video.slug} />
               <ShareButton />
             </div>

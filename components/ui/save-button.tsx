@@ -43,7 +43,7 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
         <BookmarkIcon className={saved ? "size-4 fill-current" : "size-4"} />
         {saved ? "ذخیره‌شده" : "ذخیره"}
       </TooltipTrigger>
-      <TooltipContent>{saved ? "حذف از ذخیره‌ها" : "ذخیره محتوا"}</TooltipContent>
+      <TooltipContent>{saved ? "حذف از ذخیره‌ها" : "ذخیره کردن این ویدیو"}</TooltipContent>
     </Tooltip>
   )
 }
