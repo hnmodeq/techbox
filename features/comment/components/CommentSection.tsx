@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useActionState, useEffect, useTransition, useState } from "react";
+import { useEffect, useTransition, useState } from "react";
 import { getCommentsAction, createCommentAction } from "@/features/comment/actions/comments";
 import { CommentVote } from "@/components/ui/like-button";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,9 @@ import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
 import { gregorianToJalali, getPersianMonthName } from "@/lib/jalali";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 type CommentNode = any;
-type CommentFormState = { ok: boolean; error?: string; message?: string; pending?: boolean };
 
 function nestFlat(rows: any[]): CommentNode[] {
   const map = new Map<string, any>();
@@ -26,11 +26,6 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-/**
- * Smart date formatter for comments:
- * - Within 7 days: relative ("۲ ساعت پیش", "۳ روز پیش")
- * - After 7 days: "۱۴۰۵ تیر ۱۷"
- */
 function formatCommentDate(dateStr: string): string {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return "";
@@ -80,33 +75,64 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       .catch(() => {});
   }, [load]);
 
-  const [state, formAction, isSubmitting] = useActionState<CommentFormState, FormData>(
-    async (_prev: CommentFormState, formData: FormData) => {
+  // ─── Top-level comment form state ───────────────────────────
+  const [topText, setTopText] = React.useState("");
+  const [topSubmitting, setTopSubmitting] = React.useState(false);
+
+  const handleTopSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const text = formData.get("text") as string;
+    if (!text?.trim() || text.trim().length < 2) return;
+
+    setTopSubmitting(true);
+    try {
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
-        // Fix #2: Close the reply form after successful submission
-        setReplyOpen(null);
+        setTopText("");
+        toast.success((res as any)?.message || "دیدگاه شما با موفقیت ثبت شد");
         startTransition(() => { load(); });
+      } else {
+        toast.error((res as any)?.error || "خطا در ثبت دیدگاه");
       }
-      return res as CommentFormState;
-    },
-    { ok: false }
-  );
+    } catch {
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setTopSubmitting(false);
+    }
+  };
 
-  // Track which comment's reply form is open
+  // ─── Reply form state ───────────────────────────────────────
   const [replyOpen, setReplyOpen] = React.useState<string | null>(null);
+  const [replySubmitting, setReplySubmitting] = React.useState(false);
 
-  // Track which comment is being edited
+  const handleReplySubmit = async (e: React.FormEvent<HTMLFormElement>, parentId: string) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const text = formData.get("text") as string;
+    if (!text?.trim() || text.trim().length < 2) return;
+
+    setReplySubmitting(true);
+    try {
+      const res = await createCommentAction(null, formData);
+      if ((res as any)?.ok) {
+        setReplyOpen(null);
+        toast.success((res as any)?.message || "پاسخ شما با موفقیت ثبت شد");
+        startTransition(() => { load(); });
+      } else {
+        toast.error((res as any)?.error || "خطا در ثبت پاسخ");
+      }
+    } catch {
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setReplySubmitting(false);
+    }
+  };
+
+  // ─── Edit state ─────────────────────────────────────────────
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editText, setEditText] = React.useState("");
-
-  const handleReplyClick = (commentId: string) => {
-    if (!user) {
-      window.dispatchEvent(new CustomEvent("tb_open_auth"));
-      return;
-    }
-    setReplyOpen(replyOpen === commentId ? null : commentId);
-  };
+  const [editSubmitting, setEditSubmitting] = React.useState(false);
 
   const handleEditClick = (commentId: string, currentText: string) => {
     setEditingId(commentId);
@@ -120,6 +146,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
   const handleEditSave = async (commentId: string) => {
     if (!editText.trim() || editText.trim().length < 2) return;
+    setEditSubmitting(true);
     try {
       const res = await fetch("/api/comments/edit", {
         method: "PATCH",
@@ -130,17 +157,24 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       if (res.ok) {
         setEditingId(null);
         setEditText("");
+        toast.success("دیدگاه شما با موفقیت ویرایش شد");
         startTransition(() => { load(); });
       } else {
-        alert(data.message || "خطا در ویرایش دیدگاه");
+        toast.error(data.message || "خطا در ویرایش دیدگاه");
       }
     } catch {
-      alert("خطا در ارتباط با سرور");
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setEditSubmitting(false);
     }
   };
 
+  // ─── Delete state ───────────────────────────────────────────
+  const [deletingId, setDeletingId] = React.useState<string | null>(null);
+
   const handleDelete = async (commentId: string) => {
     if (!confirm("آیا از حذف این دیدگاه مطمئن هستید؟")) return;
+    setDeletingId(commentId);
     try {
       const res = await fetch("/api/comments/delete", {
         method: "PATCH",
@@ -149,36 +183,53 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       });
       const data = await res.json();
       if (res.ok) {
+        toast.success("دیدگاه شما حذف شد");
         startTransition(() => { load(); });
       } else {
-        alert(data.message || "خطا در حذف دیدگاه");
+        toast.error(data.message || "خطا در حذف دیدگاه");
       }
     } catch {
-      alert("خطا در ارتباط با سرور");
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const isSoftDeleted = (c: CommentNode) => !!(c as any).deletedAt;
+
+  const handleReplyClick = (commentId: string) => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent("tb_open_auth"));
+      return;
+    }
+    setReplyOpen(replyOpen === commentId ? null : commentId);
+  };
 
   const renderNode = (c: CommentNode, depth = 0) => {
     const deleted = isSoftDeleted(c);
     const isOwner = user && (c as any).authorId === user.id;
     const hasBeenEdited = !!(c as any).editedAt;
     const isEditing = editingId === (c as any).id;
+    const isDeleting = deletingId === (c as any).id;
 
     return (
       <div key={c.id} style={{ marginRight: depth ? 16 : 0, marginTop: 12 }}>
-        {/* Fix #3: More padding between the border line and reply content */}
         <div className={depth ? "border-r-2 border-[var(--border-color)] pe-3" : "pe-0"} style={{ marginRight: depth ? 20 : 0 }}>
-          <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
+          <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative">
+            {/* Deleting overlay */}
+            {isDeleting && (
+              <div className="absolute inset-0 bg-[var(--card-background)]/60 rounded-[var(--corner-radius)] flex items-center justify-center z-10">
+                <Spinner className="h-5 w-5" />
+                <span className="mr-2 text-sm paragraph-color">در حال حذف…</span>
+              </div>
+            )}
+
             {deleted ? (
-              /* Soft-deleted comment: show placeholder message */
               <div className="flex items-center gap-2 py-2 paragraph-color">
                 <Icon name="trash" size={16} className="shrink-0 opacity-50" />
                 <span className="text-sm italic opacity-60">این نظر حذف شده است</span>
               </div>
             ) : isEditing ? (
-              /* Edit mode */
               <>
                 <div className="flex justify-between items-start gap-3 mb-3">
                   <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
@@ -188,16 +239,16 @@ export default function CommentSection({ module, slug }: { module: string; slug:
                   onChange={(e) => setEditText(e.target.value)}
                   className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]"
                   autoFocus
+                  disabled={editSubmitting}
                 />
                 <div className="flex justify-end gap-2 mt-2">
-                  <Button type="button" variant="ghost" size="xs" onClick={handleEditCancel}>انصراف</Button>
-                  <Button type="button" size="xs" onClick={() => handleEditSave((c as any).id)}>
-                    ذخیره تغییرات
+                  <Button type="button" variant="ghost" size="xs" onClick={handleEditCancel} disabled={editSubmitting}>انصراف</Button>
+                  <Button type="button" size="xs" onClick={() => handleEditSave((c as any).id)} disabled={editSubmitting}>
+                    {editSubmitting ? "در حال ثبت تغییرات…" : "ذخیره تغییرات"}
                   </Button>
                 </div>
               </>
             ) : (
-              /* Normal comment display */
               <>
                 <div className="flex justify-between items-start gap-3">
                   <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
@@ -218,11 +269,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
                     </Tooltip>
                   </div>
                 </div>
-                {/*
-                  Fix #1: Removed auto-prepended @author.username from reply text.
-                  The mention is already embedded in the comment text itself when the user
-                  writes a reply. Showing the author's username separately is meaningless.
-                */}
                 <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--paragraph-color)] paragraph-color leading-7">
                   {(c as any).text}
                 </p>
@@ -247,7 +293,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
                     <TooltipContent>پاسخ به این دیدگاه</TooltipContent>
                   </Tooltip>
 
-                  {/* Fix #4: Edit/Remove buttons for own comments */}
                   {isOwner && (
                     <>
                       <Tooltip>
@@ -284,30 +329,26 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               </>
             )}
 
-            {/* Reply form — only for non-deleted comments */}
             {!deleted && replyOpen === c.id && (
               <form
-                action={formAction}
+                onSubmit={(e) => handleReplySubmit(e, c.id)}
                 className="mt-3 space-y-2 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-3"
               >
                 <input type="hidden" name="module" value={module} />
                 <input type="hidden" name="slug" value={slug} />
                 <input type="hidden" name="parentId" value={c.id} />
-                {/*
-                  Fix #1: Pre-populate with @username of the person being replied to,
-                  NOT the current user's own username.
-                */}
                 <Textarea
                   name="text"
                   required
                   className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]"
                   defaultValue={`@${(c as any).author?.username || (c as any).authorName || "کاربر"} `}
-                  key={`reply-${c.id}-${replyOpen}`} // Fix #2: re-mount on open so textarea resets
+                  key={`reply-${c.id}-${replyOpen}`}
+                  disabled={replySubmitting}
                 />
                 <div className="flex justify-end gap-2">
-                  <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
-                  <Button type="submit" disabled={isSubmitting || isPending} size="xs">
-                    {isSubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
+                  <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)} disabled={replySubmitting}>انصراف</Button>
+                  <Button type="submit" disabled={replySubmitting} size="xs">
+                    {replySubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
                   </Button>
                 </div>
               </form>
@@ -324,7 +365,6 @@ export default function CommentSection({ module, slug }: { module: string; slug:
   };
 
   const totalCount = comments.reduce((s, c: any) => {
-    // Don't count soft-deleted comments in total
     if (isSoftDeleted(c)) return s;
     const replyCount = (c.replies || []).filter((r: any) => !isSoftDeleted(r)).length;
     return s + 1 + replyCount;
@@ -337,7 +377,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       </div>
 
       {user ? (
-        <form action={formAction} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8">
+        <form onSubmit={handleTopSubmit} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8">
           <input type="hidden" name="module" value={module} />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="parentId" value="" />
@@ -354,13 +394,18 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <div className="text-[11px] paragraph-color font-mono" dir="ltr">@{user.username}</div>
             </div>
           </div>
-          <Textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="min-h-[100px] w-full text-sm text-[var(--paragraph-color)]" />
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-[var(--paragraph-color)] paragraph-color">
-              {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ {(state as any)?.message || "دیدگاه شما با موفقیت ثبت شد"}</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}
-            </span>
-            <Button type="submit" disabled={isSubmitting || isPending} size="sm">
-              {isSubmitting ? "در حال ثبت..." : "ارسال دیدگاه"}
+          <Textarea
+            name="text"
+            required
+            placeholder="دیدگاه خود را درباره این مطلب بنویسید..."
+            className="min-h-[100px] w-full text-sm text-[var(--paragraph-color)]"
+            value={topText}
+            onChange={(e) => setTopText(e.target.value)}
+            disabled={topSubmitting}
+          />
+          <div className="flex justify-end">
+            <Button type="submit" disabled={topSubmitting} size="sm">
+              {topSubmitting ? "در حال ارسال…" : "ارسال دیدگاه"}
             </Button>
           </div>
         </form>

@@ -135,7 +135,13 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
     }
 
     vid.addEventListener('loadedmetadata', handleLoadedMetadata);
-    return () => vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    return () => {
+      vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      // Properly clean up video to prevent AbortError on unmount
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+    };
   }, [video.slug]);
 
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
@@ -189,6 +195,12 @@ function VideoModal({ video, onClose, onPrev, onNext }: {
             controls
             autoPlay
             playsInline
+            preload="metadata"
+            onError={(e) => {
+              // Suppress AbortError — this fires when the user closes the modal
+              // or switches video while the current one is still loading.
+              // It's normal browser behavior, not a real error.
+            }}
             className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
           />
         </div>

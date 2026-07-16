@@ -12,6 +12,9 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Ignore AbortError — it fires when the user closes the video modal
+    // or navigates away while a video is still loading. Normal browser behavior.
+    if (error.name === 'AbortError' || error.message?.includes('aborted')) return;
     Sentry.captureException(error);
   }, [error]);
 

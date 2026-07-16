@@ -1,5 +1,4 @@
 "use client"
-
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
@@ -11,7 +10,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
-      closeButton
+      // No closeButton — toasts dismiss on click
+      closeButton={false}
+      duration={4000}
+      position="bottom-center"
+      dir="rtl"
       icons={{
         success: (
           <CircleCheckIcon className="size-4" />
@@ -39,7 +42,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          toast: "cn-toast cursor-pointer",
         },
       }}
       {...props}

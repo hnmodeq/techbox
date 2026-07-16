@@ -19,4 +19,11 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
+
+  // Ignore AbortError — fires when video modal closes while loading
+  ignoreErrors: [
+    'AbortError',
+    'The fetching process for the media resource was aborted',
+    'The play() request was interrupted',
+  ],
 });

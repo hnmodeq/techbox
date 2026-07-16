@@ -105,6 +105,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
 export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes?: number; initialDislikes?: number }) {
   const [l, setL] = useState(initialLikes);
   const [v, setV] = useState<"up" | null>(null);
+  const [busy, setBusy] = useState(false);
   const [needLogin, setNeedLogin] = useState(false);
 
   // Fetch existing vote state on mount so the heart persists across page refreshes
@@ -123,20 +124,49 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
   }, [id]);
 
   const vote = async () => {
+    if (busy) return;
+    setBusy(true);
+
+    // Optimistic: update UI immediately
+    const prevV = v;
+    const prevL = l;
     const next = v === "up" ? 0 : 1;
+    const nextLiked = next === 1;
+    setV(nextLiked ? "up" : null);
+    setL(nextLiked ? l + 1 : Math.max(0, l - 1));
+    setNeedLogin(false);
+
     try {
       const res = await fetch("/api/comments/vote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ commentId: id, vote: next })
       });
-      if (res.status === 401) { setNeedLogin(true); return; }
+      if (res.status === 401) {
+        // Revert — user not logged in
+        setV(prevV);
+        setL(prevL);
+        setNeedLogin(true);
+        setBusy(false);
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
+        // Sync with server truth
         setL(data.likes);
         setV(next === 0 ? null : "up");
+      } else {
+        // Revert on error
+        setV(prevV);
+        setL(prevL);
       }
-    } catch {}
+    } catch {
+      // Revert on network error
+      setV(prevV);
+      setL(prevL);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
