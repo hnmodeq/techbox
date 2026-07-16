@@ -52,7 +52,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <AuthorLink name={item.author?.name} avatar={item.author?.avatar} username={item.author?.username} role={item.author?.job || item.author?.role} className="text-foreground" />
  )}
  <div className="ms-auto flex items-center gap-2 paragraph-color">
- <LiveViewCounter module={item.module} slug={item.slug} />
+ <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views || 0} />
  </div>
  </div>
 
@@ -62,7 +62,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <div className="mt-8 space-y-2">
  <VideoPlayer src={videoSrc} poster={item.image} title={item.title} />
  <div className="bg-[var(--card-background)] px-4 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color flex flex-wrap items-center gap-4">
- <LiveViewCounter module={item.module} slug={item.slug} showLabel />
+ <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views || 0} showLabel />
  <LikeButton contentType={item.module} slug={item.slug} initial={item.likes || 0} />
  {videoDuration && <span dir="ltr">{videoDuration}</span>}
  {videoFileSize && <span dir="ltr">{videoFileSize}</span>}
