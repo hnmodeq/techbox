@@ -13,6 +13,7 @@ import { gregorianToJalali, getPersianMonthName } from "@/lib/jalali";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth.provider";
+import { CommentFormSkeleton, CommentListSkeleton, CommentSectionSkeleton } from "@/components/ui/skeleton-layouts";
 
 type CommentNode = any;
 
@@ -50,27 +51,6 @@ function formatCommentDate(dateStr: string): string {
   if (diffHours >= 1) return `${toFa(diffHours)} ساعت پیش`;
   if (diffMinutes >= 1) return `${toFa(diffMinutes)} دقیقه پیش`;
   return "لحظاتی پیش";
-}
-
-/** Skeleton that mimics a comment card shape while auth/comments load */
-function CommentSkeleton() {
-  return (
-    <div className="space-y-3 animate-pulse">
-      {[1, 2].map((i) => (
-        <div key={i} className="bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] p-4 space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-[var(--muted-background)]" />
-            <div className="h-3 w-24 rounded bg-[var(--muted-background)]" />
-            <div className="h-3 w-16 rounded bg-[var(--muted-background)] mr-auto" />
-          </div>
-          <div className="space-y-2">
-            <div className="h-3 w-full rounded bg-[var(--muted-background)]" />
-            <div className="h-3 w-3/4 rounded bg-[var(--muted-background)]" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 }
 
 export default function CommentSection({ module, slug }: { module: string; slug: string }) {
@@ -396,20 +376,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
       </div>
 
       {authLoading ? (
-        /* Show skeleton while auth resolves — prevents "not logged in" flash */
-        <div className="mb-8">
-          <div className="bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] p-5 space-y-4 animate-pulse">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-[var(--muted-background)]" />
-              <div className="space-y-2">
-                <div className="h-3 w-20 rounded bg-[var(--muted-background)]" />
-                <div className="h-3 w-14 rounded bg-[var(--muted-background)]" />
-              </div>
-            </div>
-            <div className="h-24 rounded bg-[var(--muted-background)]" />
-            <div className="flex justify-end"><div className="h-8 w-28 rounded bg-[var(--muted-background)]" /></div>
-          </div>
-        </div>
+        <CommentFormSkeleton />
       ) : user ? (
         <form onSubmit={handleTopSubmit} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8">
           <input type="hidden" name="module" value={module} />
@@ -457,7 +424,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
 
       <div className="space-y-1 min-h-[60px]">
         {loading ? (
-          <CommentSkeleton />
+          <CommentListSkeleton />
         ) : comments.length === 0 ? (
           <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (

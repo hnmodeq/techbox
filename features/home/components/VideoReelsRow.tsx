@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import CommentSection from '@/features/comment/components/CommentSection';
 import { zIndex } from '@/design';
 import { Icon } from '@/design/icons';
-import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
+import { EmptyRow, VideoRowGridSkeleton } from './HomeRowSkeletons';
 import { LikeButton } from '@/components/ui/like-button';
 import { SaveButton } from '@/components/ui/save-button';
 import { ShareButton } from '@/components/ui/share-button';
@@ -52,7 +52,7 @@ export default function VideoReelsRow() {
           <Link href="/media" className="text-sm font-bold text-[var(--media)] hover:underline flex items-center gap-1 shrink-0"><span>گشت و گزار در ویدیوها</span><span>←</span></Link>
         </div>
         {loading ? (
-          <RowGridSkeleton count={5} imageRatio="aspect-[9/16]" className="responsive-card-grid-sm grid gap-5" />
+          <VideoRowGridSkeleton count={5} />
         ) : videos.length === 0 ? (
           <EmptyRow>هنوز ویدیویی در دیتابیس ثبت نشده است.</EmptyRow>
         ) : (
