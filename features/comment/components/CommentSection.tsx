@@ -147,9 +147,9 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <Textarea name="text" required className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]" defaultValue={`@${(c as any).author?.username || (c as any).authorName || "کاربر"} `} />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
-                <Button disabled={isSubmitting || isPending} size="xs">
-                  {isSubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
-                </Button>
+            <Button type="submit" disabled={isSubmitting || isPending} size="xs">
+              {isSubmitting ? "در حال ارسال…" : "ارسال پاسخ"}
+            </Button>
               </div>
             </form>
           )}
@@ -194,7 +194,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
             <span className="text-sm text-[var(--paragraph-color)] paragraph-color">
               {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ {(state as any)?.message || "دیدگاه شما با موفقیت ثبت شد"}</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}
             </span>
-            <Button disabled={isSubmitting || isPending} size="sm">
+            <Button type="submit" disabled={isSubmitting || isPending} size="sm">
               {isSubmitting ? "در حال ثبت..." : "ارسال دیدگاه"}
             </Button>
           </div>
