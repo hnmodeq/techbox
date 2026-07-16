@@ -30,7 +30,7 @@ export function ShareButton({ url, label = "اشتراک‌گذاری", classNam
         <Share2Icon className="size-4" />
         {label}
       </TooltipTrigger>
-      <TooltipContent>به اشتراک گذاشتن</TooltipContent>
+      <TooltipContent>به اشتراک گذاشتن لینک</TooltipContent>
     </Tooltip>
   )
 }

@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
 import { gregorianToJalali, getPersianMonthName } from "@/lib/jalali";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type CommentNode = any;
 type CommentFormState = { ok: boolean; error?: string; message?: string; pending?: boolean };
@@ -111,26 +112,34 @@ export default function CommentSection({ module, slug }: { module: string; slug:
         <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4">
           <div className="flex justify-between items-start gap-3">
             <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
-            <div className="text-[length:var(--paragraph-font-size)] paragraph-color shrink-0">
-              {formatCommentDate((c as any).createdAt)}
-            </div>
+            <Tooltip>
+              <TooltipTrigger render={<span className="text-[11px] paragraph-color shrink-0 cursor-default" />}>
+                {formatCommentDate((c as any).createdAt)}
+              </TooltipTrigger>
+              <TooltipContent>تاریخ انتشار این دیدگاه</TooltipContent>
+            </Tooltip>
           </div>
-          <p className="mt-2 whitespace-pre-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{depth > 0 && (c as any).author?.username ? <span className="text-[var(--home)]" dir="ltr">@{(c as any).author.username} </span> : null}{(c as any).text}</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--paragraph-color)] paragraph-color leading-7">{depth > 0 && (c as any).author?.username ? <span className="text-[var(--home)]" dir="ltr">@{(c as any).author.username} </span> : null}{(c as any).text}</p>
           <div className="flex items-center gap-4 mt-3">
             <CommentVote
               id={c.id}
               initialLikes={(c as any).likes ?? 0}
               initialDislikes={(c as any).dislikes ?? 0}
             />
-            <Button
-              onClick={() => handleReplyClick(c.id, (c as any).authorName)}
-              variant="link"
-              size="xs"
-              className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
-              type="button"
-            >
-              {replyOpen === c.id ? "بستن" : "پاسخ"}
-            </Button>
+            <Tooltip>
+              <TooltipTrigger render={
+                <Button
+                  onClick={() => handleReplyClick(c.id, (c as any).authorName)}
+                  variant="link"
+                  size="xs"
+                  className="text-[11px] text-[var(--paragraph-color)] paragraph-color hover:text-[var(--home)]"
+                  type="button"
+                />
+              }>
+                {replyOpen === c.id ? "بستن" : "پاسخ"}
+              </TooltipTrigger>
+              <TooltipContent>پاسخ به این دیدگاه</TooltipContent>
+            </Tooltip>
           </div>
 
           {replyOpen === c.id && (
@@ -138,7 +147,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               <input type="hidden" name="module" value={module} />
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="parentId" value={c.id} />
-              <Textarea name="text" required className="min-h-[80px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" defaultValue={`@${(c as any).authorName || "کاربر"} `} />
+              <Textarea name="text" required className="min-h-[80px] w-full text-sm text-[var(--paragraph-color)]" defaultValue={`@${(c as any).authorName || "کاربر"} `} />
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="ghost" size="xs" onClick={() => setReplyOpen(null)}>انصراف</Button>
                 <Button disabled={isSubmitting || isPending} size="xs">
@@ -179,13 +188,13 @@ export default function CommentSection({ module, slug }: { module: string; slug:
               </div>
             )}
             <div>
-              <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-semibold">{user.name}</div>
-              <div className="text-xs paragraph-color font-mono" dir="ltr">@{user.username}</div>
+              <div className="text-sm font-semibold text-[var(--paragraph-color)]">{user.name}</div>
+              <div className="text-[11px] paragraph-color font-mono" dir="ltr">@{user.username}</div>
             </div>
           </div>
-          <Textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="min-h-[100px] w-full text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]" />
+          <Textarea name="text" required placeholder="دیدگاه خود را درباره این مطلب بنویسید..." className="min-h-[100px] w-full text-sm text-[var(--paragraph-color)]" />
           <div className="flex justify-between items-center">
-            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+            <span className="text-sm text-[var(--paragraph-color)] paragraph-color">
               {state?.ok ? <span className="text-[var(--success)] font-semibold">✓ {(state as any)?.message || "دیدگاه شما با موفقیت ثبت شد"}</span> : (state as any)?.error ? <span className="text-[var(--danger)]">{(state as any).error}</span> : ""}
             </span>
             <Button disabled={isSubmitting || isPending} size="sm">
@@ -195,8 +204,8 @@ export default function CommentSection({ module, slug }: { module: string; slug:
         </form>
       ) : (
         <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed">
-          <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
-          <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
+          <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
+          <p className="text-sm text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
             برای ثبت دیدگاه، پاسخ به نظرات دیگران و پسندیدن مطالب، ابتدا باید وارد حساب کاربری خود شوید یا در کمتر از یک دقیقه ثبت‌نام کنید.
           </p>
           <div className="pt-2">
@@ -209,7 +218,7 @@ export default function CommentSection({ module, slug }: { module: string; slug:
         {loading ? (
           <div className="flex items-center justify-center py-6"><Spinner className="h-7 w-7" /></div>
         ) : comments.length === 0 ? (
-          <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
+          <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (
           comments.map(c => renderNode(c, 0))
         )}
