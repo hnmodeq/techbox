@@ -135,7 +135,22 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
+
+    // When React unmounts a <video> element mid-fetch, the browser's
+    // internal fetch abort surfaces as an unhandledRejection with
+    // AbortError. Since this is a normal part of the video modal
+    // lifecycle (close / prev / next), we catch it here.
+    const onUnhandledRejection = (e: PromiseRejectionEvent) => {
+      if (e.reason instanceof DOMException && e.reason.name === 'AbortError') {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('unhandledrejection', onUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('unhandledrejection', onUnhandledRejection);
+    };
   }, [onPrev, onNext, onClose]);
 
   useEffect(() => {
@@ -151,22 +166,38 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
       }
     };
 
+    // Suppress abort/error DOM events — when React unmounts the <video>
+    // element, the browser aborts the in-flight fetch. This is expected
+    // and should not surface as an error anywhere.
+    const suppressAbort = () => {};
+    const suppressError = (e: Event) => {
+      if (vid.error?.code === 1) {
+        // MEDIA_ERR_ABORTED — normal during unmount, suppress entirely
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    };
+    vid.addEventListener('abort', suppressAbort);
+    vid.addEventListener('error', suppressError);
+
+    vid.addEventListener('loadedmetadata', handleLoadedMetadata);
+
     if (vid.readyState >= 1) {
       setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
     }
 
-    vid.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-    // Start playback on mount
     vid.play().catch(() => {
-      // Autoplay may be blocked by browser policy — that's fine, user can click play
+      // Autoplay blocked or element detached — normal
     });
 
     return () => {
       cancelled = true;
       vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      // Only pause; don't touch src — React handles unmount via key={video.slug}
+      vid.removeEventListener('abort', suppressAbort);
+      vid.removeEventListener('error', suppressError);
       vid.pause();
+      // Do NOT manipulate src — React's key={video.slug} handles unmount/remount.
+      // Any fetch abort during unmount is caught by suppressAbort/suppressError above.
     };
   }, [video.slug]);
 
@@ -225,7 +256,6 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
               autoPlay
               playsInline
               preload="metadata"
-              onError={() => {}}
               className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
             />
           </div>
