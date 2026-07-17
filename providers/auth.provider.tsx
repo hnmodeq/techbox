@@ -21,7 +21,11 @@ type AuthContextValue = {
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<AppUser | null>(null);
+  // Read localStorage synchronously during the first render so the user
+  // is available immediately after hydration — no null→user flash.
+  const [user, setUser] = React.useState<AppUser | null>(
+    () => getCurrentUserClient()
+  );
   const [loading, setLoading] = React.useState(true);
 
   // Keep React state in sync with the client-side auth cache (localStorage +

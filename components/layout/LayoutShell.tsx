@@ -16,6 +16,7 @@ import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
 import { ModuleConfigProvider } from "@/providers/module-config.provider"
 import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
+import type { SiteLayoutConfig } from "@/lib/module-config"
 
 // Lightweight placeholder that mirrors the chat launcher
 const ChatLauncherFallback = () => (
@@ -39,16 +40,17 @@ import { AuthModal } from "@/features/auth/components/auth-modal"
 type LayoutShellProps = {
   children: React.ReactNode
   homeData?: HomeData
+  serverModuleConfig?: SiteLayoutConfig
 }
 
-export function LayoutShell({ children, homeData }: LayoutShellProps) {
+export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutShellProps) {
   return (
     <ThemeProvider>
       <AuthProvider>
         <ConsultationProvider>
           <StatsProvider>
             <HomeDataProvider initialData={homeData}>
-              <ModuleConfigProvider>
+              <ModuleConfigProvider serverConfig={serverModuleConfig}>
               <LayoutInner>{children}</LayoutInner>
               </ModuleConfigProvider>
               <Chatbot />

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { ModuleSlug } from "@/lib/module-config";
+import type { ModuleSlug, SiteLayoutConfig } from "@/lib/module-config";
 
 type ModuleConfigClient = {
   /** Set of enabled module slugs */
@@ -19,8 +19,12 @@ type ModuleConfigClient = {
   loading: boolean;
 };
 
+const ALL_SLUGS: ModuleSlug[] = [
+  "blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline",
+];
+
 const defaultConfig: ModuleConfigClient = {
-  enabled: new Set<ModuleSlug>(["blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline"]),
+  enabled: new Set(ALL_SLUGS),
   homeConfig: {} as ModuleConfigClient["homeConfig"],
   heroVisible: true,
   moduleColorsEnabled: true,
@@ -29,12 +33,52 @@ const defaultConfig: ModuleConfigClient = {
   loading: true,
 };
 
+function serverConfigToClient(data: SiteLayoutConfig): ModuleConfigClient {
+  const enabledSet = new Set<ModuleSlug>(
+    ALL_SLUGS.filter((slug) => data[slug]?.enabled !== false)
+  );
+  const homeConfig = {} as ModuleConfigClient["homeConfig"];
+  for (const slug of ALL_SLUGS) {
+    const cfg = data[slug];
+    if (!cfg) continue;
+    homeConfig[slug] = {
+      showOnHome: cfg.showOnHome,
+      homeOrder: cfg.homeOrder,
+      homeTitle: cfg.homeTitle,
+      homeMoreLabel: cfg.homeMoreLabel,
+      showHomeTitle: cfg.showHomeTitle,
+      showHomeMoreLabel: cfg.showHomeMoreLabel,
+    };
+  }
+  return {
+    enabled: enabledSet,
+    homeConfig,
+    heroVisible: data.heroVisible !== false,
+    moduleColorsEnabled: data.moduleColorsEnabled !== false,
+    unifiedModuleColor: data.unifiedModuleColor || "var(--primary)",
+    moduleColors: data.moduleColors || {},
+    loading: false,
+  };
+}
+
 const ModuleConfigContext = createContext<ModuleConfigClient>(defaultConfig);
 
-export function ModuleConfigProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<ModuleConfigClient>(defaultConfig);
+export function ModuleConfigProvider({
+  children,
+  serverConfig,
+}: {
+  children: ReactNode;
+  /** Pre-loaded server-side config — eliminates the "all modules enabled" flash */
+  serverConfig?: SiteLayoutConfig;
+}) {
+  const [config, setConfig] = useState<ModuleConfigClient>(() =>
+    serverConfig ? serverConfigToClient(serverConfig) : defaultConfig
+  );
 
   useEffect(() => {
+    // If we already have server data, skip the fetch to avoid an extra request
+    if (serverConfig) return;
+
     fetch("/api/modules/enabled")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -50,7 +94,7 @@ export function ModuleConfigProvider({ children }: { children: ReactNode }) {
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));
       });
-  }, []);
+  }, [serverConfig]);
 
   const value = useMemo(() => config, [config]);
   return <ModuleConfigContext.Provider value={value}>{children}</ModuleConfigContext.Provider>;

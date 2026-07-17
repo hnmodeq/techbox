@@ -371,8 +371,8 @@ function DateTimeDisplay() {
   }, [])
 
   const snapshot = React.useMemo(() => (now ? getTehranJalaliSnapshot(now) : null), [now])
-  const timeStr = snapshot ? formatSnapshotTime(snapshot) : "--:--:--"
-  const dateStr = snapshot ? formatSnapshotDate(snapshot) : "—"
+  const timeStr = snapshot ? formatSnapshotTime(snapshot) : null
+  const dateStr = snapshot ? formatSnapshotDate(snapshot) : null
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -381,12 +381,19 @@ function DateTimeDisplay() {
           <button
             type="button"
             className="hidden h-8 min-w-[16.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted md:flex"
+            suppressHydrationWarning
           />
         }
       >
-        <span className="tabular-nums">{timeStr}</span>
-        <span className="text-muted-foreground/50">•</span>
-        <span>{dateStr}</span>
+        {snapshot ? (
+          <>
+            <span className="tabular-nums">{timeStr}</span>
+            <span className="text-muted-foreground/50">•</span>
+            <span>{dateStr}</span>
+          </>
+        ) : (
+          <span className="inline-block h-3 w-28 animate-pulse rounded bg-muted/60" aria-hidden="true" />
+        )}
       </PopoverTrigger>
       <PopoverContent className="w-72">
         {snapshot ? (

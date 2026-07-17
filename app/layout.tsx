@@ -12,8 +12,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { defaultSeo, siteUrl } from "@/lib/seo";
 import { getHomeData } from "@/lib/home-server";
+import { getModuleConfig, type SiteLayoutConfig } from "@/lib/module-config";
 import type { HomeData } from "@/features/home/lib/home-data";
-import * as Sentry from "@sentry/nextjs";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -66,10 +66,15 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   let homeData: HomeData | undefined;
+  let moduleConfig: SiteLayoutConfig | undefined;
   try {
-    homeData = await getHomeData();
+    [homeData, moduleConfig] = await Promise.all([
+      getHomeData(),
+      getModuleConfig(),
+    ]);
   } catch {
     homeData = undefined;
+    moduleConfig = undefined;
   }
   return (
     <html
@@ -86,7 +91,7 @@ export default async function RootLayout({
         <ModuleColorApplier />
         <TooltipProvider>
           <ScrollRestoration />
-          <LayoutShell homeData={homeData}>{children}</LayoutShell>
+          <LayoutShell homeData={homeData} serverModuleConfig={moduleConfig}>{children}</LayoutShell>
           <Analytics />
           <SpeedInsights />
           <Toaster />

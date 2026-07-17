@@ -98,8 +98,14 @@ export function TechboxNavUser() {
           )}
         >
           <Avatar className="h-8 w-8 shrink-0">
-            <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
-            <AvatarFallback>{user?.name?.charAt(0) || "کاربر"}</AvatarFallback>
+            {user ? (
+              <>
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              </>
+            ) : (
+              <AvatarFallback className="bg-muted animate-pulse" />
+            )}
           </Avatar>
           <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
             <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
