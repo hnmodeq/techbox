@@ -356,13 +356,12 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
 )
 
 function DateTimeDisplay() {
-  // Do not render the current time during SSR. The CI server and the browser can
-  // use different time zones (and even different seconds), which would make the
-  // first client render differ from the server HTML and trigger hydration errors.
+  const [mounted, setMounted] = React.useState(false)
   const [now, setNow] = React.useState<Date | null>(null)
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {
+    setMounted(true)
     const updateNow = () => setNow(new Date())
     updateNow()
     const timer = setInterval(updateNow, 1000)
@@ -384,14 +383,14 @@ function DateTimeDisplay() {
           />
         }
       >
-        {snapshot ? (
+        {mounted && snapshot ? (
           <>
             <span className="tabular-nums">{timeStr}</span>
             <span className="text-muted-foreground/50">•</span>
             <span>{dateStr}</span>
           </>
         ) : (
-          <span className="inline-block h-3 w-28 animate-pulse rounded bg-muted/60" aria-hidden="true" />
+          <span className="inline-block h-3.5 w-32 animate-pulse rounded bg-muted-foreground/20" aria-hidden="true" />
         )}
       </PopoverTrigger>
       <PopoverContent className="w-72">
