@@ -153,8 +153,8 @@ function ForumFeedCard({item}:{item:ContentItem}){
 function ProductFeedCard({item}:{item:ContentItem}){
  return (
  <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] block overflow-hidden rounded-[var(--corner-radius)] p-1.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
- <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
- <SafeImage src={item.image} alt={item.title} className="object-cover" sizes="(min-width:1024px) 180px, 50vw" />
+ <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--corner-radius)] bg-white">
+ <SafeImage src={item.image} alt={item.title} className="object-contain" sizes="(min-width:1024px) 180px, 50vw" />
  </div>
  <div className="px-1 pt-2">
  <div className={`line-clamp-2 min-h-[34px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>

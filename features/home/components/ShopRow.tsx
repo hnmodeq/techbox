@@ -7,23 +7,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { CardStats } from '@/components/ui/card-stats';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
+import { useCart } from '@/providers/cart.provider';
 
 export default function ShopRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
   const { items: dbProducts, loading } = useHomeModule('shop');
   const products = dbProducts.slice(0, 5);
+  const { add, setOpen } = useCart();
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "جدیدترین تجهیزات سرور، استوریج و شبکه"}</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین محصولات سازمانی اضافه شده"}</h2>
           <ButtonLink variant="link" size="sm" className="text-[var(--shop)] font-bold shrink-0" href="/shop">
-            {homeMoreLabel || "مشاهده کل فروشگاه ←"}
+            {homeMoreLabel || "بازدید از فروشگاه ←"}
           </ButtonLink>
         </div>
 
@@ -34,25 +34,22 @@ export default function ShopRow({ homeTitle, homeMoreLabel }: { homeTitle?: stri
         ) : (
         <div className="responsive-card-grid grid gap-6">
           {products.map((prod) => (
-            <Card key={prod.slug} className="group !p-0 overflow-hidden flex flex-col justify-between hover:shadow-md transition-all duration-200">
+            <Card key={prod.slug} className="group !p-0 overflow-hidden flex flex-col justify-between hover:shadow-lg transition-all duration-300 ease-out">
               <Link href={`/shop/${prod.slug}`} className="block flex-1">
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted/70 p-4 flex items-center justify-center">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-white p-4 flex items-center justify-center">
                   <Image
                     src={prod.image || '/assets/blog-1.jpg'}
                     alt={prod.title}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="object-contain transition-transform duration-500 ease-out group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 300px"
                     {...blurProps(prod.image || '/assets/blog-1.jpg')}
                   />
-                  <Badge variant="secondary" className="absolute top-2 right-2 bg-[var(--shop)]/85 text-white border-none text-[10px]">
-                    محصول
-                  </Badge>
                 </div>
 
                 <CardContent className="p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-black text-foreground group-hover:text-[var(--shop)] transition-colors line-clamp-2 min-h-[44px] leading-6">
+                    <h3 className="text-sm font-black text-foreground group-hover:text-[var(--shop)] transition-colors duration-300 line-clamp-2 min-h-[44px] leading-6">
                       {prod.title}
                     </h3>
                     
@@ -61,12 +58,12 @@ export default function ShopRow({ homeTitle, homeMoreLabel }: { homeTitle?: stri
                     </p>
                   </div>
 
-                  <div className="mt-4 space-y-3">
-                    <div className="flex justify-start items-center">
-                      <CardStats module="shop" slug={prod.slug} initialViews={prod.views} initialLikes={prod.likes} initialComments={prod.comments || 0} showComments={true} />
-                    </div>
-                    <div className="text-xs font-black text-[var(--shop)] text-center py-1">
-                      ثبت درخواست خرید ←
+                  <div className="mt-4 flex items-center justify-between gap-2">
+                    <span className="text-xs font-black text-[var(--shop)] whitespace-nowrap">
+                      اضافه کردن به اتاق مشاوره ←
+                    </span>
+                    <div className="flex items-center" dir="ltr">
+                      <CardStats module="shop" slug={prod.slug} initialViews={prod.views} initialLikes={prod.likes} initialComments={prod.comments || 0} showComments={false} />
                     </div>
                   </div>
                 </CardContent>

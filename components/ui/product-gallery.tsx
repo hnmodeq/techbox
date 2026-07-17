@@ -12,7 +12,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
   const current = clean[index] || clean[0];
   return (
     <div className="mt-8 overflow-hidden rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)]">
-      <div className="relative aspect-[4/3] bg-[var(--muted-background)]">
+      <div className="relative aspect-[4/3] bg-white">
         <Image src={current} alt={`${title} - تصویر ${index + 1}`} fill sizes="(min-width:768px) 768px, 100vw" className="object-contain" {...blurProps(current)} />
         {clean.length > 1 && (
           <div className="absolute inset-x-0 bottom-3 flex justify-center gap-2">
