@@ -31,17 +31,19 @@ function ForumCardSkeleton() {
   );
 }
 
-export default function ForumRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
+export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
   const { items: topics, loading } = useHomeModule('forum');
 
   return (
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.forumMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "داغ\u200Cترین بحث\u200Cها و چالش\u200Cهای شبکه و دیتاسنتر"}</h2>
+          {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "داغ\u200Cترین بحث\u200Cها و چالش\u200Cهای شبکه و دیتاسنتر"}</h2>}
+          {showHomeMoreLabel && (
           <ButtonLink variant="link" size="sm" className="text-[var(--forum)] font-bold shrink-0" href="/forum">
             {homeMoreLabel || "ورود به انجمن و ثبت پرسش ←"}
           </ButtonLink>
+          )}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">

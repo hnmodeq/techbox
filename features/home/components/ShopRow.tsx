@@ -11,7 +11,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
-export default function ShopRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
+export default function ShopRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
   const { items: dbProducts, loading } = useHomeModule('shop');
   const products = dbProducts.slice(0, 5);
 
@@ -19,10 +19,12 @@ export default function ShopRow({ homeTitle, homeMoreLabel }: { homeTitle?: stri
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین محصولات سازمانی اضافه شده"}</h2>
+          {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین محصولات سازمانی اضافه شده"}</h2>}
+          {showHomeMoreLabel && (
           <ButtonLink variant="link" size="sm" className="text-[var(--shop)] font-bold shrink-0" href="/shop">
             {homeMoreLabel || "بازدید از فروشگاه ←"}
           </ButtonLink>
+          )}
         </div>
 
         {loading ? (

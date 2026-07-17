@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { RuntimeEffects } from "@/components/layout/RuntimeEffects";
+import { ModuleColorApplier } from "@/components/layout/ModuleColorApplier";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
@@ -82,6 +83,7 @@ export default async function RootLayout({
       </head>
       <body className="font-sans antialiased text-foreground">
         <RuntimeEffects />
+        <ModuleColorApplier />
         <TooltipProvider>
           <ScrollRestoration />
           <LayoutShell homeData={homeData}>{children}</LayoutShell>

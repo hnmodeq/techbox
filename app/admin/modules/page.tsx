@@ -24,7 +24,19 @@ const ALL_MODULES: ModuleSlug[] = [
   "blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline",
 ];
 
-type TabId = "modules" | "homepage" | "titles";
+type TabId = "modules" | "homepage" | "titles" | "colors";
+
+const DEFAULT_MODULE_COLORS: Record<string, string> = {
+  blog: "light-dark(oklch(0.7 0.17 52), #fb923c)",
+  news: "light-dark(oklch(0.64 0.22 25), #fb7185)",
+  media: "light-dark(oklch(0.82 0.15 85), #fcd34d)",
+  shop: "light-dark(oklch(0.8 0.19 125), #a3e635)",
+  forum: "light-dark(oklch(0.78 0.16 5), #fda4af)",
+  review: "light-dark(oklch(0.7 0.17 240), #38bdf8)",
+  download: "light-dark(oklch(0.72 0.2 350), #f472b6)",
+  timeline: "light-dark(oklch(0.72 0.16 210), #06b6d4)",
+  tools: "light-dark(oklch(0.82 0.12 200), #67e8f9)",
+};
 
 export default function AdminModulesPage() {
   const [config, setConfig] = useState<SiteLayoutConfig>(getDefaultSiteLayoutConfig());
@@ -85,6 +97,7 @@ export default function AdminModulesPage() {
     { id: "modules", label: "فعال/غیرفعال" },
     { id: "homepage", label: "چیدمان خانه" },
     { id: "titles", label: "عناوین ردیف‌ها" },
+    { id: "colors", label: "رنگ‌ها" },
   ];
 
   const sortedHomeModules = [...ALL_MODULES]
@@ -316,12 +329,21 @@ export default function AdminModulesPage() {
                         </ModuleBadge>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs">
-                          عنوان ردیف
-                          <span className="text-muted-foreground mr-1">
-                            (پیش‌فرض: {DEFAULT_HOME_TITLES[slug] || "—"})
-                          </span>
-                        </Label>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs">
+                            عنوان ردیف
+                            <span className="text-muted-foreground mr-1">
+                              (پیش‌فرض: {DEFAULT_HOME_TITLES[slug] || "—"})
+                            </span>
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-[10px] text-muted-foreground">نمایش</Label>
+                            <Switch
+                              checked={cfg?.showHomeTitle ?? true}
+                              onCheckedChange={(checked) => updateModule(slug, { showHomeTitle: checked })}
+                            />
+                          </div>
+                        </div>
                         <Input
                           value={cfg?.homeTitle || ""}
                           onChange={(e) => updateModule(slug, { homeTitle: e.target.value })}
@@ -329,12 +351,21 @@ export default function AdminModulesPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs">
-                          متن دکمه «بیشتر»
-                          <span className="text-muted-foreground mr-1">
-                            (پیش‌فرض: {DEFAULT_HOME_MORE_LABELS[slug] || "—"})
-                          </span>
-                        </Label>
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs">
+                            متن دکمه «بیشتر»
+                            <span className="text-muted-foreground mr-1">
+                              (پیش‌فرض: {DEFAULT_HOME_MORE_LABELS[slug] || "—"})
+                            </span>
+                          </Label>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-[10px] text-muted-foreground">نمایش</Label>
+                            <Switch
+                              checked={cfg?.showHomeMoreLabel ?? true}
+                              onCheckedChange={(checked) => updateModule(slug, { showHomeMoreLabel: checked })}
+                            />
+                          </div>
+                        </div>
                         <Input
                           value={cfg?.homeMoreLabel || ""}
                           onChange={(e) => updateModule(slug, { homeMoreLabel: e.target.value })}
@@ -349,6 +380,126 @@ export default function AdminModulesPage() {
                   هیچ ردیف فعالی در صفحه اصلی وجود ندارد.
                 </p>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Tab: Colors */}
+        {tab === "colors" && (
+          <Card className="p-5 space-y-4">
+            <CardHeader className="p-0">
+              <CardTitle>رنگ‌های ماژول‌ها</CardTitle>
+              <CardDescription>
+                کنترل رنگ اختصاصی هر ماژول. وقتی سیستم رنگ فعال باشد هر ماژول رنگ جداگانه دارد؛ وقتی غیرفعال باشد همه از یک رنگ واحد استفاده می‌کنند.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0 pt-4 space-y-4">
+              {/* Master toggle */}
+              <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
+                <div>
+                  <div className="text-sm font-semibold">سیستم رنگ ماژول‌ها</div>
+                  <div className="text-xs text-muted-foreground">
+                    {config.moduleColorsEnabled !== false
+                      ? "هر ماژول رنگ اختصاصی خود را دارد"
+                      : "همه ماژول‌ها از یک رنگ واحد استفاده می‌کنند"}
+                  </div>
+                </div>
+                <Switch
+                  checked={config.moduleColorsEnabled !== false}
+                  onCheckedChange={(checked) => setConfig((prev) => ({ ...prev, moduleColorsEnabled: checked }))}
+                />
+              </div>
+
+              {config.moduleColorsEnabled !== false ? (
+                /* Per-module color pickers */
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">رنگ هر ماژول</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {ALL_MODULES.map((slug) => {
+                      const meta = moduleMeta[slug];
+                      const currentColor = config.moduleColors?.[slug] || "";
+                      const defaultColor = DEFAULT_MODULE_COLORS[slug] || "var(--primary)";
+                      return (
+                        <div key={slug} className="flex items-center gap-3 rounded-lg border p-3">
+                          <div
+                            className="h-8 w-8 shrink-0 rounded-md border"
+                            style={{ backgroundColor: `var(--${slug})` }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs font-semibold flex items-center gap-2">
+                              <ModuleBadge module={slug}>{meta?.titleFa || slug}</ModuleBadge>
+                            </div>
+                            <input
+                              type="text"
+                              value={currentColor}
+                              onChange={(e) => {
+                                const newColors = { ...(config.moduleColors || {}) };
+                                if (e.target.value) {
+                                  newColors[slug] = e.target.value;
+                                } else {
+                                  delete newColors[slug];
+                                }
+                                setConfig((prev) => ({ ...prev, moduleColors: newColors }));
+                              }}
+                              placeholder={defaultColor}
+                              className="mt-1 w-full rounded border border-border bg-background px-2 py-1 text-xs font-mono text-muted-foreground"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    مقدار CSS وارد کنید (مثلاً #ff6600 یا oklch(0.7 0.17 52)). خالی بگذارید تا رنگ پیش‌فرض استفاده شود.
+                  </p>
+                </div>
+              ) : (
+                /* Unified color picker */
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold">رنگ واحد همه ماژول‌ها</Label>
+                  <div className="flex items-center gap-3 rounded-lg border p-3">
+                    <div
+                      className="h-8 w-8 shrink-0 rounded-md border"
+                      style={{ backgroundColor: config.unifiedModuleColor || "var(--primary)" }}
+                    />
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={config.unifiedModuleColor || ""}
+                        onChange={(e) => setConfig((prev) => ({ ...prev, unifiedModuleColor: e.target.value }))}
+                        placeholder="var(--primary)"
+                        className="w-full rounded border border-border bg-background px-2 py-1 text-xs font-mono text-muted-foreground"
+                      />
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        همه ماژول‌ها از این رنگ استفاده خواهند کرد. مقدار CSS وارد کنید.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Live preview */}
+              <div className="rounded-lg border p-4 space-y-2">
+                <Label className="text-xs font-semibold">پیش‌نمایش زنده</Label>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_MODULES.slice(0, 6).map((slug) => {
+                    const meta = moduleMeta[slug];
+                    return (
+                      <span
+                        key={slug}
+                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold"
+                        style={{
+                          backgroundColor: `color-mix(in oklch, var(--${slug}) 18%, transparent)`,
+                          color: `var(--${slug})`,
+                          border: `1px solid color-mix(in oklch, var(--${slug}) 35%, transparent)`,
+                        }}
+                      >
+                        {meta?.titleFa || slug}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
             </CardContent>
           </Card>
         )}

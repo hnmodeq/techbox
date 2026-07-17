@@ -174,7 +174,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           <SidebarInput
             id="search"
             placeholder="دنبال چی میگردی؟"
-            className="h-8 ps-3 pe-[7.25rem]"
+            className="h-8 ps-3 pe-[7.25rem] text-right"
             value={value}
             onChange={(e) => {
               const nextValue = e.target.value

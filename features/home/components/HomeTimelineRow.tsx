@@ -37,14 +37,15 @@ function ActiveTimelineContent() {
   );
 }
 
-export default function HomeTimelineRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
+export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
   const [active, setActive] = useState(false);
 
   return (
     <section className={`w-full py-8 bg-background border-0 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full px-4 sm:px-6 lg:px-8 space-y-6`}>
         <div className="flex items-center justify-between gap-4 mb-2">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "تاریخچه تحولات، رویدادها و نقاط عطف دیتاسنتر"}</h2>
+          {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "تاریخچه تحولات، رویدادها و نقاط عطف دیتاسنتر"}</h2>}
+          {showHomeMoreLabel && (
           <Link
             href="/timeline"
             className="text-sm font-bold text-primary hover:underline flex items-center gap-1 shrink-0"
@@ -52,6 +53,7 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel }: { homeTitl
             <span>{homeMoreLabel || "ورود به تایم\u200Cلاین کامل"}</span>
             <span>←</span>
           </Link>
+          )}
         </div>
 
         {active && (
