@@ -203,7 +203,7 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
 export const getModuleConfig = unstable_cache(
   getModuleConfigUncached,
   ["module-config-v1"],
-  { revalidate: 30, tags: ["module-config"] }
+  { revalidate: 86400, tags: ["module-config"] }
 );
 
 /**

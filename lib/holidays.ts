@@ -67,5 +67,5 @@ export const getHolidaysForMonth = unstable_cache(
     });
   },
   ["holidays-month-v1"],
-  { revalidate: 3600, tags: ["holidays"] }
+  { revalidate: 86400, tags: ["holidays"] }
 );

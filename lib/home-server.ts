@@ -157,10 +157,10 @@ async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// Cached for 60s so the layout can SSR real homepage data on every request
+// Cached for 1 day so the layout can SSR real homepage data on every request
 // without hitting the database on each navigation (kills the loading flash).
 const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v1"], {
-  revalidate: 60,
+  revalidate: 86400,
   tags: ["home-data"],
 });
 

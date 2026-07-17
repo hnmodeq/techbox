@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getModuleConfig, DEFAULT_MODULE_SLUGS, type ModuleSlug } from "@/lib/module-config";
+import { cacheHeaders, PUBLIC_CONTENT_CACHE } from "@/lib/cache-headers";
 
 export async function GET() {
   try {
@@ -26,14 +27,16 @@ export async function GET() {
       moduleColorsEnabled: config.moduleColorsEnabled !== false,
       unifiedModuleColor: config.unifiedModuleColor || "var(--primary)",
       moduleColors: config.moduleColors || {},
+    }, {
+      headers: cacheHeaders(PUBLIC_CONTENT_CACHE),
     });
   } catch {
     // Fallback: all modules enabled
     return NextResponse.json({
       enabled: DEFAULT_MODULE_SLUGS,
       homeConfig: {},
+    }, {
+      headers: cacheHeaders(PUBLIC_CONTENT_CACHE),
     });
   }
 }
-
-export const revalidate = 30;
