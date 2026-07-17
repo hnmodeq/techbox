@@ -88,7 +88,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const speed = useSpring(targetSpeed, { stiffness: 45, damping: 18, mass: 0.8 });
   const groupWidthRef = useRef(0);
   const [groupNode, setGroupNode] = useState<HTMLDivElement | null>(null);
-  const [ready, setReady] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const updateNow = () => setNowMs(Date.now());
@@ -104,8 +104,10 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
       const width = groupNode.getBoundingClientRect().width;
       if (width > 0) {
         groupWidthRef.current = width;
-        x.set(-width);
-        setReady(true);
+        // Use jump() instead of set() to place the track at -width
+        // without animating — no visible jump from x=0
+        x.jump(-width);
+        setVisible(true);
       }
     };
 
@@ -119,7 +121,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   }, [groupNode, x]);
 
   useAnimationFrame((_time, delta) => {
-    if (shouldReduceMotion || !ready) return;
+    if (shouldReduceMotion || !visible) return;
 
     const width = groupWidthRef.current;
     if (!width) return;
@@ -167,23 +169,28 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   );
 
   return (
-    <section className={`w-full max-w-full overflow-x-hidden overflow-hidden ${className}`} aria-label="آخرین به‌روزرسانی‌ها">
-      <motion.div
+    <section
+      className={`w-full max-w-full overflow-x-hidden overflow-hidden ${className}`}
+      aria-label="آخرین به‌روزرسانی‌ها"
+    >
+      <div
         dir="ltr"
         className="ticker-wrapper relative w-full max-w-full overflow-x-hidden overflow-hidden"
-        onHoverStart={() => targetSpeed.set(HOVER_SPEED)}
-        onHoverEnd={() => targetSpeed.set(NORMAL_SPEED)}
-        onFocusCapture={() => targetSpeed.set(HOVER_SPEED)}
-        onBlurCapture={() => targetSpeed.set(NORMAL_SPEED)}
+        onMouseEnter={() => targetSpeed.set(HOVER_SPEED)}
+        onMouseLeave={() => targetSpeed.set(NORMAL_SPEED)}
       >
         <motion.div
           className="ticker-motion-track flex w-max min-w-max items-center"
-          style={shouldReduceMotion ? undefined : { x }}
+          style={
+            shouldReduceMotion
+              ? undefined
+              : { x, opacity: visible ? 1 : 0, transition: "opacity 0.3s ease-out" }
+          }
         >
           {renderGroup(0)}
           {!shouldReduceMotion && renderGroup(1)}
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }
