@@ -8,12 +8,15 @@ type ModuleConfigClient = {
   enabled: Set<ModuleSlug>;
   /** Map of slug → { showOnHome, homeOrder, homeTitle, homeMoreLabel } */
   homeConfig: Record<ModuleSlug, { showOnHome: boolean; homeOrder: number; homeTitle: string; homeMoreLabel: string }>;
+  /** Whether the hero section is visible on the homepage */
+  heroVisible: boolean;
   loading: boolean;
 };
 
 const defaultConfig: ModuleConfigClient = {
   enabled: new Set<ModuleSlug>(["blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline"]),
   homeConfig: {} as ModuleConfigClient["homeConfig"],
+  heroVisible: true,
   loading: true,
 };
 
@@ -29,7 +32,8 @@ export function ModuleConfigProvider({ children }: { children: ReactNode }) {
         if (!data) return;
         const enabledSet = new Set<ModuleSlug>(data.enabled || []);
         const homeConfig = data.homeConfig || {};
-        setConfig({ enabled: enabledSet, homeConfig, loading: false });
+        const heroVisible = data.heroVisible !== false;
+        setConfig({ enabled: enabledSet, homeConfig, heroVisible, loading: false });
       })
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));

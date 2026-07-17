@@ -26,7 +26,7 @@ const ALL_MODULES: ModuleSlug[] = [
 type TabId = "modules" | "homepage" | "titles";
 
 export default function AdminModulesPage() {
-  const [config, setConfig] = useState<ModuleConfigMap>(getDefaultModuleConfigMap());
+  const [config, setConfig] = useState<ModuleConfigMap>({ ...getDefaultModuleConfigMap(), heroVisible: true });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -107,7 +107,7 @@ export default function AdminModulesPage() {
         </PageHeader>
 
         {/* Summary stats */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <Card className="p-4">
             <div className="text-sm text-muted-foreground">ماژول فعال</div>
             <div className="text-2xl font-bold">{enabledCount} از {ALL_MODULES.length}</div>
@@ -115,6 +115,10 @@ export default function AdminModulesPage() {
           <Card className="p-4">
             <div className="text-sm text-muted-foreground">ردیف صفحه اصلی</div>
             <div className="text-2xl font-bold">{homeVisibleCount} از {enabledCount}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">هیرو</div>
+            <div className="text-2xl font-bold">{config.heroVisible !== false ? "فعال" : "غیرفعال"}</div>
           </Card>
         </div>
 
@@ -189,6 +193,21 @@ export default function AdminModulesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 pt-4 space-y-2">
+              {/* Hero visibility toggle */}
+              <div className="flex items-center justify-between gap-4 rounded-lg border border-[var(--admin)]/20 bg-[var(--admin)]/5 p-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm">🏅</span>
+                  <div>
+                    <div className="text-sm font-semibold">هیرو (تکباکس)</div>
+                    <div className="text-xs text-muted-foreground">عنوان بزرگ «تکباکس» بالای صفحه اصلی</div>
+                  </div>
+                </div>
+                <Switch
+                  checked={config.heroVisible !== false}
+                  onCheckedChange={(checked) => setConfig((prev) => ({ ...prev, heroVisible: checked }))}
+                />
+              </div>
+
               {sortedHomeModules.map((slug, idx) => {
                 const meta = moduleMeta[slug];
                 const cfg = config[slug];
