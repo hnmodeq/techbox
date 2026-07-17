@@ -125,7 +125,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
   onNext: () => void;
   slideDirection: 'left' | 'right';
 }) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
@@ -138,43 +138,26 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
     return () => window.removeEventListener('keydown', handleKey);
   }, [onPrev, onNext, onClose]);
 
-  // Callback ref: captures the DOM node and wires it up.
-  // This avoids React.key-triggered unmount/remount races.
-  const setVideoRef = useCallback((node: HTMLVideoElement | null) => {
-    // Clean up previous node
-    const prev = videoRef.current;
-    if (prev && prev !== node) {
-      prev.pause();
-      prev.src = '';
-      prev.load(); // flush
-    }
-    videoRef.current = node;
-    if (!node) return;
-
-    setVideoDimensions(null);
-
-    const onMeta = () => {
-      if (videoRef.current === node) {
-        setVideoDimensions({ width: node.videoWidth, height: node.videoHeight });
-      }
-    };
-
-    if (node.readyState >= 1) {
-      onMeta();
-    }
-    node.addEventListener('loadedmetadata', onMeta);
-
-    // Auto-play; browsers may block this, user can click play via controls
-    node.play().catch(() => {});
-
-    return () => {
-      node.removeEventListener('loadedmetadata', onMeta);
-    };
-  }, []);
-
-  // When video.slug changes (prev/next), reset dimensions
   useEffect(() => {
     setVideoDimensions(null);
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    const handleLoadedMetadata = () => {
+      setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
+    };
+
+    if (vid.readyState >= 1) {
+      setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
+    }
+
+    vid.addEventListener('loadedmetadata', handleLoadedMetadata);
+    return () => {
+      vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+    };
   }, [video.slug]);
 
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
@@ -224,13 +207,15 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
           {/* Video section */}
           <div className="bg-black shrink-0 flex items-center justify-center">
             <video
-              ref={setVideoRef}
+              ref={videoRef}
+              key={video.slug}
               src={video.videoUrl || undefined}
               poster={video.image}
               controls
               autoPlay
               playsInline
               preload="metadata"
+              onError={() => {}}
               className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
             />
           </div>
