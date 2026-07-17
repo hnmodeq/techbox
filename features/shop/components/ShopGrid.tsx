@@ -131,15 +131,15 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
           <Link
             key={p.slug}
             href={`/shop/${p.slug}`}
-            className="border rounded-lg shadow-sm overflow-hidden group flex flex-col bg-card text-card-foreground hover:shadow-md transition-all"
+            className="border rounded-lg shadow-sm overflow-hidden group flex flex-col bg-card text-card-foreground hover:shadow-lg transition-all duration-300 ease-out"
           >
-            <div className="block relative aspect-[4/3] bg-muted overflow-hidden">
+            <div className="block relative aspect-[4/3] bg-white overflow-hidden">
               <Image
                 src={p.image || "/assets/blog-1.jpg"}
                 alt={p.title}
                 fill
                 sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                className="object-contain transition-transform duration-500 ease-out group-hover:scale-105"
                 {...blurProps(p.image || "/assets/blog-1.jpg")}
               />
             </div>
@@ -152,7 +152,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
               </div>
               <p className="text-sm text-muted-foreground line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
               <div className="mt-3 flex items-center justify-between gap-2">
-                <span className="text-sm font-black text-[var(--shop)]">{p.priceLabel || "مشاوره خرید"}</span>
                 <Button
                   onClick={(e) => {
                     e.preventDefault();
@@ -163,11 +162,14 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                   variant="outline"
                   className="border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold"
                 >
-                  مشاوره
+                  اضافه کردن به اتاق مشاوره
                 </Button>
+                <div dir="ltr">
+                  <CardStats module="shop" slug={p.slug} initialViews={p.views} initialLikes={p.likes} initialComments={p.comments || 0} showComments={false} />
+                </div>
               </div>
               <div className="mt-3 pt-3 border-t flex items-center justify-between">
-                <CardStats module="shop" slug={p.slug} initialViews={p.views} initialLikes={p.likes} initialComments={p.comments || 0} showComments={true} />
+                <span className="text-sm font-black text-[var(--shop)]">{p.priceLabel || "مشاوره خرید"}</span>
                 <Button
                   size="xs"
                   variant={isInComparison(p.slug) ? "secondary" : "ghost"}

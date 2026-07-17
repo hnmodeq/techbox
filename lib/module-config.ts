@@ -39,7 +39,7 @@ const DEFAULT_HOME_TITLES: Record<ModuleSlug, string> = {
   blog: "آخرین مقالات منتشر شده",
   news: "", // news doesn't have a dedicated homepage row currently
   media: "آخرین ویدیوهای کوتاه تکباکسی",
-  shop: "جدیدترین تجهیزات سرور، استوریج و شبکه",
+  shop: "آخرین محصولات سازمانی اضافه شده",
   forum: "داغ‌ترین بحث‌ها و چالش‌های شبکه و دیتاسنتر",
   review: "بنچمارک‌ها و تست‌های عملی سخت‌افزار",
   download: "ISOها، فریم‌ورها و درایورهای سرور و زیرساخت",
@@ -51,7 +51,7 @@ const DEFAULT_HOME_MORE_LABELS: Record<ModuleSlug, string> = {
   blog: "مشاهده همه ←",
   news: "",
   media: "گشت و گزار در ویدیوها",
-  shop: "مشاهده کل فروشگاه ←",
+  shop: "بازدید از فروشگاه ←",
   forum: "ورود به انجمن و ثبت پرسش ←",
   review: "مشاهده تمام بررسی‌ها ←",
   download: "ورود به مرکز دانلود ←",
