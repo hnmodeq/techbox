@@ -1,5 +1,6 @@
 "use client"
 
+import { formatRelativeDate } from "@/lib/date-format";
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -24,7 +25,7 @@ function AuthorPosts({ posts }: { posts: any[] }) {
                 {post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" {...blurProps(post.image)} />}
               </div>
               <div className="p-4">
-                <div className="text-xs text-muted-foreground">{post.dateFa || post.date_fa} • {post.category || post.module}</div>
+                <div className="text-xs text-muted-foreground">{formatRelativeDate(post.date)} • {post.category || post.module}</div>
                 <h3 className="mt-2 line-clamp-2 font-bold text-foreground">{post.title}</h3>
                 <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{post.excerpt}</p>
                 <div className="mt-3 border-t pt-3"><CardStats module={post.module} slug={post.slug} initialViews={post.views} initialLikes={post.likes} initialComments={post.comments || 0} showComments /></div>

@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
+import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { useStats } from "@/providers/stats.provider";
 
@@ -209,7 +210,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                     <span className="font-semibold text-sm group-hover:text-[var(--forum)] transition-colors line-clamp-1">{t.title}</span>
                     <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">ارسال‌شده توسط <b className="text-foreground">{t.author?.name || "کاربر تکباکس"}</b> • {t.date_fa}</div>
+                  <div className="text-xs text-muted-foreground mt-1">ارسال‌شده توسط <b className="text-foreground">{t.author?.name || "کاربر تکباکس"}</b> • {formatRelativeDate(t.date)}</div>
                 </div>
               </div>
               <div className="col-span-12 sm:col-span-4 flex items-center justify-end">

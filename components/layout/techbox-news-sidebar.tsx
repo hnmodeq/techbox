@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { formatRelativeDate } from "@/lib/date-format";
 import { NewspaperIcon, XIcon } from "lucide-react"
 
 import {
@@ -81,7 +82,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
                           {news.title}
                         </div>
                         <div className="mt-1 text-[10px] text-muted-foreground">
-                          {news.date_fa}
+                          {formatRelativeDate(news.date)}
                         </div>
                       </div>
                     </div>

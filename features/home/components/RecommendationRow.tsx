@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatRelativeDate } from "@/lib/date-format";
 import { ButtonLink } from "@/components/ui/button";
 import { CardStats } from "@/components/ui/card-stats";
 import type { ContentItem } from "@/lib/content";
@@ -59,7 +60,7 @@ export default function RecommendationRow({
                     </p>
 
                     <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-                      <div>{item.date_fa?.split(" ")[0]}</div>
+                      <div>{formatRelativeDate(item.date)}</div>
                       <CardStats module={item.module} slug={item.slug} initialViews={item.views} initialLikes={item.likes} initialComments={item.comments || 0} showComments={false} />
                     </div>
                   </CardContent>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
+import { formatRelativeDate } from "@/lib/date-format";
 
 export default function NewsList({ serverItems }: { serverItems?: ContentItem[] }) {
  const fallbackItems = getModuleItems("news");
@@ -29,7 +30,7 @@ export default function NewsList({ serverItems }: { serverItems?: ContentItem[] 
                   </div>
                   <div className="p-4 sm:col-span-2">
                     <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex flex-wrap items-center gap-2 paragraph-color">
-                      <span className="inline-flex items-center gap-1"><Icon name="clock" size={13} strokeWidth={1.75} />{n.date_fa} {n.time ? `• ${n.time}`: ""}</span>
+                      <span className="inline-flex items-center gap-1"><Icon name="clock" size={13} strokeWidth={1.75} />{formatRelativeDate(n.date)} {n.time ? `• ${n.time}`: ""}</span>
                       {n.source && <><span>•</span><span>منبع: {n.source}</span></>}
                     </div>
                     <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold mt-2 transition-colors group-hover:text-[var(--news)]">{n.title}</h3>
@@ -62,7 +63,7 @@ export default function NewsList({ serverItems }: { serverItems?: ContentItem[] 
                     <Link href={`/news/${f.slug}`} className="group block">
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex items-center gap-1 paragraph-color">
                         <Icon name="clock" size={13} strokeWidth={1.75} />
-                        <span>{f.date_fa} {f.time || ""}</span>
+                        <span>{formatRelativeDate(f.date)} {f.time || ""}</span>
                       </div>
                       <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] block mt-1 transition-colors group-hover:text-[var(--news)]">{f.title}</span>
                     </Link>

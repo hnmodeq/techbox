@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
+import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
@@ -124,7 +125,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
                   <b className="text-[var(--primary-text)]">{item.author?.name || "کاربر انجمن"}</b>
                 </span>
                 <span>•</span>
-                <span>{item.date_fa}</span>
+                <span>{formatRelativeDate(item.date)}</span>
                 <span>•</span>
                 <LiveViewCounter module="forum" slug={item.slug} showLabel={true} />
               </div>

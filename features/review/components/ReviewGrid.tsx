@@ -6,6 +6,7 @@ import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
 import ModuleHeader from "@/components/effects/ModuleHeader";
+import { formatRelativeDate } from "@/lib/date-format";
 import { CardStats } from "@/components/ui/card-stats";
 import { ReviewRating } from "@/components/ui/review-rating";
 
@@ -31,7 +32,7 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
               <div className="p-5 sm:p-6 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-2 flex-wrap text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color font-bold">
-                    <span>{r.category || 'بررسی تخصصی'} • {r.date_fa}</span>
+                    <span>{r.category || 'بررسی تخصصی'} • {formatRelativeDate(r.date)}</span>
                     <ReviewRating slug={r.slug} fallbackRating={r.rating ?? null} fallbackCount={r.ratingCount ?? 0} />
                   </div>
 

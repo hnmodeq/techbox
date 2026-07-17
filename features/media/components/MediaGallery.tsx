@@ -1,4 +1,5 @@
 "use client";
+import { formatRelativeDate } from "@/lib/date-format";
 import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import { MediaSelectorCard } from "@/components/ui/media-selector-card";
@@ -37,7 +38,7 @@ export default function MediaGallery({ serverItems }: { serverItems?: ContentIte
             title={v.title}
             category={v.category}
             author={v.author?.name}
-            dateFa={v.date_fa}
+            dateFa={formatRelativeDate(v.date)}
             duration={(v as any).videoDuration || undefined}
             onClick={() => { window.location.href = `/media/${v.slug}`; }}
           />

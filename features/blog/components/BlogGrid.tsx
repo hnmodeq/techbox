@@ -7,6 +7,7 @@ import ModuleHeader from "@/components/effects/ModuleHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardStats } from "@/components/ui/card-stats";
+import { formatRelativeDate } from "@/lib/date-format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 function stripPreviewText(value?: string) {
@@ -138,7 +139,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] grid-rows-2 items-center gap-x-3 gap-y-1">
                   <Tooltip>
                     <TooltipTrigger render={<span className="col-start-1 row-start-1 justify-self-start text-xs font-bold text-muted-foreground" dir="rtl" />}>
-                      {p.date_fa}
+                      {formatRelativeDate(p.date)}
                     </TooltipTrigger>
                     <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                   </Tooltip>

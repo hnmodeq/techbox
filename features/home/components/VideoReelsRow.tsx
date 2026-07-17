@@ -5,6 +5,7 @@ import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatRelativeDate } from "@/lib/date-format";
 import { blurProps } from "@/lib/image-placeholder";
 import { CardStats } from '@/components/ui/card-stats';
 import { Button } from '@/components/ui/button';
@@ -67,7 +68,7 @@ export default function VideoReelsRow({ homeTitle, homeMoreLabel, showHomeTitle 
               <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-3 py-3 z-30">
                 <Tooltip>
                   <TooltipTrigger render={<span className="text-[10px] font-bold text-white/90 sm:text-xs" dir="rtl" />}>
-                    {vid.date_fa}
+                    {formatRelativeDate(vid.date)}
                   </TooltipTrigger>
                   <TooltipContent>تاریخ انتشار ویدیو</TooltipContent>
                 </Tooltip>

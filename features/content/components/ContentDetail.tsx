@@ -15,6 +15,7 @@ import { AuthorLink } from "@/components/ui/author-link";
 import { ProductGallery } from "@/components/ui/product-gallery";
 import VideoPlayer from "@/features/media/components/VideoPlayer";
 import MarkdownContent from "@/features/content/components/MarkdownContent";
+import { formatRelativeDate } from "@/lib/date-format";
 import { ContentJsonLd } from "@/components/seo/StructuredData";
 import { getReadingTimeLabel } from "@/lib/reading-time";
 
@@ -33,7 +34,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
  <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color mb-3">
  <Link href={`/${item.module}`} className={`${meta.color} hover:underline`}>{meta.titleFa}</Link>
  <span>•</span>
- <span>{item.date_fa}</span>
+ <span>{formatRelativeDate(item.date)}</span>
  <span>•</span>
  <span>{item.category}</span>
  {item.module === "blog" && (

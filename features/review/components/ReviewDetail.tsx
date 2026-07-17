@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Icon } from "@/design/icons";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { LikeButton } from "@/components/ui/like-button";
+import { formatRelativeDate } from "@/lib/date-format";
 import { ReviewRating } from "@/components/ui/review-rating";
 import { RatingWidget } from "@/components/ui/rating-widget";
 import { ShareButton } from "@/components/ui/share-button";
@@ -43,7 +44,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
             <span className="rounded-full bg-[color-mix(in_oklch,var(--review)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--review)_30%,transparent)] px-3.5 py-1 text-xs font-bold text-[var(--review)]">
               {item.category || "بررسی تخصصی"}
             </span>
-            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa}</span>
+            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{formatRelativeDate(item.date)}</span>
             <ReviewRating slug={item.slug} fallbackRating={item.rating ?? null} fallbackCount={item.ratingCount ?? 0} />
           </div>
 

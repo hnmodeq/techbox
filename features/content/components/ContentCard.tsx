@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { blurProps } from "@/lib/image-placeholder";
+import { formatRelativeDate } from "@/lib/date-format";
 import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { moduleColors } from "@/config/module-colors";
@@ -71,7 +72,7 @@ export function ContentCard({ item, compact = false }: { item: ContentItem; comp
  )}
  <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-            <span>{item.date_fa}</span>
+            <span>{formatRelativeDate(item.date)}</span>
           </div>
  <h4 className={`mt-1 line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary-text)] transition-colors ${moduleHover(item.module)}`}>{item.title}</h4>
  {!compact && <p className="mt-1 line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.excerpt}</p>}
@@ -169,7 +170,7 @@ function DownloadFeedCard({item}:{item:ContentItem}){
  <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] flex items-center justify-between gap-3 rounded-[var(--corner-radius)] p-2.5 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
  <div className="min-w-0 flex-1">
  <div className={`line-clamp-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
- <div className="mt-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.date_fa} • {item.category}</div>
+ <div className="mt-0.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{formatRelativeDate(item.date)} • {item.category}</div>
  </div>
  <CardStats module="download" slug={item.slug} initialViews={item.views} initialLikes={item.likes} initialComments={item.comments || 0} showComments={true} />
  </Link>

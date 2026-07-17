@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { blurProps } from "@/lib/image-placeholder";
 import { Card, CardContent } from '@/components/ui/card';
 import { ButtonLink } from '@/components/ui/button';
+import { formatRelativeDate } from "@/lib/date-format";
 import { CardStats } from '@/components/ui/card-stats';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
@@ -115,7 +116,7 @@ export default function MagazineRow({ homeTitle, homeMoreLabel, showHomeTitle = 
                   <div dir="ltr" className="absolute inset-x-0 top-0 flex items-center justify-between bg-gradient-to-b from-black/70 to-transparent px-3 py-3">
                     <Tooltip>
                       <TooltipTrigger render={<span className="text-[10px] font-bold text-white/90 sm:text-xs" dir="rtl" />}>
-                        {art.date_fa}
+                        {formatRelativeDate(art.date)}
                       </TooltipTrigger>
                       <TooltipContent>تاریخ انتشار این مقاله</TooltipContent>
                     </Tooltip>

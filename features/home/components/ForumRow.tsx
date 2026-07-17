@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CardStats } from '@/components/ui/card-stats';
+import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from '@/components/ui/forum-badge';
 import { EmptyRow } from './HomeRowSkeletons';
 
@@ -74,7 +75,7 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
                       </h3>
 
                       <div className="mt-3 pt-3 border-t flex items-center justify-between text-[11px] text-muted-foreground">
-                        <span>{top.date_fa}</span>
+                        <span>{formatRelativeDate(top.date)}</span>
                         <CardStats module="forum" slug={top.slug} initialViews={top.views} initialLikes={top.likes} initialComments={top.comments || 0} showComments={true} />
                       </div>
                     </div>

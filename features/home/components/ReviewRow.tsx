@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { formatRelativeDate } from "@/lib/date-format";
 import { CardStats } from '@/components/ui/card-stats';
 import { AuthorLink } from '@/components/ui/author-link';
 import { ReviewRating } from '@/components/ui/review-rating';
@@ -57,7 +58,7 @@ export default function ReviewRow({ homeTitle, homeMoreLabel, showHomeTitle = tr
 
                 <CardContent className="p-4 flex-1 flex flex-col">
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground font-bold">
-                    <span>{rev.category || 'بررسی تخصصی'} • {rev.date_fa}</span>
+                    <span>{rev.category || 'بررسی تخصصی'} • {formatRelativeDate(rev.date)}</span>
                     <ReviewRating slug={rev.slug} fallbackRating={rev.rating ?? null} fallbackCount={rev.ratingCount ?? 0} compact />
                   </div>
                   <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
