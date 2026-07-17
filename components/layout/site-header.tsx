@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 
 import { SearchForm } from "./search-form"
+import { TopbarTypingText } from "./topbar-typing-text"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -545,6 +546,7 @@ export function SiteHeader({
           </Tooltip>
           <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto" />
           <NotificationsButton />
+          <TopbarTypingText />
           <TechboxBreadcrumb />
         </div>
 

@@ -27,7 +27,10 @@ export type ModuleConfig = {
   homeMoreLabel: string;
 };
 
-export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig>;
+export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig> & {
+  /** Whether the hero section is visible on the homepage */
+  heroVisible?: boolean;
+};
 
 // ─── Defaults ─────────────────────────────────────────────────────────
 
@@ -94,6 +97,7 @@ const KEY_HOME_VISIBILITY = "modules.home_visibility";
 const KEY_HOME_ORDER = "modules.home_order";
 const KEY_HOME_TITLES = "modules.home_titles";
 const KEY_HOME_MORE_LABELS = "modules.home_more_labels";
+const KEY_HERO_VISIBLE = "hero.visible";
 
 // ─── Read Config (cached) ─────────────────────────────────────────────
 
@@ -122,12 +126,13 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
 async function getModuleConfigUncached(): Promise<ModuleConfigMap> {
   const defaults = getDefaultModuleConfigMap();
 
-  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw] = await Promise.all([
+  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, heroVisibleRaw] = await Promise.all([
     getSetting(KEY_ENABLED),
     getSetting(KEY_HOME_VISIBILITY),
     getSetting(KEY_HOME_ORDER),
     getSetting(KEY_HOME_TITLES),
     getSetting(KEY_HOME_MORE_LABELS),
+    getSetting(KEY_HERO_VISIBLE),
   ]);
 
   const enabledMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(enabledRaw, {});
@@ -145,7 +150,10 @@ async function getModuleConfigUncached(): Promise<ModuleConfigMap> {
     if (homeMoreMap[slug] !== undefined) cfg.homeMoreLabel = homeMoreMap[slug]!;
   }
 
-  return defaults;
+  // Hero visibility (default: true)
+  const heroVisible = heroVisibleRaw === "false" ? false : true;
+
+  return { ...defaults, heroVisible } as ModuleConfigMap;
 }
 
 export const getModuleConfig = unstable_cache(
@@ -202,6 +210,7 @@ export async function saveModuleConfig(config: ModuleConfigMap, updatedBy: strin
     { key: KEY_HOME_ORDER, value: JSON.stringify(homeOrderMap) },
     { key: KEY_HOME_TITLES, value: JSON.stringify(homeTitlesMap) },
     { key: KEY_HOME_MORE_LABELS, value: JSON.stringify(homeMoreMap) },
+    { key: KEY_HERO_VISIBLE, value: String(config.heroVisible ?? true) },
   ];
 
   for (const { key, value } of updates) {

@@ -31,7 +31,9 @@ const moduleConfigSchema = z.record(
     homeTitle: z.string().max(200),
     homeMoreLabel: z.string().max(200),
   })
-);
+).and(z.object({
+  heroVisible: z.boolean().optional(),
+}));
 
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUserPublic();

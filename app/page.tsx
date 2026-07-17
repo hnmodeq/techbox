@@ -31,9 +31,7 @@ export default async function Page() {
 
   return (
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
-      <HeroSection enabledModules={Object.keys(config).filter(
-        (s) => config[s as ModuleSlug]?.enabled
-      ) as ModuleSlug[]} />
+      {config.heroVisible !== false && <HeroSection />}
 
       {visibleRows.map((slug) => {
         const Component = ROW_COMPONENTS[slug];

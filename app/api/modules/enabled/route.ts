@@ -17,7 +17,7 @@ export async function GET() {
       };
     }
 
-    return NextResponse.json({ enabled, homeConfig });
+    return NextResponse.json({ enabled, homeConfig, heroVisible: config.heroVisible !== false });
   } catch {
     // Fallback: all modules enabled
     return NextResponse.json({
