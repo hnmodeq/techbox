@@ -10,6 +10,7 @@ import {
   useSpring,
 } from "framer-motion";
 import { moduleColors } from "@/config/module-colors";
+import { formatRelativeTime } from "@/lib/date-format";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useHomeTicker } from "@/features/home/lib/home-data";
 
@@ -51,30 +52,6 @@ function getModuleCopy(module: ModuleSlug) {
   return moduleCopy[module] ?? { type: moduleMeta[module]?.titleFa || module, place: moduleMeta[module]?.titleFa || module, action: "منتشر شد" };
 }
 
-function formatRelativeDate(value: string | undefined, nowMs: number | null) {
-  if (!value || nowMs === null) return "";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-
-  const diffMs = nowMs - date.getTime();
-  if (diffMs < 0) return "";
-  if (diffMs < 60_000) return "همین حالا";
-
-  const minutes = Math.floor(diffMs / 60_000);
-  if (minutes < 60) return `${nf.format(minutes)} دقیقه پیش`;
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${nf.format(hours)} ساعت پیش`;
-
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${nf.format(days)} روز پیش`;
-
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${nf.format(months)} ماه پیش`;
-
-  const years = Math.floor(months / 12);
-  return `${nf.format(years)} سال پیش`;
 }
 
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
@@ -82,20 +59,12 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const live = liveItems.length ? liveItems : items;
   const filtered = useMemo(() => live.filter((item) => item.module !== "news").slice(0, 30), [live]);
   const shouldReduceMotion = useReducedMotion();
-  const [nowMs, setNowMs] = useState<number | null>(null);
   const x = useMotionValue(0);
   const targetSpeed = useMotionValue(NORMAL_SPEED);
   const speed = useSpring(targetSpeed, { stiffness: 45, damping: 18, mass: 0.8 });
   const groupWidthRef = useRef(0);
   const [groupNode, setGroupNode] = useState<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const updateNow = () => setNowMs(Date.now());
-    updateNow();
-    const timer = window.setInterval(updateNow, 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (!groupNode) return;
@@ -141,7 +110,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
       {filtered.map((item, index) => {
         const itemModule = getModule(item);
         const copy = getModuleCopy(itemModule);
-        const relativeDate = formatRelativeDate(item.date, nowMs);
+        const relativeDate = formatRelativeTime(item.date);
         const tone = moduleColors[itemModule].active;
         const hoverTone = moduleColors[itemModule].hover;
 
