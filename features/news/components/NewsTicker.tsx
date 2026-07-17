@@ -52,8 +52,6 @@ function getModuleCopy(module: ModuleSlug) {
   return moduleCopy[module] ?? { type: moduleMeta[module]?.titleFa || module, place: moduleMeta[module]?.titleFa || module, action: "منتشر شد" };
 }
 
-}
-
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const { items: liveItems } = useHomeTicker();
   const live = liveItems.length ? liveItems : items;

@@ -19,6 +19,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 type CommentNode = any;
 
 function nestFlat(rows: any[]): CommentNode[] {
+  const map = new Map<string, any>();
+  rows.forEach((r: any) => map.set(r.id, { ...r, replies: [] }));
+  const roots: any[] = [];
+  map.forEach((n) => {
+    if (n.parentId && map.has(n.parentId)) map.get(n.parentId)!.replies.push(n);
+    else roots.push(n);
+  });
+  return roots;
+}
 
 export default function CommentSection({ module, slug, initialComments }: { module: string; slug: string; initialComments?: number }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
