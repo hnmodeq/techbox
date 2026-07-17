@@ -230,4 +230,4 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
 }
 
 /** Re-export DEFAULT_HOME_TITLES and DEFAULT_HOME_MORE_LABELS for admin UI */
-export { DEFAULT_HOME_TITLES, DEFAULT_HOME_MORE_LABELS, DEFAULT_MODULE_SLUGS, getDefaultSiteLayoutConfig };
+export { DEFAULT_HOME_TITLES, DEFAULT_HOME_MORE_LABELS, DEFAULT_MODULE_SLUGS };
