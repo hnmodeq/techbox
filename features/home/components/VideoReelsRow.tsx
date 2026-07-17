@@ -125,7 +125,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
   onNext: () => void;
   slideDirection: 'left' | 'right';
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
@@ -135,70 +135,46 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKey);
-
-    // When React unmounts a <video> element mid-fetch, the browser's
-    // internal fetch abort surfaces as an unhandledRejection with
-    // AbortError. Since this is a normal part of the video modal
-    // lifecycle (close / prev / next), we catch it here.
-    const onUnhandledRejection = (e: PromiseRejectionEvent) => {
-      if (e.reason instanceof DOMException && e.reason.name === 'AbortError') {
-        e.preventDefault();
-      }
-    };
-    window.addEventListener('unhandledrejection', onUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('keydown', handleKey);
-      window.removeEventListener('unhandledrejection', onUnhandledRejection);
-    };
+    return () => window.removeEventListener('keydown', handleKey);
   }, [onPrev, onNext, onClose]);
 
-  useEffect(() => {
-    setVideoDimensions(null);
-    const vid = videoRef.current;
-    if (!vid) return;
-
-    let cancelled = false;
-
-    const handleLoadedMetadata = () => {
-      if (!cancelled) {
-        setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
-      }
-    };
-
-    // Suppress abort/error DOM events — when React unmounts the <video>
-    // element, the browser aborts the in-flight fetch. This is expected
-    // and should not surface as an error anywhere.
-    const suppressAbort = () => {};
-    const suppressError = (e: Event) => {
-      if (vid.error?.code === 1) {
-        // MEDIA_ERR_ABORTED — normal during unmount, suppress entirely
-        e.stopPropagation();
-        e.preventDefault();
-      }
-    };
-    vid.addEventListener('abort', suppressAbort);
-    vid.addEventListener('error', suppressError);
-
-    vid.addEventListener('loadedmetadata', handleLoadedMetadata);
-
-    if (vid.readyState >= 1) {
-      setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
+  // Callback ref: captures the DOM node and wires it up.
+  // This avoids React.key-triggered unmount/remount races.
+  const setVideoRef = useCallback((node: HTMLVideoElement | null) => {
+    // Clean up previous node
+    const prev = videoRef.current;
+    if (prev && prev !== node) {
+      prev.pause();
+      prev.src = '';
+      prev.load(); // flush
     }
+    videoRef.current = node;
+    if (!node) return;
 
-    vid.play().catch(() => {
-      // Autoplay blocked or element detached — normal
-    });
+    setVideoDimensions(null);
+
+    const onMeta = () => {
+      if (videoRef.current === node) {
+        setVideoDimensions({ width: node.videoWidth, height: node.videoHeight });
+      }
+    };
+
+    if (node.readyState >= 1) {
+      onMeta();
+    }
+    node.addEventListener('loadedmetadata', onMeta);
+
+    // Auto-play; browsers may block this, user can click play via controls
+    node.play().catch(() => {});
 
     return () => {
-      cancelled = true;
-      vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      vid.removeEventListener('abort', suppressAbort);
-      vid.removeEventListener('error', suppressError);
-      vid.pause();
-      // Do NOT manipulate src — React's key={video.slug} handles unmount/remount.
-      // Any fetch abort during unmount is caught by suppressAbort/suppressError above.
+      node.removeEventListener('loadedmetadata', onMeta);
     };
+  }, []);
+
+  // When video.slug changes (prev/next), reset dimensions
+  useEffect(() => {
+    setVideoDimensions(null);
   }, [video.slug]);
 
   const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
@@ -248,8 +224,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
           {/* Video section */}
           <div className="bg-black shrink-0 flex items-center justify-center">
             <video
-              ref={videoRef}
-              key={video.slug}
+              ref={setVideoRef}
               src={video.videoUrl || undefined}
               poster={video.image}
               controls
