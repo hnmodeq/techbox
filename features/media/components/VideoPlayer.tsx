@@ -1,42 +1,60 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 export default function VideoPlayer({ src, poster, title }: { src: string; poster?: string; title?: string }) {
- const videoRef = useRef<HTMLVideoElement>(null);
- const [isHls, setIsHls] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isHls, setIsHls] = useState(false);
 
- useEffect(() => {
- let hls: any;
- const video = videoRef.current;
- if (!video || !src) return;
- const isHlsSrc = src.includes(".m3u8");
- setIsHls(isHlsSrc);
- if (isHlsSrc) {
- (async () => {
- const Hls = (await import("hls.js")).default;
- if (Hls.isSupported()) {
- hls = new Hls({ enableWorker: true, lowLatencyMode: true });
- hls.loadSource(src);
- hls.attachMedia(video);
- } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
- video.src = src;
- }
- })();
- } else {
- video.src = src;
- }
- return () => { try { hls?.destroy(); } catch {} };
- }, [src]);
+  const setVideoRef = useCallback((video: HTMLVideoElement | null) => {
+    // Clean up previous video element
+    const prev = videoRef.current;
+    if (prev && prev !== video) {
+      prev.pause();
+      prev.src = '';
+    }
+    videoRef.current = video;
+    if (!video || !src) return;
 
- return (
- <div className="w-full bg-black rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)]">
- <video ref={videoRef} controls playsInline poster={poster} preload="metadata" className="w-full aspect-video bg-black" />
- {title && (
- <div className="flex justify-between bg-[var(--card-background)] px-3 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
- <span className="truncate">{title}</span>
- <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
- </div>
- )}
- </div>
- );
+    const isHlsSrc = src.includes(".m3u8");
+    setIsHls(isHlsSrc);
+
+    if (isHlsSrc) {
+      (async () => {
+        const Hls = (await import("hls.js")).default;
+        if (Hls.isSupported()) {
+          const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+          hls.loadSource(src);
+          hls.attachMedia(video);
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = src;
+        }
+      })();
+    }
+    // Note: for non-HLS, the src is already set via the <video src={src}> prop
+  }, [src]);
+
+  useEffect(() => {
+    // Reset HLS state when src changes
+    setIsHls(src?.includes(".m3u8") ?? false);
+  }, [src]);
+
+  return (
+    <div className="w-full bg-black rounded-[var(--corner-radius)] overflow-hidden border-[length:var(--border-size)] border-[var(--border-color)]">
+      <video
+        ref={setVideoRef}
+        src={src?.includes(".m3u8") ? undefined : src}
+        controls
+        playsInline
+        poster={poster}
+        preload="metadata"
+        className="w-full aspect-video bg-black"
+      />
+      {title && (
+        <div className="flex justify-between bg-[var(--card-background)] px-3 py-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+          <span className="truncate">{title}</span>
+          <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">{isHls ? "HLS • تطبیقی" : "MP4"}</span>
+        </div>
+      )}
+    </div>
+  );
 }
