@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth.provider";
 import { CommentFormSkeleton, CommentListSkeleton, CommentSectionSkeleton } from "@/components/ui/skeleton-layouts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type CommentNode = any;
 
