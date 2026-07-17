@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import TextType from "@/components/ui/text-type/TextType";
+import VariableProximity from "@/components/ui/variable-proximity/VariableProximity";
 import { moduleColors } from "@/config/module-colors";
 
 const ALL_ITEMS: { text: string; href: string; module: keyof typeof moduleColors }[] = [
@@ -21,6 +23,8 @@ export default function HeroSection({ enabledModules }: { enabledModules?: strin
     ? ALL_ITEMS.filter((item) => enabledModules.includes(item.module))
     : ALL_ITEMS;
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   if (items.length === 0) {
     return (
       <section className="w-full max-w-full flex flex-col justify-center items-center px-4 py-12 text-center" dir="rtl">
@@ -36,8 +40,16 @@ export default function HeroSection({ enabledModules }: { enabledModules?: strin
 
   return (
     <section className="w-full max-w-full flex flex-col justify-center items-center px-4 py-12 text-center" dir="rtl">
-      <div className="flex flex-col items-center w-full max-w-3xl">
-        <h1 className="text-[length:var(--hero-font-size)] text-foreground font-black tracking-tight">تکباکس</h1>
+      <div ref={containerRef} className="flex flex-col items-center w-full max-w-3xl relative">
+        <VariableProximity
+          label="تکباکس"
+          containerRef={containerRef}
+          fromFontVariationSettings="'wght' 400"
+          toFontVariationSettings="'wght' 900"
+          radius={120}
+          falloff="gaussian"
+          className="text-[length:var(--hero-font-size)] text-foreground tracking-tight"
+        />
         <div className="mt-4 w-full">
           <Link href={items[0].href} className="inline-block hero-rotator-text text-sm font-medium leading-7 sm:text-lg sm:font-semibold hover:opacity-85">
             <TextType
