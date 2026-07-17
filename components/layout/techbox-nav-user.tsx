@@ -98,18 +98,12 @@ export function TechboxNavUser() {
           )}
         >
           <Avatar className="h-8 w-8 shrink-0">
-            {user ? (
-              <>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </>
-            ) : (
-              <AvatarFallback className="bg-muted animate-pulse" />
-            )}
+            <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
+            <AvatarFallback suppressHydrationWarning>{user?.name?.charAt(0) || ""}</AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="truncate font-medium">{user?.name || "کاربر مهمان"}</span>
-            <span className="truncate text-xs text-muted-foreground">{user?.email || "ورود به حساب"}</span>
+            <span className="truncate font-medium" suppressHydrationWarning>{user?.name || "کاربر مهمان"}</span>
+            <span className="truncate text-xs text-muted-foreground" suppressHydrationWarning>{user?.email || "ورود به حساب"}</span>
           </div>
           <ChevronsUpDownIcon className="ms-auto size-4 group-data-[collapsible=icon]:hidden" />
         </button>

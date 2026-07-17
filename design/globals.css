@@ -443,3 +443,13 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+/* Video modal navigation animations */
+@keyframes slideFromRight {
+  from { transform: translateX(40px); opacity: 0.5; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideFromLeft {
+  from { transform: translateX(-40px); opacity: 0.5; }
+  to { transform: translateX(0); opacity: 1; }
+}

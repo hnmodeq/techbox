@@ -172,18 +172,6 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
       {/* Prev/Next as flex siblings — no overlap with modal */}
       {/* In RTL flex-row: first child → right, last child → left */}
       <div className="relative z-10 animate-in fade-in duration-200 flex items-center gap-1">
-        {/* Inline keyframes for slide direction */}
-        <style>{`
-          @keyframes slideFromRight {
-            from { transform: translateX(40px); opacity: 0.5; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-          @keyframes slideFromLeft {
-            from { transform: translateX(-40px); opacity: 0.5; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-        `}</style>
-
         {/* Previous button (right side in RTL) */}
         <Tooltip>
           <TooltipTrigger render={
