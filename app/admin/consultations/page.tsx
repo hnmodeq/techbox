@@ -106,7 +106,7 @@ export default function AdminConsultationsPage() {
                         <div className="text-sm font-semibold">{req.userName} {req.userEmail && <span className="text-muted-foreground font-normal">({req.userEmail})</span>}</div>
                       )}
                     </div>
-                    <Select value={req.status} onValueChange={(v) => updateStatus(req.id, v)}>
+                      <Select value={req.status} onValueChange={(v) => { if (v) updateStatus(req.id, v); }}>
                       <SelectTrigger className="w-40">
                         <SelectValue />
                       </SelectTrigger>
