@@ -39,6 +39,21 @@ export function RuntimeEffects() {
     } catch {}
   }, []);
 
+  React.useEffect(() => {
+    // Suppress AbortError from <video> elements during React unmount.
+    // When a <video> with an active fetch is unmounted (e.g. closing a
+    // modal, navigating between videos), the browser aborts the fetch
+    // and throws an unhandled DOMException. This is expected behavior,
+    // not a bug, so we prevent it from polluting the console.
+    const onUnhandled = (e: PromiseRejectionEvent) => {
+      if (e.reason instanceof DOMException && e.reason.name === 'AbortError') {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('unhandledrejection', onUnhandled);
+    return () => window.removeEventListener('unhandledrejection', onUnhandled);
+  }, []);
+
   return null;
 }
 
