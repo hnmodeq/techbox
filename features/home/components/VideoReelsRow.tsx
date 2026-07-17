@@ -156,7 +156,6 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
       vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
       vid.pause();
       vid.removeAttribute('src');
-      try { vid.load(); } catch { /* abort is expected when src is removed */ }
     };
   }, [video.slug]);
 
