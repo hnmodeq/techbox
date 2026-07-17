@@ -143,8 +143,12 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
     const vid = videoRef.current;
     if (!vid) return;
 
+    let cancelled = false;
+
     const handleLoadedMetadata = () => {
-      setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
+      if (!cancelled) {
+        setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
+      }
     };
 
     if (vid.readyState >= 1) {
@@ -152,10 +156,17 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
     }
 
     vid.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    // Start playback on mount
+    vid.play().catch(() => {
+      // Autoplay may be blocked by browser policy — that's fine, user can click play
+    });
+
     return () => {
+      cancelled = true;
       vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      // Only pause; don't touch src — React handles unmount via key={video.slug}
       vid.pause();
-      vid.removeAttribute('src');
     };
   }, [video.slug]);
 
