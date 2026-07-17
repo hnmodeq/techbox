@@ -155,8 +155,10 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
     return () => {
       vid.removeEventListener('loadedmetadata', handleLoadedMetadata);
       vid.pause();
+      // Remove src to stop any in-flight network request.
+      // Do NOT call .load() — that triggers a new fetch on an empty
+      // source, which the browser immediately aborts as an AbortError.
       vid.removeAttribute('src');
-      vid.load();
     };
   }, [video.slug]);
 
@@ -210,6 +212,7 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
               ref={videoRef}
               key={video.slug}
               src={video.videoUrl || undefined}
+              type="video/mp4"
               poster={video.image}
               controls
               autoPlay
