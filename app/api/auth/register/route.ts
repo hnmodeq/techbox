@@ -46,15 +46,23 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await hashPassword(password);
+
+    // First user to register becomes super_admin (for fresh deployments)
+    const userCount = await prisma.user.count();
+    const isFirstUser = userCount === 0;
+    const role = isFirstUser ? "super_admin" : "user";
+    const roleFa = isFirstUser ? "مدیر کل" : "کاربر عضو";
+    const modules = isFirstUser ? ["blog", "news", "media", "review", "download", "shop", "forum", "tools"] : [];
+
     const user = await prisma.user.create({
       data: {
         name,
         username: cleanUsername,
         email: email.toLowerCase(),
         password: hashedPassword,
-        role: "user",
-        roleFa: "کاربر عضو",
-        modules: [],
+        role,
+        roleFa,
+        modules,
         avatar: ""
       }
     });
@@ -81,7 +89,7 @@ export async function POST(req: NextRequest) {
         email: user.email,
         role: user.role,
         roleFa: user.roleFa || "کاربر عضو",
-        modules: [],
+        modules: user.modules || [],
         avatar: user.avatar
       }
     }, { status: 201 });
