@@ -214,8 +214,8 @@ export default function CommentSection({ module, slug, initialComments }: { modu
     const isDeleting = deletingId === (c as any).id;
 
     return (
-      <div key={c.id} style={{ marginRight: depth ? 12 : 0, marginTop: 12 }}>
-        <div className={depth ? "border-r-2 border-[var(--border-color)] pe-4 ps-3" : "pe-0"} style={{ marginRight: depth ? 16 : 0 }}>
+      <div key={c.id} className={depth ? "py-3" : ""} style={{ marginTop: depth ? 0 : 12 }}>
+        <div className={depth ? "ps-3 pe-4" : "pe-0"} style={{ marginRight: depth ? 16 : 0 }}>
           <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative">
             {isDeleting && (
               <div className="absolute inset-0 bg-[var(--card-background)]/60 rounded-[var(--corner-radius)] flex items-center justify-center z-10">
@@ -354,8 +354,10 @@ export default function CommentSection({ module, slug, initialComments }: { modu
             )}
           </div>
           {c.replies && c.replies.length > 0 && (
-            <div className="mt-2 space-y-2">
-              {c.replies.map((r: any) => renderNode(r, depth + 1))}
+            <div className="border-r-2 border-[var(--border-color)] pe-4 ps-3" style={{ marginRight: 16 }}>
+              <div className="space-y-0 divide-y-[length:var(--border-size)] divide-[var(--border-color)]">
+                {c.replies.map((r: any) => renderNode(r, depth + 1))}
+              </div>
             </div>
           )}
         </div>
