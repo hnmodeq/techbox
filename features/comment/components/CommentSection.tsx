@@ -9,7 +9,7 @@ import { Icon } from "@/design/icons";
 import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
-import { gregorianToJalali, getPersianMonthName } from "@/lib/jalali";
+import { formatRelativeTime } from "@/lib/date-format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth.provider";
@@ -19,40 +19,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 type CommentNode = any;
 
 function nestFlat(rows: any[]): CommentNode[] {
-  const map = new Map<string, any>();
-  rows.forEach((r: any) => map.set(r.id, { ...r, replies: [] }));
-  const roots: any[] = [];
-  map.forEach((n) => {
-    if (n.parentId && map.has(n.parentId)) map.get(n.parentId)!.replies.push(n);
-    else roots.push(n);
-  });
-  return roots;
-}
-
-function formatCommentDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "";
-
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffSeconds = Math.floor(diffMs / 1000);
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  const diffHours = Math.floor(diffMinutes / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  const toFa = (n: number) => n.toLocaleString("fa-IR");
-
-  if (diffDays >= 7) {
-    const jalali = gregorianToJalali(date);
-    const monthName = getPersianMonthName(jalali.month);
-    return `${toFa(jalali.year)} ${monthName} ${toFa(jalali.day)}`;
-  }
-
-  if (diffDays >= 1) return `${toFa(diffDays)} روز پیش`;
-  if (diffHours >= 1) return `${toFa(diffHours)} ساعت پیش`;
-  if (diffMinutes >= 1) return `${toFa(diffMinutes)} دقیقه پیش`;
-  return "لحظاتی پیش";
-}
 
 export default function CommentSection({ module, slug, initialComments }: { module: string; slug: string; initialComments?: number }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
@@ -258,12 +224,12 @@ export default function CommentSection({ module, slug, initialComments }: { modu
                         <TooltipTrigger render={<span className="text-[11px] paragraph-color cursor-default italic" />}>
                           (ویرایش شده)
                         </TooltipTrigger>
-                        <TooltipContent>ویرایش شده در {formatCommentDate((c as any).editedAt)}</TooltipContent>
+                        <TooltipContent>ویرایش شده در {formatRelativeTime((c as any).editedAt)}</TooltipContent>
                       </Tooltip>
                     )}
                     <Tooltip>
                       <TooltipTrigger render={<span className="text-[11px] paragraph-color shrink-0 cursor-default" />}>
-                        {formatCommentDate((c as any).createdAt)}
+                        {formatRelativeTime((c as any).createdAt)}
                       </TooltipTrigger>
                       <TooltipContent>تاریخ انتشار این دیدگاه</TooltipContent>
                     </Tooltip>

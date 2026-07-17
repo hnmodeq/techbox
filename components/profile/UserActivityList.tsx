@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/pagination"
 import { Badge } from "@/components/ui/badge"
 import { blurProps } from "@/lib/image-placeholder"
+import { formatRelativeTime } from "@/lib/date-format"
 
 export type UserActivity = {
   id: string
@@ -47,23 +48,6 @@ const moduleLabels: Record<string, string> = {
   media: "ویدیو",
   forum: "تاپیک انجمن",
   news: "خبر",
-}
-
-function relativeTime(input: string) {
-  const date = new Date(input)
-  if (Number.isNaN(date.getTime())) return "زمان نامشخص"
-  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000))
-  if (seconds < 60) return `${seconds.toLocaleString("fa-IR")} ثانیه پیش`
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) return `${minutes.toLocaleString("fa-IR")} دقیقه پیش`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours.toLocaleString("fa-IR")} ساعت پیش`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days.toLocaleString("fa-IR")} روز پیش`
-  const months = Math.floor(days / 30.4375)
-  if (months < 12) return `${months.toLocaleString("fa-IR")} ماه پیش`
-  const years = Math.floor(days / 365.2425)
-  return `${years.toLocaleString("fa-IR")} سال پیش`
 }
 
 function toRows(activities: UserActivity[]) {
@@ -157,7 +141,7 @@ export function UserActivityList({ activities, className = "" }: { activities: U
                   </div>
                   <div className="flex min-w-0 items-center gap-2">
                     <Badge variant="outline" className="shrink-0">{moduleLabels[row.module] || row.module}</Badge>
-                    <span className="truncate text-xs text-muted-foreground">{relativeTime(row.createdAt)}</span>
+                    <span className="truncate text-xs text-muted-foreground">{formatRelativeTime(row.createdAt)}</span>
                   </div>
                   <p className="line-clamp-2 min-w-0 text-sm leading-6 text-muted-foreground">
                     {row.type === "comment" ? row.text || "دیدگاه بدون متن" : "این کاربر این محتوا را پسندیده است."}
