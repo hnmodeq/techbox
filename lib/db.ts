@@ -18,7 +18,19 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientInstance
 function getPrismaClient(): PrismaClientInstance {
   if (globalForPrisma.prisma) return globalForPrisma.prisma;
 
-  const client = new PrismaClient({ log: ["warn", "error"] });
+  // Append connection_limit query param to avoid exhausting the Neon
+  // serverless connection pool during dev (Turbopack fires many parallel
+  // SSR queries). Default Neon free-tier pool is 3-5 connections.
+  let dbUrl = process.env.DATABASE_URL || "";
+  if (dbUrl && !dbUrl.includes("connection_limit=")) {
+    const sep = dbUrl.includes("?") ? "&" : "?";
+    dbUrl = dbUrl + sep + "connection_limit=5&pool_timeout=30";
+  }
+
+  const client = new PrismaClient({
+    log: ["warn", "error"],
+    datasources: { db: { url: dbUrl } },
+  });
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;
   return client;
 }

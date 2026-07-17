@@ -210,7 +210,6 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
           <div className="bg-black shrink-0 flex items-center justify-center">
             <video
               ref={videoRef}
-              key={video.slug}
               src={video.videoUrl || undefined}
               poster={video.image}
               controls
