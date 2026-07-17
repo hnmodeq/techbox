@@ -48,10 +48,6 @@ is hard text and this hard code is different for different modules. for example 
 -make the hovering effect more smooth (it's too fast and maybe it's too much)
 -create a tooltip (shadcn component) for the date when the mouse if hover it says "تاریخ ساخته شدن این پرسش" 
 
-
-Remaining:
-
-
 5-home page media row
 -remove the hovering effect from the "play" icon
 -let the play icon have no background (right now i see a circle gray background behind the play icon)
@@ -77,6 +73,7 @@ Remaining:
 -i can not reply or put comments in this modal which idk why since it was okay before, please check.
 -remove the hour/minutes from the date system. (let the date system for comments be like this: until 7 days it gonna be like how many days/hours/days ago and after 7 days it will be change to the normal system which just saying for example: 1405 tir 17)
 
+
 6-home page shop row
 -let product cards images get no crop! right now some of us cropped and is not visible fully.
 -since products have different background (some of them are transparent and some of them have a white bg) let put a white bg behind every product image in these cards / in /shop cards and in the product page itself.
@@ -88,6 +85,10 @@ Remaining:
 -let social icons and اضافه کردن به اتاق مشاوره be in same row (icons in the left side and the text on the right side)
 -let hover effect be more smoothly and
 -change the جدیدترین تجهیزات سرور، استوریج و شبکه to آخرین محصولات سازمانی اضافه شده
+
+
+Done Until Here.
+
 
 7-home page forum row
 -we have 3 topics from our forum module and let it be 6
