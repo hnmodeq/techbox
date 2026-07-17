@@ -6,13 +6,20 @@ export function RuntimeEffects() {
   React.useEffect(() => {
     try {
       const root = document.documentElement;
-      root.classList.add("main-sidebar-booting", "news-sidebar-booting");
 
       const main = localStorage.getItem("takbox-sidebar-desktop-open");
       const news = localStorage.getItem("techbox-news-sidebar-open");
 
       root.dataset.mainSidebarOpen = main === null ? "true" : String(main === "true");
       root.dataset.newsSidebarOpen = String(news === "true");
+
+      // Remove booting classes after a frame — the SSR HTML already has them,
+      // so transitions are disabled from the very first paint. Removing them
+      // after hydration re-enables smooth transitions for subsequent
+      // sidebar open/close toggles.
+      requestAnimationFrame(() => {
+        root.classList.remove("main-sidebar-booting", "news-sidebar-booting");
+      });
     } catch {}
   }, []);
 
