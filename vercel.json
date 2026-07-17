@@ -5,9 +5,6 @@
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
   "regions": ["iad1"],
-  "git": {
-    "deploymentEnabled": false
-  },
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
