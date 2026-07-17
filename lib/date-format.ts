@@ -63,7 +63,8 @@ function toJalali(date: Date) {
  *
  * For dates in the future, falls back to absolute date.
  */
-export function formatRelativeDate(date: Date | string): string {
+export function formatRelativeDate(date: Date | string | undefined | null): string {
+  if (!date) return "";
   const value = typeof date === "string" ? new Date(date) : date;
   if (isNaN(value.getTime())) return "";
 
@@ -107,7 +108,8 @@ export function formatRelativeDate(date: Date | string): string {
  *   1-23 hrs      → "۲ ساعت پیش"
  *   24+ hrs       → delegates to formatRelativeDate
  */
-export function formatRelativeTime(date: Date | string): string {
+export function formatRelativeTime(date: Date | string | undefined | null): string {
+  if (!date) return "";
   const value = typeof date === "string" ? new Date(date) : date;
   if (isNaN(value.getTime())) return "";
 
