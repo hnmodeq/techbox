@@ -70,7 +70,10 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   React.useEffect(() => {
     if (!open) return
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+      if (!rootRef.current?.contains(event.target as Node)) {
+        suppressFocusUntilRef.current = Date.now() + 600
+        setOpen(false)
+      }
     }
     document.addEventListener("pointerdown", onPointerDown)
     return () => document.removeEventListener("pointerdown", onPointerDown)
@@ -137,7 +140,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           <Label htmlFor="search" className="sr-only">
             جستجو
           </Label>
-          <div className="absolute top-1/2 start-1 z-10 -translate-y-1/2">
+          <div className="absolute top-1/2 end-1 z-10 -translate-y-1/2 flex items-center gap-0.5">
             <Select
               value={module}
               onValueChange={(nextValue) => {
@@ -151,7 +154,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
               >
                 <span className="truncate">{selectedModuleLabel}</span>
               </SelectTrigger>
-              <SelectContent align="start" className="min-w-36">
+              <SelectContent align="end" className="min-w-36">
                 {searchModules.map((item) => (
                   <SelectItem key={item.value} value={item.value}>
                     {item.label}
@@ -159,11 +162,19 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
                 ))}
               </SelectContent>
             </Select>
+            <button
+              type="button"
+              aria-label="نمایش جستجوهای اخیر"
+              className="flex size-6 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
+              onClick={() => setOpen(true)}
+            >
+              <SearchIcon className="size-4" />
+            </button>
           </div>
           <SidebarInput
             id="search"
             placeholder="دنبال چی میگردی؟"
-            className="h-8 ps-[7.25rem] pe-8"
+            className="h-8 ps-3 pe-[7.25rem]"
             value={value}
             onChange={(e) => {
               const nextValue = e.target.value
@@ -178,14 +189,6 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
               if (event.key === "Escape") setOpen(false)
             }}
           />
-          <button
-            type="button"
-            aria-label="نمایش جستجوهای اخیر"
-            className="absolute top-1/2 end-1 flex size-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-            onClick={() => setOpen(true)}
-          >
-            <SearchIcon className="size-4" />
-          </button>
         </div>
         <PopoverContent
           className="w-(--anchor-width) max-w-[calc(100vw-2rem)] p-2"

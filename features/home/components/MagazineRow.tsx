@@ -78,7 +78,7 @@ function ArticleAuthorMeta({ author, className = '' }: { author?: { name?: strin
   );
 }
 
-export default function MagazineRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
+export default function MagazineRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
   const { items: dbArticles, loading } = useHomeModule('blog');
   const articles = dbArticles.slice(0, 3);
 
@@ -86,10 +86,12 @@ export default function MagazineRow({ homeTitle, homeMoreLabel }: { homeTitle?: 
     <section className={`w-full py-8 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین مقالات منتشر شده"}</h2>
+          {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین مقالات منتشر شده"}</h2>}
+          {showHomeMoreLabel && (
           <ButtonLink variant="link" size="sm" className="text-[var(--blog)] font-bold shrink-0" href="/blog">
             {homeMoreLabel || "مشاهده همه ←"}
           </ButtonLink>
+          )}
         </div>
 
         {loading ? (

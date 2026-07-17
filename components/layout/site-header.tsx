@@ -284,6 +284,37 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
     index < leadingDays ? null : index - leadingDays + 1
   )
 
+  // Fetch holidays for this month
+  const [holidayDays, setHolidayDays] = React.useState<Set<number>>(new Set())
+
+  React.useEffect(() => {
+    if (year && month) {
+      fetch(`/api/holidays?year=${year}&month=${month}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          const days = new Set<number>()
+          // All Fridays are off
+          cells.forEach((day, index) => {
+            if (day === null) return
+            const dayOfWeek = (index + 1) % 7 // Friday = index 6 in our grid (0=Sat)
+            if (dayOfWeek === 6) days.add(day) // Friday (جمعه)
+          })
+          // Add custom holidays
+          if (data?.enabled && Array.isArray(data.holidays)) {
+            for (const h of data.holidays) {
+              const parts = h.jalaliDate?.split("/")
+              if (parts?.length === 3) {
+                const hDay = parseInt(parts[2], 10)
+                if (!isNaN(hDay)) days.add(hDay)
+              }
+            }
+          }
+          setHolidayDays(days)
+        })
+        .catch(() => {})
+    }
+  }, [year, month])
+
   return (
     <div className="space-y-3" dir="rtl">
       <div className="flex items-center justify-between">
@@ -300,14 +331,17 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
       <div className="grid grid-cols-7 gap-1 text-center text-xs">
         {cells.map((day, index) => {
           const isToday = day === today.jalaliDay
+          const isOff = day !== null && holidayDays.has(day)
           return (
             <span
               key={index}
               className={cn(
                 "flex h-7 items-center justify-center rounded-md",
                 day ? "bg-muted/40" : "bg-transparent",
-                isToday && "bg-primary text-primary-foreground font-bold"
+                isToday && "bg-primary text-primary-foreground font-bold",
+                !isToday && isOff && "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold"
               )}
+              title={isOff ? "تعطیل" : undefined}
             >
               {day ? persianDigits(day) : ""}
             </span>
@@ -546,8 +580,9 @@ export function SiteHeader({
           </Tooltip>
           <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto" />
           <NotificationsButton />
-          <TopbarTypingText />
           <TechboxBreadcrumb />
+          <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto hidden lg:block" />
+          <TopbarTypingText />
         </div>
 
         <div className="flex flex-[1.2] justify-center px-2">
@@ -565,9 +600,8 @@ export function SiteHeader({
                 render={
                   <Button
                     type="button"
-                    variant="primary"
                     size="sm"
-                    className="relative gap-1.5"
+                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600"
                     onClick={onToggleNews}
                     aria-pressed={newsOpen}
                     aria-label="اخبار زنده تکباکس"
@@ -576,11 +610,10 @@ export function SiteHeader({
               >
                 {hasUnreadNews && (
                   <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-background" />
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/40 opacity-75" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white ring-2 ring-red-600" />
                   </span>
                 )}
-                <NewspaperIcon className="size-4" />
                 <span className="hidden sm:inline">اخبار</span>
               </TooltipTrigger>
               <TooltipContent>{hasUnreadNews ? "خبر جدید" : "خبر جدیدی نیست"}</TooltipContent>

@@ -29,7 +29,16 @@ const moduleEntrySchema = z.object({
   homeOrder: z.number().int().min(0).max(100),
   homeTitle: z.string().max(200),
   homeMoreLabel: z.string().max(200),
+  showHomeTitle: z.boolean(),
+  showHomeMoreLabel: z.boolean(),
 });
+
+const TOP_LEVEL_KEYS = new Set([
+  "heroVisible",
+  "moduleColorsEnabled",
+  "unifiedModuleColor",
+  "moduleColors",
+]);
 
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUserPublic();
@@ -40,17 +49,23 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const heroVisible = body.heroVisible !== false;
+    const moduleColorsEnabled = body.moduleColorsEnabled !== false;
+    const unifiedModuleColor = typeof body.unifiedModuleColor === "string" ? body.unifiedModuleColor : "var(--primary)";
+    const moduleColors = (body.moduleColors && typeof body.moduleColors === "object") ? body.moduleColors : {};
 
     // Validate module entries
-    const moduleEntries: Record<string, z.infer<typeof moduleEntrySchema>> = {};
+    const moduleEntries: Record<string, any> = {};
     for (const [key, value] of Object.entries(body)) {
-      if (key === "heroVisible") continue;
+      if (TOP_LEVEL_KEYS.has(key)) continue;
       moduleEntries[key] = moduleEntrySchema.parse(value);
     }
 
     const config: SiteLayoutConfig = {
       ...moduleEntries,
       heroVisible,
+      moduleColorsEnabled,
+      unifiedModuleColor,
+      moduleColors,
     } as SiteLayoutConfig;
 
     await saveModuleConfig(config, user.id);

@@ -31,21 +31,23 @@ export function TopbarTypingText() {
   return (
     <Link
       href={items[0].href}
-      className="hidden lg:flex items-center min-w-0 max-w-[260px] text-sm font-medium hover:opacity-85 transition-opacity"
+      className="hidden lg:flex items-center min-w-0 max-w-[240px] text-sm font-medium hover:opacity-85 transition-opacity overflow-hidden"
       dir="rtl"
     >
-      <TextType
-        text={texts}
-        textColors={colors}
-        typingSpeed={45}
-        deletingSpeed={20}
-        pauseDuration={2800}
-        showCursor={true}
-        cursorCharacter="|"
-        cursorClassName="text-type__cursor--rtl"
-        variableSpeed={{ min: 35, max: 65 }}
-        className="text-sm font-medium leading-7 truncate"
-      />
+      <span className="truncate">
+        <TextType
+          text={texts}
+          textColors={colors}
+          typingSpeed={45}
+          deletingSpeed={20}
+          pauseDuration={2800}
+          showCursor={true}
+          cursorCharacter="|"
+          cursorClassName="text-type__cursor--rtl"
+          variableSpeed={{ min: 35, max: 65 }}
+          className="text-sm font-medium leading-7 truncate"
+        />
+      </span>
     </Link>
   );
 }

@@ -6,10 +6,16 @@ import type { ModuleSlug } from "@/lib/module-config";
 type ModuleConfigClient = {
   /** Set of enabled module slugs */
   enabled: Set<ModuleSlug>;
-  /** Map of slug → { showOnHome, homeOrder, homeTitle, homeMoreLabel } */
-  homeConfig: Record<ModuleSlug, { showOnHome: boolean; homeOrder: number; homeTitle: string; homeMoreLabel: string }>;
+  /** Map of slug → { showOnHome, homeOrder, homeTitle, homeMoreLabel, showHomeTitle, showHomeMoreLabel } */
+  homeConfig: Record<ModuleSlug, { showOnHome: boolean; homeOrder: number; homeTitle: string; homeMoreLabel: string; showHomeTitle: boolean; showHomeMoreLabel: boolean }>;
   /** Whether the hero section is visible on the homepage */
   heroVisible: boolean;
+  /** Whether the per-module color system is enabled */
+  moduleColorsEnabled: boolean;
+  /** Unified color when moduleColorsEnabled is false */
+  unifiedModuleColor: string;
+  /** Per-module custom colors */
+  moduleColors: Partial<Record<ModuleSlug, string>>;
   loading: boolean;
 };
 
@@ -17,6 +23,9 @@ const defaultConfig: ModuleConfigClient = {
   enabled: new Set<ModuleSlug>(["blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline"]),
   homeConfig: {} as ModuleConfigClient["homeConfig"],
   heroVisible: true,
+  moduleColorsEnabled: true,
+  unifiedModuleColor: "var(--primary)",
+  moduleColors: {},
   loading: true,
 };
 
@@ -33,7 +42,10 @@ export function ModuleConfigProvider({ children }: { children: ReactNode }) {
         const enabledSet = new Set<ModuleSlug>(data.enabled || []);
         const homeConfig = data.homeConfig || {};
         const heroVisible = data.heroVisible !== false;
-        setConfig({ enabled: enabledSet, homeConfig, heroVisible, loading: false });
+        const moduleColorsEnabled = data.moduleColorsEnabled !== false;
+        const unifiedModuleColor = data.unifiedModuleColor || "var(--primary)";
+        const moduleColors = data.moduleColors || {};
+        setConfig({ enabled: enabledSet, homeConfig, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, loading: false });
       })
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));

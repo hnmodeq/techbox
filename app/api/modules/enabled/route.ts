@@ -6,7 +6,7 @@ export async function GET() {
     const config = await getModuleConfig();
     const enabled = DEFAULT_MODULE_SLUGS.filter((s) => config[s]?.enabled);
 
-    const homeConfig: Record<string, { showOnHome: boolean; homeOrder: number; homeTitle: string; homeMoreLabel: string }> = {};
+    const homeConfig: Record<string, { showOnHome: boolean; homeOrder: number; homeTitle: string; homeMoreLabel: string; showHomeTitle: boolean; showHomeMoreLabel: boolean }> = {};
     for (const slug of enabled) {
       const cfg = config[slug];
       homeConfig[slug] = {
@@ -14,10 +14,19 @@ export async function GET() {
         homeOrder: cfg.homeOrder,
         homeTitle: cfg.homeTitle,
         homeMoreLabel: cfg.homeMoreLabel,
+        showHomeTitle: cfg.showHomeTitle,
+        showHomeMoreLabel: cfg.showHomeMoreLabel,
       };
     }
 
-    return NextResponse.json({ enabled, homeConfig, heroVisible: config.heroVisible !== false });
+    return NextResponse.json({
+      enabled,
+      homeConfig,
+      heroVisible: config.heroVisible !== false,
+      moduleColorsEnabled: config.moduleColorsEnabled !== false,
+      unifiedModuleColor: config.unifiedModuleColor || "var(--primary)",
+      moduleColors: config.moduleColors || {},
+    });
   } catch {
     // Fallback: all modules enabled
     return NextResponse.json({

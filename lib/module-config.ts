@@ -25,6 +25,10 @@ export type ModuleConfig = {
   homeTitle: string;
   /** Custom "more" button label. Empty = use default */
   homeMoreLabel: string;
+  /** Whether row title is visible */
+  showHomeTitle: boolean;
+  /** Whether "more" button is visible */
+  showHomeMoreLabel: boolean;
 };
 
 export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig>;
@@ -33,6 +37,12 @@ export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig>;
 export type SiteLayoutConfig = ModuleConfigMap & {
   /** Whether the hero section is visible on the homepage */
   heroVisible: boolean;
+  /** Whether the per-module color system is enabled */
+  moduleColorsEnabled: boolean;
+  /** Unified color when moduleColorsEnabled is false (CSS value) */
+  unifiedModuleColor: string;
+  /** Per-module custom colors (CSS values) */
+  moduleColors: Partial<Record<ModuleSlug, string>>;
 };
 
 // ─── Defaults ─────────────────────────────────────────────────────────
@@ -84,6 +94,8 @@ export function getDefaultModuleConfig(slug: ModuleSlug): ModuleConfig {
     homeOrder: DEFAULT_HOME_ORDER[slug] ?? 99,
     homeTitle: DEFAULT_HOME_TITLES[slug] ?? "",
     homeMoreLabel: DEFAULT_HOME_MORE_LABELS[slug] ?? "",
+    showHomeTitle: true,
+    showHomeMoreLabel: true,
   };
 }
 
@@ -94,7 +106,13 @@ export function getDefaultModuleConfigMap(): ModuleConfigMap {
 }
 
 export function getDefaultSiteLayoutConfig(): SiteLayoutConfig {
-  return { ...getDefaultModuleConfigMap(), heroVisible: true };
+  return {
+    ...getDefaultModuleConfigMap(),
+    heroVisible: true,
+    moduleColorsEnabled: true,
+    unifiedModuleColor: "var(--primary)",
+    moduleColors: {},
+  };
 }
 
 // ─── SiteSetting Keys ─────────────────────────────────────────────────
@@ -104,7 +122,12 @@ const KEY_HOME_VISIBILITY = "modules.home_visibility";
 const KEY_HOME_ORDER = "modules.home_order";
 const KEY_HOME_TITLES = "modules.home_titles";
 const KEY_HOME_MORE_LABELS = "modules.home_more_labels";
+const KEY_HOME_SHOW_TITLE = "modules.home_show_title";
+const KEY_HOME_SHOW_MORE_LABEL = "modules.home_show_more_label";
 const KEY_HERO_VISIBLE = "hero.visible";
+const KEY_MODULE_COLORS_ENABLED = "modules.colors_enabled";
+const KEY_UNIFIED_MODULE_COLOR = "modules.unified_color";
+const KEY_MODULE_COLORS = "modules.custom_colors";
 
 // ─── Read Config (cached) ─────────────────────────────────────────────
 
@@ -133,13 +156,18 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
 async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const defaults = getDefaultModuleConfigMap();
 
-  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, heroVisibleRaw] = await Promise.all([
+  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, homeShowTitleRaw, homeShowMoreLabelRaw, heroVisibleRaw, colorsEnabledRaw, unifiedColorRaw, moduleColorsRaw] = await Promise.all([
     getSetting(KEY_ENABLED),
     getSetting(KEY_HOME_VISIBILITY),
     getSetting(KEY_HOME_ORDER),
     getSetting(KEY_HOME_TITLES),
     getSetting(KEY_HOME_MORE_LABELS),
+    getSetting(KEY_HOME_SHOW_TITLE),
+    getSetting(KEY_HOME_SHOW_MORE_LABEL),
     getSetting(KEY_HERO_VISIBLE),
+    getSetting(KEY_MODULE_COLORS_ENABLED),
+    getSetting(KEY_UNIFIED_MODULE_COLOR),
+    getSetting(KEY_MODULE_COLORS),
   ]);
 
   const enabledMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(enabledRaw, {});
@@ -147,6 +175,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const homeOrderMap = parseJsonSafe<Partial<Record<ModuleSlug, number>>>(homeOrderRaw, {});
   const homeTitlesMap = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(homeTitlesRaw, {});
   const homeMoreMap = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(homeMoreRaw, {});
+  const homeShowTitleMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(homeShowTitleRaw, {});
+  const homeShowMoreLabelMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(homeShowMoreLabelRaw, {});
 
   for (const slug of DEFAULT_MODULE_SLUGS) {
     const cfg = defaults[slug];
@@ -155,12 +185,19 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
     if (homeOrderMap[slug] !== undefined) cfg.homeOrder = homeOrderMap[slug]!;
     if (homeTitlesMap[slug] !== undefined) cfg.homeTitle = homeTitlesMap[slug]!;
     if (homeMoreMap[slug] !== undefined) cfg.homeMoreLabel = homeMoreMap[slug]!;
+    if (homeShowTitleMap[slug] !== undefined) cfg.showHomeTitle = homeShowTitleMap[slug]!;
+    if (homeShowMoreLabelMap[slug] !== undefined) cfg.showHomeMoreLabel = homeShowMoreLabelMap[slug]!;
   }
 
   // Hero visibility (default: true)
   const heroVisible = heroVisibleRaw === "false" ? false : true;
 
-  return { ...defaults, heroVisible };
+  // Module color system
+  const moduleColorsEnabled = colorsEnabledRaw !== "false";
+  const unifiedModuleColor = unifiedColorRaw || "var(--primary)";
+  const moduleColors = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleColorsRaw, {});
+
+  return { ...defaults, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors };
 }
 
 export const getModuleConfig = unstable_cache(
@@ -200,6 +237,8 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
   const homeOrderMap: Record<string, number> = {};
   const homeTitlesMap: Record<string, string> = {};
   const homeMoreMap: Record<string, string> = {};
+  const homeShowTitleMap: Record<string, boolean> = {};
+  const homeShowMoreLabelMap: Record<string, boolean> = {};
 
   for (const slug of DEFAULT_MODULE_SLUGS) {
     const cfg = config[slug];
@@ -209,6 +248,8 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
     homeOrderMap[slug] = cfg.homeOrder;
     homeTitlesMap[slug] = cfg.homeTitle;
     homeMoreMap[slug] = cfg.homeMoreLabel;
+    homeShowTitleMap[slug] = cfg.showHomeTitle;
+    homeShowMoreLabelMap[slug] = cfg.showHomeMoreLabel;
   }
 
   const updates: Array<{ key: string; value: string }> = [
@@ -217,7 +258,12 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
     { key: KEY_HOME_ORDER, value: JSON.stringify(homeOrderMap) },
     { key: KEY_HOME_TITLES, value: JSON.stringify(homeTitlesMap) },
     { key: KEY_HOME_MORE_LABELS, value: JSON.stringify(homeMoreMap) },
+    { key: KEY_HOME_SHOW_TITLE, value: JSON.stringify(homeShowTitleMap) },
+    { key: KEY_HOME_SHOW_MORE_LABEL, value: JSON.stringify(homeShowMoreLabelMap) },
     { key: KEY_HERO_VISIBLE, value: String(config.heroVisible ?? true) },
+    { key: KEY_MODULE_COLORS_ENABLED, value: String(config.moduleColorsEnabled ?? true) },
+    { key: KEY_UNIFIED_MODULE_COLOR, value: config.unifiedModuleColor || "var(--primary)" },
+    { key: KEY_MODULE_COLORS, value: JSON.stringify(config.moduleColors || {}) },
   ];
 
   for (const { key, value } of updates) {

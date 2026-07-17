@@ -18,7 +18,7 @@ import { ShareButton } from '@/components/ui/share-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-export default function VideoReelsRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
+export default function VideoReelsRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
   const { items: dbVideos, loading } = useHomeModule('media');
   const videos = dbVideos.slice(0, 5);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);

@@ -11,7 +11,7 @@ import RecommendationRow from '@/features/home/components/RecommendationRow';
 import { getHomepageRecommendations } from '@/lib/recommendations';
 import { getModuleConfig, type ModuleSlug } from '@/lib/module-config';
 
-const ROW_COMPONENTS: Record<string, React.ComponentType<{ homeTitle?: string; homeMoreLabel?: string }>> = {
+const ROW_COMPONENTS: Record<string, React.ComponentType<{ homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }>> = {
   blog: MagazineRow,
   media: VideoReelsRow,
   shop: ShopRow,
@@ -42,6 +42,8 @@ export default async function Page() {
             key={slug}
             homeTitle={cfg?.homeTitle || undefined}
             homeMoreLabel={cfg?.homeMoreLabel || undefined}
+            showHomeTitle={cfg?.showHomeTitle}
+            showHomeMoreLabel={cfg?.showHomeMoreLabel}
           />
         );
       })}
