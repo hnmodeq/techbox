@@ -150,10 +150,12 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
             <SidebarProvider
               open={newsOpen}
               onOpenChange={setNewsOpen}
-              className="absolute inset-y-0 end-0 z-40"
+              className="absolute inset-y-0 end-0 z-40 pointer-events-none"
               style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
             >
-              <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
+              <div className="pointer-events-auto">
+                <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
+              </div>
             </SidebarProvider>
           </SidebarInset>
         </div>
