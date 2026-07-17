@@ -11,6 +11,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils";
 import { SearchIcon, HistoryIcon } from "lucide-react"
 import type { ModuleSlug } from "@/lib/content"
 
@@ -33,7 +34,7 @@ function isSearchModule(value: string | null): value is SearchModule {
   return Boolean(value && searchModules.some((module) => module.value === value))
 }
 
-export function SearchForm({ ...props }: React.ComponentProps<"form">) {
+export function SearchForm({ className, ...props }: React.ComponentProps<"form">) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -135,7 +136,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   }
 
   return (
-    <form ref={rootRef} onSubmit={handleSubmit} {...props} autoComplete="off">
+    <form ref={rootRef} onSubmit={handleSubmit} autoComplete="off" className={cn("relative", className)} {...props}>
       <div className="relative">
         <Label htmlFor="search" className="sr-only">
           جستجو
@@ -186,9 +187,9 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         />
       </div>
 
-      {/* Recent searches dropdown */}
+      {/* Recent searches dropdown — within the form's positioned bounds */}
       {open && (
-        <div className="absolute start-0 z-50 mt-1 w-full rounded-md border bg-popover p-2 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
+        <div className="absolute start-0 end-0 top-full z-50 mt-1 rounded-md border bg-popover p-2 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
           <div className="space-y-2" dir="rtl">
             <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
               <HistoryIcon className="size-3.5" />
