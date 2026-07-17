@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
@@ -27,6 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       where: { id },
       data,
     });
+    revalidatePath("/about");
     return NextResponse.json(faq);
   } catch (e: any) {
     if (e instanceof z.ZodError) {
@@ -44,6 +46,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   }
   try {
     await prisma.faq.delete({ where: { id } });
+    revalidatePath("/about");
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "failed" }, { status: 500 });

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getHomeData } from "@/lib/home-server";
 import { publicPostDateWhere } from "@/lib/post-date";
+import { cacheHeaders, PUBLIC_CONTENT_CACHE } from "@/lib/cache-headers";
 
 export async function GET() {
   const [homeData, stats] = await Promise.all([
@@ -12,6 +13,8 @@ export async function GET() {
   return NextResponse.json({
     ...homeData,
     ...stats,
+  }, {
+    headers: cacheHeaders(PUBLIC_CONTENT_CACHE),
   });
 }
 
@@ -29,5 +32,3 @@ async function getHomeStats() {
     return { postCount: null, userCount: null, moduleCount: null };
   }
 }
-
-export const revalidate = 60;
