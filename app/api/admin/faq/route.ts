@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const data = createSchema.parse(body);
     const faq = await prisma.faq.create({ data });
+    revalidatePath("/about");
     return NextResponse.json(faq, { status: 201 });
   } catch (e: any) {
     if (e instanceof z.ZodError) {

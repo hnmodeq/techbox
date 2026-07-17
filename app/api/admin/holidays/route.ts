@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { getHolidays, saveHolidays, isHolidaysEnabled, setHolidaysEnabled } from "@/lib/holidays";
 import { z } from "zod";
@@ -32,6 +33,7 @@ export async function PATCH(req: NextRequest) {
     // Handle enabled toggle
     if (body.enabled !== undefined) {
       await setHolidaysEnabled(Boolean(body.enabled), user.id);
+      revalidateTag("holidays");
       return NextResponse.json({ ok: true });
     }
 
@@ -39,6 +41,7 @@ export async function PATCH(req: NextRequest) {
     if (Array.isArray(body.holidays)) {
       const holidays = body.holidays.map((h: any) => holidaySchema.parse(h));
       await saveHolidays(holidays, user.id);
+      revalidateTag("holidays");
       return NextResponse.json({ ok: true });
     }
 

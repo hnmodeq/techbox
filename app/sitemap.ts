@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { publicPostDateWhere } from "@/lib/post-date";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 function siteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app").replace(/\/$/, "");
