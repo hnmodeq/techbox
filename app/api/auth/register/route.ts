@@ -23,6 +23,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Check AUTH_SECRET before attempting auth operations
+  if (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32) {
+    console.error("[register] AUTH_SECRET is missing or too short. Set it in Vercel environment variables (≥32 chars).");
+    return NextResponse.json(
+      { error: "server_config_error", message: "تنظیمات سرور ناقص است. لطفاً با مدیر سایت تماس بگیرید." },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await req.json();
     const { name, username, email, password } = registerSchema.parse(body);

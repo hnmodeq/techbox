@@ -18,7 +18,8 @@ function getAuthSecret(): Uint8Array {
     if (!envSecret || envSecret.length < 32) {
       throw new Error(
         "[auth-server] AUTH_SECRET must be set and at least 32 characters in production/preview. " +
-        "Set it in .env or Vercel environment variables."
+        "Set it in your Vercel project settings → Environment Variables. " +
+        "Generate one with: openssl rand -base64 48"
       );
     }
   }

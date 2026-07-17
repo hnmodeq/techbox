@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { getSessionUserPublic } from "@/lib/auth-server";
 
 export async function GET(){
+  // Check AUTH_SECRET before attempting auth operations
+  if (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32) {
+    console.error("[auth/me] AUTH_SECRET is missing or too short. Set it in Vercel environment variables (≥32 chars).");
+    return NextResponse.json({ user: null, error: "server_config_error" });
+  }
+
   const user = await getSessionUserPublic();
   if(!user) return NextResponse.json({ user: null });
   const modules = Array.isArray(user.modules) ? user.modules : [];
