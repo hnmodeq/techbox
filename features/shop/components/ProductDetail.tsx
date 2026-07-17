@@ -7,7 +7,7 @@ import { CardStats } from "@/components/ui/card-stats";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Button } from "@/components/ui/button";
-import { useCart } from "@/providers/cart.provider";
+import { useConsultation } from "@/providers/consultation.provider";
 import { ProductJsonLd } from "@/components/seo/StructuredData";
 
 type ProductItem = ContentItem & {
@@ -40,10 +40,10 @@ function SpecsTable({ specs }: { specs?: Record<string, unknown> | null }) {
 
 export default function ProductDetail({ item }: { item: ProductItem }) {
   const gallery = Array.isArray(item.gallery) && item.gallery.length > 0 ? item.gallery : item.image ? [item.image] : [];
-  const { add, setOpen } = useCart();
+  const { add, setOpen } = useConsultation();
 
   const addConsultation = () => {
-    add({ slug: item.slug, title: item.title, price: item.priceLabel || "مشاوره خرید", image: item.image || "" }, 1);
+    add({ slug: item.slug, title: item.title, image: item.image || "" });
     setOpen(true);
   };
 
@@ -67,7 +67,13 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
         <aside className="space-y-5 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] lg:sticky lg:top-24">
           <div className="flex flex-wrap gap-2">
             {item.category && <span className="rounded-[var(--corner-radius)] bg-[var(--shop)]/10 px-2 py-1 text-xs font-bold text-[var(--shop)]">{item.category}</span>}
-            {item.availability && <span className="rounded-[var(--corner-radius)] bg-[var(--success)]/10 px-2 py-1 text-xs font-bold text-[var(--success)]">{item.availability}</span>}
+            <span className={`rounded-[var(--corner-radius)] px-2 py-1 text-xs font-bold ${
+              item.availability === "ناموجود"
+                ? "bg-[var(--danger)]/10 text-[var(--danger)]"
+                : "bg-[var(--success)]/10 text-[var(--success)]"
+            }`}>
+              {item.availability === "ناموجود" ? "ناموجود" : "موجود"}
+            </span>
           </div>
 
           <div>
@@ -80,7 +86,13 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
             {item.model && <div className="flex justify-between gap-3"><span className="paragraph-color">مدل</span><b dir="ltr">{item.model}</b></div>}
             {item.sku && <div className="flex justify-between gap-3"><span className="paragraph-color">SKU</span><b dir="ltr">{item.sku}</b></div>}
             {item.warranty && <div className="flex justify-between gap-3"><span className="paragraph-color">گارانتی</span><b>{item.warranty}</b></div>}
-            <div className="flex justify-between gap-3 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-3"><span className="paragraph-color">قیمت</span><b className="text-[var(--shop)]">{item.priceLabel || "مشاوره خرید"}</b></div>
+          </div>
+
+          <div className="rounded-[var(--corner-radius)] bg-[var(--shop)]/5 p-4 space-y-2">
+            <div className="text-sm font-bold text-[var(--primary-text)]">قیمت بر اساس پیکربندی شما</div>
+            <p className="text-xs paragraph-color leading-5">
+              محصولات سرور و زیرساخت بر اساس نیاز شما پیکربندی می‌شوند. تیم متخصصین ما پس از ثبت درخواست، بهترین راهکار و قیمت را ارائه می‌دهند.
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -88,7 +100,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
             <LikeButton contentType="shop" slug={item.slug} initial={item.likes || 0} />
           </div>
 
-          <Button type="button" onClick={addConsultation} className="w-full">درخواست مشاوره خرید</Button>
+          <Button type="button" onClick={addConsultation} className="w-full">ثبت درخواست مشاوره</Button>
         </aside>
       </section>
 

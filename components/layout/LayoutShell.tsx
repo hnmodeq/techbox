@@ -8,7 +8,7 @@ import { TechboxAppSidebar } from "./techbox-app-sidebar"
 import { TechboxNewsSidebar } from "./techbox-news-sidebar"
 import { SiteHeader } from "./site-header"
 import FooterSection from "@/components/layout/Footer"
-import { CartProvider } from "@/providers/cart.provider"
+import { ConsultationProvider } from "@/providers/consultation.provider"
 import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
 import { AuthProvider, useAuth } from "@/providers/auth.provider"
@@ -45,7 +45,7 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <CartProvider>
+        <ConsultationProvider>
           <StatsProvider>
             <HomeDataProvider initialData={homeData}>
               <ModuleConfigProvider>
@@ -55,7 +55,7 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
               <AuthModal />
             </HomeDataProvider>
           </StatsProvider>
-        </CartProvider>
+        </ConsultationProvider>
       </AuthProvider>
     </ThemeProvider>
   )

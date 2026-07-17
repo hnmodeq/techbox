@@ -395,3 +395,18 @@ model SavedContent {
   @@unique([userId, module, slug], name: "SavedContent_user_module_slug_key")
   @@index([userId, createdAt], name: "SavedContent_user_created_idx")
 }
+
+model ConsultationRequest {
+  id        String   @id @default(cuid())
+  userId    String?
+  userName  String?
+  userEmail String?
+  items     Json     // Array of { slug, title }
+  notes     String?
+  status    String   @default("pending") // pending | contacted | quoted | closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt], name: "consultation_status_created_idx")
+  @@index([createdAt], name: "consultation_created_idx")
+}
