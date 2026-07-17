@@ -136,7 +136,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         />
         <div className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden" dir="rtl">
           <TechboxAppSidebar />
-          <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size]">
+          <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size] relative">
             {tickerItems.length > 0 && (
               <div className="border-b bg-background/95">
                 <NewsTicker items={tickerItems} className="py-0" />
@@ -146,15 +146,16 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <div className="w-full max-w-full flex-1">{children}</div>
               <FooterSection />
             </main>
+            {/* News sidebar overlays on top, doesn't push content */}
+            <SidebarProvider
+              open={newsOpen}
+              onOpenChange={setNewsOpen}
+              className="absolute inset-y-0 end-0 z-40"
+              style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
+            >
+              <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
+            </SidebarProvider>
           </SidebarInset>
-          <SidebarProvider
-            open={newsOpen}
-            onOpenChange={setNewsOpen}
-            className="contents"
-            style={{ display: "contents", "--sidebar-width": "20rem" } as React.CSSProperties}
-          >
-            <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
-          </SidebarProvider>
         </div>
       </SidebarProvider>
     </div>
