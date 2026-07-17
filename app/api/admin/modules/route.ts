@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import {
   getModuleConfig,
@@ -45,7 +46,6 @@ export async function PATCH(req: NextRequest) {
     await saveModuleConfig(parsed, user.id);
 
     // Revalidate cached data so changes take effect immediately
-    const { revalidateTag } = await import("next/cache");
     revalidateTag("module-config");
     revalidateTag("home-data");
 
