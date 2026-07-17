@@ -80,7 +80,8 @@ export default async function RootLayout({
     <html
       lang="fa"
       dir="rtl"
-      className={cn(kalameh.variable, kalameh.className, "font-sans")}
+      data-main-sidebar-open="true"
+      className={cn(kalameh.variable, kalameh.className, "font-sans", "main-sidebar-booting", "news-sidebar-booting")}
       suppressHydrationWarning
     >
       <head>
