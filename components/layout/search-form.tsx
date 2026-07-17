@@ -5,16 +5,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { Label } from "@/components/ui/label"
 import {
-  Popover,
-  PopoverContent,
-} from "@/components/ui/popover"
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select"
-import { SidebarInput } from "@/components/ui/sidebar"
+import { Input } from "@/components/ui/input"
 import { SearchIcon, HistoryIcon } from "lucide-react"
 import type { ModuleSlug } from "@/lib/content"
 
@@ -53,8 +49,6 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     () => (query ? recent.filter((item) => item.toLowerCase().includes(query)) : recent),
     [query, recent]
   )
-  // Only show recent dropdown when open AND we have something to show
-  const shouldShowDropdown = open && (query === "" ? recent.length > 0 : filteredRecent.length > 0)
   const selectedModuleLabel = React.useMemo(
     () => searchModules.find((item) => item.value === module)?.label || "همه",
     [module]
@@ -120,38 +114,23 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     goSearch(value)
   }
 
-  const handleMagnifierClick = () => {
-    // If there's text, search. Otherwise show recent searches.
-    if (value.trim()) {
-      goSearch(value)
-    } else {
-      setOpen(true)
-    }
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.value
     setValue(nextValue)
-    // Auto-open dropdown if input becomes empty (backspace) OR if query matches recents
     const nextQuery = nextValue.trim().toLowerCase()
-    if (!nextQuery && recent.length > 0) {
-      setOpen(true)
-    } else if (nextQuery && recent.some((item) => item.toLowerCase().includes(nextQuery))) {
+    if (!nextQuery || recent.some((item) => item.toLowerCase().includes(nextQuery))) {
       setOpen(true)
     }
-    // Don't steal focus — the input already has it
   }
 
   const handleInputFocus = () => {
-    if (value.trim() === "" && recent.length > 0) {
-      setOpen(true)
-    }
+    setOpen(true)
   }
 
   const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Escape") {
       setOpen(false)
-      inputRef.current?.blur()
+      event.currentTarget.blur()
     }
   }
 
@@ -161,7 +140,6 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         <Label htmlFor="search" className="sr-only">
           جستجو
         </Label>
-        {/* Controls on the left side: category selector + magnifier */}
         <div className="absolute top-1/2 end-1 z-10 -translate-y-1/2 flex items-center gap-0.5">
           <Select
             value={module}
@@ -192,11 +170,13 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
             <SearchIcon className="size-4" />
           </button>
         </div>
-        <SidebarInput
+        <Input
           id="search"
           ref={inputRef}
+          data-slot="sidebar-input"
+          data-sidebar="input"
           placeholder="دنبال چی میگردی؟"
-          className="h-8 ps-3 pe-[7.25rem] text-right"
+          className="h-8 ps-3 pe-[7.25rem] text-right border-input bg-muted/20 dark:bg-muted/30"
           autoComplete="off"
           spellCheck={false}
           value={value}
@@ -206,40 +186,36 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
         />
       </div>
 
-      {/* Recent searches dropdown — shown below the input */}
-      {shouldShowDropdown && (
-        <div className="relative">
-          <div
-            className="absolute start-0 top-1 z-50 w-full rounded-md border bg-popover p-2 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95"
-          >
-            <div className="space-y-2" dir="rtl">
-              <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
-                <HistoryIcon className="size-3.5" />
-                جستجوهای اخیر شما
-              </div>
-              {filteredRecent.length > 0 ? (
-                <div className="space-y-1">
-                  {filteredRecent.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      className="flex w-full items-center rounded-md px-2 py-2 text-start text-xs transition-colors hover:bg-muted"
-                      onMouseDown={(event) => event.preventDefault()}
-                      onClick={() => {
-                        setValue(item)
-                        goSearch(item)
-                      }}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-md bg-muted/50 px-2 py-3 text-center text-xs text-muted-foreground">
-                  هنوز جستجوی اخیری ندارید.
-                </div>
-              )}
+      {/* Recent searches dropdown */}
+      {open && (
+        <div className="absolute start-0 z-50 mt-1 w-full rounded-md border bg-popover p-2 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
+          <div className="space-y-2" dir="rtl">
+            <div className="flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground">
+              <HistoryIcon className="size-3.5" />
+              جستجوهای اخیر شما
             </div>
+            {recent.length > 0 ? (
+              <div className="space-y-1">
+                {filteredRecent.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className="flex w-full items-center rounded-md px-2 py-2 text-start text-xs transition-colors hover:bg-muted"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => {
+                      setValue(item)
+                      goSearch(item)
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-md bg-muted/50 px-2 py-3 text-center text-xs text-muted-foreground">
+                هنوز جستجوی اخیری ندارید.
+              </div>
+            )}
           </div>
         </div>
       )}
