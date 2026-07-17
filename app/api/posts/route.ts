@@ -277,7 +277,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      revalidateTag("home-data");
+      revalidateTag("home-data", "max");
       revalidatePath('/');
       revalidatePath('/forum');
       revalidatePath(`/forum/${slug}`);
@@ -304,7 +304,7 @@ export async function POST(req: NextRequest) {
         dateFa,
       },
     });
-    revalidateTag("home-data");
+    revalidateTag("home-data", "max");
     revalidatePath('/');
     revalidatePath(`/${data.module}`);
     revalidatePath(`/${data.module}/${data.slug}`);
@@ -383,7 +383,7 @@ export async function PATCH(req: NextRequest) {
     data,
   });
 
-  revalidateTag("home-data");
+  revalidateTag("home-data", "max");
   revalidatePath('/');
   revalidatePath(`/${moduleKey}`);
   revalidatePath(`/${moduleKey}/${slug}`);
@@ -423,7 +423,7 @@ export async function DELETE(req: NextRequest) {
     data: { deletedAt: new Date(), deletedBy: user.id },
   });
 
-  revalidateTag("home-data");
+  revalidateTag("home-data", "max");
   revalidatePath('/');
   revalidatePath(`/${moduleKey}`);
   revalidatePath(`/${moduleKey}/${slug}`);

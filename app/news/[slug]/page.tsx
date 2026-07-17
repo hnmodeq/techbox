@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import DbContentDetail from "@/features/content/components/DbContentDetail";
 
 export const dynamicParams = true;
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type P = Promise<{ slug: string }>;
 
