@@ -12,6 +12,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/providers/auth.provider"
 import { cn } from "@/lib/utils"
 import {
@@ -45,9 +46,30 @@ function MenuButton({
   )
 }
 
+/**
+ * Skeleton that matches the exact layout of the user profile row:
+ *   [avatar 32x32]  [name line]    [chevron]
+ *                    [email line]
+ */
+function NavUserSkeleton({ collapsed }: { collapsed: boolean }) {
+  if (collapsed) {
+    return <Skeleton className="size-8 rounded-full" />
+  }
+  return (
+    <>
+      <Skeleton className="size-8 shrink-0 rounded-full" />
+      <div className="grid flex-1 gap-1.5">
+        <Skeleton className="h-3 w-28" />
+        <Skeleton className="h-2.5 w-36" />
+      </div>
+      <ChevronsUpDownIcon className="ms-auto size-4 opacity-30" />
+    </>
+  )
+}
+
 export function TechboxNavUser() {
   const { state } = useSidebar()
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const [open, setOpen] = React.useState(false)
   const rootRef = React.useRef<HTMLLIElement | null>(null)
 
@@ -80,6 +102,8 @@ export function TechboxNavUser() {
     logout()
   }
 
+  const collapsed = state === "collapsed"
+
   return (
     <SidebarMenu>
       <SidebarMenuItem ref={rootRef} className="relative">
@@ -94,18 +118,35 @@ export function TechboxNavUser() {
           }}
           className={cn(
             "flex w-full items-center gap-2 rounded-[calc(var(--radius-sm)+2px)] p-2 text-start text-xs ring-sidebar-ring outline-hidden transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 aria-expanded:bg-muted aria-expanded:text-foreground",
-            state === "collapsed" && "size-8 justify-center p-0"
+            collapsed && "size-8 justify-center p-0"
           )}
         >
-          <Avatar className="h-8 w-8 shrink-0">
-            <AvatarImage src={user?.avatar} alt={user?.name || "کاربر"} />
-            <AvatarFallback suppressHydrationWarning>{user?.name?.charAt(0) || ""}</AvatarFallback>
-          </Avatar>
-          <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="truncate font-medium" suppressHydrationWarning>{user?.name || "کاربر مهمان"}</span>
-            <span className="truncate text-xs text-muted-foreground" suppressHydrationWarning>{user?.email || "ورود به حساب"}</span>
-          </div>
-          <ChevronsUpDownIcon className="ms-auto size-4 group-data-[collapsible=icon]:hidden" />
+          {loading ? (
+            <NavUserSkeleton collapsed={collapsed} />
+          ) : user ? (
+            <>
+              <Avatar className="h-8 w-8 shrink-0">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+              </div>
+              <ChevronsUpDownIcon className="ms-auto size-4 group-data-[collapsible=icon]:hidden" />
+            </>
+          ) : (
+            <>
+              <Avatar className="h-8 w-8 shrink-0">
+                <AvatarFallback className="text-xs">م</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate font-medium">کاربر مهمان</span>
+                <span className="truncate text-xs text-muted-foreground">ورود به حساب</span>
+              </div>
+              <ChevronsUpDownIcon className="ms-auto size-4 group-data-[collapsible=icon]:hidden" />
+            </>
+          )}
         </button>
 
         {open && (
