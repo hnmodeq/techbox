@@ -27,9 +27,12 @@ export type ModuleConfig = {
   homeMoreLabel: string;
 };
 
-export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig> & {
+export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig>;
+
+/** Full site layout config returned by getModuleConfig() */
+export type SiteLayoutConfig = ModuleConfigMap & {
   /** Whether the hero section is visible on the homepage */
-  heroVisible?: boolean;
+  heroVisible: boolean;
 };
 
 // ─── Defaults ─────────────────────────────────────────────────────────
@@ -90,6 +93,10 @@ export function getDefaultModuleConfigMap(): ModuleConfigMap {
   ) as ModuleConfigMap;
 }
 
+export function getDefaultSiteLayoutConfig(): SiteLayoutConfig {
+  return { ...getDefaultModuleConfigMap(), heroVisible: true };
+}
+
 // ─── SiteSetting Keys ─────────────────────────────────────────────────
 
 const KEY_ENABLED = "modules.enabled";
@@ -123,7 +130,7 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
  * Get the full module configuration map.
  * Cached for 30 seconds via Next.js unstable_cache.
  */
-async function getModuleConfigUncached(): Promise<ModuleConfigMap> {
+async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const defaults = getDefaultModuleConfigMap();
 
   const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, heroVisibleRaw] = await Promise.all([
@@ -153,7 +160,7 @@ async function getModuleConfigUncached(): Promise<ModuleConfigMap> {
   // Hero visibility (default: true)
   const heroVisible = heroVisibleRaw === "false" ? false : true;
 
-  return { ...defaults, heroVisible } as ModuleConfigMap;
+  return { ...defaults, heroVisible };
 }
 
 export const getModuleConfig = unstable_cache(
@@ -187,7 +194,7 @@ export async function getHomeRows(): Promise<Array<{ slug: ModuleSlug; title: st
 
 // ─── Write Config ─────────────────────────────────────────────────────
 
-export async function saveModuleConfig(config: ModuleConfigMap, updatedBy: string): Promise<void> {
+export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: string): Promise<void> {
   const enabledMap: Record<string, boolean> = {};
   const homeVisMap: Record<string, boolean> = {};
   const homeOrderMap: Record<string, number> = {};
@@ -223,4 +230,4 @@ export async function saveModuleConfig(config: ModuleConfigMap, updatedBy: strin
 }
 
 /** Re-export DEFAULT_HOME_TITLES and DEFAULT_HOME_MORE_LABELS for admin UI */
-export { DEFAULT_HOME_TITLES, DEFAULT_HOME_MORE_LABELS, DEFAULT_MODULE_SLUGS };
+export { DEFAULT_HOME_TITLES, DEFAULT_HOME_MORE_LABELS, DEFAULT_MODULE_SLUGS, getDefaultSiteLayoutConfig };

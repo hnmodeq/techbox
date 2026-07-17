@@ -4,8 +4,8 @@ import { getSessionUserPublic } from "@/lib/auth-server";
 import {
   getModuleConfig,
   saveModuleConfig,
-  getDefaultModuleConfigMap,
-  type ModuleConfigMap,
+  getDefaultSiteLayoutConfig,
+  type SiteLayoutConfig,
 } from "@/lib/module-config";
 import { z } from "zod";
 
@@ -19,21 +19,17 @@ export async function GET() {
     const config = await getModuleConfig();
     return NextResponse.json(config);
   } catch {
-    return NextResponse.json(getDefaultModuleConfigMap());
+    return NextResponse.json(getDefaultSiteLayoutConfig());
   }
 }
 
-const moduleConfigSchema = z.record(
-  z.object({
-    enabled: z.boolean(),
-    showOnHome: z.boolean(),
-    homeOrder: z.number().int().min(0).max(100),
-    homeTitle: z.string().max(200),
-    homeMoreLabel: z.string().max(200),
-  })
-).and(z.object({
-  heroVisible: z.boolean().optional(),
-}));
+const moduleEntrySchema = z.object({
+  enabled: z.boolean(),
+  showOnHome: z.boolean(),
+  homeOrder: z.number().int().min(0).max(100),
+  homeTitle: z.string().max(200),
+  homeMoreLabel: z.string().max(200),
+});
 
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUserPublic();
@@ -43,9 +39,21 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const parsed = moduleConfigSchema.parse(body) as ModuleConfigMap;
+    const heroVisible = body.heroVisible !== false;
 
-    await saveModuleConfig(parsed, user.id);
+    // Validate module entries
+    const moduleEntries: Record<string, z.infer<typeof moduleEntrySchema>> = {};
+    for (const [key, value] of Object.entries(body)) {
+      if (key === "heroVisible") continue;
+      moduleEntries[key] = moduleEntrySchema.parse(value);
+    }
+
+    const config: SiteLayoutConfig = {
+      ...moduleEntries,
+      heroVisible,
+    } as SiteLayoutConfig;
+
+    await saveModuleConfig(config, user.id);
 
     // Revalidate cached data so changes take effect immediately
     revalidatePath("/");

@@ -11,10 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ModuleBadge } from "@/components/ui/module-badge";
 import {
-  getDefaultModuleConfigMap,
+  getDefaultSiteLayoutConfig,
   DEFAULT_HOME_TITLES,
   DEFAULT_HOME_MORE_LABELS,
   type ModuleSlug,
+  type SiteLayoutConfig,
   type ModuleConfigMap,
 } from "@/lib/module-config";
 import { moduleMeta } from "@/lib/content";
@@ -26,7 +27,7 @@ const ALL_MODULES: ModuleSlug[] = [
 type TabId = "modules" | "homepage" | "titles";
 
 export default function AdminModulesPage() {
-  const [config, setConfig] = useState<ModuleConfigMap>({ ...getDefaultModuleConfigMap(), heroVisible: true });
+  const [config, setConfig] = useState<SiteLayoutConfig>(getDefaultSiteLayoutConfig());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -39,7 +40,7 @@ export default function AdminModulesPage() {
       const res = await fetch("/api/admin/modules", { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "load_failed");
-      setConfig({ ...getDefaultModuleConfigMap(), ...data });
+      setConfig({ ...getDefaultSiteLayoutConfig(), ...data, heroVisible: data.heroVisible !== false });
     } catch (e: any) {
       setMessage(e?.message || "خطا در دریافت تنظیمات ماژول");
     } finally {
@@ -193,17 +194,26 @@ export default function AdminModulesPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 pt-4 space-y-2">
-              {/* Hero visibility toggle */}
-              <div className="flex items-center justify-between gap-4 rounded-lg border border-[var(--admin)]/20 bg-[var(--admin)]/5 p-3">
+              {/* Hero row — same style as module rows */}
+              <div
+                className={`flex items-center justify-between gap-4 rounded-lg border p-3 transition-colors ${
+                  config.heroVisible ? "bg-card border-border" : "bg-muted/20 border-border/50"
+                }`}
+              >
                 <div className="flex items-center gap-3">
-                  <span className="text-sm">🏅</span>
-                  <div>
-                    <div className="text-sm font-semibold">هیرو (تکباکس)</div>
-                    <div className="text-xs text-muted-foreground">عنوان بزرگ «تکباکس» بالای صفحه اصلی</div>
-                  </div>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--admin)]/10 text-xs font-bold text-[var(--admin)]">
+                    🏅
+                  </span>
+                  <span className="text-sm font-semibold">هیرو (تکباکس)</span>
+                  <span className="text-xs text-muted-foreground">عنوان بزرگ بالای صفحه اصلی</span>
+                  {config.heroVisible ? (
+                    <Badge variant="default" className="text-[10px]">فعال</Badge>
+                  ) : (
+                    <Badge variant="secondary" className="text-[10px]">غیرفعال</Badge>
+                  )}
                 </div>
                 <Switch
-                  checked={config.heroVisible !== false}
+                  checked={config.heroVisible}
                   onCheckedChange={(checked) => setConfig((prev) => ({ ...prev, heroVisible: checked }))}
                 />
               </div>
