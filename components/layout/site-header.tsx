@@ -14,7 +14,6 @@ import {
 } from "lucide-react"
 
 import { SearchForm } from "./search-form"
-import { TopbarTypingText } from "./topbar-typing-text"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -412,6 +411,8 @@ function ThemeToggle() {
 
   React.useEffect(() => setMounted(true), [])
 
+  // During SSR and before hydration, always show moon (light mode default).
+  // The icon flips after hydration if the user prefers dark mode.
   const isDark = mounted && resolvedTheme === "dark"
   const label = !mounted ? "تغییر تم" : isDark ? "حالت روشن" : "حالت تاریک"
 
@@ -427,7 +428,9 @@ function ThemeToggle() {
           />
         }
       >
-        {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+        <span suppressHydrationWarning>
+          {isDark ? <SunIcon className="size-4" /> : <MoonIcon className="size-4" />}
+        </span>
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
@@ -567,7 +570,10 @@ export function SiteHeader({
   const sidebarTooltip = state === "expanded" ? "بستن منو" : "باز کردن منو"
 
   return (
-    <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
+    <header
+      className="sticky top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80"
+      suppressHydrationWarning
+    >
       <div className="flex h-(--header-height) w-full items-center justify-around gap-3 px-4">
         <div className="flex min-w-0 flex-1 items-center justify-start gap-2">
           <Tooltip>
@@ -589,7 +595,6 @@ export function SiteHeader({
           <NotificationsButton />
           <TechboxBreadcrumb />
           <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto hidden lg:block" />
-          <TopbarTypingText />
         </div>
 
         <div className="flex flex-[1.2] justify-center px-2">
