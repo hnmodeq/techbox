@@ -71,7 +71,7 @@ export async function PATCH(req: NextRequest) {
     await saveModuleConfig(config, user.id);
 
     // Revalidate cached data so changes take effect immediately
-    revalidateTag("module-config");
+    revalidateTag("module-config", "max");
     revalidatePath("/");
     revalidatePath("/api/modules/enabled");
 

@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest) {
     // Handle enabled toggle
     if (body.enabled !== undefined) {
       await setHolidaysEnabled(Boolean(body.enabled), user.id);
-      revalidateTag("holidays");
+      revalidateTag("holidays", "max");
       return NextResponse.json({ ok: true });
     }
 
@@ -41,7 +41,7 @@ export async function PATCH(req: NextRequest) {
     if (Array.isArray(body.holidays)) {
       const holidays = body.holidays.map((h: any) => holidaySchema.parse(h));
       await saveHolidays(holidays, user.id);
-      revalidateTag("holidays");
+      revalidateTag("holidays", "max");
       return NextResponse.json({ ok: true });
     }
 

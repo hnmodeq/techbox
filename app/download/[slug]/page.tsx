@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import DbDownloadDetail from "@/features/download/components/DbDownloadDetail";
 
 export const dynamicParams = true;
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type P = Promise<{ slug: string }>;
 

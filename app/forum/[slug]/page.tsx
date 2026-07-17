@@ -7,7 +7,7 @@ import ForumDetail from "@/features/forum/components/ForumDetail";
 type P = Promise<{ slug: string }>;
 
 export const dynamicParams = true;
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function Page({ params }: { params: P }) {
   const { slug } = await params;
