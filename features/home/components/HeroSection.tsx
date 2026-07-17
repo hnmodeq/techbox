@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import TextType from "@/components/ui/text-type/TextType";
 import { moduleColors } from "@/config/module-colors";
 
 const ALL_ITEMS: { text: string; href: string; module: keyof typeof moduleColors }[] = [
@@ -21,35 +20,39 @@ export default function HeroSection({ enabledModules }: { enabledModules?: strin
   const items = enabledModules
     ? ALL_ITEMS.filter((item) => enabledModules.includes(item.module))
     : ALL_ITEMS;
-  const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    if (items.length === 0) return;
-    const t = setInterval(() => setIndex((p) => (p + 1) % items.length), 2800);
-    return () => clearInterval(t);
-  }, [items.length]);
+  if (items.length === 0) {
+    return (
+      <section className="w-full max-w-full flex flex-col justify-center items-center px-4 py-12 text-center" dir="rtl">
+        <div className="flex flex-col items-center w-full max-w-3xl">
+          <h1 className="text-[length:var(--hero-font-size)] text-foreground font-black tracking-tight">تکباکس</h1>
+        </div>
+      </section>
+    );
+  }
 
-  const item = items[index];
+  const texts = items.map((item) => item.text);
+  const colors = items.map((item) => moduleColors[item.module]?.active || "inherit");
 
   return (
     <section className="w-full max-w-full flex flex-col justify-center items-center px-4 py-12 text-center" dir="rtl">
       <div className="flex flex-col items-center w-full max-w-3xl">
         <h1 className="text-[length:var(--hero-font-size)] text-foreground font-black tracking-tight">تکباکس</h1>
-        <div className="hero-rotator mt-4 w-full">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={item.text}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -14 }}
-              transition={{ duration: 0.35 }}
-              className="hero-item"
-            >
-              <Link href={item.href} className={`hero-rotator-text text-sm font-medium leading-7 transition-colors sm:text-lg sm:font-semibold ${moduleColors[item.module].active} hover:opacity-85`}>
-                {item.text} ←
-              </Link>
-            </motion.div>
-          </AnimatePresence>
+        <div className="mt-4 w-full">
+          <Link href={items[0].href} className="inline-block hero-rotator-text text-sm font-medium leading-7 sm:text-lg sm:font-semibold hover:opacity-85">
+            <TextType
+              text={texts}
+              textColors={colors}
+              typingSpeed={45}
+              deletingSpeed={20}
+              pauseDuration={2800}
+              showCursor={true}
+              cursorCharacter="|"
+              cursorClassName="text-type__cursor--rtl"
+              variableSpeed={{ min: 35, max: 65 }}
+              className="text-sm font-medium leading-7 sm:text-lg sm:font-semibold"
+            />
+          </Link>
         </div>
       </div>
     </section>
