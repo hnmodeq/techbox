@@ -16,7 +16,7 @@ import { AuthorLink } from '@/components/ui/author-link';
 import { ReviewRating } from '@/components/ui/review-rating';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
-export default function ReviewRow() {
+export default function ReviewRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
   const { items: dbReviews, loading } = useHomeModule('review');
   const reviews = dbReviews.slice(0, 5);
 
@@ -24,9 +24,9 @@ export default function ReviewRow() {
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.reviewMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">بنچمارک‌ها و تست‌های عملی سخت‌افزار</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "بنچمارک\u200Cها و تست\u200Cهای عملی سخت\u200Cافزار"}</h2>
           <ButtonLink variant="link" size="sm" className="text-[var(--review)] font-bold shrink-0" href="/review">
-            مشاهده تمام بررسی‌ها ←
+            {homeMoreLabel || "مشاهده تمام بررسی\u200Cها ←"}
           </ButtonLink>
         </div>
 

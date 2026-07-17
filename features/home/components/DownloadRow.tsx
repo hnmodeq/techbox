@@ -11,7 +11,7 @@ import { DownloadMetaLine } from '@/components/ui/download-meta';
 import { DownloadAction } from '@/components/ui/download-action';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
-export default function DownloadRow() {
+export default function DownloadRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
   const { items: dbFiles, loading } = useHomeModule('download');
   const files = dbFiles.slice(0, 8);
 
@@ -29,9 +29,9 @@ export default function DownloadRow() {
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.downloadMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">ISOها، فریم‌ورها و درایورهای سرور و زیرساخت</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "ISOها، فریم\u200Cورها و درایورهای سرور و زیرساخت"}</h2>
           <ButtonLink variant="link" size="sm" className="text-[var(--download)] font-bold shrink-0" href="/download">
-            ورود به مرکز دانلود ←
+            {homeMoreLabel || "ورود به مرکز دانلود ←"}
           </ButtonLink>
         </div>
 

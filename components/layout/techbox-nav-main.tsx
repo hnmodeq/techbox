@@ -20,10 +20,33 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { ChevronRightIcon } from "lucide-react"
-import { navItems, isActive } from "@/config/sidebar.config"
+import { navItems as allNavItems, isActive } from "@/config/sidebar.config"
+import { useEnabledModules } from "@/providers/module-config.provider"
+
+/** Map sidebar href to module slug for enable/disable filtering */
+const sidebarModuleMap: Record<string, string> = {
+  "/": "home",
+  "/blog": "blog",
+  "/news": "news",
+  "/media": "media",
+  "/shop": "shop",
+  "/tools": "tools",
+  "/forum": "forum",
+  "/review": "review",
+  "/download": "download",
+  "/timeline": "timeline",
+};
 
 export function TechboxNavMain() {
   const pathname = usePathname()
+  const enabledModules = useEnabledModules()
+
+  // Filter sidebar items based on enabled modules
+  const navItems = allNavItems.filter((item) => {
+    const slug = sidebarModuleMap[item.href];
+    if (!slug || slug === "home") return true;
+    return enabledModules.has(slug as any);
+  })
 
   return (
     <SidebarGroup>

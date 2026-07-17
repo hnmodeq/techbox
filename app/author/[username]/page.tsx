@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { blurProps } from "@/lib/image-placeholder";
 import { ensureSavedContentTable } from "@/lib/saved-content-table";
 import { getSessionUserPublic } from "@/lib/auth-server";
-import { getUserActivities, PROFILE_CONTENT_MODULES } from "@/lib/user-activity";
+import { getUserActivities, getProfileContentModules } from "@/lib/user-activity";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 
 export default async function AuthorProfilePage({ params }: { params: Promise<{ username: string }> }) {
@@ -19,8 +19,10 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
 
   if (!user) return <main className="mx-auto max-w-3xl px-4 py-16 text-center text-muted-foreground" dir="rtl">کاربر پیدا نشد.</main>;
 
+  const enabledModules = await getProfileContentModules();
+
   const authoredPosts = await prisma.post.findMany({
-    where: { published: true, deletedAt: null, module: { in: PROFILE_CONTENT_MODULES }, OR: [{ authorId: user.id }, { authorName: user.name }] },
+    where: { published: true, deletedAt: null, module: { in: enabledModules }, OR: [{ authorId: user.id }, { authorName: user.name }] },
     orderBy: { date: "desc" },
     include: { comments: true },
   }).catch(() => []);

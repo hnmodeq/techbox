@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getSessionUserPublic } from "@/lib/auth-server"
-import { getUserActivities, PROFILE_CONTENT_MODULES } from "@/lib/user-activity"
+import { getUserActivities, getProfileContentModules } from "@/lib/user-activity"
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers"
 
 export async function GET() {
   const user = await getSessionUserPublic()
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) })
 
+  const enabledModules = await getProfileContentModules()
+
   const [activities, authoredPosts] = await Promise.all([
     getUserActivities(user.id),
     prisma.post.findMany({
-      where: { published: true, deletedAt: null, module: { in: PROFILE_CONTENT_MODULES }, OR: [{ authorId: user.id }, { authorName: user.name }] },
+      where: { published: true, deletedAt: null, module: { in: enabledModules }, OR: [{ authorId: user.id }, { authorName: user.name }] },
       orderBy: { date: "desc" },
       take: 100,
     }).catch(() => []),

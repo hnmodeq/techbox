@@ -13,6 +13,7 @@ import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
 import { AuthProvider, useAuth } from "@/providers/auth.provider"
 import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
+import { ModuleConfigProvider } from "@/providers/module-config.provider"
 import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
 
@@ -47,7 +48,9 @@ export function LayoutShell({ children, homeData }: LayoutShellProps) {
         <CartProvider>
           <StatsProvider>
             <HomeDataProvider initialData={homeData}>
+              <ModuleConfigProvider>
               <LayoutInner>{children}</LayoutInner>
+              </ModuleConfigProvider>
               <Chatbot />
               <AuthModal />
             </HomeDataProvider>

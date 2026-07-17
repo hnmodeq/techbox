@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { CardStats } from '@/components/ui/card-stats';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 
-export default function ShopRow() {
+export default function ShopRow({ homeTitle, homeMoreLabel }: { homeTitle?: string; homeMoreLabel?: string }) {
   const { items: dbProducts, loading } = useHomeModule('shop');
   const products = dbProducts.slice(0, 5);
 
@@ -21,9 +21,9 @@ export default function ShopRow() {
     <section className={`w-full py-12 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.shopMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl sm:text-2xl font-black text-foreground">جدیدترین تجهیزات سرور، استوریج و شبکه</h2>
+          <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "جدیدترین تجهیزات سرور، استوریج و شبکه"}</h2>
           <ButtonLink variant="link" size="sm" className="text-[var(--shop)] font-bold shrink-0" href="/shop">
-            مشاهده کل فروشگاه ←
+            {homeMoreLabel || "مشاهده کل فروشگاه ←"}
           </ButtonLink>
         </div>
 

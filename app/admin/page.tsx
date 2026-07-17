@@ -131,6 +131,7 @@ export default function AdminPage() {
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
             {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
+            {user.role === "super_admin" && <ButtonLink href="/admin/modules" variant="ghost" size="sm">ماژول‌ها</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/settings" variant="ghost" size="sm">تنظیمات</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/users" variant="ghost" size="sm">کاربران</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/faq" variant="ghost" size="sm">FAQ</ButtonLink>}

@@ -9,39 +9,52 @@ import DownloadRow from '@/features/home/components/DownloadRow';
 import HomeTimelineRow from '@/features/home/components/HomeTimelineRow';
 import RecommendationRow from '@/features/home/components/RecommendationRow';
 import { getHomepageRecommendations } from '@/lib/recommendations';
+import { getModuleConfig, type ModuleSlug } from '@/lib/module-config';
 
-export default function Page() {
+const ROW_COMPONENTS: Record<string, React.ComponentType<{ homeTitle?: string; homeMoreLabel?: string }>> = {
+  blog: MagazineRow,
+  media: VideoReelsRow,
+  shop: ShopRow,
+  forum: ForumRow,
+  review: ReviewRow,
+  download: DownloadRow,
+  timeline: HomeTimelineRow,
+};
+
+export default async function Page() {
+  const config = await getModuleConfig();
+
+  // Build ordered list of visible rows
+  const visibleRows = (Object.keys(ROW_COMPONENTS) as ModuleSlug[])
+    .filter((slug) => config[slug]?.enabled && config[slug]?.showOnHome)
+    .sort((a, b) => (config[a]?.homeOrder ?? 99) - (config[b]?.homeOrder ?? 99));
+
   return (
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
-      {/* Hero Section */}
-      <HeroSection />
+      <HeroSection enabledModules={Object.keys(config).filter(
+        (s) => config[s as ModuleSlug]?.enabled
+      ) as ModuleSlug[]} />
 
-      {/* Magazine Row */}
-      <MagazineRow />
+      {visibleRows.map((slug) => {
+        const Component = ROW_COMPONENTS[slug];
+        if (!Component) return null;
+        const cfg = config[slug];
+        return (
+          <Component
+            key={slug}
+            homeTitle={cfg?.homeTitle || undefined}
+            homeMoreLabel={cfg?.homeMoreLabel || undefined}
+          />
+        );
+      })}
 
-      {/* Video Reels Row */}
-      <VideoReelsRow />
-
-      {/* Shop Row */}
-      <ShopRow />
-
-      {/* Forum Row */}
-      <ForumRow />
-
-      {/* Reviews Row */}
-      <ReviewRow />
-
-      {/* Downloads Row */}
-      <DownloadRow />
-
-      {/* Technology Timeline Preview Row */}
-      <HomeTimelineRow />
-
-      {/* Recommendation Engine */}
-      <RecommendationRow
-        items={getHomepageRecommendations(8)}
-        title="پیشنهادهای هوشمند برای شما"
-      />
+      {/* Only show recommendations if at least some modules are enabled */}
+      {visibleRows.length > 0 && (
+        <RecommendationRow
+          items={getHomepageRecommendations(8)}
+          title="پیشنهادهای هوشمند برای شما"
+        />
+      )}
     </main>
   );
 }

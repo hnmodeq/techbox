@@ -11,10 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { moduleMeta } from "@/lib/content";
+import { useEnabledModules } from "@/providers/module-config.provider";
 
 export const dynamic = "force-dynamic";
 
-const searchableModules: Array<"all" | ModuleSlug> = ["all", "news", "blog", "media", "shop", "forum", "review", "download"];
+const ALL_SEARCHABLE_MODULES: Array<"all" | ModuleSlug> = ["all", "news", "blog", "media", "shop", "forum", "review", "download"];
 const searchModuleLabels: Partial<Record<"all" | ModuleSlug, string>> = {
   all: "همه",
   news: "اخبار",
@@ -31,6 +32,10 @@ type SearchResult = ContentItem & { comments?: number };
 function SearchInner() {
   const sp = useSearchParams();
   const router = useRouter();
+  const enabledModules = useEnabledModules();
+  const searchableModules = ALL_SEARCHABLE_MODULES.filter(
+    (m) => m === "all" || enabledModules.has(m as ModuleSlug)
+  );
   const q = sp.get("q") || "";
   const moduleFilter = (sp.get("module") as "all" | ModuleSlug) || "all";
   const [input, setInput] = useState(q);

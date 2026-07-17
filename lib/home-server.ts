@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import type { HomeData } from "@/features/home/lib/home-data";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
+import { getEnabledModules } from "@/lib/module-config";
 
 const moduleTakes: Record<string, number> = {
   blog: 5,
@@ -128,13 +129,22 @@ async function findPosts(module: string, take: number) {
 }
 
 async function getHomeDataUncached(): Promise<HomeData> {
+  // Get enabled modules from DB config
+  const enabledModules = await getEnabledModules();
+
+  // Filter moduleTakes to only include enabled modules
+  const activeModuleTakes = Object.fromEntries(
+    Object.entries(moduleTakes).filter(([module]) => enabledModules.includes(module as any))
+  );
+
   const entries = await Promise.all(
-    Object.entries(moduleTakes).map(async ([module, take]) => [module, await findPosts(module, take)] as const)
+    Object.entries(activeModuleTakes).map(async ([module, take]) => [module, await findPosts(module, take)] as const)
   );
   const modules = Object.fromEntries(entries) as HomeData["modules"];
 
+  // Ticker: only include posts from enabled modules
   const tickerPosts = await prisma.post.findMany({
-    where: { published: true, deletedAt: null, date: publicPostDateWhere() },
+    where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
     orderBy: { date: "desc" },
     take: 30,
     select: cardSelect,

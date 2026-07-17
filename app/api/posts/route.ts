@@ -7,6 +7,7 @@ import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STO
 import { createPostRevision } from "@/lib/revision";
 import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
+import { getEnabledModules } from "@/lib/module-config";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 
 function normalizeSlug(value: string, fallback: string) {
@@ -47,6 +48,19 @@ export async function GET(req: NextRequest) {
       ...(slug ? { slug } : {}),
       deletedAt: null, // soft delete filter
     };
+
+    // For public queries, only return posts from enabled modules
+    if (!includeAllPublishedStates) {
+      const enabledModules = await getEnabledModules();
+      if (postModule) {
+        // If a specific module is requested but it's disabled, return empty
+        if (!enabledModules.includes(postModule as any)) {
+          return NextResponse.json([], { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
+        }
+      } else {
+        where.module = { in: enabledModules };
+      }
+    }
 
     if (includeAllPublishedStates) {
       const user = await getSessionUserPublic();

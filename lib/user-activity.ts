@@ -1,13 +1,31 @@
 import { prisma } from "@/lib/db"
 import type { UserActivity } from "@/components/profile/UserActivityList"
+import { getEnabledModules, type ModuleSlug } from "@/lib/module-config"
 
+/** Default list used when module config is unavailable */
+const DEFAULT_PROFILE_MODULES: ModuleSlug[] = ["blog", "review", "media", "forum", "news"]
+
+export async function getProfileContentModules(): Promise<ModuleSlug[]> {
+  try {
+    const enabled = await getEnabledModules()
+    // Only include enabled modules that have content
+    const contentModules: ModuleSlug[] = ["blog", "review", "media", "forum", "news"]
+    return contentModules.filter((m) => enabled.includes(m))
+  } catch {
+    return DEFAULT_PROFILE_MODULES
+  }
+}
+
+/** Sync constant for backward compatibility — used where async is not possible */
 export const PROFILE_CONTENT_MODULES = ["blog", "review", "media", "forum", "news"]
 
 export async function getUserActivities(userId: string): Promise<UserActivity[]> {
+  const enabledModules = await getProfileContentModules()
+
   const likes = await prisma.like.findMany({
     where: {
       OR: [{ userId }, { fingerprint: userId }],
-      module: { in: PROFILE_CONTENT_MODULES },
+      module: { in: enabledModules },
       deletedAt: null,
     },
     orderBy: { createdAt: "desc" },
@@ -43,7 +61,7 @@ export async function getUserActivities(userId: string): Promise<UserActivity[]>
     where: {
       authorId: userId,
       deletedAt: null,
-      post: { module: { in: PROFILE_CONTENT_MODULES }, published: true, deletedAt: null },
+      post: { module: { in: enabledModules }, published: true, deletedAt: null },
     },
     include: { post: true },
     orderBy: { createdAt: "desc" },

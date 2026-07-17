@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { moduleColors } from "@/config/module-colors";
 
-const items: { text: string; href: string; module: keyof typeof moduleColors }[] = [
+const ALL_ITEMS: { text: string; href: string; module: keyof typeof moduleColors }[] = [
   { text: "اخبار تکنولوژی رو با تکباکس دنبال کن", href: "/news", module: "news" },
   { text: "محصولات زیرساختی رو از تکباکس خریداری کن", href: "/shop", module: "shop" },
   { text: "مشکلات فنی رو داخل انجمن تکباکس مطرح کن", href: "/forum", module: "forum" },
@@ -17,13 +17,17 @@ const items: { text: string; href: string; module: keyof typeof moduleColors }[]
   { text: "تاریخچه تحولات و رویدادها رو در تایم‌لاین فناوری دنبال کن", href: "/timeline", module: "timeline" },
 ];
 
-export default function HeroSection() {
+export default function HeroSection({ enabledModules }: { enabledModules?: string[] }) {
+  const items = enabledModules
+    ? ALL_ITEMS.filter((item) => enabledModules.includes(item.module))
+    : ALL_ITEMS;
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (items.length === 0) return;
     const t = setInterval(() => setIndex((p) => (p + 1) % items.length), 2800);
     return () => clearInterval(t);
-  }, []);
+  }, [items.length]);
 
   const item = items[index];
 
