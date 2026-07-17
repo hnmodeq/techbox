@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import {
   getModuleConfig,
@@ -46,8 +46,8 @@ export async function PATCH(req: NextRequest) {
     await saveModuleConfig(parsed, user.id);
 
     // Revalidate cached data so changes take effect immediately
-    revalidateTag("module-config");
-    revalidateTag("home-data");
+    revalidatePath("/");
+    revalidatePath("/api/modules/enabled");
 
     return NextResponse.json({ ok: true });
   } catch (e: any) {
