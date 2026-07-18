@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUser, verifyPassword, hashPassword } from "@/lib/auth-server";
+import {
+  getSessionUser,
+  verifyPassword,
+  hashPassword,
+  invalidateAllSessions,
+  createSession,
+  setSessionCookie,
+} from "@/lib/auth-server";
 import { z } from "zod";
 
 const pwdSchema = z.object({
@@ -26,6 +33,12 @@ export async function POST(req: NextRequest) {
       where: { id: user.id },
       data: { password: hashed }
     });
+
+    // Revoke every other session (other devices) for this account, then issue a
+    // fresh token for the current browser so the user stays logged in here.
+    await invalidateAllSessions(user.id);
+    const fresh = await createSession(user.id);
+    await setSessionCookie(fresh);
 
     return NextResponse.json({ ok: true, message: "رمز عبور با موفقیت تغییر کرد" });
   } catch (e: any) {

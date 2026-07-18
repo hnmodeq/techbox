@@ -51,6 +51,8 @@ export default function AccountPage() {
   const [avatar, setAvatar] = useState<string>("");
   const [saveStatus, setSaveStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [pwdStatus, setPwdStatus] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
+  const [resendBusy, setResendBusy] = useState(false);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -112,6 +114,9 @@ export default function AccountPage() {
       if (res.ok && data.ok) {
         await loadUser();
         toast.success("ورود موفق");
+      } else if (data.error === "email_not_verified") {
+        setAuthError("");
+        setVerifyEmail(data.email || values.username);
       } else {
         setAuthError(data.message || data.error || "خطا در ورود");
       }
@@ -132,16 +137,42 @@ export default function AccountPage() {
         body: JSON.stringify(values),
       });
       const data = await res.json();
-      if (res.ok && data.ok) {
+      if (res.ok && data.ok && data.user) {
         await loadUser();
         toast.success("ثبت‌نام موفق");
+      } else if (res.ok && data.needsVerification) {
+        setAuthError("");
+        setVerifyEmail(data.email || values.email);
       } else {
-        setAuthError(data.error || "خطا در ثبت‌نام");
+        setAuthError(data.error || data.message || "خطا در ثبت‌نام");
       }
     } catch {
       setAuthError("خطا در ارتباط با سرور Neon");
     } finally {
       setAuthBusy(false);
+    }
+  };
+
+  const resendVerify = async () => {
+    if (!verifyEmail) return;
+    setResendBusy(true);
+    try {
+      const res = await fetch("/api/auth/send-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: verifyEmail }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        toast.success(data.alreadyVerified ? "این ایمیل قبلاً تأیید شده است." : "لینک تأیید دوباره ارسال شد.");
+        if (data.alreadyVerified) setVerifyEmail(null);
+      } else {
+        toast.error(data.message || "خطا در ارسال لینک تأیید");
+      }
+    } catch {
+      toast.error("خطا در اتصال به سرور");
+    } finally {
+      setResendBusy(false);
     }
   };
 
@@ -222,112 +253,127 @@ export default function AccountPage() {
             <p className="text-sm text-muted-foreground">برای ثبت دیدگاه، لایک و مدیریت پروفایل وارد شوید.</p>
           </div>
 
-          <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-            <TabsList className="w-full grid grid-cols-2">
-              <TabsTrigger value="login">ورود</TabsTrigger>
-              <TabsTrigger value="register">ثبت‌نام</TabsTrigger>
-            </TabsList>
+          {verifyEmail ? (
+            <div className="space-y-4">
+              <div className="rounded-md bg-green-500/10 border border-green-500/30 p-4 text-center space-y-2">
+                <p className="text-sm font-bold">ایمیل تأیید ارسال شد</p>
+                <p className="text-xs text-muted-foreground break-all" dir="ltr">{verifyEmail}</p>
+                <p className="text-xs text-muted-foreground leading-5">صندوق ورودی و هرزنامه را بررسی کنید. لینک تا ۲۴ ساعت معتبر است.</p>
+              </div>
+              <Button type="button" className="w-full" disabled={resendBusy} loading={resendBusy} onClick={resendVerify}>
+                ارسال مجدد لینک تأیید
+              </Button>
+              <Button type="button" variant="link" className="w-full" onClick={() => { setVerifyEmail(null); setTab("login"); }}>
+                بازگشت به ورود
+              </Button>
+            </div>
+          ) : (
+            <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="login">ورود</TabsTrigger>
+                <TabsTrigger value="register">ثبت‌نام</TabsTrigger>
+              </TabsList>
+              {authError && <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3 text-center text-sm text-destructive">{authError}</div>}
 
-            {authError && <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3 text-center text-sm text-destructive">{authError}</div>}
+              <TabsContent value="login" className="space-y-4 pt-4">
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                    <FormField
+                      control={loginForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>نام کاربری یا ایمیل</FormLabel>
+                          <FormControl>
+                            <Input placeholder="مثلا admin یا email@example.com" dir="ltr" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>رمز عبور</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="رمز عبور" dir="ltr" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
+                      ورود
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
 
-            <TabsContent value="login" className="space-y-4 pt-4">
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-                  <FormField
-                    control={loginForm.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>نام کاربری</FormLabel>
-                        <FormControl>
-                          <Input placeholder="مثلا admin" dir="ltr" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={loginForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>رمز عبور</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="رمز عبور" dir="ltr" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
-                    ورود
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-
-            <TabsContent value="register" className="space-y-4 pt-4">
-              <Form {...registerForm}>
-                <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
-                  <FormField
-                    control={registerForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>نام و نام خانوادگی</FormLabel>
-                        <FormControl>
-                          <Input placeholder="علیرضا محمدی" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={registerForm.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>نام کاربری انگلیسی</FormLabel>
-                        <FormControl>
-                          <Input placeholder="alireza_m" dir="ltr" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={registerForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ایمیل</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="alireza@example.com" dir="ltr" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={registerForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>رمز عبور</FormLabel>
-                        <FormControl>
-                          <Input type="password" placeholder="حداقل ۸ کاراکتر" dir="ltr" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
-                    ایجاد حساب
-                  </Button>
-                </form>
-              </Form>
-            </TabsContent>
-          </Tabs>
+              <TabsContent value="register" className="space-y-4 pt-4">
+                <Form {...registerForm}>
+                  <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+                    <FormField
+                      control={registerForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>نام و نام خانوادگی</FormLabel>
+                          <FormControl>
+                            <Input placeholder="علیرضا محمدی" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>نام کاربری انگلیسی</FormLabel>
+                          <FormControl>
+                            <Input placeholder="alireza_m" dir="ltr" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ایمیل</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="alireza@example.com" dir="ltr" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={registerForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>رمز عبور</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="حداقل ۸ کاراکتر" dir="ltr" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
+                      ایجاد حساب
+                    </Button>
+                  </form>
+                </Form>
+              </TabsContent>
+            </Tabs>
+          )}
         </Card>
       </main>
     );

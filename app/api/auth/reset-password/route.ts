@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { hashPassword } from "@/lib/auth-server";
+import { hashPassword, invalidateAllSessions } from "@/lib/auth-server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -80,6 +80,10 @@ export async function POST(req: NextRequest) {
       where: { id: resetToken.id },
       data: { used: true },
     });
+
+    // Revoke every other active session for this account (e.g. a lost/compromised
+    // device) so the password change actually takes effect everywhere.
+    await invalidateAllSessions(user.id);
 
     return NextResponse.json({
       ok: true,

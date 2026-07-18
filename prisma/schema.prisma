@@ -21,6 +21,8 @@ model User {
   modules  Json?
   avatar   String?
   password String
+  emailVerified         DateTime?
+  sessionsInvalidatedAt DateTime?
 
   posts    Post[]
   comments Comment[]
@@ -28,6 +30,7 @@ model User {
   notificationState UserNotificationState?
   newsReads UserNewsRead[]
   passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 
   @@index([role, status], name: "user_role_status_idx")
   @@index([status], name: "user_status_idx")
@@ -311,6 +314,19 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([token])
+  @@index([expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([expiresAt])
 }
 

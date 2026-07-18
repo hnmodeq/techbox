@@ -44,7 +44,15 @@ export async function POST(req: NextRequest) {
     const { username, password } = schema.parse(body);
     const cleanUser = username.trim().toLowerCase();
 
-    const user = await prisma.user.findUnique({ where: { username: cleanUser } });
+    // Allow signing in with either username or email.
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: cleanUser },
+          { email: cleanUser }
+        ]
+      }
+    });
 
     // Uniform error: don't reveal whether user exists or password is wrong
     if (!user) {
@@ -70,6 +78,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Block login until the email has been verified. Return the email so the
+    // client can offer to resend the verification link.
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        { error: "email_not_verified", message: "ایمیل این حساب تأیید نشده است.", email: user.email },
+        { status: 403 }
+      );
+    }
+
     const token = await createSession(user.id);
     await setSessionCookie(token);
 
@@ -79,6 +96,7 @@ export async function POST(req: NextRequest) {
         id: user.id,
         name: user.name,
         username: user.username,
+        email: user.email,
         role: user.role,
         roleFa: (user as any).roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر عضو"),
         modules: parseModules(user.modules),
