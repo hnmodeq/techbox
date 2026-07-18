@@ -633,7 +633,7 @@ export function SiteHeader({
                   <Button
                     type="button"
                     size="sm"
-                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600"
+                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600 px-3"
                     onClick={onToggleNews}
                     aria-pressed={newsOpen}
                     aria-label="اخبار زنده تکباکس"
@@ -646,7 +646,7 @@ export function SiteHeader({
                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white ring-2 ring-red-600" />
                   </span>
                 )}
-                <span className="hidden sm:inline">اخبار</span>
+                <span className="text-xs sm:text-sm font-bold">اخبار زنده</span>
               </TooltipTrigger>
               <TooltipContent>{hasUnreadNews ? "خبر جدید" : "خبر جدیدی نیست"}</TooltipContent>
             </Tooltip>

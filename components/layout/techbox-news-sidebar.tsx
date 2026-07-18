@@ -23,7 +23,13 @@ import { useHomeModule } from "@/features/home/lib/home-data"
 export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[] }) {
   const { setOpen } = useSidebar()
   const { items: dbNews, loading } = useHomeModule("news")
-  const newsItems = dbNews.slice(0, 15)
+
+  // Only show news from the last 24 hours (live-feel). Older news lives in /news.
+  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
+  const now = Date.now()
+  const newsItems = dbNews
+    .filter((n) => now - new Date(n.date).getTime() <= TWENTY_FOUR_HOURS)
+    .slice(0, 15)
 
   return (
     <Sidebar
@@ -55,7 +61,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
               ))
             ) : newsItems.length === 0 ? (
               <SidebarMenuItem className="p-4 text-center text-xs text-muted-foreground">
-                هنوز خبری ثبت نشده است.
+                خبر جدیدی در ۲۴ ساعت گذشته ثبت نشده است.
               </SidebarMenuItem>
             ) : (
               newsItems.map((news) => {
@@ -91,6 +97,16 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
                 </SidebarMenuItem>
                 )
               })
+            )}
+            {!loading && (
+              <SidebarMenuItem className="p-2">
+                <SidebarMenuButton
+                  render={<Link href="/news" onClick={() => setOpen(false)} />}
+                  className="h-auto justify-center py-2.5 text-xs font-bold text-red-600 hover:text-red-700"
+                >
+                  بایگانی خبر
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             )}
           </SidebarMenu>
         </ScrollArea>
