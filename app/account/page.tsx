@@ -33,6 +33,7 @@ const registerSchema = z.object({
 const profileSchema = z.object({
   name: z.string().min(2).max(100),
   email: z.string().email(),
+  currentPassword: z.string().optional(),
   job: z.string().max(100).optional(),
   birthday: z.string().max(20).optional(),
 });
@@ -64,7 +65,7 @@ export default function AccountPage() {
   });
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { name: "", email: "", job: "", birthday: "" },
+    defaultValues: { name: "", email: "", currentPassword: "", job: "", birthday: "" },
   });
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({
     resolver: zodResolver(passwordSchema),
@@ -83,6 +84,7 @@ export default function AccountPage() {
           profileForm.reset({
             name: data.user.name || "",
             email: data.user.email || "",
+            currentPassword: "",
             job: data.user.job || "",
             birthday: data.user.birthday || "",
           });
@@ -460,6 +462,27 @@ export default function AccountPage() {
                       </FormItem>
                     )}
                   />
+                  {(() => {
+                    const currentEmail = (user.email || "").toLowerCase();
+                    const typedEmail = (profileForm.watch("email") || "").toLowerCase();
+                    const emailIsChanging = typedEmail && typedEmail !== currentEmail;
+                    if (!emailIsChanging) return null;
+                    return (
+                      <FormField
+                        control={profileForm.control}
+                        name="currentPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>رمز عبور فعلی (برای تأیید تغییر ایمیل)</FormLabel>
+                            <FormControl>
+                              <Input type="password" dir="ltr" placeholder="رمز عبور فعلی" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    );
+                  })()}
                   <FormField
                     control={profileForm.control}
                     name="job"

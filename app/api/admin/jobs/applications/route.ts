@@ -60,7 +60,15 @@ export async function GET(req: NextRequest) {
         }
       }
     });
-    return NextResponse.json(applications, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+
+    // Never expose the public Blob URL to the client. Staff download resumes via
+    // the authenticated proxy at /api/admin/jobs/applications/[id]/resume.
+    const safe = applications.map(({ resumeUrl, ...rest }) => ({
+      ...rest,
+      resumeDownloadUrl: `/api/admin/jobs/applications/${rest.id}/resume`,
+    }));
+
+    return NextResponse.json(safe, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

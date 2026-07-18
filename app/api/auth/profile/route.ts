@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic, createEmailVerification } from "@/lib/auth-server";
+import { getSessionUserPublic, createEmailVerification, verifyPassword } from "@/lib/auth-server";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
@@ -8,6 +8,8 @@ import { z } from "zod";
 const profileSchema = z.object({
   name: z.string().min(2).optional(),
   email: z.string().email().optional(),
+  // Required only when the email is actually being changed (verified below).
+  currentPassword: z.string().optional(),
   job: z.string().optional(),
   birthday: z.string().optional(),
   avatar: z.string().optional(),
@@ -42,6 +44,27 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json(
           { error: "این ایمیل قبلاً توسط حساب دیگری استفاده شده است." },
           { status: 409 }
+        );
+      }
+
+      // Re-authentication: changing the recovery email must require the current
+      // password. Without this, a stolen session could silently swap in an
+      // attacker-controlled email and then take over the account via reset.
+      if (!data.currentPassword) {
+        return NextResponse.json(
+          { error: "برای تغییر ایمیل، وارد کردن رمز عبور فعلی الزامی است." },
+          { status: 400 }
+        );
+      }
+      const withPw = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { password: true },
+      });
+      const pwOk = await verifyPassword(data.currentPassword, withPw?.password ?? "").catch(() => false);
+      if (!pwOk) {
+        return NextResponse.json(
+          { error: "رمز عبور فعلی اشتباه است." },
+          { status: 400 }
         );
       }
     }

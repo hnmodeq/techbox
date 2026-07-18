@@ -90,9 +90,8 @@ function AdminApplicationsInner() {
                       {new Intl.DateTimeFormat("fa-IR").format(new Date(app.createdAt))}
                     </td>
                     <td className="p-4">
-                      <a 
-                        href={app.resumeUrl} 
-                        target="_blank" 
+                      <a
+                        href={app.resumeDownloadUrl}
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 text-[var(--home)] hover:underline text-sm font-bold"
                       >
