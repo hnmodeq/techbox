@@ -3,13 +3,19 @@
 -- without exposing/parsing the email) + an unsubscribedAt timestamp, and a
 -- NewsletterCampaign table to record each sent blast for admin history.
 
-ALTER TABLE "NewsletterSubscriber" ADD COLUMN "unsubscribeToken" TEXT NOT NULL;
+-- IMPORTANT: add the column as NULLABLE first, backfill existing rows, THEN
+-- enforce NOT NULL + unique. Adding NOT NULL without a default fails when the
+-- table already has rows (ERROR 23502).
+
+ALTER TABLE "NewsletterSubscriber" ADD COLUMN "unsubscribeToken" TEXT;
 ALTER TABLE "NewsletterSubscriber" ADD COLUMN "unsubscribedAt" TIMESTAMP(3);
 
--- Backfill unique tokens for any existing subscribers (none in practice right
--- now, but keeps the unique constraint satisfiable on backfill).
-UPDATE "NewsletterSubscriber" SET "unsubscribeToken" = gen_random_uuid() WHERE "unsubscribeToken" = '' OR "unsubscribeToken" IS NULL;
-UPDATE "NewsletterSubscriber" SET "unsubscribeToken" = id WHERE "unsubscribeToken" IS NULL;
+-- Backfill from the row's id — already unique (it's the PK), so the unique
+-- index below is guaranteed satisfiable. New rows get an auto-generated cuid
+-- via the Prisma @default(cuid()).
+UPDATE "NewsletterSubscriber" SET "unsubscribeToken" = "id" WHERE "unsubscribeToken" IS NULL;
+
+ALTER TABLE "NewsletterSubscriber" ALTER COLUMN "unsubscribeToken" SET NOT NULL;
 
 CREATE UNIQUE INDEX "NewsletterSubscriber_unsubscribeToken_key" ON "NewsletterSubscriber"("unsubscribeToken");
 
