@@ -158,11 +158,10 @@ export default function Chatbot() {
           type="button"
           onClick={() => { setOpen(true); setHasUnread(false); }}
           style={{ zIndex: zIndex.popover }}
-          className="fixed bottom-5 left-5 rounded-full shadow-md gap-2 px-4 py-2.5 h-auto"
+          className="fixed bottom-5 left-5 rounded-full shadow-md size-12 p-0"
           aria-label="چت‌های تکباکس"
         >
-          <MessageCircle className="size-4" />
-          <span className="text-xs sm:text-sm">چت‌های تکباکس</span>
+          <MessageCircle className="size-5" />
           {hasUnread && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>

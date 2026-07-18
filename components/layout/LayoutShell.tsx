@@ -18,15 +18,15 @@ import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
 import type { SiteLayoutConfig } from "@/lib/module-config"
 
-// Lightweight placeholder that mirrors the chat launcher
+// Lightweight placeholder that mirrors the chat launcher (icon-only, no text)
 const ChatLauncherFallback = () => (
   <button
     type="button"
     aria-hidden
     tabIndex={-1}
-    className="fixed bottom-5 left-5 rounded-full bg-card border border-border px-4 py-2.5 text-foreground shadow-md flex items-center gap-2 text-xs sm:text-sm"
+    className="fixed bottom-5 left-5 rounded-full bg-primary text-primary-foreground border border-border size-12 shadow-md flex items-center justify-center"
   >
-    <span>چت تکباکس</span>
+    <span className="size-5 rounded-full bg-primary-foreground/40" />
   </button>
 )
 
