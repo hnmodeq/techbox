@@ -58,10 +58,10 @@ export default function FooterSection() {
   return (
     <footer className="border-t bg-card/40 mt-auto">
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-8 md:grid-cols-2 justify-between">
           {/* RIGHT column — quick links (top) + social icons (below the links) */}
-          <div className="text-right md:flex md:flex-col md:justify-between md:gap-8">
-            <div className="flex flex-col gap-2 md:items-end">
+          <div className="md:flex md:flex-col md:justify-between md:gap-8">
+            <div className="flex flex-col gap-2 md:items-start">
               {navigation.main.map((item) => (
                 <ButtonLink
                   key={item.name}
@@ -76,7 +76,7 @@ export default function FooterSection() {
             </div>
 
             <div>
-              <div className="flex gap-2 md:justify-end">
+              <div className="flex gap-2 md:justify-start">
                 {navigation.social.map((item) => (
                   <a
                     key={item.name}
@@ -99,7 +99,9 @@ export default function FooterSection() {
           {/* LEFT column — newsletter */}
           <div className="text-right">
             <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
-            <NewsletterSignup compact />
+            <div className="max-w-[260px]">
+              <NewsletterSignup compact />
+            </div>
           </div>
         </div>
 
