@@ -56,15 +56,24 @@ export default function FooterSection() {
     <footer className="border-t bg-card/40 mt-auto">
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
         <div className="grid gap-8 md:grid-cols-2">
-          {/* LEFT column — newsletter (top) + social (bottom) */}
-          <div className="flex flex-col justify-between gap-8">
-            <div>
-              <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
-              <NewsletterSignup compact />
+          {/* RIGHT column — quick links (top) + social icons (below the links) */}
+          <div className="text-right md:flex md:flex-col md:justify-between md:gap-8">
+            <div className="flex flex-col gap-2 md:items-end">
+              {navigation.main.map((item) => (
+                <ButtonLink
+                  key={item.name}
+                  href={item.href}
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start md:justify-end font-normal text-muted-foreground hover:text-foreground"
+                >
+                  {item.name}
+                </ButtonLink>
+              ))}
             </div>
 
             <div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 md:justify-end">
                 {navigation.social.map((item) => (
                   <a
                     key={item.name}
@@ -84,21 +93,10 @@ export default function FooterSection() {
             </div>
           </div>
 
-          {/* RIGHT column — quick links (spans the column's full height) */}
-          <div className="text-right md:flex md:flex-col md:justify-start">
-            <div className="flex flex-col gap-2 md:items-end">
-              {navigation.main.map((item) => (
-                <ButtonLink
-                  key={item.name}
-                  href={item.href}
-                  variant="ghost"
-                  size="sm"
-                  className="justify-start md:justify-end font-normal text-muted-foreground hover:text-foreground"
-                >
-                  {item.name}
-                </ButtonLink>
-              ))}
-            </div>
+          {/* LEFT column — newsletter */}
+          <div className="text-right">
+            <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
+            <NewsletterSignup compact />
           </div>
         </div>
 
