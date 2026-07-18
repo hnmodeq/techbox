@@ -12,7 +12,7 @@ export type ModuleItem = {
 
 export const modules: ModuleItem[] = [
   {
-    title: "مجله",
+    title: "مجله آنلاین",
     slug: "blog",
     description: "مقالات تخصصی، تحلیل‌ها و راهنماهای عمیق.",
     color: moduleColors.blog.active,
@@ -28,7 +28,7 @@ export const modules: ModuleItem[] = [
     order: 2,
   },
   {
-    title: "رسانه ویدیویی",
+    title: "ویدیوهای کوتاه",
     slug: "media",
     description: "ویدیوهای آموزشی، بررسی‌ها و محتوای چندرسانه‌ای.",
     color: moduleColors.media.active,
@@ -52,7 +52,7 @@ export const modules: ModuleItem[] = [
     order: 5,
   },
   {
-    title: "ابزارها",
+    title: "ابزارهای کاربردی",
     slug: "tools",
     description: "ابزارهای کاربردی برای شبکه و مهندسی سیستم.",
     color: moduleColors.tools.active,
@@ -68,7 +68,7 @@ export const modules: ModuleItem[] = [
     order: 7,
   },
   {
-    title: "تایم‌لاین فناوری",
+    title: "گاه‌شمار تکنولوژی",
     slug: "timeline",
     description: "تاریخچه تحولات، رویدادها و نقاط عطف فناوری اطلاعات.",
     color: moduleColors.timeline.active,
@@ -128,13 +128,13 @@ export type ModuleMeta = {
 
 const moduleList: ModuleMeta[] = [
   { key: "home", slug: "home", title: "Home", titleFa: "خانه", href: "/", color: "var(--home)", icon: "home", descriptionFa: "صفحه اصلی" },
-  { key: "blog", slug: "blog", title: "Blog", titleFa: "بلاگ", href: "/blog", color: "var(--blog)", icon: "blog", descriptionFa: "مقالات تخصصی" },
+  { key: "blog", slug: "blog", title: "Blog", titleFa: "مجله آنلاین", href: "/blog", color: "var(--blog)", icon: "blog", descriptionFa: "مقالات تخصصی" },
   { key: "news", slug: "news", title: "News", titleFa: "اخبار", href: "/news", color: "var(--news)", icon: "news", descriptionFa: "اخبار دنیای تکنولوژی" },
-  { key: "media", slug: "media", title: "Media", titleFa: "مدیا", href: "/media", color: "var(--media)", icon: "media", descriptionFa: "ویدئو و پادکست" },
+  { key: "media", slug: "media", title: "Media", titleFa: "ویدیوهای کوتاه", href: "/media", color: "var(--media)", icon: "media", descriptionFa: "ویدئو و پادکست" },
   { key: "shop", slug: "shop", title: "Shop", titleFa: "فروشگاه", href: "/shop", color: "var(--shop)", icon: "shop", descriptionFa: "خرید تجهیزات" },
-  { key: "tools", slug: "tools", title: "Tools", titleFa: "ابزارها", href: "/tools", color: "var(--tools)", icon: "tools", descriptionFa: "ابزارهای محاسباتی" },
+  { key: "tools", slug: "tools", title: "Tools", titleFa: "ابزارهای کاربردی", href: "/tools", color: "var(--tools)", icon: "tools", descriptionFa: "ابزارهای محاسباتی" },
   { key: "download", slug: "download", title: "Download", titleFa: "دانلود", href: "/download", color: "var(--download)", icon: "downloadModule", descriptionFa: "مرکز دانلود" },
-  { key: "timeline", slug: "timeline", title: "Timeline", titleFa: "تایم‌لاین فناوری", href: "/timeline", color: "var(--timeline)", icon: "timeline", descriptionFa: "تاریخچه و رویدادهای فناوری" },
+  { key: "timeline", slug: "timeline", title: "Timeline", titleFa: "گاه‌شمار تکنولوژی", href: "/timeline", color: "var(--timeline)", icon: "timeline", descriptionFa: "تاریخچه و رویدادهای فناوری" },
   { key: "forum", slug: "forum", title: "Forum", titleFa: "انجمن", href: "/forum", color: "var(--forum)", icon: "forum", descriptionFa: "پرسش و پاسخ" },
   { key: "review", slug: "review", title: "Review", titleFa: "بررسی", href: "/review", color: "var(--review)", icon: "review", descriptionFa: "نقد و بررسی" },
   { key: "raid", slug: "raid", title: "RAID", titleFa: "رید", href: "/tools/raid-calculator", color: "var(--raid)", icon: "disk", descriptionFa: "ماشین حساب RAID" },
