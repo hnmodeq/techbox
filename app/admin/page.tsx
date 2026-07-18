@@ -145,6 +145,7 @@ export default function AdminPage() {
             {user.role === "super_admin" && <ButtonLink href="/admin/redirects" variant="ghost" size="sm">Redirectها</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/moderation" variant="ghost" size="sm">Moderation</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/newsletter" variant="ghost" size="sm">خبرنامه</ButtonLink>}
+            {user.role === "super_admin" && <ButtonLink href="/admin/inbox" variant="ghost" size="sm">صندوق پیام‌ها</ButtonLink>}
             <Button variant="ghost" size="sm" onClick={() => { logout(); setUser(null); router.refresh(); }} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">خروج</Button>
           </div>
         </PageHeader>
