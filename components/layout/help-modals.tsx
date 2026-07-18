@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Accordion,
   AccordionContent,
@@ -80,14 +80,16 @@ function FaqModal({ open, onClose }: { open: boolean; onClose: () => void }) {
           <DialogDescription className="text-center">پاسخ پرتکرارترین پرسش‌های کاربران</DialogDescription>
         </DialogHeader>
         {loading ? (
-          Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-lg" />)
+          <div className="flex items-center justify-center py-12">
+            <Spinner className="size-6" />
+          </div>
         ) : faqs.length === 0 ? (
           <Card className="p-6 text-center text-sm text-muted-foreground">هنوز سوالی ثبت نشده است.</Card>
         ) : (
           <Accordion>
             {faqs.map((f) => (
               <AccordionItem key={f.id} value={f.id}>
-                <AccordionTrigger className="text-sm font-bold text-right">{f.question}</AccordionTrigger>
+                <AccordionTrigger className="text-sm font-bold text-right [&[data-open]>svg]:rotate-180">{f.question}</AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground leading-6">{f.answer}</AccordionContent>
               </AccordionItem>
             ))}

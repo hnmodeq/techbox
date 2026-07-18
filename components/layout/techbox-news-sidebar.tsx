@@ -67,7 +67,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
               newsItems.map((news) => {
                 const isUnread = unreadSlugs.includes(news.slug)
                 return (
-                <SidebarMenuItem key={news.slug} className={isUnread ? "animate-pulse rounded-lg bg-red-500/10" : undefined}>
+                <SidebarMenuItem key={news.slug}>
                   <SidebarMenuButton
                     render={<Link href={`/news/${news.slug}`} />}
                     className="h-auto py-3 px-2"
@@ -82,10 +82,16 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
                           sizes="(min-width: 768px) 80px, 96px"
                           quality={95}
                         />
+                        {isUnread && (
+                          <span className="absolute top-1 right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0 text-start">
-                        <div className="text-xs font-bold line-clamp-2 leading-5 text-foreground">
-                          {news.title}
+                        <div className="flex items-center gap-1.5">
+                          {isUnread && <span className="size-1.5 shrink-0 rounded-full bg-red-500" />}
+                          <div className="text-xs font-bold line-clamp-2 leading-5 text-foreground">
+                            {news.title}
+                          </div>
                         </div>
                         <div className="mt-1 text-[10px] text-muted-foreground">
                           {formatRelativeDate(news.date)}

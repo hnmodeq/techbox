@@ -10,7 +10,7 @@ export default function SubnetCalculatorPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <ToolPageHeader
-        title="ماشین حساب ساب‌نت"
+        title="Subnet Calculator"
         subtitle="بدون تغییر – نسخه فعلی شما"
         accent="var(--subnet)"
         breadcrumbs={[

@@ -12,7 +12,7 @@ export default function RaidCalculatorPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <ToolPageHeader
-        title="ماشین حساب RAID"
+        title="RAID Calculator"
         subtitle="RAID 0 · 1 · 5 · 6 · 10 · SHR-1 · SHR-2"
         accent="var(--raid)"
         breadcrumbs={[

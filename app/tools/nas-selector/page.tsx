@@ -14,7 +14,7 @@ export default async function NasSelectorPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <ToolPageHeader
-        title="انتخاب‌گر NAS"
+        title="NAS Selector"
         subtitle="پیکربندی هوشمند بر اساس نیاز واقعی شما"
         accent="var(--tools)"
         breadcrumbs={[

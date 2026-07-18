@@ -14,7 +14,7 @@ export default async function NvrSelectorPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <ToolPageHeader
-        title="انتخاب‌گر NVR"
+        title="NVR Selector"
         subtitle="پیشنهاد مدل NVR مناسب پروژه دوربین مداربسته"
         accent="var(--raid)"
         breadcrumbs={[

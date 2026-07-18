@@ -288,8 +288,9 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
     const set = new Set<number>()
     cells.forEach((day, index) => {
       if (day === null) return
-      // Friday = index where (index + 1) % 7 === 6
-      if ((index + 1) % 7 === 6) set.add(day)
+      // Friday = last column (index 6, 13, 20...) which is "ج" (جمعه).
+      // The old code used (index + 1) % 7 === 6 which targeted "پ" (Thursday).
+      if (index % 7 === 6) set.add(day)
     })
     return set
   }, [])
@@ -393,7 +394,7 @@ function DateTimeDisplay() {
         render={
           <button
             type="button"
-            className="hidden h-8 min-w-[16.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted md:flex"
+            className="hidden h-8 min-w-[16.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground md:flex"
             suppressHydrationWarning
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -556,7 +557,7 @@ function NotificationsButton() {
                     key={item.id}
                     href={`/${item.module}/${item.slug}`}
                     onClick={() => setOpen(false)}
-                    className="block rounded-lg border bg-card p-3 transition-colors hover:bg-muted/60"
+                    className="block rounded-lg border bg-card p-3"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="font-bold">{item.label}</span>
@@ -646,7 +647,7 @@ export function SiteHeader({
                     <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white ring-2 ring-red-600" />
                   </span>
                 )}
-                <span className="text-xs sm:text-sm font-bold">اخبار زنده</span>
+                <span className="text-xs sm:text-sm font-bold">خبر</span>
               </TooltipTrigger>
               <TooltipContent>{hasUnreadNews ? "خبر جدید" : "خبر جدیدی نیست"}</TooltipContent>
             </Tooltip>
