@@ -56,9 +56,14 @@ const navigation = {
 // Bottom row: copyright (right) + design team (left).
 export default function FooterSection() {
   return (
-    <footer className="border-t w-full bg-yellow-200 justtify-center mt-auto">
+    <footer className="border-t w-full bg-yellow-200 justify-center mt-auto">
       <div className="mx-auto bg-blue-200 justify-between px-10 pb-8 w-full pt-12">
-        <div className="grid bg-pink-300 gap-1 md:grid-cols-2 md:justify-between w-full">
+        {/* Parent: flex (not grid) so justify-between actually works.
+            grid-cols-2 forced both columns to 1fr = no free space, so
+            justify-between did nothing. Flex lets the columns size to their
+            content and spread to opposite edges.
+            Mobile: stacked (flex-col). Desktop: row, spread to edges. */}
+        <div className="flex bg-pink-300 gap-1 flex-col md:flex-row md:justify-between w-full">
           {/* RIGHT column — quick links (top) + social icons (below the links) */}
           <div className="md:flex w-40 bg-red-200 md:flex-col md:justify-center md:gap-8">
             <div className="flex bg-green-200 flex-col gap-2 md:items-start">
