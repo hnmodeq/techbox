@@ -34,7 +34,7 @@ export default function DownloadTable({ serverItems }: { serverItems?: ContentIt
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <ModuleHeader module="download" title="مرکز دانلود تکباکس" description="ISO • Firmware • Driver – لینک مستقیم داخل ایران" count={`${filtered.length.toLocaleString("fa-IR")} فایل`} />
+      <ModuleHeader module="download" description="ISO • Firmware • Driver – لینک مستقیم داخل ایران" count={`${filtered.length.toLocaleString("fa-IR")} فایل`} />
 
       <Card className="p-4 mb-6">
         <div className="grid md:grid-cols-4 gap-3">

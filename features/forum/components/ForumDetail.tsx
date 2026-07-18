@@ -12,6 +12,7 @@ import { ForumJsonLd } from "@/components/seo/StructuredData";
 import { ShareButton } from "@/components/ui/share-button";
 import { SaveButton } from "@/components/ui/save-button";
 import { AuthorLink } from "@/components/ui/author-link";
+import { useModuleTitle } from "@/providers/module-config.provider";
 
 type ForumDetailProps = {
   slug: string;
@@ -44,6 +45,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
   const [item, setItem] = useState<any | null>(initialItem);
   const [loading, setLoading] = useState(!initialItem);
   const [notFound, setNotFound] = useState(false);
+  const forumTitle = useModuleTitle('forum', 'انجمن');
 
   useEffect(() => {
     let mounted = true;
@@ -103,7 +105,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
         </Link>
         <span>/</span>
         <Link href="/forum" className="hover:text-[var(--primary-text)]">
-          انجمن تکباکس
+          {forumTitle}
         </Link>
         <span>/</span>
         <span className="truncate text-[var(--primary-text)] max-w-xs">{item.title}</span>

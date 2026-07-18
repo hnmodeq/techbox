@@ -164,7 +164,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
-      <ModuleHeader module="forum" title="انجمن تکباکس" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={loadingTopics ? "در حال دریافت…" : `${all.length.toLocaleString("fa-IR")} موضوع`}>
+      <ModuleHeader module="forum" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={loadingTopics ? "در حال دریافت…" : `${all.length.toLocaleString("fa-IR")} موضوع`}>
         <div className="flex gap-2">
           <Input placeholder="جستجو در انجمن…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-56" />
           <Button onClick={() => setShowNew(true)}>+ موضوع جدید</Button>

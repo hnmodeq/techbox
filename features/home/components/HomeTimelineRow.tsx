@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
+import { useModuleTitle } from '@/providers/module-config.provider';
 import type { TimelineEvent } from '@/types/timeline';
 
 const PREVIEW_COUNT = 6;
@@ -99,6 +100,7 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
 
   const [preview, setPreview] = useState<TimelineEvent[]>([]);
   const [loadedCount, setLoadedCount] = useState(0);
+  const timelineTitle = useModuleTitle('timeline', 'گاه‌شمار تکنولوژی');
   const allImagesLoaded = preview.length > 0 && loadedCount >= preview.length;
 
   useEffect(() => {
@@ -190,9 +192,7 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
                     every state. Both texts are stacked and crossfaded. */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
                   <div className="relative flex items-center justify-center [filter:drop-shadow(0_2px_10px_rgba(0,0,0,0.55))]">
-                    <span className="text-xl sm:text-3xl font-black text-white whitespace-nowrap transition-all duration-700 ease-in-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-90 group-hover:-translate-y-3">
-                      تایم‌لاین فناوری
-                    </span>
+                    <span className="text-xl sm:text-3xl font-black text-white whitespace-nowrap transition-all duration-700 ease-in-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-90 group-hover:-translate-y-3">{timelineTitle}</span>
                     <span className="absolute m-auto text-lg sm:text-2xl font-black text-white whitespace-nowrap transition-all duration-700 ease-in-out opacity-0 scale-110 group-hover:opacity-100 group-hover:scale-100">
                       برای تماشا کلیک کنید
                     </span>

@@ -60,7 +60,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
 
   return (
     <main className="mx-auto max-w-7xl px-4 md:px-6 py-12" dir="rtl">
-      <ModuleHeader module="shop" title="فروشگاه زیرساخت" description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`} />
+      <ModuleHeader module="shop" description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`} />
 
       <div className="relative mb-6" ref={dropdownRef}>
         <Card className="p-3">

@@ -80,7 +80,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
   
   return (
     <main className="mx-auto max-w-7xl px-4 md:px-8 py-14" dir="rtl">
-      <ModuleHeader module="blog" title="مجله تکباکس" description={`مقالات تخصصی زیرساخت • ${items.length.toLocaleString("fa-IR")} مطلب`} />
+      <ModuleHeader module="blog" description={`مقالات تخصصی زیرساخت • ${items.length.toLocaleString("fa-IR")} مطلب`} />
       
       {loading ? (
         <div className="responsive-card-grid-lg grid gap-6">

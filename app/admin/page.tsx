@@ -132,8 +132,7 @@ export default function AdminPage() {
             <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
             {user.role === "super_admin" && <ButtonLink href="/admin/roles" variant="ghost" size="sm">نقش‌ها</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/modules" variant="ghost" size="sm">ماژول‌ها</ButtonLink>}
-            {user.role === "super_admin" && <ButtonLink href="/admin/module-names" variant="ghost" size="sm">نام ماژول‌ها</ButtonLink>}
-            {user.role === "super_admin" && <ButtonLink href="/admin/consultations" variant="ghost" size="sm">مشاوره‌ها</ButtonLink>}
+                        {user.role === "super_admin" && <ButtonLink href="/admin/consultations" variant="ghost" size="sm">مشاوره‌ها</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/holidays" variant="ghost" size="sm">تعطیلات</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/settings" variant="ghost" size="sm">تنظیمات</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/users" variant="ghost" size="sm">کاربران</ButtonLink>}

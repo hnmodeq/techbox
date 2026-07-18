@@ -18,7 +18,7 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-12" dir="rtl">
-      <ModuleHeader module="review" title="نقد و بررسی تخصصی تجهیزات" description="تست‌های آزمایشگاهی زیرساخت، بنچمارک دقیق و ارزیابی معماری" count={`${items.length.toLocaleString("fa-IR")} بررسی`} />
+      <ModuleHeader module="review" description="تست‌های آزمایشگاهی زیرساخت، بنچمارک دقیق و ارزیابی معماری" count={`${items.length.toLocaleString("fa-IR")} بررسی`} />
 
       {/* Single column vertical list with full-width horizontal cards */}
       <div className="flex flex-col gap-6 mt-8">

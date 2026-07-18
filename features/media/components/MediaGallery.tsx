@@ -27,7 +27,7 @@ export default function MediaGallery({ serverItems }: { serverItems?: ContentIte
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
-      <ModuleHeader module="media" title="رسانه ویدیویی تکباکس" count={`${allItems.length.toLocaleString("fa-IR")} ویدیو`} />
+      <ModuleHeader module="media" count={`${allItems.length.toLocaleString("fa-IR")} ویدیو`} />
 
       <div className="responsive-card-grid-sm grid gap-6 mt-8">
         {displayedItems.map((v, idx) => (

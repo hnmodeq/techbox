@@ -17,7 +17,7 @@ export default function NewsList({ serverItems }: { serverItems?: ContentItem[] 
 
  return (
  <main className="mx-auto max-w-7xl px-4 md:px-6 py-12" dir="rtl">
- <ModuleHeader module="news" title="اخبار تکنولوژی" description="با منبع و ساعت انتشار" />
+ <ModuleHeader module="news" description="با منبع و ساعت انتشار" />
 
  <div className="grid lg:grid-cols-12 gap-7 items-start mt-6">
  <section className="lg:col-span-8 order-1 lg:order-2">

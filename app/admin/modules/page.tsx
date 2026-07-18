@@ -24,7 +24,7 @@ const ALL_MODULES: ModuleSlug[] = [
   "blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline",
 ];
 
-type TabId = "modules" | "homepage" | "titles" | "colors";
+type TabId = "modules" | "homepage" | "titles" | "colors" | "names";
 
 const DEFAULT_MODULE_COLORS: Record<string, string> = {
   blog: "light-dark(oklch(0.7 0.17 52), #fb923c)",
@@ -42,8 +42,47 @@ export default function AdminModulesPage() {
   const [config, setConfig] = useState<SiteLayoutConfig>(getDefaultSiteLayoutConfig());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<TabId>("modules");
+  // ─── Module names (source of truth) ───
+  const [moduleNames, setModuleNames] = useState<Record<string, string>>({});
+  const [nameDefaults, setNameDefaults] = useState<Record<string, string>>({});
+  const [namesLoading, setNamesLoading] = useState(false);
+  const [namesSaving, setNamesSaving] = useState(false);
+
+  useEffect(() => {
+    if (tab !== "names") return;
+    setNamesLoading(true);
+    fetch("/api/admin/module-names", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d) {
+          setModuleNames(d.titles || {});
+          setNameDefaults(d.defaults || {});
+        }
+      })
+      .catch(() => {})
+      .finally(() => setNamesLoading(false));
+  }, [tab]);
+
+  const saveNames = async () => {
+    setNamesSaving(true);
+    try {
+      const res = await fetch("/api/admin/module-names", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(moduleNames),
+      });
+      if (res.ok) setMessage("نام ماژول‌ها ذخیره شد و در سراسر سایت اعمال شد");
+      else setMessage("خطا در ذخیره نام‌ها");
+    } catch {
+      setMessage("خطا در ارتباط با سرور");
+    } finally {
+      setNamesSaving(false);
+    }
+  };
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -98,6 +137,7 @@ export default function AdminModulesPage() {
     { id: "homepage", label: "چیدمان خانه" },
     { id: "titles", label: "عناوین ردیف‌ها" },
     { id: "colors", label: "رنگ‌ها" },
+    { id: "names", label: "نام ماژول‌ها" },
   ];
 
   const sortedHomeModules = [...ALL_MODULES]
@@ -501,6 +541,56 @@ export default function AdminModulesPage() {
                 </div>
               </div>
             </CardContent>
+          </Card>
+        )}
+
+
+        {/* Tab: Module Names (source of truth) */}
+        {tab === "names" && (
+          <Card className="p-5 space-y-4">
+            <CardHeader className="p-0">
+              <CardTitle>نام نمایشی ماژول‌ها</CardTitle>
+              <CardDescription>
+                منبع واحد نام ماژول‌ها — تغییر در اینجا در سراسر سایت اعمال می‌شود (سایدبار، هدر صفحات، تیکبار، بردکرامب و...).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0 space-y-3">
+              {namesLoading ? (
+                <p className="text-sm text-muted-foreground">در حال بارگذاری...</p>
+              ) : (
+                [
+                  { slug: "blog", label: "مجله / Blog" },
+                  { slug: "news", label: "اخبار / News" },
+                  { slug: "media", label: "رسانه / Media" },
+                  { slug: "shop", label: "فروشگاه / Shop" },
+                  { slug: "forum", label: "انجمن / Forum" },
+                  { slug: "review", label: "نقد و بررسی / Review" },
+                  { slug: "download", label: "دانلود / Download" },
+                  { slug: "tools", label: "ابزارها / Tools" },
+                  { slug: "timeline", label: "تایم‌لاین / Timeline" },
+                ].map((m) => {
+                  const isCustom = moduleNames[m.slug] && moduleNames[m.slug] !== nameDefaults[m.slug];
+                  return (
+                    <div key={m.slug} className="grid grid-cols-[1fr_1.4fr] items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-foreground">{m.label}</span>
+                        {isCustom && <Badge variant="secondary" className="text-[10px]">شخصی‌سازی‌شده</Badge>}
+                      </div>
+                      <Input
+                        value={moduleNames[m.slug] ?? ""}
+                        onChange={(e) => setModuleNames((t) => ({ ...t, [m.slug]: e.target.value }))}
+                        placeholder={nameDefaults[m.slug] || m.slug}
+                        className="h-9"
+                      />
+                    </div>
+                  );
+                })
+              )}
+            </CardContent>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setModuleNames({ ...nameDefaults })} disabled={namesLoading || namesSaving}>بازگشت به پیش‌فرض</Button>
+              <Button type="button" size="sm" onClick={saveNames} disabled={namesLoading || namesSaving} loading={namesSaving}>ذخیره نام‌ها</Button>
+            </div>
           </Card>
         )}
 
