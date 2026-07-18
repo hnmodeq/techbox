@@ -64,7 +64,7 @@ export function NewsletterSignup({ compact = false }: NewsletterSignupProps) {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input type="email" placeholder="ایمیل شما" dir="ltr" className="h-8 text-sm" {...field} />
+                  <Input type="email" placeholder="ایمیل خود را وارد کنید" dir="rtl" className="h-8 text-sm" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -102,7 +102,7 @@ export function NewsletterSignup({ compact = false }: NewsletterSignupProps) {
             <FormItem>
               <FormLabel className="text-xs">ایمیل</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="ایمیل شما" dir="ltr" {...field} />
+                <Input type="email" placeholder="ایمیل خود را وارد کنید" dir="rtl" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

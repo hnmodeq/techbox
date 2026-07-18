@@ -11,8 +11,6 @@ const navigation = {
     { name: "ارتباط با ما", href: "/contact" },
     { name: "درباره ما", href: "/about" },
     { name: "فرصت‌های شغلی", href: "/work-with-us" },
-    { name: "پشتیبانی", href: "/support" },
-    { name: "بازخورد", href: "/feedback" },
   ],
   social: [
     {
@@ -40,7 +38,7 @@ const navigation = {
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
             fillRule="evenodd"
-            d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 01-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 01-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 01 1.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z"
+            d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 01-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 01-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 011.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z"
             clipRule="evenodd"
           />
         </svg>
@@ -49,54 +47,56 @@ const navigation = {
   ],
 };
 
-// Rebuilt with shadcn primitives: 3-column footer with newsletter, links, social
+// Two-column footer:
+//  - RIGHT column: the quick links (full height)
+//  - LEFT  column: newsletter on top, social icons below
+// Bottom row: copyright (right) + design team (left).
 export default function FooterSection() {
   return (
     <footer className="border-t bg-card/40 mt-auto">
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
-        <div className="grid gap-8 md:grid-cols-3">
-          {/* Newsletter - Right column */}
-          <div className="text-right">
-            <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
-            <NewsletterSignup compact />
+        <div className="grid gap-8 md:grid-cols-2">
+          {/* LEFT column — newsletter (top) + social (bottom) */}
+          <div className="flex flex-col justify-between gap-8">
+            <div>
+              <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
+              <NewsletterSignup compact />
+            </div>
+
+            <div>
+              <div className="flex gap-2">
+                {navigation.social.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={item.name}
+                    className={cn(
+                      buttonVariants({ variant: "ghost", size: "icon" }),
+                      "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <item.icon className="size-5 transition-transform hover:scale-110" />
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Quick links - Middle column */}
-          <div className="text-right">
-            <h4 className="text-sm font-semibold text-foreground mb-4">لینک‌های سریع</h4>
-            <div className="flex flex-col gap-2">
+          {/* RIGHT column — quick links (spans the column's full height) */}
+          <div className="text-right md:flex md:flex-col md:justify-start">
+            <div className="flex flex-col gap-2 md:items-end">
               {navigation.main.map((item) => (
                 <ButtonLink
                   key={item.name}
                   href={item.href}
                   variant="ghost"
                   size="sm"
-                  className="justify-start font-normal text-muted-foreground hover:text-foreground"
+                  className="justify-start md:justify-end font-normal text-muted-foreground hover:text-foreground"
                 >
                   {item.name}
                 </ButtonLink>
-              ))}
-            </div>
-          </div>
-
-          {/* Social - Left column */}
-          <div className="text-right">
-            <h4 className="text-sm font-semibold text-foreground mb-4">شبکه‌های اجتماعی</h4>
-            <div className="flex gap-2">
-              {navigation.social.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={item.name}
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <item.icon className="size-5 transition-transform hover:scale-110" />
-                </a>
               ))}
             </div>
           </div>
@@ -104,20 +104,21 @@ export default function FooterSection() {
 
         <Separator className="mt-12" />
 
-        <div className="pt-6 text-center space-y-2">
-          <p className="text-sm font-semibold text-muted-foreground">
-            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «هونامیک ارتباط رستاک» میباشد.
-          </p>
-          <p className="text-xs text-muted-foreground">
+        {/* Bottom row: copyright (right) + design team (left) */}
+        <div className="pt-6 flex flex-col items-center justify-between gap-2 sm:flex-row">
+          <p className="text-xs text-muted-foreground order-2 sm:order-1">
             طراحی شده توسط{" "}
             <a
               href="https://www.bumimstudio.ir/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-bold text-foreground hover:underline"
+              className="font-bold text-[#f5b301] hover:underline"
             >
               بومیم
             </a>
+          </p>
+          <p className="text-sm font-semibold text-muted-foreground order-1 sm:order-2 text-center sm:text-right">
+            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «<a href="https://rastaak.co" target="_blank" rel="noopener noreferrer" className="text-sky-500 hover:underline">هونامیک ارتباط رستاک</a>» میباشد.
           </p>
         </div>
       </div>
