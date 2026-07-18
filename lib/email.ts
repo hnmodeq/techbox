@@ -93,4 +93,18 @@ export const emailTemplates = {
       </div>
     `,
   }),
+
+  emailVerification: (verifyLink: string) => ({
+    subject: "تأیید ایمیل در تکباکس",
+    html: `
+      <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
+        <h2>تأیید ایمیل شما</h2>
+        <p>برای فعال‌سازی حساب کاربری و تکمیل ثبت‌نام، روی دکمه زیر کلیک کنید:</p>
+        <a href="${escapeHtml(verifyLink)}" style="display: inline-block; padding: 12px 24px; background: #16a34a; color: white; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+          تأیید ایمیل
+        </a>
+        <p style="color: #666; font-size: 13px;">این لینک ۲۴ ساعت معتبر است. اگر شما این درخواست را ارسال نکرده‌اید، می‌توانید این پیام را نادیده بگیرید.</p>
+      </div>
+    `,
+  }),
 };

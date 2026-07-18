@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { hashPassword, createSession, setSessionCookie } from "@/lib/auth-server";
+import { hashPassword, createSession, setSessionCookie, createEmailVerification } from "@/lib/auth-server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendEmail, emailTemplates } from "@/lib/email";
@@ -63,6 +63,11 @@ export async function POST(req: NextRequest) {
     const roleFa = isFirstUser ? "مدیر کل" : "کاربر عضو";
     const modules = isFirstUser ? ["blog", "news", "media", "review", "download", "shop", "forum", "tools"] : [];
 
+    // The bootstrap (first) account is auto-verified and logged in immediately,
+    // so a fresh deployment can never lock itself out if email delivery fails.
+    // Every other account must verify its email before it can log in.
+    const emailVerified = isFirstUser ? new Date() : null;
+
     const user = await prisma.user.create({
       data: {
         name,
@@ -72,35 +77,50 @@ export async function POST(req: NextRequest) {
         role,
         roleFa,
         modules,
-        avatar: ""
+        avatar: "",
+        emailVerified,
       }
     });
 
-    const token = await createSession(user.id);
-    await setSessionCookie(token);
+    // --- Bootstrap path: first user is verified & logged in right away ---
+    if (isFirstUser) {
+      const token = await createSession(user.id);
+      await setSessionCookie(token);
 
-    // Send welcome email
-    if (user.email) {
-      const { subject, html } = emailTemplates.welcome(user.name || user.username);
-      await sendEmail({
-        to: user.email,
-        subject,
-        html,
-      });
+      // Send welcome email
+      if (user.email) {
+        const { subject, html } = emailTemplates.welcome(user.name || user.username);
+        await sendEmail({ to: user.email, subject, html });
+      }
+
+      return NextResponse.json({
+        ok: true,
+        user: {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          roleFa: user.roleFa || "کاربر عضو",
+          modules: user.modules || [],
+          avatar: user.avatar
+        }
+      }, { status: 201 });
     }
+
+    // --- Normal path: send a verification email, do NOT log in yet ---
+    const { rawToken } = await createEmailVerification(user.id);
+    const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const verifyLink = `${base}/auth/verify-email?token=${rawToken}&email=${encodeURIComponent(user.email)}`;
+
+    const { subject, html } = emailTemplates.emailVerification(verifyLink);
+    await sendEmail({ to: user.email, subject, html });
 
     return NextResponse.json({
       ok: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        roleFa: user.roleFa || "کاربر عضو",
-        modules: user.modules || [],
-        avatar: user.avatar
-      }
+      needsVerification: true,
+      email: user.email,
+      message: "حساب شما ساخته شد. برای تکمیل ثبت‌نام، لینک تأیید را از ایمیل خود بررسی کنید.",
     }, { status: 201 });
   } catch (e: any) {
     if (e instanceof z.ZodError) {
