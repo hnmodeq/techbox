@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
+import { blurProps } from '@/lib/image-placeholder';
 import { Badge } from '@/components/ui/badge';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
@@ -112,22 +113,34 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
             >
               {preview.length > 0 ? (
                 <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6">
-                  {preview.map((p) => (
+                  {preview.map((p, idx) => (
                     <div key={p.id} className="relative aspect-[3/4] overflow-hidden rounded-lg ring-1 ring-border">
                       <Image
                         src={p.image!}
                         alt={p.title}
                         fill
                         sizes="(max-width: 640px) 33vw, 16vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        // Priority loads the first row eagerly (no lazy delay);
+                        // the blur placeholder fills the box instantly while the
+                        // optimized image streams in.
+                        {...(idx < 3 ? { priority: true } : {})}
+                        {...blurProps(p.image)}
+                        className="object-cover"
                       />
                     </div>
                   ))}
-                  {/* Centered "click to watch" prompt sits above the images */}
+                  {/* Centered overlay: morphs from the title to a "click to watch"
+                      prompt on hover. Both strings are stacked; group-hover
+                      crossfades + scales them for a shape-changing transition. */}
                   <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <span className="rounded-full bg-background/85 px-5 py-2 text-sm font-black text-foreground shadow-sm ring-1 ring-border">
-                      برای تماشا کلیک کنید
-                    </span>
+                    <div className="relative flex h-9 min-w-[210px] items-center justify-center rounded-full bg-background/85 px-5 shadow-sm ring-1 ring-border overflow-hidden">
+                      <span className="absolute m-auto text-sm font-black text-foreground whitespace-nowrap transition-all duration-300 ease-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-90 group-hover:-translate-y-3">
+                        تایم‌لاین فناوری
+                      </span>
+                      <span className="absolute m-auto text-sm font-black text-primary whitespace-nowrap transition-all duration-300 ease-out opacity-0 scale-110 group-hover:opacity-100 group-hover:scale-100">
+                        برای تماشا کلیک کنید
+                      </span>
+                    </div>
                   </div>
                 </div>
               ) : (
