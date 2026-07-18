@@ -5,6 +5,7 @@ import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
 import type { TimelineEvent } from '@/types/timeline';
@@ -22,12 +23,10 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return copy.slice(0, Math.min(n, copy.length));
 }
 
-/** Single preview image that fades in only once decoded. Before load it is
- * fully transparent (no border, no background, no box) so there is NO second
- * skeleton stage — just the neutral grid background + title, then a smooth
- * fade-in when the photo is actually ready. */
-function TimelinePreviewImage({ src, alt, priority }: { src: string; alt: string; priority?: boolean }) {
-  const [loaded, setLoaded] = useState(false);
+/** Single preview image. Stays invisible (opacity-0) until it decodes; the
+ * parent swaps the whole grid from skeleton -> images only after ALL images
+ * have reported load, so there is exactly one skeleton -> one reveal. */
+function TimelinePreviewImage({ src, alt, priority, onLoaded }: { src: string; alt: string; priority?: boolean; onLoaded?: () => void }) {
   return (
     <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
       <Image
@@ -36,9 +35,22 @@ function TimelinePreviewImage({ src, alt, priority }: { src: string; alt: string
         fill
         sizes="(max-width: 640px) 33vw, 16vw"
         {...(priority ? { priority: true } : {})}
-        onLoad={() => setLoaded(true)}
-        className={`object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        onLoad={() => onLoaded?.()}
+        className="object-cover"
       />
+    </div>
+  );
+}
+
+/** The single skeleton: same grid layout + cell size as the final image grid,
+ *  so height never jumps. Each cell uses `skeleton-base` which already carries
+ *  the shimmer animation from globals.css. */
+function TimelineGridSkeleton({ count = PREVIEW_COUNT }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <Skeleton key={i} className="aspect-[3/4] rounded-lg" />
+      ))}
     </div>
   );
 }
@@ -84,7 +96,10 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
   // the active timeline reuses them (no double fetch).
   const { events, isLoading, error } = useTimelineEvents();
   const [active, setActive] = useState(false);
+
   const [preview, setPreview] = useState<TimelineEvent[]>([]);
+  const [loadedCount, setLoadedCount] = useState(0);
+  const allImagesLoaded = preview.length > 0 && loadedCount >= preview.length;
 
   useEffect(() => {
     if (events.length === 0) return;
@@ -92,6 +107,12 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
     if (withImages.length === 0) return;
     setPreview(pickRandom(withImages, PREVIEW_COUNT));
   }, [events]);
+
+  // Reset the load counter whenever a new random set is picked, so the skeleton
+  // shows again until the new images report ready.
+  useEffect(() => {
+    setLoadedCount(0);
+  }, [preview]);
 
   return (
     <section className={`w-full py-8 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
@@ -132,18 +153,41 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
               className="group relative cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="بارگذاری تایم‌لاین تعاملی"
             >
-              <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6 min-h-[200px] bg-muted/40">
-                {preview.map((p, idx) => (
-                  <TimelinePreviewImage key={p.id} src={p.image!} alt={p.title} priority={idx < 3} />
-                ))}
-                {/* Gradient overlay so the (larger, no-bg) title reads clearly
-                    over the image grid, which now reads as a background. */}
+              <div className="relative">
+                {/* THE skeleton: identical grid + cell size as the images, so it
+                    establishes the correct height from the very first paint
+                    (even before events are fetched) and never jumps. It is the
+                    single loading state — shimmering via skeleton-base — and
+                    stays in place until ALL images report load, then crossfades
+                    out. No separate row-skeleton, no bordered empty cells. */}
+                <div className={`transition-opacity duration-700 ${allImagesLoaded ? 'opacity-0' : 'opacity-100'}`}>
+                  <TimelineGridSkeleton count={Math.max(preview.length, PREVIEW_COUNT)} />
+                </div>
+
+                {/* Images grid — overlaid on top (absolute) so it doesn't change
+                    the layout; invisible until every image is decoded, then
+                    crossfades in. */}
+                {preview.length > 0 && (
+                  <div className={`absolute inset-0 grid grid-cols-3 gap-2 sm:grid-cols-6 transition-opacity duration-700 ${allImagesLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                    {preview.map((p, idx) => (
+                      <TimelinePreviewImage
+                        key={p.id}
+                        src={p.image!}
+                        alt={p.title}
+                        priority={idx < 3}
+                        onLoaded={() => setLoadedCount((n) => n + 1)}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Gradient overlay so the no-bg title reads clearly over the
+                    image grid (which now reads as a background). */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/45 via-black/25 to-black/45" />
 
                 {/* Centered title (no button background). Morphs SLOWLY into a
-                    "click to watch" prompt on hover. The title is the default
-                    in every state — including loading — so there's no flash of
-                    the wrong string. Both texts are stacked and crossfaded. */}
+                    "click to watch" prompt on hover. Title is the default in
+                    every state. Both texts are stacked and crossfaded. */}
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
                   <div className="relative flex items-center justify-center [filter:drop-shadow(0_2px_10px_rgba(0,0,0,0.55))]">
                     <span className="text-xl sm:text-3xl font-black text-white whitespace-nowrap transition-all duration-700 ease-in-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-90 group-hover:-translate-y-3">
