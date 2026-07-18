@@ -22,6 +22,27 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return copy.slice(0, Math.min(n, copy.length));
 }
 
+/** Single preview image that fades in only once decoded. Before load it is
+ * fully transparent (no border, no background, no box) so there is NO second
+ * skeleton stage — just the neutral grid background + title, then a smooth
+ * fade-in when the photo is actually ready. */
+function TimelinePreviewImage({ src, alt, priority }: { src: string; alt: string; priority?: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 640px) 33vw, 16vw"
+        {...(priority ? { priority: true } : {})}
+        onLoad={() => setLoaded(true)}
+        className={`object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+      />
+    </div>
+  );
+}
+
 function ActiveTimelineContent({
   events,
   isLoading,
@@ -111,18 +132,9 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
               className="group relative cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="بارگذاری تایم‌لاین تعاملی"
             >
-              <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6 min-h-[200px] bg-muted">
+              <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6 min-h-[200px] bg-muted/40">
                 {preview.map((p, idx) => (
-                  <div key={p.id} className="relative aspect-[3/4] overflow-hidden rounded-lg ring-1 ring-border">
-                    <Image
-                      src={p.image!}
-                      alt={p.title}
-                      fill
-                      sizes="(max-width: 640px) 33vw, 16vw"
-                      {...(idx < 3 ? { priority: true } : {})}
-                      className="object-cover"
-                    />
-                  </div>
+                  <TimelinePreviewImage key={p.id} src={p.image!} alt={p.title} priority={idx < 3} />
                 ))}
                 {/* Gradient overlay so the (larger, no-bg) title reads clearly
                     over the image grid, which now reads as a background. */}
