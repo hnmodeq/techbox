@@ -1,16 +1,36 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
-import { Icon } from '@/design/icons';
+import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
+import type { TimelineEvent } from '@/types/timeline';
 
-function ActiveTimelineContent() {
-  const { events, isLoading, error } = useTimelineEvents();
+const PREVIEW_COUNT = 6;
+
+/** Pick N random items from an array (Fisher–Yates). Runs only on the client
+ * (inside an effect), so there is no SSR hydration mismatch. */
+function pickRandom<T>(arr: T[], n: number): T[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(n, copy.length));
+}
+
+function ActiveTimelineContent({
+  events,
+  isLoading,
+  error,
+}: {
+  events: TimelineEvent[];
+  isLoading: boolean;
+  error: string | null;
+}) {
   const { zoom, resetZoom, setZoom } = useTimelineZoom(1);
   const { pan, startPanning, stopPanning, handlePan, resetPan } = usePan({ x: 150, y: 0 });
 
@@ -38,13 +58,24 @@ function ActiveTimelineContent() {
 }
 
 export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
+  // Fetch once at the top level so the preview can use real event images and
+  // the active timeline reuses them (no double fetch).
+  const { events, isLoading, error } = useTimelineEvents();
   const [active, setActive] = useState(false);
+  const [preview, setPreview] = useState<TimelineEvent[]>([]);
+
+  useEffect(() => {
+    if (events.length === 0) return;
+    const withImages = events.filter((e) => !!e.image);
+    if (withImages.length === 0) return;
+    setPreview(pickRandom(withImages, PREVIEW_COUNT));
+  }, [events]);
 
   return (
-    <section className={`w-full py-8 bg-background border-0 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
+    <section className={`w-full py-8 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full px-4 sm:px-6 lg:px-8 space-y-6`}>
         <div className="flex items-center justify-between gap-4 mb-2">
-          {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "تاریخچه تحولات، رویدادها و نقاط عطف دیتاسنتر"}</h2>}
+          {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "گاه\u200Cشمار پیشرفت تکنولوژی"}</h2>}
           {showHomeMoreLabel && (
           <Link
             href="/timeline"
@@ -59,14 +90,14 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
         {active && (
           <div className="text-center">
             <Badge variant="outline" className="bg-card px-4 py-1.5 text-xs font-bold text-primary shadow-sm">
-              برای مشاهده رویدادهای بیشتر، تایم‌لاین را با ماوس یا لمس به چپ و راست بکشید ↔️
+              برای مشاهده رویدادهای تکنولوژی به چپ و راست حرکت کنید.
             </Badge>
           </div>
         )}
 
         <div className="w-full overflow-hidden rounded-xl">
           {!active ? (
-            <Card
+            <div
               role="button"
               tabIndex={0}
               onClick={() => setActive(true)}
@@ -76,37 +107,38 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
                   setActive(true);
                 }
               }}
-              className="group min-h-[320px] cursor-pointer overflow-hidden border bg-card p-0 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring"
+              className="group relative cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="بارگذاری تایم‌لاین تعاملی"
             >
-              <CardContent className="relative p-6 sm:p-10">
-                <div className="pointer-events-none absolute inset-0 bg-muted/25" />
-                <div className="relative mx-auto flex min-h-[230px] max-w-5xl items-center justify-center [perspective:1200px]">
-                  {[
-                    ['timeline1.jpg','-translate-x-44 -rotate-6 scale-90 opacity-75'],
-                    ['timeline5.jpg','-translate-x-24 rotate-3 scale-95 opacity-85'],
-                    ['timeline10.jpg','z-10 scale-105'],
-                    ['timeline14.jpg','translate-x-24 -rotate-3 scale-95 opacity-85'],
-                    ['timeline17.jpg','translate-x-44 rotate-6 scale-90 opacity-75'],
-                  ].map(([img, cls]) => (
-                    <div
-                      key={img}
-                      className={`absolute h-52 w-40 overflow-hidden rounded-xl border bg-cover bg-center shadow-sm ring-1 ring-border transition-transform duration-300 group-hover:scale-[1.03] ${cls}`}
-                      style={{ backgroundImage: `url(https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com/timeline-images/${img})` }}
-                    />
+              {preview.length > 0 ? (
+                <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6">
+                  {preview.map((p) => (
+                    <div key={p.id} className="relative aspect-[3/4] overflow-hidden rounded-lg ring-1 ring-border">
+                      <Image
+                        src={p.image!}
+                        alt={p.title}
+                        fill
+                        sizes="(max-width: 640px) 33vw, 16vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      />
+                    </div>
                   ))}
+                  {/* Centered "click to watch" prompt sits above the images */}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <span className="rounded-full bg-background/85 px-5 py-2 text-sm font-black text-foreground shadow-sm ring-1 ring-border">
+                      برای تماشا کلیک کنید
+                    </span>
+                  </div>
                 </div>
-                <div className="relative z-20 -mt-4 flex flex-col items-center justify-center gap-3 text-center">
-                  <Icon name="timeline" className="w-11 h-11 text-primary" />
-                  <h3 className="text-lg sm:text-xl font-black text-foreground">نمای سریع تایم‌لاین تاریخ فناوری</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground max-w-lg leading-6">
-                    برای فعال‌سازی نسخه تعاملی، روی کارت‌های تایم‌لاین کلیک کنید.
-                  </p>
+              ) : (
+                // Loading / no-image fallback: keep it light.
+                <div className="flex min-h-[160px] items-center justify-center rounded-xl border bg-card/40">
+                  <span className="text-sm font-bold text-foreground">برای تماشا کلیک کنید</span>
                 </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           ) : (
-            <ActiveTimelineContent />
+            <ActiveTimelineContent events={events} isLoading={isLoading} error={error} />
           )}
         </div>
       </div>
