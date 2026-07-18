@@ -80,8 +80,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { module: moduleKey, slug } = schema.parse(body);
 
+    let postId: string | undefined;
+
     try {
-      await ensurePost(moduleKey, slug);
+      const post = await ensurePost(moduleKey, slug);
+      postId = post.id;
     } catch {
       return NextResponse.json({ error: "post_not_found", message: "مطلب مورد نظر یافت نشد." }, { status: 404 });
     }
@@ -106,7 +109,7 @@ export async function POST(req: NextRequest) {
       // Like: record the user's Like row and increment the counter atomically.
       await prisma.$transaction([
         prisma.like.create({
-          data: { fingerprint: fp, userId: user.id, module: moduleKey, slug },
+          data: { fingerprint: fp, userId: user.id, module: moduleKey, slug, postId },
         }),
         prisma.post.updateMany({
           where: { module: moduleKey, slug },

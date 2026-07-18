@@ -82,6 +82,7 @@ model Post {
   comments Comment[]
   ratings  Rating[]
   revisions PostRevision[]
+  likeRows Like[]   @relation("PostLikes")
 
   @@unique([module, slug], name: "module_slug")
   @@index([module, published, date], name: "post_module_published_date_idx")
@@ -181,13 +182,17 @@ model Like {
   userId      String?
   module      String
   slug        String
+  postId      String?
   createdAt   DateTime @default(now())
   deletedAt   DateTime?
   deletedBy   String?
 
+  post Post? @relation("PostLikes", fields: [postId], references: [id], onDelete: SetNull)
+
   @@unique([fingerprint, module, slug], name: "fingerprint_module_slug")
   @@index([module, slug, createdAt], name: "like_module_slug_created_idx")
   @@index([userId, createdAt], name: "like_user_created_idx")
+  @@index([postId], name: "like_post_idx")
   @@index([createdAt], name: "like_created_idx")
 }
 
