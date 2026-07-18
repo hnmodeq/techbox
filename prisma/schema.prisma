@@ -69,6 +69,7 @@ model Post {
   rating        Float?
   ratingCount   Int      @default(0)
   solved        Boolean? @default(false)
+  acceptedCommentId String? @unique
   fileName      String?
   fileUrl       String?
   fileSize      String?
@@ -83,6 +84,7 @@ model Post {
   ratings  Rating[]
   revisions PostRevision[]
   likeRows Like[]   @relation("PostLikes")
+  acceptedComment Comment? @relation("AcceptedAnswer", fields: [acceptedCommentId], references: [id], onDelete: SetNull)
 
   @@unique([module, slug], name: "module_slug")
   @@index([module, published, date], name: "post_module_published_date_idx")
@@ -157,6 +159,7 @@ model Comment {
   parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies Comment[] @relation("CommentReplies")
   votes   CommentVote[]
+  acceptedByPost Post? @relation("AcceptedAnswer")
 
   @@index([postId, status, createdAt], name: "comment_post_status_created_idx")
   @@index([authorId, createdAt], name: "comment_author_created_idx")

@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
 import { useStatEntry } from "@/providers/stats.provider";
 
-export function ForumBadge({ slug, fallback = null }: { slug: string; fallback?: boolean | null }) {
+export function ForumBadge({ slug, fallback = null, className = "" }: { slug: string; fallback?: boolean | null; className?: string }) {
   const [solved, setSolved] = useState<boolean | null>(fallback);
   const { entry: shared, status } = useStatEntry("forum", slug);
 
@@ -31,19 +32,19 @@ export function ForumBadge({ slug, fallback = null }: { slug: string; fallback?:
 
   if (solved === null) {
     return (
-      <span className="rounded-full bg-[color-mix(in_oklch,var(--info)_10%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--info)_24%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--info)]">
+      <Badge variant="ghost" className={`text-[11px] text-[var(--info)] ${className}`}>
         در حال بررسی…
-      </span>
+      </Badge>
     );
   }
 
   return solved ? (
-    <span className="rounded-full bg-[color-mix(in_oklch,var(--success)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--success)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--success)]">
+    <Badge variant="ghost" className={`text-[11px] text-[var(--success)] ${className}`}>
       حل‌شده ✓
-    </span>
+    </Badge>
   ) : (
-    <span className="rounded-full bg-[color-mix(in_oklch,var(--warning)_15%,transparent)] border-[length:var(--border-size)] border-[color-mix(in_oklch,var(--warning)_30%,transparent)] px-2.5 py-0.5 text-[11px] font-bold text-[var(--warning)]">
+    <Badge variant="ghost" className={`text-[11px] text-[var(--warning)] ${className}`}>
       باز
-    </span>
+    </Badge>
   );
 }

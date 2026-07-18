@@ -36,6 +36,7 @@ const cardSelect = {
   rating: true,
   ratingCount: true,
   solved: true,
+  acceptedCommentId: true,
   fileName: true,
   fileSize: true,
   downloadCount: true,
@@ -123,6 +124,44 @@ async function findPosts(module: string, take: number) {
     }
   } catch {
     // If comment count fetch fails, just leave it at 0
+  }
+
+  // For forum topics, enrich with the accepted (best) answer snippet so the
+  // home row can preview it. Only posts with an acceptedCommentId resolve.
+  try {
+    const acceptedIds = posts
+      .map(p => p.acceptedCommentId)
+      .filter((id): id is string => typeof id === "string" && id.length > 0);
+    if (acceptedIds.length > 0) {
+      const acceptedComments = await prisma.comment.findMany({
+        where: { id: { in: acceptedIds }, deletedAt: null },
+        select: {
+          id: true,
+          text: true,
+          authorId: true,
+          authorName: true,
+          author: { select: { name: true, username: true, avatar: true } },
+        },
+      });
+      const acceptedMap = new Map(acceptedComments.map(c => [c.id, c]));
+      for (const item of normalized) {
+        const post = posts.find(p => p.slug === item.slug);
+        const accId = post?.acceptedCommentId;
+        if (accId && acceptedMap.has(accId)) {
+          const c = acceptedMap.get(accId)!;
+          (item as any).acceptedAnswer = {
+            text: c.text,
+            author: {
+              name: c.author?.name || c.authorName || "کاربر",
+              username: c.author?.username || "",
+              avatar: c.author?.avatar || "",
+            },
+          };
+        }
+      }
+    }
+  } catch {
+    // Non-fatal: best-answer preview just won't render.
   }
 
   return normalized;

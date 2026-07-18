@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { useEffect, useTransition, useState } from "react";
-import { getCommentsAction, createCommentAction } from "@/features/comment/actions/comments";
+import { getCommentsAction, createCommentAction, acceptAnswerAction, unacceptAnswerAction, getForumTopicMetaAction } from "@/features/comment/actions/comments";
 import { CommentVote } from "@/components/ui/like-button";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
 import { formatRelativeTime } from "@/lib/date-format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth.provider";
 import { CommentFormSkeleton, CommentListSkeleton, CommentSectionSkeleton } from "@/components/ui/skeleton-layouts";
@@ -50,6 +51,59 @@ export default function CommentSection({ module, slug, initialComments }: { modu
   useEffect(() => {
     load();
   }, [load]);
+
+  // ─── Forum topic meta (for accept-best-answer) ───────────────
+  const [topicMeta, setTopicMeta] = useState<{ id: string; authorId: string | null; acceptedCommentId: string | null } | null>(null);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (module !== "forum") return;
+    let mounted = true;
+    getForumTopicMetaAction(module, slug).then((meta) => {
+      if (mounted && meta) setTopicMeta(meta);
+    });
+    return () => { mounted = false; };
+  }, [module, slug]);
+
+  const isTopicAuthor = !!(user && topicMeta && topicMeta.authorId === user.id);
+  const canManageAnswer = isTopicAuthor || user?.role === "super_admin";
+
+  const handleAccept = async (commentId: string) => {
+    setAcceptingId(commentId);
+    try {
+      const res = await acceptAnswerAction(commentId);
+      if (res.ok) {
+        toast.success("این پاسخ به‌عنوان پاسخ برتر انتخاب شد و پرسش بسته شد.");
+        setTopicMeta((m) => (m ? { ...m, acceptedCommentId: commentId } : m));
+        startTransition(() => { load(); });
+      } else {
+        toast.error(res.error || "خطا در انتخاب پاسخ برتر");
+      }
+    } catch {
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setAcceptingId(null);
+    }
+  };
+
+  const handleUnaccept = async () => {
+    if (!topicMeta) return;
+    setAcceptingId(topicMeta.acceptedCommentId);
+    try {
+      const res = await unacceptAnswerAction(topicMeta.id);
+      if (res.ok) {
+        toast.success("پاسخ برتر لغو شد و پرسش دوباره باز شد.");
+        setTopicMeta((m) => (m ? { ...m, acceptedCommentId: null } : m));
+        startTransition(() => { load(); });
+      } else {
+        toast.error(res.error || "خطا در لغو پاسخ برتر");
+      }
+    } catch {
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setAcceptingId(null);
+    }
+  };
 
   // ─── Top-level comment form state ───────────────────────────
   const [topText, setTopText] = React.useState("");
@@ -187,11 +241,18 @@ export default function CommentSection({ module, slug, initialComments }: { modu
     const hasBeenEdited = !!(c as any).editedAt;
     const isEditing = editingId === (c as any).id;
     const isDeleting = deletingId === (c as any).id;
+    const isAccepted = !!(topicMeta && topicMeta.acceptedCommentId === (c as any).id);
+    // Only the topic author/admin can accept; you can't accept your own comment.
+    const canAcceptThis =
+      module === "forum" &&
+      canManageAnswer &&
+      !deleted &&
+      !(isTopicAuthor && (c as any).authorId === user?.id);
 
     return (
       <div key={c.id} className={depth ? "py-3" : ""} style={{ marginTop: depth ? 0 : 12 }}>
         <div className={depth ? "ps-3 pe-4" : "pe-0"} style={{ marginRight: depth ? 16 : 0 }}>
-          <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative">
+          <div className={`bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative ${isAccepted ? "border-[color-mix(in_oklch,var(--success)_45%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--success)_30%,transparent)]" : "border-[var(--border-color)]"}`}>
             {isDeleting && (
               <div className="absolute inset-0 bg-[var(--card-background)]/60 rounded-[var(--corner-radius)] flex items-center justify-center z-10">
                 <Spinner className="h-5 w-5" />
@@ -225,6 +286,13 @@ export default function CommentSection({ module, slug, initialComments }: { modu
               </>
             ) : (
               <>
+                {isAccepted && (
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[color-mix(in_oklch,var(--success)_15%,transparent)] border border-[color-mix(in_oklch,var(--success)_30%,transparent)] px-2 py-0.5 text-[11px] font-bold text-[var(--success)]">
+                      پاسخ برتر ✓
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between items-start gap-3">
                   <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
                   <div className="flex items-center gap-2 shrink-0">
@@ -251,8 +319,43 @@ export default function CommentSection({ module, slug, initialComments }: { modu
                   <CommentVote
                     id={c.id}
                     initialLikes={(c as any).likes ?? 0}
-                    initialDislikes={(c as any).dislikes ?? 0}
+                    initialDislikes={(c as any).dislikes ?? 0
+                  }
                   />
+                  {module === "forum" && canAcceptThis && !isAccepted && (
+                    <Tooltip>
+                      <TooltipTrigger render={
+                        <Button
+                          onClick={() => handleAccept((c as any).id)}
+                          variant="link"
+                          size="xs"
+                          className="text-[11px] text-[var(--success)] font-bold"
+                          type="button"
+                          disabled={acceptingId === (c as any).id}
+                        />
+                      }>
+                        {acceptingId === (c as any).id ? "در حال ثبت…" : "پاسخ برتر"}
+                      </TooltipTrigger>
+                      <TooltipContent>انتخاب این پاسخ به‌عنوان پاسخ برتر و بستن پرسش</TooltipContent>
+                    </Tooltip>
+                  )}
+                  {module === "forum" && isAccepted && canManageAnswer && (
+                    <Tooltip>
+                      <TooltipTrigger render={
+                        <Button
+                          onClick={() => handleUnaccept()}
+                          variant="link"
+                          size="xs"
+                          className="text-[11px] text-[var(--warning)] font-bold"
+                          type="button"
+                          disabled={!!acceptingId}
+                        />
+                      }>
+                        لغو پاسخ برتر
+                      </TooltipTrigger>
+                      <TooltipContent>لغو انتخاب و باز کردن دوباره پرسش</TooltipContent>
+                    </Tooltip>
+                  )}
                   <Tooltip>
                     <TooltipTrigger render={
                       <Button
