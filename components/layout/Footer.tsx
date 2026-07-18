@@ -56,17 +56,14 @@ const navigation = {
 // Bottom row: copyright (right) + design team (left).
 export default function FooterSection() {
   return (
-    <footer className="border-t w-full bg-yellow-200 justify-center mt-auto">
-      <div className="mx-auto bg-blue-200 justify-between px-10 pb-8 w-full pt-12">
-        {/* Parent: flex (not grid) so justify-between actually works.
-            grid-cols-2 forced both columns to 1fr = no free space, so
-            justify-between did nothing. Flex lets the columns size to their
-            content and spread to opposite edges.
-            Mobile: stacked (flex-col). Desktop: row, spread to edges. */}
-        <div className="flex bg-pink-300 gap-1 flex-col md:flex-row md:justify-between w-full">
+    <footer className="border-t w-full mt-auto">
+      <div className="mx-auto px-10 pb-8 w-full pt-12">
+        {/* Parent: flex so justify-around spreads both columns with equal gaps
+            on both sides and between them. Mobile stacks (flex-col). */}
+        <div className="flex gap-6 flex-col md:flex-row md:justify-around w-full">
           {/* RIGHT column — quick links (top) + social icons (below the links) */}
-          <div className="md:flex w-40 bg-red-200 md:flex-col md:justify-center md:gap-8">
-            <div className="flex bg-green-200 flex-col gap-2 md:items-start">
+          <div className="md:flex md:flex-col md:gap-6">
+            <div className="flex flex-col gap-2 md:items-start">
               {navigation.main.map((item) => (
                 <ButtonLink
                   key={item.name}
@@ -81,7 +78,7 @@ export default function FooterSection() {
             </div>
 
             <div>
-              <div className="flex bg-purple-200 gap-2 md:justify-start">
+              <div className="flex gap-2 md:justify-start">
                 {navigation.social.map((item) => (
                   <a
                     key={item.name}
@@ -102,7 +99,7 @@ export default function FooterSection() {
           </div>
 
           {/* LEFT column — newsletter */}
-          <div className="text-right bg-red-300">
+          <div className="text-right">
             <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
             <div className="max-w-[260px]">
               <NewsletterSignup compact />
