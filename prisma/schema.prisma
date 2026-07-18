@@ -301,14 +301,33 @@ model TimelineLike {
 }
 
 model NewsletterSubscriber {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String    @id @default(cuid())
+  email            String    @unique
+  name             String?
+  active           Boolean   @default(true)
+  unsubscribeToken String    @unique @default(cuid())
+  unsubscribedAt   DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([active, createdAt])
+}
+
+/// A sent newsletter blast. Stores what was sent (subject, header/footer used,
+/// selected items) and basic delivery stats, so the admin has a history.
+model NewsletterCampaign {
+  id             String    @id @default(cuid())
+  subject        String
+  headerHtml     String?
+  footerHtml     String?
+  items          Json      // Array of { module, slug, title, excerpt, image, url, dateFa }
+  recipientCount Int       @default(0)
+  status         String    @default("sent") // sent | failed
+  sentBy         String?
+  sentAt         DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  @@index([sentAt])
 }
 
 model PasswordResetToken {
