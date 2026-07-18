@@ -112,10 +112,10 @@ export default function FooterSection() {
         {/* Bottom row: copyright (right, mentions رستاک) + design team (left, mentions بومیم).
             Both names show a "در دست طراحی" tooltip on hover, keep their color,
             stay clickable (cursor-pointer) but navigate nowhere. */}
-        <div className="pt-6 flex flex-col items-center justify-between gap-2 sm:flex-row">
+        <div className="pt-6 flex flex-col items-center justify-around gap-2 sm:flex-row">
           {/* رستاک — copyright line, RIGHT */}
           <p className="text-xs text-muted-foreground text-center sm:text-right order-1 sm:order-1">
-            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «
+            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت {" "}
             <Tooltip>
               <TooltipTrigger
                 render={
@@ -129,7 +129,7 @@ export default function FooterSection() {
               </TooltipTrigger>
               <TooltipContent>در دست طراحی</TooltipContent>
             </Tooltip>
-            » میباشد.
+          {" "}   میباشد.
           </p>
 
           {/* بومیم — design team, LEFT */}
@@ -140,7 +140,7 @@ export default function FooterSection() {
                 render={
                   <span
                     tabIndex={0}
-                    className="font-bold text-[#f5b301] cursor-pointer"
+                    className="text-[#f5b301] cursor-pointer"
                   />
                 }
               >
