@@ -152,7 +152,7 @@ export function TechboxNavUser() {
         {open && (
           <div
             role="menu"
-            className="absolute bottom-[calc(100%+0.5rem)] end-0 z-[70] w-64 -translate-x-4 rounded-lg bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 animate-in fade-in-0 zoom-in-95"
+            className="absolute bottom-[calc(100%+0.5rem)] start-0 z-[70] w-64 rounded-lg bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 animate-in fade-in-0 zoom-in-95"
           >
             {user ? (
               <>

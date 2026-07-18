@@ -396,13 +396,16 @@ model JobApplication {
 
 model ContactSubmission {
   id        String   @id @default(cuid())
+  type      String   @default("contact") // contact | feedback | support
   name      String
   email     String
   subject   String?
   message   String   @db.Text
+  status    String   @default("new") // new | read | resolved
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+  @@index([type, status, createdAt])
 }
 
 model SiteSetting {

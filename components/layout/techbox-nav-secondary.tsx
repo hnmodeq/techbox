@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 
 import {
   SidebarGroup,
@@ -10,22 +9,27 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LifeBuoyIcon, SendIcon } from "lucide-react"
-
-const items = [
-  {
-    title: "پشتیبانی",
-    url: "/support",
-    icon: LifeBuoyIcon,
-  },
-  {
-    title: "ارسال بازخورد",
-    url: "/feedback",
-    icon: SendIcon,
-  },
-]
+import { LifeBuoyIcon, SendIcon, HelpCircleIcon } from "lucide-react"
 
 export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const items = [
+    {
+      title: "پشتیبانی",
+      event: "tb_open_support",
+      icon: LifeBuoyIcon,
+    },
+    {
+      title: "ارسال بازخورد",
+      event: "tb_open_feedback",
+      icon: SendIcon,
+    },
+    {
+      title: "سوالات پرتکرار",
+      event: "tb_open_faq",
+      icon: HelpCircleIcon,
+    },
+  ]
+
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
@@ -34,7 +38,10 @@ export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef
             const Icon = item.icon
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton size="sm" render={<Link href={item.url} />}>
+                <SidebarMenuButton
+                  size="sm"
+                  onClick={() => window.dispatchEvent(new CustomEvent(item.event))}
+                >
                   <Icon className="size-4" />
                   <span>{item.title}</span>
                 </SidebarMenuButton>
