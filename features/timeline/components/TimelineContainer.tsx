@@ -20,6 +20,9 @@ interface TimelineContainerProps {
   onZoomOut?: () => void;
   onZoomChange?: (nextZoom: number) => void;
   onWheel?: (e: React.WheelEvent | WheelEvent) => void;
+  /** Tailwind height class for the container. Defaults to near-full-viewport
+   *  for the standalone /timeline page. The home row passes a compact value. */
+  heightClassName?: string;
 }
 
 type LineComment = { id?: string; authorName: string; text: string; createdAt?: string }
@@ -96,7 +99,7 @@ function getRelativeTimeAgo(dateGr: Date | string): string {
   return `${diffYears.toLocaleString('fa-IR')} سال پیش`;
 }
 
-export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, onPanEnd, onWheel }: TimelineContainerProps) {
+export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, onPanEnd, onWheel, heightClassName }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const xPositions = useMemo(() => {
@@ -134,7 +137,7 @@ export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, on
   }, [onWheel]);
 
   return (
-    <div ref={containerRef} className="relative h-[calc(100svh-var(--header-height))] min-h-[620px] w-full overflow-hidden select-none bg-background text-foreground transition-colors duration-200">
+    <div ref={containerRef} className={`relative ${heightClassName ?? "h-[calc(100svh-var(--header-height))] min-h-[620px]"} w-full overflow-hidden select-none bg-background text-foreground transition-colors duration-200`}>
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="h-full w-full" style={{ backgroundImage: 'linear-gradient(90deg, var(--border) 1px, transparent 1px), linear-gradient(var(--border) 1px, transparent 1px)', backgroundSize: `${50 * zoom}px 50px`, backgroundPosition: `${clampedPanX}px ${pan.y}px` }} />
       </div>

@@ -54,6 +54,7 @@ function ActiveTimelineContent({
       onResetView={handleResetView}
       onZoomChange={setZoom}
       onWheel={undefined}
+      heightClassName="h-[520px]"
     />
   );
 }
@@ -111,44 +112,39 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
               className="group relative cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="بارگذاری تایم‌لاین تعاملی"
             >
-              {preview.length > 0 ? (
-                <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6">
-                  {preview.map((p, idx) => (
-                    <div key={p.id} className="relative aspect-[3/4] overflow-hidden rounded-lg ring-1 ring-border">
-                      <Image
-                        src={p.image!}
-                        alt={p.title}
-                        fill
-                        sizes="(max-width: 640px) 33vw, 16vw"
-                        // Priority loads the first row eagerly (no lazy delay);
-                        // the blur placeholder fills the box instantly while the
-                        // optimized image streams in.
-                        {...(idx < 3 ? { priority: true } : {})}
-                        {...blurProps(p.image)}
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
-                  {/* Centered overlay: morphs from the title to a "click to watch"
-                      prompt on hover. Both strings are stacked; group-hover
-                      crossfades + scales them for a shape-changing transition. */}
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="relative flex h-9 min-w-[210px] items-center justify-center rounded-full bg-background/85 px-5 shadow-sm ring-1 ring-border overflow-hidden">
-                      <span className="absolute m-auto text-sm font-black text-foreground whitespace-nowrap transition-all duration-300 ease-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-90 group-hover:-translate-y-3">
-                        تایم‌لاین فناوری
-                      </span>
-                      <span className="absolute m-auto text-sm font-black text-primary whitespace-nowrap transition-all duration-300 ease-out opacity-0 scale-110 group-hover:opacity-100 group-hover:scale-100">
-                        برای تماشا کلیک کنید
-                      </span>
-                    </div>
+              <div className="relative grid grid-cols-3 gap-2 sm:grid-cols-6 min-h-[200px] bg-muted">
+                {preview.map((p, idx) => (
+                  <div key={p.id} className="relative aspect-[3/4] overflow-hidden rounded-lg ring-1 ring-border">
+                    <Image
+                      src={p.image!}
+                      alt={p.title}
+                      fill
+                      sizes="(max-width: 640px) 33vw, 16vw"
+                      {...(idx < 3 ? { priority: true } : {})}
+                      {...blurProps(p.image)}
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+                {/* Gradient overlay so the (larger, no-bg) title reads clearly
+                    over the image grid, which now reads as a background. */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/45 via-black/25 to-black/45" />
+
+                {/* Centered title (no button background). Morphs SLOWLY into a
+                    "click to watch" prompt on hover. The title is the default
+                    in every state — including loading — so there's no flash of
+                    the wrong string. Both texts are stacked and crossfaded. */}
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center px-4">
+                  <div className="relative flex items-center justify-center [filter:drop-shadow(0_2px_10px_rgba(0,0,0,0.55))]">
+                    <span className="text-xl sm:text-3xl font-black text-white whitespace-nowrap transition-all duration-700 ease-in-out opacity-100 scale-100 group-hover:opacity-0 group-hover:scale-90 group-hover:-translate-y-3">
+                      تایم‌لاین فناوری
+                    </span>
+                    <span className="absolute m-auto text-lg sm:text-2xl font-black text-white whitespace-nowrap transition-all duration-700 ease-in-out opacity-0 scale-110 group-hover:opacity-100 group-hover:scale-100">
+                      برای تماشا کلیک کنید
+                    </span>
                   </div>
                 </div>
-              ) : (
-                // Loading / no-image fallback: keep it light.
-                <div className="flex min-h-[160px] items-center justify-center rounded-xl border bg-card/40">
-                  <span className="text-sm font-bold text-foreground">برای تماشا کلیک کنید</span>
-                </div>
-              )}
+              </div>
             </div>
           ) : (
             <ActiveTimelineContent events={events} isLoading={isLoading} error={error} />
