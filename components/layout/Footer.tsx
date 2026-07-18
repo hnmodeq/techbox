@@ -56,19 +56,19 @@ const navigation = {
 // Bottom row: copyright (right) + design team (left).
 export default function FooterSection() {
   return (
-    <footer className="border-t bg-card/40 mt-auto">
-      <div className="mx-auto max-w-7xl px-6 pb-8 pt-12">
-        <div className="grid gap-8 md:grid-cols-2 justify-between">
+    <footer className="border-t w-full bg-yellow-200 justtify-center mt-auto">
+      <div className="mx-auto bg-blue-200 justify-between px-10 pb-8 w-full pt-12">
+        <div className="grid bg-pink-300 gap-1 md:grid-cols-2 md:justify-between w-full">
           {/* RIGHT column — quick links (top) + social icons (below the links) */}
-          <div className="md:flex md:flex-col md:justify-between md:gap-8">
-            <div className="flex flex-col gap-2 md:items-start">
+          <div className="md:flex w-40 bg-red-200 md:flex-col md:justify-center md:gap-8">
+            <div className="flex bg-green-200 flex-col gap-2 md:items-start">
               {navigation.main.map((item) => (
                 <ButtonLink
                   key={item.name}
                   href={item.href}
                   variant="ghost"
                   size="sm"
-                  className="justify-start md:justify-end font-normal text-muted-foreground hover:text-foreground"
+                  className="justify-center md:justify-center font-normal text-muted-foreground hover:text-foreground"
                 >
                   {item.name}
                 </ButtonLink>
@@ -76,7 +76,7 @@ export default function FooterSection() {
             </div>
 
             <div>
-              <div className="flex gap-2 md:justify-start">
+              <div className="flex bg-purple-200 gap-2 md:justify-start">
                 {navigation.social.map((item) => (
                   <a
                     key={item.name}
@@ -97,7 +97,7 @@ export default function FooterSection() {
           </div>
 
           {/* LEFT column — newsletter */}
-          <div className="text-right">
+          <div className="text-right bg-red-300">
             <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
             <div className="max-w-[260px]">
               <NewsletterSignup compact />
