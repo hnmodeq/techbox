@@ -17,7 +17,6 @@ import { LikeButton } from '@/components/ui/like-button';
 import { SaveButton } from '@/components/ui/save-button';
 import { ShareButton } from '@/components/ui/share-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function VideoReelsRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
   const { items: dbVideos, loading } = useHomeModule('media');
@@ -210,31 +209,29 @@ function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: {
             />
           </div>
 
-          {/* Info section with ScrollArea */}
-          <div className="min-w-0 sm:min-w-[340px] sm:max-w-[520px] sm:flex-1 max-h-[42vh] sm:max-h-none overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="p-4 sm:p-5 space-y-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
-                    <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
-                    <Icon name="close" size={22} />
-                  </Button>
+          {/* Info section */}
+          <div className="min-w-0 sm:min-w-[340px] sm:max-w-[520px] sm:flex-1 flex flex-col max-h-[42vh] sm:max-h-[92vh]">
+            <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
+                  <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
                 </div>
-
-                <div className="flex items-center justify-between" dir="ltr">
-                  <div className="flex items-center gap-3">
-                    <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
-                    <SaveButton module="media" slug={video.slug} />
-                    <ShareButton />
-                  </div>
-                </div>
-
-                <CommentSection module="media" slug={video.slug} initialComments={video.comments || 0} />
+                <Button variant="ghost" size="icon" onClick={onClose} className="text-muted-foreground hover:text-foreground shrink-0">
+                  <Icon name="close" size={22} />
+                </Button>
               </div>
-            </ScrollArea>
+
+              <div className="flex items-center justify-between" dir="ltr">
+                <div className="flex items-center gap-3">
+                  <LikeButton contentType="media" slug={video.slug} initial={video.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
+                  <SaveButton module="media" slug={video.slug} />
+                  <ShareButton />
+                </div>
+              </div>
+
+              <CommentSection module="media" slug={video.slug} initialComments={video.comments || 0} />
+            </div>
           </div>
         </div>
 

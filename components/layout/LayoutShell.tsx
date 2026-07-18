@@ -147,16 +147,16 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <FooterSection />
             </main>
             {/* News sidebar overlays on top, doesn't push content */}
+            {newsOpen && (
             <SidebarProvider
               open={newsOpen}
               onOpenChange={setNewsOpen}
-              className="absolute inset-y-0 end-0 z-40 pointer-events-none"
+              className="absolute inset-y-0 end-0 z-40"
               style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
             >
-              <div className="pointer-events-auto">
-                <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
-              </div>
+              <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
             </SidebarProvider>
+            )}
           </SidebarInset>
         </div>
       </SidebarProvider>
