@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
 import Link from 'next/link';
 import Image from 'next/image';
-import { blurProps } from '@/lib/image-placeholder';
 import { Badge } from '@/components/ui/badge';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
@@ -121,7 +120,6 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
                       fill
                       sizes="(max-width: 640px) 33vw, 16vw"
                       {...(idx < 3 ? { priority: true } : {})}
-                      {...blurProps(p.image)}
                       className="object-cover"
                     />
                   </div>
