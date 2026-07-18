@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { SVGProps } from "react";
 import { Separator } from "@/components/ui/separator";
 import { ButtonLink } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 
@@ -102,21 +105,45 @@ export default function FooterSection() {
 
         <Separator className="mt-12" />
 
-        {/* Bottom row: copyright (right) + design team (left) */}
+        {/* Bottom row: copyright (right, mentions رستاک) + design team (left, mentions بومیم).
+            Both names show a "در دست طراحی" tooltip on hover, keep their color,
+            stay clickable (cursor-pointer) but navigate nowhere. */}
         <div className="pt-6 flex flex-col items-center justify-between gap-2 sm:flex-row">
-          <p className="text-xs text-muted-foreground order-2 sm:order-1">
-            طراحی شده توسط{" "}
-            <a
-              href="https://www.bumimstudio.ir/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-[#f5b301] hover:underline"
-            >
-              بومیم
-            </a>
+          {/* رستاک — copyright line, RIGHT */}
+          <p className="text-xs text-muted-foreground text-center sm:text-right order-1 sm:order-1">
+            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span
+                    tabIndex={0}
+                    className="text-sky-500 cursor-pointer"
+                  />
+                }
+              >
+                هونامیک ارتباط رستاک
+              </TooltipTrigger>
+              <TooltipContent>در دست طراحی</TooltipContent>
+            </Tooltip>
+            » میباشد.
           </p>
-          <p className="text-sm font-semibold text-muted-foreground order-1 sm:order-2 text-center sm:text-right">
-            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت «<a href="https://rastaak.co" target="_blank" rel="noopener noreferrer" className="text-sky-500 hover:underline">هونامیک ارتباط رستاک</a>» میباشد.
+
+          {/* بومیم — design team, LEFT */}
+          <p className="text-xs text-muted-foreground order-2 sm:order-2">
+            طراحی شده توسط{" "}
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span
+                    tabIndex={0}
+                    className="font-bold text-[#f5b301] cursor-pointer"
+                  />
+                }
+              >
+                بومیم
+              </TooltipTrigger>
+              <TooltipContent>در دست طراحی</TooltipContent>
+            </Tooltip>
           </p>
         </div>
       </div>
