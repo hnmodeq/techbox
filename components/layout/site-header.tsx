@@ -278,13 +278,24 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
   const firstGregorian = jalaliToGregorian(year, month, 1)
   const firstDay = new Date(firstGregorian.year, firstGregorian.month - 1, firstGregorian.day)
   const daysInMonth = getDaysInJalaliMonth(month, year)
-  const leadingDays = (firstDay.getDay() + 1) % 7 // Persian week starts on Saturday.
+  const leadingDays = (firstDay.getDay() + 1) % 7
   const cells = Array.from({ length: leadingDays + daysInMonth }, (_, index) =>
     index < leadingDays ? null : index - leadingDays + 1
   )
 
-  // Fetch holidays for this month
-  const [holidayDays, setHolidayDays] = React.useState<Set<number>>(new Set())
+  // Pre-compute Fridays — these are always red, no fetch needed
+  const fridays = React.useMemo(() => {
+    const set = new Set<number>()
+    cells.forEach((day, index) => {
+      if (day === null) return
+      // Friday = index where (index + 1) % 7 === 6
+      if ((index + 1) % 7 === 6) set.add(day)
+    })
+    return set
+  }, [])
+
+  // Only fetch custom holidays (non-Friday off days)
+  const [customHolidayDays, setCustomHolidayDays] = React.useState<Set<number>>(new Set())
 
   React.useEffect(() => {
     if (year && month) {
@@ -292,23 +303,16 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
         .then((r) => (r.ok ? r.json() : null))
         .then((data) => {
           const days = new Set<number>()
-          // All Fridays are off
-          cells.forEach((day, index) => {
-            if (day === null) return
-            const dayOfWeek = (index + 1) % 7 // Friday = index 6 in our grid (0=Sat)
-            if (dayOfWeek === 6) days.add(day) // Friday (جمعه)
-          })
-          // Add custom holidays
           if (data?.enabled && Array.isArray(data.holidays)) {
             for (const h of data.holidays) {
               const parts = h.jalaliDate?.split("/")
               if (parts?.length === 3) {
                 const hDay = parseInt(parts[2], 10)
-                if (!isNaN(hDay)) days.add(hDay)
+                if (!isNaN(hDay) && !fridays.has(hDay)) days.add(hDay)
               }
             }
           }
-          setHolidayDays(days)
+          setCustomHolidayDays(days)
         })
         .catch(() => {})
     }
@@ -330,7 +334,8 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
       <div className="grid grid-cols-7 gap-1 text-center text-xs">
         {cells.map((day, index) => {
           const isToday = day === today.jalaliDay
-          const isOff = day !== null && holidayDays.has(day)
+          const isFriday = day !== null && fridays.has(day)
+          const isCustomOff = day !== null && customHolidayDays.has(day)
           return (
             <span
               key={index}
@@ -338,9 +343,9 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
                 "flex h-7 items-center justify-center rounded-md",
                 day ? "bg-muted/40" : "bg-transparent",
                 isToday && "bg-primary text-primary-foreground font-bold",
-                !isToday && isOff && "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold"
+                !isToday && isFriday && "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold",
+                !isToday && isCustomOff && "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-semibold"
               )}
-              title={isOff ? "تعطیل" : undefined}
             >
               {day ? persianDigits(day) : ""}
             </span>
@@ -359,6 +364,7 @@ function DateTimeDisplay() {
   const [mounted, setMounted] = React.useState(false)
   const [now, setNow] = React.useState<Date | null>(null)
   const [open, setOpen] = React.useState(false)
+  const hoverRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   React.useEffect(() => {
     setMounted(true)
@@ -372,6 +378,15 @@ function DateTimeDisplay() {
   const timeStr = snapshot ? formatSnapshotTime(snapshot) : null
   const dateStr = snapshot ? formatSnapshotDate(snapshot) : null
 
+  const handleMouseEnter = () => {
+    if (hoverRef.current) clearTimeout(hoverRef.current)
+    hoverRef.current = setTimeout(() => setOpen(true), 200)
+  }
+  const handleMouseLeave = () => {
+    if (hoverRef.current) clearTimeout(hoverRef.current)
+    hoverRef.current = setTimeout(() => setOpen(false), 300)
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
@@ -380,6 +395,8 @@ function DateTimeDisplay() {
             type="button"
             className="hidden h-8 min-w-[16.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted md:flex"
             suppressHydrationWarning
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           />
         }
       >
@@ -393,7 +410,11 @@ function DateTimeDisplay() {
           <span className="inline-block h-3.5 w-32 animate-pulse rounded bg-muted-foreground/20" aria-hidden="true" />
         )}
       </PopoverTrigger>
-      <PopoverContent className="w-72">
+      <PopoverContent
+        className="w-72"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {snapshot ? (
           <MonthCalendar today={snapshot} />
         ) : (
