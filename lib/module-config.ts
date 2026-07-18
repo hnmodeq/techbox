@@ -43,6 +43,9 @@ export type SiteLayoutConfig = ModuleConfigMap & {
   unifiedModuleColor: string;
   /** Per-module custom colors (CSS values) */
   moduleColors: Partial<Record<ModuleSlug, string>>;
+  /** Single source of truth for each module's DISPLAY NAME (titleFa).
+   *  Overrides moduleMeta/sidebar titles everywhere. */
+  titles: Record<ModuleSlug, string>;
 };
 
 // ─── Defaults ─────────────────────────────────────────────────────────
@@ -87,6 +90,24 @@ const DEFAULT_HOME_ORDER: Record<ModuleSlug, number> = {
   tools: 9,
 };
 
+// ─── Module display names (source of truth) ───────────────────────────
+// These are the canonical display names for each module. Editable from the
+// admin panel (SiteSetting: modules.titles); this is the fallback. Renaming a
+// module here (or in admin) propagates to the sidebar, tickbar, suggestions,
+// user activity, home rows, badges, and SEO via getModuleTitleFa() /
+// useModuleTitles().
+export const DEFAULT_MODULE_TITLES: Record<ModuleSlug, string> = {
+  blog: "مجله آنلاین",
+  news: "اخبار",
+  media: "ویدیوهای کوتاه",
+  shop: "فروشگاه",
+  forum: "انجمن",
+  review: "نقد و بررسی",
+  download: "دانلود",
+  tools: "ابزارهای کاربردی",
+  timeline: "گاه‌شمار تکنولوژی",
+};
+
 export function getDefaultModuleConfig(slug: ModuleSlug): ModuleConfig {
   return {
     enabled: true,
@@ -112,6 +133,7 @@ export function getDefaultSiteLayoutConfig(): SiteLayoutConfig {
     moduleColorsEnabled: true,
     unifiedModuleColor: "var(--primary)",
     moduleColors: {},
+    titles: { ...DEFAULT_MODULE_TITLES },
   };
 }
 
@@ -128,6 +150,7 @@ const KEY_HERO_VISIBLE = "hero.visible";
 const KEY_MODULE_COLORS_ENABLED = "modules.colors_enabled";
 const KEY_UNIFIED_MODULE_COLOR = "modules.unified_color";
 const KEY_MODULE_COLORS = "modules.custom_colors";
+const KEY_MODULE_TITLES = "modules.titles";
 
 // ─── Read Config (cached) ─────────────────────────────────────────────
 
@@ -156,7 +179,7 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
 async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const defaults = getDefaultModuleConfigMap();
 
-  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, homeShowTitleRaw, homeShowMoreLabelRaw, heroVisibleRaw, colorsEnabledRaw, unifiedColorRaw, moduleColorsRaw] = await Promise.all([
+  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, homeShowTitleRaw, homeShowMoreLabelRaw, heroVisibleRaw, colorsEnabledRaw, unifiedColorRaw, moduleColorsRaw, moduleTitlesRaw] = await Promise.all([
     getSetting(KEY_ENABLED),
     getSetting(KEY_HOME_VISIBILITY),
     getSetting(KEY_HOME_ORDER),
@@ -168,6 +191,7 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
     getSetting(KEY_MODULE_COLORS_ENABLED),
     getSetting(KEY_UNIFIED_MODULE_COLOR),
     getSetting(KEY_MODULE_COLORS),
+    getSetting(KEY_MODULE_TITLES),
   ]);
 
   const enabledMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(enabledRaw, {});
@@ -197,7 +221,15 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const unifiedModuleColor = unifiedColorRaw || "var(--primary)";
   const moduleColors = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleColorsRaw, {});
 
-  return { ...defaults, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors };
+  // Module display names (source of truth). Overlay DB overrides on the defaults.
+  const moduleTitlesMap = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleTitlesRaw, {});
+  const titles = { ...DEFAULT_MODULE_TITLES };
+  for (const slug of DEFAULT_MODULE_SLUGS) {
+    const override = moduleTitlesMap[slug];
+    if (typeof override === "string" && override.trim()) titles[slug] = override.trim();
+  }
+
+  return { ...defaults, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, titles };
 }
 
 export const getModuleConfig = unstable_cache(
@@ -212,6 +244,23 @@ export const getModuleConfig = unstable_cache(
 export async function getEnabledModules(): Promise<ModuleSlug[]> {
   const config = await getModuleConfig();
   return DEFAULT_MODULE_SLUGS.filter((slug) => config[slug]?.enabled !== false);
+}
+
+/**
+ * Get the full module display-name map (source of truth). Server-side only;
+ * client components use useModuleTitles() from the provider.
+ */
+export async function getModuleTitles(): Promise<Record<ModuleSlug, string>> {
+  const config = await getModuleConfig();
+  return config.titles;
+}
+
+/**
+ * Resolve a single module's display name, with a sensible fallback.
+ */
+export async function getModuleTitleFa(slug: ModuleSlug | string): Promise<string> {
+  const titles = await getModuleTitles();
+  return (titles as Record<string, string>)[slug] ?? slug;
 }
 
 /**

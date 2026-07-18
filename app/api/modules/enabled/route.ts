@@ -27,6 +27,7 @@ export async function GET() {
       moduleColorsEnabled: config.moduleColorsEnabled !== false,
       unifiedModuleColor: config.unifiedModuleColor || "var(--primary)",
       moduleColors: config.moduleColors || {},
+      titles: config.titles || {},
     }, {
       headers: cacheHeaders(PUBLIC_CONTENT_CACHE),
     });
@@ -35,6 +36,7 @@ export async function GET() {
     return NextResponse.json({
       enabled: DEFAULT_MODULE_SLUGS,
       homeConfig: {},
+      titles: {},
     }, {
       headers: cacheHeaders(PUBLIC_CONTENT_CACHE),
     });

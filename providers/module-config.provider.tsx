@@ -16,6 +16,8 @@ type ModuleConfigClient = {
   unifiedModuleColor: string;
   /** Per-module custom colors */
   moduleColors: Partial<Record<ModuleSlug, string>>;
+  /** Module display names — single source of truth (overrides moduleMeta/sidebar) */
+  titles: Partial<Record<ModuleSlug, string>>;
   loading: boolean;
 };
 
@@ -30,6 +32,7 @@ const defaultConfig: ModuleConfigClient = {
   moduleColorsEnabled: true,
   unifiedModuleColor: "var(--primary)",
   moduleColors: {},
+  titles: {},
   loading: true,
 };
 
@@ -57,6 +60,7 @@ function serverConfigToClient(data: SiteLayoutConfig): ModuleConfigClient {
     moduleColorsEnabled: data.moduleColorsEnabled !== false,
     unifiedModuleColor: data.unifiedModuleColor || "var(--primary)",
     moduleColors: data.moduleColors || {},
+    titles: data.titles || {},
     loading: false,
   };
 }
@@ -89,7 +93,8 @@ export function ModuleConfigProvider({
         const moduleColorsEnabled = data.moduleColorsEnabled !== false;
         const unifiedModuleColor = data.unifiedModuleColor || "var(--primary)";
         const moduleColors = data.moduleColors || {};
-        setConfig({ enabled: enabledSet, homeConfig, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, loading: false });
+        const titles = data.titles || {};
+        setConfig({ enabled: enabledSet, homeConfig, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, titles, loading: false });
       })
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));
@@ -112,4 +117,18 @@ export function useModuleEnabled(slug: ModuleSlug): boolean {
 export function useEnabledModules(): Set<ModuleSlug> {
   const { enabled } = useModuleConfig();
   return enabled;
+}
+
+/**
+ * Returns the module display-name map (source of truth). Use
+ * `useModuleTitle(slug, fallback)` to resolve a single name with a fallback.
+ */
+export function useModuleTitles(): Partial<Record<ModuleSlug, string>> {
+  const { titles } = useModuleConfig();
+  return titles;
+}
+
+export function useModuleTitle(slug: ModuleSlug, fallback?: string): string {
+  const { titles } = useModuleConfig();
+  return titles[slug] || fallback || slug;
 }

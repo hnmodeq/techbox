@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar"
 import { ChevronRightIcon } from "lucide-react"
 import { navItems as allNavItems, isActive } from "@/config/sidebar.config"
-import { useEnabledModules } from "@/providers/module-config.provider"
+import { useEnabledModules, useModuleTitles } from "@/providers/module-config.provider"
 
 /** Map sidebar href to module slug for enable/disable filtering */
 const sidebarModuleMap: Record<string, string> = {
@@ -40,6 +40,7 @@ const sidebarModuleMap: Record<string, string> = {
 export function TechboxNavMain() {
   const pathname = usePathname()
   const enabledModules = useEnabledModules()
+  const moduleTitles = useModuleTitles()
 
   // Filter sidebar items based on enabled modules
   const navItems = allNavItems.filter((item) => {
@@ -47,6 +48,14 @@ export function TechboxNavMain() {
     if (!slug || slug === "home") return true;
     return enabledModules.has(slug as any);
   })
+
+  // Resolve a module display name from the source of truth (DB), falling back
+  // to the static config title. This is the single place titles are decided.
+  const resolveTitle = (href: string, fallback: string) => {
+    const slug = sidebarModuleMap[href];
+    if (!slug || slug === "home") return fallback;
+    return (moduleTitles as Record<string, string>)[slug] || fallback;
+  }
 
   return (
     <SidebarGroup>
@@ -63,11 +72,11 @@ export function TechboxNavMain() {
             >
               <SidebarMenuButton
                 isActive={active}
-                tooltip={item.title}
+                tooltip={resolveTitle(item.href, item.title)}
                 render={hasChildren ? <CollapsibleTrigger /> : <Link href={item.href} />}
               >
                 <Icon className="size-4" />
-                <span>{item.title}</span>
+                <span>{resolveTitle(item.href, item.title)}</span>
               </SidebarMenuButton>
               {item.children?.length ? (
                 <>

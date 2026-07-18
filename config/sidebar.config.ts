@@ -2,7 +2,6 @@
 import {
  House,
  BookOpen,
- Newspaper,
  Clapperboard,
  ShoppingBag,
  Users,
@@ -37,14 +36,6 @@ export const navItems: NavItem[] = [
  iconClassName: moduleColors.blog.base,
  iconHoverClassName: moduleColors.blog.hover,
  iconActiveClassName: moduleColors.blog.active,
- },
- {
- title: "اخبار",
- href: "/news",
- icon: Newspaper,
- iconClassName: moduleColors.news.base,
- iconHoverClassName: moduleColors.news.hover,
- iconActiveClassName: moduleColors.news.active,
  },
  {
  title: "رسانه",
