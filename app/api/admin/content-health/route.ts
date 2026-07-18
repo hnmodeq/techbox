@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { isSafeRemoteUrl } from "@/lib/url-safety";
 
 const URL_FIELDS = ["image", "videoUrl", "fileUrl"] as const;
 
@@ -11,15 +12,29 @@ function safeJsonArray(value: unknown): string[] {
 }
 
 function isHttpUrl(value?: string | null) {
-  return Boolean(value && /^https?:\/\//i.test(value));
+  // SSRF guard: only treat public https/http URLs as checkable. Internal,
+  // loopback, private, link-local, and cloud-metadata hosts are rejected so an
+  // editor can't plant an internal URL that an admin later triggers a fetch on.
+  return Boolean(value && isSafeRemoteUrl(value, { allowHttp: true }));
 }
 
 async function checkUrl(url: string): Promise<Omit<UrlStatus, "field" | "url">> {
   try {
-    const res = await fetch(url, { method: "HEAD", cache: "no-store", signal: AbortSignal.timeout(7000) });
+    const res = await fetch(url, {
+      method: "HEAD",
+      cache: "no-store",
+      redirect: "error", // do NOT follow redirects (SSRF redirect bypass)
+      signal: AbortSignal.timeout(7000),
+    });
     if (res.ok) return { ok: true, status: res.status };
     // Some object stores disallow HEAD; try a tiny GET before marking broken.
-    const getRes = await fetch(url, { method: "GET", headers: { Range: "bytes=0-0" }, cache: "no-store", signal: AbortSignal.timeout(7000) });
+    const getRes = await fetch(url, {
+      method: "GET",
+      headers: { Range: "bytes=0-0" },
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(7000),
+    });
     return { ok: getRes.ok, status: getRes.status };
   } catch (e: any) {
     return { ok: false, error: e?.message || "request_failed" };

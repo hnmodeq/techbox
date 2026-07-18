@@ -9,6 +9,7 @@ import {
   setSessionCookie,
 } from "@/lib/auth-server";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const pwdSchema = z.object({
   currentPassword: z.string().min(1, "رمز عبور فعلی الزامی است"),
@@ -18,6 +19,15 @@ const pwdSchema = z.object({
 export async function POST(req: NextRequest) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "resetPassword");
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد درخواست‌ها بیش از حد مجاز است." },
+      { status: 429 }
+    );
+  }
 
   try {
     const body = await req.json();

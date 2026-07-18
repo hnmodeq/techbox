@@ -34,6 +34,27 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
       },
+      // Content-Security-Policy in REPORT-ONLY mode. We start here to collect
+      // violations from real traffic before enforcing, so nothing breaks. Once
+      // stable, flip the header key to Content-Security-Policy and tighten
+      // script-src toward nonces. Tune the blob/Sentry hosts to your real origins.
+      {
+        key: 'Content-Security-Policy-Report-Only',
+        value: [
+          "default-src 'self'",
+          "base-uri 'self'",
+          "frame-ancestors 'none'",
+          "object-src 'none'",
+          "style-src 'self' 'unsafe-inline'",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+          "img-src 'self' data: blob: https:",
+          "media-src 'self' https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com https://*.public.blob.vercel-storage.com",
+          "font-src 'self' data:",
+          "connect-src 'self' https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com https://vitals.vercel-insights.com https://o*.ingest.sentry.io",
+          "frame-src 'self'",
+          "form-action 'self'",
+        ].join('; '),
+      },
     ];
 
     return [

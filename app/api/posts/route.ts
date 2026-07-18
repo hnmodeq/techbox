@@ -316,13 +316,30 @@ export async function POST(req: NextRequest) {
 }
 
 
+const patchSchema = z.object({
+  module: z.string().min(1).max(40),
+  slug: z.string().min(1).max(200),
+  title: z.string().max(300).optional(),
+  excerpt: z.string().max(2000).optional(),
+  content: z.string().max(100000).optional(),
+  image: z.string().max(1000).optional(),
+  published: z.boolean().optional(),
+  status: z.enum(["draft", "review", "published", "archived"]).optional(),
+  solved: z.boolean().optional(),
+  category: z.string().max(100).optional(),
+  newSlug: z.string().min(1).max(200).optional(),
+});
+
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  const body = await req.json();
-  const moduleKey = String(body.module || "");
-  const slug = String(body.slug || "");
-  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+
+  const parsed = patchSchema.safeParse(await req.json().catch(() => ({})));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "validation", issues: parsed.error.issues }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  }
+  const body = parsed.data;
+  const { module: moduleKey, slug } = body;
   if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
 
   // Find current post (for revision + slug change detection)

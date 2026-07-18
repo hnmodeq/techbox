@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const moduleFa: Record<string, string> = { blog: "مقاله", review: "نقد", media: "ویدیو", shop: "محصول", forum: "تاپیک", download: "دانلود", news: "خبر" };
 
@@ -180,6 +181,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "views");
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
+  }
   try {
     const body = await req.json().catch(() => ({}));
     const lastReadAt = body?.lastReadAt ? new Date(body.lastReadAt) : new Date();

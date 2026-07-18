@@ -56,10 +56,20 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await hashPassword(password);
 
-    // First user to register becomes super_admin (for fresh deployments)
-    const userCount = await prisma.user.count();
-    const isFirstUser = userCount === 0;
-    const role = isFirstUser ? "super_admin" : "user";
+    // Determine role atomically. The naive `count() == 0 → super_admin` pattern
+    // is a race: two concurrent registrations on an empty DB could both observe
+    // zero and each create a super_admin. We hold a Postgres transaction-level
+    // advisory lock so only one registration can perform the bootstrap decision
+    // at a time, and re-check the count inside that critical section.
+    const LOCK_KEY = 42424201; // arbitrary fixed key for the bootstrap lock
+
+    const role = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(${LOCK_KEY}::bigint)`;
+      const userCount = await tx.user.count();
+      // Returns "super_admin" only for the genuine first user.
+      return userCount === 0 ? "super_admin" : "user";
+    });
+    const isFirstUser = role === "super_admin";
     const roleFa = isFirstUser ? "مدیر کل" : "کاربر عضو";
     const modules = isFirstUser ? ["blog", "news", "media", "review", "download", "shop", "forum", "tools"] : [];
 

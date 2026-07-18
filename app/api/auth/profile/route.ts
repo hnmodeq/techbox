@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic, createEmailVerification } from "@/lib/auth-server";
 import { sendEmail, emailTemplates } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const profileSchema = z.object({
@@ -15,6 +16,15 @@ const profileSchema = z.object({
 export async function PUT(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "profile");
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد درخواست‌ها بیش از حد مجاز است." },
+      { status: 429 }
+    );
+  }
 
   try {
     const body = await req.json();

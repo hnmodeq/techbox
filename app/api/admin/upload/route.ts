@@ -17,13 +17,16 @@ const ALLOWED_BY_KIND: Record<string, RegExp[]> = {
   avatar: [/^image\/(jpeg|png|webp)$/],
   video: [/^video\/(mp4|webm|quicktime)$/],
   download: [
-    /^application\/(pdf|zip|x-zip-compressed|octet-stream)$/,
-    /^application\/x-iso9660-image$/,
-    /^application\/x-7z-compressed$/,
-    /^application\/vnd\.rar$/,
-    /^text\//,
+    /^application\/(pdf|zip|x-zip-compressed|vnd\.rar|x-7z-compressed|x-iso9660-image|msi|vnd\.microsoft\.portable-executable|octet-stream)$/,
   ],
-  file: [/^image\//, /^video\//, /^application\//, /^text\//],
+  // "file" is the generic fallback — allow common document/image/video binaries
+  // but NOT bare text/* (would permit text/html, text/javascript in public Blob)
+  // and NOT bare application/* (would permit application/javascript etc.).
+  file: [
+    /^image\//,
+    /^video\//,
+    /^application\/(pdf|zip|x-zip-compressed|vnd\.rar|x-7z-compressed|octet-stream|json|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|vnd\.ms-excel|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|vnd\.ms-powerpoint|vnd\.openxmlformats-officedocument\.presentationml\.presentation)$/,
+  ],
 };
 
 function sanitizeSegment(value: string) {

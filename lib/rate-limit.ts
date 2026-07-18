@@ -64,6 +64,8 @@ const limiters = {
   forgotPassword: { redis: createRatelimit(3, "1 h"),   memMax: 3,   memWindowMs: 3_600_000 },
   resetPassword:  { redis: createRatelimit(5, "1 h"),   memMax: 5,   memWindowMs: 3_600_000 },
   newsletter:     { redis: createRatelimit(3, "1 h"),   memMax: 3,   memWindowMs: 3_600_000 },
+  search:         { redis: createRatelimit(30, "1 m"),  memMax: 30,  memWindowMs: 60_000 },
+  profile:        { redis: createRatelimit(10, "1 m"),  memMax: 10,  memWindowMs: 60_000 },
 };
 
 export type RateLimiterKey = keyof typeof limiters;

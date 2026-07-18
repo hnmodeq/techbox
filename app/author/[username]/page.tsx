@@ -4,7 +4,6 @@ import { Icon } from "@/design/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { blurProps } from "@/lib/image-placeholder";
-import { ensureSavedContentTable } from "@/lib/saved-content-table";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { getUserActivities, getProfileContentModules } from "@/lib/user-activity";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
@@ -37,11 +36,14 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   let savedPosts: any[] = [];
   if (isSelf) {
     try {
-      await ensureSavedContentTable();
-      const savedRows = await prisma.$queryRawUnsafe(`SELECT "module", "slug" FROM "SavedContent" WHERE "userId"=$1 ORDER BY "createdAt" DESC LIMIT 60`, user.id);
-      const savedRowsList = savedRows as Array<{ module: string; slug: string }>;
-      if (savedRowsList.length) {
-        savedPosts = await prisma.post.findMany({ where: { published: true, deletedAt: null, OR: savedRowsList.map((saved: any) => ({ module: saved.module, slug: saved.slug })) }, orderBy: { date: "desc" } }).catch(() => []);
+      const savedRows = await prisma.savedContent.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "desc" },
+        take: 60,
+        select: { module: true, slug: true },
+      });
+      if (savedRows.length) {
+        savedPosts = await prisma.post.findMany({ where: { published: true, deletedAt: null, OR: savedRows.map((saved) => ({ module: saved.module, slug: saved.slug })) }, orderBy: { date: "desc" } }).catch(() => []);
       }
     } catch {}
   }

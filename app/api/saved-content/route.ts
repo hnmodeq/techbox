@@ -1,58 +1,73 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { getSessionUserPublic } from "@/lib/auth-server"
-import { ensureSavedContentTable } from "@/lib/saved-content-table"
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers"
+import { z } from "zod"
+
+// NOTE: SavedContent is a real Prisma model (see prisma/schema.prisma). We use
+// the model's typed query methods instead of raw SQL so the runtime app DB
+// credential never needs DDL/schema privileges, and inputs are validated.
+
+const moduleSlugSchema = z.object({
+  module: z.string().min(1).max(40),
+  slug: z.string().min(1).max(200),
+})
 
 export async function GET(req: NextRequest) {
   const user = await getSessionUserPublic()
   if (!user) return NextResponse.json({ saved: false, items: [] }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
-  await ensureSavedContentTable()
+
   const { searchParams } = new URL(req.url)
   const moduleKey = searchParams.get("module")
   const slug = searchParams.get("slug")
+
   if (moduleKey && slug) {
-    const rows = await prisma.$queryRawUnsafe(
-      `SELECT "id" FROM "SavedContent" WHERE "userId"=$1 AND "module"=$2 AND "slug"=$3 LIMIT 1`,
-      user.id,
-      moduleKey,
-      slug
-    )
-    return NextResponse.json({ saved: (rows as Array<{ id: string }>).length > 0 }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
+    const parsed = moduleSlugSchema.safeParse({ module: moduleKey, slug })
+    if (!parsed.success) return NextResponse.json({ saved: false }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
+    const row = await prisma.savedContent.findUnique({
+      where: {
+        SavedContent_user_module_slug_key: { userId: user.id, module: parsed.data.module, slug: parsed.data.slug },
+      },
+      select: { id: true },
+    })
+    return NextResponse.json({ saved: !!row }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
   }
-  const rows = await prisma.$queryRawUnsafe(
-    `SELECT "module", "slug", "createdAt" FROM "SavedContent" WHERE "userId"=$1 ORDER BY "createdAt" DESC LIMIT 100`,
-    user.id
-  )
-  return NextResponse.json({ items: rows as Array<{ module: string; slug: string; createdAt: Date }> }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
+
+  const rows = await prisma.savedContent.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+    select: { module: true, slug: true, createdAt: true },
+  })
+  return NextResponse.json({ items: rows }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
 }
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic()
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) })
-  await ensureSavedContentTable()
+
   const body = await req.json().catch(() => ({}))
-  const moduleKey = String(body.module || "")
-  const slug = String(body.slug || "")
-  if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) })
-  const existing = await prisma.$queryRawUnsafe(
-    `SELECT "id" FROM "SavedContent" WHERE "userId"=$1 AND "module"=$2 AND "slug"=$3 LIMIT 1`,
-    user.id,
-    moduleKey,
-    slug
-  )
-  const existingRows = existing as Array<{ id: string }>
-  if (existingRows.length > 0) {
-    await prisma.$executeRawUnsafe(`DELETE FROM "SavedContent" WHERE "id"=$1`, existingRows[0].id)
+  const parsed = moduleSlugSchema.safeParse({ module: body?.module, slug: body?.slug })
+  if (!parsed.success) {
+    return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) })
+  }
+  const { module: moduleKey, slug } = parsed.data
+
+  const existing = await prisma.savedContent.findUnique({
+    where: {
+      SavedContent_user_module_slug_key: { userId: user.id, module: moduleKey, slug },
+    },
+    select: { id: true },
+  })
+
+  if (existing) {
+    await prisma.savedContent.delete({ where: { id: existing.id } })
     return NextResponse.json({ saved: false }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
   }
-  await prisma.$executeRawUnsafe(
-    `INSERT INTO "SavedContent" ("id", "userId", "module", "slug") VALUES ($1, $2, $3, $4) ON CONFLICT ("userId", "module", "slug") DO NOTHING`,
-    crypto.randomUUID(),
-    user.id,
-    moduleKey,
-    slug
-  )
+
+  await prisma.savedContent.create({
+    data: { userId: user.id, module: moduleKey, slug },
+  })
   return NextResponse.json({ saved: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
 }
 

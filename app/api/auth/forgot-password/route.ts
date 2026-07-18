@@ -3,19 +3,11 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { hashTokenSha256 } from "@/lib/auth-server";
 
 const schema = z.object({
   email: z.string().email(),
 });
-
-async function hashToken(token: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -51,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     // Create a secure reset token — store only the hash
     const rawToken = crypto.randomUUID();
-    const tokenHash = await hashToken(rawToken);
+    const tokenHash = await hashTokenSha256(rawToken);
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
 
     await prisma.passwordResetToken.create({

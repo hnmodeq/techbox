@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const schema = z.object({
   eventId: z.string().min(1),
@@ -27,6 +28,15 @@ export async function POST(req: NextRequest) {
       error: "unauthorized",
       message: "برای ثبت نظر در تایم‌لاین لطفا ابتدا وارد حساب کاربری شوید."
     }, { status: 401 });
+  }
+
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "comments");
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد دیدگاه‌ها بیش از حد مجاز است." },
+      { status: 429 }
+    );
   }
 
   try {

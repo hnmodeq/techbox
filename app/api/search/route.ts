@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 import { advancedSearch } from "@/lib/search";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function normalizeQuery(q: string) {
   return q.trim().replace(/\s+/g, " ").slice(0, 120);
 }
 
 export async function GET(req: NextRequest) {
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(ip, "search");
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests" },
+      { status: 429, headers: cacheHeaders(PRIVATE_NO_STORE) }
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q") || "";
   const moduleKey = searchParams.get("module") || undefined;

@@ -35,7 +35,7 @@ function getAuthSecret(): Uint8Array {
 
 const COOKIE = "tb_session";
 
-export async function hashPassword(p: string){ return bcrypt.hash(p, 10); }
+export async function hashPassword(p: string){ return bcrypt.hash(p, 12); }
 export async function verifyPassword(p: string, hash: string){ return bcrypt.compare(p, hash); }
 
 /**

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { hashPassword, invalidateAllSessions } from "@/lib/auth-server";
+import { hashPassword, hashTokenSha256 } from "@/lib/auth-server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -9,15 +9,6 @@ const schema = z.object({
   token: z.string(),
   newPassword: z.string().min(8, "رمز عبور باید حداقل ۸ کاراکتر باشد"),
 });
-
-async function hashToken(token: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(token);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -35,7 +26,7 @@ export async function POST(req: NextRequest) {
     const { email, token, newPassword } = schema.parse(body);
 
     // Hash the incoming token to compare with stored hash
-    const tokenHash = await hashToken(token);
+    const tokenHash = await hashTokenSha256(token);
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase() },
@@ -67,23 +58,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update password
+    // Password update, token consumption, and session invalidation must be
+    // atomic — otherwise a concurrent reset attempt could reuse a token or the
+    // invalidation could race the password write.
     const hashed = await hashPassword(newPassword);
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashed },
-    });
-
-    // Mark token as used
-    await prisma.passwordResetToken.update({
-      where: { id: resetToken.id },
-      data: { used: true },
-    });
-
-    // Revoke every other active session for this account (e.g. a lost/compromised
-    // device) so the password change actually takes effect everywhere.
-    await invalidateAllSessions(user.id);
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashed, sessionsInvalidatedAt: new Date() },
+      }),
+      prisma.passwordResetToken.update({
+        where: { id: resetToken.id },
+        data: { used: true },
+      }),
+    ]);
 
     return NextResponse.json({
       ok: true,
