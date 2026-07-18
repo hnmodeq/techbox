@@ -104,27 +104,37 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
               return (
                 <Card key={top.slug} className="group relative h-full p-5 hover:shadow-md transition-all duration-200">
                   <CardContent className="p-0 space-y-3">
-                    {/* Author — clickable, links to profile (sits above the stretched link) */}
-                    <Link
-                      href={`/author/${encodeURIComponent(authorSlug)}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="relative z-10 flex items-center gap-2.5 group/author hover:opacity-90 transition-opacity w-fit"
-                    >
-                      <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border group-hover/author:ring-[var(--forum)] transition-all">
-                        <AvatarImage src={top.author?.avatar || '/assets/hooman.png'} alt={authorName} />
-                        <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--forum)] transition-colors truncate">
-                          {authorName}
+                    {/* Author (right) + publish date (left) */}
+                    <div className="flex items-center justify-between gap-2">
+                      <Link
+                        href={`/author/${encodeURIComponent(authorSlug)}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative z-10 flex items-center gap-2.5 group/author hover:opacity-90 transition-opacity"
+                      >
+                        <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border group-hover/author:ring-[var(--forum)] transition-all">
+                          <AvatarImage src={top.author?.avatar || '/assets/hooman.png'} alt={authorName} />
+                          <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--forum)] transition-colors truncate">
+                            {authorName}
+                          </div>
+                          {top.author?.job ? (
+                            <div className="text-[10px] text-muted-foreground truncate">{top.author.job}</div>
+                          ) : (
+                            <div className="text-[10px] text-muted-foreground truncate">{top.author?.role || 'عضو انجمن'}</div>
+                          )}
                         </div>
-                        {top.author?.job ? (
-                          <div className="text-[10px] text-muted-foreground truncate">{top.author.job}</div>
-                        ) : (
-                          <div className="text-[10px] text-muted-foreground truncate">{top.author?.role || 'عضو انجمن'}</div>
-                        )}
-                      </div>
-                    </Link>
+                      </Link>
+
+                      {/* Publish date — left, with tooltip */}
+                      <Tooltip>
+                        <TooltipTrigger render={<span className="text-[11px] text-muted-foreground shrink-0 cursor-default" />}>
+                          {formatRelativeDate(top.date)}
+                        </TooltipTrigger>
+                        <TooltipContent>تاریخ ساخته شدن این پرسش</TooltipContent>
+                      </Tooltip>
+                    </div>
 
                     {/* Topic title — the primary stretched link (covers whole card) */}
                     <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
@@ -151,19 +161,11 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
                       </div>
                     )}
 
-                    {/* Bottom row: date (left) | counter (center) | status (right).
-                        In RTL, justify-between places the first DOM child at the
-                        visual right and the last at the visual left, so the DOM
-                        order is [status, counter, date]. */}
+                    {/* Bottom row: status (left) | reply counter (right).
+                        RTL + justify-between → DOM order [counter, status]. */}
                     <div className="pt-2 border-t flex items-center justify-between gap-2">
-                      <ForumBadge slug={top.slug} fallback={typeof (top as any).solved === 'boolean' ? (top as any).solved : null} />
                       <ForumCommentSentence slug={top.slug} initial={top.comments || 0} />
-                      <Tooltip>
-                        <TooltipTrigger render={<span className="text-[11px] text-muted-foreground shrink-0 cursor-default" />}>
-                          {formatRelativeDate(top.date)}
-                        </TooltipTrigger>
-                        <TooltipContent>تاریخ ساخته شدن این پرسش</TooltipContent>
-                      </Tooltip>
+                      <ForumBadge slug={top.slug} fallback={typeof (top as any).solved === 'boolean' ? (top as any).solved : null} />
                     </div>
                   </CardContent>
                 </Card>
