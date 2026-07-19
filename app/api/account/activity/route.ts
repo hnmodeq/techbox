@@ -9,19 +9,43 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) })
 
   const enabledModules = await getProfileContentModules()
+  // "news", "media", "shop" should be strictly author-less.
+  const authorModules = enabledModules.filter(m => !["news", "media", "shop"].includes(m))
 
-  const [activities, authoredPosts] = await Promise.all([
+  const [activities, authoredPosts, savedRecords] = await Promise.all([
     getUserActivities(user.id),
     prisma.post.findMany({
-      where: { published: true, deletedAt: null, module: { in: enabledModules }, OR: [{ authorId: user.id }, { authorName: user.name }] },
+      where: { published: true, deletedAt: null, module: { in: authorModules }, OR: [{ authorId: user.id }, { authorName: user.name }] },
       orderBy: { date: "desc" },
       take: 100,
     }).catch(() => []),
+    prisma.savedContent.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" }
+    }).catch(() => []),
   ])
+
+  let savedPosts: any[] = [];
+  if (savedRecords.length > 0) {
+    const slugMap = new Set(savedRecords.map(r => `${r.module}:${r.slug}`));
+    const rawSaved = await prisma.post.findMany({
+      where: {
+        published: true,
+        deletedAt: null,
+        OR: savedRecords.map(r => ({ module: r.module, slug: r.slug }))
+      }
+    }).catch(() => []);
+    
+    // Maintain chronological sort order of when they were saved
+    savedPosts = savedRecords
+      .map(record => rawSaved.find(p => p.module === record.module && p.slug === record.slug))
+      .filter(Boolean);
+  }
 
   return NextResponse.json({
     activities,
     authoredPosts,
+    savedPosts,
     isAuthor: authoredPosts.length > 0 || ["super_admin", "admin", "editor"].includes(user.role),
   }, { headers: cacheHeaders(PRIVATE_NO_STORE) })
 }

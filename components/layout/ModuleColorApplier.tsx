@@ -4,8 +4,9 @@ import { useModuleConfig } from "@/providers/module-config.provider";
 import { useEffect, useRef } from "react";
 import type { ModuleSlug } from "@/lib/module-config";
 
-const MODULE_SLUGS: ModuleSlug[] = [
+const MODULE_SLUGS = [
   "blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline",
+  "nas", "nvr", "raid", "subnet", "home", "account", "admin", "about", "contact", "workwithus", "consultation"
 ];
 
 /**
@@ -17,52 +18,36 @@ const MODULE_SLUGS: ModuleSlug[] = [
  * colors), we do nothing at all — the globals.css :root values are already correct.
  */
 export function ModuleColorApplier() {
-  const { moduleColorsEnabled, unifiedModuleColor, moduleColors, loading } = useModuleConfig();
-  const prevStateRef = useRef<string>("");
+  const { moduleColorsEnabled, unifiedModuleColor, moduleColors } = useModuleConfig();
 
-  useEffect(() => {
-    if (loading) return;
+  const hasCustomColors = Object.keys(moduleColors).length > 0;
 
-    const hasCustomColors = Object.keys(moduleColors).length > 0;
+  // In the default state (enabled + no custom colors), the CSS variables
+  // from globals.css are already correct — no override needed.
+  if (moduleColorsEnabled && !hasCustomColors) {
+    return null;
+  }
 
-    // In the default state (enabled + no custom colors), the CSS variables
-    // from globals.css are already correct — skip DOM writes entirely.
-    if (moduleColorsEnabled && !hasCustomColors) {
-      // Only run removal if we previously set unified colors and now need to clean up
-      if (prevStateRef.current === "unified") {
-        for (const slug of MODULE_SLUGS) {
-          document.documentElement.style.removeProperty(`--${slug}`);
-        }
-      }
-      prevStateRef.current = "default";
-      return;
+  // Generate the override CSS text
+  let cssText = ":root {\n";
+
+  if (!moduleColorsEnabled) {
+    // All modules use the unified color
+    for (const slug of MODULE_SLUGS) {
+      cssText += `  --${slug}: ${unifiedModuleColor} !important;\n`;
     }
-
-    // Build a fingerprint of what we're about to apply to avoid redundant writes
-    const nextFingerprint = moduleColorsEnabled
-      ? `custom:${JSON.stringify(moduleColors)}`
-      : `unified:${unifiedModuleColor}`;
-
-    if (nextFingerprint === prevStateRef.current) return;
-    prevStateRef.current = nextFingerprint;
-
-    if (!moduleColorsEnabled) {
-      // All modules use the unified color
-      for (const slug of MODULE_SLUGS) {
-        document.documentElement.style.setProperty(`--${slug}`, unifiedModuleColor);
-      }
-    } else {
-      // Reset to defaults first, then apply per-module custom colors
-      for (const slug of MODULE_SLUGS) {
-        document.documentElement.style.removeProperty(`--${slug}`);
-      }
-      for (const [slug, color] of Object.entries(moduleColors)) {
-        if (color) {
-          document.documentElement.style.setProperty(`--${slug}`, color);
-        }
+  } else {
+    // Apply per-module custom colors
+    for (const [slug, color] of Object.entries(moduleColors)) {
+      if (color) {
+        cssText += `  --${slug}: ${color} !important;\n`;
       }
     }
-  }, [moduleColorsEnabled, unifiedModuleColor, moduleColors, loading]);
+  }
 
-  return null;
+  cssText += "}";
+
+  return (
+    <style dangerouslySetInnerHTML={{ __html: cssText }} />
+  );
 }
