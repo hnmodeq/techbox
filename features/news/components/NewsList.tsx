@@ -29,11 +29,13 @@ function NewsArchiveCard({ item }: { item: any }) {
           <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex flex-wrap items-center gap-2 paragraph-color">
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
-                  <span className="inline-flex items-center gap-1 font-bold text-foreground">
-                    {formatRelativeDate(item.date)}
-                  </span>
-                </TooltipTrigger>
+                <TooltipTrigger
+                  render={
+                    <span className="inline-flex items-center gap-1 font-bold text-foreground">
+                      {formatRelativeDate(item.date)}
+                    </span>
+                  }
+                />
                 <TooltipContent>
                   {new Date(item.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </TooltipContent>
