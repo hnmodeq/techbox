@@ -63,9 +63,8 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
               newsItems.map((news) => {
                 const isUnread = unreadSlugs.includes(news.slug)
                 return (
-                <SidebarMenuItem key={news.slug}>
+                <SidebarMenuItem key={news.slug} className="px-3 py-1.5">
                   <NewsSidebarCard news={news} isUnread={isUnread} />
-                  <Separator className="my-1" />
                 </SidebarMenuItem>
                 )
               })
