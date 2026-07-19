@@ -6,6 +6,7 @@ import { formatRelativeTime } from "@/lib/date-format";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boolean }) {
   const [showComments, setShowComments] = useState(false);
@@ -79,13 +80,23 @@ export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boole
       </div>
 
       {/* Waterfall Comments Dropdown */}
-      {showComments && (
-        <div className="w-full bg-[var(--card-background)] border-t border-border animate-in slide-in-from-top-2 duration-200">
-          <div className="max-h-[300px] overflow-y-auto px-3 pb-3 overscroll-contain">
-            <CommentSection module="news" slug={news.slug} compact />
-          </div>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {showComments && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="w-full bg-[var(--card-background)] border-t border-border">
+              <div className="max-h-[300px] overflow-y-auto px-3 pb-3 overscroll-contain">
+                <CommentSection module="news" slug={news.slug} compact />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
