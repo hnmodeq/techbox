@@ -140,7 +140,9 @@ export function UserActivityList({ activities, className = "" }: { activities: U
                     )}
                   </div>
                   <div className="flex min-w-0 items-center gap-2">
-                    <Badge variant="outline" className="shrink-0">{moduleLabels[row.module] || row.module}</Badge>
+                    <Badge variant="outline" className="shrink-0 text-white border-transparent" style={{ backgroundColor: `var(--${row.module})` }}>
+                      {moduleLabels[row.module] || row.module}
+                    </Badge>
                     <span className="truncate text-xs text-muted-foreground">{formatRelativeTime(row.createdAt)}</span>
                   </div>
                   <p className="line-clamp-2 min-w-0 text-sm leading-6 text-muted-foreground">

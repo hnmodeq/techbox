@@ -218,14 +218,14 @@ export default function Chatbot() {
             style={{ zIndex: zIndex.chatbot }}
           >
             <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl border border-border">
-              <div className="flex flex-row items-center justify-end p-2 bg-muted/30">
+              <div className="flex flex-row items-center justify-end p-2 bg-transparent">
                 <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
                   <X className="size-4" />
                 </Button>
               </div>
 
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)} className="flex-1 flex flex-col min-h-0">
-                <TabsList className="w-full justify-start rounded-none bg-muted/30 px-2 h-auto pt-0 pb-2">
+                <TabsList className="w-full justify-start rounded-none bg-transparent px-2 h-auto pt-0 pb-2">
                   <TabsTrigger value="chatbot" className="gap-1 text-xs">
                     <Sparkles className="size-3" />
                     پشتیبانی هوشمند
@@ -258,29 +258,29 @@ export default function Chatbot() {
 
             <CardFooter className="p-2 bg-card border-t">
               {activeTab === "chatbot" && (
-                <form onSubmit={send} className="flex w-full gap-2">
+                <form onSubmit={send} className="flex w-full gap-2 items-stretch">
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="سوال فنی / محصول خود را بپرسید…"
-                    className="flex-1 h-8 text-xs"
+                    className="flex-1 h-9 text-xs"
                     disabled={loading}
                   />
-                  <Button type="submit" disabled={loading || !input.trim()} size="sm" className="px-3 text-xs">
+                  <Button type="submit" disabled={loading || !input.trim()} className="h-9 px-4 text-xs font-bold">
                     {loading ? "…" : "ارسال"}
                   </Button>
                 </form>
               )}
               {activeTab === "support" && (
-                <form onSubmit={sendSupport} className="flex w-full gap-2">
+                <form onSubmit={sendSupport} className="flex w-full gap-2 items-stretch">
                   <Input
                     value={supportInput}
                     onChange={(e) => setSupportInput(e.target.value)}
                     placeholder="پیام به پشتیبانی برخط…"
-                    className="flex-1 h-8 text-xs"
+                    className="flex-1 h-9 text-xs"
                     disabled={supportLoading}
                   />
-                  <Button type="submit" disabled={supportLoading || !supportInput.trim()} size="sm" className="px-3 text-xs">
+                  <Button type="submit" disabled={supportLoading || !supportInput.trim()} className="h-9 px-4 text-xs font-bold">
                     {supportLoading ? "…" : "ارسال"}
                   </Button>
                 </form>

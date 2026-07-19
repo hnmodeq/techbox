@@ -20,6 +20,7 @@ export async function GET(){
     status: (user as any).status || "active",
     roleFa: user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر"),
     job: user.job || "",
+    bio: user.bio || "",
     birthday: user.birthday || "",
     modules,
     avatar: user.avatar ?? ""

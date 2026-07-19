@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { Textarea } from "@/components/ui/textarea";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ const profileSchema = z.object({
   email: z.string().email(),
   currentPassword: z.string().optional(),
   job: z.string().max(100).optional(),
+  bio: z.string().max(500).optional(),
   birthday: z.string().max(20).optional(),
 });
 
@@ -65,7 +67,7 @@ export default function AccountPage() {
   });
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { name: "", email: "", currentPassword: "", job: "", birthday: "" },
+    defaultValues: { name: "", email: "", currentPassword: "", job: "", bio: "", birthday: "" },
   });
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({
     resolver: zodResolver(passwordSchema),
@@ -86,6 +88,7 @@ export default function AccountPage() {
             email: data.user.email || "",
             currentPassword: "",
             job: data.user.job || "",
+            bio: data.user.bio || "",
             birthday: data.user.birthday || "",
           });
           localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
@@ -394,7 +397,7 @@ export default function AccountPage() {
 
       <div className="grid lg:grid-cols-3 gap-6 mt-6">
         <Card className="p-6 text-center space-y-4 h-fit">
-          <div className="relative w-32 h-32 mx-auto">
+          <div className="relative w-32 h-32 mx-auto mb-6">
             {avatar && avatar !== "/assets/hooman.png" ? (
               <Image src={avatar} width={128} height={128} className="h-32 w-32 rounded-xl object-cover ring-2 ring-border shadow" alt={user?.name || "کاربر"} />
             ) : (
@@ -402,27 +405,33 @@ export default function AccountPage() {
                 <Icon name="user" size={48} />
               </div>
             )}
-            <label className="absolute bottom-1 left-1 cursor-pointer rounded-md bg-primary text-primary-foreground px-2.5 py-1 text-xs shadow hover:opacity-90">
+          </div>
+          <div className="pt-2">
+            <label className="cursor-pointer rounded-md border border-input bg-background hover:bg-muted text-foreground px-4 py-1.5 text-xs shadow-sm font-bold transition-colors">
               تغییر تصویر
               <input type="file" accept="image/*" className="hidden" onChange={onAvatarChange} />
             </label>
           </div>
-          <div>
+          <div className="pt-2">
             <div className="font-bold">{profileForm.watch("name") || user.name}</div>
-            <div className="font-mono text-xs text-muted-foreground" dir="ltr">
+            <div className="font-mono text-xs text-muted-foreground mt-1" dir="ltr">
               @{user.username}
             </div>
+            {user.job && <div className="text-sm text-muted-foreground mt-2">{user.job}</div>}
+            {user.bio && <div className="text-xs text-muted-foreground mt-2 px-2 line-clamp-3">{user.bio}</div>}
           </div>
-          <Button type="button" variant="ghost" onClick={handleLogout} className="w-full text-destructive hover:bg-destructive/10">
-            خروج از حساب
-          </Button>
+          <div className="pt-2 border-t mt-4 border-border/50">
+            <Button type="button" variant="ghost" onClick={handleLogout} className="w-full text-destructive hover:bg-destructive/10">
+              خروج از حساب
+            </Button>
+          </div>
         </Card>
 
         <div className="lg:col-span-2 space-y-6">
           <AccountProfileTabs profileEditor={
             <Card className="p-6">
               <CardHeader className="px-0 pt-0">
-                <CardTitle className="text-base">ویرایش پروفایل</CardTitle>
+                <CardTitle className="text-base">ویرایش اطلاعات حساب کاربری</CardTitle>
               </CardHeader>
             {saveStatus && (
               <div className={`rounded-md p-3 text-center text-sm mb-4 ${saveStatus.ok ? "bg-green-500/15 text-green-600 border border-green-500/30" : "bg-destructive/15 text-destructive border border-destructive/30"}`}>
@@ -483,6 +492,10 @@ export default function AccountPage() {
                       />
                     );
                   })()}
+                  <div className="space-y-2">
+                    <FormLabel>سطح کاربر</FormLabel>
+                    <Input value={user.roleFa || user.role || "عضو"} disabled className="opacity-70 bg-muted" />
+                  </div>
                   <FormField
                     control={profileForm.control}
                     name="job"
@@ -491,6 +504,19 @@ export default function AccountPage() {
                         <FormLabel>مهارت شغلی</FormLabel>
                         <FormControl>
                           <Input placeholder="مثلا کارشناس زیرساخت" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={profileForm.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem className="sm:col-span-2">
+                        <FormLabel>درباره من (بیوگرافی)</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="کمی درباره خودتان بنویسید..." className="resize-none min-h-[80px]" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

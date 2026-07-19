@@ -17,6 +17,7 @@ model User {
   roleFa   String?
   status   String  @default("active")
   job      String?
+  bio      String?
   birthday String?
   modules  Json?
   avatar   String?

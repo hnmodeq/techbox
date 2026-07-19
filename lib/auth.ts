@@ -11,6 +11,7 @@ export type AppUser = {
   avatar?: string;
   roleFa?: string;
   job?: string;
+  bio?: string;
 };
 
 const KEY = "tb_auth_user";

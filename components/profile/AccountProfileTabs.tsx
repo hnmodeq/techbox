@@ -14,9 +14,36 @@ import { blurProps } from "@/lib/image-placeholder"
 function AuthorPosts({ posts }: { posts: any[] }) {
   return (
     <section className="space-y-4">
-      <h2 className="border-b pb-3 text-xl font-black text-foreground">فعالیت نویسنده</h2>
+      <h2 className="border-b pb-3 text-xl font-black text-foreground">فعالیت محتوایی</h2>
       {posts.length === 0 ? (
         <Card><CardContent className="p-8 text-center text-muted-foreground">هنوز محتوایی منتشر نکرده‌اید.</CardContent></Card>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post: any) => (
+            <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/40">
+              <div className="relative aspect-[16/10] bg-muted">
+                {post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" {...blurProps(post.image)} />}
+              </div>
+              <div className="p-4">
+                <div className="text-xs text-muted-foreground">{formatRelativeDate(post.date)} • {post.category || post.module}</div>
+                <h3 className="mt-2 line-clamp-2 font-bold text-foreground">{post.title}</h3>
+                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{post.excerpt}</p>
+                <div className="mt-3 border-t pt-3"><CardStats module={post.module} slug={post.slug} initialViews={post.views} initialLikes={post.likes} initialComments={post.comments || 0} showComments /></div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function SavedPosts({ posts }: { posts: any[] }) {
+  return (
+    <section className="space-y-4">
+      <h2 className="border-b pb-3 text-xl font-black text-foreground">ذخیره شده ها</h2>
+      {posts.length === 0 ? (
+        <Card><CardContent className="p-8 text-center text-muted-foreground">محتوایی ذخیره نکرده‌اید.</CardContent></Card>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {posts.map((post: any) => (
@@ -41,6 +68,7 @@ function AuthorPosts({ posts }: { posts: any[] }) {
 export function AccountProfileTabs({ profileEditor }: { profileEditor: React.ReactNode }) {
   const [activities, setActivities] = React.useState<UserActivity[]>([])
   const [authoredPosts, setAuthoredPosts] = React.useState<any[]>([])
+  const [savedPosts, setSavedPosts] = React.useState<any[]>([])
   const [isAuthor, setIsAuthor] = React.useState(false)
 
   React.useEffect(() => {
@@ -50,6 +78,7 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
         if (!data) return
         setActivities(data.activities || [])
         setAuthoredPosts(data.authoredPosts || [])
+        setSavedPosts(data.savedPosts || [])
         setIsAuthor(Boolean(data.isAuthor))
       })
       .catch(() => {})
@@ -58,12 +87,14 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
   return (
     <Tabs defaultValue="profile" className="space-y-6">
       <TabsList className="flex h-auto flex-wrap gap-1">
-        <TabsTrigger value="profile">ویرایش پروفایل</TabsTrigger>
-        <TabsTrigger value="activity">فعالیت کاربری</TabsTrigger>
-        {isAuthor && <TabsTrigger value="author">فعالیت نویسنده</TabsTrigger>}
+        <TabsTrigger value="profile">ویرایش اطلاعات حساب کاربری</TabsTrigger>
+        <TabsTrigger value="activity">فعالیت کاربر</TabsTrigger>
+        <TabsTrigger value="saved">ذخیره شده ها</TabsTrigger>
+        {isAuthor && <TabsTrigger value="author">فعالیت محتوایی</TabsTrigger>}
       </TabsList>
       <TabsContent value="profile">{profileEditor}</TabsContent>
       <TabsContent value="activity"><UserActivityList activities={activities} /></TabsContent>
+      <TabsContent value="saved"><SavedPosts posts={savedPosts} /></TabsContent>
       {isAuthor && <TabsContent value="author"><AuthorPosts posts={authoredPosts} /></TabsContent>}
     </Tabs>
   )

@@ -11,6 +11,7 @@ const profileSchema = z.object({
   // Required only when the email is actually being changed (verified below).
   currentPassword: z.string().optional(),
   job: z.string().optional(),
+  bio: z.string().optional(),
   birthday: z.string().optional(),
   avatar: z.string().optional(),
 });
@@ -76,12 +77,13 @@ export async function PUT(req: NextRequest) {
         ...(newEmail !== undefined ? { email: newEmail } : {}),
         ...(emailChanged ? { emailVerified: null } : {}),
         ...(data.job !== undefined ? { job: data.job } : {}),
+        ...(data.bio !== undefined ? { bio: data.bio } : {}),
         ...(data.birthday !== undefined ? { birthday: data.birthday } : {}),
         ...(data.avatar !== undefined ? { avatar: data.avatar } : {}),
       },
       select: {
         id: true, name: true, username: true, email: true, role: true, roleFa: true,
-        job: true, birthday: true, modules: true, avatar: true, emailVerified: true,
+        job: true, bio: true, birthday: true, modules: true, avatar: true, emailVerified: true,
       },
     });
 
@@ -109,6 +111,7 @@ export async function PUT(req: NextRequest) {
         role: updated.role,
         roleFa: updated.roleFa || (updated.role === "super_admin" ? "مدیر کل" : "کاربر"),
         job: updated.job || "",
+        bio: updated.bio || "",
         birthday: updated.birthday || "",
         modules: Array.isArray(updated.modules) ? updated.modules : [],
         avatar: updated.avatar || "/assets/hooman.png",
