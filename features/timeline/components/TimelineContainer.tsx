@@ -137,11 +137,11 @@ export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, on
   }, [onWheel]);
 
   return (
-    <div ref={containerRef} className={`relative ${heightClassName ?? "h-[calc(100svh-var(--header-height))] min-h-[620px]"} w-full overflow-hidden select-none bg-background text-foreground transition-colors duration-200`}>
+    <div ref={containerRef} className={`relative h-100 w-full overflow-hidden select-none bg-background text-foreground bg-blue-200 transition-colors duration-200`}>
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="h-full w-full" style={{ backgroundImage: 'linear-gradient(90deg, var(--border) 1px, transparent 1px), linear-gradient(var(--border) 1px, transparent 1px)', backgroundSize: `${50 * zoom}px 50px`, backgroundPosition: `${clampedPanX}px ${pan.y}px` }} />
       </div>
-      <div className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing" onPointerDown={onPanStart} onPointerMove={onPanMove} onPointerUp={onPanEnd} onPointerCancel={onPanEnd}>
+      <div className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing"onPointerDown={onPanStart} onPointerMove={onPanMove} onPointerUp={onPanEnd} onPointerCancel={onPanEnd}>
         <div className="absolute z-0 h-1.5 rounded-full bg-border" style={{ left: `${clampedPanX - 100}px`, top: `calc(35% + ${pan.y}px)`, width: `${totalWidth}px`, transform: 'translateY(-50%)' }} />
         <div className="absolute left-0 top-0 h-full" style={{ left: `${clampedPanX}px`, top: `${pan.y}px` }}>
           <div className="absolute top-[35%] flex -translate-x-1/2 flex-col items-center" style={{ left: '60px' }}>

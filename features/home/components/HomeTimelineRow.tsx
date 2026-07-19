@@ -117,8 +117,8 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
   }, [preview]);
 
   return (
-    <section className={`w-full py-8 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col justify-center`} dir="rtl">
-      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full px-4 sm:px-6 lg:px-8 space-y-6`}>
+    <section className={`w-full py-8 ${HOME_ROW_SIZES.timelineMinHeight} flex flex-col bg-white justify-center`} dir="rtl">
+      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full bg-red-300 px-4 sm:px-6 lg:px-8 space-y-6`}>
         <div className="flex items-center justify-between gap-4 mb-2">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "گاه\u200Cشمار پیشرفت تکنولوژی"}</h2>}
           {showHomeMoreLabel && (
