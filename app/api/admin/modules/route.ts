@@ -79,7 +79,8 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: e.errors }, { status: 400 });
+      const messages = e.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
+      return NextResponse.json({ error: messages }, { status: 400 });
     }
     return NextResponse.json(
       { error: e?.message || "Failed to update module config" },

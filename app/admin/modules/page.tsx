@@ -139,7 +139,14 @@ export default function AdminModulesPage() {
       if (!res.ok) throw new Error(data?.error || "save_failed");
       setMessage("تنظیمات ماژول‌ها ذخیره شد ✓");
     } catch (e: any) {
-      const msg = e?.errors ? JSON.stringify(e.errors) : (e?.message || "خطا در ذخیره تنظیمات");
+      let msg = "خطا در ذخیره تنظیمات";
+      if (e?.message) {
+        msg = e.message;
+      } else if (typeof e === "string") {
+        msg = e;
+      } else if (e?.error) {
+        msg = typeof e.error === "string" ? e.error : JSON.stringify(e.error);
+      }
       setMessage(msg);
     } finally {
       setSaving(false);
