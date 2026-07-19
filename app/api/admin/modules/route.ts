@@ -24,13 +24,13 @@ export async function GET() {
 }
 
 const moduleEntrySchema = z.object({
-  enabled: z.boolean(),
-  showOnHome: z.boolean(),
-  homeOrder: z.number().int().min(0).max(100),
+  enabled: z.boolean().default(true),
+  showOnHome: z.boolean().default(true),
+  homeOrder: z.number().int().min(0).max(100).default(99),
   homeTitle: z.string().max(200).optional().default(""),
   homeMoreLabel: z.string().max(200).optional().default(""),
-  showHomeTitle: z.boolean(),
-  showHomeMoreLabel: z.boolean(),
+  showHomeTitle: z.boolean().default(true),
+  showHomeMoreLabel: z.boolean().default(true),
 });
 
 const TOP_LEVEL_KEYS = new Set([
