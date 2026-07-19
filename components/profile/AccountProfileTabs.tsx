@@ -85,7 +85,7 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">{formatRelativeDate(post.date)}</span>
                     <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                      {useModuleTitle(post.module as any, post.module)}
+                      {post.category || post.module}
                     </span>
                   </div>
                   <div className="mt-0.5 line-clamp-1 font-semibold text-foreground group-hover:underline">{post.title}</div>
