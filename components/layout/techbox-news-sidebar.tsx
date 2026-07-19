@@ -2,9 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { formatRelativeDate } from "@/lib/date-format";
-import { NewspaperIcon, XIcon } from "lucide-react"
+import { NewspaperIcon } from "lucide-react"
 
 import {
   Sidebar,
@@ -15,10 +13,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useHomeModule } from "@/features/home/lib/home-data"
+import { NewsSidebarCard } from "./news-sidebar-card"
 
 export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[] }) {
   const { setOpen } = useSidebar()
@@ -46,9 +44,6 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
             <NewspaperIcon className="size-4 text-muted-foreground" />
             <span className="text-sm font-bold text-foreground">اخبار زنده تکباکس</span>
           </div>
-          <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)}>
-            <XIcon className="size-4" />
-          </Button>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -69,37 +64,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
                 const isUnread = unreadSlugs.includes(news.slug)
                 return (
                 <SidebarMenuItem key={news.slug}>
-                  <SidebarMenuButton
-                    render={<Link href={`/news/${news.slug}`} />}
-                    className="h-auto py-3 px-2"
-                  >
-                    <div className="flex items-start gap-3 w-full">
-                      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-muted">
-                        <Image
-                          src={news.image || "/assets/blog-1.jpg"}
-                          alt={news.title}
-                          fill
-                          className="object-cover"
-                          sizes="(min-width: 768px) 80px, 96px"
-                          quality={95}
-                        />
-                        {isUnread && (
-                          <span className="absolute top-1 right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0 text-start">
-                        <div className="flex items-center gap-1.5">
-                          {isUnread && <span className="size-1.5 shrink-0 rounded-full bg-red-500" />}
-                          <div className="text-xs font-bold line-clamp-2 leading-5 text-foreground">
-                            {news.title}
-                          </div>
-                        </div>
-                        <div className="mt-1 text-[10px] text-muted-foreground">
-                          {formatRelativeDate(news.date)}
-                        </div>
-                      </div>
-                    </div>
-                  </SidebarMenuButton>
+                  <NewsSidebarCard news={news} isUnread={isUnread} />
                   <Separator className="my-1" />
                 </SidebarMenuItem>
                 )
@@ -109,9 +74,9 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
               <SidebarMenuItem className="p-2">
                 <SidebarMenuButton
                   render={<Link href="/news" onClick={() => setOpen(false)} />}
-                  className="h-auto justify-center py-2.5 text-xs font-bold text-red-600 hover:text-red-700"
+                  className="h-auto justify-center py-2.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-600/10 hover:bg-red-600/20"
                 >
-                  بایگانی خبر
+                  بایگانی خبرها
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )}
