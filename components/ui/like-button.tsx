@@ -64,13 +64,20 @@ function getCachedVote(commentId: string): boolean | undefined {
 }
 
 export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideText, lightMode }: { contentType: string; slug: string; initial?: number; tooltipLabel?: string; hideText?: boolean; lightMode?: boolean }) {
-  const cachedLiked = getCachedLiked(contentType, slug);
-  const [liked, setLiked] = useState(cachedLiked ?? false);
+  // Use a strictly null initial state for `liked` to prevent hydration mismatches,
+  // since `localStorage` (getCachedLiked) cannot be read identically on the server.
+  const [liked, setLiked] = useState<boolean | null>(null);
   const [count, setCount] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
+    // Hydrate from localStorage immediately on mount
+    const cached = getCachedLiked(contentType, slug);
+    if (cached !== undefined && liked === null) {
+      setLiked(cached);
+    }
+
     let active = true;
     fetch(`/api/like?module=${encodeURIComponent(contentType)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
       .then(r => r.json())
@@ -90,9 +97,9 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
     setBusy(true);
     setShowLoginPrompt(false);
 
-    const prevLiked = liked;
+    const prevLiked = liked ?? false;
     const prevCount = count;
-    const nextLiked = !liked;
+    const nextLiked = !prevLiked;
     
     // Optimistic update
     setLiked(nextLiked);
@@ -149,7 +156,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
                 ? (liked ? "text-red-500" : "text-white/90 hover:text-white") 
                 : (liked ? "text-red-500" : "text-[var(--paragraph-color)] hover:text-red-500")
             } ${hideText ? "text-[11px]" : "text-[length:var(--paragraph-font-size)]"}`}
-            aria-pressed={liked}
+            aria-pressed={liked ?? false}
           />
         }>
           <Heart size={16} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={`transition-transform duration-200 ${liked ? "scale-110" : "scale-100"}`} aria-hidden />
