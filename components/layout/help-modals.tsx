@@ -86,11 +86,15 @@ function FaqModal({ open, onClose }: { open: boolean; onClose: () => void }) {
         ) : faqs.length === 0 ? (
           <Card className="p-6 text-center text-sm text-muted-foreground">هنوز سوالی ثبت نشده است.</Card>
         ) : (
-          <Accordion>
+          <Accordion className="text-right">
             {faqs.map((f) => (
-              <AccordionItem key={f.id} value={f.id}>
-                <AccordionTrigger className="text-sm font-bold text-right [&[data-open]>svg]:rotate-180">{f.question}</AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground leading-6">{f.answer}</AccordionContent>
+              <AccordionItem key={f.id} value={f.id} className="border-b">
+                <AccordionTrigger className="text-sm font-bold text-right hover:no-underline [&>svg]:hidden">
+                  {f.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground leading-6 text-right pb-3">
+                  {f.answer}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -189,6 +193,32 @@ function FeedbackModal({ open, onClose, defaultName, defaultEmail }: { open: boo
 }
 
 // ─── Support Modal ───────────────────────────────────────────
+type Ticket = {
+  id: string;
+  subject: string | null;
+  message: string;
+  status: string;
+  createdAt: string;
+  replies: TicketReply[];
+};
+type TicketReply = {
+  id: string;
+  authorName: string;
+  authorRole: string;
+  message: string;
+  createdAt: string;
+};
+
+function StatusBadge({ status }: { status: string }) {
+  const map: Record<string, { label: string; cls: string }> = {
+    new: { label: "جدید", cls: "bg-red-500/15 text-red-600 border-red-500/30" },
+    read: { label: "در حال بررسی", cls: "bg-blue-500/15 text-blue-600 border-blue-500/30" },
+    resolved: { label: "حل‌شده", cls: "bg-green-500/15 text-green-600 border-green-500/30" },
+  };
+  const s = map[status] || map.new;
+  return <span className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold ${s.cls}`}>{s.label}</span>;
+}
+
 function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: boolean; onClose: () => void; defaultName: string; defaultEmail: string }) {
   const [name, setName] = useState(defaultName);
   const [email, setEmail] = useState(defaultEmail);
@@ -196,7 +226,14 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState(false);
+
+  // View state: "new" = new ticket form, "list" = my tickets list, "thread" = single ticket conversation
+  const [view, setView] = useState<"new" | "list" | "thread">("new");
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [ticketsLoading, setTicketsLoading] = useState(false);
+  const [activeTicket, setActiveTicket] = useState<Ticket | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replyBusy, setReplyBusy] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -205,9 +242,39 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
       setSubject("");
       setMessage("");
       setError("");
-      setDone(false);
+      // If we have an email, auto-load their tickets
+      if (defaultEmail) {
+        setView("list");
+        loadTickets(defaultEmail);
+      } else {
+        setView("new");
+      }
     }
   }, [open, defaultName, defaultEmail]);
+
+  const loadTickets = async (emailToLoad?: string) => {
+    const em = (emailToLoad || email).toLowerCase().trim();
+    if (!em) return;
+    setTicketsLoading(true);
+    try {
+      const res = await fetch(`/api/support/tickets?email=${encodeURIComponent(em)}`, { cache: "no-store" });
+      const data = await res.json();
+      setTickets(data.tickets || []);
+    } catch {
+      setTickets([]);
+    } finally {
+      setTicketsLoading(false);
+    }
+  };
+
+  const refreshThread = async (ticketId: string) => {
+    try {
+      const res = await fetch(`/api/support/tickets?email=${encodeURIComponent(email.toLowerCase().trim())}`, { cache: "no-store" });
+      const data = await res.json();
+      const found = (data.tickets || []).find((t: Ticket) => t.id === ticketId);
+      if (found) setActiveTicket(found);
+    } catch {}
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,8 +292,11 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        setDone(true);
         toast.success("تیکت شما ثبت شد");
+        setSubject("");
+        setMessage("");
+        setView("list");
+        loadTickets(email);
       } else {
         setError(data.error || "خطا در ثبت");
       }
@@ -237,44 +307,167 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
     }
   };
 
+  const submitReply = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeTicket || replyText.trim().length < 2) return;
+    setReplyBusy(true);
+    try {
+      const res = await fetch("/api/support/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ticketId: activeTicket.id,
+          email,
+          name,
+          message: replyText.trim(),
+        }),
+      });
+      if (res.ok) {
+        setReplyText("");
+        await refreshThread(activeTicket.id);
+      } else {
+        toast.error("خطا در ثبت پاسخ");
+      }
+    } catch {
+      toast.error("خطا در ارتباط با سرور");
+    } finally {
+      setReplyBusy(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden" dir="rtl">
-        <div className="p-6 sm:p-8 space-y-5">
+      <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden" dir="rtl">
+        <div className="p-6 sm:p-7 space-y-4 max-h-[80vh] overflow-y-auto">
           <DialogHeader className="text-center space-y-2">
-            <DialogTitle className="text-lg font-black">پشتیبانی</DialogTitle>
-            <DialogDescription className="text-xs">مشکل یا سوال خود را ثبت کنید تا تیم پشتیبانی پاسخ دهد.</DialogDescription>
+            <DialogTitle className="text-lg font-black">تیکت پشتیبانی</DialogTitle>
+            <DialogDescription className="text-xs">مشکل خود را ثبت کنید و گفتگو را پیگیری کنید.</DialogDescription>
           </DialogHeader>
-          {done ? (
-            <Card className="p-4 text-center space-y-3">
-              <p className="text-sm font-bold text-green-600">تیکت شما ثبت شد. تیم پشتیبانی به‌زودی پاسخ خواهد داد.</p>
-              <Button type="button" variant="link" size="sm" onClick={onClose}>بستن</Button>
-            </Card>
-          ) : (
-            <form onSubmit={submit} className="space-y-4">
+
+          {/* View toggle */}
+          <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-muted">
+            <button
+              type="button"
+              onClick={() => setView("new")}
+              className={`h-8 rounded-md text-xs font-bold transition-colors ${view === "new" || view === "thread" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
+            >
+              ثبت تیکت جدید
+            </button>
+            <button
+              type="button"
+              onClick={() => { setView("list"); loadTickets(); }}
+              className={`h-8 rounded-md text-xs font-bold transition-colors ${view === "list" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
+            >
+              تیکت‌های من
+            </button>
+          </div>
+
+          {/* New ticket form */}
+          {(view === "new") && (
+            <form onSubmit={submit} className="space-y-3">
               {error && <Card className="p-3 bg-destructive/10 border-destructive/30 text-center text-xs font-bold text-destructive">{error}</Card>}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="sp-name" className="text-xs font-bold">نام</Label>
-                  <Input id="sp-name" value={name} onChange={(e) => setName(e.target.value)} className="h-10 text-sm" />
+                  <Input id="sp-name" value={name} onChange={(e) => setName(e.target.value)} className="h-9 text-sm" />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="sp-email" className="text-xs font-bold">ایمیل</Label>
-                  <Input id="sp-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-10 text-sm" dir="ltr" />
+                  <Input id="sp-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-9 text-sm" dir="ltr" />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="sp-subject" className="text-xs font-bold">موضوع</Label>
-                <Input id="sp-subject" value={subject} onChange={(e) => setSubject(e.target.value)} className="h-10 text-sm" placeholder="موضوع تیکت" />
+                <Input id="sp-subject" value={subject} onChange={(e) => setSubject(e.target.value)} className="h-9 text-sm" placeholder="موضوع تیکت" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="sp-msg" className="text-xs font-bold">توضیحات</Label>
-                <Textarea id="sp-msg" value={message} onChange={(e) => setMessage(e.target.value)} className="min-h-[100px] text-sm" placeholder="مشکل یا سوال خود را شرح دهید..." />
+                <Textarea id="sp-msg" value={message} onChange={(e) => setMessage(e.target.value)} className="min-h-[90px] text-sm" placeholder="مشکل یا سوال خود را شرح دهید..." />
               </div>
               <Button type="submit" disabled={busy} className="w-full h-10 font-bold">
                 {busy ? "در حال ارسال..." : "ثبت تیکت"}
               </Button>
             </form>
+          )}
+
+          {/* My tickets list */}
+          {view === "list" && (
+            <div className="space-y-2">
+              {ticketsLoading ? (
+                <div className="flex items-center justify-center py-8"><Spinner className="size-5" /></div>
+              ) : tickets.length === 0 ? (
+                <Card className="p-6 text-center text-sm text-muted-foreground space-y-3">
+                  <p>هنوز تیکتی ثبت نکرده‌اید.</p>
+                  <Button type="button" variant="link" size="sm" onClick={() => setView("new")}>ثبت تیکت جدید</Button>
+                </Card>
+              ) : (
+                <>
+                  {tickets.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => { setActiveTicket(t); setView("thread"); }}
+                      className="w-full text-right rounded-lg border p-3 hover:border-foreground/20 transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-sm font-bold text-foreground truncate">{t.subject || t.message.slice(0, 40)}</span>
+                        <StatusBadge status={t.status} />
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{t.message}</p>
+                      <div className="text-[10px] text-muted-foreground mt-1">{new Date(t.createdAt).toLocaleDateString("fa-IR")}</div>
+                    </button>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Single ticket conversation */}
+          {view === "thread" && activeTicket && (
+            <div className="space-y-3">
+              <button type="button" onClick={() => setView("list")} className="text-xs text-muted-foreground hover:text-foreground">→ بازگشت به لیست</button>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-bold">{activeTicket.subject}</span>
+                <StatusBadge status={activeTicket.status} />
+              </div>
+              {/* Conversation */}
+              <div className="space-y-2 max-h-[280px] overflow-y-auto">
+                {/* Original message */}
+                <div className="flex justify-end">
+                  <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-primary text-primary-foreground px-3 py-2 text-xs leading-6 whitespace-pre-wrap">
+                    {activeTicket.message}
+                  </div>
+                </div>
+                {/* Replies */}
+                {activeTicket.replies.map((r) => (
+                  <div key={r.id} className={`flex ${r.authorRole === "user" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-6 whitespace-pre-wrap ${
+                      r.authorRole === "user"
+                        ? "rounded-br-sm bg-primary text-primary-foreground"
+                        : "rounded-bl-sm bg-muted border text-foreground"
+                    }`}>
+                      {r.authorRole === "admin" && <div className="text-[10px] font-bold text-foreground/60 mb-0.5">{r.authorName}</div>}
+                      {r.message}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Reply box */}
+              {activeTicket.status !== "resolved" && (
+                <form onSubmit={submitReply} className="flex gap-2">
+                  <Input
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="پاسخ خود را بنویسید..."
+                    className="flex-1 h-9 text-xs"
+                    disabled={replyBusy}
+                  />
+                  <Button type="submit" disabled={replyBusy || replyText.trim().length < 2} size="sm" className="px-3">
+                    {replyBusy ? "…" : "ارسال"}
+                  </Button>
+                </form>
+              )}
+            </div>
           )}
         </div>
       </DialogContent>

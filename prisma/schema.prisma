@@ -404,8 +404,26 @@ model ContactSubmission {
   status    String   @default("new") // new | read | resolved
   createdAt DateTime @default(now())
 
+  replies   TicketReply[]
+
   @@index([createdAt])
   @@index([type, status, createdAt])
+  @@index([email, type, createdAt])
+}
+
+/// Replies in a support ticket conversation (both user and admin messages).
+model TicketReply {
+  id          String   @id @default(cuid())
+  ticketId    String
+  authorName  String
+  authorEmail String?
+  authorRole  String   @default("user") // user | admin
+  message     String   @db.Text
+  createdAt   DateTime @default(now())
+
+  ticket ContactSubmission @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId, createdAt])
 }
 
 model SiteSetting {

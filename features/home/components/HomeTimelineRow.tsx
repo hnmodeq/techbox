@@ -185,7 +185,7 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
 
                 {/* Gradient overlay so the no-bg title reads clearly over the
                     image grid (which now reads as a background). */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/45 via-black/25 to-black/45 transition-all duration-700 group-hover:from-black/65 group-hover:via-black/50 group-hover:to-black/65" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/50 transition-all duration-700 ease-in-out group-hover:from-black/85 group-hover:via-black/70 group-hover:to-black/85" />
 
                 {/* Centered title (no button background). Morphs SLOWLY into a
                     "click to watch" prompt on hover. Title is the default in

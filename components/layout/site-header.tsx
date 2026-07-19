@@ -634,7 +634,7 @@ export function SiteHeader({
                   <Button
                     type="button"
                     size="sm"
-                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600 px-3"
+                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600 px-4"
                     onClick={onToggleNews}
                     aria-pressed={newsOpen}
                     aria-label="اخبار زنده تکباکس"

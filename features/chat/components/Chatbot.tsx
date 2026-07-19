@@ -7,10 +7,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessageCircle, X, Send, Sparkles, LifeBuoy, Users } from "lucide-react";
+import { Headset, X, Send, Sparkles, LifeBuoy } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };
-type TabType = "chatbot" | "support" | "messenger";
+type TabType = "chatbot" | "support";
 
 const STORAGE_KEY = "tb_chat_history";
 const SUPPORT_STORAGE_KEY = "tb_support_chat_history";
@@ -18,7 +18,7 @@ const PERSONAL_STORAGE_KEY = "tb_personal_chat_history";
 
 const supportWelcome: Msg = {
   role: "assistant",
-  text: "سلام، به چت پشتیبانی تکباکس خوش آمدید. پیام‌تان را بنویسید؛ اولین عضو تیم پشتیبانی که آنلاین شود پاسخ می‌دهد.",
+  text: "پشتیبانی برخط اینجاست تا شما را راهنمایی کنید",
   time: Date.now(),
 };
 
@@ -159,9 +159,9 @@ export default function Chatbot() {
           onClick={() => { setOpen(true); setHasUnread(false); }}
           style={{ zIndex: zIndex.popover }}
           className="fixed bottom-5 left-5 rounded-full shadow-md size-12 p-0"
-          aria-label="چت‌های تکباکس"
+          aria-label="پشتیبانی تکباکس"
         >
-          <MessageCircle className="size-5" />
+          <Headset className="size-5" />
           {hasUnread && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
@@ -177,9 +177,9 @@ export default function Chatbot() {
             <CardHeader className="flex flex-row items-center justify-between gap-2 p-3 border-b">
               <div className="flex items-center gap-2">
                 <div className="flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <MessageCircle className="size-4" />
+                  <Headset className="size-4" />
                 </div>
-                <CardTitle className="text-sm font-bold">چت‌های تکباکس</CardTitle>
+                <CardTitle className="text-sm font-bold">پشتیبانی تکباکس</CardTitle>
               </div>
               <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
                 <X className="size-4" />
@@ -190,22 +190,18 @@ export default function Chatbot() {
               <TabsList className="w-full justify-start rounded-none border-b bg-transparent px-2">
                 <TabsTrigger value="chatbot" className="gap-1 text-xs">
                   <Sparkles className="size-3" />
-                  چت‌بات
+                  پشتیبانی هوشمند
                 </TabsTrigger>
                 <TabsTrigger value="support" className="gap-1 text-xs">
                   <LifeBuoy className="size-3" />
-                  چت پشتیبانی
-                </TabsTrigger>
-                <TabsTrigger value="messenger" className="gap-1 text-xs">
-                  <Users className="size-3" />
-                  پیام‌ها
+                  پشتیبانی برخط
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="chatbot" className="flex-1 m-0 min-h-0">
                 <ScrollArea className="h-full">
                   <CardContent className="p-3 space-y-3 min-h-full">
-                    {renderMessages(msgs, "سوال فنی یا محصول خود را بپرسید. چت‌بات با مدل AI پاسخ می‌دهد.", loading ? "در حال فکر کردن…" : undefined)}
+                    {renderMessages(msgs, "پشتیبانی هوشمند اینجاست تا شما را راهنمایی کند", loading ? "در حال فکر کردن…" : undefined)}
                     <div ref={endRef} />
                   </CardContent>
                 </ScrollArea>
@@ -214,20 +210,12 @@ export default function Chatbot() {
               <TabsContent value="support" className="flex-1 m-0 min-h-0">
                 <ScrollArea className="h-full">
                   <CardContent className="p-3 space-y-3 min-h-full">
-                    {renderMessages(supportMsgs, undefined, supportLoading ? "در حال ارسال به پشتیبانی…" : undefined)}
+                    {renderMessages(supportMsgs.filter((m, i) => i > 0 || supportMsgs.length > 1), "پشتیبانی برخط اینجاست تا شما را راهنمایی کند", supportLoading ? "در حال ارسال به پشتیبانی…" : undefined)}
                     <div ref={endRef} />
                   </CardContent>
                 </ScrollArea>
               </TabsContent>
 
-              <TabsContent value="messenger" className="flex-1 m-0 min-h-0">
-                <ScrollArea className="h-full">
-                  <CardContent className="p-3 space-y-3 min-h-full">
-                    {renderMessages(personalMsgs)}
-                    <div ref={endRef} />
-                  </CardContent>
-                </ScrollArea>
-              </TabsContent>
             </Tabs>
 
             <Separator />
@@ -251,7 +239,7 @@ export default function Chatbot() {
                   <Input
                     value={supportInput}
                     onChange={(e) => setSupportInput(e.target.value)}
-                    placeholder="پیام به تیم پشتیبانی…"
+                    placeholder="پیام به پشتیبانی برخط…"
                     className="flex-1 h-8 text-xs"
                     disabled={supportLoading}
                   />
@@ -260,19 +248,7 @@ export default function Chatbot() {
                   </Button>
                 </form>
               )}
-              {activeTab === "messenger" && (
-                <form onSubmit={sendPersonal} className="flex w-full gap-2">
-                  <Input
-                    value={personalInput}
-                    onChange={(e) => setPersonalInput(e.target.value)}
-                    placeholder="پیام شخصی…"
-                    className="flex-1 h-8 text-xs"
-                  />
-                  <Button type="submit" disabled={!personalInput.trim()} size="sm" className="px-3">
-                    <Send className="size-3.5 me-1" /> ارسال
-                  </Button>
-                </form>
-              )}
+
             </CardFooter>
           </Card>
         </div>

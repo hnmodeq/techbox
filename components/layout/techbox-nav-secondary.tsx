@@ -14,7 +14,7 @@ import { LifeBuoyIcon, SendIcon, HelpCircleIcon } from "lucide-react"
 export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const items = [
     {
-      title: "پشتیبانی",
+      title: "تیکت",
       event: "tb_open_support",
       icon: LifeBuoyIcon,
     },

@@ -21,6 +21,9 @@ export async function GET(req: NextRequest) {
       where,
       orderBy: { createdAt: "desc" },
       take: 100,
+      include: {
+        replies: { orderBy: { createdAt: "asc" } },
+      },
     });
     return NextResponse.json(submissions, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch {
