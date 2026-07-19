@@ -27,12 +27,26 @@ export async function GET() {
 
   let savedPosts: any[] = [];
   if (savedRecords.length > 0) {
-    const slugMap = new Set(savedRecords.map(r => `${r.module}:${r.slug}`));
     const rawSaved = await prisma.post.findMany({
       where: {
         published: true,
         deletedAt: null,
         OR: savedRecords.map(r => ({ module: r.module, slug: r.slug }))
+      },
+      select: {
+        id: true,
+        module: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        image: true,
+        date: true,
+        category: true,
+        authorName: true,
+        authorAvatar: true,
+        views: true,
+        likes: true,
+        comments: true,
       }
     }).catch(() => []);
     

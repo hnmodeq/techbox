@@ -38,7 +38,26 @@ function AuthorPosts({ posts }: { posts: any[] }) {
   )
 }
 
-function SavedPosts({ posts }: { posts: any[] }) {
+function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
+  if (loading) {
+    return (
+      <section className="space-y-4">
+        <h2 className="border-b pb-3 text-xl font-black text-foreground">ذخیره شده ها</h2>
+        <div className="space-y-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex gap-3 rounded-lg border bg-card p-3 animate-pulse">
+              <div className="h-12 w-16 rounded-md bg-muted" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-3/4 bg-muted rounded" />
+                <div className="h-3 w-1/2 bg-muted rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="space-y-4">
       <h2 className="border-b pb-3 text-xl font-black text-foreground">ذخیره شده ها</h2>
@@ -102,6 +121,7 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
   const [authoredPosts, setAuthoredPosts] = React.useState<any[]>([])
   const [savedPosts, setSavedPosts] = React.useState<any[]>([])
   const [isAuthor, setIsAuthor] = React.useState(false)
+  const [savedLoading, setSavedLoading] = React.useState(true)
 
   React.useEffect(() => {
     fetch("/api/account/activity", { cache: "no-store" })
@@ -114,6 +134,7 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
         setIsAuthor(Boolean(data.isAuthor))
       })
       .catch(() => {})
+      .finally(() => setSavedLoading(false))
   }, [])
 
   return (
@@ -126,7 +147,7 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
       </TabsList>
       <TabsContent value="profile">{profileEditor}</TabsContent>
       <TabsContent value="activity"><UserActivityList activities={activities} /></TabsContent>
-      <TabsContent value="saved"><SavedPosts posts={savedPosts} /></TabsContent>
+      <TabsContent value="saved"><SavedPosts posts={savedPosts} loading={savedLoading} /></TabsContent>
       <TabsContent value="author">
         {isAuthor ? (
           <AuthorPosts posts={authoredPosts} />
