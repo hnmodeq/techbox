@@ -39,7 +39,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const { id, status } = body;
-    if (!id || !["new", "read", "resolved"].includes(status)) {
+    if (!id || !["new", "read", "waiting_user", "closed"].includes(status)) {
       return NextResponse.json({ error: "invalid_request" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
     }
     await prisma.contactSubmission.update({ where: { id }, data: { status } });

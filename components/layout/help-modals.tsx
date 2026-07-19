@@ -89,7 +89,7 @@ function FaqModal({ open, onClose }: { open: boolean; onClose: () => void }) {
           <Accordion className="text-right">
             {faqs.map((f) => (
               <AccordionItem key={f.id} value={f.id} className="border-b">
-                <AccordionTrigger className="text-sm font-bold text-right hover:no-underline [&>svg]:hidden">
+                <AccordionTrigger className="text-sm font-bold text-right justify-start hover:no-underline [&>svg]:hidden">
                   {f.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground leading-6 text-right pb-3">
@@ -213,7 +213,9 @@ function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     new: { label: "جدید", cls: "bg-red-500/15 text-red-600 border-red-500/30" },
     read: { label: "در حال بررسی", cls: "bg-blue-500/15 text-blue-600 border-blue-500/30" },
-    resolved: { label: "حل‌شده", cls: "bg-green-500/15 text-green-600 border-green-500/30" },
+    waiting_user: { label: "منتظر پاسخ شما", cls: "bg-amber-500/15 text-amber-600 border-amber-500/30" },
+    closed: { label: "بسته شد", cls: "bg-green-500/15 text-green-600 border-green-500/30" },
+    resolved: { label: "بسته شد", cls: "bg-green-500/15 text-green-600 border-green-500/30" },
   };
   const s = map[status] || map.new;
   return <span className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold ${s.cls}`}>{s.label}</span>;
@@ -344,12 +346,13 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
             <DialogDescription className="text-xs">مشکل خود را ثبت کنید و گفتگو را پیگیری کنید.</DialogDescription>
           </DialogHeader>
 
-          {/* View toggle */}
+          {/* View toggle — hidden when reading a single ticket (back button shown instead) */}
+          {view !== "thread" && (
           <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-muted">
             <button
               type="button"
               onClick={() => setView("new")}
-              className={`h-8 rounded-md text-xs font-bold transition-colors ${view === "new" || view === "thread" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
+              className={`h-8 rounded-md text-xs font-bold transition-colors ${view === "new" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
             >
               ثبت تیکت جدید
             </button>
@@ -361,6 +364,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
               تیکت‌های من
             </button>
           </div>
+          )}
 
           {/* New ticket form */}
           {(view === "new") && (
@@ -452,8 +456,11 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
                   </div>
                 ))}
               </div>
-              {/* Reply box */}
-              {activeTicket.status !== "resolved" && (
+              {activeTicket.status === "closed" && (
+                <div className="text-center text-xs text-muted-foreground py-2">این تیکت بسته شده است.</div>
+              )}
+              {/* Reply box — locked when the ticket is closed */}
+              {activeTicket.status !== "closed" && (
                 <form onSubmit={submitReply} className="flex gap-2">
                   <Input
                     value={replyText}

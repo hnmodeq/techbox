@@ -20,8 +20,11 @@ interface TimelineContainerProps {
   onZoomOut?: () => void;
   onZoomChange?: (nextZoom: number) => void;
   onWheel?: (e: React.WheelEvent | WheelEvent) => void;
-  /** Tailwind height class for the container. Defaults to near-full-viewport
-   *  for the standalone /timeline page. The home row passes a compact value. */
+  /** Called once when events load, with the pan.x that centers the NEWEST
+   *  event. The parent wires this to the pan setter so the timeline opens at
+   *  the most recent event instead of the oldest. */
+  onInitialPan?: (x: number) => void;
+  /** Tailwind height class. Defaults to a compact height that fits the cards. */
   heightClassName?: string;
 }
 
@@ -46,8 +49,7 @@ function LineCommentBox({ eventId, prefix, placeholder }: { eventId?: string; pr
     if (!eventId || !text.trim()) return
     setError('')
     const res = await fetch('/api/timeline/comments', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ eventId, text: `${prefix}${text.trim()}` }),
     })
     if (res.status === 401) {
@@ -99,8 +101,14 @@ function getRelativeTimeAgo(dateGr: Date | string): string {
   return `${diffYears.toLocaleString('fa-IR')} سال پیش`;
 }
 
-export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, onPanEnd, onWheel, heightClassName }: TimelineContainerProps) {
+// Layout constants — the timeline "machine" fits in a compact height.
+// Line sits near the top so dates fit above; cards hang below. No empty space.
+const LINE_TOP = 52;            // px from container top to the line
+const CARD_OFFSET = 28;         // px below the line where cards start
+
+export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, onPanEnd, onWheel, onInitialPan, heightClassName }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const didInitialScrollRef = useRef(false);
 
   const xPositions = useMemo(() => {
     return events.reduce<number[]>((positions, ev, idx) => {
@@ -117,12 +125,30 @@ export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, on
 
   const endPosition = (xPositions[xPositions.length - 1] || 1000) + 420;
   const totalWidth = endPosition + 300;
+
+  const [viewportWidth, setViewportWidth] = useState(1200);
+  useEffect(() => {
+    const measure = () => setViewportWidth(containerRef.current?.clientWidth || 1200);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
   const clampedPanX = useMemo(() => {
-    if (typeof window === 'undefined') return pan.x;
     const maxPan = 120;
-    const minPan = -(totalWidth - window.innerWidth + 160);
+    const minPan = -(totalWidth - viewportWidth + 160);
     return Math.max(minPan, Math.min(maxPan, pan.x));
-  }, [pan.x, totalWidth]);
+  }, [pan.x, totalWidth, viewportWidth]);
+
+  // Scroll to the NEWEST event when the timeline first opens (events load).
+  // Newest = the last event (largest x). Center it in the viewport.
+  useEffect(() => {
+    if (didInitialScrollRef.current || events.length === 0 || xPositions.length === 0 || !onInitialPan) return;
+    const newestX = xPositions[xPositions.length - 1];
+    const target = viewportWidth / 2 - newestX;
+    didInitialScrollRef.current = true;
+    onInitialPan(target);
+  }, [events.length, xPositions, viewportWidth, onInitialPan]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -137,40 +163,66 @@ export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, on
   }, [onWheel]);
 
   return (
-    <div ref={containerRef} className={`relative h-100 w-full overflow-hidden select-none bg-background text-foreground bg-blue-200 transition-colors duration-200`}>
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="h-full w-full" style={{ backgroundImage: 'linear-gradient(90deg, var(--border) 1px, transparent 1px), linear-gradient(var(--border) 1px, transparent 1px)', backgroundSize: `${50 * zoom}px 50px`, backgroundPosition: `${clampedPanX}px ${pan.y}px` }} />
-      </div>
-      <div className="absolute inset-0 overflow-hidden cursor-grab active:cursor-grabbing"onPointerDown={onPanStart} onPointerMove={onPanMove} onPointerUp={onPanEnd} onPointerCancel={onPanEnd}>
-        <div className="absolute z-0 h-1.5 rounded-full bg-border" style={{ left: `${clampedPanX - 100}px`, top: `calc(35% + ${pan.y}px)`, width: `${totalWidth}px`, transform: 'translateY(-50%)' }} />
-        <div className="absolute left-0 top-0 h-full" style={{ left: `${clampedPanX}px`, top: `${pan.y}px` }}>
-          <div className="absolute top-[35%] flex -translate-x-1/2 flex-col items-center" style={{ left: '60px' }}>
+    <div
+      ref={containerRef}
+      className={`relative w-full overflow-hidden select-none bg-background text-foreground ${heightClassName ?? 'h-[400px]'}`}
+      style={{ touchAction: 'pan-x' }}
+    >
+      {/* The single panning track. Uses translate3d for GPU-accelerated smooth
+          panning. Contains the line + every event (dot, date, card). */}
+      <div
+        className="absolute inset-0 cursor-grab active:cursor-grabbing"
+        style={{ willChange: 'transform' }}
+        onPointerDown={onPanStart}
+        onPointerMove={onPanMove}
+        onPointerUp={onPanEnd}
+        onPointerCancel={onPanEnd}
+      >
+        <div
+          className="absolute top-0 left-0 h-full"
+          style={{ transform: `translate3d(${clampedPanX}px, 0, 0)`, willChange: 'transform' }}
+        >
+          {/* The timeline line */}
+          <div
+            className="absolute z-0 h-1.5 rounded-full bg-border"
+            style={{ left: '-100px', top: `${LINE_TOP}px`, width: `${totalWidth}px` }}
+          />
+
+          {/* "Missing" anchor at the very start */}
+          <div className="absolute flex -translate-x-1/2 flex-col items-center" style={{ left: '60px', top: `${LINE_TOP}px` }}>
             <div className="absolute left-1/2 top-0 z-40 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow-sm" />
-            <div className="absolute left-1/2 top-[32px] z-30 -translate-x-1/2">
+            <div className="absolute left-1/2 z-30 -translate-x-1/2" style={{ top: `${CARD_OFFSET}px` }}>
               <LineCommentBox eventId={events[0]?.id} prefix="[missing]" placeholder="چه چیزی در تایم‌لاین کم است؟" />
             </div>
           </div>
+
+          {/* Events */}
           {events.map((event, idx) => {
             const xPos = xPositions[idx] || 240;
             const timeAgo = getRelativeTimeAgo(new Date(event.dateGr));
             return (
-              <div key={event.id} className="absolute top-[35%] flex -translate-x-1/2 flex-col items-center" style={{ left: `${xPos}px` }}>
-                <div className="absolute bottom-[calc(100%+14px)] left-1/2 flex w-64 -translate-x-1/2 flex-col items-center gap-1 text-center sm:w-72">
+              <div key={event.id} className="absolute flex -translate-x-1/2 flex-col items-center" style={{ left: `${xPos}px`, top: `${LINE_TOP}px` }}>
+                {/* Date label above the line */}
+                <div className="absolute bottom-full mb-2 flex w-64 -translate-x-1/2 flex-col items-center gap-1 text-center left-1/2 sm:w-72">
                   <div className="text-xs font-extrabold text-muted-foreground">{timeAgo}</div>
                 </div>
+                {/* Dot on the line */}
                 <div className="absolute left-1/2 top-0 z-40 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow-sm transition-transform hover:scale-125" />
-                <div className="absolute left-1/2 top-[32px] z-10 flex -translate-x-1/2 justify-center">
+                {/* Card hanging below the line */}
+                <div className="absolute left-1/2 z-10 flex -translate-x-1/2 justify-center" style={{ top: `${CARD_OFFSET}px` }}>
                   <TimelineCard event={event} importance={event.importance} />
                 </div>
               </div>
             );
           })}
-          <div className="absolute top-[35%] flex -translate-x-1/2 flex-col items-center" style={{ left: `${endPosition}px` }}>
-            <div className="absolute bottom-[calc(100%+14px)] left-1/2 w-64 -translate-x-1/2 text-center">
+
+          {/* "Today / future" anchor at the end */}
+          <div className="absolute flex -translate-x-1/2 flex-col items-center" style={{ left: `${endPosition}px`, top: `${LINE_TOP}px` }}>
+            <div className="absolute bottom-full mb-2 left-1/2 w-64 -translate-x-1/2 text-center">
               <span className="inline-flex rounded-md bg-primary px-3 py-1 text-xs font-bold text-primary-foreground shadow-sm">امروز</span>
             </div>
             <div className="absolute left-1/2 top-0 z-40 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-foreground shadow-sm" />
-            <div className="absolute left-1/2 top-[32px] z-30 -translate-x-1/2">
+            <div className="absolute left-1/2 z-30 -translate-x-1/2" style={{ top: `${CARD_OFFSET}px` }}>
               <LineCommentBox eventId={events[events.length - 1]?.id} prefix="[future]" placeholder="فکر می‌کنید بعدش چه اتفاقی می‌افتد؟" />
             </div>
           </div>

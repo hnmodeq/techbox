@@ -34,13 +34,17 @@ type Submission = {
 
 const STATUS_LABEL: Record<string, string> = {
   new: "جدید",
-  read: "خوانده‌شده",
-  resolved: "حل‌شده",
+  read: "در حال بررسی",
+  waiting_user: "منتظر پاسخ کاربر",
+  closed: "بسته شد",
+  resolved: "بسته شد",
 };
 
 const STATUS_VARIANT: Record<string, "destructive" | "secondary" | "default"> = {
   new: "destructive",
   read: "secondary",
+  waiting_user: "default",
+  closed: "default",
   resolved: "default",
 };
 
@@ -171,8 +175,8 @@ export default function AdminInboxPage() {
                       </div>
                     ))}
                   </div>
-                  {/* Admin reply box */}
-                  {activeTicket.status !== "resolved" && (
+                  {/* Admin reply box — locked when closed */}
+                  {activeTicket.status !== "closed" && (
                     <div className="flex gap-2">
                       <Input value={adminReply} onChange={(e) => setAdminReply(e.target.value)} placeholder="پاسخ به کاربر..." className="flex-1 h-9 text-sm" disabled={replyBusy} />
                       <Button size="sm" onClick={submitAdminReply} disabled={replyBusy || adminReply.trim().length < 2} loading={replyBusy}>ارسال</Button>
@@ -180,7 +184,7 @@ export default function AdminInboxPage() {
                   )}
                   <div className="flex gap-1.5">
                     {activeTicket.status === "new" && <Button variant="ghost" size="xs" onClick={() => { markStatus(activeTicket.id, "read"); setActiveTicket(null); }}>خوانده‌شد</Button>}
-                    {activeTicket.status !== "resolved" && <Button variant="ghost" size="xs" onClick={() => { markStatus(activeTicket.id, "resolved"); setActiveTicket(null); }}>حل‌شد</Button>}
+                    {activeTicket.status !== "closed" && <Button variant="ghost" size="xs" onClick={() => { markStatus(activeTicket.id, "closed"); setActiveTicket(null); }}>بستن تیکت</Button>}
                   </div>
                 </Card>
               ) : (

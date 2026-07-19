@@ -11,6 +11,8 @@ const schema = z.object({
   message: z.string().min(5, "حداقل ۵ کاراکتر").max(2000),
 });
 
+const MAX_OPEN_TICKETS = 3;
+
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
   const rateLimit = await checkRateLimit(ip, "contact");
@@ -23,11 +25,24 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = schema.parse(await req.json());
+    const cleanEmail = body.email.toLowerCase().trim();
+
+    // Enforce a maximum number of OPEN (non-closed) tickets per user.
+    const openCount = await prisma.contactSubmission.count({
+      where: { email: cleanEmail, type: "support", status: { not: "closed" } },
+    });
+    if (openCount >= MAX_OPEN_TICKETS) {
+      return NextResponse.json(
+        { error: "too_many_tickets", message: `شما در حال حاضر ${MAX_OPEN_TICKETS.toLocaleString("fa-IR")} تیکت باز دارید` },
+        { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) }
+      );
+    }
+
     await prisma.contactSubmission.create({
       data: {
         type: "support",
         name: body.name.trim(),
-        email: body.email.toLowerCase().trim(),
+        email: cleanEmail,
         subject: body.subject.trim(),
         message: body.message.trim(),
       },

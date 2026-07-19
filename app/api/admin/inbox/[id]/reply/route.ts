@@ -33,10 +33,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       },
     });
 
-    // Mark ticket as read
+    // Admin replied → ticket now waits for the user's response.
     await prisma.contactSubmission.update({
       where: { id },
-      data: { status: "read" },
+      data: { status: "waiting_user" },
     });
 
     return NextResponse.json({ ok: true, reply }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
