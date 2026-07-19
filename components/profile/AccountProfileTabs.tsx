@@ -51,9 +51,16 @@ function SavedPosts({ posts }: { posts: any[] }) {
             return (
               <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group flex gap-3 rounded-lg border bg-card p-3 transition hover:bg-muted/40">
                 {isTopic ? (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden ring-1 ring-border">
                     {post.authorAvatar ? (
-                      <Image src={post.authorAvatar} alt={post.authorName || ""} width={48} height={48} className="rounded-full object-cover" />
+                      <Image 
+                        src={post.authorAvatar} 
+                        alt={post.authorName || ""} 
+                        width={48} 
+                        height={48} 
+                        className="rounded-full object-cover" 
+                        unoptimized 
+                      />
                     ) : (
                       <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                         {(post.authorName || "U").charAt(0)}
@@ -115,12 +122,18 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
         <TabsTrigger value="profile">ویرایش اطلاعات حساب کاربری</TabsTrigger>
         <TabsTrigger value="activity">فعالیت کاربر</TabsTrigger>
         <TabsTrigger value="saved">ذخیره شده ها</TabsTrigger>
-        {isAuthor && <TabsTrigger value="author">فعالیت محتوایی</TabsTrigger>}
+        <TabsTrigger value="author">فعالیت محتوایی</TabsTrigger>
       </TabsList>
       <TabsContent value="profile">{profileEditor}</TabsContent>
       <TabsContent value="activity"><UserActivityList activities={activities} /></TabsContent>
       <TabsContent value="saved"><SavedPosts posts={savedPosts} /></TabsContent>
-      {isAuthor && <TabsContent value="author"><AuthorPosts posts={authoredPosts} /></TabsContent>}
+      <TabsContent value="author">
+        {isAuthor ? (
+          <AuthorPosts posts={authoredPosts} />
+        ) : (
+          <Card><CardContent className="p-8 text-center text-muted-foreground">شما محتوای منتشر شده‌ای ندارید.</CardContent></Card>
+        )}
+      </TabsContent>
     </Tabs>
   )
 }
