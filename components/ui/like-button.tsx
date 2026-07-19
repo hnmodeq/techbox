@@ -71,7 +71,10 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
   const [busy, setBusy] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     // Hydrate from localStorage immediately on mount
     const cached = getCachedLiked(contentType, slug);
     if (cached !== undefined && liked === null) {
@@ -144,6 +147,10 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
     }
   }, [busy, liked, count, contentType, slug]);
 
+  // Determine the display state. During SSR, we ALWAYS pretend it's false
+  // so the server and initial client render exactly match.
+  const displayLiked = mounted ? (liked ?? false) : false;
+
   return (
     <div className="relative inline-flex items-center">
       <Tooltip>
@@ -153,13 +160,13 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(); }}
             className={`flex items-center gap-1.5 font-bold transition-colors cursor-pointer ${
               lightMode 
-                ? (liked ? "text-red-500" : "text-white/90 hover:text-white") 
-                : (liked ? "text-red-500" : "text-[var(--paragraph-color)] hover:text-red-500")
+                ? (displayLiked ? "text-red-500" : "text-white/90 hover:text-white") 
+                : (displayLiked ? "text-red-500" : "text-[var(--paragraph-color)] hover:text-red-500")
             } ${hideText ? "text-[11px]" : "text-[length:var(--paragraph-font-size)]"}`}
-            aria-pressed={liked ?? false}
+            aria-pressed={displayLiked}
           />
         }>
-          <Heart size={16} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={`transition-transform duration-200 ${liked ? "scale-110" : "scale-100"}`} aria-hidden />
+          <Heart size={16} fill={displayLiked ? "currentColor" : "none"} strokeWidth={2} className={`transition-transform duration-200 ${displayLiked ? "scale-110" : "scale-100"}`} aria-hidden />
           <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
           {!hideText && <span className="hidden sm:inline">پسندیدم</span>}
         </TooltipTrigger>
