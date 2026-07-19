@@ -63,7 +63,7 @@ function getCachedVote(commentId: string): boolean | undefined {
   return getVoteCache()[commentId];
 }
 
-export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { contentType: string; slug: string; initial?: number; tooltipLabel?: string }) {
+export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideText, lightMode }: { contentType: string; slug: string; initial?: number; tooltipLabel?: string; hideText?: boolean; lightMode?: boolean }) {
   const cachedLiked = getCachedLiked(contentType, slug);
   const [liked, setLiked] = useState(cachedLiked ?? false);
   const [count, setCount] = useState(initial);
@@ -139,18 +139,20 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel }: { c
     <div className="relative inline-flex items-center">
       <Tooltip>
         <TooltipTrigger render={
-          <Button
-            onClick={toggle}
-            disabled={busy}
-            variant="ghost"
-            size="sm"
-            className={`gap-2 text-[length:var(--paragraph-font-size)] disabled:opacity-60 ${liked ? "text-red-500" : "text-[var(--paragraph-color)]"}`}
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(); }}
+            className={`flex items-center gap-1.5 font-bold transition-colors cursor-pointer ${
+              lightMode 
+                ? (liked ? "text-red-500" : "text-white/90 hover:text-white") 
+                : (liked ? "text-red-500" : "text-[var(--paragraph-color)] hover:text-red-500")
+            } ${hideText ? "text-[11px]" : "text-[length:var(--paragraph-font-size)]"}`}
             aria-pressed={liked}
           />
         }>
-          <Heart size={16} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={liked ? "text-red-500" : ""} aria-hidden />
+          <Heart size={16} fill={liked ? "currentColor" : "none"} strokeWidth={2} className={`transition-transform duration-200 ${liked ? "scale-110" : "scale-100"}`} aria-hidden />
           <span style={{ fontVariantNumeric: "tabular-nums" }}>{(count ?? 0).toLocaleString("fa-IR")}</span>
-          <span className="hidden sm:inline">پسندیدم</span>
+          {!hideText && <span className="hidden sm:inline">پسندیدم</span>}
         </TooltipTrigger>
         <TooltipContent>{tooltipLabel || "پسندیدن"}</TooltipContent>
       </Tooltip>

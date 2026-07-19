@@ -30,7 +30,7 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-export default function CommentSection({ module, slug, initialComments }: { module: string; slug: string; initialComments?: number }) {
+export default function CommentSection({ module, slug, initialComments, compact }: { module: string; slug: string; initialComments?: number; compact?: boolean }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
@@ -450,27 +450,29 @@ export default function CommentSection({ module, slug, initialComments }: { modu
   }, 0);
 
   return (
-    <section className="mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
-          دیدگاه شما{" "}
-          <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-            ({loading && initialComments === undefined
-              ? <Skeleton className="inline-block h-4 w-6 align-middle" />
-              : (loading && initialComments !== undefined ? initialComments : totalCount).toLocaleString("fa-IR")
-            })
-          </span>
-        </h3>
-      </div>
+    <section className={compact ? "mt-2 pt-2" : "mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10"}>
+      {!compact && (
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
+            دیدگاه شما{" "}
+            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+              ({loading && initialComments === undefined
+                ? <Skeleton className="inline-block h-4 w-6 align-middle" />
+                : (loading && initialComments !== undefined ? initialComments : totalCount).toLocaleString("fa-IR")
+              })
+            </span>
+          </h3>
+        </div>
+      )}
 
       {authLoading ? (
         <CommentFormSkeleton />
       ) : user ? (
-        <form onSubmit={handleTopSubmit} className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8">
+        <form onSubmit={handleTopSubmit} className={compact ? "space-y-3 mb-4" : "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8"}>
           <input type="hidden" name="module" value={module} />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="parentId" value="" />
-          <div className="flex items-center gap-3 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3">
+          <div className={`flex items-center gap-3 ${compact ? "pb-2" : "border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3"}`}>
             {user.avatar && user.avatar !== "/assets/hooman.png" ? (
               <Image src={user.avatar} width={36} height={36} alt={user.name || "کاربر"} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
             ) : (
@@ -485,8 +487,15 @@ export default function CommentSection({ module, slug, initialComments }: { modu
           </div>
           <Textarea
             name="text"
-            placeholder="دیدگاه خود را درباره این مطلب بنویسید..."
-            className="min-h-[100px] w-full text-sm text-[var(--paragraph-color)]"
+            placeholder={compact ? "دیدگاه شما..." : "دیدگاه خود را درباره این مطلب بنویسید..."}
+            className={compact ? "min-h-[40px] h-[40px] w-full text-sm text-[var(--paragraph-color)] resize-none overflow-hidden" : "min-h-[100px] w-full text-sm text-[var(--paragraph-color)]"}
+            onInput={(e) => {
+              if (compact) {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = '40px';
+                target.style.height = `${target.scrollHeight}px`;
+              }
+            }}
             value={topText}
             onChange={(e) => setTopText(e.target.value)}
             disabled={topSubmitting}
@@ -498,13 +507,17 @@ export default function CommentSection({ module, slug, initialComments }: { modu
           </div>
         </form>
       ) : (
-        <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed">
-          <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
-          <p className="text-sm text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
-            برای ثبت دیدگاه، پاسخ به نظرات دیگران و پسندیدن مطالب، ابتدا باید وارد حساب کاربری خود شوید یا در کمتر از یک دقیقه ثبت‌نام کنید.
-          </p>
-          <div className="pt-2">
-            <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} size="sm">ورود یا ثبت‌نام در تکباکس</Button>
+        <div className={compact ? "text-center py-2 mb-4" : "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed"}>
+          {!compact && (
+            <>
+              <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
+              <p className="text-sm text-[var(--paragraph-color)] paragraph-color max-w-md mx-auto">
+                برای ثبت دیدگاه، پاسخ به نظرات دیگران و پسندیدن مطالب، ابتدا باید وارد حساب کاربری خود شوید یا در کمتر از یک دقیقه ثبت‌نام کنید.
+              </p>
+            </>
+          )}
+          <div className={compact ? "" : "pt-2"}>
+            <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} size="sm">ورود یا ثبت‌نام</Button>
           </div>
         </div>
       )}
