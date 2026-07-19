@@ -127,7 +127,7 @@ export default function AccountPage() {
         setAuthError(data.message || data.error || "خطا در ورود");
       }
     } catch {
-      setAuthError("خطا در ارتباط با سرور Neon");
+      setAuthError("خطا در ارتباط با سرور");
     } finally {
       setAuthBusy(false);
     }
@@ -153,7 +153,7 @@ export default function AccountPage() {
         setAuthError(data.error || data.message || "خطا در ثبت‌نام");
       }
     } catch {
-      setAuthError("خطا در ارتباط با سرور Neon");
+      setAuthError("خطا در ارتباط با سرور");
     } finally {
       setAuthBusy(false);
     }
@@ -245,7 +245,7 @@ export default function AccountPage() {
     return (
       <main className="max-w-md mx-auto px-5 py-20 text-center" dir="rtl">
         <Card className="p-8 animate-pulse">
-          <p className="text-sm text-muted-foreground">در حال بررسی اطلاعات حساب در Neon...</p>
+          <p className="text-sm text-muted-foreground">در حال دریافت اطلاعات حساب کاربری شما...</p>
         </Card>
       </main>
     );
@@ -393,8 +393,6 @@ export default function AccountPage() {
       <PageHeader colorVar="--account" title="پروفایل و حساب کاربری" titleClassName="text-[var(--account)]">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Badge>{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>
-          <span>•</span>
-          <span className="font-mono text-xs">Neon: {user.id.slice(0, 8)}…</span>
         </div>
       </PageHeader>
 
