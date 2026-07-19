@@ -78,7 +78,14 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
                 ) : (
                   <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                     {post.image ? (
-                      <Image src={post.image} alt={post.title} fill className="object-cover" sizes="64px" {...blurProps(post.image)} />
+                      <Image 
+                        src={post.image} 
+                        alt={post.title} 
+                        fill 
+                        className="object-cover" 
+                        sizes="64px" 
+                        unoptimized 
+                      />
                     ) : null}
                   </div>
                 )}
