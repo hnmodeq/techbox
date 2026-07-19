@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { CardStats } from "@/components/ui/card-stats"
 import { UserActivityList, type UserActivity } from "@/components/profile/UserActivityList"
+import { useModuleTitle } from "@/providers/module-config.provider"
 import { blurProps } from "@/lib/image-placeholder"
 
 function AuthorPosts({ posts }: { posts: any[] }) {
@@ -39,6 +40,9 @@ function AuthorPosts({ posts }: { posts: any[] }) {
 }
 
 function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
+  // Call the hook once at the top level of the component
+  const moduleTitle = (module: string) => useModuleTitle(module as any, module);
+
   if (loading) {
     return (
       <section className="space-y-4">
@@ -85,7 +89,7 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">{formatRelativeDate(post.date)}</span>
                     <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                      {useModuleTitle(post.module as any, post.module)}
+                      {moduleTitle(post.module)}
                     </span>
                   </div>
                   <div className="mt-0.5 line-clamp-1 font-semibold text-foreground group-hover:underline">{post.title}</div>
