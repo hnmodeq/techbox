@@ -27,7 +27,7 @@ export default function ReviewRow({ homeTitle, homeMoreLabel, showHomeTitle = tr
         <div className="flex items-center justify-between gap-4 mb-6">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "بنچمارک\u200Cها و تست\u200Cهای عملی سخت\u200Cافزار"}</h2>}
           {showHomeMoreLabel && (
-          <ButtonLink variant="link" size="sm" className="text-[var(--review)] font-bold shrink-0" href="/review">
+          <ButtonLink variant="link" size="sm" className="text-[var(--primary)] font-bold shrink-0" href="/review">
             {homeMoreLabel || "مشاهده تمام بررسی\u200Cها ←"}
           </ButtonLink>
           )}
@@ -51,7 +51,7 @@ export default function ReviewRow({ homeTitle, homeMoreLabel, showHomeTitle = tr
                     sizes="(max-width: 768px) 100vw, 300px"
                     {...blurProps(rev.image || '/assets/blog-1.jpg')}
                   />
-                  <Badge variant="secondary" className="absolute top-2 right-2 bg-[var(--review)]/85 text-white border-none text-[10px]">
+                  <Badge variant="secondary" className="absolute top-2 right-2 bg-[var(--primary)]/85 text-white border-none text-[10px]">
                     بررسی
                   </Badge>
                 </div>
@@ -61,7 +61,7 @@ export default function ReviewRow({ homeTitle, homeMoreLabel, showHomeTitle = tr
                     <span>{rev.category || 'بررسی تخصصی'} • {formatRelativeDate(rev.date)}</span>
                     <ReviewRating slug={rev.slug} fallbackRating={rev.rating ?? null} fallbackCount={rev.ratingCount ?? 0} compact />
                   </div>
-                  <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--review)] transition-colors line-clamp-2 leading-6">
+                  <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--primary)] transition-colors line-clamp-2 leading-6">
                     {rev.title}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-2 leading-5">

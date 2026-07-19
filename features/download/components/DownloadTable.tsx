@@ -85,7 +85,7 @@ export default function DownloadTable({ serverItems }: { serverItems?: ContentIt
         {filtered.map((f) => (
           <Link key={f.slug} href={`/download/${f.slug}`} className="group grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-4 sm:px-5 py-4 hover:bg-muted/25 transition-all items-center">
             <div className="col-span-7">
-              <div className="font-semibold group-hover:text-[var(--download)] transition-colors">{f.title}</div>
+              <div className="font-semibold group-hover:text-[var(--primary)] transition-colors">{f.title}</div>
               <div className="text-sm text-muted-foreground mt-1 line-clamp-2">{f.excerpt}</div>
             </div>
             <div className="col-span-3 text-sm text-muted-foreground">

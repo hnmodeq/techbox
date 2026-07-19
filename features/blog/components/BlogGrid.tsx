@@ -118,7 +118,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
                 </div>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors duration-300 group-hover:text-[var(--blog)]">
+                    <h3 className="text-lg font-bold line-clamp-2 min-h-[3.5rem] transition-colors duration-300 group-hover:text-[var(--primary)]">
                       {p.title}
                     </h3>
                     {p.readingTimeLabel && (

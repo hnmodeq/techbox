@@ -24,7 +24,7 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
       {clean.length > 1 && (
         <div className="flex gap-2 overflow-x-auto bg-[var(--card-background)] p-3">
           {clean.map((src, i) => (
-            <Button key={src} type="button" variant="ghost" size="icon" onClick={() => setIndex(i)} className={`relative h-16 w-20 shrink-0 p-0 overflow-hidden rounded-[var(--corner-radius)] border ${i === index ? 'border-[var(--shop)]' : 'border-[var(--border-color)]'}`}>
+            <Button key={src} type="button" variant="ghost" size="icon" onClick={() => setIndex(i)} className={`relative h-16 w-20 shrink-0 p-0 overflow-hidden rounded-[var(--corner-radius)] border ${i === index ? 'border-[var(--primary)]' : 'border-[var(--border-color)]'}`}>
               <Image src={src} alt={`${title} thumbnail ${i + 1}`} fill sizes="80px" className="object-cover" {...blurProps(src)} />
             </Button>
           ))}

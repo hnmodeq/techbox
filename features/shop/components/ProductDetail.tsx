@@ -54,7 +54,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
       <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] paragraph-color">
         <Link href="/" className="hover:text-[var(--primary-text)]">خانه</Link>
         <span>/</span>
-        <Link href="/shop" className="hover:text-[var(--shop)]">فروشگاه</Link>
+        <Link href="/shop" className="hover:text-[var(--primary)]">فروشگاه</Link>
         <span>/</span>
         <span className="truncate text-[var(--primary-text)]">{item.title}</span>
       </nav>
@@ -66,7 +66,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
 
         <aside className="space-y-5 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-[var(--card-background)] p-5 shadow-[var(--shadow-size)] lg:sticky lg:top-24">
           <div className="flex flex-wrap gap-2">
-            {item.category && <span className="rounded-[var(--corner-radius)] bg-[var(--shop)]/10 px-2 py-1 text-xs font-bold text-[var(--shop)]">{item.category}</span>}
+            {item.category && <span className="rounded-[var(--corner-radius)] bg-[var(--primary)]/10 px-2 py-1 text-xs font-bold text-[var(--primary)]">{item.category}</span>}
             <span className={`rounded-[var(--corner-radius)] px-2 py-1 text-xs font-bold ${
               item.availability === "ناموجود"
                 ? "bg-[var(--danger)]/10 text-[var(--danger)]"
@@ -88,7 +88,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
             {item.warranty && <div className="flex justify-between gap-3"><span className="paragraph-color">گارانتی</span><b>{item.warranty}</b></div>}
           </div>
 
-          <div className="rounded-[var(--corner-radius)] bg-[var(--shop)]/5 p-4 space-y-2">
+          <div className="rounded-[var(--corner-radius)] bg-[var(--primary)]/5 p-4 space-y-2">
             <div className="text-sm font-bold text-[var(--primary-text)]">قیمت بر اساس پیکربندی شما</div>
             <p className="text-xs paragraph-color leading-5">
               محصولات سرور و زیرساخت بر اساس نیاز شما پیکربندی می‌شوند. تیم متخصصین ما پس از ثبت درخواست، بهترین راهکار و قیمت را ارائه می‌دهند.

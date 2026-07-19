@@ -19,10 +19,10 @@ export default function NotFound() {
       </div>
       
       <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl">
-        <Link href="/blog" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--blog)] transition-colors">بلاگ</Link>
-        <Link href="/news" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--news)] transition-colors">اخبار</Link>
+        <Link href="/blog" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">بلاگ</Link>
+        <Link href="/news" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">اخبار</Link>
         <Link href="/tools" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--tools)] transition-colors">ابزارها</Link>
-        <Link href="/shop" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--shop)] transition-colors">فروشگاه</Link>
+        <Link href="/shop" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">فروشگاه</Link>
       </div>
     </main>
   );

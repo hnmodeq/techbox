@@ -20,7 +20,7 @@ export default function CheckoutPage() {
         </p>
         <Link
           href="/shop"
-          className="inline-block mt-4 px-6 py-3 rounded-[var(--corner-radius)] bg-[var(--shop)] text-white font-semibold hover:opacity-90 transition-opacity"
+          className="inline-block mt-4 px-6 py-3 rounded-[var(--corner-radius)] bg-[var(--primary)] text-white font-semibold hover:opacity-90 transition-opacity"
         >
           بازگشت به فروشگاه
         </Link>

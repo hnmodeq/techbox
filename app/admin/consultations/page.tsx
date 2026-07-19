@@ -21,7 +21,7 @@ type ConsultationRequest = {
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   pending: { label: "در انتظار", color: "bg-[var(--warning)]/10 text-[var(--warning)]" },
   contacted: { label: "تماس گرفته شد", color: "bg-[var(--info)]/10 text-[var(--info)]" },
-  quoted: { label: "پیش‌فاکتور شده", color: "bg-[var(--shop)]/10 text-[var(--shop)]" },
+  quoted: { label: "پیش‌فاکتور شده", color: "bg-[var(--primary)]/10 text-[var(--primary)]" },
   closed: { label: "بسته شده", color: "bg-muted text-muted-foreground" },
 };
 
@@ -73,7 +73,7 @@ export default function AdminConsultationsPage() {
         <PageHeader
           colorVar="--shop"
           title="درخواست‌های مشاوره"
-          titleClassName="text-[var(--shop)]"
+          titleClassName="text-[var(--primary)]"
           description={`${pendingCount} درخواست در انتظار پاسخ`}
         >
           <div className="flex flex-wrap gap-2">
@@ -126,7 +126,7 @@ export default function AdminConsultationsPage() {
                         href={`/shop/${item.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 rounded-[var(--corner-radius)] bg-[var(--shop)]/5 px-2 py-1 text-xs font-medium text-[var(--shop)] hover:bg-[var(--shop)]/10 transition-colors"
+                        className="inline-flex items-center gap-1 rounded-[var(--corner-radius)] bg-[var(--primary)]/5 px-2 py-1 text-xs font-medium text-[var(--primary)] hover:bg-[var(--primary)]/10 transition-colors"
                       >
                         {item.title}
                       </a>

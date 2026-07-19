@@ -246,7 +246,7 @@ export function NvrSelector({
                     </div>
 
                     <div className="mt-5 pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3">
-                      <div className="text-[15px] font-black text-[var(--shop)]">
+                      <div className="text-[15px] font-black text-[var(--primary)]">
                         {renderPrice(model)}
                       </div>
 

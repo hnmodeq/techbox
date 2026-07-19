@@ -153,7 +153,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 </Badge>
               </div>
               <div className="p-4 flex-1 flex flex-col">
-                <div className="font-semibold mt-1 line-clamp-2 min-h-[48px] group-hover:text-[var(--shop)] transition-colors">{p.title}</div>
+                <div className="font-semibold mt-1 line-clamp-2 min-h-[48px] group-hover:text-[var(--primary)] transition-colors">{p.title}</div>
                 <div className="mt-1 flex flex-wrap gap-1 text-[11px] text-muted-foreground">
                   {p.brand && <Badge variant="outline">{p.brand}</Badge>}
                   {p.category && <Badge variant="secondary">{p.category}</Badge>}
@@ -168,7 +168,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                     }}
                     size="sm"
                     variant="outline"
-                    className="border-[var(--shop)] text-[var(--shop)] hover:bg-[var(--shop)]/10 font-bold"
+                    className="border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)]/10 font-bold"
                   >
                     ثبت درخواست مشاوره
                   </Button>

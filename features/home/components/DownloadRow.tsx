@@ -31,7 +31,7 @@ export default function DownloadRow({ homeTitle, homeMoreLabel, showHomeTitle = 
         <div className="flex items-center justify-between gap-4 mb-6">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "ISOها، فریم\u200Cورها و درایورهای سرور و زیرساخت"}</h2>}
           {showHomeMoreLabel && (
-          <ButtonLink variant="link" size="sm" className="text-[var(--download)] font-bold shrink-0" href="/download">
+          <ButtonLink variant="link" size="sm" className="text-[var(--primary)] font-bold shrink-0" href="/download">
             {homeMoreLabel || "ورود به مرکز دانلود ←"}
           </ButtonLink>
           )}
@@ -49,19 +49,19 @@ export default function DownloadRow({ homeTitle, homeMoreLabel, showHomeTitle = 
               <Card key={file.slug} className="group p-4 hover:shadow-md transition-all duration-200">
                 <CardContent className="p-0 flex flex-col justify-between gap-3">
                   <div className="flex items-start gap-3.5 min-w-0">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--download)]/10 text-[var(--download)] border border-[var(--download)]/30">
-                      <Icon name="file" size={26} className="text-[var(--download)]" />
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] border border-[var(--primary)]/30">
+                      <Icon name="file" size={26} className="text-[var(--primary)]" />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge variant="outline" className="border-[color-mix(in_oklch,var(--download)_30%,var(--border))] bg-[color-mix(in_oklch,var(--download)_12%,transparent)] text-[var(--download)] text-[11px]" dir="ltr">
+                        <Badge variant="outline" className="border-[color-mix(in_oklch,var(--primary)_30%,var(--border))] bg-[color-mix(in_oklch,var(--primary)_12%,transparent)] text-[var(--primary)] text-[11px]" dir="ltr">
                           {fileType}
                         </Badge>
                       </div>
 
                       <Link href={`/download/${file.slug}`} className="block">
-                        <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--download)] transition-colors line-clamp-1 leading-6">
+                        <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--primary)] transition-colors line-clamp-1 leading-6">
                           {file.title}
                         </h3>
                       </Link>

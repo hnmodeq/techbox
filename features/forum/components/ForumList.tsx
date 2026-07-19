@@ -173,7 +173,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
 
       <div className="flex gap-2">
         {(["داغ", "جدید", "برتر", "حل‌شده"] as const).map((t) => (
-          <Button key={t} variant={filter === t ? "secondary" : "ghost"} size="sm" onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--forum)]" : ""}>
+          <Button key={t} variant={filter === t ? "secondary" : "ghost"} size="sm" onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--primary)]" : ""}>
             {t}
           </Button>
         ))}
@@ -207,7 +207,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                 <Image src={t.avatar} alt={t.author?.name || "کاربر"} width={40} height={40} className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-border" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-sm group-hover:text-[var(--forum)] transition-colors line-clamp-1">{t.title}</span>
+                    <span className="font-semibold text-sm group-hover:text-[var(--primary)] transition-colors line-clamp-1">{t.title}</span>
                     <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">ارسال‌شده توسط <b className="text-foreground">{t.author?.name || "کاربر تکباکس"}</b> • {formatRelativeDate(t.date)}</div>

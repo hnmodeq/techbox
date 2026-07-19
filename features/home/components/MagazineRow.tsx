@@ -89,7 +89,7 @@ export default function MagazineRow({ homeTitle, homeMoreLabel, showHomeTitle = 
         <div className="flex items-center justify-between gap-4 mb-6">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین مقالات منتشر شده"}</h2>}
           {showHomeMoreLabel && (
-          <ButtonLink variant="link" size="sm" className="text-[var(--blog)] font-bold shrink-0" href="/blog">
+          <ButtonLink variant="link" size="sm" className="text-[var(--primary)] font-bold shrink-0" href="/blog">
             {homeMoreLabel || "مشاهده همه ←"}
           </ButtonLink>
           )}
@@ -132,7 +132,7 @@ export default function MagazineRow({ homeTitle, homeMoreLabel, showHomeTitle = 
                 </div>
 
                 <CardContent className="p-4">
-                  <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--blog)] transition-colors duration-300 line-clamp-2 leading-7">
+                  <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--primary)] transition-colors duration-300 line-clamp-2 leading-7">
                     {art.title}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-2 line-clamp-3 min-h-[4.5rem] leading-6">

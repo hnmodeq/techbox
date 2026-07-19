@@ -91,7 +91,7 @@ export const navItems: NavItem[] = [
  iconClassName: moduleColors.timeline.base,
  iconHoverClassName: moduleColors.timeline.hover,
  iconActiveClassName: moduleColors.timeline.active,
- tooltipClassName: "text-[var(--timeline)]",
+ tooltipClassName: "text-[var(--primary)]",
  },
  {
  title: "دانلود",

@@ -135,7 +135,7 @@ export default function ProductComparisonModal({
 
 function ComparisonRow({ label, values, highlight = false }: { label: string; values: (string | number)[]; highlight?: boolean }) {
   return (
-    <tr className={highlight ? "bg-[var(--shop)]/5" : ""}>
+    <tr className={highlight ? "bg-[var(--primary)]/5" : ""}>
       <td className="py-3 pr-4 font-bold text-[var(--primary-text)]">{label}</td>
       {values.map((val, idx) => (
         <td key={idx} className="px-4 py-3 text-center paragraph-color font-medium">

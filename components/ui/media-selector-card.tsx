@@ -75,7 +75,7 @@ export const MediaSelectorCard = React.forwardRef<HTMLButtonElement, MediaSelect
    )}
 
    <div className="absolute bottom-0 inset-x-0 p-4 text-white z-10 flex flex-col justify-end">
-   <h4 className="text-base font-bold line-clamp-2 transition-colors duration-150 group-hover:text-[var(--media)]">
+   <h4 className="text-base font-bold line-clamp-2 transition-colors duration-150 group-hover:text-[var(--primary)]">
    {title}
    </h4>
    <div className="mt-2 flex items-center justify-between text-xs text-white/80">

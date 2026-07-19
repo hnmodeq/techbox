@@ -80,7 +80,7 @@ function CartDrawer(){
            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted"><Image src={it.image || "/assets/blog-1.jpg"} alt={it.title} fill sizes="64px" className="object-cover" /></div>
            <div className="flex-1 min-w-0">
              <div className="text-sm line-clamp-2">{it.title}</div>
-             <div className="text-sm text-[var(--shop)] mt-1">{it.price} تومان</div>
+             <div className="text-sm text-[var(--primary)] mt-1">{it.price} تومان</div>
              <div className="flex items-center gap-2 mt-2">
                <Button onClick={()=>setQty(it.slug, it.qty-1)} variant="outline" size="icon-sm" className="h-6 w-6 text-sm">−</Button>
                <span className="text-sm w-6 text-center">{(it.qty ?? 1).toLocaleString("fa-IR")}</span>
@@ -114,7 +114,7 @@ export function CartIconButton(){
    <Button variant="outline" size="sm" onClick={()=>setOpen(true)} className="relative gap-1" aria-label="سبد خرید">
      <span>🛒</span>
      <span className="hidden sm:inline">سبد</span>
-     {count>0 && <span className="absolute -top-1 -left-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--shop)] px-1 text-xs text-black">{(count ?? 0).toLocaleString("fa-IR")}</span>}
+     {count>0 && <span className="absolute -top-1 -left-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--primary)] px-1 text-xs text-black">{(count ?? 0).toLocaleString("fa-IR")}</span>}
    </Button>
  );
 }

@@ -87,7 +87,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
       <main className="mx-auto max-w-3xl px-4 py-16 text-center" dir="rtl">
         <h1 className="text-[length:var(--h1-font-size)] font-black text-[var(--primary-text)]">موضوع پیدا نشد</h1>
         <p className="mt-3 paragraph-color">این موضوع در دیتابیس انجمن وجود ندارد یا موقتاً در دسترس نیست.</p>
-        <Link href="/forum" className="mt-6 inline-flex text-[var(--forum)] font-bold hover:underline">
+        <Link href="/forum" className="mt-6 inline-flex text-[var(--primary)] font-bold hover:underline">
           بازگشت به انجمن
         </Link>
       </main>

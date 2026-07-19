@@ -21,7 +21,7 @@ export default function ShopRow({ homeTitle, homeMoreLabel, showHomeTitle = true
         <div className="flex items-center justify-between gap-4 mb-6">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "آخرین محصولات سازمانی اضافه شده"}</h2>}
           {showHomeMoreLabel && (
-          <ButtonLink variant="link" size="sm" className="text-[var(--shop)] font-bold shrink-0" href="/shop">
+          <ButtonLink variant="link" size="sm" className="text-[var(--primary)] font-bold shrink-0" href="/shop">
             {homeMoreLabel || "بازدید از فروشگاه ←"}
           </ButtonLink>
           )}
@@ -60,7 +60,7 @@ export default function ShopRow({ homeTitle, homeMoreLabel, showHomeTitle = true
 
                   <CardContent className="p-4 flex-1 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-black text-foreground group-hover:text-[var(--shop)] transition-colors duration-300 line-clamp-2 min-h-[44px] leading-6">
+                      <h3 className="text-sm font-black text-foreground group-hover:text-[var(--primary)] transition-colors duration-300 line-clamp-2 min-h-[44px] leading-6">
                         {prod.title}
                       </h3>
 
@@ -78,7 +78,7 @@ export default function ShopRow({ homeTitle, homeMoreLabel, showHomeTitle = true
                       </p>
                     </div>
 
-                    <div className="mt-4 text-xs font-black text-[var(--shop)] text-center py-2 rounded-[var(--corner-radius)] bg-[var(--shop)]/5">
+                    <div className="mt-4 text-xs font-black text-[var(--primary)] text-center py-2 rounded-[var(--corner-radius)] bg-[var(--primary)]/5">
                       مشاهده جزئیات و درخواست مشاوره ←
                     </div>
                   </CardContent>

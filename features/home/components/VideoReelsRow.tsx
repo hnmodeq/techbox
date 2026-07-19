@@ -50,7 +50,7 @@ export default function VideoReelsRow({ homeTitle, homeMoreLabel, showHomeTitle 
       <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
         <div className="flex items-center justify-between gap-4 mb-6">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{homeTitle || "آخرین ویدیوهای کوتاه تکباکسی"}</h2>}
-          {showHomeMoreLabel && <Link href="/media" className="text-sm font-bold text-[var(--media)] hover:underline flex items-center gap-1 shrink-0"><span>{homeMoreLabel || "گشت و گزار در ویدیوها"}</span><span>←</span></Link>}
+          {showHomeMoreLabel && <Link href="/media" className="text-sm font-bold text-[var(--primary)] hover:underline flex items-center gap-1 shrink-0"><span>{homeMoreLabel || "گشت و گزار در ویدیوها"}</span><span>←</span></Link>}
         </div>
         {loading ? (
           <VideoRowGridSkeleton count={5} />
@@ -94,7 +94,7 @@ export default function VideoReelsRow({ homeTitle, homeMoreLabel, showHomeTitle 
               </div>
 
               <div className="relative z-30 p-3 text-white w-full">
-                <h3 className="text-[11px] sm:text-xs font-bold leading-4 line-clamp-2 text-white group-hover:text-[var(--media)] transition-colors">{vid.title}</h3>
+                <h3 className="text-[11px] sm:text-xs font-bold leading-4 line-clamp-2 text-white group-hover:text-[var(--primary)] transition-colors">{vid.title}</h3>
                 <div className="mt-2 flex items-center justify-start" dir="ltr">
                   <CardStats module="media" slug={vid.slug} initialViews={vid.views} initialLikes={vid.likes} initialComments={vid.comments || 0} showComments={true} />
                 </div>

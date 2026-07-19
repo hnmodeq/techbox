@@ -82,7 +82,7 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
         <div className="flex items-center justify-between gap-4 mb-6">
           {showHomeTitle && <h2 className="text-xl sm:text-2xl font-black text-foreground">{homeTitle || "داغ\u200Cترین بحث\u200Cها و چالش\u200Cهای شبکه و دیتاسنتر"}</h2>}
           {showHomeMoreLabel && (
-          <ButtonLink variant="link" size="sm" className="text-[var(--forum)] font-bold shrink-0" href="/forum">
+          <ButtonLink variant="link" size="sm" className="text-[var(--primary)] font-bold shrink-0" href="/forum">
             {homeMoreLabel || "ورود به انجمن و ثبت پرسش ←"}
           </ButtonLink>
           )}
@@ -111,12 +111,12 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
                         onClick={(e) => e.stopPropagation()}
                         className="relative z-10 flex items-center gap-2.5 group/author hover:opacity-90 transition-opacity"
                       >
-                        <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border group-hover/author:ring-[var(--forum)] transition-all">
+                        <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border group-hover/author:ring-[var(--primary)] transition-all">
                           <AvatarImage src={top.author?.avatar || '/assets/hooman.png'} alt={authorName} />
                           <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--forum)] transition-colors truncate">
+                          <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--primary)] transition-colors truncate">
                             {authorName}
                           </div>
                           {top.author?.job ? (
@@ -137,7 +137,7 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
                     </div>
 
                     {/* Topic title — the primary stretched link (covers whole card) */}
-                    <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--forum)] transition-colors line-clamp-2 leading-6">
+                    <h3 className="text-sm font-bold text-foreground group-hover:text-[var(--primary)] transition-colors line-clamp-2 leading-6">
                       <Link href={`/forum/${top.slug}`} className="absolute inset-0 z-0" aria-label={top.title} />
                       {top.title}
                     </h3>

@@ -36,7 +36,7 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
                     <ReviewRating slug={r.slug} fallbackRating={r.rating ?? null} fallbackCount={r.ratingCount ?? 0} />
                   </div>
 
-                  <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)] transition-colors group-hover:text-[var(--review)] leading-8">
+                  <h3 className="text-lg sm:text-xl font-black text-[var(--primary-text)] transition-colors group-hover:text-[var(--primary)] leading-8">
                     {r.title}
                   </h3>
 

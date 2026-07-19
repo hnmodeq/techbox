@@ -111,7 +111,7 @@ function ConsultationDrawer() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
-            <Icon name="cart" size={20} className="text-[var(--shop)]" />
+            <Icon name="cart" size={20} className="text-[var(--primary)]" />
             <h3 className="text-lg font-bold">اتاق مشاوره ({(count ?? 0).toLocaleString("fa-IR")})</h3>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="بستن">
@@ -120,7 +120,7 @@ function ConsultationDrawer() {
         </div>
 
         {/* Info banner */}
-        <div className="px-4 py-3 bg-[var(--shop)]/5 border-b text-xs text-muted-foreground leading-5">
+        <div className="px-4 py-3 bg-[var(--primary)]/5 border-b text-xs text-muted-foreground leading-5">
           محصولاتی که نیاز دارید را اضافه کنید و درخواست مشاوره بدهید. تیم متخصصین ما با شما تماس می‌گیرند و بهترین پیکربندی را پیشنهاد می‌دهند.
         </div>
 

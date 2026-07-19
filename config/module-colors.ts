@@ -6,23 +6,23 @@ export const moduleColors = {
   },
   blog: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--blog)]",
-    active: "text-[var(--blog)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   news: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--news)]",
-    active: "text-[var(--news)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   media: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--media)]",
-    active: "text-[var(--media)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   shop: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--shop)]",
-    active: "text-[var(--shop)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   tools: {
     base: "text-[var(--primary-text)]",
@@ -51,8 +51,8 @@ export const moduleColors = {
   },
   timeline: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--timeline)]",
-    active: "text-[var(--timeline)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   vip: {
     base: "text-[var(--primary-text)]",
@@ -61,18 +61,18 @@ export const moduleColors = {
   },
   forum: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--forum)]",
-    active: "text-[var(--forum)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   review: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--review)]",
-    active: "text-[var(--review)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   download: {
     base: "text-[var(--primary-text)]",
-    hover: "group-hover:text-[var(--download)]",
-    active: "text-[var(--download)]",
+    hover: "group-hover:text-[var(--primary)]",
+    active: "text-[var(--primary)]",
   },
   account: {
     base: "text-[var(--primary-text)]",

@@ -159,7 +159,7 @@ function ProductFeedCard({item}:{item:ContentItem}){
  </div>
  <div className="px-1 pt-2">
  <div className={`line-clamp-2 min-h-[34px] text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
- <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--shop)]">مشاوره خرید</div>
+ <div className="mt-1 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-[var(--primary)]">مشاوره خرید</div>
  </div>
  </Link>
  );
