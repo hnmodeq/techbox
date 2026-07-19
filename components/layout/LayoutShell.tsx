@@ -14,6 +14,7 @@ import { ThemeProvider } from "@/providers/theme.provider"
 import { AuthProvider, useAuth } from "@/providers/auth.provider"
 import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
 import { ModuleConfigProvider } from "@/providers/module-config.provider"
+import { TimelineLikesProvider } from "@/providers/timeline-likes.provider"
 import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
 import type { SiteLayoutConfig } from "@/lib/module-config"
@@ -52,7 +53,9 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
           <StatsProvider>
             <HomeDataProvider initialData={homeData}>
               <ModuleConfigProvider serverConfig={serverModuleConfig}>
-              <LayoutInner>{children}</LayoutInner>
+                <TimelineLikesProvider>
+                  <LayoutInner>{children}</LayoutInner>
+                </TimelineLikesProvider>
               </ModuleConfigProvider>
               <Chatbot />
               <AuthModal />
