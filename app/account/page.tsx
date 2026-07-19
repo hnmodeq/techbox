@@ -391,9 +391,7 @@ export default function AccountPage() {
     <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
       <Toaster dir="rtl" />
       <PageHeader colorVar="--account" title="پروفایل و حساب کاربری" titleClassName="text-[var(--account)]">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Badge>{user.roleFa || (user.role === "super_admin" ? "مدیر کل" : "کاربر")}</Badge>
-        </div>
+        {/* removed duplicate top badge as per request */}
       </PageHeader>
 
       <div className="grid lg:grid-cols-3 gap-6 mt-6">

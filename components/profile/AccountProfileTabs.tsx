@@ -45,20 +45,45 @@ function SavedPosts({ posts }: { posts: any[] }) {
       {posts.length === 0 ? (
         <Card><CardContent className="p-8 text-center text-muted-foreground">محتوایی ذخیره نکرده‌اید.</CardContent></Card>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post: any) => (
-            <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/40">
-              <div className="relative aspect-[16/10] bg-muted">
-                {post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" {...blurProps(post.image)} />}
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-muted-foreground">{formatRelativeDate(post.date)} • {post.category || post.module}</div>
-                <h3 className="mt-2 line-clamp-2 font-bold text-foreground">{post.title}</h3>
-                <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{post.excerpt}</p>
-                <div className="mt-3 border-t pt-3"><CardStats module={post.module} slug={post.slug} initialViews={post.views} initialLikes={post.likes} initialComments={post.comments || 0} showComments /></div>
-              </div>
-            </Link>
-          ))}
+        <div className="space-y-2">
+          {posts.map((post: any) => {
+            const isTopic = post.module === "forum";
+            return (
+              <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group flex gap-3 rounded-lg border bg-card p-3 transition hover:bg-muted/40">
+                {isTopic ? (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden">
+                    {post.authorAvatar ? (
+                      <Image src={post.authorAvatar} alt={post.authorName || ""} width={48} height={48} className="rounded-full object-cover" />
+                    ) : (
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                        {(post.authorName || "U").charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
+                    {post.image ? (
+                      <Image src={post.image} alt={post.title} fill className="object-cover" sizes="64px" {...blurProps(post.image)} />
+                    ) : null}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{formatRelativeDate(post.date)}</span>
+                    <span>•</span>
+                    <span>{post.category || post.module}</span>
+                  </div>
+                  <div className="mt-0.5 line-clamp-1 font-semibold text-foreground group-hover:underline">{post.title}</div>
+                  {isTopic && post.authorName && (
+                    <div className="text-xs text-muted-foreground mt-0.5">توسط {post.authorName}</div>
+                  )}
+                  {!isTopic && post.excerpt && (
+                    <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{post.excerpt}</p>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </section>
