@@ -24,7 +24,10 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const serverLikes = typeof (event as any).likesCount === 'number' ? (event as any).likesCount : -1;
   const serverComments = typeof (event as any).commentsCount === 'number' ? (event as any).commentsCount : -1;
 
-  const { liked, setLiked } = useTimelineLiked(event.id);
+  const { liked: contextLiked, setLiked: setContextLiked } = useTimelineLiked(event.id);
+  const [localLiked, setLocalLiked] = useState<boolean | null>(null);
+  const liked = localLiked !== null ? localLiked : contextLiked;
+
   const [likesCount, setLikesCount] = useState<number>(serverLikes);
   const [commentsCount, setCommentsCount] = useState<number>(serverComments);
   const [likeBusy, setLikeBusy] = useState(false);
@@ -88,7 +91,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     const prevCount = likesCount;
 
     // Optimistic update
-    setLiked(nextLiked);
+    setLocalLiked(nextLiked);
+    setContextLiked(nextLiked);
     setLikesCount(nextLiked ? prevCount + 1 : Math.max(0, prevCount - 1));
 
     try {
@@ -99,7 +103,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       });
 
       if (res.status === 401) {
-        setLiked(prevLiked);
+        setLocalLiked(prevLiked);
+        setContextLiked(prevLiked);
         setLikesCount(prevCount);
         window.dispatchEvent(new CustomEvent('tb_open_auth'));
         setLikeBusy(false);
@@ -108,14 +113,17 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
       if (res.ok) {
         const data = await res.json();
-        setLiked(data.liked);
+        setLocalLiked(data.liked);
+        setContextLiked(data.liked);
         if (typeof data.likes === 'number') setLikesCount(data.likes);
       } else {
-        setLiked(prevLiked);
+        setLocalLiked(prevLiked);
+        setContextLiked(prevLiked);
         setLikesCount(prevCount);
       }
     } catch {
-      setLiked(prevLiked);
+      setLocalLiked(prevLiked);
+      setContextLiked(prevLiked);
       setLikesCount(prevCount);
     } finally {
       setLikeBusy(false);
@@ -220,8 +228,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     <button
                       type="button"
                       onClick={handleLikeToggle}
-                      disabled={likeBusy}
-                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 text-muted-foreground"
+                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold cursor-pointer text-muted-foreground"
                       aria-pressed={liked}
                     />
                   }
@@ -230,7 +237,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     size={16}
                     fill={liked ? "currentColor" : "none"}
                     strokeWidth={2}
-                    className={`transition-colors duration-200 ${liked ? 'scale-110 text-red-500' : 'scale-100 text-muted-foreground hover:text-red-500'}`}
+                    className={liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}
                   />
                   {likesCount >= 0 && <span className="text-muted-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
                 </TooltipTrigger>
