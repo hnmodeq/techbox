@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
-import { useTimelineEvents, useTimelineZoom, usePan } from '@/features/timeline/hooks';
+import { useTimelineEvents } from '@/features/timeline/hooks';
 import { useModuleTitle } from '@/providers/module-config.provider';
 import type { TimelineEvent } from '@/types/timeline';
 
@@ -65,32 +65,10 @@ function ActiveTimelineContent({
   isLoading: boolean;
   error: string | null;
 }) {
-  const { zoom, resetZoom, setZoom } = useTimelineZoom(1);
-  const { pan, startPanning, stopPanning, handlePan, resetPan, setPan } = usePan({ x: 150, y: 0 });
-
-  const handleResetView = useCallback(() => {
-    resetZoom();
-    resetPan();
-  }, [resetZoom, resetPan]);
-
   if (isLoading) return <TimelineLoading />;
   if (error || !events || events.length === 0) return <TimelineError error={error || 'رویدادی یافت نشد'} />;
 
-  return (
-    <TimelineContainer
-      events={events}
-      zoom={zoom}
-      pan={pan}
-      onPanStart={startPanning}
-      onPanMove={handlePan}
-      onPanEnd={stopPanning}
-      onResetView={handleResetView}
-      onZoomChange={setZoom}
-      onWheel={undefined}
-      onSetPan={(x) => setPan({ x, y: 0 })}
-      heightClassName="h-[460px]"
-    />
-  );
+  return <TimelineContainer events={events} heightClassName="h-[460px]" />;
 }
 
 export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
