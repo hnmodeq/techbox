@@ -22,7 +22,7 @@ function AuthorPosts({ posts }: { posts: any[] }) {
           {posts.map((post: any) => (
             <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group overflow-hidden rounded-xl border bg-card transition-colors hover:bg-muted/40">
               <div className="relative aspect-[16/10] bg-muted">
-                {post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" {...blurProps(post.image)} />}
+                {post.image && <Image src={post.image} alt={post.title} fill className="object-cover transition-transform group-hover:scale-105" sizes="350px" quality={75} />}
               </div>
               <div className="p-4">
                 <div className="text-xs text-muted-foreground">{formatRelativeDate(post.date)} • {post.category || post.module}</div>
@@ -81,7 +81,7 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
                         fill 
                         className="object-cover" 
                         sizes="64px" 
-                        unoptimized 
+                        quality={75}
                       />
                     ) : null}
                   </div>
