@@ -87,7 +87,7 @@ is hard text and this hard code is different for different modules. for example 
 -change the جدیدترین تجهیزات سرور، استوریج و شبکه to آخرین محصولات سازمانی اضافه شده
 
 
-Done Until Here.
+
 
 
 7-home page forum row
@@ -158,6 +158,9 @@ change the sentence " برای مشاهده رویدادهای بیشتر ..." t
 -make the هونامیک ارتباط رستاک color blue (sky blue)
 -move the newsletter to the left side and put social icons below newsletter (so we gonna have 2 column area with 2 rows, in the right column we have our links) (full height of the column, and in the left column first row we have newsletter and left column second row we have social icons
 
+
+
+
 13-main sidebar
 -change وبلاگ to مجله آنلاین
 -change رسانه to ویدیوهای کوتاه
@@ -180,6 +183,8 @@ change the sentence " برای مشاهده رویدادهای بیشتر ..." t
 -remove the icon from the chat button and only گفت و گو is enough
 -make the inside of پشتیبانی برخط to be something like پشتیبانی هوشمند (which is the tab icon and a sentence. "پشتیبانی برخط اینجاست تا شما را راهنمایی کند")
 -change the پشتیبانی هوشمند sentence inside from سوال فنی یا محصول خود را بپرسید. چت با با مدل AI پاسخ میدهد  to "پشتیبانی هوشمند اینجاست تا شما را راهنمایی کند
+
+Done Until Here.
 
 
 17-news sidebar
