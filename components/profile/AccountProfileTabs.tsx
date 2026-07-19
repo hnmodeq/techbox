@@ -70,11 +70,8 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
             return (
               <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group flex gap-3 rounded-lg border bg-card p-3 transition hover:bg-muted/40">
                 {isTopic ? (
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden ring-1 ring-border">
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                      {(post.authorName || post.category || "U").charAt(0)}
-                    </div>
-                  </div>
+                  // Forum topics: no avatar (topics don't have reliable authorAvatar)
+                  <div className="w-12 shrink-0" />
                 ) : (
                   <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                     {post.image ? (
