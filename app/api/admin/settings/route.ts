@@ -29,6 +29,13 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "email.nodemailer_user": "",
   "email.nodemailer_pass": "",
   "email.from_address": "TechBox <techboxnoreply@gmail.com>",
+  "newsletter.email.provider": "resend",
+  "newsletter.email.nodemailer_host": "smtp.gmail.com",
+  "newsletter.email.nodemailer_port": "465",
+  "newsletter.email.nodemailer_secure": "true",
+  "newsletter.email.nodemailer_user": "",
+  "newsletter.email.nodemailer_pass": "",
+  "newsletter.email.from_address": "TechBox Newsletter <newsletter@techbox.local>",
   ...HERO_MAGIC_DEFAULTS,
 };
 
