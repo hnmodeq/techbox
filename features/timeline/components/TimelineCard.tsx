@@ -27,6 +27,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const { liked, setLiked } = useTimelineLiked(event.id);
   const [likesCount, setLikesCount] = useState<number>(serverLikes);
   const [commentsCount, setCommentsCount] = useState<number>(serverComments);
+  const [likeBusy, setLikeBusy] = useState(false);
 
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Array<{ id?: string; authorName: string; text: string; createdAt: string }>>(
@@ -79,12 +80,15 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     e.stopPropagation();
     e.preventDefault();
 
+    if (likeBusy) return;
+    setLikeBusy(true);
+
     // Optimistic update
     const prevLiked = liked;
     const prevCount = likesCount;
     setLiked(!prevLiked);
     if (likesCount >= 0) {
-      setLikesCount(prevLiked ? likesCount - 1 : likesCount + 1);
+      setLikesCount(prevLiked ? Math.max(0, likesCount - 1) : likesCount + 1);
     }
 
     try {
@@ -98,6 +102,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         setLiked(prevLiked);
         setLikesCount(prevCount);
         window.dispatchEvent(new CustomEvent('tb_open_auth'));
+        setLikeBusy(false);
         return;
       }
 
@@ -112,6 +117,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     } catch {
       setLiked(prevLiked);
       setLikesCount(prevCount);
+    } finally {
+      setLikeBusy(false);
     }
   };
 
@@ -213,16 +220,18 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     <button
                       type="button"
                       onClick={handleLikeToggle}
-                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground transition-colors cursor-pointer font-bold"
+                      disabled={likeBusy}
+                      className={`flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 ${liked ? 'text-red-500' : 'text-muted-foreground'}`}
                       aria-pressed={liked}
                     />
                   }
                 >
                   <Heart
                     size={16}
-                    className={`transition-all duration-200 ${liked ? 'fill-red-500 text-red-500 scale-110' : 'text-muted-foreground scale-100'}`}
+                    fill={liked ? "currentColor" : "none"}
+                    className={`transition-transform duration-200 ${liked ? 'scale-110' : 'scale-100'}`}
                   />
-                  {likesCount >= 0 && <span>{likesCount.toLocaleString('fa-IR')}</span>}
+                  {likesCount >= 0 && <span style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
                 </TooltipTrigger>
                 <TooltipContent>پسندها</TooltipContent>
               </Tooltip>
