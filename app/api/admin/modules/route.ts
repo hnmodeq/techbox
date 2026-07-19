@@ -53,11 +53,25 @@ export async function PATCH(req: NextRequest) {
     const unifiedModuleColor = typeof body.unifiedModuleColor === "string" ? body.unifiedModuleColor : "var(--primary)";
     const moduleColors = (body.moduleColors && typeof body.moduleColors === "object") ? body.moduleColors : {};
 
-    // Validate module entries
+    // Validate module entries — use safeParse to avoid throwing on missing fields
     const moduleEntries: Record<string, any> = {};
     for (const [key, value] of Object.entries(body)) {
       if (TOP_LEVEL_KEYS.has(key)) continue;
-      moduleEntries[key] = moduleEntrySchema.parse(value);
+      const parsed = moduleEntrySchema.safeParse(value);
+      if (parsed.success) {
+        moduleEntries[key] = parsed.data;
+      } else {
+        // fallback with safe defaults
+        moduleEntries[key] = {
+          enabled: value?.enabled ?? true,
+          showOnHome: value?.showOnHome ?? true,
+          homeOrder: value?.homeOrder ?? 99,
+          homeTitle: value?.homeTitle ?? "",
+          homeMoreLabel: value?.homeMoreLabel ?? "",
+          showHomeTitle: value?.showHomeTitle ?? true,
+          showHomeMoreLabel: value?.showHomeMoreLabel ?? true,
+        };
+      }
     }
 
     const config: SiteLayoutConfig = {
