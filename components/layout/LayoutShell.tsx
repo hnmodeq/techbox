@@ -74,35 +74,6 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
-  const newsSidebarRef = React.useRef<HTMLDivElement>(null)
-
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // We only close if it's open, and if the click was OUTSIDE the sidebar.
-      // We must also ensure the click wasn't on the "News Toggle" button in the header.
-      // The toggle button has an aria-label="اخبار زنده تکباکس" or similar, but
-      // practically, if we attach this listener, any click outside the sidebar closes it.
-      const target = event.target as Node;
-      // If clicking inside the sidebar, do nothing
-      if (newsSidebarRef.current && newsSidebarRef.current.contains(target)) {
-        return;
-      }
-      
-      // If clicking the header's toggle button (which we can identify by checking if it contains the text "خبر" or checking closest button), 
-      // we let the button's own onClick handle it, otherwise they fight and it stays open.
-      const button = (target as Element).closest('button');
-      if (button && (button.getAttribute('aria-label') === 'اخبار زنده تکباکس' || button.textContent?.includes('خبر'))) {
-        return;
-      }
-
-      setNewsOpen(false);
-    };
-
-    if (newsOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [newsOpen]);
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
@@ -181,8 +152,13 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <FooterSection />
             </main>
             {/* News sidebar overlays on top, doesn't push content */}
+            {newsOpen && (
+              <div 
+                className="fixed inset-0 z-40" 
+                onClick={() => setNewsOpen(false)}
+              />
+            )}
             <div
-              ref={newsSidebarRef}
               className={`absolute inset-y-0 left-0 z-50 w-[20rem] transition-transform duration-300 ease-in-out ${
                 newsOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"
               }`}
