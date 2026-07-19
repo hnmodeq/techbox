@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getCurrentUserClient, logout, type AppUser, canEdit } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
+import { type AppUser, canEdit } from "@/lib/auth";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -23,7 +24,7 @@ function formatNumber(value: number) {
 }
 
 export default function AdminPage() {
-  const [user, setUser] = useState<AppUser | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [drafts, setDrafts] = useState<DraftInfo[]>([]);
   const [dashboardStats, setDashboardStats] = useState<Record<string, DashboardModuleStat>>({});
   const [dashboardTotals, setDashboardTotals] = useState({ count: 0, views: 0 });
@@ -31,13 +32,6 @@ export default function AdminPage() {
   const [dashboardLoaded, setDashboardLoaded] = useState(false);
   const [dashboardError, setDashboardError] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    setUser(getCurrentUserClient());
-    const h = () => setUser(getCurrentUserClient());
-    window.addEventListener("storage", h);
-    return () => window.removeEventListener("storage", h);
-  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -110,6 +104,14 @@ export default function AdminPage() {
     );
   }, [dashboardLoaded, dashboardTotals, moduleStats]);
 
+  if (authLoading) {
+    return (
+      <main className="min-h-dvh px-4 py-16 flex items-center justify-center" dir="rtl">
+        <p className="text-muted-foreground animate-pulse text-sm">در حال بررسی دسترسی...</p>
+      </main>
+    );
+  }
+
   if (!user) {
     return (
       <main className="min-h-dvh px-4 py-16" dir="rtl">
@@ -145,7 +147,11 @@ export default function AdminPage() {
             {user.role === "super_admin" && <ButtonLink href="/admin/moderation" variant="ghost" size="sm">Moderation</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/newsletter" variant="ghost" size="sm">خبرنامه</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/inbox" variant="ghost" size="sm">صندوق پیام‌ها</ButtonLink>}
-            <Button variant="ghost" size="sm" onClick={() => { logout(); setUser(null); router.refresh(); }} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">خروج</Button>
+            <Button variant="ghost" size="sm" onClick={async () => { 
+              await fetch("/api/auth/logout", { method: "POST" });
+              localStorage.removeItem("tb_auth_user");
+              window.location.reload(); 
+            }} className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">خروج</Button>
           </div>
         </PageHeader>
 
