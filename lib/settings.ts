@@ -5,6 +5,14 @@ const DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve",
   "comments.hidden_globally": "false",
   "jobs.resume_retention_days": "30",
+  "auth.require_email_verification": "false",
+  "email.provider": "resend",
+  "email.nodemailer_host": "smtp.gmail.com",
+  "email.nodemailer_port": "465",
+  "email.nodemailer_secure": "true",
+  "email.nodemailer_user": "",
+  "email.nodemailer_pass": "",
+  "email.from_address": "TechBox <techboxnoreply@gmail.com>",
 };
 
 /**

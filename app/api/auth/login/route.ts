@@ -5,6 +5,8 @@ import { z } from "zod";
 import { captureAuthError } from "@/lib/sentry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
+import { getSetting } from "@/lib/settings";
+
 const schema = z.object({ username: z.string(), password: z.string() });
 
 function parseModules(raw: any): string[] {
@@ -78,17 +80,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Bypass email verification requirement.
-    // To re-enable, simply uncomment this block and set emailVerified to null
-    // in the register route.
-    /*
-    if (!user.emailVerified) {
+    // Block login if email hasn't been verified AND the setting strictly requires it.
+    const requireVerification = await getSetting("auth.require_email_verification") === "true";
+
+    if (requireVerification && !user.emailVerified) {
       return NextResponse.json(
         { error: "email_not_verified", message: "ایمیل این حساب تأیید نشده است.", email: user.email },
         { status: 403 }
       );
     }
-    */
 
     const token = await createSession(user.id);
     await setSessionCookie(token);

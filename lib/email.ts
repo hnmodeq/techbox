@@ -1,10 +1,8 @@
 import { Resend } from "resend";
+import nodemailer from "nodemailer";
+import { getSetting } from "@/lib/settings";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || "TechBox <onboarding@resend.dev>";
+const DEFAULT_FROM = process.env.RESEND_FROM_EMAIL || "TechBox <techboxnoreply@gmail.com>";
 
 interface SendEmailParams {
   to: string | string[];
@@ -14,14 +12,57 @@ interface SendEmailParams {
 }
 
 export async function sendEmail({ to, subject, html, from }: SendEmailParams) {
-  if (!resend) {
-    console.log("[EMAIL] Resend not configured. Email skipped.");
+  // Check settings dynamically so admin can switch without restarting server
+  const provider = await getSetting("email.provider"); // "resend" | "nodemailer"
+
+  if (provider === "nodemailer") {
+    try {
+      const user = await getSetting("email.nodemailer_user");
+      const pass = await getSetting("email.nodemailer_pass");
+      const host = await getSetting("email.nodemailer_host");
+      const port = parseInt(await getSetting("email.nodemailer_port"), 10) || 465;
+      const secure = await getSetting("email.nodemailer_secure") === "true";
+      const fromAddr = await getSetting("email.from_address") || DEFAULT_FROM;
+
+      if (!user || !pass) {
+        console.log("[EMAIL] Nodemailer missing credentials. Skipped.");
+        return { success: false, reason: "not_configured" };
+      }
+
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+      });
+
+      const result = await transporter.sendMail({
+        from: from || fromAddr,
+        to: Array.isArray(to) ? to.join(", ") : to,
+        subject,
+        html,
+      });
+
+      return { success: true, id: result.messageId };
+    } catch (error: any) {
+      console.error("[EMAIL] Nodemailer failed to send:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Fallback to Resend (default)
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    console.log("[EMAIL] Resend API key missing. Skipped.");
     return { success: false, reason: "not_configured" };
   }
 
   try {
+    const resend = new Resend(resendApiKey);
+    const fromAddr = await getSetting("email.from_address") || DEFAULT_FROM;
+    
     const result = await resend.emails.send({
-      from: from || DEFAULT_FROM,
+      from: from || fromAddr,
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
@@ -29,7 +70,7 @@ export async function sendEmail({ to, subject, html, from }: SendEmailParams) {
 
     return { success: true, id: result.data?.id };
   } catch (error: any) {
-    console.error("[EMAIL] Failed to send:", error);
+    console.error("[EMAIL] Resend failed to send:", error);
     return { success: false, error: error.message };
   }
 }

@@ -14,6 +14,14 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "modules.home_order": "{}",
   "modules.home_titles": "{}",
   "modules.home_more_labels": "{}",
+  "auth.require_email_verification": "false",
+  "email.provider": "resend",
+  "email.nodemailer_host": "smtp.gmail.com",
+  "email.nodemailer_port": "465",
+  "email.nodemailer_secure": "true",
+  "email.nodemailer_user": "",
+  "email.nodemailer_pass": "",
+  "email.from_address": "TechBox <techboxnoreply@gmail.com>",
   ...HERO_MAGIC_DEFAULTS,
 };
 

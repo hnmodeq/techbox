@@ -5,6 +5,8 @@ import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
+import { getSetting } from "@/lib/settings";
+
 const registerSchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ حرف باشد"),
   username: z.string().min(3, "نام کاربری باید حداقل ۳ حرف باشد").regex(/^[a-zA-Z0-9_]+$/, "نام کاربری فقط می‌تواند شامل حروف انگلیسی، عدد و آندرلاین باشد"),
@@ -73,10 +75,10 @@ export async function POST(req: NextRequest) {
     const roleFa = isFirstUser ? "مدیر کل" : "کاربر عضو";
     const modules = isFirstUser ? ["blog", "news", "media", "review", "download", "shop", "forum", "tools"] : [];
 
-    // The bootstrap (first) account is auto-verified and logged in immediately,
-    // Bypass email verification on registration: auto-verify everyone for now.
-    // To re-enable, change this to: const emailVerified = isFirstUser ? new Date() : null;
-    const emailVerified = new Date();
+    // The bootstrap (first) account is auto-verified and logged in immediately.
+    // Read from DB whether email verification is globally required.
+    const requireVerification = await getSetting("auth.require_email_verification") === "true";
+    const emailVerified = isFirstUser || !requireVerification ? new Date() : null;
 
     const user = await prisma.user.create({
       data: {
@@ -118,24 +120,42 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     }
 
-    // --- Normal path: Auto-login bypassing email verification ---
-    const token = await createSession(user.id);
-    await setSessionCookie(token);
+    // --- Normal path ---
+    if (!requireVerification) {
+      // Auto-login if verification isn't strictly required
+      const token = await createSession(user.id);
+      await setSessionCookie(token);
+
+      return NextResponse.json({
+        ok: true,
+        needsVerification: false,
+        user: {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          roleFa: user.roleFa || "کاربر عضو",
+          modules: user.modules || [],
+          avatar: user.avatar
+        },
+        message: "حساب شما با موفقیت ساخته شد و وارد شدید.",
+      }, { status: 201 });
+    }
+
+    // Require verification
+    const { rawToken } = await createEmailVerification(user.id);
+    const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const verifyLink = `${base}/auth/verify-email?token=${rawToken}&email=${encodeURIComponent(user.email)}`;
+
+    const { subject, html } = emailTemplates.emailVerification(verifyLink);
+    await sendEmail({ to: user.email, subject, html });
 
     return NextResponse.json({
       ok: true,
-      needsVerification: false,
-      user: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        roleFa: user.roleFa || "کاربر عضو",
-        modules: user.modules || [],
-        avatar: user.avatar
-      },
-      message: "حساب شما با موفقیت ساخته شد و وارد شدید.",
+      needsVerification: true,
+      email: user.email,
+      message: "حساب شما ساخته شد. برای تکمیل ثبت‌نام، لینک تأیید را از ایمیل خود بررسی کنید.",
     }, { status: 201 });
   } catch (e: any) {
     if (e instanceof z.ZodError) {
