@@ -2,7 +2,6 @@
 
 import { TimelineContainer, TimelineLoading, TimelineError } from '@/features/timeline/components';
 import { useTimelineEvents } from '@/features/timeline/hooks';
-import { TimelineLikesProvider } from '@/providers/timeline-likes.provider';
 
 export default function TimelinePage() {
   const { events, isLoading, error } = useTimelineEvents();
@@ -12,12 +11,8 @@ export default function TimelinePage() {
   if (!events || events.length === 0) return <TimelineError error="هیچ رویدادی یافت نشد" />;
 
   return (
-    // Scoped here (rather than globally in LayoutShell) since only /timeline
-    // needs to know which events the current user liked.
-    <TimelineLikesProvider>
-      <main className="w-full">
-        <TimelineContainer events={events} heightClassName="h-[calc(100svh-var(--header-height))]" />
-      </main>
-    </TimelineLikesProvider>
+    <main className="w-full">
+      <TimelineContainer events={events} heightClassName="h-[calc(100svh-var(--header-height))]" />
+    </main>
   );
 }
