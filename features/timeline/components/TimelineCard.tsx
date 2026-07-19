@@ -89,7 +89,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
     // Optimistic update
     setLiked(nextLiked);
-    setLikesCount(c => nextLiked ? c + 1 : Math.max(0, c - 1));
+    setLikesCount(nextLiked ? prevCount + 1 : Math.max(0, prevCount - 1));
 
     try {
       const res = await fetch('/api/timeline/like', {
@@ -221,7 +221,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                       type="button"
                       onClick={handleLikeToggle}
                       disabled={likeBusy}
-                      className={`flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 ${liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
+                      className="group flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 text-muted-foreground"
                       aria-pressed={liked}
                     />
                   }
@@ -230,11 +230,11 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     size={16}
                     fill={liked ? "currentColor" : "none"}
                     strokeWidth={2}
-                    className={`transition-transform duration-200 ${liked ? 'scale-110 text-red-500' : 'scale-100'}`}
+                    className={`transition-colors duration-200 ${liked ? 'scale-110 text-red-500' : 'scale-100 text-muted-foreground group-hover:text-red-500'}`}
                   />
-                  {likesCount >= 0 && <span style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
+                  {likesCount >= 0 && <span className="text-muted-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
                 </TooltipTrigger>
-                <TooltipContent>پسندها</TooltipContent>
+                <TooltipContent>تعداد پسندها</TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
