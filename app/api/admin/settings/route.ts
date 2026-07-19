@@ -20,6 +20,7 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "modules.unified_color": "var(--primary)",
   "modules.custom_colors": "{}",
   "modules.titles": "{}",
+  "hero.visible": "true",
   "auth.require_email_verification": "false",
   "email.provider": "resend",
   "email.nodemailer_host": "smtp.gmail.com",
