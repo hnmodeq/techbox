@@ -23,21 +23,12 @@ export async function GET() {
   }
 }
 
-const moduleEntrySchema = z.object({
-  enabled: z.boolean().optional(),
-  showOnHome: z.boolean().optional(),
-  homeOrder: z.number().int().min(0).max(100).optional(),
-  homeTitle: z.string().max(200).optional(),
-  homeMoreLabel: z.string().max(200).optional(),
-  showHomeTitle: z.boolean().optional(),
-  showHomeMoreLabel: z.boolean().optional(),
-}).partial();
-
 const TOP_LEVEL_KEYS = new Set([
   "heroVisible",
   "moduleColorsEnabled",
   "unifiedModuleColor",
   "moduleColors",
+  "titles",
 ]);
 
 export async function PATCH(req: NextRequest) {
@@ -53,25 +44,11 @@ export async function PATCH(req: NextRequest) {
     const unifiedModuleColor = typeof body.unifiedModuleColor === "string" ? body.unifiedModuleColor : "var(--primary)";
     const moduleColors = (body.moduleColors && typeof body.moduleColors === "object") ? body.moduleColors : {};
 
-    // Validate module entries — use safeParse to avoid throwing on missing fields
+    // No strict validation — frontend now always sends complete objects
     const moduleEntries: Record<string, any> = {};
     for (const [key, value] of Object.entries(body)) {
       if (TOP_LEVEL_KEYS.has(key)) continue;
-      const parsed = moduleEntrySchema.safeParse(value);
-      if (parsed.success) {
-        moduleEntries[key] = parsed.data;
-      } else {
-        // fallback with safe defaults
-        moduleEntries[key] = {
-          enabled: value?.enabled ?? true,
-          showOnHome: value?.showOnHome ?? true,
-          homeOrder: value?.homeOrder ?? 99,
-          homeTitle: value?.homeTitle ?? "",
-          homeMoreLabel: value?.homeMoreLabel ?? "",
-          showHomeTitle: value?.showHomeTitle ?? true,
-          showHomeMoreLabel: value?.showHomeMoreLabel ?? true,
-        };
-      }
+      moduleEntries[key] = value;
     }
 
     const config: SiteLayoutConfig = {
