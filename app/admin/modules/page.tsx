@@ -107,10 +107,33 @@ export default function AdminModulesPage() {
     setSaving(true);
     setMessage("");
     try {
+      // Only send the fields the PATCH endpoint expects
+      const payload = {
+        heroVisible: config.heroVisible,
+        moduleColorsEnabled: config.moduleColorsEnabled,
+        unifiedModuleColor: config.unifiedModuleColor,
+        moduleColors: config.moduleColors,
+        titles: config.titles,
+        ...Object.fromEntries(
+          ALL_MODULES.map((slug) => [
+            slug,
+            config[slug] && {
+              enabled: config[slug].enabled,
+              showOnHome: config[slug].showOnHome,
+              homeOrder: config[slug].homeOrder,
+              homeTitle: config[slug].homeTitle,
+              homeMoreLabel: config[slug].homeMoreLabel,
+              showHomeTitle: config[slug].showHomeTitle,
+              showHomeMoreLabel: config[slug].showHomeMoreLabel,
+            },
+          ]).filter(([, v]) => v)
+        ),
+      };
+
       const res = await fetch("/api/admin/modules", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(config),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "save_failed");
