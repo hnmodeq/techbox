@@ -71,20 +71,9 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
               <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group flex gap-3 rounded-lg border bg-card p-3 transition hover:bg-muted/40">
                 {isTopic ? (
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-muted overflow-hidden ring-1 ring-border">
-                    {post.authorAvatar ? (
-                      <Image 
-                        src={post.authorAvatar} 
-                        alt={post.authorName || ""} 
-                        width={48} 
-                        height={48} 
-                        className="rounded-full object-cover" 
-                        unoptimized 
-                      />
-                    ) : (
-                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                        {(post.authorName || "U").charAt(0)}
-                      </div>
-                    )}
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                      {(post.authorName || post.category || "U").charAt(0)}
+                    </div>
                   </div>
                 ) : (
                   <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
