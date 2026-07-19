@@ -243,10 +243,38 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <main className="max-w-md mx-auto px-5 py-20 text-center" dir="rtl">
-        <Card className="p-8 animate-pulse">
-          <p className="text-sm text-muted-foreground">در حال دریافت اطلاعات حساب کاربری شما...</p>
-        </Card>
+      <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
+        <div className="grid lg:grid-cols-3 gap-6 mt-6">
+          {/* Profile Card Skeleton */}
+          <Card className="p-6 space-y-6">
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-32 rounded-xl bg-muted animate-pulse mb-6" />
+              <div className="h-5 w-40 bg-muted animate-pulse rounded mb-2" />
+              <div className="h-4 w-24 bg-muted animate-pulse rounded mb-4" />
+              <div className="h-8 w-32 bg-muted animate-pulse rounded-full" />
+            </div>
+          </Card>
+
+          {/* Form Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="p-6 space-y-6">
+              <div className="h-6 w-48 bg-muted animate-pulse rounded mb-4" />
+              
+              <div className="grid sm:grid-cols-2 gap-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                    <div className="h-10 bg-muted animate-pulse rounded" />
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <div className="h-9 w-20 bg-muted animate-pulse rounded" />
+              </div>
+            </Card>
+          </div>
+        </div>
       </main>
     );
   }
