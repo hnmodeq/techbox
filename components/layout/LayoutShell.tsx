@@ -74,6 +74,32 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
+  const newsSidebarRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (newsSidebarRef.current && newsSidebarRef.current.contains(target)) {
+        return;
+      }
+      
+      const button = (target as Element).closest('button');
+      if (button && (button.getAttribute('aria-label') === 'اخبار زنده تکباکس' || button.textContent?.includes('خبر'))) {
+        return;
+      }
+
+      setNewsOpen(false);
+    };
+
+    if (newsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [newsOpen]);
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
@@ -152,13 +178,8 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <FooterSection />
             </main>
             {/* News sidebar overlays on top, doesn't push content */}
-            {newsOpen && (
-              <div 
-                className="fixed inset-0 z-40" 
-                onClick={() => setNewsOpen(false)}
-              />
-            )}
             <div
+              ref={newsSidebarRef}
               className={`absolute inset-y-0 left-0 z-50 w-[20rem] transition-transform duration-300 ease-in-out ${
                 newsOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"
               }`}
