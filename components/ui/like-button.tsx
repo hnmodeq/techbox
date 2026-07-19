@@ -93,8 +93,10 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
     const prevLiked = liked;
     const prevCount = count;
     const nextLiked = !liked;
+    
+    // Optimistic update
     setLiked(nextLiked);
-    setCount(c => nextLiked ? c + 1 : Math.max(0, c - 1));
+    setCount(nextLiked ? prevCount + 1 : Math.max(0, prevCount - 1));
     setLikedCache(contentType, slug, nextLiked);
 
     try {
@@ -116,7 +118,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
       if (res.ok) {
         const data = await res.json();
         setLiked(data.liked);
-        setCount(data.likes);
+        if (typeof data.likes === 'number') setCount(data.likes);
         setLikedCache(contentType, slug, data.liked);
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("tb_stats_update", { detail: { module: contentType, slug, likes: data.likes } }));
