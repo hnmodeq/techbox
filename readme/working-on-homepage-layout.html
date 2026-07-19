@@ -1,0 +1,219 @@
+<html>
+  <head>
+    <style>
+      .parent {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(35, 1fr);
+        gap: 7px;
+      }
+
+      .div10 {
+        grid-column: span 3 / span 3;
+        grid-row: span 3 / span 3;
+        grid-column-start: 1;
+        grid-row-start: 3;
+      }
+
+      .div16 {
+        grid-column: span 3 / span 3;
+        grid-row: span 6 / span 6;
+        grid-column-start: 4;
+        grid-row-start: 3;
+      }
+
+      .div17 {
+        grid-column: span 3 / span 3;
+        grid-row: span 3 / span 3;
+        grid-column-start: 1;
+        grid-row-start: 6;
+      }
+
+      .div18 {
+        grid-column: span 2 / span 2;
+        grid-row: span 8 / span 8;
+        grid-column-start: 1;
+        grid-row-start: 9;
+      }
+
+      .div19 {
+        grid-column: span 6 / span 6;
+        grid-row: span 2 / span 2;
+        grid-column-start: 1;
+        grid-row-start: 1;
+      }
+
+      .div20 {
+        grid-column: span 4 / span 4;
+        grid-row: span 4 / span 4;
+        grid-column-start: 3;
+        grid-row-start: 9;
+      }
+
+      .div21 {
+        grid-column: span 4 / span 4;
+        grid-row: span 4 / span 4;
+        grid-column-start: 3;
+        grid-row-start: 13;
+      }
+
+      .div23 {
+        grid-column: span 2 / span 2;
+        grid-column-start: 3;
+        grid-row-start: 20;
+      }
+
+      .div24 {
+        grid-column: span 2 / span 2;
+        grid-column-start: 1;
+        grid-row-start: 20;
+      }
+
+      .div26 {
+        grid-column: span 2 / span 2;
+        grid-column-start: 5;
+        grid-row-start: 20;
+      }
+
+      .div28 {
+        grid-column: span 4 / span 4;
+        grid-row: span 3 / span 3;
+        grid-column-start: 1;
+        grid-row-start: 17;
+      }
+
+      .div29 {
+        grid-column: span 2 / span 2;
+        grid-row: span 3 / span 3;
+        grid-column-start: 5;
+        grid-row-start: 17;
+      }
+
+      .div32 {
+        grid-column: span 2 / span 2;
+        grid-row-start: 21;
+      }
+
+      .div33 {
+        grid-column: span 2 / span 2;
+        grid-column-start: 3;
+        grid-row-start: 21;
+      }
+
+      .div34 {
+        grid-column: span 2 / span 2;
+        grid-column-start: 5;
+        grid-row-start: 21;
+      }
+
+      .div35 {
+        grid-column: span 4 / span 4;
+        grid-row: span 4 / span 4;
+        grid-column-start: 3;
+        grid-row-start: 22;
+      }
+
+      .div36 {
+        grid-column: span 2 / span 2;
+        grid-row: span 4 / span 4;
+        grid-column-start: 1;
+        grid-row-start: 22;
+      }
+
+      .div37 {
+        grid-row: span 2 / span 2;
+        grid-column-start: 3;
+        grid-row-start: 26;
+      }
+
+      .div38 {
+        grid-row: span 2 / span 2;
+        grid-column-start: 4;
+        grid-row-start: 26;
+      }
+
+      .div39 {
+        grid-row: span 2 / span 2;
+        grid-column-start: 1;
+        grid-row-start: 26;
+      }
+
+      .div40 {
+        grid-row: span 2 / span 2;
+        grid-column-start: 2;
+        grid-row-start: 26;
+      }
+
+      .div41 {
+        grid-row: span 2 / span 2;
+        grid-row-start: 26;
+      }
+
+      .div42 {
+        grid-row: span 2 / span 2;
+        grid-row-start: 26;
+      }
+
+      .div43 {
+        grid-column: span 6 / span 6;
+        grid-row: span 4 / span 4;
+        grid-column-start: 1;
+        grid-row-start: 30;
+      }
+
+      .div44 {
+        grid-column: span 6 / span 6;
+        grid-row: span 2 / span 2;
+        grid-column-start: 1;
+        grid-row-start: 34;
+      }
+
+      .div45 {
+        grid-column: span 6 / span 6;
+        grid-row: span 2 / span 2;
+        grid-column-start: 1;
+        grid-row-start: 28;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="parent">
+      <div class="div10">10</div>
+      <div class="div16">16</div>
+      <div class="div17">17</div>
+      <div class="div18">18</div>
+      <div class="div19">19</div>
+      <div class="div20">20</div>
+      <div class="div21">21</div>
+      <div class="div23">23</div>
+      <div class="div24">24</div>
+      <div class="div26">26</div>
+      <div class="div28">28</div>
+      <div class="div29">29</div>
+      <div class="div32">32</div>
+      <div class="div33">33</div>
+      <div class="div34">34</div>
+      <div class="div35">35</div>
+      <div class="div36">36</div>
+      <div class="div37">37</div>
+      <div class="div38">38</div>
+      <div class="div39">39</div>
+      <div class="div40">40</div>
+      <div class="div41">41</div>
+      <div class="div42">42</div>
+      <div class="div43">43</div>
+      <div class="div44">44</div>
+      <div class="div45">45</div>
+    </div>
+  </body>
+</html>
+
+
+
+usefuls:
+
+https://ui.aceternity.com/components/card-spotlight
+https://ui.aceternity.com/components/terminal
+
+
+https://tailwindcss.com/plus/ui-blocks/application-ui/forms/sign-in-forms#component-fef1d7e9849359af76d4d6ead796938b

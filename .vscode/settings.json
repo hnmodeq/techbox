@@ -14,7 +14,7 @@
 
   "files.exclude": {
     "**/.git": true,
-    "**/.env*": true,
+    "**/.env*": false,
     "**/.gitattributes": true,
     "**/.gitignore": true,
     "**/.github": true,
