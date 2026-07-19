@@ -41,6 +41,20 @@ export default function Chatbot() {
   const [supportLoading, setSupportLoading] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        // Exclude clicks on the launcher button itself if needed, but since it's unmounted when open, it's fine.
+        setOpen(false);
+      }
+    };
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
 
   useEffect(() => {
     try {
@@ -172,7 +186,7 @@ export default function Chatbot() {
       )}
 
       {open && (
-        <div dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{ zIndex: zIndex.chatbot }}>
+        <div ref={containerRef} dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{ zIndex: zIndex.chatbot }}>
           <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl">
             <CardHeader className="flex flex-row items-center justify-between gap-2 p-3 border-b">
               <div className="flex items-center gap-2">
