@@ -237,6 +237,21 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
   const [replyText, setReplyText] = useState("");
   const [replyBusy, setReplyBusy] = useState(false);
 
+  const loadTickets = async (emailToLoad?: string) => {
+    const em = (emailToLoad || email).toLowerCase().trim();
+    if (!em) return;
+    setTicketsLoading(true);
+    try {
+      const res = await fetch(`/api/support/tickets?email=${encodeURIComponent(em)}`, { cache: "no-store" });
+      const data = await res.json();
+      setTickets(data.tickets || []);
+    } catch {
+      setTickets([]);
+    } finally {
+      setTicketsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (open) {
       setName(defaultName);
@@ -253,21 +268,6 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
       }
     }
   }, [open, defaultName, defaultEmail]);
-
-  const loadTickets = async (emailToLoad?: string) => {
-    const em = (emailToLoad || email).toLowerCase().trim();
-    if (!em) return;
-    setTicketsLoading(true);
-    try {
-      const res = await fetch(`/api/support/tickets?email=${encodeURIComponent(em)}`, { cache: "no-store" });
-      const data = await res.json();
-      setTickets(data.tickets || []);
-    } catch {
-      setTickets([]);
-    } finally {
-      setTicketsLoading(false);
-    }
-  };
 
   const refreshThread = async (ticketId: string) => {
     try {

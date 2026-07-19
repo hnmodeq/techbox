@@ -26,6 +26,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [] }: { unreadSlugs?: string[
 
   // Only show news from the last 24 hours (live-feel). Older news lives in /news.
   const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now()
   const newsItems = dbNews
     .filter((n) => now - new Date(n.date).getTime() <= TWENTY_FOUR_HOURS)

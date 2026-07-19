@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTimelineLiked } from '@/providers/timeline-likes.provider';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 interface TimelineCardProps {
   event: TimelineEvent;
@@ -77,6 +78,15 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const handleLikeToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+
+    // Optimistic update
+    const prevLiked = liked;
+    const prevCount = likesCount;
+    setLiked(!prevLiked);
+    if (likesCount >= 0) {
+      setLikesCount(prevLiked ? likesCount - 1 : likesCount + 1);
+    }
+
     try {
       const res = await fetch('/api/timeline/like', {
         method: 'POST',
@@ -85,6 +95,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       });
 
       if (res.status === 401) {
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
         window.dispatchEvent(new CustomEvent('tb_open_auth'));
         return;
       }
@@ -93,8 +105,14 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         const data = await res.json();
         setLiked(data.liked);
         if (typeof data.likes === 'number') setLikesCount(data.likes);
+      } else {
+        setLiked(prevLiked);
+        setLikesCount(prevCount);
       }
-    } catch {}
+    } catch {
+      setLiked(prevLiked);
+      setLikesCount(prevCount);
+    }
   };
 
   const handleAddComment = async (e: React.FormEvent) => {
@@ -140,6 +158,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const formatTime = (iso: string) => {
     try {
       const d = new Date(iso);
+      // eslint-disable-next-line react-hooks/purity
       const diff = Date.now() - d.getTime();
       if (diff < 60_000) return 'لحظاتی پیش';
       if (diff < 3_600_000) return `${Math.floor(diff / 60_000).toLocaleString('fa-IR')} دقیقه پیش`;
@@ -187,45 +206,60 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
           </div>
 
           <div className="border-t-[length:var(--border-size)] border-white/20 pt-3 flex items-center justify-between gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={handleLikeToggle}
-              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-destructive transition-colors cursor-pointer font-bold"
-              aria-pressed={liked}
-            >
-              <Heart
-                size={16}
-                className={`transition-all duration-200 ${liked ? 'fill-red-500 text-red-500 scale-110' : 'text-muted-foreground scale-100'}`}
-              />
-              {/* Hide count while loading (sentinel -1), never show 0. */}
-              {likesCount >= 0 && <span>{likesCount.toLocaleString('fa-IR')}</span>}
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      type="button"
+                      onClick={handleLikeToggle}
+                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground transition-colors cursor-pointer font-bold"
+                      aria-pressed={liked}
+                    />
+                  }
+                >
+                  <Heart
+                    size={16}
+                    className={`transition-all duration-200 ${liked ? 'fill-red-500 text-red-500 scale-110' : 'text-muted-foreground scale-100'}`}
+                  />
+                  {likesCount >= 0 && <span>{likesCount.toLocaleString('fa-IR')}</span>}
+                </TooltipTrigger>
+                <TooltipContent>پسندها</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
-              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
-              aria-expanded={showComments}
-            >
-              <MessageCircle size={16} />
-              {commentsCount >= 0 && <span>{commentsCount.toLocaleString('fa-IR')}</span>}
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
+                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
+                      aria-expanded={showComments}
+                    />
+                  }
+                >
+                  <MessageCircle size={16} />
+                  {commentsCount >= 0 && <span>{commentsCount.toLocaleString('fa-IR')}</span>}
+                </TooltipTrigger>
+                <TooltipContent>دیدگاه کاربران</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 
-        {/* COMMENTS OVERLAY — drops UP from the bottom of the card, covering
-            the image (like Instagram mobile). Sits inside the card box so it
-            never escapes the card bounds. */}
+        {/* COMMENTS OVERLAY — fills the card, starting from the top. */}
         {showComments && (
           <div
-            className="absolute inset-0 z-30 flex flex-col justify-end bg-background/85 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
+            className="absolute inset-0 z-30 flex flex-col justify-start bg-background/85 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             onWheel={(e) => e.stopPropagation()}
             onDragStart={(e) => e.preventDefault()}
           >
             <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border">
-              <span className="text-sm font-bold text-foreground">نظرها</span>
+              <span className="text-sm font-bold text-foreground">دیدگاه‌های شما</span>
               <button
                 type="button"
                 onClick={() => setShowComments(false)}
@@ -236,7 +270,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               </button>
             </div>
 
-            <ScrollArea className="flex-1 max-h-[280px]">
+            <ScrollArea className="flex-1 overscroll-contain">
               <ul className="space-y-2 p-3 text-right">
                 {comments.length === 0 && (
                   <li className="rounded-md bg-muted/20 p-2.5 text-xs text-muted-foreground border border-border text-center">

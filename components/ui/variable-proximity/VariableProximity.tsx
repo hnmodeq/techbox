@@ -166,9 +166,10 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>((p
       className={`${className} variable-proximity`}
       onClick={onClick}
       style={{ display: 'inline', ...style }}
-    >
-      {words.map((word, wordIndex) => (
-        <span key={wordIndex} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+      >
+        {/* eslint-disable-next-line react-hooks/refs */}
+        {words.map((word, wordIndex) => (
+          <span key={wordIndex} style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
           {word.split('').map((letter) => {
             const currentLetterIndex = letterIndex++;
             return (

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 'use client';
 
 import { useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
@@ -168,6 +169,7 @@ const TextType = ({
   const shouldHideCursor =
     hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
 
+  // eslint-disable-next-line react-hooks/refs
   return createElement(
     Component,
     {

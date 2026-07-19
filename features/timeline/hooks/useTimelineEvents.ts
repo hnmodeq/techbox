@@ -12,11 +12,11 @@ export function useTimelineEvents() {
     async function fetchEvents() {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/timeline/events');
+        const response = await fetch('/api/timeline/events', { cache: 'no-store' });
         if (!response.ok) throw new Error('Failed to fetch');
         const data = await response.json();
         const sorted = data.sort((a: TimelineEvent, b: TimelineEvent) => {
-          return new Date(a.dateGr).getTime() - new Date(b.dateGr).getTime();
+          return new Date(b.dateGr).getTime() - new Date(a.dateGr).getTime();
         });
         setEvents(sorted);
       } catch (err) {

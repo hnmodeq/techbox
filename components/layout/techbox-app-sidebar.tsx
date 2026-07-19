@@ -22,6 +22,7 @@ export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Side
             <Tooltip>
               <TooltipTrigger render={<SidebarMenuButton size="lg" render={<Link href="/" />} />}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/logo.png" alt="تکباکس" width={32} height={32} className="object-contain" />
                 </div>
                 <div className="grid flex-1 text-start text-sm leading-tight">

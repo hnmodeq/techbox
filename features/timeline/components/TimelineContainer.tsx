@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
-
+import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
@@ -34,18 +34,47 @@ interface TimelineContainerProps {
  * so images and text can't be copied or dragged out of the timeline.
  */
 export function TimelineContainer({ events, heightClassName }: TimelineContainerProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const amount = 350; // approximate width of one card + gap
+    // In RTL, scrollLeft behaves differently across browsers.
+    // Using scrollBy with negative for left and positive for right usually works.
+    // But since RTL is tricky, we can try detecting current scrollLeft.
+    // Let's just use scrollBy: left decreases x, right increases x.
+    // Wait, in RTL, 'right' means towards the start (scrollLeft > 0 usually or 0).
+    const scrollAmount = direction === 'left' ? -amount : amount;
+    scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  };
+
   return (
-    <div
-      dir="rtl"
-      className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground ${heightClassName ?? 'h-[560px]'}`}
-      style={{
-        scrollbarWidth: 'thin',
-        WebkitOverflowScrolling: 'touch',
-        // The scroll container itself doesn't need user-select; child cards
-        // enforce their own no-select. Keep this off here so the scrollbar
-        // stays fully interactive.
-      }}
-    >
+    <div className="relative group w-full">
+      <button
+        onClick={() => scroll('right')}
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 text-muted-foreground hover:text-foreground transition-opacity p-2 hidden sm:block"
+        aria-label="اسکرول به راست"
+      >
+        <ChevronsRight size={32} />
+      </button>
+
+      <button
+        onClick={() => scroll('left')}
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 text-muted-foreground hover:text-foreground transition-opacity p-2 hidden sm:block"
+        aria-label="اسکرول به چپ"
+      >
+        <ChevronsLeft size={32} />
+      </button>
+
+      <div
+        ref={scrollRef}
+        dir="rtl"
+        className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground ${heightClassName ?? 'h-[560px]'}`}
+        style={{
+          scrollbarWidth: 'thin',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
       {/* The flex row of events. min-w-max so it never wraps. Each event
           centers on the line. */}
       <div
@@ -83,6 +112,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           );
         })}
       </div>
+    </div>
     </div>
   );
 }
