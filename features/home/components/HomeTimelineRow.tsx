@@ -68,7 +68,7 @@ function ActiveTimelineContent({
   if (isLoading) return <TimelineLoading />;
   if (error || !events || events.length === 0) return <TimelineError error={error || 'رویدادی یافت نشد'} />;
 
-  return <TimelineContainer events={events} heightClassName="h-[460px]" />;
+  return <TimelineContainer events={events} heightClassName="h-[560px]" />;
 }
 
 export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitle = true, showHomeMoreLabel = true }: { homeTitle?: string; homeMoreLabel?: string; showHomeTitle?: boolean; showHomeMoreLabel?: boolean }) {
@@ -133,7 +133,7 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
                     single loading state — shimmering via skeleton-base — and
                     stays in place until ALL images report load, then crossfades
                     out. No separate row-skeleton, no bordered empty cells. */}
-                <div className={`transition-opacity duration-700 ${allImagesLoaded ? 'opacity-0' : 'opacity-100'}`}>
+                <div className={`transition-opacity duration-700 h-[560px] ${allImagesLoaded ? 'opacity-0' : 'opacity-100'}`}>
                   <TimelineGridSkeleton count={Math.max(preview.length, PREVIEW_COUNT)} />
                 </div>
 
@@ -141,7 +141,7 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
                     the layout; invisible until every image is decoded, then
                     crossfades in. */}
                 {preview.length > 0 && (
-                  <div className={`absolute inset-0 grid grid-cols-3 gap-2 sm:grid-cols-6 transition-opacity duration-700 ${allImagesLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className={`absolute inset-0 grid grid-cols-3 gap-2 sm:grid-cols-6 h-[560px] transition-opacity duration-700 ${allImagesLoaded ? 'opacity-100' : 'opacity-0'}`}>
                     {preview.map((p, idx) => (
                       <TimelinePreviewImage
                         key={p.id}

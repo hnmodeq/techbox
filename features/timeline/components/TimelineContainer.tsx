@@ -6,67 +6,69 @@ import { TimelineCard } from './TimelineCard';
 
 interface TimelineContainerProps {
   events: TimelineEvent[];
-  /** Tailwind height class for the scroll area. */
   heightClassName?: string;
 }
 
 /**
- * A simple horizontal timeline: one native-scroll container holding a flex row
- * of events. Each event is a dot on a continuous line, with its card hanging
- * below. RTL so the newest event appears at the right (scroll-start).
+ * A simple horizontal timeline: one native horizontal-scroll container holding
+ * a flex row of events. Each event is a date label + a dot ON the line + a
+ * card hanging below. RTL so the newest event appears at the right.
  *
- * No custom pan state, no zoom hooks, no wheel hijacking — the browser's native
- * horizontal scroll (touch, trackpad, shift+wheel) does everything. This is
- * what makes it feel healthy and predictable instead of fighting the user.
+ * Uses native horizontal scroll (touch, trackpad, shift+wheel, scrollbar) — no
+ * custom pan/zoom state. Everything inside is non-draggable / non-selectable
+ * so images and text can't be copied or dragged out of the timeline.
  */
 export function TimelineContainer({ events, heightClassName }: TimelineContainerProps) {
-  const scrollRef = React.useRef<HTMLDivElement>(null);
-  const lineRef = React.useRef<HTMLDivElement>(null);
-
-  // Keep the continuous line exactly as wide as the row content (so dots line
-  // up with events regardless of scroll position).
-  React.useEffect(() => {
-    const row = scrollRef.current;
-    const line = lineRef.current;
-    if (!row || !line) return;
-    const sync = () => {
-      const inner = row.querySelector('[data-timeline-row]');
-      if (inner) line.style.width = `${inner.scrollWidth}px`;
-    };
-    sync();
-    window.addEventListener('resize', sync);
-    return () => window.removeEventListener('resize', sync);
-  }, [events]);
-
   return (
     <div
-      ref={scrollRef}
       dir="rtl"
-      className={`relative w-full overflow-x-auto overflow-y-hidden select-none bg-background text-foreground ${heightClassName ?? 'h-[440px]'}`}
-      style={{ scrollbarWidth: 'thin', WebkitOverflowScrolling: 'touch' }}
+      className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground ${heightClassName ?? 'h-[560px]'}`}
+      style={{
+        scrollbarWidth: 'thin',
+        WebkitOverflowScrolling: 'touch',
+        // The scroll container itself doesn't need user-select; child cards
+        // enforce their own no-select. Keep this off here so the scrollbar
+        // stays fully interactive.
+      }}
     >
-      {/* The flex row of events. min-w-max so it never wraps; px gives breathing
-          room at the start/end. Each event is centered on the line. */}
+      {/* The flex row of events. min-w-max so it never wraps. Each event
+          centers on the line. */}
       <div
-        data-timeline-row
-        className="relative flex min-w-max items-start gap-6 px-[10%] py-6"
+        className="relative flex min-w-max items-start gap-8 px-[8%] pt-3"
+        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+        onDragStart={(e) => e.preventDefault()}
       >
-        {/* The continuous horizontal line — sits at the same vertical position
-            as the dots (top of each event cell). */}
+        {/* The continuous horizontal line — pinned at the dot row vertical. */}
         <div
-          ref={lineRef}
-          className="pointer-events-none absolute top-[34px] h-1 rounded-full bg-border"
-          style={{ left: 0 }}
+          className="pointer-events-none absolute left-0 h-1 rounded-full bg-border"
+          style={{ top: '44px', width: '100%' }}
         />
 
-        {events.map((event) => (
-          <div key={event.id} className="relative flex shrink-0 flex-col items-center" style={{ width: 320 }}>
-            {/* Dot on the line */}
-            <div className="relative z-10 mb-4 mt-[26px] size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
-            {/* The card hangs below the dot */}
-            <TimelineCard event={event} importance={event.importance} />
-          </div>
-        ))}
+        {events.map((event) => {
+          const dateFa = (event as any).dateFa as string | undefined;
+          const yearFa = (event as any).yearFa as number | undefined;
+          return (
+            <div
+              key={event.id}
+              className="relative flex shrink-0 flex-col items-center"
+              style={{ width: 320 }}
+            >
+              {/* Date label ABOVE the line */}
+              <div className="mb-2 text-center text-xs font-bold text-muted-foreground h-6 flex items-center justify-center">
+                {dateFa || (yearFa ? yearFa.toLocaleString('fa-IR') : '')}
+              </div>
+
+              {/* Dot ON the line (sits at the same vertical as the continuous
+                  line at top:44px — date(24) + mb-2(8) + half-dot(12) ≈ 44). */}
+              <div className="relative z-10 size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
+
+              {/* Card hanging below */}
+              <div className="mt-4">
+                <TimelineCard event={event} importance={event.importance} />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

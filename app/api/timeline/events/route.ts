@@ -26,6 +26,14 @@ export async function GET() {
       orderBy: {
         dateGr: 'asc',
       },
+      include: {
+        comments: {
+          where: { status: 'approved' },
+          select: { id: true, authorName: true, text: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+        },
+        likes: { select: { id: true } },
+      },
     });
 
     if (events && events.length > 0) {
@@ -33,6 +41,9 @@ export async function GET() {
         ...event,
         image: event.image || null,
         tags: Array.isArray(event.tags) ? event.tags : [],
+        // Stable counts — no 0-during-loading flicker, real from DB.
+        likesCount: Array.isArray(event.likes) ? event.likes.length : 0,
+        commentsCount: Array.isArray(event.comments) ? event.comments.length : 0,
       }));
       return NextResponse.json(transformedEvents);
     }

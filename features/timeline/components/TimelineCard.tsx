@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { TimelineEvent } from '@/types/timeline';
-import { Heart, MessageCircle, Send } from 'lucide-react';
+import { Heart, MessageCircle, Send, X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -17,57 +17,55 @@ interface TimelineCardProps {
 }
 
 export function TimelineCard({ event, style, importance }: TimelineCardProps) {
-  const initialLikesCount = Array.isArray(event.likes)
-    ? event.likes.length
-    : typeof event.likes === 'number'
-      ? event.likes
-      : 0;
+  // Stable counts from the server payload (real DB values, no 0-flicker).
+  // We initialise from the prop directly — if the prop is missing we keep -1
+  // (sentinel) so the count is hidden until a real number arrives, never 0.
+  const serverLikes = typeof (event as any).likesCount === 'number' ? (event as any).likesCount : -1;
+  const serverComments = typeof (event as any).commentsCount === 'number' ? (event as any).commentsCount : -1;
 
   const { liked, setLiked } = useTimelineLiked(event.id);
-  const [likesCount, setLikesCount] = useState<number>(initialLikesCount);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [commentError, setCommentError] = useState('');
+  const [likesCount, setLikesCount] = useState<number>(serverLikes);
+  const [commentsCount, setCommentsCount] = useState<number>(serverComments);
 
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<Array<{ authorName: string; text: string; createdAt: string }>>(
-    Array.isArray(event.comments)
-      ? event.comments.filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]')).map((c: any) => ({ authorName: c.authorName || 'کاربر', text: c.text, createdAt: 'لحظاتی پیش' }))
+  const [comments, setComments] = useState<Array<{ id?: string; authorName: string; text: string; createdAt: string }>>(
+    Array.isArray((event as any).comments)
+      ? (event as any).comments
+          .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
+          .map((c: any) => ({
+            id: c.id,
+            authorName: c.authorName || 'عضو تکباکس',
+            text: c.text,
+            createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date(c.createdAt).toISOString(),
+          }))
       : []
   );
   const [newCommentText, setNewCommentText] = useState('');
+  const [commentError, setCommentError] = useState('');
   const router = useRouter();
 
-  // NOTE: /api/timeline/events already fetches comments + likes for every
-  // event in bulk (via Prisma `include`) as part of the single page-load
-  // request, and whether the CURRENT user liked each event comes from the
-  // single bulk /api/timeline/liked-events request via TimelineLikesProvider
-  // (see providers/timeline-likes.provider.tsx). Previously this component
-  // fired its own per-card /api/timeline/like and /api/timeline/comments
-  // GET requests on mount, meaning a page with N timeline cards made 2N
-  // extra redundant DB round trips on top of the bulk fetches that already
-  // had the data.
-
-  // Keep local comments/likes state in sync if the `event` prop itself is
-  // refreshed (e.g. parent re-fetches the timeline).
+  // Keep local state in sync if the parent re-fetches the event payload.
   useEffect(() => {
-    if (Array.isArray(event.comments)) {
-      setComments(
-        event.comments
-          .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
-          .map((c: any) => ({
-            authorName: c.authorName || 'عضو تکباکس',
-            text: c.text,
-            createdAt: 'لحظاتی پیش',
-          }))
-      );
-    }
-  }, [event.comments]);
+    if (typeof (event as any).likesCount === 'number') setLikesCount((event as any).likesCount);
+  }, [(event as any).likesCount]);
 
   useEffect(() => {
-    if (Array.isArray(event.likes) && event.likes.length > 0) {
-      setLikesCount(event.likes.length);
+    if (typeof (event as any).commentsCount === 'number') setCommentsCount((event as any).commentsCount);
+  }, [(event as any).commentsCount]);
+
+  useEffect(() => {
+    if (Array.isArray((event as any).comments)) {
+      const filtered = (event as any).comments
+        .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
+        .map((c: any) => ({
+          id: c.id,
+          authorName: c.authorName || 'عضو تکباکس',
+          text: c.text,
+          createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date(c.createdAt).toISOString(),
+        }));
+      setComments(filtered);
     }
-  }, [event.likes]);
+  }, [(event as any).comments]);
 
   const widthClass =
     importance >= 8
@@ -78,7 +76,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
   const handleLikeToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowLoginPrompt(false);
+    e.preventDefault();
     try {
       const res = await fetch('/api/timeline/like', {
         method: 'POST',
@@ -87,16 +85,14 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       });
 
       if (res.status === 401) {
-        window.dispatchEvent(new CustomEvent("tb_open_auth"));
+        window.dispatchEvent(new CustomEvent('tb_open_auth'));
         return;
       }
 
       if (res.ok) {
         const data = await res.json();
         setLiked(data.liked);
-        if (typeof data.likes === 'number') {
-          setLikesCount(data.likes);
-        }
+        if (typeof data.likes === 'number') setLikesCount(data.likes);
       }
     } catch {}
   };
@@ -115,16 +111,22 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       });
 
       if (res.status === 401) {
-        window.dispatchEvent(new CustomEvent("tb_open_auth"));
+        window.dispatchEvent(new CustomEvent('tb_open_auth'));
         return;
       }
 
       if (res.ok) {
         const created = await res.json();
         setComments((prev) => [
-          { authorName: created.authorName || 'شما', text: created.text, createdAt: 'لحظاتی پیش' },
+          {
+            id: created.id,
+            authorName: created.authorName || 'شما',
+            text: created.text,
+            createdAt: new Date(created.createdAt || Date.now()).toISOString(),
+          },
           ...prev,
         ]);
+        setCommentsCount((n) => n + 1);
         setNewCommentText('');
       } else {
         const err = await res.json();
@@ -135,17 +137,36 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     }
   };
 
+  const formatTime = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      const diff = Date.now() - d.getTime();
+      if (diff < 60_000) return 'لحظاتی پیش';
+      if (diff < 3_600_000) return `${Math.floor(diff / 60_000).toLocaleString('fa-IR')} دقیقه پیش`;
+      if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000).toLocaleString('fa-IR')} ساعت پیش`;
+      return `${Math.floor(diff / 86_400_000).toLocaleString('fa-IR')} روز پیش`;
+    } catch {
+      return '';
+    }
+  };
+
   return (
-    <div style={style} className={`${widthClass} select-none shrink-0 group flex flex-col justify-start relative`}>
-      {/* TIER 1: STRICTLY FIXED HEIGHT CARD BOX */}
-      <div className="relative h-[340px] sm:h-[360px] w-full rounded-lg overflow-hidden shadow-sm border border-border hover:border-primary transition-colors duration-[200ms] flex flex-col justify-end bg-card">
+    <div
+      style={style}
+      className={`${widthClass} shrink-0 flex flex-col justify-start relative select-none`}
+      // Lock down drag/select/copy for the whole card.
+      onDragStart={(e) => e.preventDefault()}
+    >
+      {/* TALLER CARD BOX — no hover effect, image not draggable. */}
+      <div className="relative h-[440px] sm:h-[460px] w-full rounded-lg overflow-hidden shadow-sm border border-border flex flex-col justify-end bg-card">
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {event.image ? (
             <Image
               src={event.image}
               alt={event.title || 'تصویر رویداد'}
               fill
-              className="object-cover"
+              className="object-cover pointer-events-none"
+              draggable={false}
               sizes="(max-width: 768px) 100vw, 320px"
             />
           ) : (
@@ -156,109 +177,102 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
         <div className="relative z-10 p-4.5 flex flex-col justify-end h-full text-foreground">
           <div className="flex-1 flex flex-col justify-end overflow-hidden mb-4">
-            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold text-foreground mb-2 line-clamp-2 leading-7">
+            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-bold text-foreground mb-2 line-clamp-2 leading-6">
               {event.title}
             </h3>
-            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground line-clamp-4 leading-6">
+            {/* Tighter caption spacing (leading-5 was leading-6). */}
+            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground line-clamp-6 leading-4">
               {event.description}
             </p>
           </div>
 
           <div className="border-t-[length:var(--border-size)] border-white/20 pt-3 flex items-center justify-between gap-2 shrink-0">
-            <div className="relative">
-              <button
-                type="button"
-                onClick={handleLikeToggle}
-                className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-destructive transition-colors cursor-pointer font-bold"
-              >
-                <Heart size={16} className={liked ? 'fill-current text-destructive' : ''} />
-                <span>{likesCount.toLocaleString('fa-IR')}</span>
-              </button>
-
-              {showLoginPrompt && (
-                <div className="absolute bottom-full mb-2 right-0 z-50 w-56 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-popover p-2.5 shadow-[var(--shadow-size)] text-center">
-                  <p className="text-xs text-foreground mb-2">برای پسندیدن رویداد ابتدا وارد شوید.</p>
-                  <div className="flex justify-center gap-1.5">
-                    <Button size="xs" onClick={() => router.push('/account')}>ورود / عضویت</Button>
-                    <Button variant="ghost" size="xs" onClick={() => setShowLoginPrompt(false)}>بستن</Button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={handleLikeToggle}
+              className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-destructive transition-colors cursor-pointer font-bold"
+              aria-pressed={liked}
+            >
+              <Heart
+                size={16}
+                className={`transition-colors ${liked ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
+              />
+              {/* Hide count while loading (sentinel -1), never show 0. */}
+              {likesCount >= 0 && <span>{likesCount.toLocaleString('fa-IR')}</span>}
+            </button>
 
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowComments(!showComments);
-              }}
+              onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
               className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
+              aria-expanded={showComments}
             >
               <MessageCircle size={16} />
-              <span>{comments.length.toLocaleString('fa-IR')} نظر</span>
+              {commentsCount >= 0 && <span>{commentsCount.toLocaleString('fa-IR')}</span>}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* TIER 2: EXPANDING COMMENT DRAWER */}
-      {showComments && (
-        <div
-          className="w-full mt-2 rounded-[var(--corner-radius)] border-[length:var(--border-size)] border-[var(--border-color)] bg-card/95 p-3.5 shadow-[var(--shadow-size)] flex flex-col gap-3 max-h-80 overflow-y-auto animate-in fade-in-0 slide-in-from-top-2 duration-300 z-20"
-          onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-        >
-          <form onSubmit={handleAddComment} className="flex flex-col gap-2 shrink-0">
-            <div className="flex gap-1.5 items-center">
-              <Input
-                type="text"
-                value={newCommentText}
-                onChange={(e) => {
-                  setNewCommentText(e.target.value);
-                  setCommentError('');
-                }}
-                placeholder="به نظر شما بعد از این چه اتفاقی می‌افتد؟"
-                className="!h-9 !py-1 !px-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] flex-1 !bg-background !text-foreground !border-border"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="h-9 bg-primary text-primary-foreground hover:opacity-90 shrink-0"
-                title="ارسال نظر"
+        {/* COMMENTS OVERLAY — drops UP from the bottom of the card, covering
+            the image (like Instagram mobile). Sits inside the card box so it
+            never escapes the card bounds. */}
+        {showComments && (
+          <div
+            className="absolute inset-0 z-30 flex flex-col justify-end bg-background/95 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
+            onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
+            onDragStart={(e) => e.preventDefault()}
+          >
+            <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border">
+              <span className="text-sm font-bold text-foreground">نظرها</span>
+              <button
+                type="button"
+                onClick={() => setShowComments(false)}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="بستن"
               >
-                <Send size={14} className="rtl:rotate-180" />
-              </Button>
+                <X size={16} />
+              </button>
             </div>
-            {commentError && (
-              <div className="text-[11px] text-destructive bg-destructive/10 p-1.5 rounded border-[length:var(--border-size)] border-destructive/30 flex justify-between items-center">
-                <span>{commentError}</span>
-                <Button size="xs" variant="link" onClick={() => router.push('/account')} className="text-foreground underline">ورود</Button>
-              </div>
-            )}
-          </form>
 
-          <ScrollArea className="h-44"><ul className="space-y-2 pe-2 text-right">
-            {comments.length === 0 && (
-              <li className="rounded-[var(--corner-radius)] bg-muted/60 p-2.5 text-xs text-muted-foreground border-[length:var(--border-size)] border-border">
-                هنوز نظری برای این رویداد ثبت نشده است.
-              </li>
-            )}
-            {comments.map((comment, idx) => (
-              <li
-                key={idx}
-                className="rounded-[var(--corner-radius)] bg-muted/40 p-2.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-foreground border-[length:var(--border-size)] border-border leading-5"
-              >
-                <div className="flex items-center justify-between text-[11px] text-primary mb-1">
-                  <span className="font-bold">{comment.authorName}</span>
-                  <span className="text-muted-foreground">{comment.createdAt}</span>
-                </div>
-                <p className="text-xs">{comment.text}</p>
-              </li>
-            ))}
-          </ul></ScrollArea>
-        </div>
-      )}
+            <ScrollArea className="flex-1 max-h-[280px]">
+              <ul className="space-y-2 p-3 text-right">
+                {comments.length === 0 && (
+                  <li className="rounded-md bg-muted/60 p-2.5 text-xs text-muted-foreground border border-border text-center">
+                    هنوز نظری ثبت نشده است.
+                  </li>
+                )}
+                {comments.map((comment, idx) => (
+                  <li key={comment.id || idx} className="rounded-md bg-muted/40 p-2.5 text-xs border border-border leading-5">
+                    <div className="flex items-center justify-between text-[11px] mb-1">
+                      <span className="font-bold text-primary">{comment.authorName}</span>
+                      <span className="text-muted-foreground">{formatTime(comment.createdAt)}</span>
+                    </div>
+                    <p className="text-foreground">{comment.text}</p>
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+
+            <form onSubmit={handleAddComment} className="p-3 border-t border-border bg-card">
+              <div className="flex gap-1.5 items-center">
+                <Input
+                  type="text"
+                  value={newCommentText}
+                  onChange={(e) => { setNewCommentText(e.target.value); setCommentError(''); }}
+                  placeholder="نظر شما..."
+                  className="h-9 flex-1 text-sm bg-background"
+                />
+                <Button type="submit" size="sm" className="h-9 shrink-0" title="ارسال">
+                  <Send size={14} className="rtl:rotate-180" />
+                </Button>
+              </div>
+              {commentError && <p className="text-[11px] text-destructive mt-1.5">{commentError}</p>}
+            </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
