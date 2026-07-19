@@ -66,6 +66,7 @@ export async function PATCH(req: NextRequest) {
       moduleColorsEnabled,
       unifiedModuleColor,
       moduleColors,
+      titles: (body.titles && typeof body.titles === "object") ? body.titles : {},
     } as SiteLayoutConfig;
 
     await saveModuleConfig(config, user.id);

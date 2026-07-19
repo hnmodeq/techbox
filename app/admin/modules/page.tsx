@@ -116,7 +116,8 @@ export default function AdminModulesPage() {
       if (!res.ok) throw new Error(data?.error || "save_failed");
       setMessage("تنظیمات ماژول‌ها ذخیره شد ✓");
     } catch (e: any) {
-      setMessage(e?.message || "خطا در ذخیره تنظیمات");
+      const msg = e?.errors ? JSON.stringify(e.errors) : (e?.message || "خطا در ذخیره تنظیمات");
+      setMessage(msg);
     } finally {
       setSaving(false);
     }
