@@ -69,28 +69,21 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
             const isTopic = post.module === "forum";
             return (
               <Link key={`${post.module}:${post.slug}`} href={`/${post.module}/${post.slug}`} className="group flex gap-3 rounded-lg border bg-card p-3 transition hover:bg-muted/40">
-                {isTopic ? (
-                  // Forum topics: no avatar (topics don't have reliable authorAvatar)
-                  <div className="w-12 shrink-0" />
-                ) : (
+                {!isTopic && post.image && (
                   <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                    {post.image ? (
-                      <Image 
-                        src={post.image} 
-                        alt={post.title} 
-                        fill 
-                        className="object-cover" 
-                        sizes="64px" 
-                        quality={75}
-                      />
-                    ) : null}
+                    <Image 
+                      src={post.image} 
+                      alt={post.title} 
+                      fill 
+                      className="object-cover" 
+                      sizes="64px" 
+                      unoptimized 
+                    />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{formatRelativeDate(post.date)}</span>
-                    <span>•</span>
-                    <span>{post.category || post.module}</span>
+                  <div className="text-xs text-muted-foreground">
+                    {formatRelativeDate(post.date)}
                   </div>
                   <div className="mt-0.5 line-clamp-1 font-semibold text-foreground group-hover:underline">{post.title}</div>
                   {isTopic && post.authorName && (
