@@ -80,10 +80,8 @@ export function ModuleConfigProvider({
   );
 
   useEffect(() => {
-    // If we already have server data, skip the fetch to avoid an extra request
-    if (serverConfig) return;
-
-    fetch("/api/modules/enabled")
+    // Always fetch latest config from API so color toggle works immediately after save
+    fetch("/api/modules/enabled", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!data) return;
@@ -99,7 +97,7 @@ export function ModuleConfigProvider({
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));
       });
-  }, [serverConfig]);
+  }, []);
 
   const value = useMemo(() => config, [config]);
   return <ModuleConfigContext.Provider value={value}>{children}</ModuleConfigContext.Provider>;
