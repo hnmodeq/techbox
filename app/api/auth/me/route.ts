@@ -23,7 +23,8 @@ export async function GET(){
     bio: user.bio || "",
     birthday: user.birthday || "",
     modules,
-    avatar: user.avatar ?? ""
+    avatar: user.avatar ?? "",
+    emailVerified: user.emailVerified ? true : false,
   }});
 }
 

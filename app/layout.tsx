@@ -85,7 +85,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <style dangerouslySetInnerHTML={{ __html: criticalStyles }} />
+        <style dangerouslySetInnerHTML={{ __html: criticalStyles }} suppressHydrationWarning />
       </head>
       <body className="font-sans antialiased text-foreground">
         <RuntimeEffects />
