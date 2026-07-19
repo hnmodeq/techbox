@@ -43,13 +43,18 @@ function getCachedSaved(module: string, slug: string): boolean | undefined {
 }
 
 export function SaveButton({ module, slug }: { module: string; slug: string }) {
-  // Read saved from localStorage cache synchronously for instant render
-  const cachedSaved = getCachedSaved(module, slug)
-  const [saved, setSaved] = React.useState(cachedSaved ?? false)
+  const [mounted, setMounted] = React.useState(false)
+  const [saved, setSaved] = React.useState<boolean | null>(null)
   const [busy, setBusy] = React.useState(false)
 
-  // Confirm with server
+  // Confirm with server and hydrate
   React.useEffect(() => {
+    setMounted(true)
+    const cachedSaved = getCachedSaved(module, slug)
+    if (cachedSaved !== undefined && saved === null) {
+      setSaved(cachedSaved)
+    }
+
     fetch(`/api/saved-content?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
@@ -65,8 +70,8 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
     setBusy(true)
 
     // Optimistic: toggle immediately
-    const prevSaved = saved
-    const nextSaved = !saved
+    const prevSaved = saved ?? false
+    const nextSaved = !prevSaved
     setSaved(nextSaved)
     setSavedCache(module, slug, nextSaved)
 
@@ -98,13 +103,15 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
     }
   }
 
+  const displaySaved = mounted ? (saved ?? false) : false;
+
   return (
     <Tooltip>
       <TooltipTrigger render={<Button type="button" variant="ghost" size="sm" onClick={toggle} disabled={busy} />}>
-        <BookmarkIcon className={saved ? "size-4 fill-current" : "size-4"} />
-        {saved ? "ذخیره‌شده" : "ذخیره"}
+        <BookmarkIcon className={displaySaved ? "size-4 fill-current" : "size-4"} />
+        {displaySaved ? "ذخیره‌شده" : "ذخیره"}
       </TooltipTrigger>
-      <TooltipContent>{saved ? "حذف از ذخیره‌ها" : "ذخیره کردن این ویدیو"}</TooltipContent>
+      <TooltipContent>{displaySaved ? "حذف از ذخیره‌ها" : "ذخیره کردن این پست"}</TooltipContent>
     </Tooltip>
   )
 }
