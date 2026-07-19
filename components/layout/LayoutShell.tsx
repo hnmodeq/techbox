@@ -25,9 +25,9 @@ const ChatLauncherFallback = () => (
     type="button"
     aria-hidden
     tabIndex={-1}
-    className="fixed bottom-5 left-5 rounded-full bg-primary text-primary-foreground border border-border size-12 shadow-md flex items-center justify-center"
+    className="fixed bottom-5 left-5 rounded-full size-12 flex items-center justify-center bg-transparent text-foreground hover:bg-muted transition-colors"
   >
-    <span className="size-5 rounded-full bg-primary-foreground/40" />
+    <span className="size-5 rounded-full bg-muted-foreground/40" />
   </button>
 )
 

@@ -7,7 +7,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Headset, X, Send, Sparkles, LifeBuoy } from "lucide-react";
+import { Headset, X, Sparkles, LifeBuoy } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };
 type TabType = "chatbot" | "support";
@@ -176,45 +177,59 @@ export default function Chatbot() {
 
   return (
     <>
-      {!open && (
-        <Button
-          type="button"
-          onClick={() => { setOpen(true); setHasUnread(false); }}
-          style={{ zIndex: zIndex.popover }}
-          className="fixed bottom-5 left-5 rounded-full shadow-md size-12 p-0"
-          aria-label="پشتیبانی تکباکس"
-        >
-          <Headset className="size-5" />
-          {hasUnread && (
-            <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500"></span>
-            </span>
-          )}
-        </Button>
-      )}
+      <AnimatePresence>
+        {!open && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-5 left-5"
+            style={{ zIndex: zIndex.popover }}
+          >
+            <Button
+              type="button"
+              onClick={() => { setOpen(true); setHasUnread(false); }}
+              className="rounded-full shadow-none size-12 p-0 bg-transparent hover:bg-muted text-foreground"
+              aria-label="پشتیبانی تکباکس"
+            >
+              <Headset className="size-5" />
+              {hasUnread && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500"></span>
+                </span>
+              )}
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {open && (
-        <div ref={containerRef} dir="rtl" className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" style={{ zIndex: zIndex.chatbot }}>
-          <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl">
-            <CardHeader className="flex flex-row items-center justify-between gap-2 p-3 border-b">
-              <div className="flex items-center gap-2">
-                <div className="flex size-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <Headset className="size-4" />
-                </div>
-                <CardTitle className="text-sm font-bold">پشتیبانی تکباکس</CardTitle>
+      <AnimatePresence>
+        {open && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            ref={containerRef} 
+            dir="rtl" 
+            className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" 
+            style={{ zIndex: zIndex.chatbot }}
+          >
+            <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl border border-border">
+              <div className="flex flex-row items-center justify-end p-2 bg-muted/30">
+                <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
+                  <X className="size-4" />
+                </Button>
               </div>
-              <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
-                <X className="size-4" />
-              </Button>
-            </CardHeader>
 
-            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)} className="flex-1 flex flex-col min-h-0">
-              <TabsList className="w-full justify-start rounded-none border-b bg-transparent px-2">
-                <TabsTrigger value="chatbot" className="gap-1 text-xs">
-                  <Sparkles className="size-3" />
-                  پشتیبانی هوشمند
-                </TabsTrigger>
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)} className="flex-1 flex flex-col min-h-0">
+                <TabsList className="w-full justify-start rounded-none bg-muted/30 px-2 h-auto pt-0 pb-2">
+                  <TabsTrigger value="chatbot" className="gap-1 text-xs">
+                    <Sparkles className="size-3" />
+                    پشتیبانی هوشمند
+                  </TabsTrigger>
                 <TabsTrigger value="support" className="gap-1 text-xs">
                   <LifeBuoy className="size-3" />
                   پشتیبانی برخط
@@ -241,8 +256,7 @@ export default function Chatbot() {
 
             </Tabs>
 
-            <Separator />
-            <CardFooter className="p-2">
+            <CardFooter className="p-2 bg-card border-t">
               {activeTab === "chatbot" && (
                 <form onSubmit={send} className="flex w-full gap-2">
                   <Input
@@ -252,8 +266,8 @@ export default function Chatbot() {
                     className="flex-1 h-8 text-xs"
                     disabled={loading}
                   />
-                  <Button type="submit" disabled={loading || !input.trim()} size="sm" className="px-3">
-                    {loading ? "…" : <><Send className="size-3.5 me-1" /> ارسال</>}
+                  <Button type="submit" disabled={loading || !input.trim()} size="sm" className="px-3 text-xs">
+                    {loading ? "…" : "ارسال"}
                   </Button>
                 </form>
               )}
@@ -266,16 +280,16 @@ export default function Chatbot() {
                     className="flex-1 h-8 text-xs"
                     disabled={supportLoading}
                   />
-                  <Button type="submit" disabled={supportLoading || !supportInput.trim()} size="sm" className="px-3">
-                    {supportLoading ? "…" : <><Send className="size-3.5 me-1" /> ارسال</>}
+                  <Button type="submit" disabled={supportLoading || !supportInput.trim()} size="sm" className="px-3 text-xs">
+                    {supportLoading ? "…" : "ارسال"}
                   </Button>
                 </form>
               )}
-
             </CardFooter>
           </Card>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
