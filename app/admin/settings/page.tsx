@@ -10,6 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 type Settings = {
   "comments.mode": string;
@@ -75,10 +76,10 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "settings_save_failed");
-      setMessage("تنظیمات ذخیره شد.");
+      toast.success("تنظیمات با موفقیت ذخیره شد.");
       await load();
     } catch (error: any) {
-      setMessage(error?.message || "خطا در ذخیره تنظیمات");
+      toast.error(error?.message || "خطا در ذخیره تنظیمات");
     } finally {
       setSaving(false);
     }
@@ -238,8 +239,6 @@ export default function AdminSettingsPage() {
             </div>
           </CardContent>
         </Card>
-
-        {message && <Card className="p-3 text-sm text-muted-foreground">{message}</Card>}
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={load} disabled={loading || saving}>انصراف</Button>
