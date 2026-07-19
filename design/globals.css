@@ -49,26 +49,7 @@
   --corner-radius: var(--radius);
   --border-size: 1px;
 
-  --blog: light-dark(oklch(0.7 0.17 52), #fb923c);
-  --news: light-dark(oklch(0.64 0.22 25), #fb7185);
-  --media: light-dark(oklch(0.82 0.15 85), #fcd34d);
-  --shop: light-dark(oklch(0.8 0.19 125), #a3e635);
-  --tools: light-dark(oklch(0.82 0.12 200), #67e8f9);
-  --raid: light-dark(oklch(0.66 0.18 175), #2dd4bf);
-  --subnet: light-dark(oklch(0.68 0.19 230), #60a5fa);
-  --nas: light-dark(oklch(0.7 0.18 285), #c084fc);
-  --nvr: light-dark(oklch(0.75 0.18 145), #34d399);
-  --timeline: light-dark(oklch(0.72 0.16 210), #06b6d4);
-  --forum: light-dark(oklch(0.78 0.16 5), #fda4af);
-  --review: light-dark(oklch(0.7 0.17 240), #38bdf8);
-  --download: light-dark(oklch(0.72 0.2 350), #f472b6);
-  --home: var(--primary);
-  --account: light-dark(oklch(0.8 0.12 15), #fca5a5);
-  --admin: light-dark(oklch(0.66 0.22 300), #e879f9);
-  --about: light-dark(oklch(0.72 0.16 230), #7dd3fc);
-  --contact: light-dark(oklch(0.72 0.18 150), #4ade80);
-  --workwithus: light-dark(oklch(0.7 0.17 52), #fb923c);
-  --consultation: light-dark(oklch(0.66 0.22 300), #e879f9);
+  /* Module-specific colors removed — all modules now use standard shadcn tokens (var(--primary) etc.) */
 
   --success: light-dark(oklch(0.72 0.18 150), #4ade80);
   --danger: light-dark(oklch(0.64 0.22 25), #fb7185);

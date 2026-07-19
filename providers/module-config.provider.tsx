@@ -80,7 +80,6 @@ export function ModuleConfigProvider({
   );
 
   useEffect(() => {
-    // Always fetch latest config from API so color toggle works immediately after save
     fetch("/api/modules/enabled", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -88,11 +87,17 @@ export function ModuleConfigProvider({
         const enabledSet = new Set<ModuleSlug>(data.enabled || []);
         const homeConfig = data.homeConfig || {};
         const heroVisible = data.heroVisible !== false;
-        const moduleColorsEnabled = data.moduleColorsEnabled !== false;
-        const unifiedModuleColor = data.unifiedModuleColor || "var(--primary)";
-        const moduleColors = data.moduleColors || {};
         const titles = data.titles || {};
-        setConfig({ enabled: enabledSet, homeConfig, heroVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, titles, loading: false });
+        setConfig({
+          enabled: enabledSet,
+          homeConfig,
+          heroVisible,
+          moduleColorsEnabled: false,
+          unifiedModuleColor: "var(--primary)",
+          moduleColors: {},
+          titles,
+          loading: false,
+        });
       })
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));
