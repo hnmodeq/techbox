@@ -107,27 +107,30 @@ export default function AdminModulesPage() {
     setSaving(true);
     setMessage("");
     try {
-      // Only send the fields the PATCH endpoint expects
+      // Build complete payload with all required module fields
+      const moduleData: Record<string, any> = {};
+      for (const slug of ALL_MODULES) {
+        const m = config[slug];
+        if (m) {
+          moduleData[slug] = {
+            enabled: m.enabled,
+            showOnHome: m.showOnHome,
+            homeOrder: m.homeOrder,
+            homeTitle: m.homeTitle ?? "",
+            homeMoreLabel: m.homeMoreLabel ?? "",
+            showHomeTitle: m.showHomeTitle,
+            showHomeMoreLabel: m.showHomeMoreLabel,
+          };
+        }
+      }
+
       const payload = {
         heroVisible: config.heroVisible,
         moduleColorsEnabled: config.moduleColorsEnabled,
         unifiedModuleColor: config.unifiedModuleColor,
         moduleColors: config.moduleColors,
         titles: config.titles,
-        ...Object.fromEntries(
-          ALL_MODULES.map((slug) => [
-            slug,
-            config[slug] && {
-              enabled: config[slug].enabled,
-              showOnHome: config[slug].showOnHome,
-              homeOrder: config[slug].homeOrder,
-              homeTitle: config[slug].homeTitle,
-              homeMoreLabel: config[slug].homeMoreLabel,
-              showHomeTitle: config[slug].showHomeTitle,
-              showHomeMoreLabel: config[slug].showHomeMoreLabel,
-            },
-          ]).filter(([, v]) => v)
-        ),
+        ...moduleData,
       };
 
       const res = await fetch("/api/admin/modules", {
