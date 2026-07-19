@@ -195,7 +195,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             >
               <Heart
                 size={16}
-                className={`transition-colors ${liked ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
+                className={`transition-all duration-200 ${liked ? 'fill-red-500 text-red-500 scale-110' : 'text-muted-foreground scale-100'}`}
               />
               {/* Hide count while loading (sentinel -1), never show 0. */}
               {likesCount >= 0 && <span>{likesCount.toLocaleString('fa-IR')}</span>}
@@ -218,7 +218,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             never escapes the card bounds. */}
         {showComments && (
           <div
-            className="absolute inset-0 z-30 flex flex-col justify-end bg-background/95 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
+            className="absolute inset-0 z-30 flex flex-col justify-end bg-background/85 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             onWheel={(e) => e.stopPropagation()}
@@ -239,12 +239,12 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
             <ScrollArea className="flex-1 max-h-[280px]">
               <ul className="space-y-2 p-3 text-right">
                 {comments.length === 0 && (
-                  <li className="rounded-md bg-muted/60 p-2.5 text-xs text-muted-foreground border border-border text-center">
+                  <li className="rounded-md bg-muted/20 p-2.5 text-xs text-muted-foreground border border-border text-center">
                     هنوز نظری ثبت نشده است.
                   </li>
                 )}
                 {comments.map((comment, idx) => (
-                  <li key={comment.id || idx} className="rounded-md bg-muted/40 p-2.5 text-xs border border-border leading-5">
+                  <li key={comment.id || idx} className="rounded-md bg-muted/20 p-2.5 text-xs border border-border leading-5">
                     <div className="flex items-center justify-between text-[11px] mb-1">
                       <span className="font-bold text-primary">{comment.authorName}</span>
                       <span className="text-muted-foreground">{formatTime(comment.createdAt)}</span>

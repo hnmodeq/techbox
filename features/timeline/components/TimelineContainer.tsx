@@ -4,6 +4,21 @@ import React from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
 
+
+function relativeDate(dateGr: Date | string): string {
+  const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
+  if (isNaN(d.getTime())) return '';
+  const diff = Date.now() - d.getTime();
+  if (diff < 0) return 'در آینده';
+  const days = Math.floor(diff / 86_400_000);
+  if (days === 0) return 'امروز';
+  if (days < 30) return `${days.toLocaleString('fa-IR')} روز پیش`;
+  const months = Math.floor(days / 30.4375);
+  if (months < 12) return `${months.toLocaleString('fa-IR')} ماه پیش`;
+  const years = Math.floor(days / 365.2425);
+  return `${years.toLocaleString('fa-IR')} سال پیش`;
+}
+
 interface TimelineContainerProps {
   events: TimelineEvent[];
   heightClassName?: string;
@@ -45,17 +60,15 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         />
 
         {events.map((event) => {
-          const dateFa = (event as any).dateFa as string | undefined;
-          const yearFa = (event as any).yearFa as number | undefined;
           return (
             <div
               key={event.id}
               className="relative flex shrink-0 flex-col items-center"
               style={{ width: 320 }}
             >
-              {/* Date label ABOVE the line */}
+              {/* Date label ABOVE the line — relative format (days/months/years ago) */}
               <div className="mb-2 text-center text-xs font-bold text-muted-foreground h-6 flex items-center justify-center">
-                {dateFa || (yearFa ? yearFa.toLocaleString('fa-IR') : '')}
+                {relativeDate(event.dateGr)}
               </div>
 
               {/* Dot ON the line (sits at the same vertical as the continuous
