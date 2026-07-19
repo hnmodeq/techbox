@@ -11,27 +11,28 @@ export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boole
   const [showComments, setShowComments] = useState(false);
 
   return (
-    <div className="flex flex-col w-full relative rounded-lg overflow-hidden h-[300px]">
-      {/* Full-bleed background image */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src={news.image || "/assets/blog-1.jpg"}
-          alt={news.title}
-          fill
-          className="object-cover"
-          sizes="(min-width: 768px) 300px, 100vw"
-          quality={100}
-        />
-        {/* Dark gradients for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 pointer-events-none" />
-      </div>
+    <div className="flex flex-col w-full relative rounded-lg overflow-hidden border border-border/20 shadow-sm bg-[var(--card-background)]">
+      {/* Image & Content Container (Fixed Height) */}
+      <div className="relative h-[300px] w-full flex flex-col justify-between p-4 shrink-0">
+        {/* Full-bleed background image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={news.image || "/assets/blog-1.jpg"}
+            alt={news.title}
+            fill
+            className="object-cover"
+            sizes="(min-width: 768px) 300px, 100vw"
+            quality={100}
+          />
+          {/* Dark gradients for legibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 pointer-events-none" />
+        </div>
 
-      {isUnread && (
-        <span className="absolute top-3 right-3 z-10 size-2.5 rounded-full bg-red-500 ring-2 ring-black" />
-      )}
+        {isUnread && (
+          <span className="absolute top-3 right-3 z-10 size-2.5 rounded-full bg-red-500 ring-2 ring-black" />
+        )}
 
-      <div className="relative z-10 flex flex-col justify-between p-4 h-full">
-        <div className="flex-1 min-w-0 text-start pt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="relative z-10 flex-1 min-w-0 text-start pt-2 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           <div className="text-sm font-bold leading-6 text-white drop-shadow-sm">
             {news.title}
           </div>
@@ -57,7 +58,7 @@ export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boole
         </div>
       
         {/* Actions */}
-        <div className="flex items-center gap-3 pt-3 mt-auto shrink-0 border-t border-white/20">
+        <div className="relative z-10 flex items-center gap-3 pt-3 mt-auto shrink-0 border-t border-white/20">
           <LikeButton contentType="news" slug={news.slug} initial={news.likes || 0} hideText lightMode />
           <TooltipProvider>
             <Tooltip>
@@ -77,19 +78,10 @@ export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boole
         </div>
       </div>
 
-      {/* Waterfall Comments Overlay (Absolutely positioned over the image so it doesn't stretch the card) */}
+      {/* Waterfall Comments Dropdown */}
       {showComments && (
-        <div className="absolute inset-0 z-30 bg-background/95 backdrop-blur flex flex-col animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border shrink-0">
-            <span className="text-xs font-bold text-foreground">دیدگاه‌های کاربران</span>
-            <button
-              onClick={() => setShowComments(false)}
-              className="text-muted-foreground hover:text-foreground text-[10px] bg-muted px-2 py-1 rounded-md"
-            >
-              بستن
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-3 pb-3 overscroll-contain">
+        <div className="w-full bg-[var(--card-background)] border-t border-border animate-in slide-in-from-top-2 duration-200">
+          <div className="max-h-[300px] overflow-y-auto px-3 pb-3 overscroll-contain">
             <CommentSection module="news" slug={news.slug} compact />
           </div>
         </div>
