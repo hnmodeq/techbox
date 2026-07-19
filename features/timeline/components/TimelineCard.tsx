@@ -83,13 +83,13 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     if (likeBusy) return;
     setLikeBusy(true);
 
-    // Optimistic update
     const prevLiked = liked;
+    const nextLiked = !liked;
     const prevCount = likesCount;
-    setLiked(!prevLiked);
-    if (likesCount >= 0) {
-      setLikesCount(prevLiked ? Math.max(0, likesCount - 1) : likesCount + 1);
-    }
+
+    // Optimistic update
+    setLiked(nextLiked);
+    setLikesCount(c => nextLiked ? c + 1 : Math.max(0, c - 1));
 
     try {
       const res = await fetch('/api/timeline/like', {
@@ -221,7 +221,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                       type="button"
                       onClick={handleLikeToggle}
                       disabled={likeBusy}
-                      className={`flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 ${liked ? 'text-red-500' : 'text-muted-foreground'}`}
+                      className={`flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 ${liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
                       aria-pressed={liked}
                     />
                   }
@@ -229,7 +229,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   <Heart
                     size={16}
                     fill={liked ? "currentColor" : "none"}
-                    className={`transition-transform duration-200 ${liked ? 'scale-110' : 'scale-100'}`}
+                    strokeWidth={2}
+                    className={`transition-transform duration-200 ${liked ? 'scale-110 text-red-500' : 'scale-100'}`}
                   />
                   {likesCount >= 0 && <span style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
                 </TooltipTrigger>
