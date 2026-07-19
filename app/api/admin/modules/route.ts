@@ -24,14 +24,14 @@ export async function GET() {
 }
 
 const moduleEntrySchema = z.object({
-  enabled: z.boolean().optional().default(true),
-  showOnHome: z.boolean().optional().default(true),
-  homeOrder: z.number().int().min(0).max(100).optional().default(99),
-  homeTitle: z.string().max(200).optional().default(""),
-  homeMoreLabel: z.string().max(200).optional().default(""),
-  showHomeTitle: z.boolean().optional().default(true),
-  showHomeMoreLabel: z.boolean().optional().default(true),
-});
+  enabled: z.boolean().optional(),
+  showOnHome: z.boolean().optional(),
+  homeOrder: z.number().int().min(0).max(100).optional(),
+  homeTitle: z.string().max(200).optional(),
+  homeMoreLabel: z.string().max(200).optional(),
+  showHomeTitle: z.boolean().optional(),
+  showHomeMoreLabel: z.boolean().optional(),
+}).partial();
 
 const TOP_LEVEL_KEYS = new Set([
   "heroVisible",

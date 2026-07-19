@@ -107,21 +107,19 @@ export default function AdminModulesPage() {
     setSaving(true);
     setMessage("");
     try {
-      // Build complete payload with all required module fields
+      // Build complete payload — every module must have ALL 7 required fields
       const moduleData: Record<string, any> = {};
       for (const slug of ALL_MODULES) {
-        const m = config[slug];
-        if (m) {
-          moduleData[slug] = {
-            enabled: m.enabled,
-            showOnHome: m.showOnHome,
-            homeOrder: m.homeOrder,
-            homeTitle: m.homeTitle ?? "",
-            homeMoreLabel: m.homeMoreLabel ?? "",
-            showHomeTitle: m.showHomeTitle,
-            showHomeMoreLabel: m.showHomeMoreLabel,
-          };
-        }
+        const m = config[slug] || {};
+        moduleData[slug] = {
+          enabled: m.enabled ?? true,
+          showOnHome: m.showOnHome ?? true,
+          homeOrder: m.homeOrder ?? 99,
+          homeTitle: m.homeTitle ?? "",
+          homeMoreLabel: m.homeMoreLabel ?? "",
+          showHomeTitle: m.showHomeTitle ?? true,
+          showHomeMoreLabel: m.showHomeMoreLabel ?? true,
+        };
       }
 
       const payload = {
