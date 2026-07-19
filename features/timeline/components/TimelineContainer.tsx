@@ -23,7 +23,7 @@ interface TimelineContainerProps {
   /** Called once when events load, with the pan.x that centers the NEWEST
    *  event. The parent wires this to the pan setter so the timeline opens at
    *  the most recent event instead of the oldest. */
-  onInitialPan?: (x: number) => void;
+  onSetPan?: (x: number) => void;
   /** Tailwind height class. Defaults to a compact height that fits the cards. */
   heightClassName?: string;
 }
@@ -103,10 +103,10 @@ function getRelativeTimeAgo(dateGr: Date | string): string {
 
 // Layout constants — the timeline "machine" fits in a compact height.
 // Line sits near the top so dates fit above; cards hang below. No empty space.
-const LINE_TOP = 52;            // px from container top to the line
-const CARD_OFFSET = 28;         // px below the line where cards start
+const LINE_TOP = 32;            // px from container top to the line
+const CARD_OFFSET = 20;         // px below the line where cards start
 
-export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, onPanEnd, onWheel, onInitialPan, heightClassName }: TimelineContainerProps) {
+export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, onPanEnd, onWheel, onSetPan, heightClassName }: TimelineContainerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const didInitialScrollRef = useRef(false);
 
@@ -143,12 +143,25 @@ export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, on
   // Scroll to the NEWEST event when the timeline first opens (events load).
   // Newest = the last event (largest x). Center it in the viewport.
   useEffect(() => {
-    if (didInitialScrollRef.current || events.length === 0 || xPositions.length === 0 || !onInitialPan) return;
+    if (didInitialScrollRef.current || events.length === 0 || xPositions.length === 0 || !onSetPan) return;
     const newestX = xPositions[xPositions.length - 1];
     const target = viewportWidth / 2 - newestX;
     didInitialScrollRef.current = true;
-    onInitialPan(target);
-  }, [events.length, xPositions, viewportWidth, onInitialPan]);
+    onSetPan(target);
+  }, [events.length, xPositions, viewportWidth, onSetPan]);
+
+  // Overscroll guard: clamp the UNDERLYING pan.x whenever it drifts past the
+  // bounds. Without this, dragging/scrolling past the end keeps accumulating
+  // pan.x (clampedPanX only clamps the rendered value), so the user has to
+  // scroll all the way back before movement becomes visible again. Snap back.
+  const maxPan = 120;
+  const minPan = -(totalWidth - viewportWidth + 160);
+  useEffect(() => {
+    if (!onSetPan) return;
+    if (pan.x > maxPan) onSetPan(maxPan);
+    else if (pan.x < minPan) onSetPan(minPan);
+  }, [pan.x, maxPan, minPan, onSetPan]);
+
 
   useEffect(() => {
     const el = containerRef.current;
@@ -165,7 +178,7 @@ export function TimelineContainer({ events, zoom, pan, onPanStart, onPanMove, on
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden select-none bg-background text-foreground ${heightClassName ?? 'h-[400px]'}`}
+      className={`relative w-full overflow-hidden select-none bg-background text-foreground ${heightClassName ?? 'h-[460px]'}`}
       style={{ touchAction: 'pan-x' }}
     >
       {/* The single panning track. Uses translate3d for GPU-accelerated smooth

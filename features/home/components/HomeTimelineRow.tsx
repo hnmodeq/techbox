@@ -87,8 +87,8 @@ function ActiveTimelineContent({
       onResetView={handleResetView}
       onZoomChange={setZoom}
       onWheel={undefined}
-      onInitialPan={(x) => setPan({ x, y: 0 })}
-      heightClassName="h-[420px]"
+      onSetPan={(x) => setPan({ x, y: 0 })}
+      heightClassName="h-[460px]"
     />
   );
 }
@@ -132,14 +132,6 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
           </Link>
           )}
         </div>
-
-        {active && (
-          <div className="text-center">
-            <Badge variant="outline" className="bg-card px-4 py-1.5 text-xs font-bold text-primary shadow-sm">
-              برای مشاهده رویدادهای تکنولوژی به چپ و راست حرکت کنید.
-            </Badge>
-          </div>
-        )}
 
         <div className="w-full overflow-hidden rounded-xl">
           {!active ? (

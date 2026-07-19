@@ -47,7 +47,7 @@ export default function TimelinePage() {
         onZoomOut={zoomOut}
         onResetView={handleResetView}
         onWheel={handleWheel}
-        onInitialPan={(x) => setPan({ x, y: 0 })}
+        onSetPan={(x) => setPan({ x, y: 0 })}
       />
     </TimelineLikesProvider>
   );
