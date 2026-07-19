@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { TriangleAlert } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -158,19 +159,21 @@ export default function AccountPage() {
     }
   };
 
-  const resendVerify = async () => {
-    if (!verifyEmail) return;
+  const resendVerify = async (emailOverride?: string | React.MouseEvent) => {
+    const override = typeof emailOverride === "string" ? emailOverride : undefined;
+    const targetEmail = override || verifyEmail;
+    if (!targetEmail) return;
     setResendBusy(true);
     try {
       const res = await fetch("/api/auth/send-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: verifyEmail }),
+        body: JSON.stringify({ email: targetEmail }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        toast.success(data.alreadyVerified ? "این ایمیل قبلاً تأیید شده است." : "لینک تأیید دوباره ارسال شد.");
-        if (data.alreadyVerified) setVerifyEmail(null);
+        toast.success(data.alreadyVerified ? "این ایمیل قبلاً تأیید شده است." : "لینک تأیید ارسال شد. لطفا صندوق پستی خود را بررسی کنید.");
+        if (data.alreadyVerified && !override) setVerifyEmail(null);
       } else {
         toast.error(data.message || "خطا در ارسال لینک تأیید");
       }
@@ -417,7 +420,30 @@ export default function AccountPage() {
             <div className="font-mono text-xs text-muted-foreground mt-1" dir="ltr">
               @{user.username}
             </div>
-            {user.job && <div className="text-sm text-muted-foreground mt-2">{user.job}</div>}
+            <div className="mt-3">
+              {user.emailVerified ? (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-600 text-xs font-bold">
+                  <Icon name="check" size={14} className="shrink-0" /> حساب کاربری تایید شده
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 text-[11px] font-bold">
+                    <TriangleAlert size={14} className="shrink-0" /> ایمیل حساب شما تایید نشده است
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    size="xs" 
+                    className="text-xs h-auto py-0 text-blue-500" 
+                    onClick={() => resendVerify(user.email)}
+                    disabled={resendBusy}
+                  >
+                    {resendBusy ? "در حال ارسال..." : "ارسال لینک تایید"}
+                  </Button>
+                </div>
+              )}
+            </div>
+            {user.job && <div className="text-sm text-muted-foreground mt-4">{user.job}</div>}
             {user.bio && <div className="text-xs text-muted-foreground mt-2 px-2 line-clamp-3">{user.bio}</div>}
           </div>
           <div className="pt-2 border-t mt-4 border-border/50">
