@@ -45,8 +45,13 @@ export default function Chatbot() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        // Exclude clicks on the launcher button itself if needed, but since it's unmounted when open, it's fine.
+      const target = event.target as Node;
+      if (containerRef.current && !containerRef.current.contains(target)) {
+        // Only close if it's not the launcher button (which is unmounted when open anyway, but just in case)
+        const button = (target as Element).closest('button');
+        if (button && button.getAttribute('aria-label') === 'پشتیبانی تکباکس') {
+          return;
+        }
         setOpen(false);
       }
     };
