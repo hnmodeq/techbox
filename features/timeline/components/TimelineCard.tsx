@@ -221,7 +221,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                       type="button"
                       onClick={handleLikeToggle}
                       disabled={likeBusy}
-                      className="group flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 text-muted-foreground"
+                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold transition-colors cursor-pointer disabled:opacity-60 text-muted-foreground"
                       aria-pressed={liked}
                     />
                   }
@@ -230,7 +230,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     size={16}
                     fill={liked ? "currentColor" : "none"}
                     strokeWidth={2}
-                    className={`transition-colors duration-200 ${liked ? 'scale-110 text-red-500' : 'scale-100 text-muted-foreground group-hover:text-red-500'}`}
+                    className={`transition-colors duration-200 ${liked ? 'scale-110 text-red-500' : 'scale-100 text-muted-foreground hover:text-red-500'}`}
                   />
                   {likesCount >= 0 && <span className="text-muted-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
                 </TooltipTrigger>
