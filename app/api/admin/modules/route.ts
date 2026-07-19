@@ -27,8 +27,8 @@ const moduleEntrySchema = z.object({
   enabled: z.boolean(),
   showOnHome: z.boolean(),
   homeOrder: z.number().int().min(0).max(100),
-  homeTitle: z.string().max(200),
-  homeMoreLabel: z.string().max(200),
+  homeTitle: z.string().max(200).optional().default(""),
+  homeMoreLabel: z.string().max(200).optional().default(""),
   showHomeTitle: z.boolean(),
   showHomeMoreLabel: z.boolean(),
 });
