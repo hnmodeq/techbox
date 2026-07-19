@@ -21,7 +21,8 @@ export async function GET() {
     }).catch(() => []),
     prisma.savedContent.findMany({
       where: { userId: user.id },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
+      select: { module: true, slug: true, createdAt: true }
     }).catch(() => []),
   ])
 
@@ -51,9 +52,26 @@ export async function GET() {
     }).catch(() => []);
     
     // Maintain chronological sort order of when they were saved
-    savedPosts = savedRecords
-      .map(record => rawSaved.find(p => p.module === record.module && p.slug === record.slug))
-      .filter(Boolean);
+    savedPosts = savedRecords.map(record => {
+      const found = rawSaved.find(p => p.module === record.module && p.slug === record.slug);
+      if (found) return found;
+      
+      // Fallback for forum topics or items not found in Post table
+      return {
+        module: record.module,
+        slug: record.slug,
+        title: record.module === "forum" ? `موضوع انجمن #${record.slug}` : record.slug,
+        excerpt: "",
+        image: null,
+        date: record.createdAt,
+        category: record.module,
+        authorName: null,
+        authorAvatar: null,
+        views: 0,
+        likes: 0,
+        comments: 0,
+      };
+    });
   }
 
   return NextResponse.json({
