@@ -78,14 +78,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Block login until the email has been verified. Return the email so the
-    // client can offer to resend the verification link.
+    // Bypass email verification requirement.
+    // To re-enable, simply uncomment this block and set emailVerified to null
+    // in the register route.
+    /*
     if (!user.emailVerified) {
       return NextResponse.json(
         { error: "email_not_verified", message: "ایمیل این حساب تأیید نشده است.", email: user.email },
         { status: 403 }
       );
     }
+    */
 
     const token = await createSession(user.id);
     await setSessionCookie(token);

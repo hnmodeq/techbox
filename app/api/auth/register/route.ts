@@ -74,9 +74,9 @@ export async function POST(req: NextRequest) {
     const modules = isFirstUser ? ["blog", "news", "media", "review", "download", "shop", "forum", "tools"] : [];
 
     // The bootstrap (first) account is auto-verified and logged in immediately,
-    // so a fresh deployment can never lock itself out if email delivery fails.
-    // Every other account must verify its email before it can log in.
-    const emailVerified = isFirstUser ? new Date() : null;
+    // Bypass email verification on registration: auto-verify everyone for now.
+    // To re-enable, change this to: const emailVerified = isFirstUser ? new Date() : null;
+    const emailVerified = new Date();
 
     const user = await prisma.user.create({
       data: {
@@ -118,19 +118,24 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     }
 
-    // --- Normal path: send a verification email, do NOT log in yet ---
-    const { rawToken } = await createEmailVerification(user.id);
-    const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    const verifyLink = `${base}/auth/verify-email?token=${rawToken}&email=${encodeURIComponent(user.email)}`;
-
-    const { subject, html } = emailTemplates.emailVerification(verifyLink);
-    await sendEmail({ to: user.email, subject, html });
+    // --- Normal path: Auto-login bypassing email verification ---
+    const token = await createSession(user.id);
+    await setSessionCookie(token);
 
     return NextResponse.json({
       ok: true,
-      needsVerification: true,
-      email: user.email,
-      message: "حساب شما ساخته شد. برای تکمیل ثبت‌نام، لینک تأیید را از ایمیل خود بررسی کنید.",
+      needsVerification: false,
+      user: {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        roleFa: user.roleFa || "کاربر عضو",
+        modules: user.modules || [],
+        avatar: user.avatar
+      },
+      message: "حساب شما با موفقیت ساخته شد و وارد شدید.",
     }, { status: 201 });
   } catch (e: any) {
     if (e instanceof z.ZodError) {
