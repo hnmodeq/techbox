@@ -177,33 +177,33 @@ export default function Chatbot() {
 
   return (
     <>
-      <AnimatePresence>
-        {!open && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-5 left-5"
-            style={{ zIndex: zIndex.popover }}
-          >
-            <Button
-              type="button"
-              onClick={() => { setOpen(true); setHasUnread(false); }}
-              className="rounded-full shadow-none size-12 p-0 bg-transparent hover:bg-muted text-foreground"
-              aria-label="پشتیبانی تکباکس"
-            >
-              <Headset className="size-5" />
-              {hasUnread && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500"></span>
-                </span>
-              )}
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Floating Launcher Button (Always present to act as toggle) */}
+      <div className="fixed bottom-5 left-5" style={{ zIndex: zIndex.popover + 10 }}>
+        <Button
+          type="button"
+          onClick={() => { setOpen(!open); setHasUnread(false); }}
+          className="rounded-full shadow-none size-12 p-0 bg-transparent hover:bg-muted text-foreground transition-all duration-300"
+          aria-label={open ? "بستن چت" : "پشتیبانی تکباکس"}
+        >
+          <AnimatePresence mode="wait">
+            {open ? (
+              <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                <X className="size-5" />
+              </motion.div>
+            ) : (
+              <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                <Headset className="size-5" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {!open && hasUnread && (
+            <span className="absolute -top-1 -right-1 flex h-4 w-4">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500"></span>
+            </span>
+          )}
+        </Button>
+      </div>
 
       <AnimatePresence>
         {open && (
@@ -214,18 +214,12 @@ export default function Chatbot() {
             transition={{ duration: 0.2, ease: "easeOut" }}
             ref={containerRef} 
             dir="rtl" 
-            className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" 
+            className="fixed bottom-[80px] left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" 
             style={{ zIndex: zIndex.chatbot }}
           >
-            <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl border border-border">
-              <div className="flex flex-row items-center justify-end p-2 bg-muted/30">
-                <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
-                  <X className="size-4" />
-                </Button>
-              </div>
-
+            <Card className="flex h-[520px] max-h-[calc(100vh-100px)] flex-col overflow-hidden p-0 shadow-xl border border-border">
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)} className="flex-1 flex flex-col min-h-0">
-                <TabsList className="w-full justify-start rounded-none bg-muted/30 px-2 h-auto pt-0 pb-2">
+                <TabsList className="w-full justify-start rounded-none bg-transparent px-2 h-auto pt-3 pb-3 border-b">
                   <TabsTrigger value="chatbot" className="gap-1 text-xs">
                     <Sparkles className="size-3" />
                     پشتیبانی هوشمند
