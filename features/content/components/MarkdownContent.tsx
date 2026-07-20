@@ -16,7 +16,7 @@ export default function MarkdownContent({ content }: { content: string }) {
   if (!content) return null;
   return (
     <div
-      className="prose prose-invert max-w-none text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color"
+      className="prose prose-invert max-w-none text-sm font-normal leading-7 paragraph-color"
       dir="rtl"
     >
       <ReactMarkdown

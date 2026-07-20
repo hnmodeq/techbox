@@ -10,7 +10,6 @@ import { LikeButton } from "@/components/ui/like-button";
 import { SaveButton } from "@/components/ui/save-button";
 import { ShareButton } from "@/components/ui/share-button";
 import { AuthorLink } from "@/components/ui/author-link";
-import { VerifiedBadge } from "@/components/ui/verified-badge";
 import CommentSection from "@/features/comment/components/CommentSection";
 import MarkdownContent from "@/features/content/components/MarkdownContent";
 import { formatRelativeDate } from "@/lib/date-format";
@@ -27,18 +26,16 @@ interface ArticleModalProps {
 export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") onPrev(); // RTL: right = previous
-      if (e.key === "ArrowLeft") onNext();  // RTL: left  = next
+      if (e.key === "ArrowRight") onPrev();
+      if (e.key === "ArrowLeft") onNext();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, onPrev, onNext]);
 
-  // Reset scroll on article change
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [item.slug]);
@@ -52,13 +49,11 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
       style={{ zIndex: zIndex.modal }}
       dir="rtl"
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-      {/* Nav + modal */}
       <div className="relative z-10 animate-in fade-in duration-200 flex items-center gap-2 w-full max-w-4xl">
 
-        {/* Prev (right in RTL) */}
+        {/* Prev — RIGHT side in RTL → << */}
         <button
           type="button"
           onClick={onPrev}
@@ -66,7 +61,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
           style={{ fontSize: 30, fontWeight: 900, lineHeight: 1, padding: "0 8px" }}
           aria-label="مقاله بعدی"
         >
-          {">>"}
+          {"<<"}
         </button>
 
         {/* Modal */}
@@ -74,9 +69,9 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
           className="flex-1 flex flex-col max-h-[90vh] overflow-hidden rounded-xl bg-[var(--modal-background)] border border-border shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Article hero image */}
-          {item.image && (
-            <div className="relative h-52 sm:h-64 shrink-0 overflow-hidden bg-muted">
+          {/* Hero image — title lives here */}
+          <div className="relative h-52 sm:h-64 shrink-0 overflow-hidden bg-muted">
+            {item.image ? (
               <Image
                 src={item.image}
                 alt={item.title}
@@ -85,43 +80,49 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                 sizes="900px"
                 {...blurProps(item.image)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            ) : (
+              <div className="absolute inset-0 bg-muted" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
 
-              {/* Close button over image */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="absolute top-3 left-3 text-white/80 hover:text-white hover:bg-white/10"
-              >
-                <Icon name="close" size={20} />
-              </Button>
+            {/* Close button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="absolute top-3 left-3 text-white/80 hover:text-white hover:bg-white/10"
+            >
+              <Icon name="close" size={20} />
+            </Button>
 
-              {/* Date + reading time */}
-              <div className="absolute bottom-3 right-3 flex items-center gap-3 text-white/80 text-xs">
-                <span>{formatRelativeDate(item.date)}</span>
-                {readingTime && <><span>•</span><span>{readingTime}</span></>}
-              </div>
+            {/* Date + reading time — top right */}
+            <div className="absolute top-3 right-3 flex items-center gap-2 text-white/70 text-xs">
+              <span>{formatRelativeDate(item.date)}</span>
+              {readingTime && <><span>•</span><span>{readingTime}</span></>}
             </div>
-          )}
+
+            {/* Title + "باز کردن" link — bottom of image */}
+            <div className="absolute bottom-0 inset-x-0 px-5 py-4 flex items-end justify-between gap-4">
+              <h2 className="text-lg sm:text-xl font-black text-white leading-6 flex-1">
+                {item.title}
+              </h2>
+              <Link
+                href={`/blog/${item.slug}`}
+                onClick={onClose}
+                className="shrink-0 text-xs text-white/60 hover:text-white transition-colors underline underline-offset-4 whitespace-nowrap"
+              >
+                باز کردن در صفحه کامل ↗
+              </Link>
+            </div>
+          </div>
 
           {/* Scrollable body */}
           <div
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-5"
+            className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4"
             style={{ scrollbarWidth: "thin" }}
           >
-            {/* Title */}
-            <h2 className="text-xl sm:text-2xl font-black text-foreground leading-7">
-              {item.title}
-            </h2>
-
-            {/* Excerpt */}
-            {item.excerpt && (
-              <p className="text-sm text-muted-foreground leading-7">{item.excerpt}</p>
-            )}
-
-            {/* Author + actions row */}
+            {/* Author + top actions */}
             <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
               <AuthorLink
                 name={item.author?.name}
@@ -131,21 +132,19 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                 verifiedType={(item.author as any)?.verifiedType}
                 verifiedLabel={(item.author as any)?.verifiedLabel}
               />
-              <div className="flex items-center gap-2" dir="ltr">
+              <div className="flex items-center gap-2" dir="rtl">
                 <LikeButton contentType="blog" slug={item.slug} initial={item.likes || 0} tooltipLabel="پسندیدن مقاله" />
                 <SaveButton module="blog" slug={item.slug} />
                 <ShareButton />
               </div>
             </div>
 
-            {/* Full article body */}
-            <div>
-              <MarkdownContent content={item.content || item.excerpt || ""} />
-            </div>
+            {/* Full article body — smaller font */}
+            <MarkdownContent content={item.content || item.excerpt || ""} />
 
             {/* Tags */}
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
+              <div className="flex flex-wrap gap-2 pt-1">
                 {tags.map((t) => (
                   <Link
                     key={t}
@@ -159,18 +158,11 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
               </div>
             )}
 
-            {/* Bottom actions */}
-            <div className="flex flex-wrap items-center gap-3 pt-2 pb-1 border-t border-border">
+            {/* Bottom actions — no top separator */}
+            <div className="flex flex-wrap items-center gap-3 pb-1">
               <LikeButton contentType="blog" slug={item.slug} initial={item.likes || 0} />
               <SaveButton module="blog" slug={item.slug} />
               <ShareButton />
-              <Link
-                href={`/blog/${item.slug}`}
-                onClick={onClose}
-                className="mr-auto text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
-              >
-                باز کردن در صفحه کامل ↗
-              </Link>
             </div>
 
             {/* Comments */}
@@ -182,7 +174,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
           </div>
         </div>
 
-        {/* Next (left in RTL) */}
+        {/* Next — LEFT side in RTL → >> */}
         <button
           type="button"
           onClick={onNext}
@@ -190,7 +182,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
           style={{ fontSize: 30, fontWeight: 900, lineHeight: 1, padding: "0 8px" }}
           aria-label="مقاله قبلی"
         >
-          {"<<"}
+          {">>"}
         </button>
       </div>
     </div>
