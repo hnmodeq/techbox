@@ -622,6 +622,7 @@ export function SiteHeader({
           </Tooltip>
           <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto" />
           <NotificationsButton />
+          <ThemeToggle />
           <TechboxBreadcrumb />
           {/* Removed separator after breadcrumb */}
         </div>
@@ -632,7 +633,6 @@ export function SiteHeader({
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1">
           <DateTimeDisplay />
-          <ThemeToggle />
           {onToggleNews && (
             <Tooltip>
               <TooltipTrigger
