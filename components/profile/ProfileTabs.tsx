@@ -54,27 +54,36 @@ export function ProfileTabs({
   savedPosts: any[]
   isSelf: boolean
 }) {
-  const defaultTab = "user"
-  return (
-    <Tabs defaultValue={defaultTab} className="mt-10">
-      <TabsList className="flex h-auto flex-wrap gap-1">
-        {/* <TabsTrigger value="user">فعالیت کاربری</TabsTrigger> */}
-        {isAuthor && <TabsTrigger value="author">فعالیت نویسنده</TabsTrigger>}
-        {isSelf && <TabsTrigger value="saved">ذخیره‌ها</TabsTrigger>}
-      </TabsList>
-      <TabsContent value="user" className="pt-6">
-        <UserActivityList activities={activities} />
-      </TabsContent>
-      {isAuthor && (
-        <TabsContent value="author" className="pt-6">
+  // Authors get two tabs: user activity + author content.
+  // Normal users just see activity inline — no tab chrome.
+  if (isAuthor) {
+    return (
+      <Tabs defaultValue="user" className="mt-10">
+        <TabsList className="flex h-auto flex-wrap gap-1 mb-6">
+          <TabsTrigger value="user">فعالیت کاربری</TabsTrigger>
+          <TabsTrigger value="author">فعالیت نویسنده</TabsTrigger>
+          {isSelf && <TabsTrigger value="saved">ذخیره‌ها</TabsTrigger>}
+        </TabsList>
+        <TabsContent value="user" className="pt-2">
+          <UserActivityList activities={activities} />
+        </TabsContent>
+        <TabsContent value="author" className="pt-2">
           <AuthorPosts posts={authoredPosts} />
         </TabsContent>
-      )}
-      {isSelf && (
-        <TabsContent value="saved" className="pt-6">
-          <SavedPosts posts={savedPosts} />
-        </TabsContent>
-      )}
-    </Tabs>
+        {isSelf && (
+          <TabsContent value="saved" className="pt-2">
+            <SavedPosts posts={savedPosts} />
+          </TabsContent>
+        )}
+      </Tabs>
+    )
+  }
+
+  // Normal user: show activity directly
+  return (
+    <div className="mt-10 space-y-8">
+      <UserActivityList activities={activities} />
+      {isSelf && savedPosts.length > 0 && <SavedPosts posts={savedPosts} />}
+    </div>
   )
 }

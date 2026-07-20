@@ -3,41 +3,57 @@
 import * as React from "react"
 import Link from "next/link"
 import { NewspaperIcon, XIcon } from "lucide-react"
-
 import { Separator } from "@/components/ui/separator"
 import { useHomeModule } from "@/features/home/lib/home-data"
 import { NewsSidebarCard } from "./news-sidebar-card"
 
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
+
 export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?: string[]; onClose?: () => void }) {
   const { items: dbNews, loading } = useHomeModule("news")
+  const wrapperRef = React.useRef<HTMLDivElement>(null)
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
-  const sortedNews = [...dbNews].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
-  const newsItems = sortedNews.slice(0, 15)
+  // Only news published in the last 24 hours (real filter, no fake dates)
+  const newsItems = React.useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity
+    const now = Date.now()
+    return [...dbNews]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .filter((n) => now - new Date(n.date).getTime() <= TWENTY_FOUR_HOURS)
+      .slice(0, 15)
+  }, [dbNews])
 
-  // Trap wheel events so only the sidebar scrolls, not the page
+  // Trap ALL wheel events on the sidebar wrapper so the page NEVER scrolls
   React.useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
 
     const onWheel = (e: WheelEvent) => {
+      e.stopPropagation()
+
+      const el = scrollRef.current
+      if (!el) return
+
       const { scrollTop, scrollHeight, clientHeight } = el
       const atTop = scrollTop === 0 && e.deltaY < 0
-      const atBottom = scrollTop + clientHeight >= scrollHeight && e.deltaY > 0
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0
+
       if (!atTop && !atBottom) {
         e.preventDefault()
         el.scrollTop += e.deltaY
       }
     }
 
-    el.addEventListener("wheel", onWheel, { passive: false })
-    return () => el.removeEventListener("wheel", onWheel)
+    wrapper.addEventListener("wheel", onWheel, { passive: false })
+    return () => wrapper.removeEventListener("wheel", onWheel)
   }, [])
 
   return (
-    <div className="flex h-full w-full flex-col bg-[var(--sidebar-background)] border-r border-[var(--sidebar-border)] shadow-2xl">
+    <div
+      ref={wrapperRef}
+      className="flex h-full w-full flex-col bg-[var(--sidebar-background)] border-r border-[var(--sidebar-border)] shadow-2xl"
+    >
       {/* Header */}
       <div className="flex h-14 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border)]">
         <div className="flex items-center gap-2">
@@ -55,12 +71,12 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
         )}
       </div>
 
-      {/* Scrollable content — wheel events are trapped so the page doesn't scroll */}
+      {/* Scrollable content — isolated from page scroll */}
       <div
         ref={scrollRef}
         dir="rtl"
-        className="flex-1 overflow-y-auto overscroll-contain"
-        style={{ scrollbarWidth: "thin" }}
+        className="flex-1 overflow-y-auto"
+        style={{ scrollbarWidth: "thin", overscrollBehavior: "contain" }}
       >
         <div className="flex flex-col gap-1 py-2 w-full">
           {loading ? (
@@ -71,7 +87,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
             ))
           ) : newsItems.length === 0 ? (
             <div className="p-4 text-center text-xs text-muted-foreground">
-              خبر جدیدی وجود ندارد.
+              خبر جدیدی در ۲۴ ساعت گذشته ثبت نشده است.
             </div>
           ) : (
             newsItems.map((news) => {
