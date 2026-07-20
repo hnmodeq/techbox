@@ -1,179 +1,69 @@
 <html>
   <head>
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+
       .parent {
         display: grid;
         grid-template-columns: repeat(6, 1fr);
         grid-template-rows: repeat(35, 1fr);
-        gap: 7px;
+        gap: 6px;
+        padding: 6px;
+        background-color: #5f5f5f;
+        min-height: 100vh;
       }
 
-      .div10 {
-        grid-column: span 3 / span 3;
-        grid-row: span 3 / span 3;
-        grid-column-start: 1;
-        grid-row-start: 3;
+      .parent > div {
+        border: 2px solid rgba(255, 255, 255, 0.85);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #111;
+        font-size: 18px;
+        font-weight: 600;
+        min-height: 40px;
       }
 
-      .div16 {
-        grid-column: span 3 / span 3;
-        grid-row: span 6 / span 6;
-        grid-column-start: 4;
-        grid-row-start: 3;
-      }
+      .div10  { grid-column: 1 / span 3; grid-row: 3 / span 3;  background: #f6c177; }
+      .div16  { grid-column: 4 / span 3; grid-row: 3 / span 6;  background: #8bd3dd; }
+      .div17  { grid-column: 1 / span 3; grid-row: 6 / span 3;  background: #f7a072; }
+      .div18  { grid-column: 1 / span 2; grid-row: 9 / span 8;  background: #c3f584; }
+      .div19  { grid-column: 1 / span 6; grid-row: 1 / span 2;  background: #ffd166; }
+      .div20  { grid-column: 3 / span 4; grid-row: 9 / span 4;  background: #a29bfe; }
+      .div21  { grid-column: 3 / span 4; grid-row: 13 / span 4; background: #81ecec; }
 
-      .div17 {
-        grid-column: span 3 / span 3;
-        grid-row: span 3 / span 3;
-        grid-column-start: 1;
-        grid-row-start: 6;
-      }
+      .div23  { grid-column: 3 / span 2; grid-row-start: 20; background: #fab1a0; }
+      .div24  { grid-column: 1 / span 2; grid-row-start: 20; background: #74b9ff; }
+      .div26  { grid-column: 5 / span 2; grid-row-start: 20; background: #55efc4; }
 
-      .div18 {
-        grid-column: span 2 / span 2;
-        grid-row: span 8 / span 8;
-        grid-column-start: 1;
-        grid-row-start: 9;
-      }
+      .div28  { grid-column: 1 / span 4; grid-row: 17 / span 3; background: #ffeaa7; }
+      .div29  { grid-column: 5 / span 2; grid-row: 17 / span 3; background: #fdcb6e; }
 
-      .div19 {
-        grid-column: span 6 / span 6;
-        grid-row: span 2 / span 2;
-        grid-column-start: 1;
-        grid-row-start: 1;
-      }
+      .div32  { grid-column: span 2 / span 2; grid-row-start: 21; background: #dfe6e9; }
+      .div33  { grid-column: 3 / span 2; grid-row-start: 21; background: #b2bec3; }
+      .div34  { grid-column: 5 / span 2; grid-row-start: 21; background: #ffeaa7; }
 
-      .div20 {
-        grid-column: span 4 / span 4;
-        grid-row: span 4 / span 4;
-        grid-column-start: 3;
-        grid-row-start: 9;
-      }
+      .div35  { grid-column: 3 / span 4; grid-row: 22 / span 4; background: #fab1a0; }
+      .div36  { grid-column: 1 / span 2; grid-row: 22 / span 4; background: #74b9ff; }
 
-      .div21 {
-        grid-column: span 4 / span 4;
-        grid-row: span 4 / span 4;
-        grid-column-start: 3;
-        grid-row-start: 13;
-      }
+      .div37  { grid-column-start: 3; grid-row: 26 / span 2; background: #81ecec; }
+      .div38  { grid-column-start: 4; grid-row: 26 / span 2; background: #55efc4; }
+      .div39  { grid-column-start: 1; grid-row: 26 / span 2; background: #a29bfe; }
+      .div40  { grid-column-start: 2; grid-row: 26 / span 2; background: #fdcb6e; }
+      .div41  { grid-column-start: 5; grid-row: 26 / span 2; background: #f6c177; }
+      .div42  { grid-column-start: 6; grid-row: 26 / span 2; background: #f7a072; }
 
-      .div23 {
-        grid-column: span 2 / span 2;
-        grid-column-start: 3;
-        grid-row-start: 20;
-      }
-
-      .div24 {
-        grid-column: span 2 / span 2;
-        grid-column-start: 1;
-        grid-row-start: 20;
-      }
-
-      .div26 {
-        grid-column: span 2 / span 2;
-        grid-column-start: 5;
-        grid-row-start: 20;
-      }
-
-      .div28 {
-        grid-column: span 4 / span 4;
-        grid-row: span 3 / span 3;
-        grid-column-start: 1;
-        grid-row-start: 17;
-      }
-
-      .div29 {
-        grid-column: span 2 / span 2;
-        grid-row: span 3 / span 3;
-        grid-column-start: 5;
-        grid-row-start: 17;
-      }
-
-      .div32 {
-        grid-column: span 2 / span 2;
-        grid-row-start: 21;
-      }
-
-      .div33 {
-        grid-column: span 2 / span 2;
-        grid-column-start: 3;
-        grid-row-start: 21;
-      }
-
-      .div34 {
-        grid-column: span 2 / span 2;
-        grid-column-start: 5;
-        grid-row-start: 21;
-      }
-
-      .div35 {
-        grid-column: span 4 / span 4;
-        grid-row: span 4 / span 4;
-        grid-column-start: 3;
-        grid-row-start: 22;
-      }
-
-      .div36 {
-        grid-column: span 2 / span 2;
-        grid-row: span 4 / span 4;
-        grid-column-start: 1;
-        grid-row-start: 22;
-      }
-
-      .div37 {
-        grid-row: span 2 / span 2;
-        grid-column-start: 3;
-        grid-row-start: 26;
-      }
-
-      .div38 {
-        grid-row: span 2 / span 2;
-        grid-column-start: 4;
-        grid-row-start: 26;
-      }
-
-      .div39 {
-        grid-row: span 2 / span 2;
-        grid-column-start: 1;
-        grid-row-start: 26;
-      }
-
-      .div40 {
-        grid-row: span 2 / span 2;
-        grid-column-start: 2;
-        grid-row-start: 26;
-      }
-
-      .div41 {
-        grid-row: span 2 / span 2;
-        grid-row-start: 26;
-      }
-
-      .div42 {
-        grid-row: span 2 / span 2;
-        grid-row-start: 26;
-      }
-
-      .div43 {
-        grid-column: span 6 / span 6;
-        grid-row: span 4 / span 4;
-        grid-column-start: 1;
-        grid-row-start: 30;
-      }
-
-      .div44 {
-        grid-column: span 6 / span 6;
-        grid-row: span 2 / span 2;
-        grid-column-start: 1;
-        grid-row-start: 34;
-      }
-
-      .div45 {
-        grid-column: span 6 / span 6;
-        grid-row: span 2 / span 2;
-        grid-column-start: 1;
-        grid-row-start: 28;
-      }
+      .div43  { grid-column: 1 / span 6; grid-row: 30 / span 4; background: #dfe6e9; }
+      .div44  { grid-column: 1 / span 6; grid-row: 34 / span 2; background: #b2bec3; }
+      .div45  { grid-column: 1 / span 6; grid-row: 28 / span 2; background: #ffeaa7; }
     </style>
   </head>
   <body>
@@ -182,7 +72,7 @@
       <div class="div16">16</div>
       <div class="div17">17</div>
       <div class="div18">18</div>
-      <div class="div19">19</div>
+      <div class="div19">header</div>
       <div class="div20">20</div>
       <div class="div21">21</div>
       <div class="div23">23</div>
@@ -209,11 +99,12 @@
 </html>
 
 
-
-usefuls:
-
-https://ui.aceternity.com/components/card-spotlight
+usefuls: https://ui.aceternity.com/components/card-spotlight
 https://ui.aceternity.com/components/terminal
-
-
 https://tailwindcss.com/plus/ui-blocks/application-ui/forms/sign-in-forms#component-fef1d7e9849359af76d4d6ead796938b
+
+
+https://consentpro.com/result?trid=scan_1cxh050_mrsyad55&site=https%3A%2F%2Fhnmodeq-techbox.vercel.app%2F
+
+
+

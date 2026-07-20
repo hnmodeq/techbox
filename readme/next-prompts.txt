@@ -198,8 +198,6 @@ change the sentence " برای مشاهده رویدادهای بیشتر ..." t
 
 
 
-Done Until Here.
-
 
 15-account page
 -change فعالیت نویسنده to فعالیت محتوایی
@@ -239,6 +237,9 @@ Done Until Here.
 -create a tooltip (shadcn component) hovering on the date and says "تاریخ انتشار"
 -let the hovering effect be smooth (if it already have not done yet)
 -move the date from right to left and move it from bottom to top of the social icons( so we gonna have 2 rows, first right including the author avatar and name in the right side and the date on the left side and second row author job title in the right side and social icons in the left side)
+
+Done Until Here.
+
 
 19- news page (/news)
 -remove the force news section (we don't need it anymore, already have been mention it in the previous items)
