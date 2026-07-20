@@ -69,11 +69,12 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
     if (busy) return
     setBusy(true)
 
-    // Optimistic: toggle immediately
+    // Optimistic: toggle + toast immediately so user sees it at once
     const prevSaved = saved ?? false
     const nextSaved = !prevSaved
     setSaved(nextSaved)
     setSavedCache(module, slug, nextSaved)
+    toast.success(nextSaved ? "محتوا ذخیره شد" : "محتوا از ذخیره‌ها حذف شد")
 
     try {
       const res = await fetch("/api/saved-content", {
@@ -91,9 +92,9 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
       }
       const data = await res.json().catch(() => ({}))
       const serverSaved = Boolean(data.saved)
+      // Silently reconcile with server (no second toast)
       setSaved(serverSaved)
       setSavedCache(module, slug, serverSaved)
-      toast.success(serverSaved ? "محتوا ذخیره شد" : "محتوا از ذخیره‌ها حذف شد")
     } catch {
       // Revert on network error
       setSaved(prevSaved)

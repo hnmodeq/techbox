@@ -240,7 +240,7 @@ export function VideoModal({
           </div>
 
           {/* Info side */}
-          <div className="min-w-0 sm:min-w-[320px] sm:max-w-[480px] sm:flex-1 flex flex-col max-h-[42vh] sm:max-h-[92vh]">
+          <div className="min-w-0 sm:min-w-[440px] sm:max-w-[600px] sm:flex-1 flex flex-col max-h-[42vh] sm:max-h-[92vh]">
             <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
