@@ -203,25 +203,13 @@ export function VideoModal({
         >
           {/* Video side — FIXED size so frame never jumps */}
           <div
-            className="bg-black shrink-0 flex items-center justify-center"
+            className="relative bg-black shrink-0 flex items-center justify-center"
           >
-            {/* Skeleton/placeholder shown until video can play */}
+            {/* Loading overlay — sits on top of the video (which holds layout space via h-[92vh]) */}
             {!videoReady && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
-                <Skeleton className="absolute inset-0 rounded-none opacity-30" />
-                {video.image && (
-                  <Image
-                    src={video.image}
-                    alt={video.title}
-                    fill
-                    className="object-contain opacity-20"
-                    sizes="540px"
-                  />
-                )}
-                <div className="relative z-20 flex flex-col items-center gap-2">
-                  <div className="w-10 h-10 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                  <span className="text-white/50 text-xs">در حال بارگذاری...</span>
-                </div>
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/70 pointer-events-none">
+                <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-white/80 animate-spin" />
+                <span className="text-white/50 text-xs">در حال بارگذاری...</span>
               </div>
             )}
             <video
@@ -234,7 +222,7 @@ export function VideoModal({
               preload="metadata"
               onError={() => setVideoReady(true)} // show controls even on error
               className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
-              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s", display: "block" }}
+              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s" }}
             />
           </div>
 
