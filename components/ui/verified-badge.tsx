@@ -6,7 +6,7 @@
  * Types:
  *   "content" → blue   → تولید کننده محتوای تایید شده
  *   "org"     → purple → کاربر سازمانی تایید شده (+ optional label line)
- *   "user"    → green  → کاربر تایید شده
+ *   "user"    → orange → کاربر تایید شده
  */
 
 import Image from "next/image";
@@ -30,7 +30,7 @@ const CONFIG = {
     title: "کاربر سازمانی تایید شده",
   },
   user: {
-    src: "/assets/badges/green-verified.png",
+    src: "/assets/badges/orange-verified.png",
     title: "کاربر تایید شده",
   },
 } as const;

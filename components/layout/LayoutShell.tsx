@@ -194,6 +194,16 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         }`}
       >
         <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
+
+        {/* Rail — thin strip on the right (outer) edge, clicking closes the sidebar */}
+        {newsOpen && (
+          <button
+            type="button"
+            aria-label="بستن اخبار"
+            onClick={() => setNewsOpen(false)}
+            className="absolute inset-y-0 -right-3 z-20 w-3 cursor-w-resize after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border transition-colors"
+          />
+        )}
       </div>
     </div>
   )
