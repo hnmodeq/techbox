@@ -104,13 +104,6 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                 <Icon name="close" size={20} />
               </Button>
 
-              {/* Title — just above the date/reading time caption */}
-              <div className="absolute bottom-8 inset-x-0 px-5">
-                <h2 className="text-lg sm:text-xl font-black text-white leading-6 drop-shadow line-clamp-2">
-                  {item.title}
-                </h2>
-              </div>
-
               {/* Date + reading time — bottom caption */}
               <div className="absolute bottom-3 right-3 flex items-center gap-3 text-white/70 text-xs">
                 <Tooltip>
@@ -158,6 +151,11 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                   باز کردن در صفحه کامل ↗
                 </Link>
               </div>
+
+              {/* Title — above article body */}
+              <h2 className="text-lg sm:text-xl font-black text-foreground leading-7">
+                {item.title}
+              </h2>
 
               {/* Full article body */}
               <MarkdownContent content={item.content || item.excerpt || ""} />
