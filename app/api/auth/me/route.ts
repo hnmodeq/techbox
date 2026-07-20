@@ -25,6 +25,8 @@ export async function GET(){
     modules,
     avatar: user.avatar ?? "",
     emailVerified: user.emailVerified ? true : false,
+    verifiedType: (user as any).verifiedType || null,
+    verifiedLabel: (user as any).verifiedLabel || null,
   }});
 }
 

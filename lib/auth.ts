@@ -12,6 +12,8 @@ export type AppUser = {
   roleFa?: string;
   job?: string;
   bio?: string;
+  verifiedType?: string | null;
+  verifiedLabel?: string | null;
 };
 
 const KEY = "tb_auth_user";

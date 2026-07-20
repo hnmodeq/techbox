@@ -46,7 +46,7 @@ const cardSelect = {
   priceLabel: true,
   availability: true,
   authorName: true,
-  author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true } },
+  author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true, verifiedType: true, verifiedLabel: true } },
 } as const;
 
 function firstGalleryImage(value: unknown) {
@@ -88,13 +88,15 @@ function normalizeCard(p: any) {
     model: p.model,
     priceLabel: p.priceLabel,
     availability: p.availability,
-    author: {
-      name: p.author?.name || p.authorName || "کاربر تکباکس",
-      username: p.author?.username || "",
-      role: p.author?.roleFa || p.author?.role || "عضو انجمن",
-      job: p.author?.job || "",
-      avatar: p.author?.avatar || "",
-    },
+      author: {
+        name: p.author?.name || p.authorName || "کاربر تکباکس",
+        username: p.author?.username || "",
+        role: p.author?.roleFa || p.author?.role || "عضو انجمن",
+        job: p.author?.job || "",
+        avatar: p.author?.avatar || "",
+        verifiedType: (p.author as any)?.verifiedType || null,
+        verifiedLabel: (p.author as any)?.verifiedLabel || null,
+      },
   };
 }
 

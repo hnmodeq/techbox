@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Icon } from "@/design/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
@@ -91,7 +92,16 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
                 </span>
 
                 <div>
-                  <h1 className="text-2xl font-black text-foreground sm:text-3xl">{user.name}</h1>
+                  <h1 className="text-2xl font-black text-foreground sm:text-3xl flex items-center gap-2">
+                    {user.name}
+                    {(user as any).verifiedType && (
+                      <VerifiedBadge
+                        type={(user as any).verifiedType as "content" | "org" | "user"}
+                        label={(user as any).verifiedLabel}
+                        size={22}
+                      />
+                    )}
+                  </h1>
                   <div className="mt-0.5 font-mono text-xs text-muted-foreground" dir="ltr">
                     @{user.username}
                   </div>

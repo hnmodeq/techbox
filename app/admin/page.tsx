@@ -147,6 +147,7 @@ export default function AdminPage() {
             {user.role === "super_admin" && <ButtonLink href="/admin/moderation" variant="ghost" size="sm">Moderation</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/newsletter" variant="ghost" size="sm">خبرنامه</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/inbox" variant="ghost" size="sm">صندوق پیام‌ها</ButtonLink>}
+            {user.role === "super_admin" && <ButtonLink href="/admin/verification" variant="ghost" size="sm">تایید هویت ✅</ButtonLink>}
             <Button variant="ghost" size="sm" onClick={async () => { 
               await fetch("/api/auth/logout", { method: "POST" });
               localStorage.removeItem("tb_auth_user");
