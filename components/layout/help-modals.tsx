@@ -17,8 +17,9 @@ import {
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/providers/auth.provider";
+import { VerificationRequestForm } from "@/features/auth/components/VerificationRequestForm";
 
-type ModalType = "faq" | "feedback" | "support" | null;
+type ModalType = "faq" | "feedback" | "support" | "verification" | null;
 
 type Faq = { id: string; question: string; answer: string };
 
@@ -34,13 +35,16 @@ export function HelpModals() {
     const openFaq = make("faq");
     const openFeedback = make("feedback");
     const openSupport = make("support");
+    const openVerification = make("verification");
     window.addEventListener("tb_open_faq", openFaq);
     window.addEventListener("tb_open_feedback", openFeedback);
     window.addEventListener("tb_open_support", openSupport);
+    window.addEventListener("tb_open_verification", openVerification);
     return () => {
       window.removeEventListener("tb_open_faq", openFaq);
       window.removeEventListener("tb_open_feedback", openFeedback);
       window.removeEventListener("tb_open_support", openSupport);
+      window.removeEventListener("tb_open_verification", openVerification);
     };
   }, []);
 
@@ -53,6 +57,7 @@ export function HelpModals() {
       <FaqModal open={open === "faq"} onClose={() => setOpen(null)} />
       <FeedbackModal open={open === "feedback"} onClose={() => setOpen(null)} defaultName={defaultName} defaultEmail={defaultEmail} />
       <SupportModal open={open === "support"} onClose={() => setOpen(null)} defaultName={defaultName} defaultEmail={defaultEmail} />
+      <VerificationModal open={open === "verification"} onClose={() => setOpen(null)} user={user} />
     </>
   );
 }
@@ -477,6 +482,47 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
             </div>
           )}
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Verification / Badge Request Modal ─────────────────────
+function VerificationModal({ open, onClose, user }: { open: boolean; onClose: () => void; user: any }) {
+  const [existingRequest, setExistingRequest] = React.useState<{ status: string; type: string; adminNote?: string } | null | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (!open || !user) return;
+    fetch("/api/verification/request")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setExistingRequest(d?.requests?.[0] || null))
+      .catch(() => setExistingRequest(null));
+  }, [open, user]);
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-[480px] max-h-[85vh] overflow-y-auto" dir="rtl">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-black">درخواست نشان تایید هویت</DialogTitle>
+          <DialogDescription className="text-right">
+            نوع نشان مورد نظر را انتخاب کنید و اطلاعات درخواست را وارد کنید.
+          </DialogDescription>
+        </DialogHeader>
+        {!user ? (
+          <div className="py-8 text-center text-sm text-muted-foreground">
+            برای درخواست نشان ابتدا وارد حساب کاربری خود شوید.
+          </div>
+        ) : (
+          <VerificationRequestForm
+            existingRequest={existingRequest}
+            onSuccess={() => {
+              fetch("/api/verification/request")
+                .then((r) => (r.ok ? r.json() : null))
+                .then((d) => setExistingRequest(d?.requests?.[0] || null))
+                .catch(() => {});
+            }}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

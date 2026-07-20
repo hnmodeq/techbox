@@ -22,7 +22,7 @@ const TICK_OPTIONS: { type: TickType; label: string; description: string; color:
     type: "user",
     label: "کاربر تایید شده",
     description: "تایید هویت کاربر واقعی با ارسال مدارک",
-    color: "text-yellow-500",
+    color: "text-green-500",
   },
   {
     type: "content",
@@ -128,7 +128,7 @@ export function VerificationRequestForm({
       <div className="space-y-4">
         <div className={`rounded-lg border p-4 text-sm ${
           approved ? "border-green-500/30 bg-green-500/10" :
-          pending ? "border-yellow-500/30 bg-yellow-500/10" :
+          pending ? "border-green-500/30 bg-green-500/10" :
           "border-red-500/30 bg-red-500/10"
         }`}>
           <div className="flex items-center gap-2 font-bold mb-1">

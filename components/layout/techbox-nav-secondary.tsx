@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LifeBuoyIcon, SendIcon, HelpCircleIcon } from "lucide-react"
+import { LifeBuoyIcon, SendIcon, HelpCircleIcon, BadgeCheckIcon } from "lucide-react"
 
 export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const items = [
@@ -27,6 +27,11 @@ export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef
       title: "سوالات پرتکرار",
       event: "tb_open_faq",
       icon: HelpCircleIcon,
+    },
+    {
+      title: "درخواست نشان",
+      event: "tb_open_verification",
+      icon: BadgeCheckIcon,
     },
   ]
 
