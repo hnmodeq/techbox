@@ -204,7 +204,6 @@ export function VideoModal({
           {/* Video side — FIXED size so frame never jumps */}
           <div
             className="bg-black shrink-0 flex items-center justify-center relative self-stretch"
-            style={{ width: "min(51.75vh, 540px)", minWidth: "min(51.75vh, 540px)" }}
           >
             {/* Skeleton/placeholder shown until video can play */}
             {!videoReady && (
@@ -234,7 +233,7 @@ export function VideoModal({
               playsInline
               preload="metadata"
               onError={() => setVideoReady(true)} // show controls even on error
-              className="w-full max-h-[92vh] object-contain"
+              className="h-full w-auto object-contain"
               style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s", display: "block" }}
             />
           </div>
