@@ -36,14 +36,14 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
-      {/* Navigation buttons — big borderless << >> */}
+      {/* Navigation buttons — right arrow on right, left arrow on left */}
       <button
         onClick={() => scroll('right')}
         className="absolute right-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors select-none"
         style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, padding: "0 10px" }}
         aria-label="اسکرول به راست"
       >
-        {">>"}
+        →
       </button>
 
       <button
@@ -52,7 +52,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, padding: "0 10px" }}
         aria-label="اسکرول به چپ"
       >
-        {"<<"}
+        ←
       </button>
 
       {/* Scroll container — no visible scrollbar */}

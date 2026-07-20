@@ -41,9 +41,11 @@ export function FloatingSearch() {
   const [catOpen,    setCatOpen]    = React.useState(false)
   const [recent,     setRecent]     = React.useState<string[]>([])
 
-  const rootRef      = React.useRef<HTMLDivElement>(null)
-  const inputRef     = React.useRef<HTMLInputElement>(null)
-  const hoverRef     = React.useRef(false)
+  const rootRef       = React.useRef<HTMLDivElement>(null)
+  const inputRef      = React.useRef<HTMLInputElement>(null)
+  const inputWrapRef  = React.useRef<HTMLDivElement>(null)  // wraps input — used to position recent dropup
+  const catWrapRef    = React.useRef<HTMLDivElement>(null)  // wraps category button
+  const hoverRef      = React.useRef(false)
   const collapseTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   React.useEffect(() => {
@@ -138,84 +140,6 @@ export function FloatingSearch() {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* ── Category drop-up ── */}
-        <div
-          className={cn(
-            "absolute right-0 bottom-[calc(100%+10px)] w-28 overflow-hidden rounded-xl shadow-lg transition-all duration-300 ease-out",
-            BAR_BG,
-            catOpen && expanded
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-2 pointer-events-none"
-          )}
-        >
-          <div className="p-1">
-            {searchModules.map((m) => (
-              <button
-                key={m.value}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  setModule(m.value)
-                  setCatOpen(false)
-                }}
-                className={cn(
-                  "w-full text-right text-xs px-3 py-1.5 rounded-lg transition-colors",
-                  m.value === module
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                )}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Recent searches drop-up ── */}
-        <div
-          className={cn(
-            "absolute bottom-[calc(100%+10px)] overflow-hidden rounded-xl shadow-lg transition-all duration-300 ease-out",
-            BAR_BG,
-            "left-28 right-8",
-            recentOpen && filteredRecent.length > 0 && expanded
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-2 pointer-events-none"
-          )}
-        >
-          <div className="p-1.5">
-            {/* Header: title right, clear icon left */}
-            <div className="flex items-center justify-between px-2 py-1">
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <button
-                      type="button"
-                      onMouseDown={(e: React.MouseEvent) => e.preventDefault()}
-                      onClick={clearRecent}
-                      className="flex items-center justify-center h-5 w-5 text-muted-foreground hover:text-destructive transition-colors"
-                    />
-                  }
-                >
-                  <Trash2Icon className="size-3.5" />
-                </TooltipTrigger>
-                <TooltipContent>پاک کردن گذشته</TooltipContent>
-              </Tooltip>
-              <span className="text-[10px] font-bold text-muted-foreground">جستوجوهای قبلی</span>
-            </div>
-            {filteredRecent.map((item) => (
-              <button
-                key={item}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { setValue(item); goSearch(item) }}
-                className="w-full text-right text-xs px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* ── Main pill ── */}
         <form
           onSubmit={handleSubmit}
@@ -225,13 +149,135 @@ export function FloatingSearch() {
             expanded ? "opacity-100" : "opacity-50"
           )}
         >
-          {/* Category button */}
+          {/* Search icon — LEFT side */}
+          <button
+            type="submit"
+            aria-label="جستجو"
+            className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          >
+            <SearchIcon className="size-3.5" />
+          </button>
+
+          {/* Input — with its own relative wrapper for the recent drop-up */}
+          <div ref={inputWrapRef} className="relative">
+            {/* ── Recent searches drop-up — anchored above the input wrapper ── */}
+            <div
+              className={cn(
+                "absolute bottom-[calc(100%+10px)] right-0 left-0 overflow-hidden rounded-xl shadow-lg transition-all duration-300 ease-out",
+                BAR_BG,
+                recentOpen && filteredRecent.length > 0 && expanded
+                  ? "opacity-100 translate-y-0 pointer-events-auto"
+                  : "opacity-0 translate-y-2 pointer-events-none"
+              )}
+            >
+              <div className="p-1.5">
+                {/* Header: title right, clear icon left */}
+                <div className="flex items-center justify-between px-2 py-1">
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <button
+                          type="button"
+                          onMouseDown={(e: React.MouseEvent) => e.preventDefault()}
+                          onClick={clearRecent}
+                          className="flex items-center justify-center h-5 w-5 text-muted-foreground hover:text-destructive transition-colors"
+                        />
+                      }
+                    >
+                      <Trash2Icon className="size-3.5" />
+                    </TooltipTrigger>
+                    <TooltipContent>پاک کردن گذشته</TooltipContent>
+                  </Tooltip>
+                  <span className="text-[10px] font-bold text-muted-foreground">جستوجوهای قبلی</span>
+                </div>
+                {filteredRecent.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setValue(item); goSearch(item) }}
+                    className="w-full text-right text-xs px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Input
+              ref={inputRef}
+              placeholder="دنبال چیزی میگردی؟"
+              value={value}
+              onChange={(e) => {
+                setValue(e.target.value)
+                setRecentOpen(true)
+                setCatOpen(false)
+              }}
+              onFocus={() => {
+                setRecentOpen(true)
+                setCatOpen(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setRecentOpen(false)
+                  setCatOpen(false)
+                  e.currentTarget.blur()
+                }
+              }}
+              autoComplete="off"
+              spellCheck={false}
+              className={cn(
+                "!border-0 !bg-transparent !shadow-none focus-visible:ring-0 text-right text-sm h-6 transition-all duration-500 px-1",
+                expanded ? "w-36" : "w-28"
+              )}
+            />
+          </div>
+
+          {expanded && (
+            <div className="h-4 w-px bg-border/50 shrink-0" />
+          )}
+
+          {/* Category button — RIGHT side (in RTL = visually left of input) */}
           <div
+            ref={catWrapRef}
             className={cn(
-              "overflow-hidden transition-all duration-500",
+              "relative overflow-visible transition-all duration-500",
               expanded ? "w-24 opacity-100" : "w-0 opacity-0 pointer-events-none"
             )}
           >
+            {/* ── Category drop-up — anchored above the category wrapper ── */}
+            <div
+              className={cn(
+                "absolute bottom-[calc(100%+10px)] right-0 w-28 overflow-hidden rounded-xl shadow-lg transition-all duration-300 ease-out",
+                BAR_BG,
+                catOpen && expanded
+                  ? "opacity-100 translate-y-0 pointer-events-auto"
+                  : "opacity-0 translate-y-2 pointer-events-none"
+              )}
+            >
+              <div className="p-1">
+                {searchModules.map((m) => (
+                  <button
+                    key={m.value}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setModule(m.value)
+                      setCatOpen(false)
+                    }}
+                    className={cn(
+                      "w-full text-right text-xs px-3 py-1.5 rounded-lg transition-colors",
+                      m.value === module
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={() => {
@@ -243,48 +289,6 @@ export function FloatingSearch() {
               {selectedLabel}
             </button>
           </div>
-
-          {expanded && (
-            <div className="h-4 w-px bg-border/50 shrink-0" />
-          )}
-
-          {/* Input */}
-          <Input
-            ref={inputRef}
-            placeholder="دنبال چیزی میگردی؟"
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              setRecentOpen(true)
-              setCatOpen(false)
-            }}
-            onFocus={() => {
-              setRecentOpen(true)
-              setCatOpen(false)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setRecentOpen(false)
-                setCatOpen(false)
-                e.currentTarget.blur()
-              }
-            }}
-            autoComplete="off"
-            spellCheck={false}
-            className={cn(
-              "!border-0 !bg-transparent !shadow-none focus-visible:ring-0 text-right text-sm h-6 transition-all duration-500 px-1",
-              expanded ? "w-36" : "w-28"
-            )}
-          />
-
-          {/* Search icon */}
-          <button
-            type="submit"
-            aria-label="جستجو"
-            className="flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground transition-colors shrink-0"
-          >
-            <SearchIcon className="size-3.5" />
-          </button>
         </form>
       </div>
     </TooltipProvider>

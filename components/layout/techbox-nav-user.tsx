@@ -171,6 +171,10 @@ export function TechboxNavUser() {
                   <BadgeCheckIcon className="size-4" />
                   حساب کاربری
                 </MenuButton>
+                <MenuButton onClick={() => { setOpen(false); window.dispatchEvent(new CustomEvent("tb_open_verification")); }}>
+                  <BadgeCheckIcon className="size-4" />
+                  تایید هویت
+                </MenuButton>
                 {user.role === "super_admin" && (
                   <MenuButton onClick={() => go("/admin")}>
                     <ShieldIcon className="size-4" />

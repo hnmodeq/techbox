@@ -41,10 +41,13 @@ function ForumCommentSentence({ slug, initial }: { slug: string; initial: number
   }, [slug, shared, status]);
 
   return (
-    <span className="text-[11px] text-muted-foreground">
-      <span className="font-bold text-foreground">{count.toLocaleString('fa-IR')}</span>{' '}
-      پاسخ ثبت شده
-    </span>
+    <Tooltip>
+      <TooltipTrigger render={<span className="text-[11px] text-muted-foreground cursor-default" />}>
+        <span className="font-bold text-foreground">{count.toLocaleString('fa-IR')}</span>{' '}
+        پاسخ ثبت شده
+      </TooltipTrigger>
+      <TooltipContent>تعداد پاسخ ثبت شده برای این موضوع</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -136,7 +139,7 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
                         <TooltipTrigger render={<span className="text-[11px] text-muted-foreground shrink-0 cursor-default" />}>
                           {formatRelativeDate(top.date)}
                         </TooltipTrigger>
-                        <TooltipContent>تاریخ ساخته شدن این پرسش</TooltipContent>
+                        <TooltipContent>تاریخ ایجاد موضوع</TooltipContent>
                       </Tooltip>
                     </div>
 

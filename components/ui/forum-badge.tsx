@@ -53,8 +53,8 @@ export function ForumBadge({ slug, fallback = null, className = "" }: { slug: st
         </TooltipTrigger>
         <TooltipContent dir="rtl">
           {solved
-            ? "پاسخی مناسب به این موضوع داده شده"
-            : "هنوز پاسخ مناسبی برای این موضوع دریافت نشده"}
+            ? "به این موضوع پاسخ داده شده"
+            : "کاربر همچنان منتظر پاسخ بهتری است"}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
