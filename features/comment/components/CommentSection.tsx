@@ -456,9 +456,11 @@ export default function CommentSection({ module, slug, initialComments, compact 
           <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
             دیدگاه شما{" "}
             <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              ({loading && initialComments === undefined
-                ? <Skeleton className="inline-block h-4 w-6 align-middle" />
-                : (loading && initialComments !== undefined ? initialComments : totalCount).toLocaleString("fa-IR")
+              ({loading
+                ? (initialComments && initialComments > 0
+                    ? initialComments.toLocaleString("fa-IR")
+                    : <Skeleton className="inline-block h-4 w-6 align-middle" />)
+                : totalCount.toLocaleString("fa-IR")
               })
             </span>
           </h3>
