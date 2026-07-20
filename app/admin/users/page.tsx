@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 
 type AdminUser = {
@@ -29,6 +30,8 @@ type AdminUser = {
   modules: string[];
   avatar?: string | null;
   counts?: { posts: number; comments: number; ratings: number };
+  verifiedType?: string | null;
+  verifiedLabel?: string | null;
 };
 
 type Activity = {
@@ -121,6 +124,8 @@ export default function AdminUsersPage() {
       birthday: selected.birthday || null,
       modules: selected.modules || [],
       avatar: selected.avatar || null,
+      verifiedType: selected.verifiedType || null,
+      verifiedLabel: selected.verifiedLabel || null,
     };
     if (password.trim()) payload.password = password.trim();
     try {
@@ -206,6 +211,35 @@ export default function AdminUsersPage() {
                     <div className="space-y-1"><Label className="text-xs">شغل/توضیح</Label><Input value={selected.job || ""} onChange={(e) => updateSelected({ job: e.target.value })} /></div>
                     <div className="space-y-1"><Label className="text-xs">تاریخ تولد</Label><Input value={selected.birthday || ""} onChange={(e) => updateSelected({ birthday: e.target.value })} /></div>
                     <div className="space-y-1"><Label className="text-xs">آواتار URL</Label><Input value={selected.avatar || ""} onChange={(e) => updateSelected({ avatar: e.target.value })} dir="ltr" /></div>
+                    {/* Verification badge */}
+                    <div className="space-y-1">
+                      <Label className="text-xs flex items-center gap-1.5">
+                        نشان تایید هویت
+                        {selected.verifiedType && (
+                          <VerifiedBadge type={selected.verifiedType as "content" | "org" | "user"} label={selected.verifiedLabel} size={14} />
+                        )}
+                      </Label>
+                      <select
+                        value={selected.verifiedType || ""}
+                        onChange={(e) => updateSelected({ verifiedType: e.target.value || null, verifiedLabel: e.target.value ? selected.verifiedLabel : null })}
+                        className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
+                      >
+                        <option value="">بدون نشان</option>
+                        <option value="user">🟡 کاربر تایید شده</option>
+                        <option value="content">🔵 تولید کننده محتوای تایید شده</option>
+                        <option value="org">🟣 کاربر سازمانی تایید شده</option>
+                      </select>
+                    </div>
+                    {selected.verifiedType === "org" && (
+                      <div className="space-y-1">
+                        <Label className="text-xs">برچسب سازمانی (نمایش در tooltip)</Label>
+                        <Input
+                          value={selected.verifiedLabel || ""}
+                          onChange={(e) => updateSelected({ verifiedLabel: e.target.value || null })}
+                          placeholder="مثلاً: کارشناس فناوری اطلاعات - بانک ملت"
+                        />
+                      </div>
+                    )}
                     <div className="space-y-1">
                       <Label className="text-xs">نقش</Label>
                       <Select value={selected.role} onValueChange={(v) => updateSelected({ role: v as string })}>

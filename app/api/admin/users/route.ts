@@ -15,6 +15,8 @@ const updateSchema = z.object({
   modules: z.array(z.string()).optional(),
   avatar: z.string().max(500).nullable().optional(),
   password: z.string().min(6).max(100).optional(),
+  verifiedType: z.enum(["content", "org", "user"]).nullable().optional(),
+  verifiedLabel: z.string().max(300).nullable().optional(),
 });
 
 async function requireSuperAdmin() {
@@ -49,6 +51,8 @@ function publicUser(user: any) {
     modules: safeModules(user.modules),
     avatar: user.avatar,
     counts: user._count,
+    verifiedType: user.verifiedType ?? null,
+    verifiedLabel: user.verifiedLabel ?? null,
   };
 }
 
@@ -91,8 +95,8 @@ export async function PATCH(req: NextRequest) {
   }
 
   const data: any = {};
-  for (const key of ["name", "email", "role", "roleFa", "status", "job", "birthday", "avatar"] as const) {
-    if (key in body) data[key] = body[key] || null;
+  for (const key of ["name", "email", "role", "roleFa", "status", "job", "birthday", "avatar", "verifiedType", "verifiedLabel"] as const) {
+    if (key in body) data[key] = body[key] ?? null;
   }
   if (body.role) data.roleFa = body.roleFa ?? (body.role === "super_admin" ? "مدیر کل" : body.role === "editor" ? "ویراستار" : "کاربر عضو");
   if (body.modules) data.modules = body.modules;
