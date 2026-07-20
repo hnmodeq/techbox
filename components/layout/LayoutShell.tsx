@@ -106,6 +106,9 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const newsSlugsKey = dbNews.map((item) => item.slug).filter(Boolean).join(",")
   const hasUnreadNews = unreadNewsSlugs.length > 0
 
+  // Prevent re-fetching read-state for the same slugs+user combination
+  const lastFetchedReadStateKey = React.useRef<string>("")
+
   React.useEffect(() => {
     try {
       document.documentElement.dataset.newsSidebarOpen = String(newsOpen)
@@ -120,6 +123,11 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
       setUnreadNewsSlugs((current) => (current.length ? [] : current))
       return
     }
+
+    // Skip if we already fetched for this exact user+slugs combo — prevents re-render loops
+    const fetchKey = `${userId}:${newsSlugsKey}`
+    if (lastFetchedReadStateKey.current === fetchKey) return
+    lastFetchedReadStateKey.current = fetchKey
 
     fetch(`/api/news/read-state?slugs=${encodeURIComponent(newsSlugsKey)}`, { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))

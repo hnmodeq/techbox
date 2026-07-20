@@ -1,16 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Users, UserPlus, UserMinus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+interface UserRow {
+  id: string;
+  name: string;
+  username: string;
+  avatar?: string;
+}
 
 interface FollowStatsProps {
   username: string;
   viewerId?: string;
-  /** Initial counts from the server so there's no loading flash */
   initialFollowersCount?: number;
   initialFollowingCount?: number;
 }
@@ -27,21 +35,29 @@ export function FollowStats({
   });
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<"followers" | "following">("followers");
-  const [users, setUsers] = useState<{ id: string; name: string; username: string; avatar?: string }[]>([]);
+  const [users, setUsers] = useState<UserRow[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [viewerFollowing, setViewerFollowing] = useState<Set<string>>(new Set());
+  const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
 
-  // Refresh counts from server (reconcile with live DB)
+  // Reconcile counts with server once — deduplicated to avoid re-render loops
   useEffect(() => {
     const qs = viewerId ? `?username=${username}&viewerId=${viewerId}` : `?username=${username}`;
     fetch(`/api/follow${qs}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (d) setStats({ followersCount: d.followersCount, followingCount: d.followingCount });
+        if (d) {
+          setStats((prev) => {
+            if (prev.followersCount === d.followersCount && prev.followingCount === d.followingCount) return prev;
+            return { followersCount: d.followersCount, followingCount: d.followingCount };
+          });
+        }
       })
       .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username, viewerId]);
 
-  const openModal = async (type: "followers" | "following") => {
+  const openModal = useCallback(async (type: "followers" | "following") => {
     setModalType(type);
     setShowModal(true);
     setLoadingUsers(true);
@@ -52,17 +68,87 @@ export function FollowStats({
       const res = await fetch(`/api/follow/${endpoint}?username=${username}`);
       if (res.ok) {
         const data = await res.json();
-        setUsers(data.users || []);
+        const list: UserRow[] = data.users || [];
+        setUsers(list);
+
+        // Check which users the viewer is already following
+        if (viewerId && list.length > 0) {
+          const checks = await Promise.allSettled(
+            list.map((u) =>
+              fetch(`/api/follow?username=${u.username}&viewerId=${viewerId}`)
+                .then((r) => (r.ok ? r.json() : null))
+                .then((d) => (d?.isFollowing ? u.id : null))
+            )
+          );
+          const following = new Set<string>();
+          checks.forEach((result) => {
+            if (result.status === "fulfilled" && result.value) following.add(result.value);
+          });
+          setViewerFollowing(following);
+        }
       }
     } finally {
       setLoadingUsers(false);
     }
-  };
+  }, [username, viewerId]);
+
+  const toggleFollow = useCallback(async (targetUserId: string) => {
+    if (!viewerId || busyIds.has(targetUserId)) return;
+
+    const isCurrentlyFollowing = viewerFollowing.has(targetUserId);
+    const next = !isCurrentlyFollowing;
+
+    // Optimistic update
+    setBusyIds((prev) => new Set(prev).add(targetUserId));
+    setViewerFollowing((prev) => {
+      const s = new Set(prev);
+      next ? s.add(targetUserId) : s.delete(targetUserId);
+      return s;
+    });
+    toast.success(next ? "دنبال می‌کنید" : "دنبال کردن متوقف شد");
+
+    try {
+      const res = await fetch("/api/follow", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetUserId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setViewerFollowing((prev) => {
+          const s = new Set(prev);
+          data.following ? s.add(targetUserId) : s.delete(targetUserId);
+          return s;
+        });
+      } else {
+        // Revert
+        setViewerFollowing((prev) => {
+          const s = new Set(prev);
+          isCurrentlyFollowing ? s.add(targetUserId) : s.delete(targetUserId);
+          return s;
+        });
+        toast.error("خطا در ارتباط");
+      }
+    } catch {
+      setViewerFollowing((prev) => {
+        const s = new Set(prev);
+        isCurrentlyFollowing ? s.add(targetUserId) : s.delete(targetUserId);
+        return s;
+      });
+      toast.error("خطا در ارتباط");
+    } finally {
+      setBusyIds((prev) => {
+        const s = new Set(prev);
+        s.delete(targetUserId);
+        return s;
+      });
+    }
+  }, [viewerId, viewerFollowing, busyIds]);
 
   return (
     <>
-      {/* Follow counts row */}
-      <div className="flex items-center gap-4 text-sm" dir="rtl">
+      {/* Follow counts */}
+      <div className="flex items-center gap-2 text-sm" dir="rtl">
         <button
           onClick={() => openModal("followers")}
           className="flex items-center gap-1.5 rounded-lg px-3 py-2 transition-colors hover:bg-muted group"
@@ -74,7 +160,8 @@ export function FollowStats({
           <span className="text-muted-foreground text-xs">دنبال‌کننده</span>
         </button>
 
-        <Separator orientation="vertical" className="h-5" />
+        {/* Taller separator */}
+        <Separator orientation="vertical" className="h-8 self-stretch" />
 
         <button
           onClick={() => openModal("following")}
@@ -96,7 +183,8 @@ export function FollowStats({
               {modalType === "followers" ? "دنبال‌کنندگان" : "دنبال می‌کند"}
             </DialogTitle>
           </DialogHeader>
-          <div className="max-h-[400px] overflow-y-auto space-y-1 -mx-1 px-1">
+
+          <div className="max-h-[420px] overflow-y-auto space-y-1 -mx-1 px-1">
             {loadingUsers ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 p-2">
@@ -105,6 +193,7 @@ export function FollowStats({
                     <div className="h-3 w-24 rounded bg-muted animate-pulse" />
                     <div className="h-2.5 w-16 rounded bg-muted animate-pulse" />
                   </div>
+                  <div className="h-6 w-16 rounded bg-muted animate-pulse shrink-0" />
                 </div>
               ))
             ) : users.length === 0 ? (
@@ -112,34 +201,62 @@ export function FollowStats({
                 {modalType === "followers" ? "هنوز دنبال‌کننده‌ای وجود ندارد." : "هنوز کسی را دنبال نمی‌کند."}
               </p>
             ) : (
-              users.map((u) => (
-                <Link
-                  key={u.id}
-                  href={`/author/${u.username}`}
-                  onClick={() => setShowModal(false)}
-                  className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0 border border-border">
-                    {u.avatar ? (
-                      <Image
-                        src={u.avatar}
-                        alt={u.name}
-                        width={40}
-                        height={40}
-                        className="object-cover w-full h-full"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm font-bold">
-                        {u.name?.[0] ?? "؟"}
+              users.map((u) => {
+                const isFollowing = viewerFollowing.has(u.id);
+                const isBusy = busyIds.has(u.id);
+                const isSelf = viewerId === u.id;
+
+                return (
+                  <div
+                    key={u.id}
+                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/60 transition-colors"
+                  >
+                    {/* Clickable avatar + name → profile */}
+                    <Link
+                      href={`/author/${u.username}`}
+                      onClick={() => setShowModal(false)}
+                      className="flex items-center gap-3 flex-1 min-w-0"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0 border border-border">
+                        {u.avatar ? (
+                          <Image
+                            src={u.avatar}
+                            alt={u.name}
+                            width={40}
+                            height={40}
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm font-bold">
+                            {u.name?.[0] ?? "؟"}
+                          </div>
+                        )}
                       </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-sm text-foreground truncate">{u.name}</div>
+                        <div className="text-xs text-muted-foreground" dir="ltr">@{u.username}</div>
+                      </div>
+                    </Link>
+
+                    {/* In-modal follow/unfollow — only for logged-in viewer, not self */}
+                    {viewerId && !isSelf && (
+                      <Button
+                        size="sm"
+                        variant={isFollowing ? "outline" : "primary"}
+                        className="shrink-0 gap-1 text-xs"
+                        disabled={isBusy}
+                        onClick={() => toggleFollow(u.id)}
+                      >
+                        {isFollowing ? (
+                          <><UserMinus size={12} /> رها</>
+                        ) : (
+                          <><UserPlus size={12} /> دنبال</>
+                        )}
+                      </Button>
                     )}
                   </div>
-                  <div>
-                    <div className="font-semibold text-sm text-foreground">{u.name}</div>
-                    <div className="text-xs text-muted-foreground" dir="ltr">@{u.username}</div>
-                  </div>
-                </Link>
-              ))
+                );
+              })
             )}
           </div>
         </DialogContent>

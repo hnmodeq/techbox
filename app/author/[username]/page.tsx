@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
 import { blurProps } from "@/lib/image-placeholder";
 import { getSessionUserPublic } from "@/lib/auth-server";
-import { getUserActivities, getProfileContentModules } from "@/lib/user-activity";
+import { getUserActivities, getProfileContentModulesForAuthor } from "@/lib/user-activity";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { FollowButton } from "@/components/profile/FollowButton";
 import { FollowStats } from "@/components/profile/FollowStats";
@@ -28,13 +28,14 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
     );
   }
 
-  const enabledModules = await getProfileContentModules();
+  // Only personal-authorship modules — media/news/shop have no personal author
+  const authorModules = await getProfileContentModulesForAuthor();
 
   const authoredPosts = await prisma.post.findMany({
     where: {
       published: true,
       deletedAt: null,
-      module: { in: enabledModules },
+      module: { in: authorModules },
       OR: [{ authorId: user.id }, { authorName: user.name }],
     },
     orderBy: { date: "desc" },

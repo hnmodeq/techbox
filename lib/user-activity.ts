@@ -2,13 +2,11 @@ import { prisma } from "@/lib/db"
 import type { UserActivity } from "@/components/profile/UserActivityList"
 import { getEnabledModules, type ModuleSlug } from "@/lib/module-config"
 
-/** Default list used when module config is unavailable */
 const DEFAULT_PROFILE_MODULES: ModuleSlug[] = ["blog", "review", "media", "forum", "news"]
 
 export async function getProfileContentModules(): Promise<ModuleSlug[]> {
   try {
     const enabled = await getEnabledModules()
-    // Only include enabled modules that have content
     const contentModules: ModuleSlug[] = ["blog", "review", "media", "forum", "news"]
     return contentModules.filter((m) => enabled.includes(m))
   } catch {
@@ -16,8 +14,22 @@ export async function getProfileContentModules(): Promise<ModuleSlug[]> {
   }
 }
 
-/** Sync constant for backward compatibility — used where async is not possible */
 export const PROFILE_CONTENT_MODULES = ["blog", "review", "media", "forum", "news"]
+
+/**
+ * Modules that are org-level content with no personal author.
+ * These are excluded from the author content tab.
+ */
+export const AUTHOR_CONTENT_MODULES: ModuleSlug[] = ["blog", "review", "forum"]
+
+export async function getProfileContentModulesForAuthor(): Promise<ModuleSlug[]> {
+  try {
+    const enabled = await getEnabledModules()
+    return AUTHOR_CONTENT_MODULES.filter((m) => enabled.includes(m))
+  } catch {
+    return AUTHOR_CONTENT_MODULES
+  }
+}
 
 export async function getUserActivities(userId: string): Promise<UserActivity[]> {
   const enabledModules = await getProfileContentModules()
