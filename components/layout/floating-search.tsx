@@ -143,7 +143,7 @@ export function FloatingSearch() {
             <SelectTrigger
               size="sm"
               aria-label="محدوده جستجو"
-              className="h-7 w-28 border-0 bg-transparent shadow-none px-2 rounded-full text-xs"
+              className="h-7 w-28 !border-0 !bg-transparent !shadow-none px-2 rounded-full text-xs focus:ring-0 focus-visible:ring-0"
             >
               <span className="truncate">{selectedLabel}</span>
             </SelectTrigger>
@@ -172,7 +172,7 @@ export function FloatingSearch() {
                 : "opacity-0 translate-y-1 pointer-events-none"
             )}
           >
-            <div className="rounded-xl p-1.5">
+            <div className="rounded-xl border border-border bg-popover shadow-xl p-1.5">
               <div className="flex items-center gap-1 px-2 pb-1 text-[10px] font-bold text-muted-foreground">
                 <HistoryIcon className="size-3" />
                 اخیر
@@ -206,7 +206,7 @@ export function FloatingSearch() {
             autoComplete="off"
             spellCheck={false}
             className={cn(
-              "border-0 bg-transparent shadow-none focus-visible:ring-0 text-right text-sm h-7 transition-all duration-500",
+              "!border-0 !bg-transparent !shadow-none focus-visible:ring-0 text-right text-sm h-7 transition-all duration-500",
               expanded ? "w-48" : "w-32"
             )}
           />
