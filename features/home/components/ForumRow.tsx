@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatRelativeDate } from '@/lib/date-format';
 import { ForumBadge } from '@/components/ui/forum-badge';
+import { VerifiedBadge } from '@/components/ui/verified-badge';
 import { useStatEntry } from '@/providers/stats.provider';
 import { EmptyRow } from './HomeRowSkeletons';
 
@@ -116,8 +117,11 @@ export default function ForumRow({ homeTitle, homeMoreLabel, showHomeTitle = tru
                           <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--primary)] transition-colors truncate">
-                            {authorName}
+                          <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--primary)] transition-colors flex items-center gap-1">
+                            <span className="truncate">{authorName}</span>
+                            {(top.author as any)?.verifiedType && (
+                              <VerifiedBadge type={(top.author as any).verifiedType as 'content' | 'org' | 'user'} label={(top.author as any)?.verifiedLabel} size={13} />
+                            )}
                           </div>
                           {top.author?.job ? (
                             <div className="text-[10px] text-muted-foreground truncate">{top.author.job}</div>

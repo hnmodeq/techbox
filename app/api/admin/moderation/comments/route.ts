@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
     take,
     include: {
-      author: { select: { id: true, name: true, username: true, avatar: true, status: true } },
+      author: { select: { id: true, name: true, username: true, avatar: true, status: true, verifiedType: true, verifiedLabel: true } },
       post: { select: { id: true, module: true, slug: true, title: true } },
     },
   });

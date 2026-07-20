@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { useStatEntry } from "@/providers/stats.provider";
 
 export function ForumBadge({ slug, fallback = null, className = "" }: { slug: string; fallback?: boolean | null; className?: string }) {
@@ -15,8 +16,6 @@ export function ForumBadge({ slug, fallback = null, className = "" }: { slug: st
 
   useEffect(() => {
     let mounted = true;
-    // Only fall back once the bulk fetch has actually settled and this
-    // item still isn't in it - not on a guessed timer.
     if (status === "loading" || shared) return () => { mounted = false; };
 
     fetch(`/api/stats?module=forum&slug=${encodeURIComponent(slug)}`)
@@ -38,13 +37,26 @@ export function ForumBadge({ slug, fallback = null, className = "" }: { slug: st
     );
   }
 
-  return solved ? (
-    <Badge variant="ghost" className={`text-[11px] text-[var(--success)] ${className}`}>
-      حل‌شده ✓
-    </Badge>
-  ) : (
-    <Badge variant="ghost" className={`text-[11px] text-[var(--warning)] ${className}`}>
-      باز
-    </Badge>
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger render={<span className="inline-flex" />}>
+          {solved ? (
+            <Badge variant="ghost" className={`text-[11px] text-[var(--success)] cursor-default ${className}`}>
+              حل‌شده ✓
+            </Badge>
+          ) : (
+            <Badge variant="ghost" className={`text-[11px] text-[var(--warning)] cursor-default ${className}`}>
+              باز
+            </Badge>
+          )}
+        </TooltipTrigger>
+        <TooltipContent dir="rtl">
+          {solved
+            ? "پاسخی مناسب به این موضوع داده شده"
+            : "هنوز پاسخ مناسبی برای این موضوع دریافت نشده"}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

@@ -53,7 +53,7 @@ export default function ReviewDetail({ item }: ReviewDetailProps) {
           </h1>
 
           <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
-            <AuthorLink name={item.author?.name || "نویسنده تکباکس"} avatar={item.author?.avatar || "/assets/hooman.png"} />
+            <AuthorLink name={item.author?.name || "نویسنده تکباکس"} avatar={item.author?.avatar || "/assets/hooman.png"} username={(item.author as any)?.username} verifiedType={(item.author as any)?.verifiedType} verifiedLabel={(item.author as any)?.verifiedLabel} />
 
             <div className="flex items-center gap-3">
               <LiveViewCounter module="review" slug={item.slug} initialViews={item.views || 0} showLabel={true} />

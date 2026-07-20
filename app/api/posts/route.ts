@@ -123,6 +123,8 @@ export async function GET(req: NextRequest) {
             roleFa: true,
             job: true,
             avatar: true,
+            verifiedType: true,
+            verifiedLabel: true,
           },
         },
       },
@@ -174,6 +176,8 @@ export async function GET(req: NextRequest) {
         role: p.author?.roleFa || p.author?.role || "عضو انجمن",
         job: p.author?.job || "",
         avatar: p.author?.avatar || "/assets/hooman.png",
+        verifiedType: (p.author as any)?.verifiedType || null,
+        verifiedLabel: (p.author as any)?.verifiedLabel || null,
       },
     }));
 

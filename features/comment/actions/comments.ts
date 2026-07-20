@@ -32,7 +32,7 @@ export async function getCommentsAction(module: string, slug: string) {
     return await prisma.comment.findMany({
       where: { postId: post.id, status: "approved" },
       orderBy: { createdAt: "asc" },
-      include: { author: { select: { name: true, username: true, avatar: true } } },
+      include: { author: { select: { name: true, username: true, avatar: true, verifiedType: true, verifiedLabel: true } } },
     });
   } catch {
     return [];

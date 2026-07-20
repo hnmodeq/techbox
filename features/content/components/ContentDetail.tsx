@@ -50,7 +50,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
 
  <div className="flex flex-wrap items-center gap-3 mt-6 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)]">
  {item.module !== "media" && (
- <AuthorLink name={item.author?.name} avatar={item.author?.avatar} username={item.author?.username} role={item.author?.job || item.author?.role} className="text-foreground" />
+ <AuthorLink name={item.author?.name} avatar={item.author?.avatar} username={item.author?.username} role={item.author?.job || item.author?.role} verifiedType={(item.author as any)?.verifiedType} verifiedLabel={(item.author as any)?.verifiedLabel} className="text-foreground" />
  )}
  <div className="ms-auto flex items-center gap-2 paragraph-color">
  <LiveViewCounter module={item.module} slug={item.slug} initialViews={item.views || 0} />

@@ -268,7 +268,7 @@ export default function CommentSection({ module, slug, initialComments, compact 
             ) : isEditing ? (
               <>
                 <div className="flex justify-between items-start gap-3 mb-3">
-                  <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
+                  <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} verifiedType={(c as any).author?.verifiedType} verifiedLabel={(c as any).author?.verifiedLabel} />
                 </div>
                 <Textarea
                   value={editText}
@@ -294,7 +294,7 @@ export default function CommentSection({ module, slug, initialComments, compact 
                   </div>
                 )}
                 <div className="flex justify-between items-start gap-3">
-                  <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} />
+                  <AuthorLink name={(c as any).authorName || "کاربر"} username={(c as any).author?.username} avatar={(c as any).author?.avatar || ""} verifiedType={(c as any).author?.verifiedType} verifiedLabel={(c as any).author?.verifiedLabel} />
                   <div className="flex items-center gap-2 shrink-0">
                     {hasBeenEdited && (
                       <Tooltip>

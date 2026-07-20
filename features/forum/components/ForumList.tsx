@@ -18,6 +18,7 @@ import ModuleHeader from "@/components/effects/ModuleHeader";
 import { CardStats } from "@/components/ui/card-stats";
 import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from "@/components/ui/forum-badge";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { useStats } from "@/providers/stats.provider";
 
 type ForumPost = ReturnType<typeof getModuleItems>[0] & { solved?: boolean };
@@ -210,7 +211,14 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                     <span className="font-semibold text-sm group-hover:text-[var(--primary)] transition-colors line-clamp-1">{t.title}</span>
                     <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">ارسال‌شده توسط <b className="text-foreground">{t.author?.name || "کاربر تکباکس"}</b> • {formatRelativeDate(t.date)}</div>
+                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1 flex-wrap">
+                    ارسال‌شده توسط
+                    <b className="text-foreground">{t.author?.name || "کاربر تکباکس"}</b>
+                    {(t.author as any)?.verifiedType && (
+                      <VerifiedBadge type={(t.author as any).verifiedType as "content" | "org" | "user"} label={(t.author as any)?.verifiedLabel} size={13} />
+                    )}
+                    • {formatRelativeDate(t.date)}
+                  </div>
                 </div>
               </div>
               <div className="col-span-12 sm:col-span-4 flex items-center justify-end">

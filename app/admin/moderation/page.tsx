@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 
 type ModerationComment = {
   id: string;
@@ -157,7 +158,12 @@ export default function ModerationPage() {
                   <div className="flex min-w-0 items-center gap-3">
                     {comment.author?.avatar && <Image src={comment.author.avatar} width={40} height={40} alt={comment.authorName} className="h-10 w-10 rounded-full object-cover" />}
                     <div>
-                      <div className="font-bold text-sm">{comment.author?.name || comment.authorName}</div>
+                      <div className="font-bold text-sm flex items-center gap-1">
+                        {comment.author?.name || comment.authorName}
+                        {(comment.author as any)?.verifiedType && (
+                          <VerifiedBadge type={(comment.author as any).verifiedType as "content" | "org" | "user"} label={(comment.author as any)?.verifiedLabel} size={13} />
+                        )}
+                      </div>
                       <div className="font-mono text-xs text-muted-foreground" dir="ltr">@{comment.author?.username || "guest"}</div>
                     </div>
                   </div>

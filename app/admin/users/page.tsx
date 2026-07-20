@@ -171,7 +171,12 @@ export default function AdminUsersPage() {
                       {u.avatar ? <Image src={u.avatar} alt={u.name} fill sizes="40px" className="object-cover" /> : null}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="font-bold truncate">{u.name}</div>
+                      <div className="font-bold flex items-center gap-1">
+                        <span className="truncate">{u.name}</span>
+                        {u.verifiedType && (
+                          <VerifiedBadge type={u.verifiedType as "content" | "org" | "user"} label={u.verifiedLabel} size={13} />
+                        )}
+                      </div>
                       <div className="text-xs text-muted-foreground font-mono" dir="ltr">@{u.username}</div>
                     </div>
                     <Badge variant={statusVariant(u.status)}>{u.status}</Badge>
