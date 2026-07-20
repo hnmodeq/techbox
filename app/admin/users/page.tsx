@@ -225,7 +225,7 @@ export default function AdminUsersPage() {
                         className="w-full rounded-md border bg-background px-3 py-1.5 text-sm"
                       >
                         <option value="">بدون نشان</option>
-                        <option value="user">🟡 کاربر تایید شده</option>
+                        <option value="user">🟢 کاربر تایید شده</option>
                         <option value="content">🔵 تولید کننده محتوای تایید شده</option>
                         <option value="org">🟣 کاربر سازمانی تایید شده</option>
                       </select>

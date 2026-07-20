@@ -1,14 +1,15 @@
 "use client";
 
 /**
- * VerifiedBadge — tick icon shown next to usernames for verified accounts.
+ * VerifiedBadge — PNG badge shown next to usernames for verified accounts.
  *
  * Types:
- *   "content" → blue  → تولید کننده محتوای تایید شده
+ *   "content" → blue   → تولید کننده محتوای تایید شده
  *   "org"     → purple → کاربر سازمانی تایید شده (+ optional label line)
- *   "user"    → yellow → کاربر تایید شده
+ *   "user"    → green  → کاربر تایید شده
  */
 
+import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface VerifiedBadgeProps {
@@ -21,32 +22,18 @@ interface VerifiedBadgeProps {
 
 const CONFIG = {
   content: {
-    color: "#3b82f6",   // blue-500
+    src: "/assets/badges/blue-verified.png",
     title: "تولید کننده محتوای تایید شده",
   },
   org: {
-    color: "#a855f7",   // purple-500
+    src: "/assets/badges/purple-verified.png",
     title: "کاربر سازمانی تایید شده",
   },
   user: {
-    color: "#eab308",   // yellow-500
+    src: "/assets/badges/green-verified.png",
     title: "کاربر تایید شده",
   },
 } as const;
-
-function TickSvg({ color, size }: { color: string; size: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill={color}
-      aria-hidden="true"
-    >
-      <path d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-    </svg>
-  );
-}
 
 export function VerifiedBadge({ type, label, size = 16, className = "" }: VerifiedBadgeProps) {
   const cfg = CONFIG[type];
@@ -62,7 +49,14 @@ export function VerifiedBadge({ type, label, size = 16, className = "" }: Verifi
             />
           }
         >
-          <TickSvg color={cfg.color} size={size} />
+          <Image
+            src={cfg.src}
+            alt={cfg.title}
+            width={size}
+            height={size}
+            className="object-contain"
+            unoptimized
+          />
         </TooltipTrigger>
         <TooltipContent dir="rtl" className="text-right">
           <p className="font-semibold">{cfg.title}</p>
