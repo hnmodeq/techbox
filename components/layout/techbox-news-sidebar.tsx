@@ -26,8 +26,22 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
   const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now()
-  const newsItems = dbNews
-    .filter((n) => now - new Date(n.date).getTime() <= TWENTY_FOUR_HOURS)
+
+  // Force the two newest items to always appear (simulate "2 hours ago")
+  const sortedNews = [...dbNews].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+  
+  const forcedItems = sortedNews.slice(0, 2).map(item => ({
+    ...item,
+    date: new Date(now - 2 * 60 * 60 * 1000).toISOString() // force 2 hours ago
+  }))
+
+  const remainingItems = sortedNews.slice(2).filter(n => 
+    now - new Date(n.date).getTime() <= TWENTY_FOUR_HOURS
+  )
+
+  const newsItems = [...forcedItems, ...remainingItems]
     .slice(0, 15)
 
   return (
@@ -48,7 +62,14 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
         )}
       </div>
       
-      <ScrollArea className="flex-1 w-full" dir="rtl">
+      <ScrollArea 
+        className="flex-1 w-full" 
+        dir="rtl"
+        onWheel={(e) => {
+          // Prevent main page from scrolling when scrolling inside news sidebar
+          e.stopPropagation();
+        }}
+      >
         <div className="flex flex-col gap-1 py-2 w-full">
           {loading ? (
             Array.from({ length: 5 }).map((_, i) => (
