@@ -98,7 +98,7 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
                       <VerifiedBadge
                         type={(user as any).verifiedType as "content" | "org" | "user"}
                         label={(user as any).verifiedLabel}
-                        size={22}
+                        size={28}
                       />
                     )}
                   </h1>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { UserPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,12 +19,10 @@ export function FollowButton({ targetUserId, viewerId, initialIsFollowing = fals
   const toggleFollow = async () => {
     if (busy) return;
 
-    // Optimistic update — user sees the change immediately
     const next = !isFollowing;
     setIsFollowing(next);
     toast.success(next ? "دنبال می‌کنید" : "دنبال کردن متوقف شد");
 
-    // Fire-and-forget in the background
     setBusy(true);
     try {
       const res = await fetch("/api/follow", {
@@ -34,10 +33,8 @@ export function FollowButton({ targetUserId, viewerId, initialIsFollowing = fals
 
       if (res.ok) {
         const data = await res.json();
-        // Reconcile with server truth silently
         setIsFollowing(data.following);
       } else {
-        // Revert on server error
         setIsFollowing(!next);
         toast.error("خطا در ارتباط");
       }
@@ -50,23 +47,34 @@ export function FollowButton({ targetUserId, viewerId, initialIsFollowing = fals
   };
 
   return (
-    <Button
-      onClick={toggleFollow}
-      variant={isFollowing ? "outline" : "primary"}
-      size="sm"
-      className="gap-1.5"
-    >
-      {isFollowing ? (
-        <>
-          <UserMinus size={14} />
-          توقف دنبال کردن
-        </>
-      ) : (
-        <>
-          <UserPlus size={14} />
-          دنبال کردن
-        </>
-      )}
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Button
+              onClick={toggleFollow}
+              variant={isFollowing ? "outline" : "primary"}
+              size="sm"
+              className="gap-1.5"
+            />
+          }
+        >
+          {isFollowing ? (
+            <>
+              <UserMinus size={14} />
+              توقف دنبال کردن
+            </>
+          ) : (
+            <>
+              <UserPlus size={14} />
+              دنبال کردن
+            </>
+          )}
+        </TooltipTrigger>
+        <TooltipContent dir="rtl" className="max-w-[220px] text-center">
+          با دنبال کردن این کاربر از فعالیت‌های عمومی او مطلع می‌شوید
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

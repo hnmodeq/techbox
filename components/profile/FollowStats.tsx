@@ -7,6 +7,7 @@ import { Users, UserPlus, UserMinus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
 interface UserRow {
@@ -153,31 +154,47 @@ export function FollowStats({
   return (
     <>
       {/* Follow counts row */}
-      <div className="flex items-center gap-2 text-sm" dir="rtl">
-        <button
-          onClick={() => openModal("followers")}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 transition-colors hover:bg-muted group"
-        >
-          <Users size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="font-black text-foreground text-base tabular-nums">
-            {stats.followersCount.toLocaleString("fa-IR")}
-          </span>
-          <span className="text-muted-foreground text-xs">دنبال‌کننده</span>
-        </button>
+      <TooltipProvider>
+        <div className="flex items-center gap-2 text-sm" dir="rtl">
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={() => openModal("followers")}
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-2 transition-colors hover:bg-muted group"
+                />
+              }
+            >
+              <Users size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="font-black text-foreground text-base tabular-nums">
+                {stats.followersCount.toLocaleString("fa-IR")}
+              </span>
+              <span className="text-muted-foreground text-xs">دنبال‌کننده</span>
+            </TooltipTrigger>
+            <TooltipContent>تعداد دنبال کننده‌های این کاربر</TooltipContent>
+          </Tooltip>
 
-        <Separator orientation="vertical" className="h-8 self-stretch" />
+          <Separator orientation="vertical" className="h-8 self-stretch" />
 
-        <button
-          onClick={() => openModal("following")}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 transition-colors hover:bg-muted group"
-        >
-          <Users size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
-          <span className="font-black text-foreground text-base tabular-nums">
-            {stats.followingCount.toLocaleString("fa-IR")}
-          </span>
-          <span className="text-muted-foreground text-xs">دنبال می‌کند</span>
-        </button>
-      </div>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  onClick={() => openModal("following")}
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-2 transition-colors hover:bg-muted group"
+                />
+              }
+            >
+              <Users size={15} className="text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="font-black text-foreground text-base tabular-nums">
+                {stats.followingCount.toLocaleString("fa-IR")}
+              </span>
+              <span className="text-muted-foreground text-xs">دنبال می‌کند</span>
+            </TooltipTrigger>
+            <TooltipContent>تعداد کاربرهایی که این کاربر دنبال می‌کند</TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
 
       {/* Modal — shared for both followers & following */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
