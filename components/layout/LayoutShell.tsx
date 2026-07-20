@@ -73,12 +73,31 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
+  const newsSidebarRef = React.useRef<HTMLDivElement>(null)
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
   const newsSlugsKey = dbNews.map((item) => item.slug).filter(Boolean).join(",")
   const hasUnreadNews = unreadNewsSlugs.length > 0
   const lastFetchedReadStateKey = React.useRef<string>("")
+
+  // Close when clicking outside the sidebar panel
+  React.useEffect(() => {
+    if (!newsOpen) return
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as Element
+      if (newsSidebarRef.current?.contains(target)) return
+      if (target.closest("[data-news-toggle]")) return
+      setNewsOpen(false)
+    }
+    document.addEventListener("mousedown", onMouseDown)
+    return () => document.removeEventListener("mousedown", onMouseDown)
+  }, [newsOpen])
+
+  // Lock page scroll while cursor is over the news sidebar; unlock when it leaves or closes
+  const lockScroll = React.useCallback(() => { document.body.style.overflow = "hidden" }, [])
+  const unlockScroll = React.useCallback(() => { document.body.style.overflow = "" }, [])
+  React.useEffect(() => { if (!newsOpen) document.body.style.overflow = "" }, [newsOpen])
 
   React.useEffect(() => {
     try {
@@ -167,14 +186,14 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         fixed means it is completely outside the document scroll flow.
       */}
       <div
+        ref={newsSidebarRef}
+        onMouseEnter={lockScroll}
+        onMouseLeave={unlockScroll}
         className={`fixed left-0 top-(--header-height) h-[calc(100svh-var(--header-height))] z-40 hidden md:flex flex-col overflow-hidden border-r border-[var(--sidebar-border)] bg-[var(--sidebar-background)] transition-[width] duration-300 ease-in-out ${
           newsOpen ? "w-[20rem] shadow-xl" : "w-0 border-r-0"
         }`}
       >
-        <TechboxNewsSidebar
-          unreadSlugs={openedUnreadNewsSlugs}
-          onClose={() => setNewsOpen(false)}
-        />
+        <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} />
       </div>
     </div>
   )

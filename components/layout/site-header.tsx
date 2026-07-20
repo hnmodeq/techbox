@@ -646,6 +646,7 @@ export function SiteHeader({
                     onClick={onToggleNews}
                     aria-pressed={newsOpen}
                     aria-label="اخبار زنده تکباکس"
+                    data-news-toggle="true"
                   />
                 }
               >
