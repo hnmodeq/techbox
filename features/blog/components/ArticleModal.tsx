@@ -104,14 +104,14 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                 <Icon name="close" size={20} />
               </Button>
 
-              {/* Title — top of image (right side, below close row) */}
-              <div className="absolute top-12 inset-x-0 px-5">
-                <h2 className="text-lg sm:text-xl font-black text-white leading-6 drop-shadow">
+              {/* Title — just above the date/reading time caption */}
+              <div className="absolute bottom-8 inset-x-0 px-5">
+                <h2 className="text-lg sm:text-xl font-black text-white leading-6 drop-shadow line-clamp-2">
                   {item.title}
                 </h2>
               </div>
 
-              {/* Date + reading time — bottom of image */}
+              {/* Date + reading time — bottom caption */}
               <div className="absolute bottom-3 right-3 flex items-center gap-3 text-white/70 text-xs">
                 <Tooltip>
                   <TooltipTrigger render={<span className="cursor-default" />}>
