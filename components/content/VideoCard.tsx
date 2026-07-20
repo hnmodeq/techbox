@@ -197,14 +197,14 @@ export function VideoModal({
         <div
           className="flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] w-full sm:w-auto"
           style={{
-            maxWidth: "80rem",
+            maxWidth: "96rem",
             animation: `${slideDirection === "right" ? "slideFromRight" : "slideFromLeft"} 250ms ease-out`,
           }}
         >
           {/* Video side — FIXED size so frame never jumps */}
           <div
-            className="bg-black shrink-0 flex items-center justify-center relative"
-            style={{ width: "min(45vw, 560px)", height: "min(92vh, 760px)" }}
+            className="bg-black shrink-0 flex items-center justify-center relative self-stretch"
+            style={{ width: "min(48vw, 600px)", minWidth: "min(48vw, 600px)" }}
           >
             {/* Skeleton/placeholder shown until video can play */}
             {!videoReady && (
@@ -234,13 +234,13 @@ export function VideoModal({
               playsInline
               preload="metadata"
               onError={() => setVideoReady(true)} // show controls even on error
-              className="w-full h-full object-contain"
-              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s" }}
+              className="w-full max-h-[92vh] object-contain"
+              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s", display: "block" }}
             />
           </div>
 
           {/* Info side */}
-          <div className="min-w-0 sm:min-w-[440px] sm:max-w-[600px] sm:flex-1 flex flex-col max-h-[42vh] sm:max-h-[92vh]">
+          <div className="min-w-0 sm:min-w-[440px] sm:max-w-[600px] sm:flex-1 flex flex-col max-h-[92vh]">
             <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
