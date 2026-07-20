@@ -1,13 +1,12 @@
 "use client";
 
 /**
- * MagazineCard — shared card component used by both:
- *   - features/home/components/MagazineRow.tsx  (homepage blog row)
- *   - features/blog/components/BlogGrid.tsx      (/blog page)
+ * MagazineCard — shared card used by:
+ *   - features/home/components/MagazineRow.tsx  → links to /blog/[slug]
+ *   - features/blog/components/BlogGrid.tsx      → opens ArticleModal
  *
- * Design: full-bleed image fills the entire card. Title, author, stats and
- * date all sit on top of the image inside a gradient overlay at the bottom.
- * Date + reading-time sit in a lighter gradient at the top.
+ * When `onOpen` is provided the card renders as a button (no navigation).
+ * When absent it renders a Link to the slug page (homepage behaviour).
  */
 
 import React from "react";
@@ -20,7 +19,7 @@ import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { blurProps } from "@/lib/image-placeholder";
 import { formatRelativeDate } from "@/lib/date-format";
 
-// ─── helpers (duplicated-free: defined once here) ────────────────────────────
+// ─── helpers ─────────────────────────────────────────────────────────────────
 
 function stripPreviewText(value?: string) {
   return (value || "")
@@ -72,15 +71,12 @@ function ArticleAuthorMeta({
           <Link
             href={`/author/${encodeURIComponent(slug)}`}
             onClick={(e) => e.stopPropagation()}
-            className={`grid grid-cols-[minmax(60px,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 ${className}`}
+            className={`grid grid-cols-[minmax(60px,1fr)_2rem] grid-rows-2 items-center gap-x-2 text-right transition-opacity hover:opacity-90 min-w-[120px] ${className}`}
             dir="ltr"
           />
         }
       >
-        <div
-          className="col-start-1 row-start-1 min-w-0 self-end flex items-center gap-1 text-xs font-extrabold text-white drop-shadow"
-          dir="rtl"
-        >
+        <div className="col-start-1 row-start-1 min-w-0 self-end flex items-center gap-1 text-xs font-extrabold text-white drop-shadow" dir="rtl">
           <span className="truncate">{name}</span>
           {author?.verifiedType && (
             <VerifiedBadge
@@ -91,10 +87,7 @@ function ArticleAuthorMeta({
           )}
         </div>
         {job && (
-          <div
-            className="col-start-1 row-start-2 min-w-0 self-start truncate text-[10px] text-white/70"
-            dir="rtl"
-          >
+          <div className="col-start-1 row-start-2 min-w-0 self-start truncate text-[10px] text-white/70" dir="rtl">
             {job}
           </div>
         )}
@@ -113,7 +106,7 @@ function ArticleAuthorMeta({
   );
 }
 
-// ─── The card ─────────────────────────────────────────────────────────────────
+// ─── Card item type ───────────────────────────────────────────────────────────
 
 export interface MagazineCardItem {
   slug: string;
@@ -130,13 +123,20 @@ export interface MagazineCardItem {
   author?: { name?: string; username?: string; avatar?: string; job?: string; role?: string; verifiedType?: string | null; verifiedLabel?: string | null };
 }
 
-export function MagazineCard({ item }: { item: MagazineCardItem }) {
+// ─── Card ─────────────────────────────────────────────────────────────────────
+
+export function MagazineCard({
+  item,
+  onOpen,
+}: {
+  item: MagazineCardItem;
+  /** When provided, clicking opens the article modal instead of navigating */
+  onOpen?: () => void;
+}) {
   const postModule = item.module || "blog";
 
-  return (
-    <Card className="group !p-0 overflow-hidden relative aspect-[3/4] transition-all duration-500 ease-out hover:-translate-y-0.5 hover:shadow-xl">
-      <Link href={`/${postModule}/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title} />
-
+  const inner = (
+    <>
       {/* Full-bleed image */}
       <Image
         src={item.image || "/assets/blog-1.jpg"}
@@ -180,22 +180,36 @@ export function MagazineCard({ item }: { item: MagazineCardItem }) {
         </h3>
 
         <div className="flex items-end justify-between gap-2 pointer-events-auto" dir="ltr">
-          {/* Stats — icons white */}
           <div className="[&_span]:text-white [&_svg]:text-white/70">
             <CardStats
               module={postModule}
               slug={item.slug}
               initialViews={item.views ?? 0}
               initialLikes={item.likes ?? 0}
-              initialComments={item.comments ?? 0}
+              initialComments={item.comments}
               showComments
             />
           </div>
-
-          {/* Author */}
           <ArticleAuthorMeta author={item.author} />
         </div>
       </div>
+    </>
+  );
+
+  const baseClass = "group !p-0 overflow-hidden relative aspect-[3/4] transition-all duration-500 ease-out hover:-translate-y-0.5 hover:shadow-xl cursor-pointer";
+
+  if (onOpen) {
+    return (
+      <Card className={baseClass} onClick={onOpen}>
+        {inner}
+      </Card>
+    );
+  }
+
+  return (
+    <Card className={baseClass}>
+      <Link href={`/${postModule}/${item.slug}`} className="absolute inset-0 z-10" aria-label={item.title} />
+      {inner}
     </Card>
   );
 }
