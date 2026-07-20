@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useHomeModule } from '@/features/home/lib/home-data';
 import { HOME_ROW_SIZES } from './HomeRowConfig';
-import Link from 'next/link';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyRow, RowGridSkeleton } from './HomeRowSkeletons';
 import { MagazineCard } from '@/components/content/MagazineCard';
+import { ArticleModal } from '@/features/blog/components/ArticleModal';
+import type { ContentItem } from '@/lib/content';
 
 export default function MagazineRow({
   homeTitle,
@@ -22,42 +23,62 @@ export default function MagazineRow({
   const { items: dbArticles, loading } = useHomeModule('blog');
   const articles = dbArticles.slice(0, 3);
 
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const open  = useCallback((idx: number) => setActiveIndex(idx), []);
+  const close = useCallback(() => setActiveIndex(null), []);
+  const prev  = useCallback(() =>
+    setActiveIndex((i) => (i === null ? null : i > 0 ? i - 1 : articles.length - 1)),
+    [articles.length]
+  );
+  const next  = useCallback(() =>
+    setActiveIndex((i) => (i === null ? null : i < articles.length - 1 ? i + 1 : 0)),
+    [articles.length]
+  );
+
   return (
-    <section
-      className={`w-full py-8 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`}
-      dir="rtl"
-    >
-      <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
-        <div className="flex items-center justify-between gap-4 mb-6">
-          {showHomeTitle && (
-            <h2 className="text-xl sm:text-2xl font-black text-foreground">
-              {homeTitle || "آخرین مقالات منتشر شده"}
-            </h2>
-          )}
-          {showHomeMoreLabel && (
-            <ButtonLink
-              variant="link"
-              size="sm"
-              className="text-[var(--primary)] font-bold shrink-0"
-              href="/blog"
-            >
-              {homeMoreLabel || "مشاهده همه ←"}
-            </ButtonLink>
+    <>
+      <section
+        className={`w-full py-8 px-4 sm:px-6 lg:px-8 bg-background ${HOME_ROW_SIZES.magazineMinHeight} flex flex-col justify-center`}
+        dir="rtl"
+      >
+        <div className={`mx-auto ${HOME_ROW_SIZES.containerMaxWidth} w-full`}>
+          <div className="flex items-center justify-between gap-4 mb-6">
+            {showHomeTitle && (
+              <h2 className="text-xl sm:text-2xl font-black text-foreground">
+                {homeTitle || 'آخرین مقالات منتشر شده'}
+              </h2>
+            )}
+            {showHomeMoreLabel && (
+              <ButtonLink variant="link" size="sm" className="text-[var(--primary)] font-bold shrink-0" href="/blog">
+                {homeMoreLabel || 'مشاهده همه ←'}
+              </ButtonLink>
+            )}
+          </div>
+
+          {loading ? (
+            <RowGridSkeleton count={3} />
+          ) : articles.length === 0 ? (
+            <EmptyRow>هنوز مقاله‌ای در دیتابیس ثبت نشده است.</EmptyRow>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {articles.map((art, idx) => (
+                <MagazineCard key={art.slug} item={art} onOpen={() => open(idx)} />
+              ))}
+            </div>
           )}
         </div>
+      </section>
 
-        {loading ? (
-          <RowGridSkeleton count={3} />
-        ) : articles.length === 0 ? (
-          <EmptyRow>هنوز مقاله‌ای در دیتابیس ثبت نشده است.</EmptyRow>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((art) => (
-              <MagazineCard key={art.slug} item={art} />
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
+      {/* Article modal — same as /blog page */}
+      {activeIndex !== null && articles[activeIndex] && (
+        <ArticleModal
+          item={articles[activeIndex] as ContentItem}
+          onClose={close}
+          onPrev={prev}
+          onNext={next}
+        />
+      )}
+    </>
   );
 }

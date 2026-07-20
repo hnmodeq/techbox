@@ -187,10 +187,10 @@ export default function Chatbot() {
             className="fixed bottom-5 left-5"
             style={{ zIndex: zIndex.popover }}
           >
-            <Button
+            <button
               type="button"
               onClick={() => { setOpen(true); setHasUnread(false); }}
-              className="rounded-full shadow-none size-12 p-0 bg-transparent text-foreground transition-transform duration-150 hover:-translate-y-0.5"
+              className="relative rounded-full size-12 p-0 bg-transparent text-foreground transition-transform duration-150 hover:-translate-y-0.5 flex items-center justify-center focus:outline-none"
               aria-label="پشتیبانی تکباکس"
             >
               <Headset className="size-5" />
@@ -200,7 +200,7 @@ export default function Chatbot() {
                   <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500"></span>
                 </span>
               )}
-            </Button>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

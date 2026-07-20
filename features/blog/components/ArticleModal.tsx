@@ -51,13 +51,12 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
   }, [item.slug, router]);
 
   const handleOpenFullPage = useCallback(() => {
-    // Show loading overlay inside modal — don't close it
     setNavigating(true);
-    // Navigate; Next.js will transition; we close the modal after a brief delay
-    // so the user sees the loading state then the new page appears cleanly
+    // Show full-screen loading overlay, navigate, modal closes naturally when
+    // the new page replaces the current one (the /blog route unmounts BlogGrid)
     router.push(`/blog/${item.slug}`);
-    // Close modal after 600ms — by then the new page is rendering
-    setTimeout(() => onClose(), 600);
+    // Fallback: close modal after 3s in case navigation is very slow
+    setTimeout(() => { setNavigating(false); onClose(); }, 3000);
   }, [item.slug, router, onClose]);
 
   const readingTime = item.readingTimeLabel || "";
@@ -97,11 +96,11 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
             className="relative flex-1 flex flex-col max-h-[90vh] overflow-hidden rounded-xl bg-[var(--modal-background)] border border-border shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* ── Navigation loading overlay ── */}
+            {/* ── Full-screen navigation loading overlay ── */}
             {navigating && (
-              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-background/80 backdrop-blur-sm rounded-xl">
-                <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-                <span className="text-sm text-muted-foreground">در حال باز کردن مقاله...</span>
+              <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/90 backdrop-blur-md">
+                <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                <span className="text-sm font-medium text-muted-foreground">در حال باز کردن مقاله...</span>
               </div>
             )}
 

@@ -15,7 +15,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/providers/auth.provider";
 import { VerificationRequestForm } from "@/features/auth/components/VerificationRequestForm";
 
@@ -53,7 +52,6 @@ export function HelpModals() {
 
   return (
     <>
-      <Toaster dir="rtl" />
       <FaqModal open={open === "faq"} onClose={() => setOpen(null)} />
       <FeedbackModal open={open === "feedback"} onClose={() => setOpen(null)} defaultName={defaultName} defaultEmail={defaultEmail} />
       <SupportModal open={open === "support"} onClose={() => setOpen(null)} defaultName={defaultName} defaultEmail={defaultEmail} />

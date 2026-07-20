@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { SearchIcon, Trash2Icon } from "lucide-react"
+import { SearchIcon, Trash2Icon, ChevronDownIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import { Input } from "@/components/ui/input"
@@ -144,7 +144,7 @@ export function FloatingSearch() {
         <form
           onSubmit={handleSubmit}
           className={cn(
-            "flex items-center gap-1 rounded-full shadow-lg px-2.5 py-1.5 transition-all duration-500 ease-out",
+            "flex items-center gap-1 rounded-full shadow-lg px-2.5 py-1.5 transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
             BAR_BG,
             expanded ? "opacity-100" : "opacity-50"
           )}
@@ -227,7 +227,7 @@ export function FloatingSearch() {
               autoComplete="off"
               spellCheck={false}
               className={cn(
-                "!border-0 !bg-transparent !shadow-none focus-visible:ring-0 text-right text-sm h-6 transition-all duration-500 px-1",
+                "!border-0 !bg-transparent !shadow-none focus-visible:ring-0 text-right text-sm h-6 transition-[width] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] px-1",
                 expanded ? "w-36" : "w-28"
               )}
             />
@@ -241,7 +241,7 @@ export function FloatingSearch() {
           <div
             ref={catWrapRef}
             className={cn(
-              "relative overflow-visible transition-all duration-500",
+              "relative overflow-visible transition-[width,opacity] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
               expanded ? "w-24 opacity-100" : "w-0 opacity-0 pointer-events-none"
             )}
           >
@@ -284,9 +284,12 @@ export function FloatingSearch() {
                 setCatOpen((o) => !o)
                 setRecentOpen(false)
               }}
-              className="h-6 w-24 text-xs text-right px-2 rounded-full hover:bg-muted/40 transition-colors whitespace-nowrap overflow-hidden text-ellipsis"
+              className="h-6 w-24 text-xs text-right px-2 rounded-full transition-colors whitespace-nowrap overflow-hidden flex items-center justify-between gap-1 text-foreground/80 hover:text-foreground"
             >
-              {selectedLabel}
+              <span className="truncate">{selectedLabel}</span>
+              <ChevronDownIcon
+                className={`size-3 shrink-0 transition-transform duration-300 ${catOpen ? "-rotate-180" : ""}`}
+              />
             </button>
           </div>
         </form>

@@ -177,8 +177,8 @@ function TechboxBreadcrumb() {
   if (crumbs.length <= 1) return null
 
   return (
-    <Breadcrumb className="hidden min-w-0 lg:block">
-      <BreadcrumbList>
+    <Breadcrumb className="hidden lg:block shrink-0">
+      <BreadcrumbList className="flex-nowrap whitespace-nowrap">
         {crumbs.map((crumb, index) => {
           const isCurrent = index === crumbs.length - 1
           const tooltipText = isCurrent ? "اینجا هستید" : `رفتن به ${crumb.label}`
@@ -604,7 +604,7 @@ export function SiteHeader({
       suppressHydrationWarning
     >
       <div className="flex h-(--header-height) w-full items-center justify-around gap-3 px-4">
-        <div className="flex min-w-0 flex-1 items-center justify-start gap-2">
+        <div className="flex min-w-0 flex-[2] items-center justify-start gap-2">
           <Tooltip>
             <TooltipTrigger
               render={
