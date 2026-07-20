@@ -13,7 +13,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ usernam
     if (!user) return NextResponse.json(null, { status: 404, headers: cacheHeaders(PRIVATE_NO_STORE) })
     const authoredCount = await prisma.post.count({ where: { published: true, deletedAt: null, OR: [{ authorId: user.id }, { authorName: user.name }] } })
     const isAuthor = authoredCount > 0 || ["super_admin", "admin", "editor"].includes(user.role)
-    return NextResponse.json({ ...user, authoredCount, isAuthor, breadcrumbParent: isAuthor ? (user.job || user.roleFa || "نویسنده") : "حساب کاربری" }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) })
+    return NextResponse.json({ ...user, authoredCount, isAuthor, breadcrumbParent: "حساب کاربری" }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) })
   } catch {
     return NextResponse.json({ error: "db_error" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) })
   }

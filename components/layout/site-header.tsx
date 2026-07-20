@@ -78,7 +78,7 @@ type NotificationItem = {
   read?: boolean
 }
 
-function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: string | null, authorCrumbs?: { parent: string; name: string }): Crumb[] {
+function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: string | null, authorName?: string): Crumb[] {
   const parts = pathname.split("/").filter(Boolean)
   if (parts.length === 0) return [{ label: "خانه" }]
 
@@ -91,10 +91,13 @@ function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: stri
     const isCurrent = i === parts.length - 1
     const meta = moduleMeta[part as ModuleSlug]
 
-    if (part === "author" && authorCrumbs) {
-      crumbs.push({ label: authorCrumbs.parent, href: isCurrent ? undefined : accumulated })
-    } else if (parts[0] === "author" && i === 1 && authorCrumbs) {
-      crumbs.push({ label: authorCrumbs.name })
+    if (part === "author") {
+      // Always show "حساب کاربری" — never the job title
+      crumbs.push({ label: "حساب کاربری", href: isCurrent ? undefined : accumulated })
+    } else if (parts[0] === "author" && i === 1) {
+      // Show Persian name once loaded; decoded slug until then (no flicker with English)
+      const fallback = decodeURIComponent(part).replace(/-/g, " ")
+      crumbs.push({ label: authorName || fallback })
     } else if (meta) {
       crumbs.push({ label: meta.titleFa || meta.title || part, href: isCurrent ? undefined : accumulated })
     } else if (part === "search") {
@@ -113,7 +116,7 @@ function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: stri
 function TechboxBreadcrumb() {
   const pathname = usePathname()
   const [dynamicTitle, setDynamicTitle] = React.useState<string>("")
-  const [authorCrumbs, setAuthorCrumbs] = React.useState<{ parent: string; name: string } | undefined>()
+  const [authorName, setAuthorName] = React.useState<string>("")
   const [searchQuery, setSearchQuery] = React.useState<string | null>(null)
 
   React.useEffect(() => {
@@ -129,20 +132,24 @@ function TechboxBreadcrumb() {
     const firstPart = parts[0]
     const moduleKey = firstPart as ModuleSlug | undefined
     const slug = parts[1]
-    setAuthorCrumbs(undefined)
 
     if (firstPart === "author" && slug) {
+      setDynamicTitle("")
       let cancelled = false
       fetch(`/api/users/public/${encodeURIComponent(slug)}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((profile) => {
-          if (!cancelled && profile) setAuthorCrumbs({ parent: profile.breadcrumbParent || "حساب کاربری", name: profile.name || slug })
+          if (!cancelled && profile?.name) {
+            // Only update state when value actually changes to avoid re-render loops
+            setAuthorName((prev) => (prev === profile.name ? prev : profile.name))
+          }
         })
-        .catch(() => {
-          if (!cancelled) setAuthorCrumbs(undefined)
-        })
+        .catch(() => {})
       return () => { cancelled = true }
     }
+
+    // Non-author route: clear author name without triggering extra renders
+    setAuthorName((prev) => (prev === "" ? prev : ""))
 
     if (!moduleKey || !slug || !contentModules.includes(moduleKey)) {
       setDynamicTitle("")
@@ -153,18 +160,19 @@ function TechboxBreadcrumb() {
     fetch(`/api/posts?module=${encodeURIComponent(moduleKey)}&slug=${encodeURIComponent(slug)}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((post) => {
-        if (!cancelled) setDynamicTitle(post?.title || "")
+        if (!cancelled) {
+          const title = post?.title || ""
+          setDynamicTitle((prev) => (prev === title ? prev : title))
+        }
       })
       .catch(() => {
         if (!cancelled) setDynamicTitle("")
       })
 
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [pathname])
 
-  const crumbs = React.useMemo(() => buildCrumbs(pathname, dynamicTitle, searchQuery, authorCrumbs), [pathname, dynamicTitle, searchQuery, authorCrumbs])
+  const crumbs = React.useMemo(() => buildCrumbs(pathname, dynamicTitle, searchQuery, authorName), [pathname, dynamicTitle, searchQuery, authorName])
 
   if (crumbs.length <= 1) return null
 
