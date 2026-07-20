@@ -71,7 +71,7 @@ export default function ReviewRow({ homeTitle, homeMoreLabel, showHomeTitle = tr
               </Link>
 
               <div className="px-4 pb-4 pt-3 border-t flex items-center justify-between text-xs text-muted-foreground font-bold">
-                <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} />
+                <AuthorLink name={rev.author?.name} avatar={rev.author?.avatar} role={rev.author?.role} verifiedType={rev.author?.verifiedType} verifiedLabel={rev.author?.verifiedLabel} />
                 <CardStats module="review" slug={rev.slug} initialViews={rev.views} initialLikes={rev.likes} initialComments={rev.comments || 0} showComments={true} />
               </div>
             </Card>

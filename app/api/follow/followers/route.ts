@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
       name: f.follower.name,
       username: f.follower.username,
       avatar: f.follower.avatar,
+      verifiedType: (f.follower as any).verifiedType ?? null,
+      verifiedLabel: (f.follower as any).verifiedLabel ?? null,
       isFollowedByViewer: viewerFollowingSet.has(f.follower.id),
     })),
   });

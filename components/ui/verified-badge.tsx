@@ -1,7 +1,11 @@
 "use client";
 
 /**
- * VerifiedBadge — PNG badge shown next to usernames for verified accounts.
+ * VerifiedBadge — badge image shown next to usernames for verified accounts.
+ *
+ * Uses a plain <img> with eager loading so the badge appears immediately
+ * without any network-induced delay (next/image lazy optimization caused
+ * the badge to pop in after the name was already rendered).
  *
  * Types:
  *   "content" → blue   → تولید کننده محتوای تایید شده
@@ -9,7 +13,6 @@
  *   "user"    → orange → کاربر تایید شده
  */
 
-import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface VerifiedBadgeProps {
@@ -49,13 +52,17 @@ export function VerifiedBadge({ type, label, size = 16, className = "" }: Verifi
             />
           }
         >
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={cfg.src}
             alt={cfg.title}
             width={size}
             height={size}
-            className="object-contain"
-            unoptimized
+            loading="eager"
+            // @ts-expect-error — fetchpriority is a valid HTML attribute
+            fetchpriority="high"
+            decoding="sync"
+            style={{ width: size, height: size, objectFit: "contain" }}
           />
         </TooltipTrigger>
         <TooltipContent dir="rtl" className="text-right">

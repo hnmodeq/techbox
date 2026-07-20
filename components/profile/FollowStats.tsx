@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Users, UserPlus, UserMinus } from "lucide-react";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,8 @@ interface UserRow {
   name: string;
   username: string;
   avatar?: string;
+  verifiedType?: string | null;
+  verifiedLabel?: string | null;
   isFollowedByViewer?: boolean;
 }
 
@@ -256,7 +259,12 @@ export function FollowStats({
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-sm text-foreground truncate">{u.name}</div>
+                        <div className="font-semibold text-sm text-foreground flex items-center gap-1">
+                          <span className="truncate">{u.name}</span>
+                          {u.verifiedType && (
+                            <VerifiedBadge type={u.verifiedType as "content" | "org" | "user"} label={u.verifiedLabel} size={14} />
+                          )}
+                        </div>
                         <div className="text-xs text-muted-foreground" dir="ltr">
                           @{u.username}
                         </div>
