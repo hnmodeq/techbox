@@ -190,7 +190,7 @@ export default function Chatbot() {
             <Button
               type="button"
               onClick={() => { setOpen(true); setHasUnread(false); }}
-              className="rounded-full shadow-none size-12 p-0 bg-transparent hover:bg-muted text-foreground"
+              className="rounded-full shadow-none size-12 p-0 bg-transparent text-foreground transition-transform duration-150 hover:-translate-y-0.5"
               aria-label="پشتیبانی تکباکس"
             >
               <Headset className="size-5" />
@@ -217,7 +217,7 @@ export default function Chatbot() {
             className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" 
             style={{ zIndex: zIndex.chatbot }}
           >
-            <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl border border-border">
+            <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl border border-border/80 bg-background/90 backdrop-blur-md">
               <div className="flex flex-row items-center justify-end p-2 bg-transparent">
                 <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
                   <X className="size-4" />
@@ -262,7 +262,7 @@ export default function Chatbot() {
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="سوال فنی / محصول خود را بپرسید…"
+                    placeholder="پیام به پشتیبانی هوشمند ..."
                     className="flex-1 h-9 text-xs"
                     disabled={loading}
                   />
