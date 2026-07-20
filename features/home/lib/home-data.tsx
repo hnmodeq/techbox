@@ -28,11 +28,44 @@ export function HomeDataProvider({
 
     const apply = (body: any) => {
       if (!mounted) return;
-      setData({
-        modules: body.modules || {},
-        ticker: body.ticker || [],
+      // Merge the incoming author fields with any existing ones so that a
+      // stale cached API response (missing verifiedType etc.) never replaces
+      // richer data that was already in state from the server render.
+      const mergeModules = (
+        incoming: Record<string, any[]>,
+        existing: Record<string, any[]>
+      ): Record<string, any[]> => {
+        const result: Record<string, any[]> = {};
+        for (const mod of new Set([...Object.keys(incoming), ...Object.keys(existing)])) {
+          const inc = incoming[mod] ?? [];
+          const ext = existing[mod] ?? [];
+          if (inc.length === 0) { result[mod] = ext; continue; }
+          // Merge per-slug: keep all fields from existing, overlay non-null from incoming
+          const extMap = new Map(ext.map((i: any) => [i.slug, i]));
+          result[mod] = inc.map((item: any) => {
+            const existingItem = extMap.get(item.slug);
+            if (!existingItem) return item;
+            return {
+              ...existingItem,
+              ...item,
+              author: {
+                ...existingItem.author,
+                ...item.author,
+                // Never overwrite verifiedType/verifiedLabel with null if existing has a value
+                verifiedType: item.author?.verifiedType ?? existingItem.author?.verifiedType ?? null,
+                verifiedLabel: item.author?.verifiedLabel ?? existingItem.author?.verifiedLabel ?? null,
+              },
+            };
+          });
+        }
+        return result;
+      };
+
+      setData((prev) => ({
+        modules: mergeModules(body.modules || {}, prev.modules as Record<string, any[]>),
+        ticker: body.ticker || prev.ticker,
         generatedAt: body.generatedAt,
-      });
+      }));
     };
 
     if (initialData) {
