@@ -37,6 +37,7 @@ const Chatbot = dynamic(() => import("@/features/chat/components/Chatbot"), {
 
 import { AuthModal } from "@/features/auth/components/auth-modal"
 import { HelpModals } from "@/components/layout/help-modals"
+import { FloatingSearch } from "@/components/layout/floating-search"
 
 type LayoutShellProps = {
   children: React.ReactNode
@@ -59,6 +60,9 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
               <Chatbot />
               <AuthModal />
               <HelpModals />
+              <React.Suspense fallback={null}>
+                <FloatingSearch />
+              </React.Suspense>
             </HomeDataProvider>
           </StatsProvider>
         </ConsultationProvider>
