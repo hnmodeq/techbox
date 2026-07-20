@@ -434,9 +434,3 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   from { transform: translateX(-40px); opacity: 0.5; }
   to { transform: translateX(0); opacity: 1; }
 }
-
-/* Terminal cursor blink */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
