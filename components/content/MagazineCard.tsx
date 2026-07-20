@@ -61,7 +61,7 @@ function ArticleAuthorMeta({
   className?: string;
 }) {
   const name = author?.name || "تحریریه";
-  const job = author?.job || author?.role || "";
+  const job = author?.job || "";
   const slug = getAuthorSlug(author);
 
   return (
