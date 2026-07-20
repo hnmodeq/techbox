@@ -136,25 +136,12 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
           onToggleNews={() => setNewsOpen((o) => !o)}
         />
 
-        {/*
-          Three-column row (RTL):
-            right → TechboxAppSidebar (main nav)
-            center → SidebarInset (page content, scrolls normally)
-            left  → News sidebar column (always in DOM, width-animated)
-
-          The news column is a real flex sibling of the content area —
-          not an overlay, not fixed/absolute. Its inner div is sticky +
-          fixed-height with overflow-y-auto, mirroring exactly how the
-          main shadcn sidebar isolates its own scroll from the page.
-        */}
         <div
           className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden"
           dir="rtl"
         >
-          {/* Main navigation sidebar (right in RTL) */}
           <TechboxAppSidebar />
 
-          {/* Page content */}
           <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size]">
             {tickerItems.length > 0 && (
               <div className="border-b bg-background/95">
@@ -169,35 +156,26 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <FooterSection />
             </main>
           </SidebarInset>
-
-          {/*
-            News sidebar column (left in RTL).
-            - Always rendered — no conditional mount/unmount.
-            - Width animates 0 ↔ 20rem via CSS transition (same mechanism as
-              the main sidebar collapsing via collapsible="offcanvas").
-            - When open: the inner sticky+h-svh div holds its own overflow-y-auto
-              scroll area, completely separate from the page scroll.
-            - overflow-hidden on the outer shell clips content during the
-              width transition so nothing bleeds out.
-          */}
-          <div
-            dir="ltr"
-            className={`hidden md:flex flex-col shrink-0 overflow-hidden border-r border-[var(--sidebar-border)] transition-[width] duration-300 ease-in-out ${
-              newsOpen ? "w-[20rem]" : "w-0 border-r-0"
-            }`}
-          >
-            {/* Sticky panel: always fills exactly the visible viewport height below the header */}
-            <div
-              className="sticky top-[var(--header-height)] h-[calc(100svh-var(--header-height))] w-[20rem] flex flex-col bg-[var(--sidebar-background)]"
-            >
-              <TechboxNewsSidebar
-                unreadSlugs={openedUnreadNewsSlugs}
-                onClose={() => setNewsOpen(false)}
-              />
-            </div>
-          </div>
         </div>
       </SidebarProvider>
+
+      {/*
+        News sidebar — fixed to the viewport, same as <Sidebar> in shadcn/ui.
+        Uses top-(--header-height) which is Tailwind v4 CSS-variable syntax,
+        identical to what TechboxAppSidebar uses — resolves to var(--header-height).
+        The CSS variable is defined on the outermost div of LayoutInner.
+        fixed means it is completely outside the document scroll flow.
+      */}
+      <div
+        className={`fixed left-0 top-(--header-height) h-[calc(100svh-var(--header-height))] z-40 hidden md:flex flex-col overflow-hidden border-r border-[var(--sidebar-border)] bg-[var(--sidebar-background)] transition-[width] duration-300 ease-in-out ${
+          newsOpen ? "w-[20rem] shadow-xl" : "w-0 border-r-0"
+        }`}
+      >
+        <TechboxNewsSidebar
+          unreadSlugs={openedUnreadNewsSlugs}
+          onClose={() => setNewsOpen(false)}
+        />
+      </div>
     </div>
   )
 }
