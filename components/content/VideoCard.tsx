@@ -204,7 +204,7 @@ export function VideoModal({
           {/* Video side — FIXED size so frame never jumps */}
           <div
             className="bg-black shrink-0 flex items-center justify-center relative self-stretch"
-            style={{ width: "min(48vw, 600px)", minWidth: "min(48vw, 600px)" }}
+            style={{ width: "min(45vw, 560px)", minWidth: "min(45vw, 560px)" }}
           >
             {/* Skeleton/placeholder shown until video can play */}
             {!videoReady && (
@@ -240,7 +240,7 @@ export function VideoModal({
           </div>
 
           {/* Info side */}
-          <div className="min-w-0 sm:min-w-[440px] sm:max-w-[600px] sm:flex-1 flex flex-col max-h-[92vh]">
+          <div className="min-w-0 sm:min-w-[480px] sm:flex-1 flex flex-col max-h-[92vh]">
             <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">

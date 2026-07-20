@@ -47,7 +47,7 @@ export default function BlogGrid({ serverItems }: { serverItems?: ContentItem[] 
             style={{ right: "50%", width: 1, transform: "translateX(50%)" }}
           />
 
-          <div className="flex flex-col gap-12">
+          <div className="flex flex-col gap-4">
             {items.map((item, idx) => {
               // In RTL: even indices → card on right half, odd → card on left half
               const cardOnRight = idx % 2 === 0;
