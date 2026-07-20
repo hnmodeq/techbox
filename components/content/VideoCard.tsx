@@ -204,7 +204,7 @@ export function VideoModal({
           {/* Video side — FIXED size so frame never jumps */}
           <div
             className="bg-black shrink-0 flex items-center justify-center relative self-stretch"
-            style={{ width: "min(45vw, 560px)", minWidth: "min(45vw, 560px)" }}
+            style={{ width: "min(60vw, 800px)", minWidth: "min(60vw, 800px)" }}
           >
             {/* Skeleton/placeholder shown until video can play */}
             {!videoReady && (
@@ -216,7 +216,7 @@ export function VideoModal({
                     alt={video.title}
                     fill
                     className="object-contain opacity-20"
-                    sizes="560px"
+                    sizes="800px"
                   />
                 )}
                 <div className="relative z-20 flex flex-col items-center gap-2">
