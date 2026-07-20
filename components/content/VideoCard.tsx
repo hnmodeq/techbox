@@ -7,7 +7,7 @@
  *
  * Card: 9/16 aspect-ratio thumbnail, play icon morphs to "پخش ویدیو" on hover,
  *       date top-right, duration top-left, stats bottom.
- * Modal: full video player with comments, like, save, share, prev/next nav.
+ * Modal: full video player with comments, like, save, share, << >> nav buttons.
  */
 
 import React, { useRef, useEffect, useState, useCallback } from "react";
@@ -23,6 +23,7 @@ import CommentSection from "@/features/comment/components/CommentSection";
 import { blurProps } from "@/lib/image-placeholder";
 import { formatRelativeDate } from "@/lib/date-format";
 import { zIndex } from "@/design";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,19 +43,13 @@ export interface VideoItem {
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
-interface VideoCardProps {
-  video: VideoItem;
-  onOpen: () => void;
-}
-
-export function VideoCard({ video, onOpen }: VideoCardProps) {
+export function VideoCard({ video, onOpen }: { video: VideoItem; onOpen: () => void }) {
   return (
     <button
       type="button"
       onClick={onOpen}
       className="group relative w-full aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm bg-card flex flex-col justify-end text-right cursor-pointer"
     >
-      {/* Thumbnail */}
       <Image
         src={video.image || "/assets/blog-1.jpg"}
         alt={video.title}
@@ -63,7 +58,6 @@ export function VideoCard({ video, onOpen }: VideoCardProps) {
         sizes="200px"
         {...blurProps(video.image || "/assets/blog-1.jpg")}
       />
-      {/* Gradient overlays */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
 
       {/* Date (right) + Duration (left) — top bar */}
@@ -87,7 +81,7 @@ export function VideoCard({ video, onOpen }: VideoCardProps) {
         )}
       </div>
 
-      {/* Play icon → "پخش ویدیو" morph on hover */}
+      {/* Play → "پخش ویدیو" morph */}
       <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
         <div className="relative flex items-center justify-center overflow-hidden h-8">
           <span className="absolute flex items-center justify-center transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:blur-sm group-hover:scale-75 group-hover:opacity-0">
@@ -99,7 +93,7 @@ export function VideoCard({ video, onOpen }: VideoCardProps) {
         </div>
       </div>
 
-      {/* Title + stats — bottom */}
+      {/* Title + stats */}
       <div className="relative z-30 p-3 text-white w-full">
         <h3 className="text-[11px] sm:text-xs font-bold leading-4 line-clamp-2 text-white group-hover:text-[var(--primary)] transition-colors">
           {video.title}
@@ -110,7 +104,7 @@ export function VideoCard({ video, onOpen }: VideoCardProps) {
             slug={video.slug}
             initialViews={video.views}
             initialLikes={video.likes}
-            initialComments={video.comments || 0}
+            initialComments={video.comments}
             showComments
           />
         </div>
@@ -119,19 +113,50 @@ export function VideoCard({ video, onOpen }: VideoCardProps) {
   );
 }
 
+// ─── Nav button — big, borderless << >> ──────────────────────────────────────
+
+function NavButton({ direction, onClick, label }: {
+  direction: "prev" | "next";
+  onClick: () => void;
+  label: string;
+}) {
+  // In RTL: prev = right chevrons (>>), next = left chevrons (<<)
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            onClick={onClick}
+            className="shrink-0 flex items-center justify-center text-white/60 hover:text-white transition-colors duration-150 select-none"
+            style={{ fontSize: 32, fontWeight: 900, lineHeight: 1, padding: "0 8px" }}
+          />
+        }
+      >
+        {direction === "prev" ? ">>" : "<<"}
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 // ─── Modal ────────────────────────────────────────────────────────────────────
 
-interface VideoModalProps {
+export function VideoModal({
+  video,
+  onClose,
+  onPrev,
+  onNext,
+  slideDirection,
+}: {
   video: VideoItem;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
   slideDirection: "left" | "right";
-}
-
-export function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: VideoModalProps) {
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -144,19 +169,17 @@ export function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: V
   }, [onPrev, onNext, onClose]);
 
   useEffect(() => {
-    setVideoDimensions(null);
+    setVideoReady(false);
     const vid = videoRef.current;
     if (!vid) return;
-    const handleMeta = () => setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
-    if (vid.readyState >= 1) setVideoDimensions({ width: vid.videoWidth, height: vid.videoHeight });
-    vid.addEventListener("loadedmetadata", handleMeta);
+    const onCanPlay = () => setVideoReady(true);
+    if (vid.readyState >= 3) setVideoReady(true);
+    vid.addEventListener("canplay", onCanPlay);
     return () => {
-      vid.removeEventListener("loadedmetadata", handleMeta);
+      vid.removeEventListener("canplay", onCanPlay);
       vid.pause();
     };
   }, [video.slug]);
-
-  const isPortrait = videoDimensions ? videoDimensions.height >= videoDimensions.width : true;
 
   return (
     <div
@@ -166,33 +189,42 @@ export function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: V
     >
       <div className="absolute inset-0 bg-black/80" onClick={onClose} />
 
-      <div className="relative z-10 animate-in fade-in duration-200 flex items-center gap-1">
-        {/* Prev (right in RTL) */}
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <button
-                type="button"
-                onClick={onPrev}
-                className="shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
-              />
-            }
-          >
-            <Icon name="chevronRight" size={24} />
-          </TooltipTrigger>
-          <TooltipContent>ویدیوی بعدی</TooltipContent>
-        </Tooltip>
+      <div className="relative z-10 animate-in fade-in duration-200 flex items-center gap-2">
+        {/* Prev button (right in RTL = >> ) */}
+        <NavButton direction="prev" onClick={onPrev} label="ویدیوی بعدی" />
 
         {/* Modal */}
         <div
           className="flex flex-col sm:flex-row max-h-[92vh] overflow-hidden rounded-[var(--corner-radius)] bg-[var(--modal-background)] border-[length:var(--border-size)] border-[var(--border-color)] shadow-[var(--shadow-size)] w-full sm:w-auto"
           style={{
-            maxWidth: isPortrait ? "80rem" : "100rem",
+            maxWidth: "80rem",
             animation: `${slideDirection === "right" ? "slideFromRight" : "slideFromLeft"} 250ms ease-out`,
           }}
         >
-          {/* Video */}
-          <div className="bg-black shrink-0 flex items-center justify-center">
+          {/* Video side — FIXED size so frame never jumps */}
+          <div
+            className="bg-black shrink-0 flex items-center justify-center relative"
+            style={{ width: "min(45vw, 560px)", height: "min(92vh, 760px)" }}
+          >
+            {/* Skeleton/placeholder shown until video can play */}
+            {!videoReady && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
+                <Skeleton className="absolute inset-0 rounded-none opacity-30" />
+                {video.image && (
+                  <Image
+                    src={video.image}
+                    alt={video.title}
+                    fill
+                    className="object-contain opacity-20"
+                    sizes="560px"
+                  />
+                )}
+                <div className="relative z-20 flex flex-col items-center gap-2">
+                  <div className="w-10 h-10 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  <span className="text-white/50 text-xs">در حال بارگذاری...</span>
+                </div>
+              </div>
+            )}
             <video
               ref={videoRef}
               src={video.videoUrl || undefined}
@@ -201,18 +233,21 @@ export function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: V
               autoPlay
               playsInline
               preload="metadata"
-              onError={() => {}}
-              className="block bg-black h-[50vh] sm:h-[92vh] w-auto sm:max-w-[45vw] object-contain"
+              onError={() => setVideoReady(true)} // show controls even on error
+              className="w-full h-full object-contain"
+              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s" }}
             />
           </div>
 
-          {/* Info */}
-          <div className="min-w-0 sm:min-w-[340px] sm:max-w-[520px] sm:flex-1 flex flex-col max-h-[42vh] sm:max-h-[92vh]">
+          {/* Info side */}
+          <div className="min-w-0 sm:min-w-[320px] sm:max-w-[480px] sm:flex-1 flex flex-col max-h-[42vh] sm:max-h-[92vh]">
             <div className="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <h3 className="font-black text-[var(--primary-text)] text-lg leading-8">{video.title}</h3>
-                  <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
+                  {video.excerpt && (
+                    <p className="paragraph-color mt-1 text-sm leading-7">{video.excerpt}</p>
+                  )}
                 </div>
                 <Button
                   variant="ghost"
@@ -244,27 +279,14 @@ export function VideoModal({ video, onClose, onPrev, onNext, slideDirection }: V
           </div>
         </div>
 
-        {/* Next (left in RTL) */}
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <button
-                type="button"
-                onClick={onNext}
-                className="shrink-0 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-card/80 border border-border text-foreground backdrop-blur-sm hover:bg-card hover:scale-110 transition-all duration-200 shadow-lg"
-              />
-            }
-          >
-            <Icon name="chevronLeft" size={24} />
-          </TooltipTrigger>
-          <TooltipContent>ویدیوی قبلی</TooltipContent>
-        </Tooltip>
+        {/* Next button (left in RTL = << ) */}
+        <NavButton direction="next" onClick={onNext} label="ویدیوی قبلی" />
       </div>
     </div>
   );
 }
 
-// ─── Hook: modal state management ────────────────────────────────────────────
+// ─── Hook ─────────────────────────────────────────────────────────────────────
 
 export function useVideoModal(videos: VideoItem[]) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -277,22 +299,17 @@ export function useVideoModal(videos: VideoItem[]) {
   const prev = useCallback(() => {
     setSlideDirection("right");
     setSlideKey((k) => k + 1);
-    setActiveIndex((prev) => {
-      if (prev === null) return null;
-      return prev > 0 ? prev - 1 : videos.length - 1;
-    });
+    setActiveIndex((p) => (p === null ? null : p > 0 ? p - 1 : videos.length - 1));
   }, [videos.length]);
 
   const next = useCallback(() => {
     setSlideDirection("left");
     setSlideKey((k) => k + 1);
-    setActiveIndex((prev) => {
-      if (prev === null) return null;
-      return prev < videos.length - 1 ? prev + 1 : 0;
-    });
+    setActiveIndex((p) => (p === null ? null : p < videos.length - 1 ? p + 1 : 0));
   }, [videos.length]);
 
-  const activeVideo = activeIndex !== null && activeIndex < videos.length ? videos[activeIndex] : null;
+  const activeVideo =
+    activeIndex !== null && activeIndex < videos.length ? videos[activeIndex] : null;
 
   return { activeIndex, activeVideo, slideKey, slideDirection, open, close, prev, next };
 }

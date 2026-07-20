@@ -3,8 +3,7 @@
 import React, { useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
@@ -37,21 +36,23 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
-      {/* Navigation buttons */}
+      {/* Navigation buttons — big borderless << >> */}
       <button
         onClick={() => scroll('right')}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center size-11 rounded-full border border-border bg-background/90 shadow-md text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors select-none"
+        style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, padding: "0 10px" }}
         aria-label="اسکرول به راست"
       >
-        <ChevronRight size={22} />
+        {">>"}
       </button>
 
       <button
         onClick={() => scroll('left')}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center size-11 rounded-full border border-border bg-background/90 shadow-md text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors select-none"
+        style={{ fontSize: 28, fontWeight: 900, lineHeight: 1, padding: "0 10px" }}
         aria-label="اسکرول به چپ"
       >
-        <ChevronLeft size={22} />
+        {"<<"}
       </button>
 
       {/* Scroll container — no visible scrollbar */}

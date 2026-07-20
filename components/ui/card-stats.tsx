@@ -18,7 +18,7 @@ export function CardStats({
   slug,
   initialViews = 0,
   initialLikes = 0,
-  initialComments = 0,
+  initialComments,
   showComments = false,
   showLabel = false
 }: {
@@ -32,7 +32,8 @@ export function CardStats({
 }) {
   const [views, setViews] = useState(initialViews);
   const [likes, setLikes] = useState(initialLikes);
-  const [comments, setComments] = useState(initialComments);
+  // null = not yet loaded; avoids showing "0" before the real count arrives
+  const [comments, setComments] = useState<number | null>(initialComments ?? null);
   const { entry: shared, status } = useStatEntry(module, slug);
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export function CardStats({
         <Icon name="like" size={16} strokeWidth={2} className="text-muted-foreground" />
         <span className="text-foreground">{likes.toLocaleString("fa-IR")}</span>
       </StatTooltip>
-      {showComments && (
+      {showComments && comments !== null && (
         <StatTooltip label="دیدگاه کاربران">
           <Icon name="comment" size={16} strokeWidth={2} className="text-muted-foreground" />
           <span className="text-foreground">{comments.toLocaleString("fa-IR")}</span>
