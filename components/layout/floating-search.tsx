@@ -152,7 +152,7 @@ export function FloatingSearch() {
               side="top"
               align="start"
               sideOffset={6}
-              className="min-w-[7rem] animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
+              className="min-w-[7rem] animate-in fade-in-0 slide-in-from-bottom-2 duration-200 !bg-background/90 backdrop-blur-md !border-border/80"
             >
               {searchModules.map((m) => (
                 <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
@@ -172,7 +172,7 @@ export function FloatingSearch() {
                 : "opacity-0 translate-y-1 pointer-events-none"
             )}
           >
-            <div className="rounded-xl border border-border bg-popover shadow-xl p-1.5">
+            <div className="rounded-xl border border-border/80 bg-background/90 backdrop-blur-md shadow-lg p-1.5">
               <div className="flex items-center gap-1 px-2 pb-1 text-[10px] font-bold text-muted-foreground">
                 <HistoryIcon className="size-3" />
                 اخیر
