@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS // Core Workspace</title>
+  
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Plus Jakarta Sans for UI, JetBrains Mono for Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+  
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow-slow': 'glow 4s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            glow: {
+              '0%': { boxShadow: '0 0 5px rgba(var(--accent-rgb), 0.1), 0 0 10px rgba(var(--accent-rgb), 0.05)' },
+              '100%': { boxShadow: '0 0 15px rgba(var(--accent-rgb), 0.25), 0 0 25px rgba(var(--accent-rgb), 0.15)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Theme CSS Variables */
+    :root {
+      --accent-rgb: 99, 102, 241; /* Default Indigo */
+      --accent-hex: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.15);
+    }
+
+    body {
+      background-color: #050507;
+      color: #f4f4f5;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Grid Layout Customizations */
+    .parent {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(35, minmax(75px, auto));
+      background-color: #0d0d11; /* Sleek obsidian background for the parent */
+      gap: 5px; /* Perfect 5px gap as requested */
+      padding: 5px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Standard Card Styling */
+    .parent > div {
+      background-color: #121215; /* Distinct dark color, different from the parent #0d0d11 background */
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Dynamic Card Spotlight Effect tracking */
+    .parent > div::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(250px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(var(--accent-rgb), 0.08), transparent 80%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .parent > div:hover::after {
+      opacity: 1;
+    }
+
+    /* Hover effect elevating cards & updating border color dynamically based on theme */
+    .parent > div:hover {
+      background-color: #17171c;
+      border-color: rgba(var(--accent-rgb), 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.8), 0 0 15px -3px rgba(var(--accent-rgb), 0.1);
+      z-index: 10;
+    }
+
+    /* Layout Coordinates exactly preserving user layout requirements */
+    .div10 {
+      grid-column: span 3 / span 3;
+      grid-row: span 3 / span 3;
+      grid-column-start: 1;
+      grid-row-start: 3;
+    }
+
+    .div16 {
+      grid-column: span 3 / span 3;
+      grid-row: span 6 / span 6;
+      grid-column-start: 4;
+      grid-row-start: 3;
+    }
+
+    .div17 {
+      grid-column: span 3 / span 3;
+      grid-row: span 3 / span 3;
+      grid-column-start: 1;
+      grid-row-start: 6;
+    }
+
+    .div18 {
+      grid-column: span 2 / span 2;
+      grid-row: span 8 / span 8;
+      grid-column-start: 1;
+      grid-row-start: 9;
+    }
+
+    .div19 {
+      grid-column: span 6 / span 6;
+      grid-row: span 2 / span 2;
+      grid-column-start: 1;
+      grid-row-start: 1;
+      background: linear-gradient(180deg, #16161a 0%, #121215 100%) !important;
+    }
+
+    .div20 {
+      grid-column: span 4 / span 4;
+      grid-row: span 4 / span 4;
+      grid-column-start: 3;
+      grid-row-start: 9;
+    }
+
+    .div21 {
+      grid-column: span 4 / span 4;
+      grid-row: span 4 / span 4;
+      grid-column-start: 3;
+      grid-row-start: 13;
+    }
+
+    .div23 {
+      grid-column: span 2 / span 2;
+      grid-column-start: 3;
+      grid-row-start: 20;
+    }
+
+    .div24 {
+      grid-column: span 2 / span 2;
+      grid-column-start: 1;
+      grid-row-start: 20;
+    }
+
+    .div26 {
+      grid-column: span 2 / span 2;
+      grid-column-start: 5;
+      grid-row-start: 20;
+    }
+
+    .div28 {
+      grid-column: span 4 / span 4;
+      grid-row: span 3 / span 3;
+      grid-column-start: 1;
+      grid-row-start: 17;
+    }
+
+    .div29 {
+      grid-column: span 2 / span 2;
+      grid-row: span 3 / span 3;
+      grid-column-start: 5;
+      grid-row-start: 17;
+    }
+
+    /* Added explicit column starts to avoid placement gaps */
+    .div32 {
+      grid-column: span 2 / span 2;
+      grid-column-start: 1;
+      grid-row-start: 21;
+    }
+
+    .div33 {
+      grid-column: span 2 / span 2;
+      grid-column-start: 3;
+      grid-row-start: 21;
+    }
+
+    .div34 {
+      grid-column: span 2 / span 2;
+      grid-column-start: 5;
+      grid-row-start: 21;
+    }
+
+    .div35 {
+      grid-column: span 4 / span 4;
+      grid-row: span 4 / span 4;
+      grid-column-start: 3;
+      grid-row-start: 22;
+    }
+
+    .div36 {
+      grid-column: span 2 / span 2;
+      grid-row: span 4 / span 4;
+      grid-column-start: 1;
+      grid-row-start: 22;
+    }
+
+    /* Column starts added explicitly for safety */
+    .div37 {
+      grid-row: span 2 / span 2;
+      grid-column-start: 3;
+      grid-row-start: 26;
+    }
+
+    .div38 {
+      grid-row: span 2 / span 2;
+      grid-column-start: 4;
+      grid-row-start: 26;
+    }
+
+    .div39 {
+      grid-row: span 2 / span 2;
+      grid-column-start: 1;
+      grid-row-start: 26;
+    }
+
+    .div40 {
+      grid-row: span 2 / span 2;
+      grid-column-start: 2;
+      grid-row-start: 26;
+    }
+
+    .div41 {
+      grid-row: span 2 / span 2;
+      grid-column-start: 5;
+      grid-row-start: 26;
+    }
+
+    .div42 {
+      grid-row: span 2 / span 2;
+      grid-column-start: 6;
+      grid-row-start: 26;
+    }
+
+    .div43 {
+      grid-column: span 6 / span 6;
+      grid-row: span 4 / span 4;
+      grid-column-start: 1;
+      grid-row-start: 30;
+    }
+
+    .div44 {
+      grid-column: span 6 / span 6;
+      grid-row: span 2 / span 2;
+      grid-column-start: 1;
+      grid-row-start: 34;
+      background: linear-gradient(0deg, #09090b 0%, #121215 100%) !important;
+    }
+
+    .div45 {
+      grid-column: span 6 / span 6;
+      grid-row: span 2 / span 2;
+      grid-column-start: 1;
+      grid-row-start: 28;
+    }
+
+    /* Custom scrollbars for clean code lists & monitors */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(var(--accent-rgb), 0.3);
+    }
+
+    /* Responsive Grid Breakpoint to guarantee phone/tablet view works perfectly */
+    @media (max-width: 1024px) {
+      .parent {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 10px;
+        background-color: transparent;
+        border: none;
+      }
+      .parent > div {
+        grid-column: auto !important;
+        grid-row: auto !important;
+        min-height: auto !important;
+        width: 100%;
+        margin-bottom: 0px;
+      }
+    }
+  </style>
+</head>
+<body class="py-10 px-4 md:px-8">
+
+  <!-- Glow Background Accents -->
+  <div class="fixed -top-40 -left-40 w-96 h-96 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none transition-all duration-700" id="glow-1"></div>
+  <div class="fixed top-1/2 right-10 w-80 h-80 rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none transition-all duration-700" id="glow-2"></div>
+
+  <!-- Main Container -->
+  <div class="w-full max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center md:justify-between px-2 gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-400">
+        NEXUS // CORE SYSTEM
+      </h1>
+      <p class="text-xs text-zinc-500 font-mono mt-1">
+        LIVE WORKSPACE ENVIRONMENT // VER 4.10.36
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-mono">
+        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
+        ALL SYSTEMS OPERATIONAL
+      </span>
+    </div>
+  </div>
+
+  <!-- The Grid Container -->
+  <div class="parent">
+
+    <!-- div19: Header Navbar -->
+    <div class="div19 flex flex-row items-center justify-between z-20">
+      <div class="flex items-center gap-3">
+        <!-- Logo -->
+        <div class="p-2 rounded-lg bg-zinc-800/80 border border-zinc-700 flex items-center justify-center transition-all duration-500" id="logo-box">
+          <svg class="w-5 h-5 text-indigo-400 transition-colors duration-500" id="logo-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75L16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-bold tracking-wider text-sm block">NEXUS // CORE</span>
+          <span class="text-[10px] text-zinc-500 font-mono">WORKSPACE DASHBOARD</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="hidden lg:flex items-center gap-6 text-xs font-medium text-zinc-400">
+        <a href="#" class="hover:text-white transition-colors duration-200 py-1 border-b border-transparent hover:border-indigo-500">Overview</a>
+        <a href="#" class="hover:text-white transition-colors duration-200 py-1">Terminal</a>
+        <a href="#" class="hover:text-white transition-colors duration-200 py-1">Metrics</a>
+        <a href="#" class="hover:text-white transition-colors duration-200 py-1">FAQ</a>
+        <a href="#" class="hover:text-white transition-colors duration-200 py-1">Pricing</a>
+      </div>
+
+      <!-- Theme & Accent Palette Changer -->
+      <div class="flex items-center gap-3">
+        <span class="text-zinc-500 text-[10px] font-mono hidden md:inline">SELECT CORES:</span>
+        <div class="flex items-center bg-zinc-950/80 p-1.5 border border-zinc-800/80 rounded-full gap-2">
+          <!-- Cyan Button -->
+          <button onclick="changeTheme('cyan', '6, 182, 212', '#06b6d4')" class="w-5 h-5 rounded-full bg-cyan-500 border-2 border-transparent hover:scale-115 transition-transform" title="Cyan Theme"></button>
+          <!-- Indigo Button -->
+          <button onclick="changeTheme('indigo', '99, 102, 241', '#6366f1')" class="w-5 h-5 rounded-full bg-indigo-500 border-2 border-zinc-200 hover:scale-115 transition-all" id="theme-btn-indigo" title="Indigo Theme"></button>
+          <!-- Amber Button -->
+          <button onclick="changeTheme('amber', '245, 158, 11', '#f59e0b')" class="w-5 h-5 rounded-full bg-amber-500 border-2 border-transparent hover:scale-115 transition-transform" title="Amber Theme"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- div10: Bio / Introduction -->
+    <div class="div10 flex flex-col justify-between">
+      <div class="flex items-start gap-4">
+        <!-- SVG developer profile avatar -->
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-zinc-800 to-zinc-700 p-0.5 border border-zinc-600/50 flex-shrink-0 flex items-center justify-center">
+          <svg class="w-7 h-7 text-zinc-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-indigo-400 theme-text-accent">PROJECT FOUNDER</span>
+          <h2 class="text-xl font-extrabold text-white leading-tight mt-0.5">Welcome, Operator</h2>
+          <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+            I build responsive workspace interfaces and interactive frontend systems. Discover high-fidelity widgets styled with CSS Grid.
+          </p>
+        </div>
+      </div>
+      <!-- Actions/Socials -->
+      <div class="flex items-center justify-between border-t border-zinc-800/60 pt-3 mt-4">
+        <span class="text-[10px] text-zinc-500 font-mono">STATION: DESKTOP_7</span>
+        <div class="flex gap-2">
+          <!-- Mock Social Icons -->
+          <a href="#" class="text-zinc-500 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.164 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+          </a>
+          <a href="#" class="text-zinc-500 hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- div16: Card Spotlight (Aceternity Spotlight Style) -->
+    <div class="div16 flex flex-col justify-between" id="spotlight-card">
+      <div>
+        <div class="flex items-center justify-between mb-3 border-b border-zinc-800/60 pb-3">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-indigo-400 theme-text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            <span class="text-xs font-mono uppercase tracking-wider text-indigo-400 theme-text-accent">SPOTLIGHT REVEAL</span>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300">ACTIVE DETECTOR</span>
+        </div>
+        <h3 class="text-base font-bold text-white mb-2">Authentication Security Steps</h3>
+        <p class="text-xs text-zinc-400 leading-relaxed mb-4">
+          Hover your mouse inside this card. A beautiful dynamic radial spotlight tracking light gradient reveals behind the steps.
+        </p>
+
+        <!-- Authentication steps list -->
+        <div class="space-y-3 mt-4 relative z-10">
+          <div class="flex items-start gap-3 p-2 rounded bg-zinc-900/60 border border-white/5 hover:border-indigo-500/30 transition-all">
+            <div class="w-5 h-5 rounded-full bg-indigo-500/10 text-indigo-400 theme-text-accent theme-bg-accent-10 flex items-center justify-center text-xs font-bold shrink-0">1</div>
+            <div>
+              <span class="text-xs font-bold text-white block">Email Verification</span>
+              <p class="text-[10px] text-zinc-500">Provide an active workspace inbox key.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-2 rounded bg-zinc-900/60 border border-white/5 hover:border-indigo-500/30 transition-all">
+            <div class="w-5 h-5 rounded-full bg-indigo-500/10 text-indigo-400 theme-text-accent theme-bg-accent-10 flex items-center justify-center text-xs font-bold shrink-0">2</div>
+            <div>
+              <span class="text-xs font-bold text-white block">Cryptographic Lock</span>
+              <p class="text-[10px] text-zinc-500">Set a high-entropy master access code.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-2 rounded bg-zinc-900/60 border border-white/5 hover:border-indigo-500/30 transition-all">
+            <div class="w-5 h-5 rounded-full bg-indigo-500/10 text-indigo-400 theme-text-accent theme-bg-accent-10 flex items-center justify-center text-xs font-bold shrink-0">3</div>
+            <div>
+              <span class="text-xs font-bold text-white block">Two-Factor Auth</span>
+              <p class="text-[10px] text-zinc-500">Verify temporary secrets on device nodes.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-2 rounded bg-zinc-900/60 border border-white/5 hover:border-indigo-500/30 transition-all">
+            <div class="w-5 h-5 rounded-full bg-indigo-500/10 text-indigo-400 theme-text-accent theme-bg-accent-10 flex items-center justify-center text-xs font-bold shrink-0">4</div>
+            <div>
+              <span class="text-xs font-bold text-white block">Biometric Gateway</span>
+              <p class="text-[10px] text-zinc-500">Enable face and touch ID lock layers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-[10px] text-zinc-500 font-mono mt-4 pt-2 border-t border-zinc-800/40 relative z-10 flex justify-between">
+        <span>SPOTLIGHT_RADIUS: 250px</span>
+        <span>ALPHA SECURE v2</span>
+      </div>
+    </div>
+
+    <!-- div17: Live Quick Stats -->
+    <div class="div17 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-4 h-4 text-emerald-400 animate-pulse-slow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+          <span class="text-xs font-mono uppercase tracking-wider text-zinc-400">REALTIME TELEMETRY</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-2">
+          <div class="p-2 rounded bg-zinc-950 border border-zinc-850">
+            <span class="text-[10px] text-zinc-500 font-mono uppercase block">UPTIME</span>
+            <span class="text-sm font-extrabold text-emerald-400 font-mono block mt-1" id="stat-uptime">99.982%</span>
+          </div>
+          <div class="p-2 rounded bg-zinc-950 border border-zinc-850">
+            <span class="text-[10px] text-zinc-500 font-mono uppercase block">SERVERS</span>
+            <span class="text-sm font-extrabold text-white font-mono block mt-1 counter-target" data-target="142">0</span>
+          </div>
+          <div class="p-2 rounded bg-zinc-950 border border-zinc-850">
+            <span class="text-[10px] text-zinc-500 font-mono uppercase block">REQUESTS</span>
+            <span class="text-sm font-extrabold text-indigo-450 theme-text-accent font-mono block mt-1" id="stat-requests">4,281</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-zinc-800/50 flex flex-col gap-1.5">
+        <div class="flex items-center justify-between text-[10px] font-mono">
+          <span class="text-zinc-500">NODE ALLOCATION SPEED:</span>
+          <span class="text-indigo-400 theme-text-accent font-bold" id="speed-meter">84.2 Gops</span>
+        </div>
+        <div class="w-full h-1 bg-zinc-950 rounded-full overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-indigo-500 to-cyan-500 theme-bg-gradient transition-all duration-1000" style="width: 78%" id="stat-progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- div18: Interactive macOS style Shell Terminal -->
+    <div class="div18 flex flex-col justify-between" id="terminal-card">
+      <div class="flex flex-col h-full">
+        <!-- Terminal Header -->
+        <div class="flex items-center justify-between bg-zinc-950/60 p-2.5 rounded-t-lg border-b border-zinc-900 -mx-5 -mt-5 mb-3">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-full bg-red-500/80 block cursor-pointer" title="Close" onclick="resetTerminal()"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500/80 block"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500/80 block"></span>
+          </div>
+          <span class="text-[10px] text-zinc-400 font-mono">guest@nexus: ~/workspace</span>
+          <div class="w-4"></div>
+        </div>
+
+        <!-- Terminal Output Screen -->
+        <div class="flex-grow font-mono text-[11px] text-zinc-300 space-y-1.5 overflow-y-auto custom-scrollbar h-[220px]" id="terminal-screen">
+          <div class="text-zinc-500">// Nexus Virtual Terminal Console</div>
+          <div class="text-zinc-500">// Connected to edge-node-7 // TLS 1.3</div>
+          <div class="pt-1"></div>
+          <div id="terminal-logs"></div>
+          <!-- Current input line -->
+          <div class="flex items-center">
+            <span class="text-emerald-400 mr-1.5">guest@nexus:~$</span>
+            <span id="terminal-input" class="text-white font-medium"></span>
+            <span class="w-1.5 h-3.5 bg-indigo-400 theme-bg-accent ml-0.5 animate-pulse" id="terminal-cursor"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-zinc-800/50 pt-2 mt-4 text-[10px] text-zinc-500 font-mono flex items-center justify-between">
+        <span>SHELL: BASH v5.2</span>
+        <span>BENCHMARK: EXCELLENT</span>
+      </div>
+    </div>
+
+    <!-- div20: Live Metrics SVG Chart Dashboard -->
+    <div class="div20 flex flex-col justify-between" id="dashboard-card">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-indigo-500 theme-bg-accent animate-ping"></div>
+          <span class="text-xs font-mono uppercase tracking-wider text-zinc-300">LIVE WORKLOAD METRICS</span>
+        </div>
+        <div class="flex items-center gap-3 text-[10px] font-mono">
+          <span class="text-emerald-400 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+            LIVE FLOW
+          </span>
+          <span class="text-zinc-500" id="current-time">12:44:02 PM</span>
+        </div>
+      </div>
+
+      <!-- Realtime Chart Area -->
+      <div class="flex-grow flex items-center justify-center relative min-h-[140px] mt-2 mb-2 bg-zinc-950/40 border border-zinc-900/60 rounded-lg p-2 overflow-hidden">
+        <svg class="w-full h-full absolute inset-0" id="live-svg-chart" viewBox="0 0 400 150" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent-hex)" stop-opacity="0.25"></stop>
+              <stop offset="100%" stop-color="var(--accent-hex)" stop-opacity="0.0"></stop>
+            </linearGradient>
+          </defs>
+          <!-- Grid Lines -->
+          <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(255,255,255,0.02)" stroke-dasharray="3,3"></line>
+          <line x1="0" y1="75" x2="400" y2="75" stroke="rgba(255,255,255,0.02)" stroke-dasharray="3,3"></line>
+          <line x1="0" y1="120" x2="400" y2="120" stroke="rgba(255,255,255,0.02)" stroke-dasharray="3,3"></line>
+          <!-- Chart Paths (Updated dynamically by JS) -->
+          <path id="chart-area" d="M 0 150 Q 50 110, 100 130 T 200 90 T 300 110 T 400 60 L 400 150 Z" fill="url(#chart-grad)"></path>
+          <path id="chart-line" d="M 0 150 Q 50 110, 100 130 T 200 90 T 300 110 T 400 60" fill="none" stroke="var(--accent-hex)" stroke-width="2" stroke-linecap="round"></path>
+          <!-- Moving Pulse Dot -->
+          <circle id="chart-pulse" cx="400" cy="60" r="4" fill="#ffffff" class="filter drop-shadow-[0_0_8px_var(--accent-hex)]"></circle>
+        </svg>
+
+        <!-- Metric badges inside chart container -->
+        <div class="absolute bottom-2 left-2 flex items-center gap-3 bg-zinc-900/90 border border-zinc-800/80 px-2.5 py-1.5 rounded-md text-[10px] font-mono shadow-lg">
+          <div>
+            <span class="text-zinc-500 block uppercase text-[8px]">Throughput</span>
+            <span class="text-white font-bold block" id="throughput-val">482 MB/s</span>
+          </div>
+          <div class="border-l border-zinc-800 h-6"></div>
+          <div>
+            <span class="text-zinc-500 block uppercase text-[8px]">CPU load</span>
+            <span class="text-white font-bold block" id="cpu-load-val">42.4%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-[10px] text-zinc-500 font-mono flex items-center justify-between mt-1">
+        <span>SAMPLING_RATE: 1.5s</span>
+        <span>EDGE CLUSTERS: 12 GLOBAL DEPLOYMENTS</span>
+      </div>
+    </div>
+
+    <!-- div21: Tailwind UI Style Secure Sign-In Form Widget -->
+    <div class="div21 flex flex-col justify-between" id="auth-card">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-mono uppercase tracking-wider text-zinc-400">SECURE PORTAL CORE</span>
+        <span class="w-2 h-2 rounded-full bg-zinc-700" id="portal-lock-indicator"></span>
+      </div>
+
+      <!-- Auth Form Content -->
+      <form id="nexus-sign-in" onsubmit="handleAuthSubmit(event)" class="space-y-3 flex-grow flex flex-col justify-center max-w-md mx-auto w-full">
+        <div>
+          <label for="email" class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider mb-1">Operator Identifier</label>
+          <div class="relative rounded-md shadow-sm">
+            <input type="email" name="email" id="email" required class="block w-full rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-xs text-white py-2 px-3 focus:outline-none transition-all" placeholder="user@nexus.io">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[10px] font-mono text-zinc-400 uppercase tracking-wider">Access Secret</label>
+            <a href="#" onclick="alert('Demo reset key triggered. Try signing in with any email/password.'); return false;" class="text-[9px] font-mono text-indigo-400 theme-text-accent hover:underline">Request Reset?</a>
+          </div>
+          <div class="relative rounded-md shadow-sm">
+            <input type="password" name="password" id="password" required class="block w-full rounded-lg bg-zinc-950 border border-zinc-800 hover:border-zinc-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-xs text-white py-2 px-3 focus:outline-none transition-all" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[10px] pt-1">
+          <label class="flex items-center gap-1.5 cursor-pointer text-zinc-500 hover:text-zinc-300">
+            <input type="checkbox" class="rounded bg-zinc-950 border-zinc-850 text-indigo-500 focus:ring-0 focus:ring-offset-0 w-3 h-3">
+            <span>Cache Token</span>
+          </label>
+          <span class="text-zinc-500 font-mono text-[9px]">AES-256 ENCRYPTED</span>
+        </div>
+
+        <button type="submit" id="auth-btn" class="w-full py-2 px-4 rounded-lg bg-indigo-600 hover:bg-indigo-500 theme-bg-accent text-white text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden group shadow-[0_4px_20px_rgba(var(--accent-rgb),0.15)] mt-1">
+          <span id="auth-btn-text">Authenticate Key</span>
+          <svg id="auth-btn-icon" class="w-3.5 h-3.5 text-white animate-spin hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </button>
+      </form>
+
+      <div class="text-[10px] text-zinc-500 font-mono text-center mt-3 pt-2 border-t border-zinc-800/40">
+        SECURITY GATEWAY: STANDBY
+      </div>
+    </div>
+
+    <!-- div28: Highlight Project Showcase -->
+    <div class="div28 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-[9px] font-mono text-zinc-400">FEATURED APPARATUS</span>
+          <span class="text-[10px] text-indigo-400 theme-text-accent font-mono">PROJECT QUANTUM CORE</span>
+        </div>
+        <h3 class="text-lg font-extrabold text-white">Advanced Cloud-Native Dashboard Orchestration</h3>
+        <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+          Nexus Workspace integrates real-time web socket feeds, secure cryptographic sign-in pipelines, live process logging monitors, and modular web interfaces into a single low-overhead viewport.
+        </p>
+      </div>
+
+      <!-- Tech Stack Badges row -->
+      <div class="flex flex-wrap items-center justify-between border-t border-zinc-800/60 pt-3 mt-4 gap-2">
+        <div class="flex gap-1.5 flex-wrap">
+          <span class="px-2 py-0.5 rounded-full bg-zinc-950 border border-zinc-800 text-[9px] font-mono text-zinc-400">Next.js 15</span>
+          <span class="px-2 py-0.5 rounded-full bg-zinc-950 border border-zinc-800 text-[9px] font-mono text-zinc-400">Tailwind CSS v4</span>
+          <span class="px-2 py-0.5 rounded-full bg-zinc-950 border border-zinc-800 text-[9px] font-mono text-zinc-400">WebSockets</span>
+          <span class="px-2 py-0.5 rounded-full bg-zinc-950 border border-zinc-800 text-[9px] font-mono text-zinc-400">Rust API</span>
+        </div>
+        <a href="#" class="text-xs font-bold text-indigo-400 theme-text-accent hover:underline flex items-center gap-1">
+          Open Portal
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- div29: Client Quote Testimonial -->
+    <div class="div29 flex flex-col justify-between">
+      <div class="flex flex-col h-full justify-between">
+        <div class="flex text-amber-500 gap-0.5">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+
+        <p class="text-xs italic text-zinc-300 mt-2 leading-relaxed">
+          "The interactive dashboard feeds, the zero-latency CLI emulation, and aesthetic dark UI modules make deploying client-facing pipelines exceptionally effortless."
+        </p>
+
+        <div class="flex items-center gap-2.5 mt-3 border-t border-zinc-800/50 pt-2 shrink-0">
+          <div class="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-white uppercase border border-zinc-700">M</div>
+          <div>
+            <span class="text-[10px] font-bold text-white block">Marcus Aurel</span>
+            <span class="text-[8px] text-zinc-500 font-mono block">CTO, HELIOS INFRA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- div24: Core Pillar - Performance -->
+    <div class="div24 flex flex-col justify-between">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="w-4 h-4 text-amber-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+        </svg>
+        <span class="text-[10px] font-mono tracking-wider uppercase text-zinc-400">PERFORMANCE RATING</span>
+      </div>
+      <div>
+        <span class="text-xs font-extrabold text-white block">Sub-10ms Edge Deployment</span>
+        <p class="text-[10px] text-zinc-500 mt-1 leading-relaxed">Global network distribution caches assets instantaneously closer to clients.</p>
+      </div>
+    </div>
+
+    <!-- div23: Core Pillar - Cryptography -->
+    <div class="div23 flex flex-col justify-between">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="w-4 h-4 text-indigo-400 theme-text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+        <span class="text-[10px] font-mono tracking-wider uppercase text-zinc-400">ENCRYPTION PROTOCOL</span>
+      </div>
+      <div>
+        <span class="text-xs font-extrabold text-white block">End-To-End Security</span>
+        <p class="text-[10px] text-zinc-500 mt-1 leading-relaxed">State-of-the-art AES-256 GCM locks every single user token block secure.</p>
+      </div>
+    </div>
+
+    <!-- div26: Core Pillar - Serverless Automation -->
+    <div class="div26 flex flex-col justify-between">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="w-4 h-4 text-cyan-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+        </svg>
+        <span class="text-[10px] font-mono tracking-wider uppercase text-zinc-400">AUTONOMOUS FLOW</span>
+      </div>
+      <div>
+        <span class="text-xs font-extrabold text-white block">Automated CI/CD Engines</span>
+        <p class="text-[10px] text-zinc-500 mt-1 leading-relaxed">Push code, test systems, build binaries and update clusters concurrently.</p>
+      </div>
+    </div>
+
+    <!-- div32: Secondary perk 1 -->
+    <div class="div32 flex flex-col justify-between">
+      <div class="flex items-center gap-1.5 text-zinc-500 text-[10px] font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 theme-bg-accent"></span>
+        MODULE ALPHA
+      </div>
+      <div>
+        <span class="text-xs font-bold text-white block">Supercharged Analytics</span>
+        <p class="text-[10px] text-zinc-500 mt-0.5 leading-relaxed">Extract core usage stats inside an integrated dashboard view.</p>
+      </div>
+    </div>
+
+    <!-- div33: Secondary perk 2 -->
+    <div class="div33 flex flex-col justify-between">
+      <div class="flex items-center gap-1.5 text-zinc-500 text-[10px] font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+        MODULE BETA
+      </div>
+      <div>
+        <span class="text-xs font-bold text-white block">Cloud Integration</span>
+        <p class="text-[10px] text-zinc-500 mt-0.5 leading-relaxed">Instantly stream active event feeds into Slack or Discord nodes.</p>
+      </div>
+    </div>
+
+    <!-- div34: Secondary perk 3 -->
+    <div class="div34 flex flex-col justify-between">
+      <div class="flex items-center gap-1.5 text-zinc-500 text-[10px] font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+        MODULE GAMMA
+      </div>
+      <div>
+        <span class="text-xs font-bold text-white block">Serverless Functions</span>
+        <p class="text-[10px] text-zinc-500 mt-0.5 leading-relaxed">Deploy lightweight backend tasks executing globally inside v8 environments.</p>
+      </div>
+    </div>
+
+    <!-- div36: FAQ Accordion -->
+    <div class="div36 flex flex-col justify-between" id="faq-card">
+      <div>
+        <div class="flex items-center gap-2 mb-3 border-b border-zinc-800/60 pb-3">
+          <svg class="w-4 h-4 text-indigo-400 theme-text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+          </svg>
+          <span class="text-xs font-mono uppercase tracking-wider text-indigo-400 theme-text-accent">FAQ GATEWAY</span>
+        </div>
+
+        <!-- FAQ list -->
+        <div class="space-y-2 mt-2">
+          <!-- Item 1 -->
+          <div class="rounded border border-zinc-800/80 bg-zinc-950/40 p-2 cursor-pointer group" onclick="toggleFaq(1)">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-white group-hover:text-indigo-400 theme-text-accent-hover transition-colors">How fast is Nexus Core?</span>
+              <svg class="w-3 h-3 text-zinc-500 transition-transform duration-300 transform" id="faq-icon-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="max-h-0 overflow-hidden transition-all duration-300 mt-1" id="faq-ans-1">
+              <p class="text-[9px] text-zinc-400 leading-normal border-t border-zinc-800/40 pt-1.5">
+                Nexus responds globally under 10ms by distributing assets dynamically to closest server edge centers.
+              </p>
+            </div>
+          </div>
+          <!-- Item 2 -->
+          <div class="rounded border border-zinc-800/80 bg-zinc-950/40 p-2 cursor-pointer group" onclick="toggleFaq(2)">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-white group-hover:text-indigo-400 theme-text-accent-hover transition-colors">Is custom code supported?</span>
+              <svg class="w-3 h-3 text-zinc-500 transition-transform duration-300 transform" id="faq-icon-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="max-h-0 overflow-hidden transition-all duration-300 mt-1" id="faq-ans-2">
+              <p class="text-[9px] text-zinc-400 leading-normal border-t border-zinc-800/40 pt-1.5">
+                Yes, full serverless support for React, Next.js, Node, Python, and micro-containers is configured natively.
+              </p>
+            </div>
+          </div>
+          <!-- Item 3 -->
+          <div class="rounded border border-zinc-800/80 bg-zinc-950/40 p-2 cursor-pointer group" onclick="toggleFaq(3)">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-white group-hover:text-indigo-400 theme-text-accent-hover transition-colors">Is there a free trial?</span>
+              <svg class="w-3 h-3 text-zinc-500 transition-transform duration-300 transform" id="faq-icon-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+            <div class="max-h-0 overflow-hidden transition-all duration-300 mt-1" id="faq-ans-3">
+              <p class="text-[9px] text-zinc-400 leading-normal border-t border-zinc-800/40 pt-1.5">
+                Our Hobby Tier is 100% free with core serverless and metrics logs included forever. No payment card needed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-[10px] text-zinc-500 font-mono mt-4 pt-2 border-t border-zinc-800/40">
+        INTERACTIVE UTILITY NODES
+      </div>
+    </div>
+
+    <!-- div35: Live Event Logging Monitor -->
+    <div class="div35 flex flex-col justify-between" id="logs-card">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500 theme-bg-accent animate-ping"></span>
+          <span class="text-xs font-mono uppercase tracking-wider text-zinc-300">LIVE SECURITY LOG MONITOR</span>
+        </div>
+        <span class="text-[9px] font-mono text-zinc-500" id="log-speed-indicator">INTERVAL: 2.2s</span>
+      </div>
+
+      <!-- Logs Scrolling Window -->
+      <div class="flex-grow bg-zinc-950/80 border border-zinc-900 rounded-lg p-2.5 font-mono text-[10px] leading-relaxed text-zinc-300 overflow-y-auto h-[200px] custom-scrollbar" id="logs-container">
+        <!-- Default Initial Logs -->
+        <div class="text-zinc-500 border-b border-zinc-900/60 pb-1 mb-1">[08:02:44] [SYSTEM] Core log pipeline activated...</div>
+        <div class="text-indigo-450 theme-text-accent">[08:02:45] [INFO] Loading dashboard metrics...</div>
+        <div class="text-cyan-450">[08:02:46] [NETWORK] Syncing edge node clusters...</div>
+        <div class="text-emerald-450">[08:02:47] [SUCCESS] All nodes securely established</div>
+      </div>
+
+      <div class="text-[10px] text-zinc-500 font-mono flex items-center justify-between mt-3 pt-2 border-t border-zinc-800/40">
+        <span>LOGS_COUNT: <span id="log-count">4</span></span>
+        <span>STATUS: LIVE STREAMING</span>
+      </div>
+    </div>
+
+    <!-- Tech Stack Icons (div39, div40, div37, div38, div41, div42) -->
+    <!-- div39: React -->
+    <div class="div39 flex flex-col justify-between items-center text-center hover:bg-zinc-850 border border-zinc-800/60 hover:border-indigo-500/40 group">
+      <div class="w-8 h-8 rounded-full bg-indigo-500/10 text-indigo-400 theme-text-accent flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-white block">React</span>
+        <span class="text-[8px] text-zinc-500 font-mono">COMPETENCY: 94%</span>
+      </div>
+    </div>
+
+    <!-- div40: Tailwind -->
+    <div class="div40 flex flex-col justify-between items-center text-center hover:bg-zinc-850 border border-zinc-800/60 hover:border-cyan-500/40 group">
+      <div class="w-8 h-8 rounded-full bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20 group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18M3 12h18"></path></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-white block">Tailwind</span>
+        <span class="text-[8px] text-zinc-500 font-mono">COMPETENCY: 98%</span>
+      </div>
+    </div>
+
+    <!-- div37: TypeScript -->
+    <div class="div37 flex flex-col justify-between items-center text-center hover:bg-zinc-850 border border-zinc-800/60 hover:border-indigo-500/40 group">
+      <div class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-white block">TypeScript</span>
+        <span class="text-[8px] text-zinc-500 font-mono">COMPETENCY: 91%</span>
+      </div>
+    </div>
+
+    <!-- div38: Node.js -->
+    <div class="div38 flex flex-col justify-between items-center text-center hover:bg-zinc-850 border border-zinc-800/60 hover:border-emerald-500/40 group">
+      <div class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-white block">Node.js</span>
+        <span class="text-[8px] text-zinc-500 font-mono">COMPETENCY: 89%</span>
+      </div>
+    </div>
+
+    <!-- div41: Python -->
+    <div class="div41 flex flex-col justify-between items-center text-center hover:bg-zinc-850 border border-zinc-800/60 hover:border-amber-500/40 group">
+      <div class="w-8 h-8 rounded-full bg-amber-500/10 text-amber-450 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-white block">Python</span>
+        <span class="text-[8px] text-zinc-500 font-mono">COMPETENCY: 84%</span>
+      </div>
+    </div>
+
+    <!-- div42: Docker -->
+    <div class="div42 flex flex-col justify-between items-center text-center hover:bg-zinc-850 border border-zinc-800/60 hover:border-cyan-500/40 group">
+      <div class="w-8 h-8 rounded-full bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-110 transition-transform">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+      </div>
+      <div>
+        <span class="text-[10px] font-bold text-white block">Docker</span>
+        <span class="text-[8px] text-zinc-500 font-mono">COMPETENCY: 82%</span>
+      </div>
+    </div>
+
+    <!-- div45: Horizontal Call to Action Banner -->
+    <div class="div45 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div>
+        <span class="text-xs font-mono text-indigo-400 theme-text-accent uppercase tracking-wider font-semibold">GET STARTED TODAY</span>
+        <h3 class="text-xl font-extrabold text-white mt-1">Accelerate Your Core Dev Stream</h3>
+        <p class="text-xs text-zinc-400 mt-1 max-w-xl">
+          Instantiate a secure cloud dashboard container in under 3 minutes. Zero credit card needed to initialize development nodes.
+        </p>
+      </div>
+      <!-- Actions buttons -->
+      <div class="flex items-center gap-3 w-full md:w-auto shrink-0 pt-2 md:pt-0">
+        <button onclick="alert('Demo launch successful. Cloud dashboard instantiated!');" class="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 theme-bg-accent text-white text-xs font-bold transition-all duration-300 shadow-md flex-grow md:flex-grow-0">
+          Deploy Core Station
+        </button>
+        <button onclick="window.scrollTo(0, document.body.scrollHeight);" class="px-4 py-2.5 rounded-lg border border-zinc-700 hover:border-zinc-500 bg-transparent text-zinc-300 hover:text-white text-xs font-bold transition-all duration-300 flex-grow md:flex-grow-0">
+          View Plans
+        </button>
+      </div>
+    </div>
+
+    <!-- div43: Services / Pricing Tiers (Row-span 4 block) -->
+    <div class="div43 flex flex-col justify-between" id="pricing-card">
+      <div class="flex items-center justify-between mb-4 border-b border-zinc-800/60 pb-3">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-indigo-400 theme-text-accent" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+          </svg>
+          <span class="text-xs font-mono uppercase tracking-wider text-indigo-400 theme-text-accent">GLOBAL PRICING TIERS</span>
+        </div>
+        <span class="text-[10px] text-zinc-500 font-mono">TRANSACTION GATEWAY SECURED</span>
+      </div>
+
+      <!-- Pricing Plans Columns Sub-Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow items-stretch my-1">
+        <!-- Tier 1 -->
+        <div class="bg-zinc-950/60 border border-zinc-850 p-4 rounded-xl flex flex-col justify-between group hover:border-zinc-700 transition-all duration-300">
+          <div>
+            <span class="text-[10px] font-mono text-zinc-500 uppercase">Hobby Pack</span>
+            <div class="flex items-baseline mt-1">
+              <span class="text-2xl font-extrabold text-white font-mono">$0</span>
+              <span class="text-zinc-500 text-[10px] ml-1 font-mono">/ month</span>
+            </div>
+            <p class="text-[10px] text-zinc-400 mt-2">Core node metrics logs and 5 container links included.</p>
+          </div>
+          <button onclick="alert('Free pack instantiated.');" class="w-full mt-4 py-1.5 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold transition-all border border-zinc-800">
+            Activate Free
+          </button>
+        </div>
+
+        <!-- Tier 2: Glowing Premium -->
+        <div class="bg-zinc-950/90 border-2 border-indigo-500/80 theme-border-accent p-4 rounded-xl flex flex-col justify-between relative group shadow-[0_10px_30px_-5px_rgba(var(--accent-rgb),0.15)] scale-[1.02] md:scale-105 z-10 transition-all duration-300">
+          <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-500 theme-bg-accent text-white text-[8px] font-bold tracking-wider uppercase">MOST POPULAR</span>
+          <div>
+            <span class="text-[10px] font-mono text-indigo-400 theme-text-accent uppercase font-bold">Developer Pro</span>
+            <div class="flex items-baseline mt-1">
+              <span class="text-2xl font-extrabold text-white font-mono">$19</span>
+              <span class="text-zinc-400 text-[10px] ml-1 font-mono">/ month</span>
+            </div>
+            <p class="text-[10px] text-zinc-300 mt-2">Unlimited dynamic deployments, custom domain links, and 24/7 priority mail support.</p>
+          </div>
+          <button onclick="alert('Developer Pro tier selected. Secure checkout triggered.');" class="w-full mt-4 py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 theme-bg-accent text-white text-[10px] font-bold transition-all shadow-[0_2px_10px_rgba(var(--accent-rgb),0.2)]">
+            Upgrade to Pro
+          </button>
+        </div>
+
+        <!-- Tier 3 -->
+        <div class="bg-zinc-950/60 border border-zinc-850 p-4 rounded-xl flex flex-col justify-between group hover:border-zinc-700 transition-all duration-300">
+          <div>
+            <span class="text-[10px] font-mono text-zinc-500 uppercase">Enterprise</span>
+            <div class="flex items-baseline mt-1">
+              <span class="text-2xl font-extrabold text-white font-mono">Custom</span>
+              <span class="text-zinc-500 text-[10px] ml-1 font-mono">/ scale</span>
+            </div>
+            <p class="text-[10px] text-zinc-400 mt-2">Dedicated cluster VPCs, single sign-on security portals, and personal support SLA managers.</p>
+          </div>
+          <button onclick="alert('Contacting sales representative portal...');" class="w-full mt-4 py-1.5 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-bold transition-all border border-zinc-800">
+            Contact Sales
+          </button>
+        </div>
+      </div>
+
+      <div class="text-[10px] text-zinc-500 font-mono mt-3 pt-2 border-t border-zinc-800/40 text-center">
+        SSL ENCRYPTED SECURE PAYMENT CHANNELS // REFUNDS SUPPORTED FOR 14 DAYS
+      </div>
+    </div>
+
+    <!-- div44: Footer Component -->
+    <div class="div44 flex flex-col md:flex-row items-center justify-between text-zinc-500 font-mono text-[10px] gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>© 2026 NEXUS CORE INC. ALL RIGHTS RESERVED.</span>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#" class="hover:text-zinc-300 transition-colors">SECURITY REPORT</a>
+        <a href="#" class="hover:text-zinc-300 transition-colors">SYSTEM STATUS</a>
+        <a href="#" class="hover:text-zinc-300 transition-colors">API CREDENTIALS</a>
+        <a href="#" class="hover:text-zinc-300 transition-colors">LICENSE AGREEMENT</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive JavaScript Systems -->
+  <script>
+    // 1. Accent Theme switching system
+    function changeTheme(themeName, rgbValues, hexCode) {
+      document.documentElement.style.setProperty('--accent-rgb', rgbValues);
+      document.documentElement.style.setProperty('--accent-hex', hexCode);
+      document.documentElement.style.setProperty('--accent-glow', `rgba(${rgbValues}, 0.15)`);
+
+      // Update background glow shapes
+      const glow1 = document.getElementById('glow-1');
+      const glow2 = document.getElementById('glow-2');
+      if (themeName === 'cyan') {
+        glow1.className = "fixed -top-40 -left-40 w-96 h-96 rounded-full bg-cyan-500/10 blur-[120px] pointer-events-none transition-all duration-700";
+        glow2.className = "fixed top-1/2 right-10 w-80 h-80 rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none transition-all duration-700";
+      } else if (themeName === 'amber') {
+        glow1.className = "fixed -top-40 -left-40 w-96 h-96 rounded-full bg-amber-500/10 blur-[120px] pointer-events-none transition-all duration-700";
+        glow2.className = "fixed top-1/2 right-10 w-80 h-80 rounded-full bg-red-500/5 blur-[120px] pointer-events-none transition-all duration-700";
+      } else {
+        glow1.className = "fixed -top-40 -left-40 w-96 h-96 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none transition-all duration-700";
+        glow2.className = "fixed top-1/2 right-10 w-80 h-80 rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none transition-all duration-700";
+      }
+
+      // Update themed text/border/bg DOM elements
+      document.querySelectorAll('.theme-text-accent').forEach(el => {
+        el.style.color = hexCode;
+      });
+      document.querySelectorAll('.theme-bg-accent').forEach(el => {
+        el.style.backgroundColor = hexCode;
+      });
+      document.querySelectorAll('.theme-border-accent').forEach(el => {
+        el.style.borderColor = hexCode;
+      });
+      document.querySelectorAll('.theme-bg-accent-10').forEach(el => {
+        el.style.backgroundColor = `rgba(${rgbValues}, 0.1)`;
+      });
+
+      // Update active border styles on changer pills
+      document.querySelectorAll('.flex.items-center.bg-zinc-950\\/80 button').forEach(btn => {
+        btn.style.borderColor = 'transparent';
+      });
+      event.target.style.borderColor = '#ffffff';
+
+      // Push custom log entry indicating theme instantiation
+      addLogEntry('SYSTEM', `Core theme reconfigured to ${themeName.toUpperCase()}`, 'info');
+    }
+
+    // Initialize Card Mouse Spotlights (Aceternity Spotlight concept)
+    const cards = document.querySelectorAll('.parent > div');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+
+    // 2. Interactive Self-Typing BASH Terminal Emulator
+    const terminalCommands = [
+      { text: "git clone https://github.com/nexus/workspace.git core", isCommand: true },
+      { text: "Cloning into 'core'...", isCommand: false },
+      { text: "Receiving metadata objects: 100% (201/201), done.", isCommand: false },
+      { text: "Resolving delta links: 100% (94/94), done.", isCommand: false },
+      { text: "cd core && npm install --silent", isCommand: true },
+      { text: "✔ Added 134 packages, synced edge cache in 1.48s", isCommand: false },
+      { text: "nexus-cli cluster deploy --prod", isCommand: true },
+      { text: "⚡ Optimizing asset distribution nodes...", isCommand: false },
+      { text: "✔ Compiled edge workspace binaries (0.42s)", isCommand: false },
+      { text: "🌐 Deploying to 12 edge locations...", isCommand: false },
+      { text: "✔ Status: ONLINE. Live at https://core.nexus.io", isCommand: false },
+      { text: "clear", isCommand: true, clear: true }
+    ];
+
+    let currentCmdIdx = 0;
+    let charIdx = 0;
+    const terminalInput = document.getElementById('terminal-input');
+    const terminalLogs = document.getElementById('terminal-logs');
+    const terminalScreen = document.getElementById('terminal-screen');
+
+    function runTerminalTyping() {
+      if (currentCmdIdx >= terminalCommands.length) {
+        currentCmdIdx = 0;
+      }
+      
+      const cmdObj = terminalCommands[currentCmdIdx];
+      
+      if (cmdObj.isCommand) {
+        // Clear screen command
+        if (cmdObj.clear) {
+          setTimeout(() => {
+            terminalLogs.innerHTML = "";
+            terminalInput.textContent = "";
+            currentCmdIdx++;
+            charIdx = 0;
+            runTerminalTyping();
+          }, 1500);
+          return;
+        }
+
+        // Type out the command letter by letter
+        terminalInput.textContent = "";
+        charIdx = 0;
+        function typeLetter() {
+          if (charIdx < cmdObj.text.length) {
+            terminalInput.textContent += cmdObj.text.charAt(charIdx);
+            charIdx++;
+            setTimeout(typeLetter, 45 + Math.random() * 40);
+          } else {
+            // Command completed, hit enter and show output
+            setTimeout(() => {
+              const cmdLine = document.createElement('div');
+              cmdLine.innerHTML = `<span class="text-emerald-400">guest@nexus:~$</span> <span class="text-white">${cmdObj.text}</span>`;
+              terminalLogs.appendChild(cmdLine);
+              terminalInput.textContent = "";
+              currentCmdIdx++;
+              runTerminalTyping();
+              terminalScreen.scrollTop = terminalScreen.scrollHeight;
+            }, 500);
+          }
+        }
+        typeLetter();
+      } else {
+        // Output line - display immediately
+        setTimeout(() => {
+          const logLine = document.createElement('div');
+          logLine.textContent = cmdObj.text;
+          
+          // Style outputs
+          if (cmdObj.text.startsWith("✔") || cmdObj.text.includes("ONLINE")) {
+            logLine.className = "text-emerald-400";
+          } else if (cmdObj.text.startsWith("⚡")) {
+            logLine.className = "text-indigo-400 theme-text-accent";
+          } else {
+            logLine.className = "text-zinc-400";
+          }
+          
+          terminalLogs.appendChild(logLine);
+          currentCmdIdx++;
+          runTerminalTyping();
+          terminalScreen.scrollTop = terminalScreen.scrollHeight;
+        }, 300 + Math.random() * 200);
+      }
+    }
+
+    function resetTerminal() {
+      terminalLogs.innerHTML = "<div class='text-zinc-500'>// Console reset initiated...</div>";
+      terminalInput.textContent = "";
+      currentCmdIdx = 0;
+      charIdx = 0;
+      addLogEntry('CONSOLE', 'Virtual bash terminal restarted by user', 'warn');
+    }
+
+    // Start terminal emulator on load
+    setTimeout(runTerminalTyping, 1000);
+
+    // 3. Realtime SVG Spline Line Chart Generator
+    const svgChart = document.getElementById('live-svg-chart');
+    const chartArea = document.getElementById('chart-area');
+    const chartLine = document.getElementById('chart-line');
+    const chartPulse = document.getElementById('chart-pulse');
+    const throughputVal = document.getElementById('throughput-val');
+    const cpuLoadVal = document.getElementById('cpu-load-val');
+
+    let chartPoints = [80, 110, 95, 120, 85, 105, 75, 90, 60];
+
+    function updateLiveChart() {
+      // Shift array and add new randomized natural telemetry point
+      chartPoints.shift();
+      const lastVal = chartPoints[chartPoints.length - 1];
+      const change = (Math.random() - 0.48) * 35;
+      let nextVal = Math.round(lastVal + change);
+      if (nextVal < 20) nextVal = 30;
+      if (nextVal > 140) nextVal = 120;
+      chartPoints.push(nextVal);
+
+      // Generate SVG Spline representation
+      const width = 400;
+      const height = 150;
+      const step = width / (chartPoints.length - 1);
+      
+      let dLine = `M 0 ${chartPoints[0]}`;
+      for (let i = 1; i < chartPoints.length; i++) {
+        const x = i * step;
+        const y = chartPoints[i];
+        const prevX = (i - 1) * step;
+        const prevY = chartPoints[i - 1];
+        // Smooth Bezier Curve controls
+        const cpX1 = prevX + step / 2;
+        const cpY1 = prevY;
+        const cpX2 = prevX + step / 2;
+        const cpY2 = y;
+        dLine += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${x} ${y}`;
+      }
+
+      const dArea = `${dLine} L 400 150 L 0 150 Z`;
+
+      // Update Path DOM attributes
+      chartLine.setAttribute('d', dLine);
+      chartArea.setAttribute('d', dArea);
+
+      // Position moving pulse dot at last coordinate
+      chartPulse.setAttribute('cx', 400);
+      chartPulse.setAttribute('cy', nextVal);
+
+      // Update numerical indicators
+      const throughput = Math.round(450 + (150 - nextVal) * 2.2);
+      const cpu = Math.round(20 + (150 - nextVal) * 0.4);
+      throughputVal.textContent = `${throughput} MB/s`;
+      cpuLoadVal.textContent = `${cpu}.4%`;
+
+      // Sync active clock
+      const now = new Date();
+      document.getElementById('current-time').textContent = now.toLocaleTimeString();
+
+      // Trigger log entry occasionally
+      if (Math.random() > 0.75) {
+        addLogEntry('TELEMETRY', `Metrics updated: cpu ${cpu}%, throughput ${throughput}MB/s`, 'info');
+      }
+    }
+
+    setInterval(updateLiveChart, 1500);
+
+    // 4. Client Testimonial Form / Sign In Form Interaction
+    function handleAuthSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('email').value;
+      const authBtn = document.getElementById('auth-btn');
+      const authBtnText = document.getElementById('auth-btn-text');
+      const authBtnIcon = document.getElementById('auth-btn-icon');
+      const portalIndicator = document.getElementById('portal-lock-indicator');
+
+      authBtnText.textContent = "Verifying Credentials...";
+      authBtnIcon.classList.remove('hidden');
+      authBtn.disabled = true;
+
+      setTimeout(() => {
+        authBtnText.textContent = "SESSION AUTHORIZED ✓";
+        authBtnIcon.classList.add('hidden');
+        authBtn.classList.remove('bg-indigo-600');
+        authBtn.classList.add('bg-emerald-600');
+        portalIndicator.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
+        
+        // Push secure success notification into logs and terminal
+        addLogEntry('SECURITY', `Operator Session Authorized for ${email}`, 'success');
+        
+        // Append log into terminal manually to link elements together
+        const authLog = document.createElement('div');
+        authLog.className = "text-emerald-400 font-bold";
+        authLog.textContent = `[GATEWAY] Authorized remote session key for ${email}`;
+        terminalLogs.appendChild(authLog);
+        terminalScreen.scrollTop = terminalScreen.scrollHeight;
+
+        alert(`Authentication successful for ${email}! Security session generated.`);
+        
+        // Reset state after delay
+        setTimeout(() => {
+          authBtnText.textContent = "Authenticate Key";
+          authBtn.classList.remove('bg-emerald-600');
+          authBtn.classList.add('bg-indigo-600');
+          authBtn.disabled = false;
+        }, 5000);
+      }, 1800);
+    }
+
+    // 5. Accordion Expand/Collapse FAQ Action
+    function toggleFaq(index) {
+      const ans = document.getElementById(`faq-ans-${index}`);
+      const icon = document.getElementById(`faq-icon-${index}`);
+      
+      if (ans.style.maxHeight && ans.style.maxHeight !== '0px') {
+        ans.style.maxHeight = '0px';
+        icon.style.transform = 'rotate(0deg)';
+      } else {
+        // Collapse others
+        for (let i = 1; i <= 3; i++) {
+          document.getElementById(`faq-ans-${i}`).style.maxHeight = '0px';
+          document.getElementById(`faq-icon-${i}`).style.transform = 'rotate(0deg)';
+        }
+        ans.style.maxHeight = ans.scrollHeight + 'px';
+        icon.style.transform = 'rotate(180deg)';
+        addLogEntry('FAQ', `Expanded assistance module #${index}`, 'info');
+      }
+    }
+
+    // 6. Realtime Log Monitor stream builder
+    const logsContainer = document.getElementById('logs-container');
+    const logCountSpan = document.getElementById('log-count');
+    let logCount = 4;
+
+    const logPhrases = [
+      { text: "GET /api/v1/metrics - 200 OK (8ms) from node-us-east", type: "info" },
+      { text: "Cache purge requested on 4 global edge nodes", type: "info" },
+      { text: "Syncing DB transactions: 14 keys replicated successfully", type: "success" },
+      { text: "CPU temperature spike warning on node-ap-south: 62°C", type: "warn" },
+      { text: "BGP route optimization initialized: 12ms latency saved", type: "success" },
+      { text: "Session token regenerated for node administrator", type: "warn" },
+      { text: "Websocket link open: client_id client-9042", type: "info" },
+      { text: "Cron script executed: cleaned 1,402 expired sandbox caches", type: "success" }
+    ];
+
+    function addLogEntry(facility, message, level) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+      const logLine = document.createElement('div');
+      
+      let levelClass = "text-indigo-400 theme-text-accent";
+      let levelLabel = "INFO";
+      if (level === 'success') {
+        levelClass = "text-emerald-400";
+        levelLabel = "SUCCESS";
+      } else if (level === 'warn') {
+        levelClass = "text-amber-400";
+        levelLabel = "WARN";
+      }
+
+      logLine.className = "border-t border-zinc-900/40 pt-1.5 mt-1.5 opacity-0 transition-opacity duration-500";
+      logLine.innerHTML = `<span class="text-zinc-500">[${timeStr}]</span> <span class="${levelClass}">[${facility.toUpperCase()}]</span> ${message}`;
+      
+      logsContainer.appendChild(logLine);
+      
+      // Smooth fade-in
+      setTimeout(() => { logLine.classList.remove('opacity-0'); }, 50);
+
+      // Scroll to bottom
+      logsContainer.scrollTop = logsContainer.scrollHeight;
+
+      logCount++;
+      logCountSpan.textContent = logCount;
+    }
+
+    // Append automatic logs at intervals
+    function autoAppendLogs() {
+      const randomPhrase = logPhrases[Math.floor(Math.random() * logPhrases.length)];
+      addLogEntry('SERVER', randomPhrase.text, randomPhrase.type);
+      
+      // Randomize next interval to feel like real event traffic
+      setTimeout(autoAppendLogs, 1500 + Math.random() * 3000);
+    }
+    
+    // Start streaming logs
+    setTimeout(autoAppendLogs, 2500);
+
+    // 7. IntersectionObserver Count Up Telemetry numbers
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const target = entry.target;
+          const endVal = parseInt(target.getAttribute('data-target'));
+          let currentVal = 0;
+          const duration = 1200; // ms
+          const stepTime = Math.max(Math.floor(duration / endVal), 15);
+          
+          const counter = setInterval(() => {
+            currentVal += Math.ceil(endVal / 80);
+            if (currentVal >= endVal) {
+              target.textContent = endVal;
+              clearInterval(counter);
+            } else {
+              target.textContent = currentVal;
+            }
+          }, stepTime);
+          
+          observer.unobserve(target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.counter-target').forEach(el => observer.observe(el));
+  </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a1e0b9dac8ae1bf4',t:'MTc4NDUzNzUwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

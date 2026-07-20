@@ -16,7 +16,7 @@
     "**/.git": true,
     "**/.env*": false,
     "**/.gitattributes": true,
-    "**/.gitignore": true,
+    "**/.gitignore": false,
     "**/.github": true,
     "**/docker-compose.yml": true,
     "**/next-env.d.ts": true,
