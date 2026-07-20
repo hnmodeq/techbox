@@ -9,12 +9,24 @@ import { NewsSidebarCard } from "./news-sidebar-card"
 
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
-export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?: string[]; onClose?: () => void }) {
-  const { items: dbNews, loading } = useHomeModule("news")
-  const wrapperRef = React.useRef<HTMLDivElement>(null)
-  const scrollRef = React.useRef<HTMLDivElement>(null)
+interface TechboxNewsSidebarProps {
+  unreadSlugs?: string[]
+  onClose?: () => void
+  /** Forwarded ref so the parent (LayoutShell) can redirect wheel events here */
+  scrollRef?: React.RefObject<HTMLDivElement | null>
+}
 
-  // Only news published in the last 24 hours (real filter, no fake dates)
+export function TechboxNewsSidebar({
+  unreadSlugs = [],
+  onClose,
+  scrollRef,
+}: TechboxNewsSidebarProps) {
+  const { items: dbNews, loading } = useHomeModule("news")
+  // Internal fallback ref if the parent doesn't provide one
+  const internalScrollRef = React.useRef<HTMLDivElement>(null)
+  const resolvedScrollRef = scrollRef ?? internalScrollRef
+
+  // Only news published in the last 24 hours
   const newsItems = React.useMemo(() => {
     // eslint-disable-next-line react-hooks/purity
     const now = Date.now()
@@ -24,36 +36,8 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
       .slice(0, 15)
   }, [dbNews])
 
-  // Trap ALL wheel events on the sidebar wrapper so the page NEVER scrolls
-  React.useEffect(() => {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
-
-    const onWheel = (e: WheelEvent) => {
-      e.stopPropagation()
-
-      const el = scrollRef.current
-      if (!el) return
-
-      const { scrollTop, scrollHeight, clientHeight } = el
-      const atTop = scrollTop === 0 && e.deltaY < 0
-      const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0
-
-      if (!atTop && !atBottom) {
-        e.preventDefault()
-        el.scrollTop += e.deltaY
-      }
-    }
-
-    wrapper.addEventListener("wheel", onWheel, { passive: false })
-    return () => wrapper.removeEventListener("wheel", onWheel)
-  }, [])
-
   return (
-    <div
-      ref={wrapperRef}
-      className="flex h-full w-full flex-col bg-[var(--sidebar-background)] border-r border-[var(--sidebar-border)] shadow-2xl"
-    >
+    <div className="flex h-full w-full flex-col bg-[var(--sidebar-background)] border-r border-[var(--sidebar-border)] shadow-2xl">
       {/* Header */}
       <div className="flex h-14 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border)]">
         <div className="flex items-center gap-2">
@@ -71,9 +55,9 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
         )}
       </div>
 
-      {/* Scrollable content — isolated from page scroll */}
+      {/* Scrollable content */}
       <div
-        ref={scrollRef}
+        ref={resolvedScrollRef}
         dir="rtl"
         className="flex-1 overflow-y-auto"
         style={{ scrollbarWidth: "thin", overscrollBehavior: "contain" }}

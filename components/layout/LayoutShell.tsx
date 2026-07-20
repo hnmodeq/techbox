@@ -75,19 +75,16 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
   const newsSidebarRef = React.useRef<HTMLDivElement>(null)
+  // The scrollable div inside TechboxNewsSidebar — used to redirect wheel events
+  const newsSidebarScrollRef = React.useRef<HTMLDivElement>(null)
 
+  // Close on outside click
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
-      if (newsSidebarRef.current && newsSidebarRef.current.contains(target)) {
-        return;
-      }
-      
+      if (newsSidebarRef.current && newsSidebarRef.current.contains(target)) return;
       const button = (target as Element).closest('button');
-      if (button && (button.getAttribute('aria-label') === 'اخبار زنده تکباکس' || button.textContent?.includes('خبر'))) {
-        return;
-      }
-
+      if (button && (button.getAttribute('aria-label') === 'اخبار زنده تکباکس' || button.textContent?.includes('خبر'))) return;
       setNewsOpen(false);
     };
 
@@ -99,6 +96,32 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
+  }, [newsOpen]);
+
+  // When the sidebar is open, capture ALL wheel events on the document and
+  // redirect them into the sidebar's scroll container — this way even scrolling
+  // outside the sidebar panel drives the sidebar, not the page.
+  React.useEffect(() => {
+    if (!newsOpen) return;
+
+    const onDocWheel = (e: WheelEvent) => {
+      // If the event already originates inside the sidebar, let it through
+      if (newsSidebarRef.current?.contains(e.target as Node)) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const scrollEl = newsSidebarScrollRef.current;
+      if (!scrollEl) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollEl;
+      const atTop = scrollTop === 0 && e.deltaY < 0;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
+      if (!atTop && !atBottom) scrollEl.scrollTop += e.deltaY;
+    };
+
+    document.addEventListener("wheel", onDocWheel, { passive: false });
+    return () => document.removeEventListener("wheel", onDocWheel);
   }, [newsOpen]);
 
   const { items: dbNews } = useHomeModule("news")
@@ -192,7 +215,11 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
                 newsOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"
               }`}
             >
-              <TechboxNewsSidebar unreadSlugs={openedUnreadNewsSlugs} onClose={() => setNewsOpen(false)} />
+              <TechboxNewsSidebar
+                unreadSlugs={openedUnreadNewsSlugs}
+                onClose={() => setNewsOpen(false)}
+                scrollRef={newsSidebarScrollRef}
+              />
             </div>
           </SidebarInset>
         </div>

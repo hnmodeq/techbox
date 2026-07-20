@@ -14,6 +14,7 @@ interface UserRow {
   name: string;
   username: string;
   avatar?: string;
+  isFollowedByViewer?: boolean;
 }
 
 interface FollowStatsProps {
@@ -37,10 +38,11 @@ export function FollowStats({
   const [modalType, setModalType] = useState<"followers" | "following">("followers");
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  // Track which listed users the viewer is following (optimistic-updatable)
   const [viewerFollowing, setViewerFollowing] = useState<Set<string>>(new Set());
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
 
-  // Reconcile counts with server once — deduplicated to avoid re-render loops
+  // Reconcile counts once on mount — deduped to avoid re-render loops
   useEffect(() => {
     const qs = viewerId ? `?username=${username}&viewerId=${viewerId}` : `?username=${username}`;
     fetch(`/api/follow${qs}`)
@@ -48,7 +50,11 @@ export function FollowStats({
       .then((d) => {
         if (d) {
           setStats((prev) => {
-            if (prev.followersCount === d.followersCount && prev.followingCount === d.followingCount) return prev;
+            if (
+              prev.followersCount === d.followersCount &&
+              prev.followingCount === d.followingCount
+            )
+              return prev;
             return { followersCount: d.followersCount, followingCount: d.followingCount };
           });
         }
@@ -57,97 +63,96 @@ export function FollowStats({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username, viewerId]);
 
-  const openModal = useCallback(async (type: "followers" | "following") => {
-    setModalType(type);
-    setShowModal(true);
-    setLoadingUsers(true);
-    setUsers([]);
+  const openModal = useCallback(
+    async (type: "followers" | "following") => {
+      setModalType(type);
+      setShowModal(true);
+      setLoadingUsers(true);
+      setUsers([]);
+      setViewerFollowing(new Set());
 
-    try {
-      const endpoint = type === "followers" ? "followers" : "following";
-      const res = await fetch(`/api/follow/${endpoint}?username=${username}`);
-      if (res.ok) {
-        const data = await res.json();
-        const list: UserRow[] = data.users || [];
-        setUsers(list);
-
-        // Check which users the viewer is already following
-        if (viewerId && list.length > 0) {
-          const checks = await Promise.allSettled(
-            list.map((u) =>
-              fetch(`/api/follow?username=${u.username}&viewerId=${viewerId}`)
-                .then((r) => (r.ok ? r.json() : null))
-                .then((d) => (d?.isFollowing ? u.id : null))
-            )
+      try {
+        const endpoint = type === "followers" ? "followers" : "following";
+        // Pass viewerId so the API can return isFollowedByViewer in ONE query
+        const qs = viewerId ? `?username=${username}&viewerId=${viewerId}` : `?username=${username}`;
+        const res = await fetch(`/api/follow/${endpoint}${qs}`);
+        if (res.ok) {
+          const data = await res.json();
+          const list: UserRow[] = data.users || [];
+          setUsers(list);
+          // Seed the following set from the API response (no extra round-trips)
+          const alreadyFollowing = new Set<string>(
+            list.filter((u) => u.isFollowedByViewer).map((u) => u.id)
           );
-          const following = new Set<string>();
-          checks.forEach((result) => {
-            if (result.status === "fulfilled" && result.value) following.add(result.value);
-          });
-          setViewerFollowing(following);
+          setViewerFollowing(alreadyFollowing);
         }
+      } finally {
+        setLoadingUsers(false);
       }
-    } finally {
-      setLoadingUsers(false);
-    }
-  }, [username, viewerId]);
+    },
+    [username, viewerId]
+  );
 
-  const toggleFollow = useCallback(async (targetUserId: string) => {
-    if (!viewerId || busyIds.has(targetUserId)) return;
+  const toggleFollow = useCallback(
+    async (targetUserId: string) => {
+      if (!viewerId || busyIds.has(targetUserId)) return;
 
-    const isCurrentlyFollowing = viewerFollowing.has(targetUserId);
-    const next = !isCurrentlyFollowing;
+      const wasFollowing = viewerFollowing.has(targetUserId);
+      const next = !wasFollowing;
 
-    // Optimistic update
-    setBusyIds((prev) => new Set(prev).add(targetUserId));
-    setViewerFollowing((prev) => {
-      const s = new Set(prev);
-      next ? s.add(targetUserId) : s.delete(targetUserId);
-      return s;
-    });
-    toast.success(next ? "دنبال می‌کنید" : "دنبال کردن متوقف شد");
-
-    try {
-      const res = await fetch("/api/follow", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetUserId }),
+      // Optimistic update — user sees change immediately
+      setBusyIds((prev) => new Set(prev).add(targetUserId));
+      setViewerFollowing((prev) => {
+        const s = new Set(prev);
+        next ? s.add(targetUserId) : s.delete(targetUserId);
+        return s;
       });
-      if (res.ok) {
-        const data = await res.json();
-        setViewerFollowing((prev) => {
-          const s = new Set(prev);
-          data.following ? s.add(targetUserId) : s.delete(targetUserId);
-          return s;
+      toast.success(next ? "دنبال می‌کنید" : "دنبال کردن متوقف شد");
+
+      try {
+        const res = await fetch("/api/follow", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ targetUserId }),
         });
-      } else {
-        // Revert
+        if (res.ok) {
+          const data = await res.json();
+          // Reconcile with server truth
+          setViewerFollowing((prev) => {
+            const s = new Set(prev);
+            data.following ? s.add(targetUserId) : s.delete(targetUserId);
+            return s;
+          });
+        } else {
+          // Revert
+          setViewerFollowing((prev) => {
+            const s = new Set(prev);
+            wasFollowing ? s.add(targetUserId) : s.delete(targetUserId);
+            return s;
+          });
+          toast.error("خطا در ارتباط");
+        }
+      } catch {
         setViewerFollowing((prev) => {
           const s = new Set(prev);
-          isCurrentlyFollowing ? s.add(targetUserId) : s.delete(targetUserId);
+          wasFollowing ? s.add(targetUserId) : s.delete(targetUserId);
           return s;
         });
         toast.error("خطا در ارتباط");
+      } finally {
+        setBusyIds((prev) => {
+          const s = new Set(prev);
+          s.delete(targetUserId);
+          return s;
+        });
       }
-    } catch {
-      setViewerFollowing((prev) => {
-        const s = new Set(prev);
-        isCurrentlyFollowing ? s.add(targetUserId) : s.delete(targetUserId);
-        return s;
-      });
-      toast.error("خطا در ارتباط");
-    } finally {
-      setBusyIds((prev) => {
-        const s = new Set(prev);
-        s.delete(targetUserId);
-        return s;
-      });
-    }
-  }, [viewerId, viewerFollowing, busyIds]);
+    },
+    [viewerId, viewerFollowing, busyIds]
+  );
 
   return (
     <>
-      {/* Follow counts */}
+      {/* Follow counts row */}
       <div className="flex items-center gap-2 text-sm" dir="rtl">
         <button
           onClick={() => openModal("followers")}
@@ -160,7 +165,6 @@ export function FollowStats({
           <span className="text-muted-foreground text-xs">دنبال‌کننده</span>
         </button>
 
-        {/* Taller separator */}
         <Separator orientation="vertical" className="h-8 self-stretch" />
 
         <button
@@ -175,7 +179,7 @@ export function FollowStats({
         </button>
       </div>
 
-      {/* Modal */}
+      {/* Modal — shared for both followers & following */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-sm" dir="rtl">
           <DialogHeader>
@@ -193,12 +197,14 @@ export function FollowStats({
                     <div className="h-3 w-24 rounded bg-muted animate-pulse" />
                     <div className="h-2.5 w-16 rounded bg-muted animate-pulse" />
                   </div>
-                  <div className="h-6 w-16 rounded bg-muted animate-pulse shrink-0" />
+                  <div className="h-7 w-24 rounded bg-muted animate-pulse shrink-0" />
                 </div>
               ))
             ) : users.length === 0 ? (
               <p className="text-center text-muted-foreground py-8 text-sm">
-                {modalType === "followers" ? "هنوز دنبال‌کننده‌ای وجود ندارد." : "هنوز کسی را دنبال نمی‌کند."}
+                {modalType === "followers"
+                  ? "هنوز دنبال‌کننده‌ای وجود ندارد."
+                  : "هنوز کسی را دنبال نمی‌کند."}
               </p>
             ) : (
               users.map((u) => {
@@ -211,7 +217,7 @@ export function FollowStats({
                     key={u.id}
                     className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/60 transition-colors"
                   >
-                    {/* Clickable avatar + name → profile */}
+                    {/* Clickable avatar + name → profile page */}
                     <Link
                       href={`/author/${u.username}`}
                       onClick={() => setShowModal(false)}
@@ -234,23 +240,31 @@ export function FollowStats({
                       </div>
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground truncate">{u.name}</div>
-                        <div className="text-xs text-muted-foreground" dir="ltr">@{u.username}</div>
+                        <div className="text-xs text-muted-foreground" dir="ltr">
+                          @{u.username}
+                        </div>
                       </div>
                     </Link>
 
-                    {/* In-modal follow/unfollow — only for logged-in viewer, not self */}
+                    {/* Follow / unfollow — shown in BOTH modals for all users except self */}
                     {viewerId && !isSelf && (
                       <Button
                         size="sm"
                         variant={isFollowing ? "outline" : "primary"}
-                        className="shrink-0 gap-1 text-xs"
+                        className="shrink-0 gap-1 text-xs whitespace-nowrap"
                         disabled={isBusy}
                         onClick={() => toggleFollow(u.id)}
                       >
                         {isFollowing ? (
-                          <><UserMinus size={12} /> رها</>
+                          <>
+                            <UserMinus size={12} />
+                            توقف دنبال کردن
+                          </>
                         ) : (
-                          <><UserPlus size={12} /> دنبال</>
+                          <>
+                            <UserPlus size={12} />
+                            دنبال کردن
+                          </>
                         )}
                       </Button>
                     )}
