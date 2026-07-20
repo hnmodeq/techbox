@@ -1,4 +1,12 @@
 "use client";
+
+/**
+ * SuggestionGrid — shows related content based on shared tags.
+ *
+ * Fetches posts from each allowed module separately so a single module
+ * cannot dominate the 200-item fetch limit.
+ * Suggests blog, forum, media, download — all must share ≥1 tag.
+ */
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -6,17 +14,24 @@ import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { formatRelativeDate } from "@/lib/date-format";
 
-// Modules to include in suggestions from blog article pages
-const SUGGEST_MODULES = new Set(["blog", "forum", "media", "download"]);
+const SUGGEST_MODULES = ["blog", "forum", "media", "download"] as const;
+const PER_MODULE = 30; // fetch this many per module
 
 export default function SuggestionGrid({ current }: { current: ContentItem }) {
   const [items, setItems] = useState<ContentItem[]>([]);
 
   useEffect(() => {
-    fetch("/api/posts?take=200", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => { if (Array.isArray(d)) setItems(d); })
-      .catch(() => {});
+    // Fetch from each module separately so no module dominates the result pool
+    Promise.all(
+      SUGGEST_MODULES.map((mod) =>
+        fetch(`/api/posts?module=${mod}&take=${PER_MODULE}`, { cache: "no-store" })
+          .then((r) => r.json())
+          .then((d) => (Array.isArray(d) ? d : []))
+          .catch(() => [] as ContentItem[])
+      )
+    ).then((results) => {
+      setItems(results.flat());
+    });
   }, []);
 
   const related = useMemo(() => {
@@ -24,16 +39,11 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
     if (tags.size === 0) return [];
 
     return items
-      // exclude the current article itself
       .filter((i) => !(i.module === current.module && i.slug === current.slug))
-      // only from the allowed modules
-      .filter((i) => SUGGEST_MODULES.has(i.module))
-      // score by tag overlap only — no same-module bonus
       .map((i) => ({
         item: i,
         score: (i.tags || []).filter((t) => tags.has(t)).length,
       }))
-      // must share at least 1 tag
       .filter((x) => x.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 6)
