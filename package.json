@@ -14,6 +14,7 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:baseline": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql && prisma migrate resolve --applied 0_init",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-job-titles": "tsx prisma/seed-job-titles.ts",
     "postinstall": "prisma generate",
     "data": "node scripts/data.cjs",
     "tree": "node scripts/tree.cjs",
