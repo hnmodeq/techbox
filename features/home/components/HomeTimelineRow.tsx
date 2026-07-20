@@ -44,6 +44,9 @@ export default function HomeTimelineRow({ homeTitle, homeMoreLabel, showHomeTitl
             </Link>
           )}
         </div>
+        <p className="text-xs text-muted-foreground text-right -mt-3">
+          برای مشاهده رویدادهای تکنولوژی به چپ و راست حرکت کنید.
+        </p>
 
         {/* The real timeline panel — same frame before and after. No preview
             state, no click-to-activate. The user scrolls immediately. */}

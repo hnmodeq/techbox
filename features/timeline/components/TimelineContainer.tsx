@@ -3,7 +3,8 @@
 import React, { useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
-import { ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
@@ -24,95 +25,83 @@ interface TimelineContainerProps {
   heightClassName?: string;
 }
 
-/**
- * A simple horizontal timeline: one native horizontal-scroll container holding
- * a flex row of events. Each event is a date label + a dot ON the line + a
- * card hanging below. RTL so the newest event appears at the right.
- *
- * Uses native horizontal scroll (touch, trackpad, shift+wheel, scrollbar) — no
- * custom pan/zoom state. Everything inside is non-draggable / non-selectable
- * so images and text can't be copied or dragged out of the timeline.
- */
 export function TimelineContainer({ events, heightClassName }: TimelineContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
-    const amount = 350; // approximate width of one card + gap
-    // In RTL, scrollLeft behaves differently across browsers.
-    // Using scrollBy with negative for left and positive for right usually works.
-    // But since RTL is tricky, we can try detecting current scrollLeft.
-    // Let's just use scrollBy: left decreases x, right increases x.
-    // Wait, in RTL, 'right' means towards the start (scrollLeft > 0 usually or 0).
+    const amount = 360;
     const scrollAmount = direction === 'left' ? -amount : amount;
     scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   };
 
   return (
-    <div className="relative group w-full">
+    <div className="relative w-full" dir="rtl">
+      {/* Navigation buttons */}
       <button
         onClick={() => scroll('right')}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 text-muted-foreground hover:text-foreground transition-opacity p-2 hidden sm:block"
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center size-11 rounded-full border border-border bg-background/90 shadow-md text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
         aria-label="اسکرول به راست"
       >
-        <ChevronsRight size={32} />
+        <ChevronRight size={22} />
       </button>
 
       <button
         onClick={() => scroll('left')}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 text-muted-foreground hover:text-foreground transition-opacity p-2 hidden sm:block"
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 hidden sm:flex items-center justify-center size-11 rounded-full border border-border bg-background/90 shadow-md text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
         aria-label="اسکرول به چپ"
       >
-        <ChevronsLeft size={32} />
+        <ChevronLeft size={22} />
       </button>
 
+      {/* Scroll container — no visible scrollbar */}
       <div
         ref={scrollRef}
         dir="rtl"
         className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground ${heightClassName ?? 'h-[560px]'}`}
         style={{
-          scrollbarWidth: 'thin',
+          scrollbarWidth: 'none',
           WebkitOverflowScrolling: 'touch',
         }}
       >
-      {/* The flex row of events. min-w-max so it never wraps. Each event
-          centers on the line. */}
-      <div
-        className="relative flex min-w-max items-start gap-8 px-[8%] pt-3"
-        style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
-        onDragStart={(e) => e.preventDefault()}
-      >
-        {/* The continuous horizontal line — pinned at the dot row vertical. */}
-        <div
-          className="pointer-events-none absolute left-0 h-1 rounded-full bg-border"
-          style={{ top: '44px', width: '100%' }}
-        />
+        {/* Hide webkit scrollbar */}
+        <style>{`
+          [data-timeline-scroll]::-webkit-scrollbar { display: none; }
+        `}</style>
 
-        {events.map((event) => {
-          return (
+        <div
+          className="relative flex min-w-max items-start gap-8 px-[8%] pt-3"
+          style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
+          onDragStart={(e) => e.preventDefault()}
+        >
+          {/* Continuous horizontal line */}
+          <div
+            className="pointer-events-none absolute left-0 h-1 rounded-full bg-border"
+            style={{ top: '44px', width: '100%' }}
+          />
+
+          {events.map((event) => (
             <div
               key={event.id}
               className="relative flex shrink-0 flex-col items-center"
               style={{ width: 320 }}
             >
-              {/* Date label ABOVE the line — relative format (days/months/years ago) */}
+              {/* Date label above the line */}
               <div className="mb-2 text-center text-xs font-bold text-muted-foreground h-6 flex items-center justify-center">
                 {relativeDate(event.dateGr)}
               </div>
 
-              {/* Dot ON the line (sits at the same vertical as the continuous
-                  line at top:44px — date(24) + mb-2(8) + half-dot(12) ≈ 44). */}
+              {/* Dot on the line */}
               <div className="relative z-10 size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
 
-              {/* Card hanging below */}
+              {/* Card */}
               <div className="mt-4">
                 <TimelineCard event={event} importance={event.importance} />
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
-    </div>
     </div>
   );
 }

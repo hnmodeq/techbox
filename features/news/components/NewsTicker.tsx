@@ -9,11 +9,9 @@ import {
   useReducedMotion,
   useSpring,
 } from "framer-motion";
-import { moduleColors } from "@/config/module-colors";
 import { formatRelativeTime } from "@/lib/date-format";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useHomeTicker } from "@/features/home/lib/home-data";
-
 
 type TickerItem = {
   slug: string;
@@ -31,25 +29,26 @@ const KNOWN: ModuleSlug[] = ["blog", "news", "media", "review", "tools", "downlo
 const NORMAL_SPEED = 48;
 const HOVER_SPEED = 7;
 
-const moduleCopy: Partial<Record<ModuleSlug, { type: string; place: string; action: string }>> = {
-  blog: { type: "مقاله", place: "مجله", action: "منتشر شد" },
-  news: { type: "خبر", place: "اخبار", action: "منتشر شد" },
-  media: { type: "ویدیو", place: "ویدیوهای کوتاه", action: "منتشر شد" },
-  review: { type: "نقد و بررسی", place: "نقد و بررسی", action: "منتشر شد" },
-  download: { type: "فایل", place: "دانلود", action: "اضافه شد" },
-  shop: { type: "محصول", place: "فروشگاه", action: "اضافه شد" },
-  forum: { type: "موضوع", place: "انجمن", action: "ایجاد شد" },
-  tools: { type: "ابزار", place: "ابزارها", action: "اضافه شد" },
+const moduleCopy: Partial<Record<ModuleSlug, { type: string; action: string }>> = {
+  blog: { type: "مقاله", action: "منتشر شد" },
+  news: { type: "خبر", action: "منتشر شد" },
+  media: { type: "ویدیو", action: "منتشر شد" },
+  review: { type: "نقد و بررسی", action: "منتشر شد" },
+  download: { type: "فایل", action: "اضافه شد" },
+  shop: { type: "محصول", action: "اضافه شد" },
+  forum: { type: "موضوع", action: "ایجاد شد" },
+  tools: { type: "ابزار", action: "اضافه شد" },
 };
-
-const nf = new Intl.NumberFormat("fa-IR");
 
 function getModule(item: TickerItem): ModuleSlug {
   return KNOWN.includes(item.module as ModuleSlug) ? (item.module as ModuleSlug) : "blog";
 }
 
 function getModuleCopy(module: ModuleSlug) {
-  return moduleCopy[module] ?? { type: moduleMeta[module]?.titleFa || module, place: moduleMeta[module]?.titleFa || module, action: "منتشر شد" };
+  return moduleCopy[module] ?? {
+    type: moduleMeta[module]?.titleFa || module,
+    action: "منتشر شد",
+  };
 }
 
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
@@ -71,8 +70,6 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
       const width = groupNode.getBoundingClientRect().width;
       if (width > 0) {
         groupWidthRef.current = width;
-        // Use jump() instead of set() to place the track at -width
-        // without animating — no visible jump from x=0
         x.jump(-width);
         setVisible(true);
       }
@@ -109,26 +106,29 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
         const itemModule = getModule(item);
         const copy = getModuleCopy(itemModule);
         const relativeDate = formatRelativeTime(item.date);
-        const tone = moduleColors[itemModule].active;
-        const hoverTone = moduleColors[itemModule].hover;
 
         return (
           <Link
             key={`${groupIndex}-${item.module}-${item.slug}-${index}`}
             href={`/${itemModule}/${item.slug}`}
             tabIndex={groupIndex > 0 ? -1 : undefined}
-            className={`ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-semibold text-foreground transition-colors duration-200 ${hoverTone}`}
+            className="ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-light text-foreground hover:text-foreground/80 transition-colors duration-200"
             dir="rtl"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70 transition-transform group-hover:scale-125" />
-            <span>
-              <span className="font-bold text-foreground">{copy.type}</span>{" "}
-              <span>{item.title}</span>{" "}
-              <span className="text-muted-foreground">در</span>{" "}
-              <span className={`font-bold ${tone}`}>{copy.place}</span>{" "}
-              <span className="text-muted-foreground">{copy.action}.</span>
+            {/* Dot separator */}
+            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/50 shrink-0" />
+
+            {/* Sentence: «مقاله راهنمای ... منتشر شد.» */}
+            <span className="text-foreground font-light">
+              {copy.type}{" "}
+              <span className="font-light">{item.title}</span>{" "}
+              <span className="font-light">{copy.action}.</span>
             </span>
-            {relativeDate && <span className="text-muted-foreground">{relativeDate}</span>}
+
+            {/* Relative date — different color, same weight */}
+            {relativeDate && (
+              <span className="text-muted-foreground font-light shrink-0">{relativeDate}</span>
+            )}
           </Link>
         );
       })}

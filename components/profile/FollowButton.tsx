@@ -2,19 +2,29 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { UserPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 
 interface FollowButtonProps {
   targetUserId: string;
   viewerId: string;
+  initialIsFollowing?: boolean;
 }
 
-export function FollowButton({ targetUserId, viewerId }: FollowButtonProps) {
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [loading, setLoading] = useState(false);
+export function FollowButton({ targetUserId, viewerId, initialIsFollowing = false }: FollowButtonProps) {
+  const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+  const [busy, setBusy] = useState(false);
 
   const toggleFollow = async () => {
-    setLoading(true);
+    if (busy) return;
+
+    // Optimistic update — user sees the change immediately
+    const next = !isFollowing;
+    setIsFollowing(next);
+    toast.success(next ? "دنبال می‌کنید" : "دنبال کردن متوقف شد");
+
+    // Fire-and-forget in the background
+    setBusy(true);
     try {
       const res = await fetch("/api/follow", {
         method: "POST",
@@ -24,25 +34,39 @@ export function FollowButton({ targetUserId, viewerId }: FollowButtonProps) {
 
       if (res.ok) {
         const data = await res.json();
+        // Reconcile with server truth silently
         setIsFollowing(data.following);
-        toast.success(data.following ? "دنبال می‌کنید" : "دنبال کردن متوقف شد");
+      } else {
+        // Revert on server error
+        setIsFollowing(!next);
+        toast.error("خطا در ارتباط");
       }
     } catch {
+      setIsFollowing(!next);
       toast.error("خطا در ارتباط");
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
   };
 
   return (
     <Button
       onClick={toggleFollow}
-      disabled={loading}
-      variant={isFollowing ? "outline" : "default"}
+      variant={isFollowing ? "outline" : "primary"}
       size="sm"
-      className="mt-2"
+      className="gap-1.5"
     >
-      {isFollowing ? "توقف دنبال کردن" : "دنبال کردن"}
+      {isFollowing ? (
+        <>
+          <UserMinus size={14} />
+          توقف دنبال کردن
+        </>
+      ) : (
+        <>
+          <UserPlus size={14} />
+          دنبال کردن
+        </>
+      )}
     </Button>
   );
 }

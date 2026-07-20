@@ -38,16 +38,30 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const username = searchParams.get("username");
+  const viewerId = searchParams.get("viewerId");
 
   if (!username) return NextResponse.json({ error: "username required" }, { status: 400 });
 
   const user = await prisma.user.findUnique({ where: { username } });
   if (!user) return NextResponse.json({ error: "user not found" }, { status: 404 });
 
-  const [followersCount, followingCount] = await Promise.all([
-    prisma.follow?.count({ where: { followingId: user.id } }).catch(() => 0),
-    prisma.follow?.count({ where: { followerId: user.id } }).catch(() => 0),
+  const [followersCount, followingCount, isFollowing] = await Promise.all([
+    prisma.follow.count({ where: { followingId: user.id } }).catch(() => 0),
+    prisma.follow.count({ where: { followerId: user.id } }).catch(() => 0),
+    viewerId && viewerId !== user.id
+      ? prisma.follow
+          .findUnique({
+            where: {
+              followerId_followingId: {
+                followerId: viewerId,
+                followingId: user.id,
+              },
+            },
+          })
+          .then((r) => !!r)
+          .catch(() => false)
+      : Promise.resolve(false),
   ]);
 
-  return NextResponse.json({ followersCount, followingCount });
+  return NextResponse.json({ followersCount, followingCount, isFollowing });
 }

@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { Heart, MessageCircle, Send, X } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTimelineLiked } from '@/providers/timeline-likes.provider';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
@@ -18,9 +16,6 @@ interface TimelineCardProps {
 }
 
 export function TimelineCard({ event, style, importance }: TimelineCardProps) {
-  // Stable counts from the server payload (real DB values, no 0-flicker).
-  // We initialise from the prop directly — if the prop is missing we keep -1
-  // (sentinel) so the count is hidden until a real number arrives, never 0.
   const serverLikes = typeof (event as any).likesCount === 'number' ? (event as any).likesCount : -1;
   const serverComments = typeof (event as any).commentsCount === 'number' ? (event as any).commentsCount : -1;
 
@@ -47,7 +42,31 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   );
   const [newCommentText, setNewCommentText] = useState('');
   const [commentError, setCommentError] = useState('');
-  const router = useRouter();
+
+  // Ref for the comment scroll area — used to trap wheel events
+  const commentScrollRef = useRef<HTMLDivElement>(null);
+
+  // Trap wheel events inside the comment area so only it scrolls
+  useEffect(() => {
+    const el = commentScrollRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      const atTop = scrollTop === 0 && e.deltaY < 0;
+      const atBottom = scrollTop + clientHeight >= scrollHeight && e.deltaY > 0;
+      if (!atTop && !atBottom) {
+        e.preventDefault();
+        e.stopPropagation();
+        el.scrollTop += e.deltaY;
+      } else {
+        e.stopPropagation();
+      }
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, [showComments]);
 
   // Keep local state in sync if the parent re-fetches the event payload.
   useEffect(() => {
@@ -188,11 +207,10 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     <div
       style={style}
       className={`${widthClass} shrink-0 flex flex-col justify-start relative select-none`}
-      // Lock down drag/select/copy for the whole card.
       onDragStart={(e) => e.preventDefault()}
     >
-      {/* TALLER CARD BOX — no hover effect, image not draggable. */}
       <div className="relative h-[440px] sm:h-[460px] w-full rounded-lg overflow-hidden shadow-sm border border-border flex flex-col justify-end bg-card">
+        {/* Background image + gradient */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {event.image ? (
             <Image
@@ -209,18 +227,19 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-transparent" />
         </div>
 
-        <div className="relative z-10 p-4.5 flex flex-col justify-end h-full text-foreground">
+        {/* Card content */}
+        <div className="relative z-10 p-4 flex flex-col justify-end h-full text-foreground">
           <div className="flex-1 flex flex-col justify-end overflow-hidden mb-4">
-            <h3 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-bold text-foreground mb-2 line-clamp-2 leading-6">
+            <h3 className="font-bold text-foreground mb-2 line-clamp-2 leading-6">
               {event.title}
             </h3>
-            {/* Tighter caption spacing (leading-5 was leading-6). */}
-            <p className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground line-clamp-6 leading-4">
+            <p className="text-sm text-muted-foreground line-clamp-6 leading-5">
               {event.description}
             </p>
           </div>
 
-          <div className="border-t-[length:var(--border-size)] border-white/20 pt-3 flex items-center justify-between gap-2 shrink-0">
+          {/* Like + Comment buttons */}
+          <div className="border-t border-white/20 pt-3 flex items-center justify-between gap-2 shrink-0">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger
@@ -228,18 +247,22 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     <button
                       type="button"
                       onClick={handleLikeToggle}
-                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] font-bold cursor-pointer text-muted-foreground"
+                      className="flex items-center gap-1.5 text-sm font-bold cursor-pointer text-muted-foreground"
                       aria-pressed={liked}
                     />
                   }
                 >
                   <Heart
                     size={16}
-                    fill={liked ? "currentColor" : "none"}
+                    fill={liked ? 'currentColor' : 'none'}
                     strokeWidth={2}
-                    className={liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}
+                    className={liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500 transition-colors'}
                   />
-                  {likesCount >= 0 && <span className="text-muted-foreground" style={{ fontVariantNumeric: "tabular-nums" }}>{likesCount.toLocaleString('fa-IR')}</span>}
+                  {likesCount >= 0 && (
+                    <span className="text-muted-foreground tabular-nums">
+                      {likesCount.toLocaleString('fa-IR')}
+                    </span>
+                  )}
                 </TooltipTrigger>
                 <TooltipContent>تعداد پسندها</TooltipContent>
               </Tooltip>
@@ -252,7 +275,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
-                      className="flex items-center gap-1.5 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
+                      className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
                       aria-expanded={showComments}
                     />
                   }
@@ -266,28 +289,33 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
           </div>
         </div>
 
-        {/* COMMENTS OVERLAY — fills the card, starting from the top. */}
+        {/* Comments overlay */}
         {showComments && (
           <div
-            className="absolute inset-0 z-30 flex flex-col justify-start bg-background/85 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
+            className="absolute inset-0 z-30 flex flex-col bg-background/90 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
-            onWheel={(e) => e.stopPropagation()}
             onDragStart={(e) => e.preventDefault()}
           >
-            <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border shrink-0">
               <span className="text-sm font-bold text-foreground">دیدگاه‌های شما</span>
               <button
                 type="button"
                 onClick={() => setShowComments(false)}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="بستن"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <ScrollArea className="flex-1 overscroll-contain">
+            {/* Scrollable comment list — wheel trapped inside */}
+            <div
+              ref={commentScrollRef}
+              className="flex-1 overflow-y-auto overscroll-contain"
+              style={{ scrollbarWidth: 'thin' }}
+            >
               <ul className="space-y-2 p-3 text-right">
                 {comments.length === 0 && (
                   <li className="rounded-md bg-muted/20 p-2.5 text-xs text-muted-foreground border border-border text-center">
@@ -304,9 +332,10 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   </li>
                 ))}
               </ul>
-            </ScrollArea>
+            </div>
 
-            <form onSubmit={handleAddComment} className="p-3 border-t border-border bg-card">
+            {/* Comment input */}
+            <form onSubmit={handleAddComment} className="p-3 border-t border-border bg-card shrink-0">
               <div className="flex gap-1.5 items-center">
                 <Input
                   type="text"
@@ -315,8 +344,8 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   placeholder="نظر شما..."
                   className="h-9 flex-1 text-sm bg-background"
                 />
-                <Button type="submit" size="sm" className="h-9 shrink-0" title="ارسال">
-                  <Send size={14} className="rtl:rotate-180" />
+                <Button type="submit" size="sm" className="h-9 shrink-0 px-3">
+                  ثبت نظر
                 </Button>
               </div>
               {commentError && <p className="text-[11px] text-destructive mt-1.5">{commentError}</p>}

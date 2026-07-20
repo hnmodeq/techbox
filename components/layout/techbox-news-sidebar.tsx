@@ -4,48 +4,41 @@ import * as React from "react"
 import Link from "next/link"
 import { NewspaperIcon, XIcon } from "lucide-react"
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { useHomeModule } from "@/features/home/lib/home-data"
 import { NewsSidebarCard } from "./news-sidebar-card"
 
 export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?: string[]; onClose?: () => void }) {
-  const { setOpen } = useSidebar()
   const { items: dbNews, loading } = useHomeModule("news")
+  const scrollRef = React.useRef<HTMLDivElement>(null)
 
-  // Only show news from the last 24 hours (live-feel). Older news lives in /news.
-  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
-  // eslint-disable-next-line react-hooks/purity
-  const now = Date.now()
-
-  // Force the two newest items to always appear (simulate "2 hours ago")
-  const sortedNews = [...dbNews].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+  const sortedNews = [...dbNews].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
-  
-  const forcedItems = sortedNews.slice(0, 2).map(item => ({
-    ...item,
-    date: new Date(now - 2 * 60 * 60 * 1000).toISOString() // force 2 hours ago
-  }))
+  const newsItems = sortedNews.slice(0, 15)
 
-  const remainingItems = sortedNews.slice(2).filter(n => 
-    now - new Date(n.date).getTime() <= TWENTY_FOUR_HOURS
-  )
+  // Trap wheel events so only the sidebar scrolls, not the page
+  React.useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
 
-  const newsItems = [...forcedItems, ...remainingItems]
-    .slice(0, 15)
+    const onWheel = (e: WheelEvent) => {
+      const { scrollTop, scrollHeight, clientHeight } = el
+      const atTop = scrollTop === 0 && e.deltaY < 0
+      const atBottom = scrollTop + clientHeight >= scrollHeight && e.deltaY > 0
+      if (!atTop && !atBottom) {
+        e.preventDefault()
+        el.scrollTop += e.deltaY
+      }
+    }
+
+    el.addEventListener("wheel", onWheel, { passive: false })
+    return () => el.removeEventListener("wheel", onWheel)
+  }, [])
 
   return (
     <div className="flex h-full w-full flex-col bg-[var(--sidebar-background)] border-r border-[var(--sidebar-border)] shadow-2xl">
+      {/* Header */}
       <div className="flex h-14 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border)]">
         <div className="flex items-center gap-2">
           <NewspaperIcon className="size-4 text-muted-foreground" />
@@ -61,14 +54,13 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
           </button>
         )}
       </div>
-      
-      <ScrollArea 
-        className="flex-1 w-full" 
+
+      {/* Scrollable content — wheel events are trapped so the page doesn't scroll */}
+      <div
+        ref={scrollRef}
         dir="rtl"
-        onWheel={(e) => {
-          // Prevent main page from scrolling when scrolling inside news sidebar
-          e.stopPropagation();
-        }}
+        className="flex-1 overflow-y-auto overscroll-contain"
+        style={{ scrollbarWidth: "thin" }}
       >
         <div className="flex flex-col gap-1 py-2 w-full">
           {loading ? (
@@ -79,7 +71,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
             ))
           ) : newsItems.length === 0 ? (
             <div className="p-4 text-center text-xs text-muted-foreground">
-              خبر جدیدی در ۲۴ ساعت گذشته ثبت نشده است.
+              خبر جدیدی وجود ندارد.
             </div>
           ) : (
             newsItems.map((news) => {
@@ -91,8 +83,10 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
               )
             })
           )}
+
           {!loading && (
             <div className="p-3 w-full">
+              <Separator className="mb-3" />
               <Link
                 href="/news"
                 onClick={onClose}
@@ -103,7 +97,7 @@ export function TechboxNewsSidebar({ unreadSlugs = [], onClose }: { unreadSlugs?
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   )
 }
