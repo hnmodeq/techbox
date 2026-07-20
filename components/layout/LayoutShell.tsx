@@ -73,38 +73,11 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
-  const newsSidebarRef = React.useRef<HTMLDivElement>(null)
-
-  // Close when clicking outside the sidebar panel
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      const target = event.target as Node
-      if (newsSidebarRef.current?.contains(target)) return
-      const button = (target as Element).closest("button")
-      if (
-        button &&
-        (button.getAttribute("aria-label") === "اخبار زنده تکباکس" ||
-          button.textContent?.includes("خبر"))
-      )
-        return
-      setNewsOpen(false)
-    }
-
-    if (newsOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
-      document.addEventListener("touchstart", handleClickOutside)
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-      document.removeEventListener("touchstart", handleClickOutside)
-    }
-  }, [newsOpen])
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
   const newsSlugsKey = dbNews.map((item) => item.slug).filter(Boolean).join(",")
   const hasUnreadNews = unreadNewsSlugs.length > 0
-
   const lastFetchedReadStateKey = React.useRef<string>("")
 
   React.useEffect(() => {
@@ -116,41 +89,33 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     let cancelled = false
-
     if (!userId || !newsSlugsKey) {
-      setUnreadNewsSlugs((current) => (current.length ? [] : current))
+      setUnreadNewsSlugs((c) => (c.length ? [] : c))
       return
     }
-
     const fetchKey = `${userId}:${newsSlugsKey}`
     if (lastFetchedReadStateKey.current === fetchKey) return
     lastFetchedReadStateKey.current = fetchKey
 
     fetch(`/api/news/read-state?slugs=${encodeURIComponent(newsSlugsKey)}`, { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!cancelled) {
           const next = Array.isArray(data?.unreadSlugs) ? data.unreadSlugs : []
-          setUnreadNewsSlugs((current) => (current.join(",") === next.join(",") ? current : next))
+          setUnreadNewsSlugs((c) => (c.join(",") === next.join(",") ? c : next))
         }
       })
-      .catch(() => {
-        if (!cancelled) setUnreadNewsSlugs((current) => (current.length ? [] : current))
-      })
+      .catch(() => { if (!cancelled) setUnreadNewsSlugs((c) => (c.length ? [] : c)) })
 
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [userId, newsSlugsKey])
 
   React.useEffect(() => {
     if (!newsOpen || !userId || !newsSlugsKey || unreadNewsSlugs.length === 0) return
-
     const slugs = newsSlugsKey.split(",").filter(Boolean)
-    const unreadAtOpen = slugs.filter((slug) => unreadNewsSlugs.includes(slug))
+    const unreadAtOpen = slugs.filter((s) => unreadNewsSlugs.includes(s))
     setOpenedUnreadNewsSlugs(unreadAtOpen)
     setUnreadNewsSlugs([])
-
     fetch("/api/news/read-state", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -168,43 +133,71 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         <SiteHeader
           hasUnreadNews={hasUnreadNews}
           newsOpen={newsOpen}
-          onToggleNews={() => setNewsOpen((open) => !open)}
+          onToggleNews={() => setNewsOpen((o) => !o)}
         />
-        <div className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden" dir="rtl">
+
+        {/*
+          Three-column row (RTL):
+            right → TechboxAppSidebar (main nav)
+            center → SidebarInset (page content, scrolls normally)
+            left  → News sidebar column (always in DOM, width-animated)
+
+          The news column is a real flex sibling of the content area —
+          not an overlay, not fixed/absolute. Its inner div is sticky +
+          fixed-height with overflow-y-auto, mirroring exactly how the
+          main shadcn sidebar isolates its own scroll from the page.
+        */}
+        <div
+          className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden"
+          dir="rtl"
+        >
+          {/* Main navigation sidebar (right in RTL) */}
           <TechboxAppSidebar />
+
+          {/* Page content */}
           <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size]">
             {tickerItems.length > 0 && (
               <div className="border-b bg-background/95">
                 <NewsTicker items={tickerItems} className="py-0" />
               </div>
             )}
-            <main id="main-content" className="flex min-h-[calc(100svh-var(--header-height))] flex-col">
+            <main
+              id="main-content"
+              className="flex min-h-[calc(100svh-var(--header-height))] flex-col"
+            >
               <div className="w-full max-w-full flex-1">{children}</div>
               <FooterSection />
             </main>
           </SidebarInset>
+
+          {/*
+            News sidebar column (left in RTL).
+            - Always rendered — no conditional mount/unmount.
+            - Width animates 0 ↔ 20rem via CSS transition (same mechanism as
+              the main sidebar collapsing via collapsible="offcanvas").
+            - When open: the inner sticky+h-svh div holds its own overflow-y-auto
+              scroll area, completely separate from the page scroll.
+            - overflow-hidden on the outer shell clips content during the
+              width transition so nothing bleeds out.
+          */}
+          <div
+            dir="ltr"
+            className={`hidden md:flex flex-col shrink-0 overflow-hidden border-r border-[var(--sidebar-border)] transition-[width] duration-300 ease-in-out ${
+              newsOpen ? "w-[20rem]" : "w-0 border-r-0"
+            }`}
+          >
+            {/* Sticky panel: always fills exactly the visible viewport height below the header */}
+            <div
+              className="sticky top-[var(--header-height)] h-[calc(100svh-var(--header-height))] w-[20rem] flex flex-col bg-[var(--sidebar-background)]"
+            >
+              <TechboxNewsSidebar
+                unreadSlugs={openedUnreadNewsSlugs}
+                onClose={() => setNewsOpen(false)}
+              />
+            </div>
+          </div>
         </div>
       </SidebarProvider>
-
-      {/*
-        News sidebar — fixed to the viewport, exactly like the main app sidebar.
-        Starts below the sticky header, spans the full remaining height.
-        Because it is fixed (not absolute/relative), it is completely outside
-        the page scroll flow — scrolling the page never moves the sidebar.
-        No wheel-event interception needed.
-      */}
-      <div
-        ref={newsSidebarRef}
-        className={`fixed left-0 top-[var(--header-height)] bottom-0 z-50 w-[20rem] transition-transform duration-300 ease-in-out ${
-          newsOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"
-        }`}
-        style={{ "--header-height": "calc(var(--spacing) * 14)" } as React.CSSProperties}
-      >
-        <TechboxNewsSidebar
-          unreadSlugs={openedUnreadNewsSlugs}
-          onClose={() => setNewsOpen(false)}
-        />
-      </div>
     </div>
   )
 }

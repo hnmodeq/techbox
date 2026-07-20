@@ -18,7 +18,6 @@ export function TechboxNewsSidebar({
 }) {
   const { items: dbNews, loading } = useHomeModule("news")
 
-  // Only news published in the last 24 hours
   const newsItems = React.useMemo(() => {
     // eslint-disable-next-line react-hooks/purity
     const now = Date.now()
@@ -29,17 +28,17 @@ export function TechboxNewsSidebar({
   }, [dbNews])
 
   return (
-    <div className="flex h-full w-full flex-col bg-[var(--sidebar-background)] border-r border-[var(--sidebar-border)] shadow-2xl">
+    <div className="flex h-full w-full flex-col">
       {/* Header */}
       <div className="flex h-14 shrink-0 items-center justify-between px-4 border-b border-[var(--sidebar-border)]">
         <div className="flex items-center gap-2">
           <NewspaperIcon className="size-4 text-muted-foreground" />
-          <span className="text-sm font-bold text-foreground">اخبار زنده تکباکس</span>
+          <span className="text-sm font-bold text-foreground">اخبار زنده</span>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none"
           >
             <XIcon className="size-4" />
             <span className="sr-only">بستن</span>
@@ -48,8 +47,9 @@ export function TechboxNewsSidebar({
       </div>
 
       {/*
-        Scrollable list — because the parent is fixed to the viewport,
-        scrolling here never touches the page. No hacks needed.
+        Scrollable news list.
+        The parent (sticky + fixed-height) isolates this from the page scroll —
+        exactly the same as SidebarContent inside the main sidebar.
       */}
       <div
         dir="rtl"
@@ -68,14 +68,11 @@ export function TechboxNewsSidebar({
               خبر جدیدی در ۲۴ ساعت گذشته ثبت نشده است.
             </div>
           ) : (
-            newsItems.map((news) => {
-              const isUnread = unreadSlugs.includes(news.slug)
-              return (
-                <div key={news.slug} className="px-3 py-1.5 w-full flex flex-col items-center">
-                  <NewsSidebarCard news={news} isUnread={isUnread} />
-                </div>
-              )
-            })
+            newsItems.map((news) => (
+              <div key={news.slug} className="px-3 py-1.5 w-full flex flex-col items-center">
+                <NewsSidebarCard news={news} isUnread={unreadSlugs.includes(news.slug)} />
+              </div>
+            ))
           )}
 
           {!loading && (
@@ -83,7 +80,6 @@ export function TechboxNewsSidebar({
               <Separator className="mb-3" />
               <Link
                 href="/news"
-                onClick={onClose}
                 className="flex items-center justify-center w-full rounded-md py-2.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-600/10 hover:bg-red-600/20 transition-colors"
               >
                 بایگانی خبرها
