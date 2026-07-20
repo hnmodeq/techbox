@@ -43,7 +43,6 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   }).catch(() => []);
 
   const isAuthor = authoredPosts.length > 0 || ["super_admin", "admin", "editor"].includes(user.role);
-  const isSelf = viewer?.id === user.id;
 
   const totalViews = authoredPosts.reduce((acc: number, p: any) => acc + (p.views || 0), 0);
   const totalLikes = authoredPosts.reduce((acc: number, p: any) => acc + (p.likes || 0), 0);
@@ -62,26 +61,6 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
   ]);
 
   const activities = await getUserActivities(user.id);
-
-  let savedPosts: any[] = [];
-  if (isSelf) {
-    try {
-      const savedRows = await prisma.savedContent.findMany({
-        where: { userId: user.id },
-        orderBy: { createdAt: "desc" },
-        take: 60,
-        select: { module: true, slug: true },
-      });
-      if (savedRows.length) {
-        savedPosts = await prisma.post
-          .findMany({
-            where: { published: true, deletedAt: null, OR: savedRows.map((s) => ({ module: s.module, slug: s.slug })) },
-            orderBy: { date: "desc" },
-          })
-          .catch(() => []);
-      }
-    } catch {}
-  }
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-12" dir="rtl">
@@ -189,8 +168,6 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
         isAuthor={isAuthor}
         authoredPosts={authoredPosts}
         activities={activities}
-        savedPosts={savedPosts}
-        isSelf={isSelf}
       />
     </main>
   );

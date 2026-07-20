@@ -19,7 +19,6 @@ import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
 import type { SiteLayoutConfig } from "@/lib/module-config"
 
-// Lightweight placeholder that mirrors the chat launcher (icon-only, no text)
 const ChatLauncherFallback = () => (
   <button
     type="button"
@@ -75,61 +74,37 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
   const newsSidebarRef = React.useRef<HTMLDivElement>(null)
-  // The scrollable div inside TechboxNewsSidebar — used to redirect wheel events
-  const newsSidebarScrollRef = React.useRef<HTMLDivElement>(null)
 
-  // Close on outside click
+  // Close when clicking outside the sidebar panel
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      const target = event.target as Node;
-      if (newsSidebarRef.current && newsSidebarRef.current.contains(target)) return;
-      const button = (target as Element).closest('button');
-      if (button && (button.getAttribute('aria-label') === 'اخبار زنده تکباکس' || button.textContent?.includes('خبر'))) return;
-      setNewsOpen(false);
-    };
+      const target = event.target as Node
+      if (newsSidebarRef.current?.contains(target)) return
+      const button = (target as Element).closest("button")
+      if (
+        button &&
+        (button.getAttribute("aria-label") === "اخبار زنده تکباکس" ||
+          button.textContent?.includes("خبر"))
+      )
+        return
+      setNewsOpen(false)
+    }
 
     if (newsOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchstart", handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("touchstart", handleClickOutside)
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, [newsOpen]);
-
-  // When the sidebar is open, capture ALL wheel events on the document and
-  // redirect them into the sidebar's scroll container — this way even scrolling
-  // outside the sidebar panel drives the sidebar, not the page.
-  React.useEffect(() => {
-    if (!newsOpen) return;
-
-    const onDocWheel = (e: WheelEvent) => {
-      // If the event already originates inside the sidebar, let it through
-      if (newsSidebarRef.current?.contains(e.target as Node)) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const scrollEl = newsSidebarScrollRef.current;
-      if (!scrollEl) return;
-
-      const { scrollTop, scrollHeight, clientHeight } = scrollEl;
-      const atTop = scrollTop === 0 && e.deltaY < 0;
-      const atBottom = scrollTop + clientHeight >= scrollHeight - 1 && e.deltaY > 0;
-      if (!atTop && !atBottom) scrollEl.scrollTop += e.deltaY;
-    };
-
-    document.addEventListener("wheel", onDocWheel, { passive: false });
-    return () => document.removeEventListener("wheel", onDocWheel);
-  }, [newsOpen]);
+      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("touchstart", handleClickOutside)
+    }
+  }, [newsOpen])
 
   const { items: dbNews } = useHomeModule("news")
   const { items: tickerItems } = useHomeTicker()
   const newsSlugsKey = dbNews.map((item) => item.slug).filter(Boolean).join(",")
   const hasUnreadNews = unreadNewsSlugs.length > 0
 
-  // Prevent re-fetching read-state for the same slugs+user combination
   const lastFetchedReadStateKey = React.useRef<string>("")
 
   React.useEffect(() => {
@@ -147,7 +122,6 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // Skip if we already fetched for this exact user+slugs combo — prevents re-render loops
     const fetchKey = `${userId}:${newsSlugsKey}`
     if (lastFetchedReadStateKey.current === fetchKey) return
     lastFetchedReadStateKey.current = fetchKey
@@ -198,7 +172,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         />
         <div className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden" dir="rtl">
           <TechboxAppSidebar />
-          <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size] relative">
+          <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size]">
             {tickerItems.length > 0 && (
               <div className="border-b bg-background/95">
                 <NewsTicker items={tickerItems} className="py-0" />
@@ -208,22 +182,29 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
               <div className="w-full max-w-full flex-1">{children}</div>
               <FooterSection />
             </main>
-            {/* News sidebar overlays on top, doesn't push content */}
-            <div
-              ref={newsSidebarRef}
-              className={`absolute inset-y-0 left-0 z-50 w-[20rem] transition-transform duration-300 ease-in-out ${
-                newsOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"
-              }`}
-            >
-              <TechboxNewsSidebar
-                unreadSlugs={openedUnreadNewsSlugs}
-                onClose={() => setNewsOpen(false)}
-                scrollRef={newsSidebarScrollRef}
-              />
-            </div>
           </SidebarInset>
         </div>
       </SidebarProvider>
+
+      {/*
+        News sidebar — fixed to the viewport, exactly like the main app sidebar.
+        Starts below the sticky header, spans the full remaining height.
+        Because it is fixed (not absolute/relative), it is completely outside
+        the page scroll flow — scrolling the page never moves the sidebar.
+        No wheel-event interception needed.
+      */}
+      <div
+        ref={newsSidebarRef}
+        className={`fixed left-0 top-[var(--header-height)] bottom-0 z-50 w-[20rem] transition-transform duration-300 ease-in-out ${
+          newsOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full shadow-none"
+        }`}
+        style={{ "--header-height": "calc(var(--spacing) * 14)" } as React.CSSProperties}
+      >
+        <TechboxNewsSidebar
+          unreadSlugs={openedUnreadNewsSlugs}
+          onClose={() => setNewsOpen(false)}
+        />
+      </div>
     </div>
   )
 }

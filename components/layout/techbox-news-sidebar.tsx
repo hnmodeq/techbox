@@ -9,22 +9,14 @@ import { NewsSidebarCard } from "./news-sidebar-card"
 
 const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
 
-interface TechboxNewsSidebarProps {
-  unreadSlugs?: string[]
-  onClose?: () => void
-  /** Forwarded ref so the parent (LayoutShell) can redirect wheel events here */
-  scrollRef?: React.RefObject<HTMLDivElement | null>
-}
-
 export function TechboxNewsSidebar({
   unreadSlugs = [],
   onClose,
-  scrollRef,
-}: TechboxNewsSidebarProps) {
+}: {
+  unreadSlugs?: string[]
+  onClose?: () => void
+}) {
   const { items: dbNews, loading } = useHomeModule("news")
-  // Internal fallback ref if the parent doesn't provide one
-  const internalScrollRef = React.useRef<HTMLDivElement>(null)
-  const resolvedScrollRef = scrollRef ?? internalScrollRef
 
   // Only news published in the last 24 hours
   const newsItems = React.useMemo(() => {
@@ -55,12 +47,14 @@ export function TechboxNewsSidebar({
         )}
       </div>
 
-      {/* Scrollable content */}
+      {/*
+        Scrollable list — because the parent is fixed to the viewport,
+        scrolling here never touches the page. No hacks needed.
+      */}
       <div
-        ref={resolvedScrollRef}
         dir="rtl"
         className="flex-1 overflow-y-auto"
-        style={{ scrollbarWidth: "thin", overscrollBehavior: "contain" }}
+        style={{ scrollbarWidth: "thin" }}
       >
         <div className="flex flex-col gap-1 py-2 w-full">
           {loading ? (
