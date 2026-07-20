@@ -25,6 +25,11 @@ model User {
   emailVerified         DateTime?
   sessionsInvalidatedAt DateTime?
 
+  /// Verification badge type: "content" | "org" | "user" | null (none)
+  verifiedType  String?
+  /// For org users: admin-written label shown in tooltip, e.g. "کارشناس فناوری - بانک ملت"
+  verifiedLabel String?
+
   posts    Post[]
   comments Comment[]
   ratings  Rating[]
@@ -32,6 +37,7 @@ model User {
   newsReads UserNewsRead[]
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  verificationRequests VerificationRequest[]
 
   // Follow system
   followers Follow[] @relation("UserFollowers")
@@ -477,6 +483,43 @@ model SavedContent {
 
   @@unique([userId, module, slug], name: "SavedContent_user_module_slug_key")
   @@index([userId, createdAt], name: "SavedContent_user_created_idx")
+}
+
+/// Badge verification request submitted by a user.
+/// type: "content" = blue tick, "org" = purple tick, "user" = yellow tick
+model VerificationRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "content" | "org" | "user"
+  status    String   @default("pending") // "pending" | "approved" | "denied"
+
+  // Common fields
+  message   String   @db.Text
+  phone     String?
+  nationalId String?
+
+  // Blue-tick (content creator) extras
+  modules   String[] // selected content modules
+
+  // Purple-tick (org) extras
+  orgName          String?
+  orgNationalId    String?
+  orgPosition      String?   // applicant's position in org
+  orgApplicantName String?   // full legal name
+
+  // Admin response
+  adminNote    String?  @db.Text
+  reviewedBy   String?  // admin userId
+  reviewedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status, createdAt])
+  @@index([createdAt])
 }
 
 model ConsultationRequest {

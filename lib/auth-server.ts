@@ -171,6 +171,8 @@ export async function getSessionUserPublic(){
         avatar: true,
         emailVerified: true,
         sessionsInvalidatedAt: true,
+        verifiedType: true,
+        verifiedLabel: true,
       },
     });
     if (!user) return null;

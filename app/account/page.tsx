@@ -19,6 +19,8 @@ import { Icon } from "@/design/icons";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { AccountProfileTabs } from "@/components/profile/AccountProfileTabs";
+import { VerificationRequestForm } from "@/features/auth/components/VerificationRequestForm";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 
 const loginSchema = z.object({
   username: z.string().min(2),
@@ -57,6 +59,7 @@ export default function AccountPage() {
   const [pwdStatus, setPwdStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
   const [resendBusy, setResendBusy] = useState(false);
+  const [verifRequest, setVerifRequest] = useState<{ status: string; type: string; adminNote?: string } | null | undefined>(undefined);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -93,6 +96,11 @@ export default function AccountPage() {
             birthday: data.user.birthday || "",
           });
           localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
+          // Load verification request status
+          fetch("/api/verification/request").then(r => r.ok ? r.json() : null).then(d => {
+            const latest = d?.requests?.[0] || null;
+            setVerifRequest(latest);
+          }).catch(() => setVerifRequest(null));
           setLoading(false);
           return;
         }
@@ -478,6 +486,33 @@ export default function AccountPage() {
         </Card>
 
         <div className="lg:col-span-2 space-y-6">
+          {/* Verification badge section */}
+          <Card className="p-6" dir="rtl">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-base font-bold flex items-center gap-2">
+                  تایید هویت
+                  {user.verifiedType && (
+                    <VerifiedBadge type={user.verifiedType} label={user.verifiedLabel} size={18} />
+                  )}
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {user.verifiedType ? "حساب شما تایید شده است" : "درخواست دریافت نشان تایید هویت"}
+                </p>
+              </div>
+            </div>
+            {verifRequest !== undefined && (
+              <VerificationRequestForm
+                existingRequest={verifRequest}
+                onSuccess={() => {
+                  fetch("/api/verification/request").then(r => r.ok ? r.json() : null).then(d => {
+                    setVerifRequest(d?.requests?.[0] || null);
+                  });
+                }}
+              />
+            )}
+          </Card>
+
           <AccountProfileTabs profileEditor={
             <Card className="p-6">
               <CardHeader className="px-0 pt-0">

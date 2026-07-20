@@ -16,6 +16,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { CardStats } from "@/components/ui/card-stats";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { blurProps } from "@/lib/image-placeholder";
 import { formatRelativeDate } from "@/lib/date-format";
 
@@ -57,7 +58,7 @@ function ArticleAuthorMeta({
   author,
   className = "",
 }: {
-  author?: { name?: string; username?: string; avatar?: string; job?: string; role?: string };
+  author?: { name?: string; username?: string; avatar?: string; job?: string; role?: string; verifiedType?: string | null; verifiedLabel?: string | null };
   className?: string;
 }) {
   const name = author?.name || "تحریریه";
@@ -77,10 +78,17 @@ function ArticleAuthorMeta({
         }
       >
         <div
-          className="col-start-1 row-start-1 min-w-0 self-end truncate text-xs font-extrabold text-white drop-shadow"
+          className="col-start-1 row-start-1 min-w-0 self-end flex items-center gap-1 text-xs font-extrabold text-white drop-shadow"
           dir="rtl"
         >
-          {name}
+          <span className="truncate">{name}</span>
+          {author?.verifiedType && (
+            <VerifiedBadge
+              type={author.verifiedType as "content" | "org" | "user"}
+              label={author.verifiedLabel}
+              size={12}
+            />
+          )}
         </div>
         {job && (
           <div
@@ -119,7 +127,7 @@ export interface MagazineCardItem {
   views?: number;
   likes?: number;
   comments?: number;
-  author?: { name?: string; username?: string; avatar?: string; job?: string; role?: string };
+  author?: { name?: string; username?: string; avatar?: string; job?: string; role?: string; verifiedType?: string | null; verifiedLabel?: string | null };
 }
 
 export function MagazineCard({ item }: { item: MagazineCardItem }) {

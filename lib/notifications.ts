@@ -163,7 +163,47 @@ export async function buildNotificationsForUser(
     }),
   ];
 
-  return Array.from(new Map(events.map((e) => [e.id, e])).values())
+  // Verification result notifications (stored in SiteSetting by admin)
+  const verifNotifPrefix = `verif_notif_${userId}_`;
+  const verifSettings = await client.siteSetting.findMany({
+    where: { key: { startsWith: verifNotifPrefix } },
+  }).catch(() => []);
+
+  const verifTypeLabel: Record<string, string> = {
+    content: "تولید کننده محتوای تایید شده",
+    org: "کاربر سازمانی تایید شده",
+    user: "کاربر تایید شده",
+  };
+
+  const verifEvents: NotificationItem[] = verifSettings.map((s) => {
+    try {
+      const data = JSON.parse(s.value);
+      const requestId = s.key.replace(verifNotifPrefix, "");
+      const approved = data.decision === "approved";
+      const typeLabel = verifTypeLabel[data.type] || "تایید هویت";
+      return {
+        id: `verif-${requestId}`,
+        type: "comment" as const,
+        module: "account",
+        slug: "",
+        title: approved ? `درخواست ${typeLabel} تایید شد` : `درخواست ${typeLabel} رد شد`,
+        actor: "تکباکس",
+        username: "",
+        avatar: null,
+        text: approved
+          ? `تبریک! درخواست ${typeLabel} شما تایید شد.`
+          : `درخواست شما رد شد${data.adminNote ? `: ${data.adminNote}` : "."}`,
+        createdAt: data.reviewedAt || new Date().toISOString(),
+        label: approved ? `✅ درخواست ${typeLabel} تایید شد` : `❌ درخواست ${typeLabel} رد شد`,
+      };
+    } catch {
+      return null;
+    }
+  }).filter(Boolean) as NotificationItem[];
+
+  const allEvents = [...events, ...verifEvents];
+
+  return Array.from(new Map(allEvents.map((e) => [e.id, e])).values())
     .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
     .slice(0, 30);
 }
