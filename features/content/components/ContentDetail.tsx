@@ -130,8 +130,8 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
           <ShareButton />
         </div>
 
-        <SuggestionGrid current={item} />
         <CommentSection module={item.module} slug={item.slug} initialComments={item.comments || 0} />
+        <SuggestionGrid current={item} />
       </article>
     </>
   );

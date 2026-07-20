@@ -402,7 +402,7 @@ function DateTimeDisplay() {
         render={
           <button
             type="button"
-            className="hidden h-8 min-w-[16.5rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground md:flex"
+            className="hidden h-8 min-w-[12rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground md:flex"
             suppressHydrationWarning
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -623,7 +623,7 @@ export function SiteHeader({
           <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto" />
           <NotificationsButton />
           <TechboxBreadcrumb />
-          <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto hidden lg:block" />
+          {/* Removed separator after breadcrumb */}
         </div>
 
         <div className="flex flex-[1.2] justify-center px-2">
@@ -640,7 +640,7 @@ export function SiteHeader({
                   <Button
                     type="button"
                     size="sm"
-                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600 px-4"
+                    className="relative gap-1.5 bg-red-600 hover:bg-red-700 text-white border-red-600 px-6"
                     onClick={onToggleNews}
                     aria-pressed={newsOpen}
                     aria-label="اخبار زنده تکباکس"

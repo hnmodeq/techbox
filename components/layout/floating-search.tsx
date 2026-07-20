@@ -40,12 +40,14 @@ export function FloatingSearch() {
   const [value, setValue] = React.useState("")
   const [module, setModule] = React.useState<SearchModule>("all")
   const [expanded, setExpanded] = React.useState(false)
-  const [dropupOpen, setDropupOpen] = React.useState(false)
+  const [recentOpen, setRecentOpen] = React.useState(false)
   const [recent, setRecent] = React.useState<string[]>([])
+
   const rootRef = React.useRef<HTMLDivElement>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  // Timer ref for the 1-second collapse delay
+  const collapseTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Sync with /search params
   React.useEffect(() => {
     if (pathname !== "/search") return
     setValue(searchParams.get("q") || "")
@@ -53,7 +55,6 @@ export function FloatingSearch() {
     setModule(isSearchModule(m) ? m : "all")
   }, [pathname, searchParams])
 
-  // Load recent searches
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem(RECENT_KEY)
@@ -63,13 +64,13 @@ export function FloatingSearch() {
 
   // Close on outside click
   React.useEffect(() => {
-    if (!dropupOpen) return
+    if (!recentOpen) return
     const onDown = (e: PointerEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setDropupOpen(false)
+      if (!rootRef.current?.contains(e.target as Node)) setRecentOpen(false)
     }
     document.addEventListener("pointerdown", onDown)
     return () => document.removeEventListener("pointerdown", onDown)
-  }, [dropupOpen])
+  }, [recentOpen])
 
   const saveSearch = React.useCallback((q: string) => {
     setRecent((prev) => {
@@ -83,7 +84,7 @@ export function FloatingSearch() {
     const trimmed = q.trim()
     if (!trimmed) return
     saveSearch(trimmed)
-    setDropupOpen(false)
+    setRecentOpen(false)
     const params = new URLSearchParams({ q: trimmed })
     if (mod !== "all") params.set("module", mod)
     router.push(`/search?${params.toString()}`)
@@ -92,6 +93,19 @@ export function FloatingSearch() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     goSearch(value)
+  }
+
+  const handleMouseEnter = () => {
+    if (collapseTimer.current) clearTimeout(collapseTimer.current)
+    setExpanded(true)
+  }
+
+  const handleMouseLeave = () => {
+    // 1-second delay before collapsing
+    collapseTimer.current = setTimeout(() => {
+      setExpanded(false)
+      setRecentOpen(false)
+    }, 1000)
   }
 
   const query = value.trim().toLowerCase()
@@ -104,47 +118,24 @@ export function FloatingSearch() {
   return (
     <div
       ref={rootRef}
-      className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50"
+      className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50"
       dir="rtl"
-      onMouseEnter={() => setExpanded(true)}
-      onMouseLeave={() => {
-        setExpanded(false)
-        setDropupOpen(false)
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Drop-up recent searches — appears above the bar */}
-      {dropupOpen && filteredRecent.length > 0 && (
-        <div className="absolute bottom-full mb-2 right-0 left-0 rounded-xl border border-border bg-popover shadow-xl p-2 animate-in fade-in-0 slide-in-from-bottom-2 duration-150">
-          <div className="flex items-center gap-1.5 px-2 pb-1.5 text-xs font-bold text-muted-foreground">
-            <HistoryIcon className="size-3" />
-            جستجوهای اخیر شما
-          </div>
-          {filteredRecent.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { setValue(item); goSearch(item) }}
-              className="w-full text-right text-xs px-3 py-2 rounded-lg hover:bg-muted transition-colors"
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Floating bar */}
       <form
         onSubmit={handleSubmit}
         className={cn(
-          "flex items-center gap-2 rounded-full border border-border bg-background/90 backdrop-blur-md shadow-xl px-3 py-2 transition-all duration-300 ease-out",
-          expanded ? "gap-2" : "gap-1.5"
+          "flex items-center gap-1.5 rounded-full border border-border/60 backdrop-blur-md shadow-lg px-3 py-2 transition-all duration-500 ease-out",
+          expanded
+            ? "bg-background/90 border-border/80 opacity-100"
+            : "bg-background/40 border-border/30 opacity-60"
         )}
       >
-        {/* Category selector — only when expanded */}
+        {/* Category selector with its own drop-up */}
         <div
           className={cn(
-            "overflow-hidden transition-all duration-300",
+            "relative overflow-visible transition-all duration-500",
             expanded ? "w-28 opacity-100" : "w-0 opacity-0 pointer-events-none"
           )}
         >
@@ -152,11 +143,17 @@ export function FloatingSearch() {
             <SelectTrigger
               size="sm"
               aria-label="محدوده جستجو"
-              className="h-7 w-28 border-border bg-muted/40 px-2 rounded-full text-xs"
+              className="h-7 w-28 border-0 bg-transparent shadow-none px-2 rounded-full text-xs"
             >
               <span className="truncate">{selectedLabel}</span>
             </SelectTrigger>
-            <SelectContent align="center" className="min-w-36">
+            {/* drop-up: use side="top" equivalent — SelectContent will use align+side */}
+            <SelectContent
+              side="top"
+              align="start"
+              sideOffset={6}
+              className="min-w-[7rem] animate-in fade-in-0 slide-in-from-bottom-2 duration-200"
+            >
               {searchModules.map((m) => (
                 <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
               ))}
@@ -164,34 +161,64 @@ export function FloatingSearch() {
           </Select>
         </div>
 
-        {/* Input */}
-        <Input
-          ref={inputRef}
-          placeholder="دنبال چی میگردی؟"
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value)
-            setDropupOpen(true)
-          }}
-          onFocus={() => setDropupOpen(true)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") { setDropupOpen(false); e.currentTarget.blur() }
-          }}
-          autoComplete="off"
-          spellCheck={false}
-          className={cn(
-            "border-0 bg-transparent shadow-none focus-visible:ring-0 text-right text-sm transition-all duration-300 h-7",
-            expanded ? "w-52" : "w-36"
-          )}
-        />
+        {/* Input with drop-up recent searches above it */}
+        <div className="relative">
+          {/* Drop-up recent searches — above the input, same width */}
+          <div
+            className={cn(
+              "absolute bottom-full mb-2 right-0 left-0 overflow-hidden transition-all duration-200",
+              recentOpen && filteredRecent.length > 0
+                ? "opacity-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 translate-y-1 pointer-events-none"
+            )}
+          >
+            <div className="rounded-xl p-1.5">
+              <div className="flex items-center gap-1 px-2 pb-1 text-[10px] font-bold text-muted-foreground">
+                <HistoryIcon className="size-3" />
+                اخیر
+              </div>
+              {filteredRecent.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { setValue(item); goSearch(item) }}
+                  className="w-full text-right text-xs px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        {/* Search button */}
+          <Input
+            ref={inputRef}
+            placeholder="دنبال چی میگردی؟"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value)
+              if (e.target.value.trim()) setRecentOpen(true)
+            }}
+            onFocus={() => setRecentOpen(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") { setRecentOpen(false); e.currentTarget.blur() }
+            }}
+            autoComplete="off"
+            spellCheck={false}
+            className={cn(
+              "border-0 bg-transparent shadow-none focus-visible:ring-0 text-right text-sm h-7 transition-all duration-500",
+              expanded ? "w-48" : "w-32"
+            )}
+          />
+        </div>
+
+        {/* Search button — no background */}
         <button
           type="submit"
           aria-label="جستجو"
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shrink-0"
+          className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground transition-colors shrink-0"
         >
-          <SearchIcon className="size-3.5" />
+          <SearchIcon className="size-4" />
         </button>
       </form>
     </div>
