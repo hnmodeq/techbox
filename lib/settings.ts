@@ -2,13 +2,6 @@ import { prisma } from "./db";
 import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 
 const DEFAULTS: Record<string, string> = {
-  "hero.terminal.lines": JSON.stringify([
-    "به تکباکس خوش اومدی 👋",
-    "پلتفرم تخصصی زیرساخت و فناوری اطلاعات",
-    "مقاله، ویدیو، انجمن، ابزار، فروشگاه و بیشتر...",
-    "محتوای تخصصی برای مهندسان زیرساخت ایران",
-    "سرور، شبکه، استوریج، امنیت — همه اینجاست",
-  ]),
   "comments.mode": "auto_approve",
   "comments.hidden_globally": "false",
   "jobs.resume_retention_days": "30",
