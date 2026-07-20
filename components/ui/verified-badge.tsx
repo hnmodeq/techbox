@@ -4,8 +4,7 @@
  * VerifiedBadge — badge image shown next to usernames for verified accounts.
  *
  * Uses a plain <img> with eager loading so the badge appears immediately
- * without any network-induced delay (next/image lazy optimization caused
- * the badge to pop in after the name was already rendered).
+ * without any lazy-load delay.
  *
  * Types:
  *   "content" → blue   → تولید کننده محتوای تایید شده
@@ -17,7 +16,6 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 
 interface VerifiedBadgeProps {
   type: "content" | "org" | "user";
-  /** For org type: admin-written label, e.g. "کارشناس فناوری - بانک ملت" */
   label?: string | null;
   size?: number;
   className?: string;
@@ -59,8 +57,7 @@ export function VerifiedBadge({ type, label, size = 16, className = "" }: Verifi
             width={size}
             height={size}
             loading="eager"
-            // @ts-expect-error — fetchpriority is a valid HTML attribute
-            fetchpriority="high"
+            fetchPriority="high"
             decoding="sync"
             style={{ width: size, height: size, objectFit: "contain" }}
           />
