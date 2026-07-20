@@ -233,7 +233,7 @@ export function VideoModal({
               playsInline
               preload="metadata"
               onError={() => setVideoReady(true)} // show controls even on error
-              className="h-full w-auto object-contain"
+              className="h-full w-auto max-h-[85vh] max-w-[380px] object-contain"
               style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.3s", display: "block" }}
             />
           </div>
