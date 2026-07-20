@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { CardStats } from "@/components/ui/card-stats"
 import { UserActivityList, type UserActivity } from "@/components/profile/UserActivityList"
-import { useModuleTitle } from "@/providers/module-config.provider"
+import { useModuleTitles } from "@/providers/module-config.provider"
+import type { ModuleSlug } from "@/lib/content"
 import { blurProps } from "@/lib/image-placeholder"
 
 function AuthorPosts({ posts }: { posts: any[] }) {
@@ -40,8 +41,9 @@ function AuthorPosts({ posts }: { posts: any[] }) {
 }
 
 function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
-  // Call the hook once at the top level of the component
-  const moduleTitle = (module: string) => useModuleTitle(module as any, module);
+  // Call the hook once at the top level of the component, then use a plain lookup
+  const moduleTitles = useModuleTitles();
+  const moduleTitle = (module: string) => moduleTitles[module as ModuleSlug] || module;
 
   if (loading) {
     return (

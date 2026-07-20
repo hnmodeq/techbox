@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
 
 type Mode = "login" | "register";
 type View = "form" | "verifySent";
@@ -189,8 +188,7 @@ export function AuthModal() {
 
   return (
     <>
-      <Toaster dir="rtl" />
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden" dir="rtl">
           <div className="p-6 sm:p-8 space-y-5">
             {/* Header */}

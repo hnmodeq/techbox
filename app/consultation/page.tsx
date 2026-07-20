@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
 
 const consultationSchema = z.object({
   orgName: z.string().min(2, "نام سازمان حداقل ۲").max(200),
@@ -57,8 +56,7 @@ export default function ConsultationPage() {
 
   return (
     <main className="max-w-2xl mx-auto px-5 py-16 space-y-6" dir="rtl">
-      <Toaster dir="rtl" />
-      <h1 className="text-2xl font-extrabold tracking-tight">درخواست مشاوره زیرساخت</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight">درخواست مشاوره زیرساخت</h1>
       <Card className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

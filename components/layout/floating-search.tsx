@@ -27,11 +27,14 @@ function isSearchModule(v: string | null): v is SearchModule {
   return Boolean(v && searchModules.some((m) => m.value === v))
 }
 
-const BAR_BG = "bg-background/90 backdrop-blur-md border border-border/80"
+// Shared visual style for pill + drop-ups
+// NOTE: no backdrop-blur on drop-ups — it causes blurry text when layered
+const PILL_BG = "bg-background/90 backdrop-blur-md border border-border/80"
+const DROPUP_BG = "bg-popover border border-border/80"
 
 export function FloatingSearch() {
-  const router   = useRouter()
-  const pathname = usePathname()
+  const router       = useRouter()
+  const pathname     = usePathname()
   const searchParams = useSearchParams()
 
   const [value,      setValue]      = React.useState("")
@@ -43,11 +46,12 @@ export function FloatingSearch() {
 
   const rootRef       = React.useRef<HTMLDivElement>(null)
   const inputRef      = React.useRef<HTMLInputElement>(null)
-  const inputWrapRef  = React.useRef<HTMLDivElement>(null)  // wraps input — used to position recent dropup
-  const catWrapRef    = React.useRef<HTMLDivElement>(null)  // wraps category button
+  const inputWrapRef  = React.useRef<HTMLDivElement>(null)
+  const catWrapRef    = React.useRef<HTMLDivElement>(null)
   const hoverRef      = React.useRef(false)
   const collapseTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Sync with URL when on /search page
   React.useEffect(() => {
     if (pathname !== "/search") return
     setValue(searchParams.get("q") || "")
@@ -55,6 +59,7 @@ export function FloatingSearch() {
     setModule(isSearchModule(m) ? m : "all")
   }, [pathname, searchParams])
 
+  // Load recent searches from localStorage
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem(RECENT_KEY)
@@ -81,6 +86,8 @@ export function FloatingSearch() {
     saveSearch(trimmed)
     setRecentOpen(false)
     setCatOpen(false)
+    // Clear the input after navigating
+    setValue("")
     const params = new URLSearchParams({ q: trimmed })
     if (mod !== "all") params.set("module", mod)
     router.push(`/search?${params.toString()}`)
@@ -124,7 +131,7 @@ export function FloatingSearch() {
     return () => document.removeEventListener("pointerdown", onPointerDown)
   }, [])
 
-  const query         = value.trim().toLowerCase()
+  const query          = value.trim().toLowerCase()
   const filteredRecent = query
     ? recent.filter((r) => r.toLowerCase().includes(query))
     : recent
@@ -144,12 +151,12 @@ export function FloatingSearch() {
         <form
           onSubmit={handleSubmit}
           className={cn(
-            "flex items-center gap-1 rounded-full shadow-lg px-2.5 py-1.5 transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
-            BAR_BG,
+            "flex items-center gap-1 rounded-full shadow-lg px-2.5 py-1.5 transition-[opacity] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
+            PILL_BG,
             expanded ? "opacity-100" : "opacity-50"
           )}
         >
-          {/* Search icon — LEFT side */}
+          {/* Search icon — LEFT side in LTR layout (right side visually in RTL pill) */}
           <button
             type="submit"
             aria-label="جستجو"
@@ -164,7 +171,7 @@ export function FloatingSearch() {
             <div
               className={cn(
                 "absolute bottom-[calc(100%+10px)] right-0 left-0 overflow-hidden rounded-xl shadow-lg transition-all duration-300 ease-out",
-                BAR_BG,
+                DROPUP_BG,
                 recentOpen && filteredRecent.length > 0 && expanded
                   ? "opacity-100 translate-y-0 pointer-events-auto"
                   : "opacity-0 translate-y-2 pointer-events-none"
@@ -196,7 +203,7 @@ export function FloatingSearch() {
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => { setValue(item); goSearch(item) }}
-                    className="w-full text-right text-xs px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
+                    className="w-full text-right text-xs px-2 py-1.5 rounded-lg hover:bg-muted transition-colors text-foreground"
                   >
                     {item}
                   </button>
@@ -233,23 +240,28 @@ export function FloatingSearch() {
             />
           </div>
 
-          {expanded && (
-            <div className="h-4 w-px bg-border/50 shrink-0" />
-          )}
+          {/* Divider — only visible when expanded */}
+          <div
+            className={cn(
+              "h-4 w-px bg-border/50 shrink-0 transition-[opacity] duration-300",
+              expanded ? "opacity-100" : "opacity-0"
+            )}
+          />
 
-          {/* Category button — RIGHT side (in RTL = visually left of input) */}
+          {/* Category button — RIGHT side (in RTL = visually left of divider)
+              Appears by expanding width; NO opacity fade so the button just clips in cleanly */}
           <div
             ref={catWrapRef}
             className={cn(
-              "relative overflow-visible transition-[width,opacity] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
-              expanded ? "w-24 opacity-100" : "w-0 opacity-0 pointer-events-none"
+              "relative overflow-visible transition-[width] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
+              expanded ? "w-24" : "w-0 pointer-events-none"
             )}
           >
             {/* ── Category drop-up — anchored above the category wrapper ── */}
             <div
               className={cn(
                 "absolute bottom-[calc(100%+10px)] right-0 w-28 overflow-hidden rounded-xl shadow-lg transition-all duration-300 ease-out",
-                BAR_BG,
+                DROPUP_BG,
                 catOpen && expanded
                   ? "opacity-100 translate-y-0 pointer-events-auto"
                   : "opacity-0 translate-y-2 pointer-events-none"
@@ -269,7 +281,7 @@ export function FloatingSearch() {
                       "w-full text-right text-xs px-3 py-1.5 rounded-lg transition-colors",
                       m.value === module
                         ? "bg-primary text-primary-foreground"
-                        : "hover:bg-muted"
+                        : "hover:bg-muted text-foreground"
                     )}
                   >
                     {m.label}
@@ -278,6 +290,7 @@ export function FloatingSearch() {
               </div>
             </div>
 
+            {/* The button itself — visible only when expanded (clipped by parent width=0) */}
             <button
               type="button"
               onClick={() => {

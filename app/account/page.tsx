@@ -17,7 +17,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/design/icons";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner";
 import { AccountProfileTabs } from "@/components/profile/AccountProfileTabs";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 
@@ -284,8 +283,7 @@ export default function AccountPage() {
   if (!user) {
     return (
       <main className="max-w-xl mx-auto px-4 py-12" dir="rtl">
-        <Toaster dir="rtl" />
-        <Card className="p-6 sm:p-8 space-y-6">
+                <Card className="p-6 sm:p-8 space-y-6">
           <div className="text-center space-y-2">
             <h1 className="text-xl font-extrabold text-[var(--home)]">ورود و عضویت تکباکس</h1>
             <p className="text-sm text-muted-foreground">برای ثبت دیدگاه، لایک و مدیریت پروفایل وارد شوید.</p>
@@ -419,8 +417,7 @@ export default function AccountPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10" dir="rtl">
-      <Toaster dir="rtl" />
-      <PageHeader colorVar="--account" title="پروفایل و حساب کاربری" titleClassName="text-[var(--account)]">
+            <PageHeader colorVar="--account" title="پروفایل و حساب کاربری" titleClassName="text-[var(--account)]">
         {/* removed duplicate top badge as per request */}
       </PageHeader>
 

@@ -54,7 +54,10 @@ function getModuleCopy(module: ModuleSlug) {
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const { items: liveItems } = useHomeTicker();
   const live = liveItems.length ? liveItems : items;
-  const filtered = useMemo(() => live.filter((item) => item.module !== "news").slice(0, 30), [live]);
+  const filtered = useMemo(
+    () => live.filter((item) => item.module !== "news" && item.module !== "shop").slice(0, 30),
+    [live]
+  );
   const shouldReduceMotion = useReducedMotion();
   const x = useMotionValue(0);
   const targetSpeed = useMotionValue(NORMAL_SPEED);

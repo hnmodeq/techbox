@@ -1,13 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { zIndex } from "@/design";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Headset, X, Sparkles, LifeBuoy } from "lucide-react";
+import { Headset, X, Sparkles, LifeBuoy, Send } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Msg = { role: "user" | "assistant"; text: string; time: number };
@@ -15,29 +13,111 @@ type TabType = "chatbot" | "support";
 
 const STORAGE_KEY = "tb_chat_history";
 const SUPPORT_STORAGE_KEY = "tb_support_chat_history";
-const PERSONAL_STORAGE_KEY = "tb_personal_chat_history";
 
 const supportWelcome: Msg = {
   role: "assistant",
-  text: "پشتیبانی برخط اینجاست تا شما را راهنمایی کنید",
+  text: "پشتیبانی برخط اینجاست تا شما را راهنمایی کنند",
   time: Date.now(),
 };
 
-const personalWelcome: Msg = {
-  role: "assistant",
-  text: "پیام‌های شخصی شما اینجا نمایش داده می‌شود. فعلاً می‌توانید نمونه پیام خود را بنویسید تا ظاهر چت را ببینید.",
-  time: Date.now(),
-};
+// ── Inline-send input (send button INSIDE the input on the left in RTL) ──────
+interface InlineInputProps {
+  value: string;
+  onChange: (v: string) => void;
+  onSubmit: (e?: React.FormEvent) => void;
+  placeholder: string;
+  disabled: boolean;
+  isLoading: boolean;
+}
 
+function InlineInput({ value, onChange, onSubmit, placeholder, disabled, isLoading }: InlineInputProps) {
+  return (
+    <form onSubmit={onSubmit} className="flex-1 min-w-0">
+      <div className="relative flex items-center">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="h-9 text-xs pr-3 pl-10 w-full"
+          disabled={disabled}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSubmit();
+            }
+          }}
+          autoComplete="off"
+        />
+        {/* Send button INSIDE input — positioned on the left (in RTL, left = start of text) */}
+        <button
+          type="submit"
+          disabled={disabled || !value.trim()}
+          aria-label="ارسال"
+          className="absolute left-1.5 flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40 disabled:pointer-events-none"
+        >
+          {isLoading ? (
+            <span className="text-[10px]">…</span>
+          ) : (
+            <Send className="size-3.5" />
+          )}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+// ── Message list renderer ─────────────────────────────────────────────────────
+interface MessageListProps {
+  messages: Msg[];
+  emptyText?: string;
+  loadingText?: string;
+  endRef: React.RefObject<HTMLDivElement | null>;
+}
+
+function MessageList({ messages, emptyText, loadingText, endRef }: MessageListProps) {
+  return (
+    <>
+      {messages.length === 0 && emptyText && (
+        <div className="text-center py-8 space-y-2">
+          <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-muted">
+            <Sparkles className="size-5 text-muted-foreground" />
+          </div>
+          <p className="text-xs text-muted-foreground">{emptyText}</p>
+        </div>
+      )}
+      {messages.map((m, i) => (
+        <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+          <div
+            className={`max-w-[82%] rounded-2xl px-3 py-2 text-xs leading-6 whitespace-pre-wrap shadow-sm ${
+              m.role === "user"
+                ? "bg-primary text-primary-foreground rounded-br-sm"
+                : "bg-card border rounded-bl-sm"
+            }`}
+          >
+            {m.text}
+          </div>
+        </div>
+      ))}
+      {loadingText && (
+        <div className="flex justify-start">
+          <div className="rounded-2xl rounded-bl-sm border bg-card px-3 py-2 text-xs text-muted-foreground">
+            {loadingText}
+          </div>
+        </div>
+      )}
+      <div ref={endRef} />
+    </>
+  );
+}
+
+// ── Main Chatbot component ────────────────────────────────────────────────────
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("chatbot");
   const [input, setInput] = useState("");
   const [supportInput, setSupportInput] = useState("");
-  const [personalInput, setPersonalInput] = useState("");
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [supportMsgs, setSupportMsgs] = useState<Msg[]>([supportWelcome]);
-  const [personalMsgs, setPersonalMsgs] = useState<Msg[]>([personalWelcome]);
   const [loading, setLoading] = useState(false);
   const [supportLoading, setSupportLoading] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
@@ -48,11 +128,8 @@ export default function Chatbot() {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
       if (containerRef.current && !containerRef.current.contains(target)) {
-        // Only close if it's not the launcher button (which is unmounted when open anyway, but just in case)
-        const button = (target as Element).closest('button');
-        if (button && button.getAttribute('aria-label') === 'پشتیبانی تکباکس') {
-          return;
-        }
+        const button = (target as Element).closest("button");
+        if (button && button.getAttribute("aria-label") === "پشتیبانی تکباکس") return;
         setOpen(false);
       }
     };
@@ -70,10 +147,8 @@ export default function Chatbot() {
     try {
       const s = localStorage.getItem(STORAGE_KEY);
       const support = localStorage.getItem(SUPPORT_STORAGE_KEY);
-      const personal = localStorage.getItem(PERSONAL_STORAGE_KEY);
       if (s) setMsgs(JSON.parse(s));
       if (support) setSupportMsgs(JSON.parse(support));
-      if (personal) setPersonalMsgs(JSON.parse(personal));
     } catch {}
   }, []);
 
@@ -86,11 +161,6 @@ export default function Chatbot() {
     localStorage.setItem(SUPPORT_STORAGE_KEY, JSON.stringify(supportMsgs.slice(-40)));
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [supportMsgs]);
-
-  useEffect(() => {
-    localStorage.setItem(PERSONAL_STORAGE_KEY, JSON.stringify(personalMsgs.slice(-40)));
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [personalMsgs]);
 
   const send = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -109,10 +179,16 @@ export default function Chatbot() {
         }),
       });
       const data = await res.json();
-      const reply = data?.reply || data?.error || "پاسخی دریافت نشد – کلید API را در .env تنظیم کنید: CHAT_API_KEY / CHAT_BASE_URL";
+      const reply =
+        data?.reply ||
+        data?.error ||
+        "پاسخی دریافت نشد – کلید API را در .env تنظیم کنید: CHAT_API_KEY / CHAT_BASE_URL";
       setMsgs((m) => [...m, { role: "assistant", text: reply, time: Date.now() }]);
     } catch {
-      setMsgs((m) => [...m, { role: "assistant", text: "خطا در اتصال به سرویس چت – حالت آفلاین.", time: Date.now() }]);
+      setMsgs((m) => [
+        ...m,
+        { role: "assistant", text: "خطا در اتصال به سرویس چت – حالت آفلاین.", time: Date.now() },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -138,45 +214,9 @@ export default function Chatbot() {
     }, 700);
   };
 
-  const sendPersonal = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    const text = personalInput.trim();
-    if (!text) return;
-    setPersonalMsgs((m) => [...m, { role: "user", text, time: Date.now() }]);
-    setPersonalInput("");
-  };
-
-  const renderMessages = (messages: Msg[], emptyText?: string, loadingText?: string) => (
-    <>
-      {messages.length === 0 && emptyText && (
-        <div className="text-center py-8 space-y-2">
-          <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-muted">
-            <Sparkles className="size-5 text-muted-foreground" />
-          </div>
-          <p className="text-xs text-muted-foreground">{emptyText}</p>
-        </div>
-      )}
-      {messages.map((m, i) => (
-        <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-          <div
-            className={`max-w-[82%] rounded-2xl px-3 py-2 text-xs leading-6 whitespace-pre-wrap shadow-sm ${
-              m.role === "user" ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-card border rounded-bl-sm"
-            }`}
-          >
-            {m.text}
-          </div>
-        </div>
-      ))}
-      {loadingText && (
-        <div className="flex justify-start">
-          <div className="rounded-2xl rounded-bl-sm border bg-card px-3 py-2 text-xs text-muted-foreground">{loadingText}</div>
-        </div>
-      )}
-    </>
-  );
-
   return (
     <>
+      {/* ── Launcher button ── */}
       <AnimatePresence>
         {!open && (
           <motion.div
@@ -189,15 +229,18 @@ export default function Chatbot() {
           >
             <button
               type="button"
-              onClick={() => { setOpen(true); setHasUnread(false); }}
+              onClick={() => {
+                setOpen(true);
+                setHasUnread(false);
+              }}
               className="relative rounded-full size-12 p-0 bg-transparent text-foreground transition-transform duration-150 hover:-translate-y-0.5 flex items-center justify-center focus:outline-none"
               aria-label="پشتیبانی تکباکس"
             >
               <Headset className="size-5" />
               {hasUnread && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                  <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500"></span>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex h-4 w-4 rounded-full bg-red-500" />
                 </span>
               )}
             </button>
@@ -205,88 +248,98 @@ export default function Chatbot() {
         )}
       </AnimatePresence>
 
+      {/* ── Chat modal ── */}
       <AnimatePresence>
         {open && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            ref={containerRef} 
-            dir="rtl" 
-            className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]" 
+            ref={containerRef}
+            dir="rtl"
+            className="fixed bottom-4 left-4 right-4 sm:left-4 sm:right-auto sm:w-[380px]"
             style={{ zIndex: zIndex.chatbot }}
           >
             <Card className="flex h-[520px] max-h-[72vh] flex-col overflow-hidden p-0 shadow-xl border border-border/80 bg-background/90 backdrop-blur-md">
-              <div className="flex flex-row items-center justify-end p-2 bg-transparent">
-                <Button variant="ghost" size="icon-xs" onClick={() => setOpen(false)} aria-label="بستن چت">
-                  <X className="size-4" />
-                </Button>
-              </div>
 
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabType)} className="flex-1 flex flex-col min-h-0">
-                <TabsList className="w-full justify-start rounded-none bg-transparent px-2 h-auto pt-0 pb-2">
+              {/* Tabs */}
+              <Tabs
+                value={activeTab}
+                onValueChange={(v) => setActiveTab(v as TabType)}
+                className="flex-1 flex flex-col min-h-0"
+              >
+                <TabsList className="w-full justify-start rounded-none bg-transparent px-2 h-auto pt-3 pb-2 border-b border-border/50">
                   <TabsTrigger value="chatbot" className="gap-1 text-xs">
                     <Sparkles className="size-3" />
                     پشتیبانی هوشمند
                   </TabsTrigger>
-                <TabsTrigger value="support" className="gap-1 text-xs">
-                  <LifeBuoy className="size-3" />
-                  پشتیبانی برخط
-                </TabsTrigger>
-              </TabsList>
+                  <TabsTrigger value="support" className="gap-1 text-xs">
+                    <LifeBuoy className="size-3" />
+                    پشتیبانی برخط
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="chatbot" className="flex-1 m-0 min-h-0">
-                <ScrollArea className="h-full">
-                  <CardContent className="p-3 space-y-3 min-h-full">
-                    {renderMessages(msgs, "پشتیبانی هوشمند اینجاست تا شما را راهنمایی کند", loading ? "در حال فکر کردن…" : undefined)}
-                    <div ref={endRef} />
-                  </CardContent>
-                </ScrollArea>
-              </TabsContent>
+                <TabsContent value="chatbot" className="flex-1 m-0 min-h-0">
+                  <ScrollArea className="h-full">
+                    <CardContent className="p-3 space-y-3 min-h-full">
+                      <MessageList
+                        messages={msgs}
+                        emptyText="پشتیبانی هوشمند اینجاست تا شما را راهنمایی کند"
+                        loadingText={loading ? "در حال فکر کردن…" : undefined}
+                        endRef={endRef}
+                      />
+                    </CardContent>
+                  </ScrollArea>
+                </TabsContent>
 
-              <TabsContent value="support" className="flex-1 m-0 min-h-0">
-                <ScrollArea className="h-full">
-                  <CardContent className="p-3 space-y-3 min-h-full">
-                    {renderMessages(supportMsgs.filter((m, i) => i > 0 || supportMsgs.length > 1), "پشتیبانی برخط اینجاست تا شما را راهنمایی کند", supportLoading ? "در حال ارسال به پشتیبانی…" : undefined)}
-                    <div ref={endRef} />
-                  </CardContent>
-                </ScrollArea>
-              </TabsContent>
+                <TabsContent value="support" className="flex-1 m-0 min-h-0">
+                  <ScrollArea className="h-full">
+                    <CardContent className="p-3 space-y-3 min-h-full">
+                      <MessageList
+                        messages={supportMsgs.filter((m, i) => i > 0 || supportMsgs.length > 1)}
+                        emptyText="پشتیبانی برخط اینجاست تا شما را راهنمایی کند"
+                        loadingText={supportLoading ? "در حال ارسال به پشتیبانی…" : undefined}
+                        endRef={endRef}
+                      />
+                    </CardContent>
+                  </ScrollArea>
+                </TabsContent>
+              </Tabs>
 
-            </Tabs>
+              {/* ── Footer: close button (bottom-left) + inline-send input ── */}
+              <div className="p-2 border-t border-border/50 flex items-center gap-2">
+                {/* Close button — bottom-left corner (in RTL left = start of line) */}
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="بستن چت"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                  <X className="size-4" />
+                </button>
 
-            <CardFooter className="p-2 bg-card border-t">
-              {activeTab === "chatbot" && (
-                <form onSubmit={send} className="flex w-full gap-2 items-stretch">
-                  <Input
+                {activeTab === "chatbot" ? (
+                  <InlineInput
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={setInput}
+                    onSubmit={send}
                     placeholder="پیام به پشتیبانی هوشمند ..."
-                    className="flex-1 h-9 text-xs"
                     disabled={loading}
+                    isLoading={loading}
                   />
-                  <Button type="submit" disabled={loading || !input.trim()} className="h-9 px-4 text-xs font-bold">
-                    {loading ? "…" : "ارسال"}
-                  </Button>
-                </form>
-              )}
-              {activeTab === "support" && (
-                <form onSubmit={sendSupport} className="flex w-full gap-2 items-stretch">
-                  <Input
+                ) : (
+                  <InlineInput
                     value={supportInput}
-                    onChange={(e) => setSupportInput(e.target.value)}
+                    onChange={setSupportInput}
+                    onSubmit={sendSupport}
                     placeholder="پیام به پشتیبانی برخط…"
-                    className="flex-1 h-9 text-xs"
                     disabled={supportLoading}
+                    isLoading={supportLoading}
                   />
-                  <Button type="submit" disabled={supportLoading || !supportInput.trim()} className="h-9 px-4 text-xs font-bold">
-                    {supportLoading ? "…" : "ارسال"}
-                  </Button>
-                </form>
-              )}
-            </CardFooter>
-          </Card>
+                )}
+              </div>
+            </Card>
           </motion.div>
         )}
       </AnimatePresence>
