@@ -203,7 +203,7 @@ export function VideoModal({
         >
           {/* Video side — FIXED size so frame never jumps */}
           <div
-            className="relative bg-black shrink-0 flex items-center justify-center"
+            className="relative bg-black shrink-0 flex items-center justify-center h-[50vh] sm:h-[92vh] sm:min-w-[calc(92vh*9/16)]"
           >
             {/* Loading overlay — sits on top of the video (which holds layout space via h-[92vh]) */}
             {!videoReady && (
