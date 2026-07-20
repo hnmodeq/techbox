@@ -107,7 +107,7 @@ export function UserActivityList({ activities, className = "" }: { activities: U
       <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
         <div>
           <h2 className="text-xl font-black text-foreground">فعالیت‌های کاربر</h2>
-          <p className="mt-1 text-xs text-muted-foreground">پسندها و دیدگاه‌های واقعی ثبت‌شده در دیتابیس</p>
+          <p className="mt-1 text-xs text-muted-foreground"></p>
         </div>
         <div className="flex rounded-lg border bg-muted/30 p-1">
           {[

@@ -58,7 +58,7 @@ export function ProfileTabs({
   return (
     <Tabs defaultValue={defaultTab} className="mt-10">
       <TabsList className="flex h-auto flex-wrap gap-1">
-        <TabsTrigger value="user">فعالیت کاربری</TabsTrigger>
+        {/* <TabsTrigger value="user">فعالیت کاربری</TabsTrigger> */}
         {isAuthor && <TabsTrigger value="author">فعالیت نویسنده</TabsTrigger>}
         {isSelf && <TabsTrigger value="saved">ذخیره‌ها</TabsTrigger>}
       </TabsList>

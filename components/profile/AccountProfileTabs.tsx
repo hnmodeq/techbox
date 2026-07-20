@@ -88,7 +88,10 @@ function SavedPosts({ posts, loading }: { posts: any[]; loading?: boolean }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">{formatRelativeDate(post.date)}</span>
-                    <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    <span 
+                      className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium"
+                      style={{ color: `var(--${post.module})` }}
+                    >
                       {moduleTitle(post.module)}
                     </span>
                   </div>
