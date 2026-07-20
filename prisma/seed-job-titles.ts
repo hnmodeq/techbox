@@ -1,6 +1,6 @@
 /**
- * Seed random IT job titles for users who don't have one yet.
- * Run: npx tsx prisma/seed-job-titles.ts
+ * Seed random IT job titles for ALL users, overwriting any existing value.
+ * Run: pnpm db:seed-job-titles
  */
 import { PrismaClient } from "@prisma/client";
 
@@ -31,11 +31,10 @@ const IT_JOB_TITLES = [
 
 async function main() {
   const users = await prisma.user.findMany({
-    where: { job: null },
-    select: { id: true, username: true },
+    select: { id: true, username: true, job: true },
   });
 
-  console.log(`Found ${users.length} users without a job title. Seeding...`);
+  console.log(`Updating job titles for all ${users.length} users...`);
 
   for (const user of users) {
     const job = IT_JOB_TITLES[Math.floor(Math.random() * IT_JOB_TITLES.length)];
@@ -43,7 +42,7 @@ async function main() {
       where: { id: user.id },
       data: { job },
     });
-    console.log(`  @${user.username} → ${job}`);
+    console.log(`  @${user.username}  ${user.job ?? "(none)"} → ${job}`);
   }
 
   console.log("Done.");
