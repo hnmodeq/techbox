@@ -180,7 +180,7 @@ export function TechboxNavUser() {
                 <div className="-mx-1 my-1 h-px bg-border/50" />
                 <MenuButton destructive onClick={handleLogout}>
                   <LogOutIcon className="size-4" />
-                  Log Out
+                  خروج از حساب
                 </MenuButton>
               </>
             ) : (

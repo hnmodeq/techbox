@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import * as React from "react"
 
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarRail } from "@/components/ui/sidebar"
 import { TechboxNavMain } from "./techbox-nav-main"
 import { TechboxNavSecondary } from "./techbox-nav-secondary"
 import { TechboxNavUser } from "./techbox-nav-user"
@@ -42,6 +43,7 @@ export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Side
       <SidebarFooter>
         <TechboxNavUser />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }

@@ -29,7 +29,7 @@ export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef
       icon: HelpCircleIcon,
     },
     {
-      title: "درخواست نشان",
+      title: "تایید هویت",
       event: "tb_open_verification",
       icon: BadgeCheckIcon,
     },
