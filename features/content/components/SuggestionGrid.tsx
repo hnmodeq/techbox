@@ -6,24 +6,34 @@ import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { formatRelativeDate } from "@/lib/date-format";
 
+// Modules to include in suggestions from blog article pages
+const SUGGEST_MODULES = new Set(["blog", "forum", "media", "download"]);
+
 export default function SuggestionGrid({ current }: { current: ContentItem }) {
   const [items, setItems] = useState<ContentItem[]>([]);
 
   useEffect(() => {
-    fetch("/api/posts?take=100", { cache: "no-store" })
+    fetch("/api/posts?take=200", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => { if (Array.isArray(d)) setItems(d); })
       .catch(() => {});
   }, []);
 
   const related = useMemo(() => {
-    const tags = new Set(current.tags || []);
+    const tags = new Set((current.tags || []).filter(Boolean));
+    if (tags.size === 0) return [];
+
     return items
+      // exclude the current article itself
       .filter((i) => !(i.module === current.module && i.slug === current.slug))
+      // only from the allowed modules
+      .filter((i) => SUGGEST_MODULES.has(i.module))
+      // score by tag overlap only — no same-module bonus
       .map((i) => ({
         item: i,
-        score: (i.tags || []).filter((t) => tags.has(t)).length * 3 + (i.module === current.module ? 1 : 0),
+        score: (i.tags || []).filter((t) => tags.has(t)).length,
       }))
+      // must share at least 1 tag
       .filter((x) => x.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 6)
@@ -47,22 +57,12 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
               href={`/${item.module}/${item.slug}`}
               className="group flex gap-3 rounded-lg border border-border bg-card p-3 transition hover:bg-muted/40"
             >
-              {/* Thumbnail */}
               {!isTopic && item.image && (
                 <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                    unoptimized
-                  />
+                  <Image src={item.image} alt={item.title} fill className="object-cover" sizes="64px" unoptimized />
                 </div>
               )}
-
               <div className="flex-1 min-w-0">
-                {/* Date + module tag */}
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{formatRelativeDate(item.date)}</span>
                   <span
@@ -72,13 +72,9 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
                     {meta?.titleFa || item.module}
                   </span>
                 </div>
-
-                {/* Title */}
                 <div className="mt-0.5 line-clamp-1 font-semibold text-foreground group-hover:underline text-sm">
                   {item.title}
                 </div>
-
-                {/* Excerpt or author */}
                 {isTopic && (item as any).authorName && (
                   <div className="text-xs text-muted-foreground mt-0.5">توسط {(item as any).authorName}</div>
                 )}

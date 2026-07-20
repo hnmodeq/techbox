@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { type ContentItem } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/design/icons";
@@ -26,6 +27,8 @@ interface ArticleModalProps {
 
 export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [navigating, setNavigating] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -39,7 +42,23 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    setNavigating(false);
   }, [item.slug]);
+
+  // Prefetch the article page as soon as the modal opens
+  useEffect(() => {
+    router.prefetch(`/blog/${item.slug}`);
+  }, [item.slug, router]);
+
+  const handleOpenFullPage = useCallback(() => {
+    // Show loading overlay inside modal — don't close it
+    setNavigating(true);
+    // Navigate; Next.js will transition; we close the modal after a brief delay
+    // so the user sees the loading state then the new page appears cleanly
+    router.push(`/blog/${item.slug}`);
+    // Close modal after 600ms — by then the new page is rendering
+    setTimeout(() => onClose(), 600);
+  }, [item.slug, router, onClose]);
 
   const readingTime = item.readingTimeLabel || "";
   const tags: string[] = Array.isArray((item as any).tags) ? (item as any).tags : [];
@@ -55,7 +74,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
 
         <div className="relative z-10 animate-in fade-in duration-200 flex items-center gap-2 w-full max-w-4xl">
 
-          {/* Prev — RIGHT side in RTL → << */}
+          {/* Prev — RIGHT in RTL → << */}
           <Tooltip>
             <TooltipTrigger
               render={
@@ -75,9 +94,17 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
 
           {/* Modal */}
           <div
-            className="flex-1 flex flex-col max-h-[90vh] overflow-hidden rounded-xl bg-[var(--modal-background)] border border-border shadow-2xl"
+            className="relative flex-1 flex flex-col max-h-[90vh] overflow-hidden rounded-xl bg-[var(--modal-background)] border border-border shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* ── Navigation loading overlay ── */}
+            {navigating && (
+              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-background/80 backdrop-blur-sm rounded-xl">
+                <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+                <span className="text-sm text-muted-foreground">در حال باز کردن مقاله...</span>
+              </div>
+            )}
+
             {/* Hero image */}
             <div className="relative h-52 sm:h-64 shrink-0 overflow-hidden bg-muted">
               {item.image ? (
@@ -94,7 +121,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
 
-              {/* Close button — top left */}
+              {/* Close button */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -104,7 +131,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                 <Icon name="close" size={20} />
               </Button>
 
-              {/* Date + reading time — bottom caption */}
+              {/* Date + reading time — bottom of image */}
               <div className="absolute bottom-3 right-3 flex items-center gap-3 text-white/70 text-xs">
                 <Tooltip>
                   <TooltipTrigger render={<span className="cursor-default" />}>
@@ -112,7 +139,6 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                   </TooltipTrigger>
                   <TooltipContent>تاریخ انتشار</TooltipContent>
                 </Tooltip>
-
                 {readingTime && (
                   <>
                     <span className="text-white/40">•</span>
@@ -133,7 +159,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
               className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4"
               style={{ scrollbarWidth: "thin" }}
             >
-              {/* Author row — author right, "باز کردن" left */}
+              {/* Author row — author right, full-page button left */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
                 <AuthorLink
                   name={item.author?.name}
@@ -143,16 +169,18 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                   verifiedType={(item.author as any)?.verifiedType}
                   verifiedLabel={(item.author as any)?.verifiedLabel}
                 />
-                <Link
-                  href={`/blog/${item.slug}`}
-                  onClick={onClose}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4 whitespace-nowrap"
+                {/* Full-page button — does NOT close modal immediately */}
+                <button
+                  type="button"
+                  onClick={handleOpenFullPage}
+                  disabled={navigating}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4 whitespace-nowrap disabled:opacity-50"
                 >
                   باز کردن در صفحه کامل ↗
-                </Link>
+                </button>
               </div>
 
-              {/* Title — above article body */}
+              {/* Title */}
               <h2 className="text-lg sm:text-xl font-black text-foreground leading-7">
                 {item.title}
               </h2>
@@ -176,7 +204,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
                 </div>
               )}
 
-              {/* Social actions — single row, no separator */}
+              {/* Social actions */}
               <div className="flex flex-wrap items-center gap-3 pb-1">
                 <LikeButton contentType="blog" slug={item.slug} initial={item.likes || 0} tooltipLabel="پسندیدن مقاله" />
                 <SaveButton module="blog" slug={item.slug} />
@@ -192,7 +220,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
             </div>
           </div>
 
-          {/* Next — LEFT side in RTL → >> */}
+          {/* Next — LEFT in RTL → >> */}
           <Tooltip>
             <TooltipTrigger
               render={
