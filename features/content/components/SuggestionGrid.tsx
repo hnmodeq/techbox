@@ -1,21 +1,18 @@
 "use client";
 
 /**
- * SuggestionGrid — shows related content based on shared tags, category, and keywords.
+ * SuggestionGrid — suggests related content based on SHARED TAGS only.
  *
- * Scoring (works even when tags are empty — no db:seed-tags required):
- *   +3 per shared tag
- *   +2 shared category (exact match)
- *   +1 per keyword from current title found in candidate title/excerpt
+ * Scoring: +1 per shared tag between current post and candidate.
+ * Only posts with score > 0 are shown (must share at least 1 tag).
+ * Max 2 results per module so one module can't monopolise all 6 slots.
  *
- * This ensures forum/media/download posts are always suggested, not just blog.
- *
- * Tooltips:
- *   - blog/review: "تاریخ انتشار این مقاله"
- *   - media:       "تاریخ انتشار این ویدیو"
- *   - forum:       "تاریخ ایجاد این موضوع"
- *   - download:    "تاریخ انتشار این فایل"
- *   - shop:        موجود / ناموجود badge (prioritise موجود)
+ * Tooltips per module type:
+ *   blog/review → "تاریخ انتشار این مقاله"
+ *   media       → "تاریخ انتشار این ویدیو"
+ *   forum       → "تاریخ ایجاد این موضوع"
+ *   download    → "تاریخ انتشار این فایل"
+ *   shop        → موجود / ناموجود badge (no date; موجود items prioritised)
  */
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -37,51 +34,6 @@ const DATE_TOOLTIP: Partial<Record<string, string>> = {
   news:     "تاریخ انتشار این خبر",
 };
 
-const MIN_KW_LEN = 3;
-const STOP_WORDS = new Set([
-  "در", "از", "به", "با", "که", "این", "آن", "برای", "های", "یک", "است",
-  "و", "یا", "را", "تا", "می", "اما", "اگر", "نیز", "هم",
-  "the", "for", "and", "with", "how", "what", "why", "when",
-]);
-
-function extractKeywords(text: string): Set<string> {
-  const words = text
-    .toLowerCase()
-    .split(/[\s\-_/،,؟?!:.]+/)
-    .map((w) => w.replace(/[«»"'()\[\]{}]/g, "").trim())
-    .filter((w) => w.length >= MIN_KW_LEN && !STOP_WORDS.has(w));
-  return new Set(words);
-}
-
-function scoreItem(current: ContentItem, candidate: ContentItem): number {
-  let score = 0;
-
-  // Tag overlap — highest weight (explicit editorial signal)
-  const currentTags = new Set((current.tags || []).map((t) => t.toLowerCase().trim()).filter(Boolean));
-  const candidateTags = (candidate.tags || []).map((t) => t.toLowerCase().trim()).filter(Boolean);
-  for (const tag of candidateTags) {
-    if (currentTags.has(tag)) score += 3;
-  }
-
-  // Category match — medium weight
-  if (
-    current.category &&
-    candidate.category &&
-    current.category.trim().toLowerCase() === candidate.category.trim().toLowerCase()
-  ) {
-    score += 2;
-  }
-
-  // Title/excerpt keyword overlap — low weight fallback when tags/category absent
-  const currentKws = extractKeywords(current.title + " " + (current.excerpt || ""));
-  const candidateKws = extractKeywords(candidate.title + " " + (candidate.excerpt || ""));
-  for (const kw of candidateKws) {
-    if (currentKws.has(kw)) score += 1;
-  }
-
-  return score;
-}
-
 export default function SuggestionGrid({ current }: { current: ContentItem }) {
   const [items, setItems] = useState<ContentItem[]>([]);
 
@@ -93,18 +45,25 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
           .then((d) => (Array.isArray(d) ? d : []))
           .catch(() => [] as ContentItem[])
       )
-    ).then((results) => {
-      setItems(results.flat());
-    });
+    ).then((results) => setItems(results.flat()));
   }, []);
 
   const related = useMemo(() => {
+    const currentTags = new Set(
+      (current.tags || []).map((t) => t.toLowerCase().trim()).filter(Boolean)
+    );
+    if (currentTags.size === 0) return [];
+
     return items
       .filter((i) => !(i.module === current.module && i.slug === current.slug))
-      .map((i) => ({ item: i, score: scoreItem(current, i) }))
+      .map((i) => ({
+        item: i,
+        score: (i.tags || [])
+          .map((t) => t.toLowerCase().trim())
+          .filter((t) => t && currentTags.has(t)).length,
+      }))
       .filter((x) => x.score > 0)
       .sort((a, b) => {
-        // Shop: prioritise موجود at equal score
         if (a.item.module === "shop" && b.item.module === "shop") {
           const aAvail = a.item.availability !== "ناموجود" ? 1 : 0;
           const bAvail = b.item.availability !== "ناموجود" ? 1 : 0;
@@ -112,10 +71,8 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
         }
         return b.score - a.score;
       })
-      // Cap at 2 per module so one module can't monopolise the 6 slots
       .reduce<Array<{ item: ContentItem; score: number }>>((acc, x) => {
-        const moduleCount = acc.filter((r) => r.item.module === x.item.module).length;
-        if (moduleCount < 2) acc.push(x);
+        if (acc.filter((r) => r.item.module === x.item.module).length < 2) acc.push(x);
         return acc;
       }, [])
       .slice(0, 6)
@@ -132,11 +89,11 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
         </h3>
         <div className="space-y-2">
           {related.map((item) => {
-            const isTopic = item.module === "forum";
-            const isShop = item.module === "shop";
-            const meta = moduleMeta[item.module];
+            const isTopic     = item.module === "forum";
+            const isShop      = item.module === "shop";
+            const meta        = moduleMeta[item.module];
             const dateTooltip = DATE_TOOLTIP[item.module];
-            const relDate = formatRelativeDate(item.date);
+            const relDate     = formatRelativeDate(item.date);
             const isUnavailable = item.availability === "ناموجود";
 
             return (
@@ -150,6 +107,7 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
                     <Image src={item.image} alt={item.title} fill className="object-cover" sizes="64px" unoptimized />
                   </div>
                 )}
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     {isShop ? (
@@ -188,7 +146,9 @@ export default function SuggestionGrid({ current }: { current: ContentItem }) {
                   </div>
 
                   {isTopic && (item as any).authorName && (
-                    <div className="text-xs text-muted-foreground mt-0.5">توسط {(item as any).authorName}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      توسط {(item as any).authorName}
+                    </div>
                   )}
                   {!isTopic && item.excerpt && (
                     <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{item.excerpt}</p>
