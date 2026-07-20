@@ -45,8 +45,8 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "user not found" }, { status: 404 });
 
   const [followersCount, followingCount] = await Promise.all([
-    prisma.follow.count({ where: { followingId: user.id } }),
-    prisma.follow.count({ where: { followerId: user.id } }),
+    prisma.follow?.count({ where: { followingId: user.id } }).catch(() => 0),
+    prisma.follow?.count({ where: { followerId: user.id } }).catch(() => 0),
   ]);
 
   return NextResponse.json({ followersCount, followingCount });

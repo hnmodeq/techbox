@@ -165,7 +165,6 @@ export async function getSessionUserPublic(){
         roleFa: true,
         status: true,
         job: true,
-        bio: true,
         birthday: true,
         modules: true,
         avatar: true,
