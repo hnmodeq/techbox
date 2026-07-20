@@ -177,7 +177,6 @@ export function VideoModal({
     vid.addEventListener("canplay", onCanPlay);
     return () => {
       vid.removeEventListener("canplay", onCanPlay);
-      vid.pause();
     };
   }, [video.slug]);
 
@@ -205,13 +204,7 @@ export function VideoModal({
           <div
             className="relative bg-black shrink-0 flex items-center justify-center h-[50vh] sm:h-[92vh] sm:min-w-[calc(92vh*9/16)]"
           >
-            {/* Loading overlay — sits on top of the video (which holds layout space via h-[92vh]) */}
-            {!videoReady && (
-              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-black/40 pointer-events-none">
-                <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-white/80 animate-spin" />
-                <span className="text-white/50 text-xs">در حال بارگذاری...</span>
-              </div>
-            )}
+
             <video
               ref={videoRef}
               src={video.videoUrl || undefined}
@@ -246,7 +239,7 @@ export function VideoModal({
                 </Button>
               </div>
 
-              <div className="flex items-center gap-3" dir="ltr">
+              <div className="flex items-center gap-3" dir="rtl">
                 <LikeButton
                   contentType="media"
                   slug={video.slug}

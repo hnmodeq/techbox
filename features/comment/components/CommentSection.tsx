@@ -453,17 +453,16 @@ export default function CommentSection({ module, slug, initialComments, compact 
     <section className={compact ? "mt-2 pt-2" : "mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10"}>
       {!compact && (
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
-            دیدگاه شما{" "}
-            <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-              ({loading
-                ? (initialComments && initialComments > 0
-                    ? initialComments.toLocaleString("fa-IR")
-                    : <Skeleton className="inline-block h-4 w-6 align-middle" />)
-                : totalCount.toLocaleString("fa-IR")
-              })
-            </span>
-          </h3>
+          {loading ? (
+            <Skeleton className="h-7 w-48 rounded-md" />
+          ) : (
+            <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
+              دیدگاه شما{" "}
+              <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+                ({totalCount.toLocaleString("fa-IR")})
+              </span>
+            </h3>
+          )}
         </div>
       )}
 
