@@ -40,23 +40,17 @@ function isNA(v: unknown): boolean {
   return !v || NA_VALUES.has(String(v).trim());
 }
 
-// ── Countdown timer — primary colour, above the badge ────────────────────────
+// ── Countdown timer — dark text, Farsi font, no days, HH:MM:SS only ──────────
 function DiscountTimer({ endsAt }: { endsAt: string }) {
   const t = useCountdown(endsAt);
   if (!t || t.expired) return null;
-  const pad = (n: number) => String(n).padStart(2, "0");
+  const pad = (n: number) => n.toLocaleString("fa-IR").padStart(2, "۰");
   return (
     <div
-      className="flex items-center gap-px text-[9px] font-mono font-bold leading-none mb-0.5"
-      style={{ color: "var(--primary)" }}
+      className="text-[10px] font-bold leading-none mb-1 text-gray-800"
       dir="ltr"
     >
-      {t.days > 0 && <span>{pad(t.days)}d&nbsp;</span>}
-      <span>{pad(t.hours)}</span>
-      <span className="animate-pulse mx-px">:</span>
-      <span>{pad(t.minutes)}</span>
-      <span className="animate-pulse mx-px">:</span>
-      <span>{pad(t.seconds)}</span>
+      {pad(t.hours)}:{pad(t.minutes)}:{pad(t.seconds)}
     </div>
   );
 }
@@ -111,9 +105,9 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       href={`/shop/${p.slug}`}
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
     >
-      {/* Image — white bg, larger padding = smaller image appearance */}
-      <div className="relative w-full bg-white" style={{ paddingBottom: "70%" }}>
-        <div className="absolute inset-0 flex items-center justify-center px-14 py-10">
+      {/* Image — white bg, generous padding keeps image visually small */}
+      <div className="relative w-full bg-white" style={{ paddingBottom: "75%" }}>
+        <div className="absolute inset-0 flex items-center justify-center px-16 py-12">
           <Image
             src={p.image || "/assets/blog-1.jpg"}
             alt={p.title}

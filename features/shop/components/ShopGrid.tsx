@@ -381,8 +381,8 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 <div className={cn(
                   "grid gap-4",
                   sidebarOpen
-                    ? "grid-cols-2 xl:grid-cols-3"
-                    : "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
+                    ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+                    : "grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 )}>
                   {visible.map((p) => <ShopProductCard key={p.slug} product={p} />)}
                 </div>
