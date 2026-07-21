@@ -17,6 +17,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
 export type Drive = { id: string; sizeTb: number; label: string; type: "HDD" | "SSD" };
@@ -316,17 +317,29 @@ function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: numb
   const total = reservedBinary + usableBinary + protectionBinary + unusedBinary || 1;
 
   const segs = [
-    { label: "فضای رزرو سیستم", labelEn: "Reserved capacity for system", value: reservedBinary, color: "bg-orange-400" },
-    { label: "ظرفیت قابل استفاده", labelEn: "Available capacity", value: usableBinary, color: "bg-emerald-500" },
-    { label: "محافظت", labelEn: "Protection", value: protectionBinary, color: "bg-blue-600" },
-    { label: "فضای بلااستفاده", labelEn: "Unused space", value: unusedBinary, color: "bg-zinc-300 dark:bg-zinc-600" },
+    { label: "فضای رزرو سیستم", value: reservedBinary, color: "bg-orange-400" },
+    { label: "ظرفیت قابل استفاده", value: usableBinary, color: "bg-emerald-500" },
+    { label: "محافظت", value: protectionBinary, color: "bg-blue-600" },
+    { label: "فضای بلااستفاده", value: unusedBinary, color: "bg-zinc-300 dark:bg-zinc-600" },
   ].filter((s) => s.value > 0.005);
 
   return (
-    <div className="space-y-2">
-      <div className="flex h-6 w-full overflow-hidden rounded-sm bg-muted border">
+    <div className="space-y-2.5">
+      <div className="flex h-7 w-full overflow-hidden rounded-md bg-muted border shadow-inner">
         {segs.map((s, i) => (
-          <div key={i} className={cn("h-full", s.color)} style={{ width: `${(s.value / total) * 100}%` }} title={`${s.label}: ${s.value.toFixed(2)}`} />
+          <Tooltip key={i}>
+            <TooltipTrigger
+              render={
+                <div
+                  className={cn("h-full transition-all duration-700 ease-out hover:brightness-110 cursor-pointer", s.color)}
+                  style={{ width: `${(s.value / total) * 100}%` }}
+                />
+              }
+            />
+            <TooltipContent side="top" className="text-[11px]">
+              {s.label}: {formatFaBinary(s.value / BINARY_FACTOR)} ({((s.value / total) * 100).toFixed(1)}٪)
+            </TooltipContent>
+          </Tooltip>
         ))}
       </div>
       <div className="flex flex-wrap gap-3 text-[10px]">
@@ -371,7 +384,8 @@ export default function RaidCalculator() {
   const hasDrives = drives.length > 0;
 
   return (
-    <div className="w-full max-w-[1280px] mx-auto space-y-8" dir="rtl">
+    <TooltipProvider delay={100}>
+      <div className="w-full max-w-[1280px] mx-auto space-y-8" dir="rtl">
       {/* Step 1 */}
       <div className="bg-card text-card-foreground border border-border rounded-xl shadow-sm overflow-hidden">
         <div className="px-5 sm:px-6 py-4 border-b bg-muted/30 flex items-center gap-3">
@@ -443,7 +457,7 @@ export default function RaidCalculator() {
                 <div
                   key={d.id}
                   className={cn(
-                    "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-colors",
+                    "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-all duration-300 ease-out animate-in fade-in zoom-in-95",
                     d.type === "SSD"
                       ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 hover:border-primary/30"
                       : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20"
@@ -501,17 +515,22 @@ export default function RaidCalculator() {
             <div className="mt-6 space-y-6 bg-card rounded-lg border p-4 sm:p-5">
               {/* RAID A */}
               <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
-                <div className="lg:w-[240px] shrink-0">
+                <div className="lg:w-[300px] shrink-0">
                   <Select value={raidA} onValueChange={(v) => setRaidA(v as RaidKey)}>
-                    <SelectTrigger className="h-10 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-colors w-full">
+                    <SelectTrigger className="h-11 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-all duration-200 w-full">
                       <SelectValue>
                         {RAID_OPTIONS.find((o) => o.key === raidA)?.label} - {RAID_OPTIONS.find((o) => o.key === raidA)?.faultTolerance}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="min-w-[320px] max-w-[90vw]">
+                    <SelectContent className="min-w-[520px] max-w-[95vw] max-h-[380px] animate-in fade-in-0 zoom-in-95 duration-200">
                       {RAID_OPTIONS.map((o) => (
-                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-2.5">
-                          {o.label} - {o.faultTolerance} - {o.description}
+                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-3 whitespace-normal leading-6 data-[state=checked]:bg-accent">
+                          <div className="flex flex-col text-right">
+                            <span className="font-bold">
+                              {o.label} - {o.faultTolerance}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground whitespace-normal leading-5">{o.description}</span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -532,17 +551,22 @@ export default function RaidCalculator() {
 
               {/* RAID B */}
               <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
-                <div className="lg:w-[240px] shrink-0">
+                <div className="lg:w-[300px] shrink-0">
                   <Select value={raidB} onValueChange={(v) => setRaidB(v as RaidKey)}>
-                    <SelectTrigger className="h-10 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-colors w-full">
+                    <SelectTrigger className="h-11 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-all duration-200 w-full">
                       <SelectValue>
                         {RAID_OPTIONS.find((o) => o.key === raidB)?.label} - {RAID_OPTIONS.find((o) => o.key === raidB)?.faultTolerance}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="min-w-[320px] max-w-[90vw]">
+                    <SelectContent className="min-w-[520px] max-w-[95vw] max-h-[380px] animate-in fade-in-0 zoom-in-95 duration-200">
                       {RAID_OPTIONS.map((o) => (
-                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-2.5">
-                          {o.label} - {o.faultTolerance} - {o.description}
+                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-3 whitespace-normal leading-6 data-[state=checked]:bg-accent">
+                          <div className="flex flex-col text-right">
+                            <span className="font-bold">
+                              {o.label} - {o.faultTolerance}
+                            </span>
+                            <span className="text-[11px] text-muted-foreground whitespace-normal leading-5">{o.description}</span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -631,5 +655,6 @@ export default function RaidCalculator() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </TooltipProvider>
   );
 }
