@@ -4,194 +4,244 @@ import { blurProps } from "@/lib/image-placeholder";
 import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import Link from "next/link";
-import { useMemo, useState, useRef, useEffect } from "react";
-import { useConsultation } from "@/providers/consultation.provider";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Icon } from "@/design/icons";
+import { Card } from "@/components/ui/card";
 import ModuleHeader from "@/components/effects/ModuleHeader";
-import { CardStats } from "@/components/ui/card-stats";
 import { useProductComparison } from "@/hooks/useProductComparison";
 import ProductComparisonModal from "@/components/ui/product-comparison-modal";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { GitCompareArrows } from "lucide-react";
+
+const PAGE_SIZE = 12;
 
 export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("shop");
   const { items: dbItems } = useDbPosts("shop", fallbackItems, 100);
-
   const items = serverItems && serverItems.length > 0 ? serverItems : dbItems;
-  const [q, setQ] = useState("");
-  const [cat, setCat] = useState<string>("all");
-  const [sort, setSort] = useState<"new" | "popular" | "liked">("new");
-  const [filterOpen, setFilterOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const { add } = useConsultation();
 
-  const { comparedProducts, addToComparison, removeFromComparison, clearComparison, isInComparison, count: compareCount } =
-    useProductComparison();
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+
+  const {
+    comparedProducts,
+    addToComparison,
+    removeFromComparison,
+    clearComparison,
+    isInComparison,
+    count: compareCount,
+  } = useProductComparison();
 
   const [showComparisonModal, setShowComparisonModal] = useState(false);
 
-  const categories = Array.from(new Set(items.map((i) => i.category).filter(Boolean))) as string[];
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setFilterOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  // Filter by search only (no category / sort filter — hidden per request)
   const filtered = useMemo(() => {
-    let list = [...items];
-    if (q) {
-      const s = q.toLowerCase();
-      list = list.filter((i) => i.title.toLowerCase().includes(s) || i.tags.some((t) => t.includes(s)));
+    if (!q.trim()) return items;
+    const s = q.trim().toLowerCase();
+    return items.filter(
+      (i) =>
+        i.title.toLowerCase().includes(s) ||
+        (i.excerpt || "").toLowerCase().includes(s) ||
+        i.tags.some((t) => t.toLowerCase().includes(s))
+    );
+  }, [items, q]);
+
+  // Reset to page 1 whenever filter changes
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  const goPage = (p: number) => setPage(Math.max(1, Math.min(p, totalPages)));
+
+  // Build page numbers with ellipsis
+  const pageNums: (number | "…")[] = useMemo(() => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages: (number | "…")[] = [1];
+    if (safePage > 3) pages.push("…");
+    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
+      pages.push(i);
     }
-    if (cat !== "all") list = list.filter((i) => i.category === cat);
-    if (sort === "popular") list.sort((a, b) => b.views - a.views);
-    if (sort === "liked") list.sort((a, b) => b.likes - a.likes);
-    return list;
-  }, [items, q, cat, sort]);
+    if (safePage < totalPages - 2) pages.push("…");
+    pages.push(totalPages);
+    return pages;
+  }, [totalPages, safePage]);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 md:px-6 py-12" dir="rtl">
-      <ModuleHeader module="shop" description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`} />
+    <TooltipProvider>
+      <main className="mx-auto max-w-7xl px-4 md:px-6 py-12" dir="rtl">
+        <ModuleHeader
+          module="shop"
+          description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`}
+        />
 
-      <div className="relative mb-6" ref={dropdownRef}>
-        <Card className="p-3">
-          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] items-center">
-            <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجوی محصول…" />
-            <Button type="button" variant={filterOpen ? "secondary" : "ghost"} onClick={() => setFilterOpen(!filterOpen)} className="flex items-center gap-2">
-              <span>فیلترها {cat !== "all" ? `• ${cat}` : ""}</span>
-              <Icon name="chevronDown" className={`h-4 w-4 transition-transform ${filterOpen ? "rotate-180" : ""}`} />
-            </Button>
+        {/* ── Toolbar: search (right) + compare button (left) ── */}
+        <Card className="p-3 mb-6">
+          <div className="flex items-center gap-3">
+            {/* Search — takes all remaining space */}
+            <Input
+              value={q}
+              onChange={(e) => { setQ(e.target.value); setPage(1); }}
+              placeholder="جستجوی محصول…"
+              className="flex-1"
+            />
+
+            {/* Compare button — always visible on the left */}
+            <Tooltip>
+              <TooltipTrigger render={<span className="shrink-0" />}>
+                <Button
+                  type="button"
+                  variant={compareCount > 0 ? "primary" : "outline"}
+                  onClick={() => { if (compareCount > 0) setShowComparisonModal(true); }}
+                  className="flex items-center gap-2"
+                >
+                  <GitCompareArrows className="size-4" />
+                  <span>مقایسه</span>
+                  {compareCount > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-foreground text-primary text-[10px] font-bold">
+                      {compareCount}
+                    </span>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>افزودن به مقایسه</TooltipContent>
+            </Tooltip>
           </div>
         </Card>
 
-        {filterOpen && (
-          <Card className="absolute left-0 right-0 sm:right-auto sm:w-96 top-full mt-2 z-30 p-4 space-y-4 shadow-lg animate-in fade-in-0 zoom-in-95">
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">دسته‌بندی</label>
-                <Select value={cat} onValueChange={(v) => setCat((v as string) || "all")}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">همه دسته‌ها</SelectItem>
-                    {categories.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">مرتب‌سازی</label>
-                <Select value={sort} onValueChange={(v) => setSort(v as any)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="new">جدیدترین</SelectItem>
-                    <SelectItem value="popular">پربازدیدترین</SelectItem>
-                    <SelectItem value="liked">محبوب‌ترین</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2 border-t">
-              <Button
-                type="button"
-                variant="ghost"
-                size="xs"
-                onClick={() => {
-                  setCat("all");
-                  setSort("new");
-                }}
+        {/* ── Product grid ── */}
+        <div className="responsive-card-grid grid gap-5">
+          {paginated.map((p) => {
+            const inCompare = isInComparison(p.slug);
+            return (
+              <Link
+                key={p.slug}
+                href={`/shop/${p.slug}`}
+                className="border rounded-lg shadow-sm overflow-hidden group flex flex-col bg-card text-card-foreground hover:shadow-lg transition-all duration-300 ease-out"
               >
-                پاک کردن
-              </Button>
-              <Button type="button" size="xs" onClick={() => setFilterOpen(false)}>
-                بستن منو
-              </Button>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      <div className="responsive-card-grid grid gap-5">
-        {filtered.map((p) => {
-          const available = p.availability !== "ناموجود";
-          return (
-            <Link
-              key={p.slug}
-              href={`/shop/${p.slug}`}
-              className="border rounded-lg shadow-sm overflow-hidden group flex flex-col bg-card text-card-foreground hover:shadow-lg transition-all duration-300 ease-out"
-            >
-              <div className="block relative aspect-[4/3] bg-white overflow-hidden">
-                <Image
-                  src={p.image || "/assets/blog-1.jpg"}
-                  alt={p.title}
-                  fill
-                  sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw"
-                  className="object-contain transition-transform duration-500 ease-out group-hover:scale-105"
-                  {...blurProps(p.image || "/assets/blog-1.jpg")}
-                />
-                <Badge
-                  className={`absolute top-2 left-2 border-none text-[10px] font-bold ${
-                    available ? "bg-[var(--success)]/85 text-white" : "bg-[var(--danger)]/85 text-white"
-                  }`}
-                >
-                  {available ? "موجود" : "ناموجود"}
-                </Badge>
-              </div>
-              <div className="p-4 flex-1 flex flex-col">
-                <div className="font-semibold mt-1 line-clamp-2 min-h-[48px] group-hover:text-[var(--primary)] transition-colors">{p.title}</div>
-                <div className="mt-1 flex flex-wrap gap-1 text-[11px] text-muted-foreground">
-                  {p.brand && <Badge variant="outline">{p.brand}</Badge>}
-                  {p.category && <Badge variant="secondary">{p.category}</Badge>}
+                {/* Image — white bg, no crop, no overflow */}
+                <div className="relative aspect-[4/3] bg-white flex items-center justify-center p-3">
+                  <Image
+                    src={p.image || "/assets/blog-1.jpg"}
+                    alt={p.title}
+                    fill
+                    sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw"
+                    className="object-contain"
+                    {...blurProps(p.image || "/assets/blog-1.jpg")}
+                  />
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-1 flex-1">{p.excerpt}</p>
-                <div className="mt-3 flex items-center justify-between gap-2 pt-3 border-t">
-                  <Button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      add({ slug: p.slug, title: p.title, image: p.image || "" });
-                    }}
-                    size="sm"
-                    variant="outline"
-                    className="border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)]/10 font-bold"
-                  >
-                    ثبت درخواست مشاوره
-                  </Button>
-                  <div dir="ltr">
-                    <CardStats module="shop" slug={p.slug} initialViews={p.views} initialLikes={p.likes} initialComments={p.comments || 0} showComments={false} />
+
+                {/* Card body */}
+                <div className="p-4 flex-1 flex flex-col gap-2">
+                  {/* Title */}
+                  <div className="font-semibold line-clamp-2 min-h-[48px] group-hover:text-[var(--primary)] transition-colors">
+                    {p.title}
+                  </div>
+
+                  {/* Excerpt */}
+                  {p.excerpt && (
+                    <p className="text-sm text-muted-foreground line-clamp-2 flex-1">{p.excerpt}</p>
+                  )}
+
+                  {/* Compare toggle — bottom action, no other buttons */}
+                  <div className="pt-3 border-t mt-auto">
+                    <Tooltip>
+                      <TooltipTrigger render={<span className="w-full block" />}>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={inCompare ? "primary" : "outline"}
+                          className="w-full flex items-center gap-2"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (inCompare) {
+                              removeFromComparison(p.slug);
+                            } else {
+                              addToComparison(p);
+                            }
+                          }}
+                        >
+                          <GitCompareArrows className="size-4" />
+                          {inCompare ? "حذف از مقایسه" : "افزودن به مقایسه"}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>افزودن به مقایسه</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-      {filtered.length === 0 && <div className="text-center py-16 text-muted-foreground">محصولی یافت نشد</div>}
-
-      {compareCount > 0 && (
-        <div className="fixed bottom-6 right-6 z-50">
-          <Button onClick={() => setShowComparisonModal(true)} className="shadow-lg flex items-center gap-2">
-            مقایسه ({compareCount})
-          </Button>
+              </Link>
+            );
+          })}
         </div>
-      )}
 
-      {showComparisonModal && <ProductComparisonModal isOpen={showComparisonModal} products={comparedProducts} onClose={() => setShowComparisonModal(false)} onRemove={removeFromComparison} onClear={clearComparison} />}
-    </main>
+        {filtered.length === 0 && (
+          <div className="text-center py-16 text-muted-foreground">محصولی یافت نشد</div>
+        )}
+
+        {/* ── Shadcn Pagination ── */}
+        {totalPages > 1 && (
+          <div className="mt-10">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => goPage(safePage - 1)}
+                    aria-disabled={safePage === 1}
+                    className={safePage === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+
+                {pageNums.map((n, idx) =>
+                  n === "…" ? (
+                    <PaginationItem key={`ellipsis-${idx}`}>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  ) : (
+                    <PaginationItem key={n}>
+                      <PaginationLink
+                        isActive={n === safePage}
+                        onClick={() => goPage(n as number)}
+                        className="cursor-pointer"
+                      >
+                        {(n as number).toLocaleString("fa-IR")}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => goPage(safePage + 1)}
+                    aria-disabled={safePage === totalPages}
+                    className={safePage === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
+        {/* ── Comparison modal ── */}
+        {showComparisonModal && (
+          <ProductComparisonModal
+            isOpen={showComparisonModal}
+            products={comparedProducts}
+            onClose={() => setShowComparisonModal(false)}
+            onRemove={removeFromComparison}
+            onClear={clearComparison}
+          />
+        )}
+      </main>
+    </TooltipProvider>
   );
 }
