@@ -163,6 +163,9 @@ function NewPostInner() {
       model: "",
       sku: "",
       priceLabel: "",
+      priceAmount: "",
+      discountPercent: "",
+      discountEndsAt: "",
       availability: "",
       warranty: "",
       specs: "",
@@ -225,6 +228,9 @@ function NewPostInner() {
         model: it.model || "",
         sku: it.sku || "",
         priceLabel: it.priceLabel || "",
+        priceAmount: it.priceAmount ? String(it.priceAmount) : "",
+        discountPercent: it.discountPercent ? String(it.discountPercent) : "",
+        discountEndsAt: it.discountEndsAt ? new Date(it.discountEndsAt).toISOString().slice(0, 16) : "",
         availability: it.availability || "",
         warranty: it.warranty || "",
         specs: it.specs ? JSON.stringify(it.specs, null, 2) : "",
@@ -291,6 +297,9 @@ function NewPostInner() {
       model: (values.model || "").trim() || undefined,
       sku: (values.sku || "").trim() || undefined,
       priceLabel: (values.priceLabel || "").trim() || undefined,
+      priceAmount: (values.priceAmount || "").trim() ? Number(values.priceAmount) : undefined,
+      discountPercent: (values.discountPercent || "").trim() ? Number(values.discountPercent) : undefined,
+      discountEndsAt: (values.discountEndsAt || "").trim() ? new Date(values.discountEndsAt!).toISOString() : undefined,
       availability: (values.availability || "").trim() || undefined,
       warranty: (values.warranty || "").trim() || undefined,
       specs: parseSpecs(values.specs || ""),
@@ -600,19 +609,146 @@ function NewPostInner() {
               {moduleWatch === "shop" && (
                 <AccordionItem value="shop">
                   <Card className="p-0">
-                    <AccordionTrigger className="p-4">فروشگاه</AccordionTrigger>
-                    <AccordionContent className="p-4 pt-0 space-y-4">
+                    <AccordionTrigger className="p-4">🛒 اطلاعات فروشگاه</AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0 space-y-5">
+
+                      {/* Brand / Model / SKU */}
                       <div className="grid gap-3 md:grid-cols-3">
-                        <FormField control={form.control as any} name="brand" render={({ field }) => (<FormItem><FormLabel>Brand</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
-                        <FormField control={form.control as any} name="model" render={({ field }) => (<FormItem><FormLabel>Model</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
-                        <FormField control={form.control as any} name="sku" render={({ field }) => (<FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
-                        <FormField control={form.control as any} name="priceLabel" render={({ field }) => (<FormItem><FormLabel>Price Label</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
-                        <FormField control={form.control as any} name="availability" render={({ field }) => (<FormItem><FormLabel>Availability</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
-                        <FormField control={form.control as any} name="warranty" render={({ field }) => (<FormItem><FormLabel>Warranty</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>)} />
+                        <FormField control={form.control as any} name="brand" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>برند</FormLabel>
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
+                              <SelectTrigger><SelectValue placeholder="انتخاب برند…" /></SelectTrigger>
+                              <SelectContent>
+                                {["Dell","HPE","QNAP","Synology","Cisco","Fortinet","MikroTik","Huawei","Aruba","Juniper","Palo Alto","Netgear","سایر"].map((b) => (
+                                  <SelectItem key={b} value={b}>{b}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control as any} name="model" render={({ field }) => (
+                          <FormItem><FormLabel>مدل</FormLabel><FormControl><Input placeholder="PowerEdge R750xs" dir="ltr" {...field} /></FormControl></FormItem>
+                        )} />
+                        <FormField control={form.control as any} name="sku" render={({ field }) => (
+                          <FormItem><FormLabel>کد محصول (SKU)</FormLabel><FormControl><Input dir="ltr" {...field} /></FormControl></FormItem>
+                        )} />
                       </div>
-                      <FormField control={form.control as any} name="gallery" render={({ field }) => (<FormItem><FormLabel>Gallery URLs (one per line)</FormLabel><FormControl><Textarea className="min-h-[90px]" dir="ltr" {...field} /></FormControl></FormItem>)} />
-                      <BlobUploadField label="افزودن تصویر به گالری" kind="image" folder="products" accept="image/*" onUploaded={(r) => form.setValue("gallery", [form.getValues("gallery")?.trim(), r.url].filter(Boolean).join("\n"))} />
-                      <FormField control={form.control as any} name="specs" render={({ field }) => (<FormItem><FormLabel>Specs JSON یا key:value</FormLabel><FormControl><Textarea className="min-h-[110px] font-mono" dir="ltr" placeholder={'{"cpu":"..."}'} {...field} /></FormControl></FormItem>)} />
+
+                      <Separator />
+
+                      {/* Availability + Warranty */}
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <FormField control={form.control as any} name="availability" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>وضعیت موجودی</FormLabel>
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
+                              <SelectTrigger><SelectValue placeholder="انتخاب…" /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="موجود برای مشاوره">✅ موجود برای مشاوره</SelectItem>
+                                <SelectItem value="موجود">✅ موجود</SelectItem>
+                                <SelectItem value="ناموجود">❌ ناموجود</SelectItem>
+                                <SelectItem value="اتمام موجودی">⚠️ اتمام موجودی</SelectItem>
+                                <SelectItem value="پیش‌سفارش">📦 پیش‌سفارش</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control as any} name="warranty" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>گارانتی (خالی = بدون گارانتی)</FormLabel>
+                            <Select value={field.value || ""} onValueChange={field.onChange}>
+                              <SelectTrigger><SelectValue placeholder="انتخاب…" /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">بدون گارانتی</SelectItem>
+                                <SelectItem value="گارانتی اصالت و سلامت فیزیکی تکباکس">گارانتی تکباکس</SelectItem>
+                                <SelectItem value="گارانتی ۱۲ ماهه تکباکس">گارانتی ۱۲ ماهه</SelectItem>
+                                <SelectItem value="گارانتی ۲۴ ماهه تکباکس">گارانتی ۲۴ ماهه</SelectItem>
+                                <SelectItem value="گارانتی رسمی برند">گارانتی رسمی برند</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )} />
+                      </div>
+
+                      <Separator />
+
+                      {/* Pricing */}
+                      <div>
+                        <p className="text-sm font-semibold mb-3">قیمت‌گذاری</p>
+                        <div className="grid gap-3 md:grid-cols-3">
+                          <FormField control={form.control as any} name="priceAmount" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>قیمت (تومان)</FormLabel>
+                              <FormControl><Input type="number" dir="ltr" placeholder="920000000" {...field} /></FormControl>
+                              <FormDescription className="text-[11px]">۰ یا خالی = تماس بگیرید</FormDescription>
+                            </FormItem>
+                          )} />
+                          <FormField control={form.control as any} name="discountPercent" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>درصد تخفیف (۰-۹۹)</FormLabel>
+                              <FormControl><Input type="number" min="0" max="99" dir="ltr" placeholder="15" {...field} /></FormControl>
+                            </FormItem>
+                          )} />
+                          <FormField control={form.control as any} name="discountEndsAt" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>پایان تخفیف</FormLabel>
+                              <FormControl><Input type="datetime-local" dir="ltr" {...field} /></FormControl>
+                            </FormItem>
+                          )} />
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Specs */}
+                      <div>
+                        <p className="text-sm font-semibold mb-3">مشخصات فنی</p>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          {(["CPU", "RAM", "Bay", "Network Card", "Form Factor", "Drive Type", "Throughput"] as const).map((key) => {
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            const labels: Record<string, string> = {
+                              "CPU": "CPU / پردازنده", "RAM": "RAM / حافظه", "Bay": "Bay / درایو",
+                              "Network Card": "کارت شبکه", "Form Factor": "فرم فاکتور",
+                              "Drive Type": "نوع درایو (All-Flash / Hybrid / All-HDD)", "Throughput": "پهنای باند",
+                            };
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">{labels[key]}</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    let obj: Record<string, string> = {};
+                                    try { obj = JSON.parse(specsStr); } catch {}
+                                    if (val.trim()) obj[key] = val; else delete obj[key];
+                                    form.setValue("specs", JSON.stringify(obj, null, 2));
+                                  }}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <Separator />
+
+                      {/* Images */}
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold">تصاویر محصول</p>
+                        <BlobUploadField label="آپلود تصویر اصلی" kind="image" folder="products" accept="image/*"
+                          onUploaded={(r) => form.setValue("image", r.url)} />
+                        <BlobUploadField label="افزودن به گالری" kind="image" folder="products" accept="image/*"
+                          onUploaded={(r) => form.setValue("gallery", [form.getValues("gallery")?.trim(), r.url].filter(Boolean).join("\n"))} />
+                        <FormField control={form.control as any} name="gallery" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>URLهای گالری (هر خط یک URL)</FormLabel>
+                            <FormControl><Textarea className="min-h-[70px]" dir="ltr" {...field} /></FormControl>
+                          </FormItem>
+                        )} />
+                      </div>
+
                     </AccordionContent>
                   </Card>
                 </AccordionItem>

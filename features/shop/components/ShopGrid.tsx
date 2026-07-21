@@ -3,14 +3,11 @@
 import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { useProductComparison } from "@/hooks/useProductComparison";
-import ProductComparisonModal from "@/components/ui/product-comparison-modal";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { GitCompareArrows, SlidersHorizontal, X, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { SlidersHorizontal, X, Search, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ShopProductCard from "./ShopProductCard";
 import ShopBanner, { type ShopBannerItem } from "./ShopBanner";
@@ -32,6 +29,18 @@ const BRAND_META: Record<string, string> = {
 
 const PAGE_SIZE = 16;
 
+/** Resolve effective numeric price — priceAmount first, then parse priceLabel */
+function resolvePrice(item: ContentItem): number {
+  if (item.priceAmount && item.priceAmount > 0) return item.priceAmount;
+  const label = item.priceLabel ?? "";
+  const ascii = label.replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
+  const num = parseFloat(ascii.replace(/[^\d.]/g, ""));
+  if (isNaN(num) || num <= 0) return 0;
+  if (/میلیارد/.test(label)) return Math.round(num * 1_000_000_000);
+  if (/میلیون/.test(label))  return Math.round(num * 1_000_000);
+  return Math.round(num);
+}
+
 function useShopBanners(): ShopBannerItem[] {
   const [banners, setBanners] = useState<ShopBannerItem[]>([]);
   useEffect(() => {
@@ -46,7 +55,6 @@ function useShopBanners(): ShopBannerItem[] {
 export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("shop");
   const { items: dbItems } = useDbPosts("shop", fallbackItems, 200);
-  // Prefer live API data; fall back to SSR items only while client fetch is pending
   const items = dbItems.length > 0 ? dbItems : (serverItems ?? fallbackItems);
   const banners = useShopBanners();
 
@@ -55,8 +63,8 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const [onlyAvailable, setOnlyAvailable] = useState(false);
 
   const priceRange = useMemo(() => {
-    const prices = items.map((i) => i.priceAmount ?? 0).filter((p) => p > 0);
-    if (!prices.length) return { min: 0, max: 200000000 };
+    const prices = items.map(resolvePrice).filter((p) => p > 0);
+    if (!prices.length) return { min: 0, max: 2_000_000_000 };
     return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [items]);
 
@@ -88,13 +96,18 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const sorted = useMemo(() => {
     let list = [...items];
     if (onlyAvailable) list = list.filter((i) => i.availability !== "ناموجود" && i.availability !== "اتمام موجودی");
-    if (priceFilter) list = list.filter((i) => { const pr = i.priceAmount ?? 0; return pr === 0 || (pr >= priceFilter[0] && pr <= priceFilter[1]); });
+    if (priceFilter) {
+      list = list.filter((i) => {
+        const pr = resolvePrice(i);
+        return pr === 0 || (pr >= priceFilter[0] && pr <= priceFilter[1]);
+      });
+    }
     if (selectedBrands.size > 0) list = list.filter((i) => i.brand && selectedBrands.has(i.brand));
     if (selectedCats.size > 0) list = list.filter((i) => i.category && selectedCats.has(i.category));
     switch (sort) {
       case "newest":     list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); break;
-      case "price_asc":  list.sort((a, b) => (a.priceAmount ?? 0) - (b.priceAmount ?? 0)); break;
-      case "price_desc": list.sort((a, b) => (b.priceAmount ?? 0) - (a.priceAmount ?? 0)); break;
+      case "price_asc":  list.sort((a, b) => resolvePrice(a) - resolvePrice(b)); break;
+      case "price_desc": list.sort((a, b) => resolvePrice(b) - resolvePrice(a)); break;
       case "discount":   list.sort((a, b) => (b.discountPercent ?? 0) - (a.discountPercent ?? 0)); break;
       default:           list.sort((a, b) => b.views - a.views);
     }
@@ -118,10 +131,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   }, [sorted.length]);
 
   const visible = sorted.slice(0, visibleCount);
-
-  const { comparedProducts, removeFromComparison, clearComparison, count: compareCount } = useProductComparison();
-  const [showComparision, setShowComparision] = useState(false);
-
   const activeFilterCount = (onlyAvailable ? 1 : 0) + (priceFilter ? 1 : 0) + selectedBrands.size + selectedCats.size;
 
   const clearAllFilters = useCallback(() => {
@@ -129,11 +138,15 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     setSelectedBrands(new Set()); setSelectedCats(new Set());
   }, []);
 
+  const fmtSliderPrice = (v: number) => {
+    if (v >= 1_000_000_000) return (v / 1_000_000_000).toLocaleString("fa-IR", { maximumFractionDigits: 1 }) + " م";
+    return Math.round(v / 1_000_000).toLocaleString("fa-IR") + " M";
+  };
+
   return (
     <TooltipProvider>
       <div className="mx-auto max-w-7xl px-4 md:px-6 py-6" dir="rtl">
 
-        {/* Banner */}
         {banners.length > 0 && <ShopBanner banners={banners} />}
 
         {/* Sort bar */}
@@ -169,7 +182,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
             ))}
           </div>
 
-          <span className="text-xs text-muted-foreground shrink-0 mr-auto">
+          <span className="text-xs text-muted-foreground shrink-0">
             {sorted.length.toLocaleString("fa-IR")} کالا
           </span>
         </div>
@@ -192,13 +205,11 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 </div>
               </div>
 
-              {/* فقط کالاهای موجود */}
               <div className="flex items-center justify-between border-b pb-3">
                 <span className="text-sm">فقط کالاهای موجود</span>
                 <Switch checked={onlyAvailable} onCheckedChange={setOnlyAvailable} />
               </div>
 
-              {/* Price range */}
               <div className="border-b pb-3 space-y-3">
                 <button type="button" onClick={() => setPriceOpen((o) => !o)} className="flex items-center justify-between w-full">
                   <span className="font-medium text-sm">فیلتر بر اساس قیمت</span>
@@ -207,13 +218,14 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 {priceOpen && (
                   <div className="space-y-3 pt-1">
                     <Slider
-                      min={priceRange.min} max={priceRange.max} step={1000000}
+                      min={priceRange.min} max={priceRange.max}
+                      step={Math.max(1_000_000, Math.round((priceRange.max - priceRange.min) / 100))}
                       value={effectivePrice}
                       onValueChange={(v) => setPriceFilter(v as [number, number])}
                     />
                     <div className="flex justify-between text-[10px] text-muted-foreground" dir="ltr">
-                      <span>{Math.round(effectivePrice[0] / 1000000).toLocaleString("fa-IR")}M</span>
-                      <span>{Math.round(effectivePrice[1] / 1000000).toLocaleString("fa-IR")}M</span>
+                      <span>{fmtSliderPrice(effectivePrice[0])}</span>
+                      <span>{fmtSliderPrice(effectivePrice[1])}</span>
                     </div>
                     {priceFilter && (
                       <button type="button" onClick={() => setPriceFilter(null)} className="text-[11px] text-destructive hover:underline">
@@ -224,7 +236,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 )}
               </div>
 
-              {/* Brands */}
               <div className="border-b pb-3 space-y-2">
                 <button type="button" onClick={() => setBrandOpen((o) => !o)} className="flex items-center justify-between w-full">
                   <span className="font-medium text-sm">برندها</span>
@@ -254,7 +265,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 )}
               </div>
 
-              {/* Categories */}
               <div className="pb-3 space-y-2">
                 <button type="button" onClick={() => setCatOpen((o) => !o)} className="flex items-center justify-between w-full">
                   <span className="font-medium text-sm">کاربری</span>
@@ -297,8 +307,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 )}>
                   {visible.map((p) => <ShopProductCard key={p.slug} product={p} />)}
                 </div>
-
-                {/* Infinite scroll sentinel */}
                 {visibleCount < sorted.length && (
                   <div ref={loaderRef} className="flex justify-center py-10">
                     <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
@@ -308,26 +316,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
             )}
           </div>
         </div>
-
-        {/* Floating compare button */}
-        {compareCount > 0 && (
-          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
-            <Button onClick={() => setShowComparision(true)} className="shadow-xl flex items-center gap-2 rounded-full px-6">
-              <GitCompareArrows className="size-4" />
-              مقایسه {compareCount.toLocaleString("fa-IR")} محصول
-            </Button>
-          </div>
-        )}
-
-        {showComparision && (
-          <ProductComparisonModal
-            isOpen={showComparision}
-            products={comparedProducts}
-            onClose={() => setShowComparision(false)}
-            onRemove={removeFromComparison}
-            onClear={clearComparison}
-          />
-        )}
       </div>
     </TooltipProvider>
   );
