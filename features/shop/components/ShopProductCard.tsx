@@ -105,8 +105,8 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       href={`/shop/${p.slug}`}
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden items-center"
     >
-      {/* Image — fixed height, centered */}
-      <div className="relative w-40 bg-white h-32 flex">
+      {/* Image — fixed height, centered with padding so image appears smaller */}
+      <div className="relative w-full bg-white h-52 flex items-center justify-center p-10">
           <Image
             src={p.image || "/assets/blog-1.jpg"}
             alt={p.title}
