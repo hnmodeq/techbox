@@ -377,7 +377,6 @@ export default function RaidCalculator() {
         <div className="px-5 sm:px-6 py-4 border-b bg-muted/30 flex items-center gap-3">
           <span className="inline-flex items-center justify-center rounded-md bg-foreground text-background text-[11px] font-black px-2.5 py-1">مرحله ۱</span>
           <h2 className="text-[16px] sm:text-[18px] font-black">انتخاب دیسک‌ها</h2>
-          <span className="text-[11px] text-muted-foreground mr-2">Select drives</span>
         </div>
 
         <div className="p-5 sm:p-6 space-y-6">
@@ -437,43 +436,46 @@ export default function RaidCalculator() {
             })}
           </div>
 
-          {/* Selected tray – now 100% tokens, light in light mode / dark in dark mode */}
-          <div className="rounded-lg border border-border bg-muted dark:bg-muted/40 p-3 sm:p-4 min-h-[120px] shadow-inner">
+          {/* Selected tray – tokens, light/dark, fixed 10 slots, invisible overlay to prevent shift */}
+          <div className="relative rounded-lg border border-border bg-muted dark:bg-muted/40 p-3 sm:p-4 min-h-[130px] shadow-inner">
             <div className="flex flex-wrap gap-2.5 sm:gap-3">
-              {drives.length === 0 ? (
-                <div className="w-full h-[84px] flex flex-col items-center justify-center gap-1 text-[12px] text-muted-foreground">
-                  <HardDrive className="size-6 opacity-60 text-muted-foreground" />
-                  <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
-                  <span className="text-[10px] text-muted-foreground/70">نمای دیسک‌های انتخابی اینجا خواهد بود</span>
-                </div>
-              ) : (
-                drives.map((d) => (
-                  <div
-                    key={d.id}
-                    className={cn(
-                      "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-colors",
-                      d.type === "SSD"
-                        ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 hover:border-primary/30"
-                        : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20"
-                    )}
+              {drives.map((d) => (
+                <div
+                  key={d.id}
+                  className={cn(
+                    "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-colors",
+                    d.type === "SSD"
+                      ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 hover:border-primary/30"
+                      : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20"
+                  )}
+                >
+                  <HardDrive className={cn("size-6 transition", d.type === "SSD" ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground")} />
+                  <span className="text-[11px] font-bold">{d.label}</span>
+                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-md font-medium", d.type === "SSD" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>{d.type}</span>
+                  <button
+                    onClick={() => removeDrive(d.id)}
+                    className="absolute -top-2 -right-2 size-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
+                    aria-label="حذف"
                   >
-                    <HardDrive className={cn("size-6 transition", d.type === "SSD" ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground")} />
-                    <span className="text-[11px] font-bold">{d.label}</span>
-                    <span className={cn("text-[9px] px-1.5 py-0.5 rounded-md font-medium", d.type === "SSD" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>{d.type}</span>
-                    <button
-                      onClick={() => removeDrive(d.id)}
-                      className="absolute -top-2 -right-2 size-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
-                      aria-label="حذف"
-                    >
-                      <XIcon className="size-3.5" />
-                    </button>
-                  </div>
-                ))
-              )}
-              {Array.from({ length: Math.max(0, 12 - drives.length) }).map((_, i) => (
+                    <XIcon className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+              {Array.from({ length: Math.max(0, 10 - drives.length) }).map((_, i) => (
                 <div key={`ph-${i}`} className="h-[92px] w-[84px] rounded-md bg-background/60 dark:bg-card/40 border border-dashed border-border/60" />
               ))}
             </div>
+            {/* Empty overlay – invisible placeholder keeps layout, no shift when drives appear */}
+            {drives.length === 0 ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-lg bg-muted/90 dark:bg-muted/70 backdrop-blur-[1px] text-[12px] text-muted-foreground pointer-events-none">
+                <HardDrive className="size-6 opacity-60" />
+                <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
+              </div>
+            ) : (
+              <div className="absolute inset-0 pointer-events-none invisible flex flex-col items-center justify-center gap-1 text-[12px] text-muted-foreground">
+                <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between text-[12px] text-muted-foreground pt-1">
@@ -481,7 +483,7 @@ export default function RaidCalculator() {
               تعداد کل دیسک‌ها: <b className="text-foreground">{drives.length.toLocaleString("fa-IR")}</b>
             </span>
             <button onClick={reset} className="rounded-md border border-border px-3 py-1.5 text-[11px] font-medium hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20 transition-colors">
-              بازنشانی / Reset
+              بازنشانی
             </button>
           </div>
         </div>
@@ -494,38 +496,29 @@ export default function RaidCalculator() {
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center justify-center rounded-md bg-foreground text-background text-[11px] font-black px-2.5 py-1">مرحله ۲</span>
               <h2 className="text-[16px] sm:text-[18px] font-black">برآورد فضای قابل استفاده</h2>
-              <span className="text-[11px] text-muted-foreground mr-2">Usage estimate</span>
             </div>
-            <a href="#" className="mt-2 inline-flex text-[11px] text-blue-600 dark:text-blue-400 hover:underline">
-              اطلاعات بیشتر درباره انواع RAID / Learn more about RAID types ↗
-            </a>
 
             <div className="mt-6 space-y-6 bg-card rounded-lg border p-4 sm:p-5">
               {/* RAID A */}
-              <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
-                <div className="lg:w-[160px] shrink-0">
+              <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
+                <div className="lg:w-[240px] shrink-0">
                   <Select value={raidA} onValueChange={(v) => setRaidA(v as RaidKey)}>
-                    <SelectTrigger className="h-9 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-colors">
-                      <SelectValue />
+                    <SelectTrigger className="h-10 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-colors w-full">
+                      <SelectValue>
+                        {RAID_OPTIONS.find((o) => o.key === raidA)?.label} - {RAID_OPTIONS.find((o) => o.key === raidA)?.faultTolerance}
+                      </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="min-w-[320px] max-w-[90vw]">
                       {RAID_OPTIONS.map((o) => (
-                        <SelectItem key={o.key} value={o.key} className="text-[12px]">
-                          {o.label} – {o.faultTolerance}
+                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-2.5">
+                          {o.label} - {o.faultTolerance} - {o.description}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center rounded-sm bg-muted border px-2 py-0.5 text-[10px] font-black">
-                      {resultA.valid ? RAID_OPTIONS.find((o) => o.key === raidA)?.short : "خطا"}
-                    </span>
-                    <div className="flex-1">
-                      <UsageBar result={resultA} driveCount={drives.length} />
-                    </div>
-                  </div>
+                <div className="flex-1 space-y-2 pt-1">
+                  <UsageBar result={resultA} driveCount={drives.length} />
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] sm:text-[11px] text-muted-foreground pr-1">
                     <span>قابل استفاده: <b className="text-foreground">{formatFaBinary(resultA.usableTb)}</b></span>
                     <span>تحمل خطا: <b className="text-foreground">{resultA.faultTolerance}</b></span>
@@ -538,30 +531,25 @@ export default function RaidCalculator() {
               </div>
 
               {/* RAID B */}
-              <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
-                <div className="lg:w-[160px] shrink-0">
+              <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
+                <div className="lg:w-[240px] shrink-0">
                   <Select value={raidB} onValueChange={(v) => setRaidB(v as RaidKey)}>
-                    <SelectTrigger className="h-9 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-colors">
-                      <SelectValue />
+                    <SelectTrigger className="h-10 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-colors w-full">
+                      <SelectValue>
+                        {RAID_OPTIONS.find((o) => o.key === raidB)?.label} - {RAID_OPTIONS.find((o) => o.key === raidB)?.faultTolerance}
+                      </SelectValue>
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="min-w-[320px] max-w-[90vw]">
                       {RAID_OPTIONS.map((o) => (
-                        <SelectItem key={o.key} value={o.key} className="text-[12px]">
-                          {o.label} – {o.faultTolerance}
+                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-2.5">
+                          {o.label} - {o.faultTolerance} - {o.description}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center justify-center rounded-sm bg-muted border px-2 py-0.5 text-[10px] font-black">
-                      {resultB.valid ? RAID_OPTIONS.find((o) => o.key === raidB)?.short : "خطا"}
-                    </span>
-                    <div className="flex-1">
-                      <UsageBar result={resultB} driveCount={drives.length} />
-                    </div>
-                  </div>
+                <div className="flex-1 space-y-2 pt-1">
+                  <UsageBar result={resultB} driveCount={drives.length} />
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] sm:text-[11px] text-muted-foreground pr-1">
                     <span>قابل استفاده: <b className="text-foreground">{formatFaBinary(resultB.usableTb)}</b></span>
                     <span>تحمل خطا: <b className="text-foreground">{resultB.faultTolerance}</b></span>
