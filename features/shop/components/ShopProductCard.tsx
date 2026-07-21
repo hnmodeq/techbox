@@ -149,16 +149,13 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           )}
         </div>
 
-        {/* Shipping line like Digikala */}
+        {/* Shipping line — all real data from DB (availability) */}
         <div className="flex items-center gap-1 text-[10px] text-muted-foreground min-h-[16px]">
           {!isUnavailable ? (
-            <>
-              <span className="inline-flex items-center gap-1">
-                <Truck className="size-3 text-sky-500" />
-                <span className="text-[10px]">ارسال سریع</span>
-              </span>
-              <span className="text-[9px] text-muted-foreground/60 hidden sm:inline">• دیجی‌کالا</span>
-            </>
+            <span className="inline-flex items-center gap-1">
+              <Truck className="size-3 text-sky-500" />
+              <span className="text-[10px]">موجود در انبار • ارسال سریع</span>
+            </span>
           ) : (
             <span className="text-[10px] text-red-500/80">ناموجود</span>
           )}
@@ -186,58 +183,54 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         )}
       </div>
 
-      {/* ── Bottom price + discount ── */}
-      <div className="mt-auto flex items-end justify-between gap-2 px-3 pb-3 pt-2">
-        {/* Right side visually = badge + timer (start side in RTL) */}
-        <div className="flex flex-col items-start gap-1 shrink-0">
-          {discount > 0 && !isUnavailable && (
-            <>
-              {/* Timer above badge if amazing */}
-              {p.discountEndsAt && (
-                <div className="flex items-center gap-1">
-                  <DiscountTimer endsAt={p.discountEndsAt} small />
-                </div>
-              )}
+      {/* ── Bottom price + discount — fixed: no absolute masking ── */}
+      <div className="mt-auto flex flex-col gap-1 px-3 pb-3 pt-2">
+        <div className="flex items-end justify-between gap-2">
+          {/* Badge (right side visually in RTL) */}
+          <div className="shrink-0">
+            {discount > 0 && !isUnavailable ? (
               <span className="inline-flex h-5 min-w-7 items-center justify-center rounded-full bg-[#ef394e] px-1.5 text-[11px] font-bold leading-none text-white">
                 {discount.toLocaleString("fa-IR")}٪
               </span>
-            </>
-          )}
-        </div>
+            ) : (
+              <span className="h-5 block" />
+            )}
+          </div>
 
-        {/* Left side visually = price (end side in RTL) */}
-        <div className="flex flex-col items-end text-left" dir="rtl">
-          {isUnavailable ? (
-            <span className="text-[12px] font-bold text-muted-foreground">ناموجود</span>
-          ) : priceAmount <= 0 ? (
-            <span className="text-[11px] font-semibold text-muted-foreground">تماس بگیرید</span>
-          ) : (
-            <>
-              {discount > 0 && (
-                <div className="flex items-baseline gap-1 opacity-60">
-                  <span className="text-[11px] text-muted-foreground line-through">
-                    {orig.number}
+          {/* Price (left side visually in RTL) — all real data from DB */}
+          <div className="flex flex-col items-end text-left" dir="rtl">
+            {isUnavailable ? (
+              <span className="text-[12px] font-bold text-muted-foreground">ناموجود</span>
+            ) : priceAmount <= 0 ? (
+              <span className="text-[11px] font-semibold text-muted-foreground">تماس بگیرید</span>
+            ) : (
+              <>
+                {discount > 0 && (
+                  <div className="flex items-baseline gap-1 opacity-60">
+                    <span className="text-[11px] text-muted-foreground line-through">
+                      {orig.number}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <span className="text-[13px] font-bold leading-none text-foreground">
+                    {disc.number}
                   </span>
+                  <span className="text-[10px] font-normal text-muted-foreground">تومان</span>
                 </div>
-              )}
-              <div className="flex items-center gap-1">
-                <span className="text-[13px] font-bold leading-none text-foreground">
-                  {disc.number}
-                </span>
-                <span className="text-[10px] font-normal text-muted-foreground">تومان</span>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Subtle bottom border extra timer like Digikala amazing bottom line */}
-      {discount >= 20 && p.discountEndsAt && (
-        <div className="absolute bottom-0 left-0 right-0 flex h-5 items-center justify-end border-t border-border/30 bg-card/80 px-3 backdrop-blur-[2px]">
-          <span className="text-[10px] text-[#ef394e] ml-1">اتمام پیشنهاد:</span>
-          <DiscountTimer endsAt={p.discountEndsAt} small />
-        </div>
-      )}
+        {/* Timer — real discountEndsAt from DB, managed in admin panel, no masking */}
+        {p.discountEndsAt && discount > 0 && !isUnavailable && (
+          <div className="flex items-center justify-between gap-1 border-t border-border/30 pt-1.5 mt-0.5">
+            <span className="text-[10px] font-medium text-[#ef394e]">اتمام پیشنهاد:</span>
+            <DiscountTimer endsAt={p.discountEndsAt} small />
+          </div>
+        )}
+      </div>
     </Link>
   );
 }
