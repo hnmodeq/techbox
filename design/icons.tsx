@@ -59,6 +59,9 @@ import {
   History,
   Trash2,
   Pencil,
+  RefreshCw,
+  Settings,
+  ArrowLeftRight,
   type LucideIcon,
   type LucideProps,
 } from "lucide-react";
@@ -115,6 +118,9 @@ export const icons = {
   timeline: History,
   trash: Trash2,
   edit: Pencil,
+  refresh: RefreshCw,
+  settings: Settings,
+  shuffle: ArrowLeftRight,
 } as const;
 
 export type IconName = keyof typeof icons;
