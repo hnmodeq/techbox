@@ -1,32 +1,20 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Icon } from "@/design/icons";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import { MinusIcon, PlusIcon, XIcon } from "lucide-react";
+import { XIcon, PlusIcon, HardDrive } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useDbPosts } from "@/hooks/useDbPosts";
+import { getModuleItems, type ContentItem } from "@/lib/content";
+import Link from "next/link";
+import Image from "next/image";
+import { blurProps } from "@/lib/image-placeholder";
 
-export type RaidKey =
-  | "basic"
-  | "jbod"
-  | "raid0"
-  | "raid1"
-  | "raid5"
-  | "raid6"
-  | "raid10"
-  | "shr1"
-  | "shr2";
-
-export type Drive = {
-  id: string;
-  sizeTb: number;
-};
-
+export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
+export type Drive = { id: string; sizeTb: number };
 export type RaidResult = {
   usableTb: number;
   protectionTb: number;
@@ -47,63 +35,47 @@ type RaidOption = {
   label: string;
   short: string;
   minDisks: number;
-  maxDisks?: number;
   protected: boolean;
   description: string;
   faultTolerance: string;
 };
 
 export const RAID_OPTIONS: RaidOption[] = [
-  { key: "basic", label: "Basic", short: "Basic", minDisks: 1, protected: false, description: "هر دیسک به‌صورت مستقل استفاده می‌شود؛ بیشترین ظرفیت، بدون افزونگی.", faultTolerance: "ندارد" },
-  { key: "jbod", label: "JBOD", short: "JBOD", minDisks: 1, protected: false, description: "ترکیب ظرفیت دیسک‌ها در یک Volume پیوسته؛ خرابی یک دیسک می‌تواند داده‌ها را از بین ببرد.", faultTolerance: "ندارد" },
-  { key: "raid0", label: "RAID 0", short: "R0", minDisks: 2, protected: false, description: "Striping برای کارایی بالا؛ بدون تحمل خرابی دیسک.", faultTolerance: "ندارد" },
-  { key: "raid1", label: "RAID 1", short: "R1", minDisks: 2, protected: true, description: "Mirror کامل بین دیسک‌ها؛ مناسب داده‌های مهم با ظرفیت کمتر.", faultTolerance: "تا خرابی همه دیسک‌ها به‌جز یک دیسک" },
-  { key: "raid5", label: "RAID 5", short: "R5", minDisks: 3, protected: true, description: "ترکیب ظرفیت و افزونگی با یک دیسک Parity.", faultTolerance: "خرابی ۱ دیسک" },
-  { key: "raid6", label: "RAID 6", short: "R6", minDisks: 4, protected: true, description: "دو Parity برای امنیت بیشتر؛ مناسب آرایه‌های بزرگ‌تر.", faultTolerance: "خرابی ۲ دیسک" },
-  { key: "raid10", label: "RAID 10", short: "R10", minDisks: 4, protected: true, description: "Mirror + Stripe برای کارایی و افزونگی؛ نیازمند تعداد دیسک زوج.", faultTolerance: "حداقل ۱ دیسک، بسته به جفت Mirror" },
-  { key: "shr1", label: "SHR-1", short: "SHR1", minDisks: 2, protected: true, description: "Synology Hybrid RAID با تحمل خرابی یک دیسک و استفاده بهتر از دیسک‌های نامساوی.", faultTolerance: "خرابی ۱ دیسک" },
-  { key: "shr2", label: "SHR-2", short: "SHR2", minDisks: 4, protected: true, description: "SHR با تحمل خرابی دو دیسک؛ مناسب ظرفیت‌های بالا و آرایه‌های حساس.", faultTolerance: "خرابی ۲ دیسک" },
+  { key: "basic", label: "Basic", short: "Basic", minDisks: 1, protected: false, description: "هر دیسک مستقل استفاده می‌شود.", faultTolerance: "ندارد" },
+  { key: "jbod", label: "JBOD", short: "JBOD", minDisks: 1, protected: false, description: "ترکیب دیسک‌ها در یک Volume.", faultTolerance: "ندارد" },
+  { key: "raid0", label: "RAID 0", short: "R0", minDisks: 2, protected: false, description: "Striping برای کارایی.", faultTolerance: "ندارد" },
+  { key: "raid1", label: "RAID 1", short: "R1", minDisks: 2, protected: true, description: "Mirror کامل.", faultTolerance: "n-1 دیسک" },
+  { key: "raid5", label: "RAID 5", short: "R5", minDisks: 3, protected: true, description: "یک دیسک Parity.", faultTolerance: "۱ دیسک" },
+  { key: "raid6", label: "RAID 6", short: "R6", minDisks: 4, protected: true, description: "دو Parity.", faultTolerance: "۲ دیسک" },
+  { key: "raid10", label: "RAID 10", short: "R10", minDisks: 4, protected: true, description: "Mirror + Stripe.", faultTolerance: "۱+ دیسک" },
+  { key: "shr1", label: "SHR", short: "SHR", minDisks: 2, protected: true, description: "Synology Hybrid RAID – بهینه برای دیسک‌های نامساوی.", faultTolerance: "۱ دیسک" },
+  { key: "shr2", label: "SHR-2", short: "SHR2", minDisks: 4, protected: true, description: "SHR با تحمل ۲ دیسک.", faultTolerance: "۲ دیسک" },
 ];
 
-const DRIVE_SIZE_OPTIONS = [2, 4, 8, 12, 16, 24, 32];
-const DEFAULT_DRIVES: Drive[] = [
-  { id: "d-1", sizeTb: 8 },
-  { id: "d-2", sizeTb: 8 },
-  { id: "d-3", sizeTb: 8 },
-  { id: "d-4", sizeTb: 8 },
-];
-
-const nf = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 2 });
-const pf = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 });
+// Synology size pills - same as screenshot
+const DRIVE_SIZE_OPTIONS = [24, 20, 18, 16, 14, 12, 10, 8, 6, 4, 3, 2, 1];
 
 function uid() {
   return `d-${Math.random().toString(36).slice(2, 10)}`;
 }
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
+function sum(v: number[]) {
+  return v.reduce((a, b) => a + b, 0);
 }
-function sum(values: number[]) {
-  return values.reduce((acc, item) => acc + item, 0);
-}
-function formatTb(value: number) {
-  if (!Number.isFinite(value) || value <= 0) return "۰ ترابایت";
-  return `${nf.format(value)} ترابایت`;
-}
+const nf = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 1 });
+const nf0 = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 });
 
-function calculateShr(sizes: number[], parityDisks: 1 | 2) {
+function calculateShr(sizes: number[], parity: 1 | 2) {
   const sorted = [...sizes].filter(Boolean).sort((a, b) => a - b);
   const raw = sum(sorted);
-  let usable = 0;
-  let protection = 0;
-  let unused = 0;
-  let previous = 0;
-
-  for (const boundary of sorted) {
-    const slice = boundary - previous;
+  let usable = 0,
+    protection = 0,
+    unused = 0;
+  let prev = 0;
+  for (const b of sorted) {
+    const slice = b - prev;
     if (slice <= 0) continue;
-    const members = sorted.filter((size) => size >= boundary).length;
-
-    if (parityDisks === 1) {
+    const members = sorted.filter((s) => s >= b).length;
+    if (parity === 1) {
       if (members >= 2) {
         usable += (members - 1) * slice;
         protection += slice;
@@ -118,448 +90,450 @@ function calculateShr(sizes: number[], parityDisks: 1 | 2) {
         unused += members * slice;
       }
     }
-    previous = boundary;
+    prev = b;
   }
-  const roundingGap = raw - usable - protection - unused;
-  if (Math.abs(roundingGap) > 0.00001) unused += roundingGap;
+  const gap = raw - usable - protection - unused;
+  if (Math.abs(gap) > 0.00001) unused += gap;
   return { usable, protection, unused };
 }
 
-export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount: number): RaidResult {
-  const option = RAID_OPTIONS.find((item) => item.key === raidKey);
+export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount = 0): RaidResult {
+  const option = RAID_OPTIONS.find((o) => o.key === raidKey);
   if (!option) {
     return {
-      usableTb: 0, protectionTb: 0, unusedTb: 0, rawTb: 0, activeRawTb: 0, spareTb: 0,
-      valid: false, minDisks: 0, warnings: [], description: "",
-      faultTolerance: "انتخاب نشده", efficiency: 0,
+      usableTb: 0,
+      protectionTb: 0,
+      unusedTb: 0,
+      rawTb: 0,
+      activeRawTb: 0,
+      spareTb: 0,
+      valid: false,
+      minDisks: 0,
+      warnings: [],
+      description: "",
+      faultTolerance: "",
+      efficiency: 0,
     };
   }
-
-  const allSizes = drives.map((drive) => Number(drive.sizeTb)).filter((size) => size > 0);
+  const allSizes = drives.map((d) => Number(d.sizeTb)).filter((s) => s > 0);
   const rawTb = sum(allSizes);
   const sortedDesc = [...allSizes].sort((a, b) => b - a);
-  const spareSizes = sortedDesc.slice(0, clamp(spareCount, 0, Math.max(0, sortedDesc.length - 1)));
-  const activeSizes = sortedDesc.slice(spareSizes.length);
-  const activeRawTb = sum(activeSizes);
-  const spareTb = sum(spareSizes);
-  const n = activeSizes.length;
-  const min = n ? Math.min(...activeSizes) : 0;
+  const spare = sortedDesc.slice(0, Math.min(spareCount, Math.max(0, sortedDesc.length - 1)));
+  const active = sortedDesc.slice(spare.length);
+  const activeRawTb = sum(active);
+  const spareTb = sum(spare);
+  const n = active.length;
+  const min = n ? Math.min(...active) : 0;
   const warnings: string[] = [];
 
-  let usableTb = 0;
-  let protectionTb = 0;
-  let unusedTb = 0;
+  let usableTb = 0,
+    protectionTb = 0,
+    unusedTb = 0;
 
-  if (n < option.minDisks) {
-    warnings.push(`برای ${option.label} حداقل ${nf.format(option.minDisks)} دیسک فعال لازم است.`);
-  }
-  if (raidKey === "raid10" && n % 2 !== 0) {
-    warnings.push("RAID 10 به تعداد دیسک زوج نیاز دارد؛ یک دیسک اضافه باعث عدم اعتبار آرایه می‌شود.");
-  }
+  if (n < option.minDisks) warnings.push(`حداقل ${option.minDisks} دیسک برای ${option.label} نیاز است.`);
+  if (raidKey === "raid10" && n % 2 !== 0) warnings.push("RAID 10 نیاز به تعداد دیسک زوج دارد.");
 
   switch (raidKey) {
     case "basic":
-    case "jbod": {
+    case "jbod":
       usableTb = activeRawTb;
       break;
-    }
-    case "raid0": {
+    case "raid0":
       usableTb = n >= 2 ? min * n : 0;
       unusedTb = Math.max(0, activeRawTb - usableTb);
       break;
-    }
-    case "raid1": {
+    case "raid1":
       usableTb = n >= 2 ? min : 0;
       protectionTb = n >= 2 ? min * (n - 1) : 0;
       unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb);
       break;
-    }
-    case "raid5": {
+    case "raid5":
       usableTb = n >= 3 ? min * (n - 1) : 0;
       protectionTb = n >= 3 ? min : 0;
       unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb);
       break;
-    }
-    case "raid6": {
+    case "raid6":
       usableTb = n >= 4 ? min * (n - 2) : 0;
       protectionTb = n >= 4 ? min * 2 : 0;
       unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb);
       break;
-    }
-    case "raid10": {
+    case "raid10":
       usableTb = n >= 4 && n % 2 === 0 ? min * (n / 2) : 0;
       protectionTb = n >= 4 && n % 2 === 0 ? min * (n / 2) : 0;
       unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb);
       break;
-    }
-    case "shr1": {
+    case "shr1":
       if (n >= 2) {
-        const shr = calculateShr(activeSizes, 1);
-        usableTb = shr.usable;
-        protectionTb = shr.protection;
-        unusedTb = shr.unused;
+        const s = calculateShr(active, 1);
+        usableTb = s.usable;
+        protectionTb = s.protection;
+        unusedTb = s.unused;
       }
       break;
-    }
-    case "shr2": {
+    case "shr2":
       if (n >= 4) {
-        const shr = calculateShr(activeSizes, 2);
-        usableTb = shr.usable;
-        protectionTb = shr.protection;
-        unusedTb = shr.unused;
+        const s = calculateShr(active, 2);
+        usableTb = s.usable;
+        protectionTb = s.protection;
+        unusedTb = s.unused;
       }
       break;
-    }
   }
 
-  if (["raid0", "raid1", "raid5", "raid6", "raid10"].includes(raidKey)) {
-    const uniqueSizes = new Set(activeSizes);
-    if (uniqueSizes.size > 1) {
-      warnings.push("در RAID کلاسیک، ظرفیت قابل استفاده بر اساس کوچک‌ترین دیسک محاسبه می‌شود و بخشی از دیسک‌های بزرگ‌تر بلااستفاده می‌ماند.");
-    }
-  }
-  if ((raidKey === "shr1" || raidKey === "shr2") && unusedTb > 0) {
-    warnings.push("به‌دلیل ترکیب ظرفیت‌ها، بخشی از فضا در این چیدمان قابل استفاده نیست. افزودن دیسک هم‌اندازه می‌تواند آن را فعال کند.");
-  }
-
-  const valid = warnings.every((warning) => !warning.includes("حداقل") && !warning.includes("زوج"));
+  const valid = n >= option.minDisks && !(raidKey === "raid10" && n % 2 !== 0);
   const efficiency = activeRawTb > 0 ? (usableTb / activeRawTb) * 100 : 0;
 
   return {
-    usableTb, protectionTb, unusedTb, rawTb, activeRawTb, spareTb,
-    valid, minDisks: option.minDisks, warnings, description: option.description,
-    faultTolerance: option.faultTolerance, efficiency,
+    usableTb,
+    protectionTb,
+    unusedTb,
+    rawTb,
+    activeRawTb,
+    spareTb,
+    valid,
+    minDisks: option.minDisks,
+    warnings,
+    description: option.description,
+    faultTolerance: option.faultTolerance,
+    efficiency,
   };
 }
 
-function Segment({ label, value, total, className }: { label: string; value: number; total: number; className: string; }) {
-  const width = total > 0 ? Math.max(value > 0 ? 2 : 0, (value / total) * 100) : 0;
-  return <div className={className} style={{ width: `${width}%` }} title={`${label}: ${formatTb(value)}`} aria-label={`${label}: ${formatTb(value)}`} />;
+// Binary conversion: Synology shows TiB but labels TB (1000^4 / 1024^4 = 0.9094947)
+const BINARY_FACTOR = 1000 ** 4 / 1024 ** 4; // 0.909...
+function toBinary(tb: number) {
+  return tb * BINARY_FACTOR;
+}
+function formatBinary(tb: number) {
+  const b = toBinary(tb);
+  if (b <= 0) return "۰";
+  if (b < 1) return `${(b * 1000).toFixed(0)} GB`;
+  return `${b.toFixed(b >= 10 ? 1 : 2)} TB`;
 }
 
-function StatCard({ label, value, hint, tone = "default" }: { label: string; value: string; hint: string; tone?: "default" | "accent" | "success" | "warning" }) {
-  const toneClass =
-    tone === "accent" ? "text-[var(--raid)]"
-    : tone === "success" ? "text-[var(--success)]"
-    : tone === "warning" ? "text-[var(--warning)]"
-    : "text-foreground";
+function parseBay(specs: any): number | null {
+  if (!specs || typeof specs !== "object") return null;
+  const v = specs["Bay"] ?? specs["bay"] ?? specs["Bays"] ?? specs["تعداد Bay"] ?? specs["ظرفیت نصب"];
+  if (!v) return null;
+  const m = String(v).match(/(\d+)/);
+  if (m) return parseInt(m[1], 10);
+  return null;
+}
+
+function RecommendedModels({ driveCount }: { driveCount: number }) {
+  const fallback = getModuleItems("shop");
+  const { items: dbItems } = useDbPosts("shop", fallback, 100);
+  const items = dbItems.length > 0 ? dbItems : fallback;
+
+  const filtered = useMemo(() => {
+    if (driveCount === 0) return [];
+    // Consider NAS-like items: brand Synology/QNAP or category NAS or has Bay spec
+    const candidates = items.filter((p) => {
+      const brand = (p.brand || "").toLowerCase();
+      const cat = (p.category || "").toLowerCase();
+      const isNasBrand = ["synology", "qnap", "asustor", "terramaster"].some((b) => brand.includes(b));
+      const isNasCat = cat.includes("nas") || cat.includes("ذخیره") || cat.includes("شبکه");
+      const bay = parseBay(p.specs);
+      return (isNasBrand || isNasCat || bay !== null) && (bay === null || bay >= 1);
+    });
+
+    const withBay = candidates
+      .map((p) => ({ p, bay: parseBay(p.specs) ?? 999 }))
+      .filter(({ bay }) => bay >= driveCount)
+      .sort((a, b) => a.bay - b.bay)
+      .slice(0, 12)
+      .map(({ p }) => p);
+
+    // If not enough, fallback to any shop product with image to show at least something real
+    if (withBay.length < 3) {
+      const anyWithImage = items.filter((p) => p.image).slice(0, 12);
+      return withBay.length > 0 ? withBay : anyWithImage;
+    }
+    return withBay;
+  }, [items, driveCount]);
+
+  if (driveCount === 0) return null;
+  if (filtered.length === 0) return (
+    <div className="rounded-lg border border-dashed p-6 text-center text-[12px] text-muted-foreground">
+      هیچ محصول NAS با {driveCount} Bay در فروشگاه یافت نشد. محصولات را از ادمین اضافه کنید.
+    </div>
+  );
+
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="text-[length:var(--paragraph-font-size)] paragraph-color">{label}</div>
-        <div className={`mt-2 text-2xl font-black leading-none ${toneClass}`}>{value}</div>
-        <div className="mt-2 text-[length:var(--paragraph-font-size)] paragraph-color">{hint}</div>
-      </CardContent>
-    </Card>
+    <div className="space-y-3">
+      <h3 className="text-[16px] font-bold">Recommended models</h3>
+      <p className="text-[12px] text-muted-foreground">مدل‌های واقعی از فروشگاه تکباکس بر اساس تعداد دیسک انتخابی ({driveCount} Bay)</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-px bg-border border border-border rounded-lg overflow-hidden">
+        {filtered.map((p) => (
+          <Link key={`${p.module}-${p.slug}`} href={`/shop/${p.slug}`} className="bg-card p-4 flex flex-col items-center gap-3 hover:bg-accent/50 transition group">
+            <div className="relative w-full aspect-square">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.image || "/assets/blog-1.jpg"} alt={p.title} className="w-full h-full object-contain group-hover:scale-105 transition" />
+            </div>
+            <div className="text-center">
+              <div className="text-[12px] font-bold line-clamp-2 leading-5">{p.model || p.title.slice(0, 40)}</div>
+              {p.brand && <div className="text-[10px] text-muted-foreground mt-1">{p.brand}</div>}
+              {parseBay(p.specs) && <div className="text-[10px] text-muted-foreground">{parseBay(p.specs)} Bay</div>}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: number }) {
+  // System reserved: 10GB per drive ~ 0.01TB decimal -> binary
+  const reservedDecimal = driveCount * 0.01;
+  const reservedBinary = toBinary(reservedDecimal);
+  const usableBinary = Math.max(0, toBinary(result.usableTb) - reservedBinary);
+  const protectionBinary = toBinary(result.protectionTb);
+  const unusedBinary = toBinary(result.unusedTb);
+  const totalBinary = reservedBinary + usableBinary + protectionBinary + unusedBinary || 1;
+
+  const segs = [
+    { label: "Reserved capacity for system", value: reservedBinary, color: "bg-[#f5a623]" },
+    { label: "Available capacity", value: usableBinary, color: "bg-[#38c172] dark:bg-[#2ecc9a]" },
+    { label: "Protection", value: protectionBinary, color: "bg-[#2d7ff9]" },
+    { label: "Unused space", value: unusedBinary, color: "bg-[#d8d8d8] dark:bg-zinc-600" },
+  ].filter((s) => s.value > 0.001);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex h-6 w-full overflow-hidden rounded-sm bg-muted">
+        {segs.map((s, i) => (
+          <div
+            key={i}
+            className={cn("h-full transition-all", s.color)}
+            style={{ width: `${(s.value / totalBinary) * 100}%` }}
+            title={`${s.label}: ${s.value.toFixed(2)} TB`}
+          />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground">
+        {segs.map((s, i) => (
+          <span key={i} className="flex items-center gap-1.5">
+            <span className={cn("size-2 rounded-sm", s.color)} />
+            {s.label} {s.value > 0 ? `(${s.value.toFixed(1)} TB)` : ""}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }
 
 export default function RaidCalculator() {
-  const [drives, setDrives] = useState<Drive[]>(DEFAULT_DRIVES);
-  const [raid, setRaid] = useState<RaidKey | "">("");
-  const [spareCount, setSpareCount] = useState(0);
+  const [drives, setDrives] = useState<Drive[]>([]);
+  const [driveType, setDriveType] = useState<"HDD" | "SSD">("HDD");
+  const [raidA, setRaidA] = useState<RaidKey>("raid5");
+  const [raidB, setRaidB] = useState<RaidKey>("raid6");
 
-  const result = useMemo(() => calculateRaid(raid as RaidKey, drives, spareCount), [raid, drives, spareCount]);
-  const selectedOption = RAID_OPTIONS.find((item) => item.key === raid);
-  const canRemove = drives.length > 1;
-  const effectiveSpareMax = Math.max(0, drives.length - 1);
-  const barTotal = Math.max(result.activeRawTb + result.spareTb, result.rawTb, 1);
+  const counts = useMemo(() => {
+    const m = new Map<number, number>();
+    for (const d of drives) m.set(d.sizeTb, (m.get(d.sizeTb) || 0) + 1);
+    return m;
+  }, [drives]);
 
-  function addDrive(sizeTb = 8) {
-    setDrives((current) => [...current, { id: uid(), sizeTb: clamp(Number(sizeTb) || 1, 0.1, 100) }]);
-  }
-  function updateDrive(id: string, sizeTb: number) {
-    setDrives((current) => current.map((drive) => (drive.id === id ? { ...drive, sizeTb: clamp(Number(sizeTb) || 0.1, 0.1, 100) } : drive)));
-  }
-  function removeDrive(id: string) {
-    setDrives((current) => (current.length <= 1 ? current : current.filter((drive) => drive.id !== id)));
-    setSpareCount((current) => clamp(current, 0, Math.max(0, drives.length - 2)));
-  }
-  function applyPreset(sizeTb: number, count: number) {
-    setDrives(Array.from({ length: count }, () => ({ id: uid(), sizeTb })));
-    setSpareCount(0);
-  }
+  const addDrive = (size: number) => {
+    setDrives((prev) => [...prev, { id: uid(), sizeTb: size }]);
+  };
+  const removeDrive = (id: string) => {
+    setDrives((prev) => prev.filter((d) => d.id !== id));
+  };
+  const reset = () => setDrives([]);
+
+  const resultA = useMemo(() => calculateRaid(raidA, drives, 0), [raidA, drives]);
+  const resultB = useMemo(() => calculateRaid(raidB, drives, 0), [raidB, drives]);
+
+  const hasDrives = drives.length > 0;
 
   return (
-    <section dir="rtl" className="w-full font-sans text-foreground">
-      <Card className="overflow-hidden">
-        <div className="relative grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(420px,0.85fr)] lg:p-8">
-          {/* Left column — Tool inputs */}
-          <div className="space-y-6">
-            <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-              <div>
-                <Badge
-                  variant="outline"
-                  className="mb-3 border-[color-mix(in_oklch,var(--raid)_35%,var(--border))] bg-[color-mix(in_oklch,var(--raid)_12%,var(--muted))] text-foreground"
+    <div className="w-full max-w-[1280px] mx-auto space-y-8" dir="ltr">
+      {/* Step 1 */}
+      <div className="bg-card border border-border rounded-lg shadow-sm">
+        <div className="p-5 sm:p-6 border-b">
+          <h2 className="flex items-center gap-3 text-[16px] font-bold">
+            <span className="inline-flex items-center justify-center rounded bg-foreground text-background text-[11px] font-bold px-2 py-0.5">Step 1</span>
+            Select drives
+          </h2>
+        </div>
+
+        <div className="p-5 sm:p-6 space-y-5">
+          <div className="flex gap-2 border-b">
+            {(["HDD", "SSD"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setDriveType(t)}
+                className={cn(
+                  "px-4 py-2 text-[13px] font-medium border-b-2 -mb-px",
+                  driveType === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
+            {DRIVE_SIZE_OPTIONS.map((sz) => {
+              const c = counts.get(sz) || 0;
+              return (
+                <button
+                  key={sz}
+                  onClick={() => addDrive(sz)}
+                  className={cn(
+                    "relative flex items-center justify-between rounded-sm border bg-muted/30 px-3 py-2.5 text-[12px] hover:bg-muted transition",
+                    c > 0 && "bg-foreground text-background border-foreground"
+                  )}
                 >
-                  <Icon name="server" className="h-3.5 w-3.5 text-[var(--raid)]" />
-                  ابزار محاسبه RAID
-                </Badge>
-                <h2 className="text-[length:var(--h1-font-size)] text-[var(--h1-font-color)] font-extrabold">ماشین حساب RAID و SHR</h2>
-                <p className="mt-3 max-w-2xl text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold paragraph-color">
-                  ظرفیت قابل استفاده، افزونگی، فضای بلااستفاده و Hot Spare را برای RAIDهای کلاسیک و Synology Hybrid RAID با دیسک‌های هم‌اندازه یا ترکیبی محاسبه کنید.
-                </p>
-              </div>
-              <Button variant="outline" size="sm" onClick={() => applyPreset(8, 4)} className="shrink-0">
-                بازنشانی نمونه ۴×۸ ترابایت
-              </Button>
-            </header>
+                  <span>{sz} TB</span>
+                  {c > 0 && <span className="ml-2 inline-flex size-5 items-center justify-center rounded-full bg-background text-foreground text-[11px] font-bold">{c}</span>}
+                </button>
+              );
+            })}
+          </div>
 
-            {/* Drives Selection Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <CardTitle className="text-[length:var(--h2-font-size)]">انتخاب دیسک‌ها</CardTitle>
-                    <CardDescription>برای افزودن دیسک جدید روی دکمه + کلیک کنید و ظرفیت مورد نظر را از منو انتخاب نمایید.</CardDescription>
+          <div className="rounded-md bg-[#2f333a] dark:bg-[#1e2126] p-3 sm:p-4 min-h-[112px]">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {drives.length === 0 ? (
+                <div className="w-full h-[80px] flex items-center justify-center text-[12px] text-white/40">
+                  برای شروع، یک سایز دیسک از بالا انتخاب کنید — لیست دیسک‌های انتخابی اینجا نمایش داده می‌شود.
+                </div>
+              ) : (
+                drives.map((d) => (
+                  <div key={d.id} className="group relative flex h-[84px] w-[76px] flex-col items-center justify-center rounded-sm bg-[#3a3e47] text-white border border-white/10 hover:border-white/20">
+                    <HardDrive className="size-6 mb-1 text-white/70" />
+                    <span className="text-[11px] font-bold">{d.sizeTb} TB</span>
+                    <button onClick={() => removeDrive(d.id)} className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                      <XIcon className="size-3" />
+                    </button>
                   </div>
-                  <Badge variant="secondary">{nf.format(drives.length)} دیسک فعال</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 items-center">
-                  {drives.map((drive, index) => (
-                    <Card key={drive.id} className="group p-3.5 transition hover:border-[color-mix(in_oklch,var(--raid)_42%,var(--border))]">
-                      <div className="mb-3 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 font-black text-sm">
-                          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[color-mix(in_oklch,var(--raid)_15%,var(--muted))] text-[var(--raid)]">
-                            <Icon name="disk" className="h-4 w-4" />
-                          </span>
-                          دیسک {nf.format(index + 1)}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          disabled={!canRemove}
-                          onClick={() => removeDrive(drive.id)}
-                          className="h-7 w-7"
-                          aria-label="حذف دیسک"
-                        >
-                          <XIcon className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                      <Select
-                        value={String(drive.sizeTb)}
-                        onValueChange={(v) => updateDrive(drive.id, Number(v))}
-                      >
-                        <SelectTrigger className="font-black [direction:ltr]" aria-label={`ظرفیت دیسک ${index + 1}`}>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {DRIVE_SIZE_OPTIONS.map((sz) => (
-                            <SelectItem key={sz} value={String(sz)}>{sz} TB</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </Card>
-                  ))}
+                ))
+              )}
+              {/* empty placeholders like Synology */}
+              {Array.from({ length: Math.max(0, 12 - drives.length) }).map((_, i) => (
+                <div key={`ph-${i}`} className="h-[84px] w-[76px] rounded-sm bg-white/[0.04] border border-dashed border-white/10" />
+              ))}
+            </div>
+          </div>
 
-                  {/* Add Drive Button */}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => addDrive(8)}
-                    className="h-full min-h-[110px] border-dashed border-[var(--raid)]/50 bg-[var(--raid)]/5 hover:bg-[var(--raid)]/15 flex-col gap-2 text-[var(--raid)] font-black"
-                  >
-                    <PlusIcon className="h-8 w-8 stroke-[3]" />
-                    <span className="text-sm">افزودن دیسک جدید</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="flex items-center justify-between text-[12px] text-muted-foreground">
+            <span>Total number of drives: {drives.length}</span>
+            <button onClick={reset} className="hover:text-foreground underline underline-offset-4">Reset</button>
+          </div>
+        </div>
+      </div>
 
-            {/* RAID Type + Spare Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <div>
-                  <CardTitle className="text-[length:var(--h2-font-size)]">انتخاب نوع RAID</CardTitle>
-                  <CardDescription>معماری و نوع آرایه دیسک را از منوی کشویی انتخاب کنید.</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="max-w-xl">
-                  <Select
-                    value={raid}
-                    onValueChange={(v) => setRaid(v as RaidKey)}
-                  >
-                    <SelectTrigger className="w-full !h-12 font-bold text-base">
-                      <SelectValue placeholder="-- انتخاب نوع آرایه RAID یا SHR --" />
+      {/* Step 2 - appears when drives selected */}
+      {hasDrives && (
+        <div className="bg-[#f5f5f5] dark:bg-muted/20 border border-border rounded-lg">
+          <div className="p-5 sm:p-6">
+            <h2 className="flex items-center gap-3 text-[16px] font-bold">
+              <span className="inline-flex items-center justify-center rounded bg-foreground text-background text-[11px] font-bold px-2 py-0.5">Step 2</span>
+              Usage estimate
+            </h2>
+            <a href="#" className="mt-2 inline-flex text-[11px] text-[#2d7ff9] hover:underline">
+              Learn more about RAID types ↗
+            </a>
+
+            <div className="mt-6 space-y-6">
+              {/* RAID A row */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div className="sm:w-[140px] shrink-0">
+                  <Select value={raidA} onValueChange={(v) => setRaidA(v as RaidKey)}>
+                    <SelectTrigger className="h-8 text-[12px]">
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {RAID_OPTIONS.map((option) => (
-                        <SelectItem key={option.key} value={option.key}>
-                          {option.label} — حداقل {nf.format(option.minDisks)} دیسک · {option.faultTolerance}
+                      {RAID_OPTIONS.map((o) => (
+                        <SelectItem key={o.key} value={o.key} className="text-[12px]">
+                          {o.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {selectedOption && (
-                    <div className="mt-3.5 p-3.5 rounded-md bg-muted border border-border text-sm leading-6">
-                      <span className="font-extrabold text-[var(--raid)]">{selectedOption.label}: </span>
-                      {selectedOption.description}
-                    </div>
-                  )}
                 </div>
-
-                <Separator />
-
-                {/* Hot Spare with Slider */}
-                <div className="rounded-md border border-border bg-muted/60 p-4">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <Label className="font-black text-base">دیسک رزرو (Hot Spare)</Label>
-                      <p className="text-[length:var(--paragraph-font-size)] paragraph-color mt-1">
-                        بزرگ‌ترین دیسک‌ها به‌عنوان Spare رزرو می‌شوند و وارد ظرفیت Volume نمی‌شوند.
-                      </p>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center rounded-sm bg-muted px-1.5 py-0.5 text-[10px] font-bold border">
+                      {resultA.valid ? RAID_OPTIONS.find((o) => o.key === raidA)?.short : "!"}
+                    </span>
+                    <div className="flex-1">
+                      <UsageBar result={resultA} driveCount={drives.length} />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setSpareCount((v) => clamp(v - 1, 0, effectiveSpareMax))}
-                        className="h-9 w-9"
-                      >
-                        <MinusIcon className="h-4 w-4" />
-                      </Button>
-                      <div className="w-32">
-                        <Slider
-                          value={[spareCount]}
-                          onValueChange={(v: any) => setSpareCount(Array.isArray(v) ? v[0] : v)}
-                          min={0}
-                          max={effectiveSpareMax}
-                          step={1}
-                        />
-                        <div className="text-center font-black text-lg mt-1">{nf.format(spareCount)}</div>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setSpareCount((v) => clamp(v + 1, 0, effectiveSpareMax))}
-                        className="h-9 w-9"
-                      >
-                        <PlusIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  </div>
+                  <div className="flex gap-2 text-[10px] text-muted-foreground">
+                    <span>Usable: {formatBinary(resultA.usableTb)} • Fault: {resultA.faultTolerance} • Eff: {nf0.format(resultA.efficiency)}%</span>
+                    {resultA.warnings.length > 0 && <span className="text-amber-600">{resultA.warnings[0]}</span>}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
 
-          {/* Right column — Results */}
-          <div className="border-t border-border lg:border-t-0 lg:border-s lg:pt-0 lg:ps-6 pt-4">
-            {!raid || !selectedOption ? (
-              <Card className="my-6 border-dashed bg-muted/40">
-                <CardContent className="p-8 text-center">
-                  <Icon name="disk" className="h-10 w-10 mx-auto paragraph-color mb-3 opacity-60" />
-                  <p className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold font-bold">هیچ نوع RAID انتخاب نشده است</p>
-                  <p className="mt-2 text-[length:var(--paragraph-font-size)] paragraph-color max-w-md mx-auto">
-                    لطفاً برای مشاهده نتیجه محاسبه، نقشه ظرفیت و تحلیل راندمان، یکی از انواع RAID یا SHR را از گزینه‌های بالا انتخاب کنید.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="overflow-hidden">
-                {/* Result header */}
-                <div className="border-b border-border bg-[color-mix(in_oklch,var(--raid)_10%,var(--card))] p-6">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <div className="paragraph-color font-bold">نتیجه نهایی محاسبه برای</div>
-                      <div className="mt-1 text-3xl font-black text-[var(--raid)]">{selectedOption.label}</div>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={result.valid
-                        ? "border-[color-mix(in_oklch,var(--success)_40%,var(--border))] text-[var(--success)] bg-[color-mix(in_oklch,var(--success)_12%,transparent)]"
-                        : "border-[color-mix(in_oklch,var(--danger)_40%,var(--border))] text-[var(--danger)] bg-[color-mix(in_oklch,var(--danger)_12%,transparent)]"
-                      }
-                    >
-                      {result.valid ? "پیکربندی معتبر" : "نیازمند اصلاح دیسک‌ها"}
-                    </Badge>
-                  </div>
-                  <p className="mt-3 paragraph-color">{result.description}</p>
-                </div>
-
-                <CardContent className="space-y-6 p-6">
-                  {/* Stats grid */}
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard label="ظرفیت قابل استفاده" value={formatTb(result.usableTb)} hint="فضای نهایی Volume" tone="accent" />
-                    <StatCard label="بازده ظرفیت" value={`${pf.format(result.efficiency)}٪`} hint="نسبت به دیسک‌های فعال" tone="success" />
-                    <StatCard label="حفاظت / Parity" value={formatTb(result.protectionTb)} hint={result.faultTolerance} />
-                    <StatCard label="بلااستفاده + Spare" value={formatTb(result.unusedTb + result.spareTb)} hint="فضای رزرو یا غیرقابل استفاده" tone="warning" />
-                  </div>
-
-                  {/* Capacity bar */}
-                  <div>
-                    <div className="mb-2 flex items-center justify-between text-sm paragraph-color font-bold">
-                      <span>نقشه توزیع ظرفیت</span>
-                      <span className="paragraph-color">ظرفیت خام کل: {formatTb(result.rawTb)}</span>
-                    </div>
-                    <div className="flex h-6 overflow-hidden rounded-md border border-border bg-muted" aria-label="نمودار ظرفیت RAID">
-                      <Segment label="قابل استفاده" value={result.usableTb} total={barTotal} className="bg-[var(--raid)]" />
-                      <Segment label="حفاظت" value={result.protectionTb} total={barTotal} className="bg-[var(--success)]" />
-                      <Segment label="بلااستفاده" value={result.unusedTb} total={barTotal} className="bg-[var(--warning)]" />
-                      <Segment label="Hot Spare" value={result.spareTb} total={barTotal} className="bg-muted-foreground" />
-                    </div>
-                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm paragraph-color">
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--raid)]" /> قابل استفاده</span>
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--success)]" /> حفاظت</span>
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-[var(--warning)]" /> بلااستفاده</span>
-                      <span className="flex items-center gap-2"><i className="h-3 w-3 rounded-full bg-muted-foreground" /> Spare</span>
-                    </div>
-                  </div>
-
-                  {/* Technical summary */}
-                  <Card className="bg-muted/60">
-                    <CardContent className="p-5">
-                      <div className="mb-3 flex items-center gap-2 font-black text-base">
-                        <Icon name="shield" className="h-5 w-5 text-[var(--raid)]" />
-                        خلاصه فنی پیکربندی
-                      </div>
-                      <dl className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm paragraph-color">
-                        <div>
-                          <dt className="paragraph-color">دیسک فعال</dt>
-                          <dd className="mt-1 font-black text-base text-foreground">{nf.format(drives.length - spareCount)} عدد</dd>
-                        </div>
-                        <div>
-                          <dt className="paragraph-color">Hot Spare</dt>
-                          <dd className="mt-1 font-black text-base text-foreground">{nf.format(spareCount)} عدد</dd>
-                        </div>
-                        <div>
-                          <dt className="paragraph-color">ظرفیت خام فعال</dt>
-                          <dd className="mt-1 font-black text-base text-foreground">{formatTb(result.activeRawTb)}</dd>
-                        </div>
-                        <div>
-                          <dt className="paragraph-color">تحمل خرابی</dt>
-                          <dd className="mt-1 font-black text-base text-foreground">{result.faultTolerance}</dd>
-                        </div>
-                      </dl>
-                    </CardContent>
-                  </Card>
-
-                  {/* Warnings */}
-                  {result.warnings.length > 0 ? (
-                    <div className="space-y-2">
-                      {result.warnings.map((warning) => (
-                        <div key={warning} className="rounded-md border border-[color-mix(in_oklch,var(--warning)_35%,var(--border))] bg-[color-mix(in_oklch,var(--warning)_11%,var(--card))] p-3.5 text-sm">
-                          {warning}
-                        </div>
+              {/* RAID B row */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div className="sm:w-[140px] shrink-0">
+                  <Select value={raidB} onValueChange={(v) => setRaidB(v as RaidKey)}>
+                    <SelectTrigger className="h-8 text-[12px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RAID_OPTIONS.map((o) => (
+                        <SelectItem key={o.key} value={o.key} className="text-[12px]">
+                          {o.label}
+                        </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center rounded-sm bg-muted px-1.5 py-0.5 text-[10px] font-bold border">
+                      {resultB.valid ? RAID_OPTIONS.find((o) => o.key === raidB)?.short : "!"}
+                    </span>
+                    <div className="flex-1">
+                      <UsageBar result={resultB} driveCount={drives.length} />
                     </div>
-                  ) : (
-                    <div className="rounded-md border border-[color-mix(in_oklch,var(--success)_35%,var(--border))] bg-[color-mix(in_oklch,var(--success)_10%,var(--card))] p-3.5 text-sm font-bold text-foreground">
-                      این چیدمان از نظر تعداد دیسک معتبر است و ظرفیت بدون هیچ هشداری محاسبه شد.
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
+                  </div>
+                  <div className="flex gap-2 text-[10px] text-muted-foreground">
+                    <span>Usable: {formatBinary(resultB.usableTb)} • Fault: {resultB.faultTolerance}</span>
+                    {resultB.warnings.length > 0 && <span className="text-amber-600">{resultB.warnings[0]}</span>}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 text-[10px] text-muted-foreground">
+              Results of Synology RAID Calculator are based on a binary storage calculation, not decimal. • Raw: {formatBinary(resultA.rawTb || resultB.rawTb)} • System reserved ~10GB/drive
+            </div>
           </div>
         </div>
-      </Card>
-    </section>
+      )}
+
+      {/* Recommended models — real shop products */}
+      {hasDrives && (
+        <div className="space-y-4">
+          <RecommendedModels driveCount={drives.length} />
+        </div>
+      )}
+
+      {/* Notes like Synology */}
+      <div className="rounded-lg bg-muted/40 border p-4 text-[11px] leading-5 text-muted-foreground space-y-2">
+        <p className="font-bold text-foreground">Notes:</p>
+        <ol className="list-decimal pl-4 space-y-1">
+          <li>
+            <span className="font-medium">Reserved capacity for system</span> is ~10GB per drive for OS/SWAP. {" "}
+            <span className="text-[10px]">Similar to Synology KB.</span>
+          </li>
+          <li>
+            <span className="font-medium">Available capacity</span> after RAID loses 4% for Btrfs metadata, 2% for ext4. Actual data space less than estimate.
+          </li>
+          <li>
+            Synology RAID Calculator recommends models based on total bays. We use real products from your /shop (Brand Synology/QNAP or Bay spec) filtered by bay count ≥ {drives.length}.
+          </li>
+          <li>RAID types and max single volume capacity vary by model. Check DataSheet of each NAS.</li>
+          <li>If using different capacities, use SHR/SHR-2 to minimize unused space — like Synology Hybrid RAID.</li>
+        </ol>
+      </div>
+    </div>
   );
 }
