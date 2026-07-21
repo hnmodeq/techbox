@@ -21,10 +21,12 @@ function getPrismaClient(): PrismaClientInstance {
   // Append connection_limit query param to avoid exhausting the Neon
   // serverless connection pool during dev (Turbopack fires many parallel
   // SSR queries). Default Neon free-tier pool is 3-5 connections.
+  // After P2024 fix, we reduced parallel queries to 1 per request, but keep
+  // limit 10 to handle burst of parallel API routes (/api/stats, /api/modules/enabled, etc.)
   let dbUrl = process.env.DATABASE_URL || "";
   if (dbUrl && !dbUrl.includes("connection_limit=")) {
     const sep = dbUrl.includes("?") ? "&" : "?";
-    dbUrl = dbUrl + sep + "connection_limit=5&pool_timeout=30";
+    dbUrl = dbUrl + sep + "connection_limit=10&pool_timeout=15";
   }
 
   const client = new PrismaClient({
