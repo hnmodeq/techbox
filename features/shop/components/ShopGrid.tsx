@@ -22,14 +22,16 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: "discount",   label: "بیشترین تخفیف" },
 ];
 
-const BRAND_META: Record<string, string> = {
+// Bilingual brand map: English (left) + Farsi (right)
+const BRAND_FA: Record<string, string> = {
   QNAP: "کیونپ", Dell: "دل", HPE: "اچ‌پی‌ای", Synology: "سینولوژی",
   Fortinet: "فورتی‌نت", MikroTik: "میکروتیک", Cisco: "سیسکو", Huawei: "هواوی",
+  Aruba: "آروبا", Juniper: "جونیپر", Netgear: "نت‌گیر",
 };
 
 const PAGE_SIZE = 16;
 
-/** Resolve effective numeric price — priceAmount first, then parse priceLabel */
+/** Resolve effective numeric price for sorting — priceAmount first, then parse priceLabel */
 function resolvePrice(item: ContentItem): number {
   if (item.priceAmount && item.priceAmount > 0) return item.priceAmount;
   const label = item.priceLabel ?? "";
@@ -59,8 +61,12 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const banners = useShopBanners();
 
   const [sort, setSort] = useState<SortKey>("popular");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Sidebar open by default; filter sections collapsed by default
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [priceOpen, setPriceOpen] = useState(false);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
 
   const priceRange = useMemo(() => {
     const prices = items.map(resolvePrice).filter((p) => p > 0);
@@ -78,7 +84,9 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const [brandSearch, setBrandSearch] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const filteredBrands = allBrands.filter(
-    (b) => b.toLowerCase().includes(brandSearch.toLowerCase()) || (BRAND_META[b] || "").includes(brandSearch)
+    (b) =>
+      b.toLowerCase().includes(brandSearch.toLowerCase()) ||
+      (BRAND_FA[b] || "").includes(brandSearch)
   );
 
   const allCategories = useMemo(
@@ -88,10 +96,6 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const [catSearch, setCatSearch] = useState("");
   const [selectedCats, setSelectedCats] = useState<Set<string>>(new Set());
   const filteredCats = allCategories.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()));
-
-  const [priceOpen, setPriceOpen] = useState(true);
-  const [brandOpen, setBrandOpen] = useState(true);
-  const [catOpen, setCatOpen] = useState(true);
 
   const sorted = useMemo(() => {
     let list = [...items];
@@ -138,6 +142,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     setSelectedBrands(new Set()); setSelectedCats(new Set());
   }, []);
 
+  // Format slider labels
   const fmtSliderPrice = (v: number) => {
     if (v >= 1_000_000_000) return (v / 1_000_000_000).toLocaleString("fa-IR", { maximumFractionDigits: 1 }) + " م";
     return Math.round(v / 1_000_000).toLocaleString("fa-IR") + " M";
@@ -187,45 +192,79 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
           </span>
         </div>
 
-        <div className="flex gap-5">
-          {/* Filter Sidebar */}
+        <div className="flex gap-6">
+          {/* ── Filter Sidebar — open by default ── */}
           {sidebarOpen && (
-            <aside className="w-52 shrink-0 space-y-4 text-sm sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" dir="rtl">
-              <div className="flex items-center justify-between">
-                <span className="font-bold">فیلترها</span>
+            <aside className="w-56 shrink-0 space-y-1 text-sm sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" dir="rtl">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b">
+                <span className="font-bold text-sm">فیلترها</span>
                 <div className="flex items-center gap-2">
                   {activeFilterCount > 0 && (
                     <button type="button" onClick={clearAllFilters} className="text-[11px] text-destructive hover:underline">
-                      پاک کردن همه
+                      پاک کردن
                     </button>
                   )}
                   <button type="button" onClick={() => setSidebarOpen(false)}>
-                    <X className="size-4 text-muted-foreground" />
+                    <X className="size-4 text-muted-foreground hover:text-foreground" />
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-b pb-3">
+              {/* فقط کالاهای موجود — toggle */}
+              <div className="flex items-center justify-between py-3 border-b">
                 <span className="text-sm">فقط کالاهای موجود</span>
                 <Switch checked={onlyAvailable} onCheckedChange={setOnlyAvailable} />
               </div>
 
-              <div className="border-b pb-3 space-y-3">
-                <button type="button" onClick={() => setPriceOpen((o) => !o)} className="flex items-center justify-between w-full">
-                  <span className="font-medium text-sm">فیلتر بر اساس قیمت</span>
+              {/* ── قیمت ── */}
+              <div className="border-b">
+                <button
+                  type="button"
+                  onClick={() => setPriceOpen((o) => !o)}
+                  className="flex items-center justify-between w-full py-3 text-sm font-medium"
+                >
+                  <span>فیلتر بر اساس قیمت</span>
                   {priceOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
                 </button>
                 {priceOpen && (
-                  <div className="space-y-3 pt-1">
-                    <Slider
-                      min={priceRange.min} max={priceRange.max}
-                      step={Math.max(1_000_000, Math.round((priceRange.max - priceRange.min) / 100))}
-                      value={effectivePrice}
-                      onValueChange={(v) => setPriceFilter(v as [number, number])}
-                    />
+                  <div className="pb-4 space-y-3">
+                    {/* Slider — uses onValueCommit to avoid jump bug */}
+                    <div className="px-1">
+                      <Slider
+                        min={priceRange.min}
+                        max={priceRange.max}
+                        step={Math.max(5_000_000, Math.round((priceRange.max - priceRange.min) / 50))}
+                        value={effectivePrice}
+                        onValueChange={(v) => setPriceFilter(v as [number, number])}
+                      />
+                    </div>
                     <div className="flex justify-between text-[10px] text-muted-foreground" dir="ltr">
                       <span>{fmtSliderPrice(effectivePrice[0])}</span>
                       <span>{fmtSliderPrice(effectivePrice[1])}</span>
+                    </div>
+                    {/* Manual min/max inputs as an alternative — more reliable than slider */}
+                    <div className="grid grid-cols-2 gap-2" dir="ltr">
+                      <Input
+                        type="number"
+                        placeholder="از"
+                        className="h-7 text-xs"
+                        value={effectivePrice[0] === priceRange.min ? "" : effectivePrice[0]}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          if (!isNaN(v)) setPriceFilter([v, effectivePrice[1]]);
+                        }}
+                      />
+                      <Input
+                        type="number"
+                        placeholder="تا"
+                        className="h-7 text-xs"
+                        value={effectivePrice[1] === priceRange.max ? "" : effectivePrice[1]}
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          if (!isNaN(v)) setPriceFilter([effectivePrice[0], v]);
+                        }}
+                      />
                     </div>
                     {priceFilter && (
                       <button type="button" onClick={() => setPriceFilter(null)} className="text-[11px] text-destructive hover:underline">
@@ -236,26 +275,46 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 )}
               </div>
 
-              <div className="border-b pb-3 space-y-2">
-                <button type="button" onClick={() => setBrandOpen((o) => !o)} className="flex items-center justify-between w-full">
-                  <span className="font-medium text-sm">برندها</span>
+              {/* ── برندها ── */}
+              <div className="border-b">
+                <button
+                  type="button"
+                  onClick={() => setBrandOpen((o) => !o)}
+                  className="flex items-center justify-between w-full py-3 text-sm font-medium"
+                >
+                  <span>برندها</span>
                   {brandOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
                 </button>
                 {brandOpen && (
-                  <div className="space-y-2">
+                  <div className="pb-4 space-y-2">
                     <div className="relative">
                       <Search className="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
-                      <Input value={brandSearch} onChange={(e) => setBrandSearch(e.target.value)} placeholder="جستجوی برند…" className="h-7 text-xs pr-6" />
+                      <Input
+                        value={brandSearch}
+                        onChange={(e) => setBrandSearch(e.target.value)}
+                        placeholder="جستجوی برند…"
+                        className="h-7 text-xs pr-6"
+                      />
                     </div>
-                    <div className="max-h-40 overflow-y-auto space-y-1.5">
+                    <div className="max-h-40 overflow-y-auto space-y-1">
                       {filteredBrands.map((brand) => (
-                        <label key={brand} className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={selectedBrands.has(brand)}
-                            onChange={(e) => { const n = new Set(selectedBrands); e.target.checked ? n.add(brand) : n.delete(brand); setSelectedBrands(n); }}
-                            className="rounded border-gray-300 size-3.5" />
-                          <span className="text-xs">
-                            {brand}
-                            {BRAND_META[brand] && <span className="text-muted-foreground"> ({BRAND_META[brand]})</span>}
+                        <label key={brand} className="flex items-center cursor-pointer py-0.5">
+                          <input
+                            type="checkbox"
+                            checked={selectedBrands.has(brand)}
+                            onChange={(e) => {
+                              const n = new Set(selectedBrands);
+                              e.target.checked ? n.add(brand) : n.delete(brand);
+                              setSelectedBrands(n);
+                            }}
+                            className="rounded border-gray-300 size-3.5 shrink-0 ml-2"
+                          />
+                          {/* English left — Farsi right, single line */}
+                          <span className="flex items-center justify-between flex-1 min-w-0" dir="ltr">
+                            <span className="text-xs font-medium text-foreground">{brand}</span>
+                            {BRAND_FA[brand] && (
+                              <span className="text-xs text-muted-foreground mr-1" dir="rtl">{BRAND_FA[brand]}</span>
+                            )}
                           </span>
                         </label>
                       ))}
@@ -265,23 +324,40 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 )}
               </div>
 
-              <div className="pb-3 space-y-2">
-                <button type="button" onClick={() => setCatOpen((o) => !o)} className="flex items-center justify-between w-full">
-                  <span className="font-medium text-sm">کاربری</span>
+              {/* ── کاربری ── */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setCatOpen((o) => !o)}
+                  className="flex items-center justify-between w-full py-3 text-sm font-medium"
+                >
+                  <span>کاربری</span>
                   {catOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
                 </button>
                 {catOpen && (
-                  <div className="space-y-2">
+                  <div className="pb-4 space-y-2">
                     <div className="relative">
                       <Search className="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
-                      <Input value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="جستجوی دسته‌بندی…" className="h-7 text-xs pr-6" />
+                      <Input
+                        value={catSearch}
+                        onChange={(e) => setCatSearch(e.target.value)}
+                        placeholder="جستجوی دسته‌بندی…"
+                        className="h-7 text-xs pr-6"
+                      />
                     </div>
-                    <div className="max-h-40 overflow-y-auto space-y-1.5">
+                    <div className="max-h-40 overflow-y-auto space-y-1">
                       {filteredCats.map((cat) => (
-                        <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                          <input type="checkbox" checked={selectedCats.has(cat)}
-                            onChange={(e) => { const n = new Set(selectedCats); e.target.checked ? n.add(cat) : n.delete(cat); setSelectedCats(n); }}
-                            className="rounded border-gray-300 size-3.5" />
+                        <label key={cat} className="flex items-center gap-2 cursor-pointer py-0.5">
+                          <input
+                            type="checkbox"
+                            checked={selectedCats.has(cat)}
+                            onChange={(e) => {
+                              const n = new Set(selectedCats);
+                              e.target.checked ? n.add(cat) : n.delete(cat);
+                              setSelectedCats(n);
+                            }}
+                            className="rounded border-gray-300 size-3.5"
+                          />
                           <span className="text-xs">{cat}</span>
                         </label>
                       ))}
@@ -293,20 +369,22 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
             </aside>
           )}
 
-          {/* Product grid */}
+          {/* ── Product grid ── */}
           <div className="flex-1 min-w-0">
             {sorted.length === 0 ? (
               <div className="text-center py-20 text-muted-foreground">محصولی یافت نشد</div>
             ) : (
               <>
+                {/* Wider cards: 3 cols with sidebar, 4 without */}
                 <div className={cn(
-                  "grid gap-4",
+                  "grid gap-5",
                   sidebarOpen
-                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                    ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
                     : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
                 )}>
                   {visible.map((p) => <ShopProductCard key={p.slug} product={p} />)}
                 </div>
+
                 {visibleCount < sorted.length && (
                   <div ref={loaderRef} className="flex justify-center py-10">
                     <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
