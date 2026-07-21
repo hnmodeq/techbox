@@ -46,7 +46,8 @@ function useShopBanners(): ShopBannerItem[] {
 export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("shop");
   const { items: dbItems } = useDbPosts("shop", fallbackItems, 200);
-  const items = serverItems && serverItems.length > 0 ? serverItems : dbItems;
+  // Prefer live API data; fall back to SSR items only while client fetch is pending
+  const items = dbItems.length > 0 ? dbItems : (serverItems ?? fallbackItems);
   const banners = useShopBanners();
 
   const [sort, setSort] = useState<SortKey>("popular");
