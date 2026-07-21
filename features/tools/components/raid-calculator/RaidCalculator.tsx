@@ -7,6 +7,16 @@ import { cn } from "@/lib/utils";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
 export type Drive = { id: string; sizeTb: number; label: string; type: "HDD" | "SSD" };
@@ -338,6 +348,8 @@ export default function RaidCalculator() {
   const [driveType, setDriveType] = useState<"HDD" | "SSD">("HDD");
   const [raidA, setRaidA] = useState<RaidKey>("raid5");
   const [raidB, setRaidB] = useState<RaidKey>("raid6");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingType, setPendingType] = useState<"HDD" | "SSD" | null>(null);
 
   const currentSizes = driveType === "HDD" ? HDD_SIZES : SSD_SIZES;
 
@@ -375,13 +387,10 @@ export default function RaidCalculator() {
               <button
                 key={t}
                 onClick={() => {
-                  // Synology behavior: switching drive type resets calculator – mixing HDD+SSD in same RAID is blocked by vendors
                   if (t !== driveType && drives.length > 0) {
-                    if (confirm(`تغییر نوع دیسک از ${driveType} به ${t} باعث پاک شدن دیسک‌های انتخابی فعلی می‌شود (همان رفتار سینولوژی). آیا مطمئن هستید؟\nSwitching drive type will reset selection because HDD+SSD cannot be mixed in same RAID (QNAP/Dell/Synology).`)) {
-                      setDrives([]);
-                    } else {
-                      return;
-                    }
+                    setPendingType(t);
+                    setConfirmOpen(true);
+                    return;
                   }
                   setDriveType(t);
                 }}
@@ -597,6 +606,42 @@ export default function RaidCalculator() {
           </li>
         </ol>
       </div>
+
+      {/* Shadcn Dialog for HDD ↔ SSD switch – replaces browser confirm */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent dir="rtl" className="max-w-[360px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-[14px] font-black">تغییر نوع دیسک</AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] leading-6">
+              تغییر نوع دیسک از <b className="text-foreground">{driveType}</b> به <b className="text-foreground">{pendingType}</b> باعث بازنشانی تنظیمات فعلی میشود
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row justify-start gap-2 sm:justify-start">
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingType) {
+                  setDrives([]);
+                  setDriveType(pendingType);
+                }
+                setConfirmOpen(false);
+                setPendingType(null);
+              }}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
+            >
+              مشکلی نیست
+            </AlertDialogAction>
+            <AlertDialogCancel
+              onClick={() => {
+                setConfirmOpen(false);
+                setPendingType(null);
+              }}
+              className="min-w-[80px]"
+            >
+              انصراف
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
