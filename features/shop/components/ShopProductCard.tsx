@@ -105,9 +105,9 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       href={`/shop/${p.slug}`}
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
     >
-      {/* Image — white bg, generous padding keeps image visually small */}
-      <div className="relative w-full bg-white" style={{ paddingBottom: "75%" }}>
-        <div className="absolute inset-0 flex items-center justify-center px-16 py-12">
+      {/* Image — fixed height container, generous padding keeps image small */}
+      <div className="relative w-full bg-white h-52">
+        <div className="absolute inset-0 flex items-center justify-center p-10">
           <Image
             src={p.image || "/assets/blog-1.jpg"}
             alt={p.title}
