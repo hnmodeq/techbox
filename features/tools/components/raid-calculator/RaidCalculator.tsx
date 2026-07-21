@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { XIcon, HardDrive } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDbPosts } from "@/hooks/useDbPosts";
@@ -48,17 +47,16 @@ type RaidOption = {
 
 export const RAID_OPTIONS: RaidOption[] = [
   { key: "basic", label: "Basic", short: "Basic", minDisks: 1, protected: false, description: "هر دیسک مستقل – بیشترین ظرفیت، بدون تحمل خرابی.", faultTolerance: "ندارد" },
-  { key: "jbod", label: "JBOD", short: "JBOD", minDisks: 1, protected: false, description: "ترکیب ظرفیت دیسک‌ها در یک Volume.", faultTolerance: "ندارد" },
-  { key: "raid0", label: "RAID 0", short: "R0", minDisks: 2, protected: false, description: "Striping برای کارایی بالا، بدون تحمل خرابی.", faultTolerance: "ندارد" },
-  { key: "raid1", label: "RAID 1", short: "R1", minDisks: 2, protected: true, description: "Mirror کامل – امنیت بالا.", faultTolerance: "تحمل خرابی n-1 دیسک" },
-  { key: "raid5", label: "RAID 5", short: "R5", minDisks: 3, protected: true, description: "یک دیسک Parity – تعادل ظرفیت و امنیت.", faultTolerance: "تحمل خرابی ۱ دیسک" },
-  { key: "raid6", label: "RAID 6", short: "R6", minDisks: 4, protected: true, description: "دو Parity – مناسب آرایه‌های بزرگ.", faultTolerance: "تحمل خرابی ۲ دیسک" },
-  { key: "raid10", label: "RAID 10", short: "R10", minDisks: 4, protected: true, description: "Mirror + Stripe.", faultTolerance: "حداقل ۱ دیسک" },
+  { key: "jbod", label: "JBOD", short: "JBOD", minDisks: 1, protected: false, description: "ترکیب ظرفیت دیسک‌ها در یک Volume پیوسته.", faultTolerance: "ندارد" },
+  { key: "raid0", label: "RAID 0", short: "RAID 0", minDisks: 2, protected: false, description: "Striping برای کارایی بالا، بدون تحمل خرابی.", faultTolerance: "ندارد" },
+  { key: "raid1", label: "RAID 1", short: "RAID 1", minDisks: 2, protected: true, description: "Mirror کامل – امنیت بالا، تحمل خرابی تا n-1 دیسک.", faultTolerance: "تحمل خرابی n-1 دیسک" },
+  { key: "raid5", label: "RAID 5", short: "RAID 5", minDisks: 3, protected: true, description: "یک دیسک Parity – تعادل ظرفیت و امنیت.", faultTolerance: "تحمل خرابی ۱ دیسک" },
+  { key: "raid6", label: "RAID 6", short: "RAID 6", minDisks: 4, protected: true, description: "دو Parity – مناسب آرایه‌های بزرگ و حساس.", faultTolerance: "تحمل خرابی ۲ دیسک" },
+  { key: "raid10", label: "RAID 10", short: "RAID 10", minDisks: 4, protected: true, description: "Mirror + Stripe – کارایی و امنیت.", faultTolerance: "حداقل ۱ دیسک" },
   { key: "shr1", label: "SHR", short: "SHR", minDisks: 2, protected: true, description: "Synology Hybrid RAID – بهینه برای دیسک‌های نامساوی.", faultTolerance: "تحمل خرابی ۱ دیسک" },
-  { key: "shr2", label: "SHR-2", short: "SHR2", minDisks: 4, protected: true, description: "SHR با تحمل ۲ دیسک – مناسب آرایه‌های حساس.", faultTolerance: "تحمل خرابی ۲ دیسک" },
+  { key: "shr2", label: "SHR-2", short: "SHR-2", minDisks: 4, protected: true, description: "SHR با تحمل ۲ دیسک – مناسب آرایه‌های بزرگ.", faultTolerance: "تحمل خرابی ۲ دیسک" },
 ];
 
-// HDD sizes like screenshot 1: 24,20,18,16,14,12,10,8,6,4,3,2,1 TB
 const HDD_SIZES: { tb: number; label: string }[] = [
   { tb: 24, label: "۲۴ ترابایت" },
   { tb: 20, label: "۲۰ ترابایت" },
@@ -74,14 +72,13 @@ const HDD_SIZES: { tb: number; label: string }[] = [
   { tb: 2, label: "۲ ترابایت" },
   { tb: 1, label: "۱ ترابایت" },
 ];
-// SSD sizes like screenshot 2: 7.68TB, 7TB, 3.84TB, 1.92TB, 960GB, 480GB
-const SSD_SIZES: { tb: number; label: string; labelEn: string }[] = [
-  { tb: 7.68, label: "۷.۶۸ ترابایت", labelEn: "7.68 TB" },
-  { tb: 7, label: "۷ ترابایت", labelEn: "7 TB" },
-  { tb: 3.84, label: "۳.۸۴ ترابایت", labelEn: "3.84 TB" },
-  { tb: 1.92, label: "۱.۹۲ ترابایت", labelEn: "1.92 TB" },
-  { tb: 0.96, label: "۹۶۰ گیگابایت", labelEn: "960 GB" },
-  { tb: 0.48, label: "۴۸۰ گیگابایت", labelEn: "480 GB" },
+const SSD_SIZES: { tb: number; label: string }[] = [
+  { tb: 7.68, label: "۷.۶۸ ترابایت" },
+  { tb: 7, label: "۷ ترابایت" },
+  { tb: 3.84, label: "۳.۸۴ ترابایت" },
+  { tb: 1.92, label: "۱.۹۲ ترابایت" },
+  { tb: 0.96, label: "۹۶۰ گیگابایت" },
+  { tb: 0.48, label: "۴۸۰ گیگابایت" },
 ];
 
 function uid() {
@@ -90,7 +87,6 @@ function uid() {
 function sum(v: number[]) {
   return v.reduce((a, b) => a + b, 0);
 }
-const nfFa = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 1 });
 const nfFa0 = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 });
 
 function calculateShr(sizes: number[], parity: 1 | 2) {
@@ -108,16 +104,12 @@ function calculateShr(sizes: number[], parity: 1 | 2) {
       if (members >= 2) {
         usable += (members - 1) * slice;
         protection += slice;
-      } else {
-        unused += members * slice;
-      }
+      } else unused += members * slice;
     } else {
       if (members >= 3) {
         usable += (members - 2) * slice;
         protection += 2 * slice;
-      } else {
-        unused += members * slice;
-      }
+      } else unused += members * slice;
     }
     prev = b;
   }
@@ -154,7 +146,6 @@ export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount = 0)
   const n = active.length;
   const min = n ? Math.min(...active) : 0;
   const warnings: string[] = [];
-
   let usableTb = 0,
     protectionTb = 0,
     unusedTb = 0;
@@ -208,24 +199,9 @@ export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount = 0)
       }
       break;
   }
-
   const valid = n >= option.minDisks && !(raidKey === "raid10" && n % 2 !== 0);
   const efficiency = activeRawTb > 0 ? (usableTb / activeRawTb) * 100 : 0;
-
-  return {
-    usableTb,
-    protectionTb,
-    unusedTb,
-    rawTb,
-    activeRawTb,
-    spareTb,
-    valid,
-    minDisks: option.minDisks,
-    warnings,
-    description: option.description,
-    faultTolerance: option.faultTolerance,
-    efficiency,
-  };
+  return { usableTb, protectionTb, unusedTb, rawTb, activeRawTb, spareTb, valid, minDisks: option.minDisks, warnings, description: option.description, faultTolerance: option.faultTolerance, efficiency };
 }
 
 const BINARY_FACTOR = 1000 ** 4 / 1024 ** 4;
@@ -243,7 +219,6 @@ function formatFaTb(tb: number) {
   if (tb < 1) return `${(tb * 1000).toLocaleString("fa-IR")} گیگابایت`;
   return `${tb.toLocaleString("fa-IR", { maximumFractionDigits: 2 })} ترابایت`;
 }
-
 function parseBay(specs: any): number | null {
   if (!specs || typeof specs !== "object") return null;
   const v = specs["Bay"] ?? specs["bay"] ?? specs["Bays"] ?? specs["تعداد Bay"];
@@ -256,7 +231,6 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
   const fallback = getModuleItems("shop");
   const { items: dbItems } = useDbPosts("shop", fallback, 120);
   const items = dbItems.length > 0 ? dbItems : fallback;
-
   const filtered = useMemo(() => {
     if (driveCount === 0) return [];
     const candidates = items.filter((p) => {
@@ -267,28 +241,21 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
       const bay = parseBay(p.specs);
       return isNasBrand || isNasCat || bay !== null;
     });
-
     const withBay = candidates
       .map((p) => ({ p, bay: parseBay(p.specs) ?? 999 }))
       .filter(({ bay }) => bay >= driveCount)
       .sort((a, b) => a.bay - b.bay)
       .slice(0, 10)
       .map(({ p }) => p);
-
     if (withBay.length >= 2) return withBay;
-    // fallback to any real product with image if not enough NAS
     return items.filter((p) => p.image).slice(0, 10);
   }, [items, driveCount]);
-
   if (driveCount === 0) return null;
-
   return (
     <div className="space-y-4">
       <h3 className="text-[18px] font-black">مدل‌های پیشنهادی</h3>
-      <p className="text-[12px] text-muted-foreground">
-        بر اساس تعداد دیسک انتخابی ({driveCount.toLocaleString("fa-IR")} عدد) – مدل‌های واقعی از فروشگاه تکباکس
-      </p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-px bg-border border border-border rounded-lg overflow-hidden">
+      <p className="text-[12px] text-muted-foreground">بر اساس {driveCount.toLocaleString("fa-IR")} دیسک – مدل‌های واقعی از فروشگاه تکباکس</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-px bg-border border rounded-lg overflow-hidden">
         {filtered.map((p) => (
           <Link key={p.slug} href={`/shop/${p.slug}`} className="group bg-card p-4 flex flex-col items-center gap-3 hover:bg-accent hover:text-accent-foreground transition-colors">
             <div className="relative w-full aspect-[4/3] bg-transparent">
@@ -309,7 +276,7 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
 }
 
 function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: number }) {
-  const reservedDecimal = driveCount * 0.01; // 10GB
+  const reservedDecimal = driveCount * 0.01;
   const reservedBinary = toBinary(reservedDecimal);
   const usableBinary = Math.max(0, toBinary(result.usableTb) - reservedBinary);
   const protectionBinary = toBinary(result.protectionTb);
@@ -324,8 +291,9 @@ function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: numb
   ].filter((s) => s.value > 0.005);
 
   return (
-    <div className="space-y-2.5">
-      <div className="flex h-7 w-full overflow-hidden rounded-md bg-muted border shadow-inner">
+    <div className="space-y-3">
+      {/* Strong height bar – h-11 with smooth transition */}
+      <div className="flex h-11 w-full overflow-hidden rounded-lg bg-muted border shadow-inner">
         {segs.map((s, i) => (
           <Tooltip key={i}>
             <TooltipTrigger
@@ -342,10 +310,10 @@ function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: numb
           </Tooltip>
         ))}
       </div>
-      <div className="flex flex-wrap gap-3 text-[10px]">
+      <div className="flex flex-wrap gap-3 text-[11px]">
         {segs.map((s, i) => (
           <span key={i} className="flex items-center gap-1.5">
-            <span className={cn("size-2.5 rounded-[2px]", s.color)} />
+            <span className={cn("size-3 rounded-[2px]", s.color)} />
             <span className="text-muted-foreground">
               {s.label} {s.value > 0 ? `• ${formatFaBinary(s.value / BINARY_FACTOR)}` : ""}
             </span>
@@ -359,8 +327,7 @@ function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: numb
 export default function RaidCalculator() {
   const [drives, setDrives] = useState<Drive[]>([]);
   const [driveType, setDriveType] = useState<"HDD" | "SSD">("HDD");
-  const [raidA, setRaidA] = useState<RaidKey>("raid5");
-  const [raidB, setRaidB] = useState<RaidKey>("raid6");
+  const [raid, setRaid] = useState<RaidKey>("raid5");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingType, setPendingType] = useState<"HDD" | "SSD" | null>(null);
 
@@ -378,283 +345,248 @@ export default function RaidCalculator() {
   const removeDrive = (id: string) => setDrives((p) => p.filter((d) => d.id !== id));
   const reset = () => setDrives([]);
 
-  const resultA = useMemo(() => calculateRaid(raidA, drives, 0), [raidA, drives]);
-  const resultB = useMemo(() => calculateRaid(raidB, drives, 0), [raidB, drives]);
-
+  const result = useMemo(() => calculateRaid(raid, drives, 0), [raid, drives]);
   const hasDrives = drives.length > 0;
+  const selectedOption = RAID_OPTIONS.find((o) => o.key === raid);
 
   return (
-    <TooltipProvider delay={100}>
+    <TooltipProvider delay={80}>
       <div className="w-full max-w-[1280px] mx-auto space-y-8" dir="rtl">
-      {/* Step 1 */}
-      <div className="bg-card text-card-foreground border border-border rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 sm:px-6 py-4 border-b bg-muted/30 flex items-center gap-3">
-          <span className="inline-flex items-center justify-center rounded-md bg-foreground text-background text-[11px] font-black px-2.5 py-1">مرحله ۱</span>
-          <h2 className="text-[16px] sm:text-[18px] font-black">انتخاب دیسک‌ها</h2>
-        </div>
-
-        <div className="p-5 sm:p-6 space-y-6">
-          {/* HDD / SSD tabs – with proper tokens & hover contrast */}
-          <div className="flex gap-1 border-b border-border">
-            {(["HDD", "SSD"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  if (t !== driveType && drives.length > 0) {
-                    setPendingType(t);
-                    setConfirmOpen(true);
-                    return;
-                  }
-                  setDriveType(t);
-                }}
-                className={cn(
-                  "relative px-5 py-2.5 text-[13px] font-bold border-b-2 -mb-px transition-colors",
-                  driveType === t
-                    ? "border-primary text-primary bg-primary/5"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent-foreground/20"
-                )}
-              >
-                {t === "HDD" ? "هارد دیسک (HDD)" : "اس اس دی (SSD)"}
-              </button>
-            ))}
+        {/* Step 1 */}
+        <div className="bg-card text-card-foreground border border-border rounded-xl shadow-sm overflow-hidden">
+          <div className="px-5 sm:px-6 py-4 border-b bg-muted/30 flex items-center gap-3">
+            <span className="inline-flex items-center justify-center rounded-md bg-foreground text-background text-[11px] font-black px-2.5 py-1">مرحله ۱</span>
+            <h2 className="text-[16px] sm:text-[18px] font-black">انتخاب دیسک‌ها</h2>
           </div>
 
-          {/* Size pills – HDD vs SSD different */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
-            {currentSizes.map((o) => {
-              const c = counts.get(o.tb) || 0;
-              const isSelected = c > 0;
-              return (
+          <div className="p-5 sm:p-6 space-y-6">
+            <div className="flex gap-1 border-b border-border">
+              {(["HDD", "SSD"] as const).map((t) => (
                 <button
-                  key={`${o.tb}-${o.label}`}
-                  onClick={() => addDrive(o.tb, o.label)}
+                  key={t}
+                  onClick={() => {
+                    if (t !== driveType && drives.length > 0) {
+                      setPendingType(t);
+                      setConfirmOpen(true);
+                      return;
+                    }
+                    setDriveType(t);
+                  }}
                   className={cn(
-                    "group relative flex items-center justify-between rounded-md border px-3 py-2.5 text-[12px] font-medium transition-all",
-                    "bg-card text-card-foreground border-border",
-                    "hover:border-primary hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    isSelected &&
-                      "bg-primary text-primary-foreground border-primary shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                    "relative px-5 py-2.5 text-[13px] font-bold border-b-2 -mb-px transition-all duration-200",
+                    driveType === t ? "border-primary text-primary bg-primary/5" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent-foreground/20"
                   )}
                 >
-                  <span className="truncate">{o.label}</span>
-                  {isSelected ? (
-                    <span className="mr-2 inline-flex size-5 items-center justify-center rounded-full bg-primary-foreground text-primary text-[11px] font-black">
-                      {c.toLocaleString("fa-IR")}
-                    </span>
-                  ) : (
-                    <span className="mr-2 opacity-0 group-hover:opacity-100 transition text-[10px] text-muted-foreground group-hover:text-accent-foreground">+ افزودن</span>
-                  )}
+                  {t === "HDD" ? "هارد دیسک (HDD)" : "اس اس دی (SSD)"}
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
 
-          {/* Selected tray – tokens, light/dark, fixed 10 slots, invisible overlay to prevent shift */}
-          <div className="relative rounded-lg border border-border bg-muted dark:bg-muted/40 p-3 sm:p-4 min-h-[130px] shadow-inner">
-            <div className="flex flex-wrap gap-2.5 sm:gap-3">
-              {drives.map((d) => (
-                <div
-                  key={d.id}
-                  className={cn(
-                    "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-all duration-300 ease-out animate-in fade-in zoom-in-95",
-                    d.type === "SSD"
-                      ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 hover:border-primary/30"
-                      : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20"
-                  )}
-                >
-                  <HardDrive className={cn("size-6 transition", d.type === "SSD" ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground")} />
-                  <span className="text-[11px] font-bold">{d.label}</span>
-                  <span className={cn("text-[9px] px-1.5 py-0.5 rounded-md font-medium", d.type === "SSD" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>{d.type}</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+              {currentSizes.map((o) => {
+                const c = counts.get(o.tb) || 0;
+                const isSelected = c > 0;
+                return (
                   <button
-                    onClick={() => removeDrive(d.id)}
-                    className="absolute -top-2 -right-2 size-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
-                    aria-label="حذف"
+                    key={`${o.tb}-${o.label}`}
+                    onClick={() => addDrive(o.tb, o.label)}
+                    className={cn(
+                      "group relative flex items-center justify-between rounded-md border px-3 py-2.5 text-[12px] font-medium transition-all duration-200",
+                      "bg-card text-card-foreground border-border hover:border-primary hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
+                      isSelected && "bg-primary text-primary-foreground border-primary shadow-sm hover:bg-primary/90"
+                    )}
                   >
-                    <XIcon className="size-3.5" />
+                    <span className="truncate">{o.label}</span>
+                    {isSelected ? (
+                      <span className="mr-2 inline-flex size-5 items-center justify-center rounded-full bg-primary-foreground text-primary text-[11px] font-black">
+                        {c.toLocaleString("fa-IR")}
+                      </span>
+                    ) : (
+                      <span className="mr-2 opacity-0 group-hover:opacity-100 transition text-[10px]">+ افزودن</span>
+                    )}
                   </button>
-                </div>
-              ))}
-              {Array.from({ length: Math.max(0, 10 - drives.length) }).map((_, i) => (
-                <div key={`ph-${i}`} className="h-[92px] w-[84px] rounded-md bg-background/60 dark:bg-card/40 border border-dashed border-border/60" />
-              ))}
+                );
+              })}
             </div>
-            {/* Empty overlay – invisible placeholder keeps layout, no shift when drives appear */}
-            {drives.length === 0 ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-lg bg-muted/90 dark:bg-muted/70 backdrop-blur-[1px] text-[12px] text-muted-foreground pointer-events-none">
-                <HardDrive className="size-6 opacity-60" />
-                <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
-              </div>
-            ) : (
-              <div className="absolute inset-0 pointer-events-none invisible flex flex-col items-center justify-center gap-1 text-[12px] text-muted-foreground">
-                <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
-              </div>
-            )}
-          </div>
 
-          <div className="flex items-center justify-between text-[12px] text-muted-foreground pt-1">
-            <span>
-              تعداد کل دیسک‌ها: <b className="text-foreground">{drives.length.toLocaleString("fa-IR")}</b>
-            </span>
-            <button onClick={reset} className="rounded-md border border-border px-3 py-1.5 text-[11px] font-medium hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20 transition-colors">
-              بازنشانی
-            </button>
+            <div className="relative rounded-lg border border-border bg-muted dark:bg-muted/40 p-3 sm:p-4 min-h-[130px] shadow-inner">
+              <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                {drives.map((d) => (
+                  <div
+                    key={d.id}
+                    className={cn(
+                      "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-all duration-300 ease-out animate-in fade-in zoom-in-95",
+                      d.type === "SSD" ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20" : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground"
+                    )}
+                  >
+                    <HardDrive className={cn("size-6", d.type === "SSD" ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground")} />
+                    <span className="text-[11px] font-bold">{d.label}</span>
+                    <span className={cn("text-[9px] px-1.5 py-0.5 rounded-md", d.type === "SSD" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>{d.type}</span>
+                    <button onClick={() => removeDrive(d.id)} className="absolute -top-2 -right-2 size-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground transition-all">
+                      <XIcon className="size-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {Array.from({ length: Math.max(0, 10 - drives.length) }).map((_, i) => (
+                  <div key={`ph-${i}`} className="h-[92px] w-[84px] rounded-md bg-background/60 dark:bg-card/40 border border-dashed border-border/60 transition-all duration-300" />
+                ))}
+              </div>
+              {drives.length === 0 ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-lg bg-muted/90 dark:bg-muted/70 backdrop-blur-[1px] text-[12px] text-muted-foreground pointer-events-none">
+                  <HardDrive className="size-6 opacity-60" />
+                  <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
+                </div>
+              ) : (
+                <div className="absolute inset-0 pointer-events-none invisible" />
+              )}
+            </div>
+
+            <div className="flex items-center justify-between text-[12px] text-muted-foreground pt-1">
+              <span>
+                تعداد کل دیسک‌ها: <b className="text-foreground">{drives.length.toLocaleString("fa-IR")}</b>
+              </span>
+              <button onClick={reset} className="rounded-md border border-border px-3 py-1.5 text-[11px] font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
+                بازنشانی
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Step 2 – only when drives selected */}
-      {hasDrives && (
-        <div className="bg-[#f6f6f7] dark:bg-muted/20 border border-border rounded-xl overflow-hidden">
-          <div className="px-5 sm:px-6 py-5">
-            <div className="flex items-center gap-3">
-              <span className="inline-flex items-center justify-center rounded-md bg-foreground text-background text-[11px] font-black px-2.5 py-1">مرحله ۲</span>
-              <h2 className="text-[16px] sm:text-[18px] font-black">برآورد فضای قابل استفاده</h2>
-            </div>
+        {/* Step 2 – single RAID calculator */}
+        {hasDrives && (
+          <div className="bg-[#f6f6f7] dark:bg-muted/20 border border-border rounded-xl overflow-hidden">
+            <div className="px-5 sm:px-6 py-5 space-y-5">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center justify-center rounded-md bg-foreground text-background text-[11px] font-black px-2.5 py-1">مرحله ۲</span>
+                <h2 className="text-[16px] sm:text-[18px] font-black">برآورد فضای قابل استفاده</h2>
+              </div>
 
-            <div className="mt-6 space-y-6 bg-card rounded-lg border p-4 sm:p-5">
-              {/* RAID A */}
-              <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
-                <div className="lg:w-[300px] shrink-0">
-                  <Select value={raidA} onValueChange={(v) => setRaidA(v as RaidKey)}>
-                    <SelectTrigger className="h-11 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-all duration-200 w-full">
-                      <SelectValue>
-                        {RAID_OPTIONS.find((o) => o.key === raidA)?.label} - {RAID_OPTIONS.find((o) => o.key === raidA)?.faultTolerance}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent className="min-w-[520px] max-w-[95vw] max-h-[380px] animate-in fade-in-0 zoom-in-95 duration-200">
-                      {RAID_OPTIONS.map((o) => (
-                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-3 whitespace-normal leading-6 data-[state=checked]:bg-accent">
-                          <div className="flex flex-col text-right">
-                            <span className="font-bold">
-                              {o.label} - {o.faultTolerance}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground whitespace-normal leading-5">{o.description}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="bg-card rounded-xl border p-4 sm:p-6 space-y-5">
+                {/* RAID Buttons – short titles, tooltip with description */}
+                <div className="flex flex-wrap gap-2">
+                  {RAID_OPTIONS.map((o) => {
+                    const isActive = raid === o.key;
+                    return (
+                      <Tooltip key={o.key}>
+                        <TooltipTrigger
+                          render={
+                            <button
+                              onClick={() => setRaid(o.key)}
+                              className={cn(
+                                "rounded-full px-4 py-2 text-[12px] font-bold border transition-all duration-200",
+                                isActive
+                                  ? "bg-primary text-primary-foreground border-primary shadow-md scale-[1.02]"
+                                  : "bg-card border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:border-primary/30 hover:scale-[1.02]"
+                              )}
+                            >
+                              {o.label}
+                            </button>
+                          }
+                        />
+                        <TooltipContent className="max-w-[260px] text-right leading-5 text-[11px]">
+                          <p className="font-bold">{o.label} – {o.faultTolerance}</p>
+                          <p className="text-muted-foreground mt-1">{o.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
                 </div>
-                <div className="flex-1 space-y-2 pt-1">
-                  <UsageBar result={resultA} driveCount={drives.length} />
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] sm:text-[11px] text-muted-foreground pr-1">
-                    <span>قابل استفاده: <b className="text-foreground">{formatFaBinary(resultA.usableTb)}</b></span>
-                    <span>تحمل خطا: <b className="text-foreground">{resultA.faultTolerance}</b></span>
-                    <span>بازده: <b className="text-foreground">{nfFa0.format(resultA.efficiency)}٪</b></span>
-                    {resultA.warnings.map((w, i) => (
-                      <span key={i} className="text-amber-600 dark:text-amber-400">⚠ {w}</span>
-                    ))}
+
+                {/* Animated strong height bar */}
+                <div className="space-y-4">
+                  <UsageBar result={result} driveCount={drives.length} />
+
+                  {/* Information area below progress bar – like other infos */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 rounded-lg bg-muted/30 border p-4">
+                    <div className="space-y-1">
+                      <div className="text-[11px] text-muted-foreground">قابل استفاده</div>
+                      <div className="text-[14px] font-black">{formatFaBinary(result.usableTb)}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-[11px] text-muted-foreground">تحمل خطا</div>
+                      <div className="text-[13px] font-bold">{selectedOption?.faultTolerance || result.faultTolerance}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-[11px] text-muted-foreground">بازده</div>
+                      <div className="text-[13px] font-bold">{nfFa0.format(result.efficiency)}٪</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-[11px] text-muted-foreground">توضیح</div>
+                      <div className="text-[11px] leading-5">{selectedOption?.description}</div>
+                    </div>
+                  </div>
+
+                  {result.warnings.length > 0 && (
+                    <div className="rounded-md bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3 text-[11px] leading-5 text-amber-800 dark:text-amber-200">
+                      {result.warnings.map((w, i) => (
+                        <div key={i}>⚠ {w}</div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="pt-3 border-t text-[10px] text-muted-foreground leading-4">
+                    نتایج بر اساس محاسبه باینری است. مجموع خام: {formatFaTb(result.rawTb)} • فضای رزرو سیستم حدود ۱۰ گیگابایت به ازای هر دیسک • فضای کل: {formatFaBinary(result.rawTb)} باینری.
                   </div>
                 </div>
               </div>
-
-              {/* RAID B */}
-              <div className="flex flex-col lg:flex-row gap-3 lg:items-start">
-                <div className="lg:w-[300px] shrink-0">
-                  <Select value={raidB} onValueChange={(v) => setRaidB(v as RaidKey)}>
-                    <SelectTrigger className="h-11 text-[12px] font-bold bg-background border-border hover:border-primary hover:bg-accent transition-all duration-200 w-full">
-                      <SelectValue>
-                        {RAID_OPTIONS.find((o) => o.key === raidB)?.label} - {RAID_OPTIONS.find((o) => o.key === raidB)?.faultTolerance}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent className="min-w-[520px] max-w-[95vw] max-h-[380px] animate-in fade-in-0 zoom-in-95 duration-200">
-                      {RAID_OPTIONS.map((o) => (
-                        <SelectItem key={o.key} value={o.key} className="text-[12px] py-3 whitespace-normal leading-6 data-[state=checked]:bg-accent">
-                          <div className="flex flex-col text-right">
-                            <span className="font-bold">
-                              {o.label} - {o.faultTolerance}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground whitespace-normal leading-5">{o.description}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1 space-y-2 pt-1">
-                  <UsageBar result={resultB} driveCount={drives.length} />
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] sm:text-[11px] text-muted-foreground pr-1">
-                    <span>قابل استفاده: <b className="text-foreground">{formatFaBinary(resultB.usableTb)}</b></span>
-                    <span>تحمل خطا: <b className="text-foreground">{resultB.faultTolerance}</b></span>
-                    {resultB.warnings.map((w, i) => (
-                      <span key={i} className="text-amber-600 dark:text-amber-400">⚠ {w}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t text-[10px] text-muted-foreground leading-4">
-                نتایج بر اساس محاسبه باینری است، نه ده‌دهی. مجموع خام: {formatFaTb(resultA.rawTb || resultB.rawTb)} • فضای رزرو سیستم حدود ۱۰ گیگابایت به ازای هر دیسک.
-              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Recommended models – real shop */}
-      {hasDrives && (
-        <div className="bg-card border rounded-xl p-5 sm:p-6">
-          <RecommendedModels driveCount={drives.length} />
-        </div>
-      )}
+        {hasDrives && (
+          <div className="bg-card border rounded-xl p-5 sm:p-6">
+            <RecommendedModels driveCount={drives.length} />
+          </div>
+        )}
 
-      {/* Notes – Persian like Synology */}
-      <div className="rounded-xl bg-muted/40 border p-5 text-[11px] leading-6 text-muted-foreground space-y-3" dir="rtl">
-        <p className="font-black text-foreground text-[12px]">یادداشت‌ها:</p>
-        <ol className="list-decimal pr-5 space-y-2">
-          <li>
-            <b className="text-foreground">فضای رزرو سیستم</b> فضایی است که برای پارتیشن سیستم و SWAP رزرو می‌شود. هر دیسک در RAID باید تقریباً ۱۰ گیگابایت فضای سیستم رزرو کند.
-          </li>
-          <li>
-            <b className="text-foreground">ظرفیت قابل استفاده</b> به فضایی گفته می‌شود که پس از پیکربندی RAID می‌توان Volume ساخت. هنگام ساخت Volume، سیستم برای متادیتا فضا رزرو می‌کند. فایل‌سیستم Btrfs حدود ۴٪ و ext4 حدود ۲٪ را برای متادیتا رزرو می‌کند، بنابراین فضای واقعی ذخیره داده کمتر از برآورد ماشین‌حساب خواهد بود.
-          </li>
-          <li>
-            ماشین‌حساب مدل‌ها را بر اساس تعداد و ظرفیت کل دیسک‌های انتخابی پیشنهاد می‌دهد. برخی مدل‌ها ممکن است از ظرفیت خاصی پشتیبانی نکنند اما همان ظرفیت با ترکیب دیگر یا با یونیت توسعه قابل دستیابی است. در این صفحه مدل‌های واقعی فروشگاه تکباکس بر اساس Bay فیلتر می‌شوند.
-          </li>
-          <li>انواع RAID و حداکثر ظرفیت یک Volume ممکن است بسته به مدل متفاوت باشد. لطفاً DataSheet مدل NAS خود را بررسی کنید.</li>
-          <li>
-            اگر قصد دارید از دیسک‌هایی با ظرفیت متفاوت استفاده کنید، توصیه می‌شود از SHR یا SHR-2 برای به حداقل رساندن فضای بلااستفاده استفاده کنید.
-          </li>
-        </ol>
+        <div className="rounded-xl bg-muted/40 border p-5 text-[11px] leading-6 text-muted-foreground space-y-3" dir="rtl">
+          <p className="font-black text-foreground text-[12px]">یادداشت‌ها:</p>
+          <ol className="list-decimal pr-5 space-y-2">
+            <li>
+              <b className="text-foreground">فضای رزرو سیستم</b> حدود ۱۰ گیگابایت به ازای هر دیسک برای پارتیشن سیستم و SWAP.
+            </li>
+            <li>
+              <b className="text-foreground">ظرفیت قابل استفاده</b> پس از ساخت Volume برای متادیتا ۴٪ در Btrfs و ۲٪ در ext4 کم می‌شود.
+            </li>
+            <li>مدل‌ها بر اساس تعداد Bay واقعی از فروشگاه تکباکس پیشنهاد می‌شوند.</li>
+            <li>اگر دیسک‌ها ظرفیت متفاوت دارند، از SHR/SHR-2 استفاده کنید.</li>
+          </ol>
+        </div>
+
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent dir="rtl" className="max-w-[360px]">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-[14px] font-black">تغییر نوع دیسک</AlertDialogTitle>
+              <AlertDialogDescription className="text-[13px] leading-6">
+                تغییر نوع دیسک از <b className="text-foreground">{driveType}</b> به <b className="text-foreground">{pendingType}</b> باعث بازنشانی تنظیمات فعلی میشود
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row justify-start gap-2">
+              <AlertDialogAction
+                onClick={() => {
+                  if (pendingType) {
+                    setDrives([]);
+                    setDriveType(pendingType);
+                  }
+                  setConfirmOpen(false);
+                  setPendingType(null);
+                }}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
+              >
+                مشکلی نیست
+              </AlertDialogAction>
+              <AlertDialogCancel
+                onClick={() => {
+                  setConfirmOpen(false);
+                  setPendingType(null);
+                }}
+              >
+                انصراف
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      {/* Shadcn Dialog for HDD ↔ SSD switch – replaces browser confirm */}
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent dir="rtl" className="max-w-[360px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-[14px] font-black">تغییر نوع دیسک</AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] leading-6">
-              تغییر نوع دیسک از <b className="text-foreground">{driveType}</b> به <b className="text-foreground">{pendingType}</b> باعث بازنشانی تنظیمات فعلی میشود
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row justify-start gap-2 sm:justify-start">
-            <AlertDialogAction
-              onClick={() => {
-                if (pendingType) {
-                  setDrives([]);
-                  setDriveType(pendingType);
-                }
-                setConfirmOpen(false);
-                setPendingType(null);
-              }}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[100px]"
-            >
-              مشکلی نیست
-            </AlertDialogAction>
-            <AlertDialogCancel
-              onClick={() => {
-                setConfirmOpen(false);
-                setPendingType(null);
-              }}
-              className="min-w-[80px]"
-            >
-              انصراف
-            </AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
     </TooltipProvider>
   );
 }
