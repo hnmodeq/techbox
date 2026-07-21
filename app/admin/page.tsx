@@ -137,6 +137,7 @@ export default function AdminPage() {
                         {user.role === "super_admin" && <ButtonLink href="/admin/consultations" variant="ghost" size="sm">مشاوره‌ها</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/holidays" variant="ghost" size="sm">تعطیلات</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/settings" variant="ghost" size="sm">تنظیمات</ButtonLink>}
+            {user.role === "super_admin" && <ButtonLink href="/admin/shop-banners" variant="ghost" size="sm">بنرهای فروشگاه</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/users" variant="ghost" size="sm">کاربران</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/faq" variant="ghost" size="sm">FAQ</ButtonLink>}
             {user.role === "super_admin" && <ButtonLink href="/admin/design-system" variant="ghost" size="sm">🎨 دیزاین سیستم</ButtonLink>}

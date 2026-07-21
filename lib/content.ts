@@ -39,6 +39,9 @@ export type ContentItem = {
   model?: string | null;
   sku?: string | null;
   priceLabel?: string | null;
+  priceAmount?: number | null;
+  discountPercent?: number | null;
+  discountEndsAt?: string | null;
   availability?: string | null;
   warranty?: string | null;
   specs?: Record<string, unknown> | null;

@@ -82,6 +82,9 @@ model Post {
   model      String?
   sku        String?
   priceLabel String?
+  priceAmount   Float?
+  discountPercent Int?
+  discountEndsAt DateTime?
   availability String?
   warranty   String?
   specs      Json?

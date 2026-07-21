@@ -6,6 +6,7 @@ import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
 import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
+  "shop.banners": "[]",
   "comments.mode": "auto_approve", // "auto_approve" | "require_approval"
   "comments.hidden_globally": "false", // "true" | "false"
   "jobs.resume_retention_days": "30",
