@@ -28,6 +28,7 @@ function parsePriceLabel(label: string | null | undefined): number {
 }
 
 // ── Spec defs — Bay / CPU / RAM / Network Card ────────────────────────────────
+// Tooltip shows English key + value (no Farsi labels)
 const SPEC_DEFS: Array<{ Icon: React.ElementType; key: string }> = [
   { Icon: HardDrive,   key: "Bay" },
   { Icon: Cpu,         key: "CPU" },
@@ -68,23 +69,18 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
           <div className="flex items-center gap-1 cursor-default w-fit">
             <div className="flex gap-px">
               {[1, 2, 3, 4, 5].map((s) => (
-                <Star
-                  key={s}
-                  className={cn("size-3",
-                    s <= full ? "fill-amber-400 text-amber-400"
-                    : s === full + 1 && half ? "fill-amber-200 text-amber-400"
-                    : "fill-gray-200 text-gray-200"
-                  )}
-                />
+                <Star key={s} className={cn("size-3",
+                  s <= full ? "fill-amber-400 text-amber-400"
+                  : s === full + 1 && half ? "fill-amber-200 text-amber-400"
+                  : "fill-gray-200 text-gray-200"
+                )} />
               ))}
             </div>
             <span className="text-[10px] text-gray-500 leading-none">
               {rating.toLocaleString("fa-IR", { maximumFractionDigits: 1 })}
             </span>
             {count > 0 && (
-              <span className="text-[10px] text-gray-300 leading-none">
-                ({count.toLocaleString("fa-IR")})
-              </span>
+              <span className="text-[10px] text-gray-300 leading-none">({count.toLocaleString("fa-IR")})</span>
             )}
           </div>
         }
@@ -112,7 +108,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       href={`/shop/${p.slug}`}
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
     >
-      {/* ── Discount badge + countdown — top-right ── */}
+      {/* Discount badge + countdown — top-right */}
       {discount > 0 && !isUnavailable && (
         <div className="absolute top-2 right-2 z-10 flex flex-col items-end">
           <span className="rounded-md bg-red-500 px-1.5 py-0.5 text-[11px] font-bold text-white leading-tight">
@@ -122,7 +118,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </div>
       )}
 
-      {/* ── Image ── */}
+      {/* Image — white bg, image kept small via padding */}
       <div className="relative w-full bg-white" style={{ paddingBottom: "70%" }}>
         <div className="absolute inset-0 flex items-center justify-center px-10 py-6">
           <Image
@@ -136,7 +132,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </div>
       </div>
 
-      {/* ── Card body ── */}
+      {/* Card body */}
       <div className="flex flex-col gap-2 px-4 pt-2 pb-4 flex-1">
 
         {/* Title */}
@@ -155,7 +151,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           </div>
         )}
 
-        {/* ── Spec icons — tooltip shows only the value, no Farsi label ── */}
+        {/* Spec icons — tooltip shows "Key: value" in English */}
         {validSpecs.length > 0 && (
           <div
             className="grid gap-1 py-2 border-y border-gray-100"
@@ -175,34 +171,36 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
                       </div>
                     }
                   />
-                  {/* Tooltip: only the spec value, no Farsi label */}
-                  <TooltipContent side="bottom">{value}</TooltipContent>
+                  {/* Tooltip: "Key: value" — English key, no Farsi */}
+                  <TooltipContent side="bottom">{key}: {value}</TooltipContent>
                 </Tooltip>
               );
             })}
           </div>
         )}
 
-        {/* ── Price row: price RIGHT, warranty icon LEFT ── */}
-        {/* In LTR layout: warranty on the left, price on the right */}
+        {/* Price row: warranty LEFT, price RIGHT */}
         <div className="mt-auto flex items-end justify-between gap-2">
 
-          {/* Warranty icon — LEFT side */}
-          {p.warranty && (
+          {/* Warranty icon — LEFT */}
+          {p.warranty ? (
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <div className="flex items-center justify-center cursor-default shrink-0">
+                  <div className="flex items-center cursor-default shrink-0">
                     <ShieldCheck className="size-5 text-green-500" />
                   </div>
                 }
               />
               <TooltipContent>دارای گارانتی — {p.warranty}</TooltipContent>
             </Tooltip>
+          ) : (
+            // Spacer so price stays right-aligned even without warranty
+            <span className="size-5 shrink-0" />
           )}
 
-          {/* Price — RIGHT side, always pushed right */}
-          <div className="flex flex-col items-end mr-auto" dir="rtl">
+          {/* Price — RIGHT, always text-right */}
+          <div className="flex flex-col items-end" dir="rtl">
             {isUnavailable ? (
               <span className="text-sm font-bold text-red-500">ناموجود</span>
             ) : priceAmount <= 0 ? (
