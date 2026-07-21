@@ -1,247 +1,333 @@
 "use client";
-import Image from "next/image";
-import { blurProps } from "@/lib/image-placeholder";
+
 import { getModuleItems, type ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import ModuleHeader from "@/components/effects/ModuleHeader";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useProductComparison } from "@/hooks/useProductComparison";
 import ProductComparisonModal from "@/components/ui/product-comparison-modal";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { GitCompareArrows } from "lucide-react";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { GitCompareArrows, SlidersHorizontal, X, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { cn } from "@/lib/utils";
+import ShopProductCard from "./ShopProductCard";
+import ShopBanner, { type ShopBannerItem } from "./ShopBanner";
 
-const PAGE_SIZE = 12;
+type SortKey = "newest" | "price_asc" | "price_desc" | "discount" | "popular";
+
+const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+  { key: "popular",    label: "پرفروش‌ترین" },
+  { key: "newest",     label: "جدیدترین کالا" },
+  { key: "price_desc", label: "بالاترین قیمت" },
+  { key: "price_asc",  label: "پایین‌ترین قیمت" },
+  { key: "discount",   label: "بیشترین تخفیف" },
+];
+
+const BRAND_META: Record<string, string> = {
+  QNAP: "کیونپ", Dell: "دل", HPE: "اچ‌پی‌ای", Synology: "سینولوژی",
+  Fortinet: "فورتی‌نت", MikroTik: "میکروتیک", Cisco: "سیسکو", Huawei: "هواوی",
+};
+
+const PAGE_SIZE = 16;
+
+function useShopBanners(): ShopBannerItem[] {
+  const [banners, setBanners] = useState<ShopBannerItem[]>([]);
+  useEffect(() => {
+    fetch("/api/settings?key=shop.banners", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => { try { const raw = d["shop.banners"]; if (raw) setBanners(JSON.parse(raw)); } catch {} })
+      .catch(() => {});
+  }, []);
+  return banners;
+}
 
 export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const fallbackItems = getModuleItems("shop");
-  const { items: dbItems } = useDbPosts("shop", fallbackItems, 100);
+  const { items: dbItems } = useDbPosts("shop", fallbackItems, 200);
   const items = serverItems && serverItems.length > 0 ? serverItems : dbItems;
+  const banners = useShopBanners();
 
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<SortKey>("popular");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
 
-  const {
-    comparedProducts,
-    addToComparison,
-    removeFromComparison,
-    clearComparison,
-    isInComparison,
-    count: compareCount,
-  } = useProductComparison();
+  const priceRange = useMemo(() => {
+    const prices = items.map((i) => i.priceAmount ?? 0).filter((p) => p > 0);
+    if (!prices.length) return { min: 0, max: 200000000 };
+    return { min: Math.min(...prices), max: Math.max(...prices) };
+  }, [items]);
 
-  const [showComparisonModal, setShowComparisonModal] = useState(false);
+  const [priceFilter, setPriceFilter] = useState<[number, number] | null>(null);
+  const effectivePrice: [number, number] = priceFilter ?? [priceRange.min, priceRange.max];
 
-  // Filter by search only (no category / sort filter — hidden per request)
-  const filtered = useMemo(() => {
-    if (!q.trim()) return items;
-    const s = q.trim().toLowerCase();
-    return items.filter(
-      (i) =>
-        i.title.toLowerCase().includes(s) ||
-        (i.excerpt || "").toLowerCase().includes(s) ||
-        i.tags.some((t) => t.toLowerCase().includes(s))
-    );
-  }, [items, q]);
+  const allBrands = useMemo(
+    () => Array.from(new Set(items.map((i) => i.brand).filter(Boolean))) as string[],
+    [items]
+  );
+  const [brandSearch, setBrandSearch] = useState("");
+  const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
+  const filteredBrands = allBrands.filter(
+    (b) => b.toLowerCase().includes(brandSearch.toLowerCase()) || (BRAND_META[b] || "").includes(brandSearch)
+  );
 
-  // Reset to page 1 whenever filter changes
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const allCategories = useMemo(
+    () => Array.from(new Set(items.map((i) => i.category).filter(Boolean))) as string[],
+    [items]
+  );
+  const [catSearch, setCatSearch] = useState("");
+  const [selectedCats, setSelectedCats] = useState<Set<string>>(new Set());
+  const filteredCats = allCategories.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()));
 
-  const goPage = (p: number) => setPage(Math.max(1, Math.min(p, totalPages)));
+  const [priceOpen, setPriceOpen] = useState(true);
+  const [brandOpen, setBrandOpen] = useState(true);
+  const [catOpen, setCatOpen] = useState(true);
 
-  // Build page numbers with ellipsis
-  const pageNums: (number | "…")[] = useMemo(() => {
-    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-    const pages: (number | "…")[] = [1];
-    if (safePage > 3) pages.push("…");
-    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
-      pages.push(i);
+  const sorted = useMemo(() => {
+    let list = [...items];
+    if (onlyAvailable) list = list.filter((i) => i.availability !== "ناموجود" && i.availability !== "اتمام موجودی");
+    if (priceFilter) list = list.filter((i) => { const pr = i.priceAmount ?? 0; return pr === 0 || (pr >= priceFilter[0] && pr <= priceFilter[1]); });
+    if (selectedBrands.size > 0) list = list.filter((i) => i.brand && selectedBrands.has(i.brand));
+    if (selectedCats.size > 0) list = list.filter((i) => i.category && selectedCats.has(i.category));
+    switch (sort) {
+      case "newest":     list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); break;
+      case "price_asc":  list.sort((a, b) => (a.priceAmount ?? 0) - (b.priceAmount ?? 0)); break;
+      case "price_desc": list.sort((a, b) => (b.priceAmount ?? 0) - (a.priceAmount ?? 0)); break;
+      case "discount":   list.sort((a, b) => (b.discountPercent ?? 0) - (a.discountPercent ?? 0)); break;
+      default:           list.sort((a, b) => b.views - a.views);
     }
-    if (safePage < totalPages - 2) pages.push("…");
-    pages.push(totalPages);
-    return pages;
-  }, [totalPages, safePage]);
+    return list;
+  }, [items, sort, onlyAvailable, priceFilter, selectedBrands, selectedCats]);
+
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const loaderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setVisibleCount(PAGE_SIZE); }, [sort, onlyAvailable, priceFilter, selectedBrands, selectedCats]);
+
+  useEffect(() => {
+    const el = loaderRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisibleCount((c) => Math.min(c + PAGE_SIZE, sorted.length)); },
+      { rootMargin: "300px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [sorted.length]);
+
+  const visible = sorted.slice(0, visibleCount);
+
+  const { comparedProducts, removeFromComparison, clearComparison, count: compareCount } = useProductComparison();
+  const [showComparision, setShowComparision] = useState(false);
+
+  const activeFilterCount = (onlyAvailable ? 1 : 0) + (priceFilter ? 1 : 0) + selectedBrands.size + selectedCats.size;
+
+  const clearAllFilters = useCallback(() => {
+    setOnlyAvailable(false); setPriceFilter(null);
+    setSelectedBrands(new Set()); setSelectedCats(new Set());
+  }, []);
 
   return (
     <TooltipProvider>
-      <main className="mx-auto max-w-7xl px-4 md:px-6 py-12" dir="rtl">
-        <ModuleHeader
-          module="shop"
-          description={`ارسال سریع • گارانتی اصالت • ${filtered.length.toLocaleString("fa-IR")} کالا`}
-        />
+      <div className="mx-auto max-w-7xl px-4 md:px-6 py-6" dir="rtl">
 
-        {/* ── Toolbar: search (right) + compare button (left) ── */}
-        <Card className="p-3 mb-6">
-          <div className="flex items-center gap-3">
-            {/* Search — takes all remaining space */}
-            <Input
-              value={q}
-              onChange={(e) => { setQ(e.target.value); setPage(1); }}
-              placeholder="جستجوی محصول…"
-              className="flex-1"
-            />
+        {/* Banner */}
+        {banners.length > 0 && <ShopBanner banners={banners} />}
 
-            {/* Compare button — always visible on the left */}
-            <Tooltip>
-              <TooltipTrigger render={<span className="shrink-0" />}>
-                <Button
-                  type="button"
-                  variant={compareCount > 0 ? "primary" : "outline"}
-                  onClick={() => { if (compareCount > 0) setShowComparisonModal(true); }}
-                  className="flex items-center gap-2"
-                >
-                  <GitCompareArrows className="size-4" />
-                  <span>مقایسه</span>
-                  {compareCount > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-foreground text-primary text-[10px] font-bold">
-                      {compareCount}
-                    </span>
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>افزودن به مقایسه</TooltipContent>
-            </Tooltip>
-          </div>
-        </Card>
+        {/* Sort bar */}
+        <div className="flex items-center justify-between gap-3 mb-5 flex-wrap bg-muted/40 rounded-xl px-4 py-2">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((o) => !o)}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          >
+            <SlidersHorizontal className="size-4" />
+            <span>فیلترها</span>
+            {activeFilterCount > 0 && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
 
-        {/* ── Product grid ── */}
-        <div className="responsive-card-grid grid gap-5">
-          {paginated.map((p) => {
-            const inCompare = isInComparison(p.slug);
-            return (
-              <Link
-                key={p.slug}
-                href={`/shop/${p.slug}`}
-                className="border rounded-lg shadow-sm overflow-hidden group flex flex-col bg-card text-card-foreground hover:shadow-lg transition-all duration-300 ease-out"
+          <div className="flex items-center gap-1 flex-wrap">
+            <span className="text-xs text-muted-foreground ml-2 shrink-0">ترتیب:</span>
+            {SORT_OPTIONS.map((o) => (
+              <button
+                key={o.key}
+                type="button"
+                onClick={() => setSort(o.key)}
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap",
+                  sort === o.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
               >
-                {/* Image — white bg, no crop, no overflow */}
-                <div className="relative aspect-[4/3] bg-white flex items-center justify-center p-3">
-                  <Image
-                    src={p.image || "/assets/blog-1.jpg"}
-                    alt={p.title}
-                    fill
-                    sizes="(min-width:1280px) 25vw, (min-width:640px) 50vw, 100vw"
-                    className="object-contain"
-                    {...blurProps(p.image || "/assets/blog-1.jpg")}
-                  />
-                </div>
+                {o.label}
+              </button>
+            ))}
+          </div>
 
-                {/* Card body */}
-                <div className="p-4 flex-1 flex flex-col gap-2">
-                  {/* Title */}
-                  <div className="font-semibold line-clamp-2 min-h-[48px] group-hover:text-[var(--primary)] transition-colors">
-                    {p.title}
-                  </div>
-
-                  {/* Excerpt */}
-                  {p.excerpt && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 flex-1">{p.excerpt}</p>
-                  )}
-
-                  {/* Compare toggle — bottom action, no other buttons */}
-                  <div className="pt-3 border-t mt-auto">
-                    <Tooltip>
-                      <TooltipTrigger render={<span className="w-full block" />}>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant={inCompare ? "primary" : "outline"}
-                          className="w-full flex items-center gap-2"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (inCompare) {
-                              removeFromComparison(p.slug);
-                            } else {
-                              addToComparison(p);
-                            }
-                          }}
-                        >
-                          <GitCompareArrows className="size-4" />
-                          {inCompare ? "حذف از مقایسه" : "افزودن به مقایسه"}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>افزودن به مقایسه</TooltipContent>
-                    </Tooltip>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+          <span className="text-xs text-muted-foreground shrink-0 mr-auto">
+            {sorted.length.toLocaleString("fa-IR")} کالا
+          </span>
         </div>
 
-        {filtered.length === 0 && (
-          <div className="text-center py-16 text-muted-foreground">محصولی یافت نشد</div>
-        )}
+        <div className="flex gap-5">
+          {/* Filter Sidebar */}
+          {sidebarOpen && (
+            <aside className="w-52 shrink-0 space-y-4 text-sm sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" dir="rtl">
+              <div className="flex items-center justify-between">
+                <span className="font-bold">فیلترها</span>
+                <div className="flex items-center gap-2">
+                  {activeFilterCount > 0 && (
+                    <button type="button" onClick={clearAllFilters} className="text-[11px] text-destructive hover:underline">
+                      پاک کردن همه
+                    </button>
+                  )}
+                  <button type="button" onClick={() => setSidebarOpen(false)}>
+                    <X className="size-4 text-muted-foreground" />
+                  </button>
+                </div>
+              </div>
 
-        {/* ── Shadcn Pagination ── */}
-        {totalPages > 1 && (
-          <div className="mt-10">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => goPage(safePage - 1)}
-                    aria-disabled={safePage === 1}
-                    className={safePage === 1 ? "pointer-events-none opacity-40" : "cursor-pointer"}
-                  />
-                </PaginationItem>
+              {/* فقط کالاهای موجود */}
+              <div className="flex items-center justify-between border-b pb-3">
+                <span className="text-sm">فقط کالاهای موجود</span>
+                <Switch checked={onlyAvailable} onCheckedChange={setOnlyAvailable} />
+              </div>
 
-                {pageNums.map((n, idx) =>
-                  n === "…" ? (
-                    <PaginationItem key={`ellipsis-${idx}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  ) : (
-                    <PaginationItem key={n}>
-                      <PaginationLink
-                        isActive={n === safePage}
-                        onClick={() => goPage(n as number)}
-                        className="cursor-pointer"
-                      >
-                        {(n as number).toLocaleString("fa-IR")}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
+              {/* Price range */}
+              <div className="border-b pb-3 space-y-3">
+                <button type="button" onClick={() => setPriceOpen((o) => !o)} className="flex items-center justify-between w-full">
+                  <span className="font-medium text-sm">فیلتر بر اساس قیمت</span>
+                  {priceOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                </button>
+                {priceOpen && (
+                  <div className="space-y-3 pt-1">
+                    <Slider
+                      min={priceRange.min} max={priceRange.max} step={1000000}
+                      value={effectivePrice}
+                      onValueChange={(v) => setPriceFilter(v as [number, number])}
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground" dir="ltr">
+                      <span>{Math.round(effectivePrice[0] / 1000000).toLocaleString("fa-IR")}M</span>
+                      <span>{Math.round(effectivePrice[1] / 1000000).toLocaleString("fa-IR")}M</span>
+                    </div>
+                    {priceFilter && (
+                      <button type="button" onClick={() => setPriceFilter(null)} className="text-[11px] text-destructive hover:underline">
+                        پاک کردن
+                      </button>
+                    )}
+                  </div>
                 )}
+              </div>
 
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => goPage(safePage + 1)}
-                    aria-disabled={safePage === totalPages}
-                    className={safePage === totalPages ? "pointer-events-none opacity-40" : "cursor-pointer"}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+              {/* Brands */}
+              <div className="border-b pb-3 space-y-2">
+                <button type="button" onClick={() => setBrandOpen((o) => !o)} className="flex items-center justify-between w-full">
+                  <span className="font-medium text-sm">برندها</span>
+                  {brandOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                </button>
+                {brandOpen && (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Search className="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
+                      <Input value={brandSearch} onChange={(e) => setBrandSearch(e.target.value)} placeholder="جستجوی برند…" className="h-7 text-xs pr-6" />
+                    </div>
+                    <div className="max-h-40 overflow-y-auto space-y-1.5">
+                      {filteredBrands.map((brand) => (
+                        <label key={brand} className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={selectedBrands.has(brand)}
+                            onChange={(e) => { const n = new Set(selectedBrands); e.target.checked ? n.add(brand) : n.delete(brand); setSelectedBrands(n); }}
+                            className="rounded border-gray-300 size-3.5" />
+                          <span className="text-xs">
+                            {brand}
+                            {BRAND_META[brand] && <span className="text-muted-foreground"> ({BRAND_META[brand]})</span>}
+                          </span>
+                        </label>
+                      ))}
+                      {filteredBrands.length === 0 && <p className="text-[11px] text-muted-foreground">برندی یافت نشد</p>}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Categories */}
+              <div className="pb-3 space-y-2">
+                <button type="button" onClick={() => setCatOpen((o) => !o)} className="flex items-center justify-between w-full">
+                  <span className="font-medium text-sm">کاربری</span>
+                  {catOpen ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                </button>
+                {catOpen && (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Search className="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
+                      <Input value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="جستجوی دسته‌بندی…" className="h-7 text-xs pr-6" />
+                    </div>
+                    <div className="max-h-40 overflow-y-auto space-y-1.5">
+                      {filteredCats.map((cat) => (
+                        <label key={cat} className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={selectedCats.has(cat)}
+                            onChange={(e) => { const n = new Set(selectedCats); e.target.checked ? n.add(cat) : n.delete(cat); setSelectedCats(n); }}
+                            className="rounded border-gray-300 size-3.5" />
+                          <span className="text-xs">{cat}</span>
+                        </label>
+                      ))}
+                      {filteredCats.length === 0 && <p className="text-[11px] text-muted-foreground">دسته‌ای یافت نشد</p>}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </aside>
+          )}
+
+          {/* Product grid */}
+          <div className="flex-1 min-w-0">
+            {sorted.length === 0 ? (
+              <div className="text-center py-20 text-muted-foreground">محصولی یافت نشد</div>
+            ) : (
+              <>
+                <div className={cn(
+                  "grid gap-4",
+                  sidebarOpen
+                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                    : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                )}>
+                  {visible.map((p) => <ShopProductCard key={p.slug} product={p} />)}
+                </div>
+
+                {/* Infinite scroll sentinel */}
+                {visibleCount < sorted.length && (
+                  <div ref={loaderRef} className="flex justify-center py-10">
+                    <div className="h-6 w-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Floating compare button */}
+        {compareCount > 0 && (
+          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
+            <Button onClick={() => setShowComparision(true)} className="shadow-xl flex items-center gap-2 rounded-full px-6">
+              <GitCompareArrows className="size-4" />
+              مقایسه {compareCount.toLocaleString("fa-IR")} محصول
+            </Button>
           </div>
         )}
 
-        {/* ── Comparison modal ── */}
-        {showComparisonModal && (
+        {showComparision && (
           <ProductComparisonModal
-            isOpen={showComparisonModal}
+            isOpen={showComparision}
             products={comparedProducts}
-            onClose={() => setShowComparisonModal(false)}
+            onClose={() => setShowComparision(false)}
             onRemove={removeFromComparison}
             onClear={clearComparison}
           />
         )}
-      </main>
+      </div>
     </TooltipProvider>
   );
 }
