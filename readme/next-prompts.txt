@@ -235,7 +235,6 @@ change the sentence " برای مشاهده رویدادهای بیشتر ..." t
 -let the hovering effect be smooth (if it already have not done yet)
 -move the date from right to left and move it from bottom to top of the social icons( so we gonna have 2 rows, first right including the author avatar and name in the right side and the date on the left side and second row author job title in the right side and social icons in the left side)
 
-Done Until Here.
 
 
 19- news page (/news)
@@ -249,6 +248,8 @@ Done Until Here.
 -let cards be able to get like and comment from this page (not the slug page inside a card), so we gonna have a list here and no one can enter to a card. everyone needs to put check news/likes/comments in here and news bar (news bar as our main news module and /news as an archive if users want to have access to news before 24 hours) note: we already have the like and comment directly on cards in our news bar. we just need to have them on cards in this page (/news)
 -make sure we have pagination here (shadcn component)
 
+
+
 20-media page (/media)
 -let the hover effect in this page be same with the homepage media row (transforming play icon to پخش ویدیو)
 -remove the content subject tag on cards (example: مجازی سازی ویدیوی آموزشی ذخیره سازی)
@@ -258,6 +259,10 @@ Done Until Here.
 -move the date from bottom left to bottom up
 -move the video duration from top left to top right
 -show at least 8 videos in each page (pages of pagination) 
+
+
+
+
 
 21-shop page (/shop)
 -lets move the comparing button from the bottom right of the side to be above of products (beside of /shop search bar. so we gonna have a row that right side is the search bar and the left side is the comparing button)
@@ -273,6 +278,8 @@ Done Until Here.
 -make sure we have shadcn style pagination for this page
 -make the TB-1002 TB-1001 which idk what it is invisible
 -make invisible the filtering for now
+
+Done Until Here.
 
 22-NAS Selector page
 -remove the breadcrumb from this page (we already have a breadcrumb in our top bar)

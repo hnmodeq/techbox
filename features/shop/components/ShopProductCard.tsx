@@ -106,21 +106,18 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
     >
       {/* Image — fixed height container, generous padding keeps image small */}
-      <div className="relative w-full bg-white h-52">
-        <div className="absolute inset-0 flex items-center justify-center p-10">
+      <div className="relative w-50 bg-white h-52">
           <Image
             src={p.image || "/assets/blog-1.jpg"}
             alt={p.title}
             fill
-            sizes="(min-width:1280px) 18vw, (min-width:768px) 30vw, 50vw"
             className="object-contain"
             {...blurProps(p.image || "/assets/blog-1.jpg")}
           />
-        </div>
       </div>
 
       {/* Card body */}
-      <div className="flex flex-col gap-2 px-4 pt-2 pb-4 flex-1">
+      <div className="flex flex-col gap-2 p-2 justify-center flex-1">
 
         {/* Title */}
         <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug min-h-[2.5rem] text-right" dir="rtl">
