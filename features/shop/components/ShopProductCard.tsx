@@ -6,7 +6,7 @@ import { blurProps } from "@/lib/image-placeholder";
 import type { ContentItem } from "@/lib/content";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Star, ShieldCheck, Cpu, MemoryStick, HardDrive, Network } from "lucide-react";
+import { Star, Cpu, MemoryStick, HardDrive, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ── Price helpers ─────────────────────────────────────────────────────────────
@@ -28,7 +28,6 @@ function parsePriceLabel(label: string | null | undefined): number {
 }
 
 // ── Spec defs — Bay / CPU / RAM / Network Card ────────────────────────────────
-// Tooltip shows English key + value (no Farsi labels)
 const SPEC_DEFS: Array<{ Icon: React.ElementType; key: string }> = [
   { Icon: HardDrive,   key: "Bay" },
   { Icon: Cpu,         key: "CPU" },
@@ -41,13 +40,17 @@ function isNA(v: unknown): boolean {
   return !v || NA_VALUES.has(String(v).trim());
 }
 
-// ── Countdown timer ───────────────────────────────────────────────────────────
+// ── Countdown timer — primary colour, above the badge ────────────────────────
 function DiscountTimer({ endsAt }: { endsAt: string }) {
   const t = useCountdown(endsAt);
   if (!t || t.expired) return null;
   const pad = (n: number) => String(n).padStart(2, "0");
   return (
-    <div className="flex items-center gap-px text-[9px] font-mono font-bold text-red-400 mt-0.5 leading-none" dir="ltr">
+    <div
+      className="flex items-center gap-px text-[9px] font-mono font-bold leading-none mb-0.5"
+      style={{ color: "var(--primary)" }}
+      dir="ltr"
+    >
       {t.days > 0 && <span>{pad(t.days)}d&nbsp;</span>}
       <span>{pad(t.hours)}</span>
       <span className="animate-pulse mx-px">:</span>
@@ -108,19 +111,9 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       href={`/shop/${p.slug}`}
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
     >
-      {/* Discount badge + countdown — top-right */}
-      {discount > 0 && !isUnavailable && (
-        <div className="absolute top-2 right-2 z-10 flex flex-col items-end">
-          <span className="rounded-md bg-red-500 px-1.5 py-0.5 text-[11px] font-bold text-white leading-tight">
-            {discount.toLocaleString("fa-IR")}٪
-          </span>
-          {p.discountEndsAt && <DiscountTimer endsAt={p.discountEndsAt} />}
-        </div>
-      )}
-
-      {/* Image — white bg, image kept small via padding */}
+      {/* Image — white bg, larger padding = smaller image appearance */}
       <div className="relative w-full bg-white" style={{ paddingBottom: "70%" }}>
-        <div className="absolute inset-0 flex items-center justify-center px-10 py-6">
+        <div className="absolute inset-0 flex items-center justify-center px-14 py-10">
           <Image
             src={p.image || "/assets/blog-1.jpg"}
             alt={p.title}
@@ -151,7 +144,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           </div>
         )}
 
-        {/* Spec icons — tooltip shows "Key: value" in English */}
+        {/* Spec icons */}
         {validSpecs.length > 0 && (
           <div
             className="grid gap-1 py-2 border-y border-gray-100"
@@ -171,7 +164,6 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
                       </div>
                     }
                   />
-                  {/* Tooltip: "Key: value" — English key, no Farsi */}
                   <TooltipContent side="bottom">{key}: {value}</TooltipContent>
                 </Tooltip>
               );
@@ -179,27 +171,27 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           </div>
         )}
 
-        {/* Price row: warranty LEFT, price RIGHT */}
+        {/* Bottom row: discount badge (left) + price (right) */}
         <div className="mt-auto flex items-end justify-between gap-2">
 
-          {/* Warranty icon — LEFT */}
-          {p.warranty ? (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <div className="flex items-center cursor-default shrink-0">
-                    <ShieldCheck className="size-5 text-green-500" />
-                  </div>
-                }
-              />
-              <TooltipContent>دارای گارانتی — {p.warranty}</TooltipContent>
-            </Tooltip>
-          ) : (
-            // Spacer so price stays right-aligned even without warranty
-            <span className="size-5 shrink-0" />
-          )}
+          {/* LEFT — discount timer (above) + discount badge. Hidden when no discount */}
+          <div className="flex flex-col items-start shrink-0">
+            {discount > 0 && !isUnavailable ? (
+              <>
+                {/* Timer above the badge, primary color */}
+                {p.discountEndsAt && <DiscountTimer endsAt={p.discountEndsAt} />}
+                {/* Discount % badge */}
+                <span className="rounded-md bg-red-500 px-1.5 py-0.5 text-[11px] font-bold text-white leading-tight">
+                  {discount.toLocaleString("fa-IR")}٪
+                </span>
+              </>
+            ) : (
+              /* Invisible spacer keeps price pinned right on cards without discount */
+              <span className="invisible text-[11px]">0٪</span>
+            )}
+          </div>
 
-          {/* Price — RIGHT, always text-right */}
+          {/* RIGHT — price, always right-aligned */}
           <div className="flex flex-col items-end" dir="rtl">
             {isUnavailable ? (
               <span className="text-sm font-bold text-red-500">ناموجود</span>
@@ -207,17 +199,19 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
               <span className="text-sm font-semibold text-gray-500">تماس بگیرید</span>
             ) : (
               <>
+                {/* Original price with strikethrough when discounted */}
                 {discount > 0 && (
                   <div className="flex items-baseline gap-1 leading-none mb-0.5">
                     <span className="text-[11px] text-gray-400 line-through">{orig.number}</span>
                     <span className="text-[9px] text-gray-400">{orig.unit}</span>
                   </div>
                 )}
+                {/* Discounted / normal price — same color always */}
                 <div className="flex items-baseline gap-1 leading-none">
-                  <span className={cn("text-base font-bold", discount > 0 ? "text-red-600" : "text-gray-900")}>
+                  <span className="text-base font-bold text-gray-900">
                     {disc.number}
                   </span>
-                  <span className={cn("text-[10px] font-normal", discount > 0 ? "text-red-500" : "text-gray-500")}>
+                  <span className="text-[10px] font-normal text-gray-500">
                     {disc.unit}
                   </span>
                 </div>
