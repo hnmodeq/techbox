@@ -9,6 +9,7 @@ import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { getEnabledModules } from "@/lib/module-config";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
+import { getCurrencyRates, calculateFinalTomanPrice, type CurrencyCode } from "@/lib/currency";
 
 function normalizeSlug(value: string, fallback: string) {
   const base = (value || fallback)
@@ -95,7 +96,27 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    const out = posts.map((p: any) => ({
+    // Calculate final Toman price for shop using current currency rates if source price exists
+    let currencyRates: any = null;
+    try {
+      if (!postModule || postModule === "shop") {
+        currencyRates = await getCurrencyRates();
+      }
+    } catch {}
+
+    const out = posts.map((p: any) => {
+      let finalPriceAmount = p.priceAmount ?? null;
+      if (p.module === "shop" && (p as any).sourcePriceAmount && (p as any).sourcePriceAmount > 0 && currencyRates) {
+        try {
+          finalPriceAmount = calculateFinalTomanPrice({
+            sourcePrice: (p as any).sourcePriceAmount,
+            sourceCurrency: ((p as any).sourceCurrency as CurrencyCode) || "USD",
+            productAdjustmentPercent: (p as any).priceAdjustmentPercent ?? 0,
+            rates: currencyRates,
+          });
+        } catch {}
+      }
+      return {
       id: p.id,
       slug: p.slug,
       module: p.module,
@@ -132,7 +153,10 @@ export async function GET(req: NextRequest) {
       model: p.model,
       sku: p.sku,
       priceLabel: p.priceLabel,
-      priceAmount: p.priceAmount ?? null,
+      priceAmount: finalPriceAmount,
+      sourcePriceAmount: (p as any).sourcePriceAmount ?? null,
+      sourceCurrency: (p as any).sourceCurrency ?? null,
+      priceAdjustmentPercent: (p as any).priceAdjustmentPercent ?? null,
       discountPercent: p.discountPercent ?? null,
       discountEndsAt: p.discountEndsAt ? p.discountEndsAt.toISOString() : null,
       availability: p.availability,
@@ -147,7 +171,8 @@ export async function GET(req: NextRequest) {
         verifiedType: (p.author as any)?.verifiedType || null,
         verifiedLabel: (p.author as any)?.verifiedLabel || null,
       },
-    }));
+    };
+    });
 
     // Attach comment counts in bulk
     try {
@@ -199,6 +224,9 @@ const createSchema = z.object({
   sku: z.string().max(100).optional(),
   priceLabel: z.string().max(200).optional(),
   priceAmount: z.number().min(0).optional(),
+  sourcePriceAmount: z.number().min(0).optional(),
+  sourceCurrency: z.string().max(10).optional(),
+  priceAdjustmentPercent: z.number().min(-90).max(500).optional(),
   discountPercent: z.number().int().min(0).max(99).optional(),
   discountEndsAt: z.string().optional(),
   availability: z.string().max(100).optional(),
@@ -266,6 +294,9 @@ export async function POST(req: NextRequest) {
       tags: data.tags,
       specs: data.specs || {},
       priceAmount: data.priceAmount ?? undefined,
+      sourcePriceAmount: (data as any).sourcePriceAmount ?? undefined,
+      sourceCurrency: (data as any).sourceCurrency ?? undefined,
+      priceAdjustmentPercent: (data as any).priceAdjustmentPercent ?? undefined,
       discountPercent: data.discountPercent ?? undefined,
       discountEndsAt: data.discountEndsAt ? new Date(data.discountEndsAt) : undefined,
       authorId: user.id,

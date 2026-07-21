@@ -115,6 +115,9 @@ const postSchema = z.object({
   sku: z.string().max(100).optional(),
   priceLabel: z.string().max(200).optional(),
   priceAmount: z.string().max(30).optional(),
+  sourcePriceAmount: z.string().max(20).optional(),
+  sourceCurrency: z.string().max(10).optional(),
+  priceAdjustmentPercent: z.string().max(10).optional(),
   discountPercent: z.string().max(5).optional(),
   discountEndsAt: z.string().max(30).optional(),
   availability: z.string().max(100).optional(),
@@ -164,6 +167,9 @@ function NewPostInner() {
       sku: "",
       priceLabel: "",
       priceAmount: "",
+      sourcePriceAmount: "",
+      sourceCurrency: "USD",
+      priceAdjustmentPercent: "0",
       discountPercent: "",
       discountEndsAt: "",
       availability: "",
@@ -229,6 +235,9 @@ function NewPostInner() {
         sku: it.sku || "",
         priceLabel: it.priceLabel || "",
         priceAmount: it.priceAmount ? String(it.priceAmount) : "",
+        sourcePriceAmount: (it as any).sourcePriceAmount ? String((it as any).sourcePriceAmount) : "",
+        sourceCurrency: (it as any).sourceCurrency || "USD",
+        priceAdjustmentPercent: (it as any).priceAdjustmentPercent ? String((it as any).priceAdjustmentPercent) : "0",
         discountPercent: it.discountPercent ? String(it.discountPercent) : "",
         discountEndsAt: it.discountEndsAt ? new Date(it.discountEndsAt).toISOString().slice(0, 16) : "",
         availability: it.availability || "",
@@ -298,6 +307,9 @@ function NewPostInner() {
       sku: (values.sku || "").trim() || undefined,
       priceLabel: (values.priceLabel || "").trim() || undefined,
       priceAmount: (values.priceAmount || "").trim() ? Number(values.priceAmount) : undefined,
+      sourcePriceAmount: (values as any).sourcePriceAmount ? Number((values as any).sourcePriceAmount) : undefined,
+      sourceCurrency: (values as any).sourceCurrency || "USD",
+      priceAdjustmentPercent: (values as any).priceAdjustmentPercent ? Number((values as any).priceAdjustmentPercent) : 0,
       discountPercent: (values.discountPercent || "").trim() ? Number(values.discountPercent) : undefined,
       discountEndsAt: (values.discountEndsAt || "").trim() ? new Date(values.discountEndsAt!).toISOString() : undefined,
       availability: (values.availability || "").trim() || undefined,
@@ -673,29 +685,81 @@ function NewPostInner() {
 
                       <Separator />
 
-                      {/* Pricing */}
-                      <div>
-                        <p className="text-sm font-semibold mb-3">قیمت‌گذاری</p>
-                        <div className="grid gap-3 md:grid-cols-3">
-                          <FormField control={form.control as any} name="priceAmount" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>قیمت (تومان)</FormLabel>
-                              <FormControl><Input type="number" dir="ltr" placeholder="920000000" {...field} /></FormControl>
-                              <FormDescription className="text-[11px]">۰ یا خالی = تماس بگیرید</FormDescription>
-                            </FormItem>
-                          )} />
-                          <FormField control={form.control as any} name="discountPercent" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>درصد تخفیف (۰-۹۹)</FormLabel>
-                              <FormControl><Input type="number" min="0" max="99" dir="ltr" placeholder="15" {...field} /></FormControl>
-                            </FormItem>
-                          )} />
-                          <FormField control={form.control as any} name="discountEndsAt" render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>پایان تخفیف</FormLabel>
-                              <FormControl><Input type="datetime-local" dir="ltr" {...field} /></FormControl>
-                            </FormItem>
-                          )} />
+                      {/* Pricing – New dual-price system */}
+                      <div className="space-y-5">
+                        <div>
+                          <p className="text-sm font-semibold mb-1">قیمت‌گذاری دو مرحله‌ای (ارز مبدا → تومان)</p>
+                          <p className="text-[11px] text-muted-foreground mb-3">
+                            قیمت مبدا (USD/EUR/AED) فقط در ادمین قابل مشاهده است. قیمت نهایی تومان = قیمت مبدا × نرخ روز ارز × (1+تعدیل جهانی%) × (1+تعدیل محصول%). نرخ ارز و تعدیل جهانی در صفحه تنظیمات سایت مدیریت می‌شود.
+                          </p>
+                          <div className="grid gap-3 md:grid-cols-3">
+                            <FormField control={form.control as any} name="sourcePriceAmount" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>قیمت مبدا (پنهان – فقط ادمین)</FormLabel>
+                                <FormControl><Input type="number" dir="ltr" placeholder="1000" {...field} /></FormControl>
+                                <FormDescription className="text-[11px]">مثلاً 1000 دلار – از QNAP پر شده</FormDescription>
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control as any} name="sourceCurrency" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>واحد ارز مبدا</FormLabel>
+                                <Select value={field.value || "USD"} onValueChange={field.onChange}>
+                                  <SelectTrigger><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="USD">USD – دلار آمریکا (پیش‌فرض)</SelectItem>
+                                    <SelectItem value="EUR">EUR – یورو</SelectItem>
+                                    <SelectItem value="AED">AED – درهم امارات</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormDescription className="text-[11px]">پیش‌فرض USD، در صورت یورو/درهم تغییر دهید</FormDescription>
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control as any} name="priceAdjustmentPercent" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>تعدیل این محصول (%) – {field.value || "0"}%</FormLabel>
+                                <FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px]">-۵۰٪</span>
+                                    <input type="range" min={-50} max={100} step={1} value={parseFloat(field.value || "0")} onChange={(e) => field.onChange(e.target.value)} className="flex-1" />
+                                    <span className="text-[10px]">+۱۰۰٪</span>
+                                  </div>
+                                </FormControl>
+                                <FormDescription className="text-[11px]">افزایش/کاهش قیمت فقط این محصول نسبت به نرخ محاسبه شده</FormDescription>
+                              </FormItem>
+                            )} />
+                          </div>
+                          <div className="mt-3 rounded-md bg-muted/40 p-3 text-[11px] leading-5">
+                            <p className="font-bold">محاسبه زنده:</p>
+                            <p dir="ltr" className="font-mono text-[11px]">Final Toman = Source × Rate(Currency) × (1+Global%) × (1+Product%)</p>
+                            <p className="mt-1 text-muted-foreground">قیمت نهایی در فرانت‌اند به تومان نمایش داده می‌شود. قیمت مبدا هرگز به کاربر نمایش داده نمی‌شود.</p>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <p className="text-sm font-semibold mb-3">قیمت نهایی و تخفیف (قابل override دستی)</p>
+                          <div className="grid gap-3 md:grid-cols-3">
+                            <FormField control={form.control as any} name="priceAmount" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>قیمت نهایی دستی (تومان) – اختیاری</FormLabel>
+                                <FormControl><Input type="number" dir="ltr" placeholder="مثلاً 189000000 (خالی = محاسبه خودکار)" {...field} /></FormControl>
+                                <FormDescription className="text-[11px]">اگر خالی باشد، از فرمول بالا محاسبه می‌شود. اگر پر کنید، override می‌شود.</FormDescription>
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control as any} name="discountPercent" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>درصد تخفیف (۰-۹۹)</FormLabel>
+                                <FormControl><Input type="number" min="0" max="99" dir="ltr" placeholder="15" {...field} /></FormControl>
+                              </FormItem>
+                            )} />
+                            <FormField control={form.control as any} name="discountEndsAt" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>پایان تخفیف</FormLabel>
+                                <FormControl><Input type="datetime-local" dir="ltr" {...field} /></FormControl>
+                              </FormItem>
+                            )} />
+                          </div>
                         </div>
                       </div>
 

@@ -24,6 +24,10 @@ type Settings = {
   "email.nodemailer_user": string;
   "email.nodemailer_pass": string;
   "email.from_address": string;
+  "currency.usd_rate": string;
+  "currency.eur_rate": string;
+  "currency.aed_rate": string;
+  "currency.global_adjustment_percent": string;
 };
 
 const DEFAULTS: Settings = {
@@ -38,6 +42,10 @@ const DEFAULTS: Settings = {
   "email.nodemailer_user": "",
   "email.nodemailer_pass": "",
   "email.from_address": "TechBox <techboxnoreply@gmail.com>",
+  "currency.usd_rate": "189000",
+  "currency.eur_rate": "200000",
+  "currency.aed_rate": "51500",
+  "currency.global_adjustment_percent": "0",
 };
 
 export default function AdminSettingsPage() {
@@ -236,6 +244,83 @@ export default function AdminSettingsPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="p-6 border shadow-sm space-y-6">
+          <CardHeader className="p-0">
+            <CardTitle>تنظیمات قیمت و ارز (قیمت‌گذاری فروشگاه)</CardTitle>
+            <CardDescription>
+              نرخ تبدیل ارز مبدا به تومان. قیمت نهایی = قیمت دلاری × نرخ ارز × (1 + تعدیل جهانی %) × (1 + تعدیل محصول %). هر روز نرخ‌ها را به‌روز کنید.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0 space-y-6">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label>نرخ دلار (USD → Toman)</Label>
+                <Input
+                  type="number"
+                  dir="ltr"
+                  placeholder="189000"
+                  value={settings["currency.usd_rate"]}
+                  onChange={(e) => setSettings((prev) => ({ ...prev, "currency.usd_rate": e.target.value }))}
+                />
+                <p className="text-[11px] text-muted-foreground">مثال: 189000 یعنی 1 دلار = 189,000 تومان</p>
+              </div>
+              <div className="space-y-2">
+                <Label>نرخ یورو (EUR → Toman)</Label>
+                <Input
+                  type="number"
+                  dir="ltr"
+                  placeholder="200000"
+                  value={settings["currency.eur_rate"]}
+                  onChange={(e) => setSettings((prev) => ({ ...prev, "currency.eur_rate": e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>نرخ درهم (AED → Toman)</Label>
+                <Input
+                  type="number"
+                  dir="ltr"
+                  placeholder="51500"
+                  value={settings["currency.aed_rate"]}
+                  onChange={(e) => setSettings((prev) => ({ ...prev, "currency.aed_rate": e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <Label>تعدیل جهانی قیمت‌ها (Global Price Adjustment) – {settings["currency.global_adjustment_percent"]}%</Label>
+              <div className="flex items-center gap-4">
+                <span className="text-[11px] text-muted-foreground">-۵۰٪</span>
+                <input
+                  type="range"
+                  min={-50}
+                  max={100}
+                  step={1}
+                  value={parseFloat(settings["currency.global_adjustment_percent"] || "0")}
+                  onChange={(e) => setSettings((prev) => ({ ...prev, "currency.global_adjustment_percent": e.target.value }))}
+                  className="flex-1"
+                />
+                <span className="text-[11px] text-muted-foreground">+۱۰۰٪</span>
+                <Badge variant="outline" className="min-w-[50px] justify-center">
+                  {settings["currency.global_adjustment_percent"]}%
+                </Badge>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                این اسلایدر قیمت تمام محصولات را به صورت جهانی کم یا زیاد می‌کند. مثلاً +10% یعنی همه محصولات 10% گران‌تر محاسبه می‌شوند.
+              </p>
+            </div>
+
+            <div className="rounded-md bg-muted/40 p-3 text-[11px] leading-5">
+              <p className="font-bold">فرمول نهایی:</p>
+              <p dir="ltr" className="font-mono text-[12px] mt-1">
+                Final = SourcePrice × Rate(Currency) × (1 + Global% /100) × (1 + Product% /100)
+              </p>
+              <p className="mt-2">مثال: محصول 1000 دلار × نرخ 189,000 = 189,000,000 تومان × تعدیل جهانی 10% = 207,900,000 تومان</p>
             </div>
           </CardContent>
         </Card>

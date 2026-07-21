@@ -16,6 +16,7 @@ import { ProductJsonLd } from "@/components/seo/StructuredData";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Star, ShieldCheck, Truck, Package, Info, Cpu, MemoryStick, HardDrive, Monitor, Battery, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
+import SpecsTableCategorized from "@/features/shop/components/SpecsTableCategorized";
 
 type ProductItem = ContentItem & {
   brand?: string | null;
@@ -364,9 +365,12 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
               </TabsContent>
 
               <TabsContent value="specs" className="pt-6">
-                <h2 className="text-[16px] font-bold mb-4">مشخصات فنی</h2>
-                <div className="rounded-lg border border-border bg-card p-4">
-                  <SpecsTable specs={item.specs} />
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-[16px] font-bold">مشخصات فنی – دسته‌بندی فارسی (۲۵ مورد مهم)</h2>
+                  <span className="text-[11px] text-muted-foreground">بر اساس دیتاشیت QNAP – قابل مدیریت از ادمین</span>
+                </div>
+                <div className="rounded-xl border border-border bg-card p-4 sm:p-6">
+                  <SpecsTableCategorized specs={item.specs as Record<string, unknown>} />
                 </div>
               </TabsContent>
 

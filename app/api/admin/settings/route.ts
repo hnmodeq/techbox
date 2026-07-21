@@ -37,6 +37,10 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "newsletter.email.nodemailer_user": "",
   "newsletter.email.nodemailer_pass": "",
   "newsletter.email.from_address": "TechBox Newsletter <newsletter@techbox.local>",
+  "currency.usd_rate": "189000",
+  "currency.eur_rate": "200000",
+  "currency.aed_rate": "51500",
+  "currency.global_adjustment_percent": "0",
   ...HERO_MAGIC_DEFAULTS,
 };
 
