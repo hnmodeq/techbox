@@ -437,32 +437,32 @@ export default function RaidCalculator() {
             })}
           </div>
 
-          {/* Selected tray – dark like Synology but token-aware */}
-          <div className="rounded-lg border border-border bg-[#2f333a] dark:bg-[#15181e] p-3 sm:p-4 min-h-[120px] shadow-inner">
+          {/* Selected tray – now 100% tokens, light in light mode / dark in dark mode */}
+          <div className="rounded-lg border border-border bg-muted dark:bg-muted/40 p-3 sm:p-4 min-h-[120px] shadow-inner">
             <div className="flex flex-wrap gap-2.5 sm:gap-3">
               {drives.length === 0 ? (
-                <div className="w-full h-[84px] flex flex-col items-center justify-center gap-1 text-[12px] text-white/50">
-                  <HardDrive className="size-6 opacity-60" />
+                <div className="w-full h-[84px] flex flex-col items-center justify-center gap-1 text-[12px] text-muted-foreground">
+                  <HardDrive className="size-6 opacity-60 text-muted-foreground" />
                   <span>برای شروع، یک ظرفیت از بالا انتخاب کنید</span>
-                  <span className="text-[10px] text-white/30">نمای دیسک‌های انتخابی اینجا خواهد بود</span>
+                  <span className="text-[10px] text-muted-foreground/70">نمای دیسک‌های انتخابی اینجا خواهد بود</span>
                 </div>
               ) : (
                 drives.map((d) => (
                   <div
                     key={d.id}
                     className={cn(
-                      "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border text-white shadow-sm transition-colors",
+                      "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-colors",
                       d.type === "SSD"
-                        ? "bg-[#2a5a8a] dark:bg-[#1e3a5a] border-blue-300/30 hover:border-blue-200/50 hover:bg-[#325f8f]"
-                        : "bg-[#3e444e] dark:bg-[#252a33] border-white/15 hover:border-white/30 hover:bg-[#4a505c]"
+                        ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 hover:border-primary/30"
+                        : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20"
                     )}
                   >
-                    <HardDrive className={cn("size-6 transition", d.type === "SSD" ? "text-blue-200 group-hover:text-white" : "text-white/70 group-hover:text-white")} />
+                    <HardDrive className={cn("size-6 transition", d.type === "SSD" ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground")} />
                     <span className="text-[11px] font-bold">{d.label}</span>
-                    <span className={cn("text-[9px] px-1 rounded", d.type === "SSD" ? "bg-blue-400/30 text-blue-100" : "bg-white/10 text-white/60")}>{d.type}</span>
+                    <span className={cn("text-[9px] px-1.5 py-0.5 rounded-md font-medium", d.type === "SSD" ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>{d.type}</span>
                     <button
                       onClick={() => removeDrive(d.id)}
-                      className="absolute -top-2 -right-2 size-6 rounded-full bg-white text-black flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
+                      className="absolute -top-2 -right-2 size-6 rounded-full bg-background border border-border text-foreground flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all"
                       aria-label="حذف"
                     >
                       <XIcon className="size-3.5" />
@@ -471,7 +471,7 @@ export default function RaidCalculator() {
                 ))
               )}
               {Array.from({ length: Math.max(0, 12 - drives.length) }).map((_, i) => (
-                <div key={`ph-${i}`} className="h-[92px] w-[84px] rounded-md bg-white/[0.04] border border-dashed border-white/10" />
+                <div key={`ph-${i}`} className="h-[92px] w-[84px] rounded-md bg-background/60 dark:bg-card/40 border border-dashed border-border/60" />
               ))}
             </div>
           </div>
