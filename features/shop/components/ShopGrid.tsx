@@ -195,7 +195,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         <div className="flex gap-6">
           {/* ── Filter Sidebar — open by default ── */}
           {sidebarOpen && (
-            <aside className="w-56 shrink-0 space-y-1 text-sm sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" dir="rtl">
+            <aside className="w-72 shrink-0 space-y-1 text-sm sticky top-20 self-start max-h-[calc(100vh-6rem)] overflow-y-auto" dir="rtl">
               {/* Header */}
               <div className="flex items-center justify-between pb-3 border-b">
                 <span className="font-bold text-sm">فیلترها</span>
@@ -296,9 +296,10 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                         className="h-7 text-xs pr-6"
                       />
                     </div>
-                    <div className="max-h-40 overflow-y-auto space-y-1">
+                    {/* No scroll — show all brands, English left, Farsi right */}
+                    <div className="space-y-0.5">
                       {filteredBrands.map((brand) => (
-                        <label key={brand} className="flex items-center cursor-pointer py-0.5">
+                        <label key={brand} className="flex items-center cursor-pointer py-1 gap-2">
                           <input
                             type="checkbox"
                             checked={selectedBrands.has(brand)}
@@ -307,18 +308,18 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                               e.target.checked ? n.add(brand) : n.delete(brand);
                               setSelectedBrands(n);
                             }}
-                            className="rounded border-gray-300 size-3.5 shrink-0 ml-2"
+                            className="rounded border-gray-300 size-3.5 shrink-0"
                           />
-                          {/* English left — Farsi right, single line */}
-                          <span className="flex items-center justify-between flex-1 min-w-0" dir="ltr">
+                          {/* English left, Farsi right — no overlap with scrollbar */}
+                          <div className="flex items-center justify-between flex-1 min-w-0 pr-1">
                             <span className="text-xs font-medium text-foreground">{brand}</span>
                             {BRAND_FA[brand] && (
-                              <span className="text-xs text-muted-foreground mr-1" dir="rtl">{BRAND_FA[brand]}</span>
+                              <span className="text-xs text-muted-foreground" dir="rtl">{BRAND_FA[brand]}</span>
                             )}
-                          </span>
+                          </div>
                         </label>
                       ))}
-                      {filteredBrands.length === 0 && <p className="text-[11px] text-muted-foreground">برندی یافت نشد</p>}
+                      {filteredBrands.length === 0 && <p className="text-[11px] text-muted-foreground py-1">برندی یافت نشد</p>}
                     </div>
                   </div>
                 )}
@@ -345,9 +346,10 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                         className="h-7 text-xs pr-6"
                       />
                     </div>
-                    <div className="max-h-40 overflow-y-auto space-y-1">
+                    {/* No scroll on categories either */}
+                    <div className="space-y-0.5">
                       {filteredCats.map((cat) => (
-                        <label key={cat} className="flex items-center gap-2 cursor-pointer py-0.5">
+                        <label key={cat} className="flex items-center gap-2 cursor-pointer py-1">
                           <input
                             type="checkbox"
                             checked={selectedCats.has(cat)}
@@ -379,8 +381,8 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                 <div className={cn(
                   "grid gap-5",
                   sidebarOpen
-                    ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
-                    : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
+                    ? "grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
                 )}>
                   {visible.map((p) => <ShopProductCard key={p.slug} product={p} />)}
                 </div>

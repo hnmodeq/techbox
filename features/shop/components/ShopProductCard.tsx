@@ -27,12 +27,12 @@ function parsePriceLabel(label: string | null | undefined): number {
   return Math.round(num);
 }
 
-// ── Spec defs — always in order: Bay, CPU, RAM, Network Card ─────────────────
-const SPEC_DEFS: Array<{ Icon: React.ElementType; key: string; label: string }> = [
-  { Icon: HardDrive,   key: "Bay",          label: "درایو / Bay" },
-  { Icon: Cpu,         key: "CPU",          label: "پردازنده" },
-  { Icon: MemoryStick, key: "RAM",          label: "حافظه" },
-  { Icon: Network,     key: "Network Card", label: "کارت شبکه" },
+// ── Spec defs — Bay / CPU / RAM / Network Card ────────────────────────────────
+const SPEC_DEFS: Array<{ Icon: React.ElementType; key: string }> = [
+  { Icon: HardDrive,   key: "Bay" },
+  { Icon: Cpu,         key: "CPU" },
+  { Icon: MemoryStick, key: "RAM" },
+  { Icon: Network,     key: "Network Card" },
 ];
 
 const NA_VALUES = new Set(["n/a", "na", "-", "", "N/A", "N/A (Expansion Unit)", "N/A (Expansion)"]);
@@ -48,14 +48,16 @@ function DiscountTimer({ endsAt }: { endsAt: string }) {
   return (
     <div className="flex items-center gap-px text-[9px] font-mono font-bold text-red-400 mt-0.5 leading-none" dir="ltr">
       {t.days > 0 && <span>{pad(t.days)}d&nbsp;</span>}
-      <span>{pad(t.hours)}</span><span className="animate-pulse mx-px">:</span>
-      <span>{pad(t.minutes)}</span><span className="animate-pulse mx-px">:</span>
+      <span>{pad(t.hours)}</span>
+      <span className="animate-pulse mx-px">:</span>
+      <span>{pad(t.minutes)}</span>
+      <span className="animate-pulse mx-px">:</span>
       <span>{pad(t.seconds)}</span>
     </div>
   );
 }
 
-// ── Stars with "رضایت خریدار" tooltip ────────────────────────────────────────
+// ── Star rating ───────────────────────────────────────────────────────────────
 function StarRating({ rating, count }: { rating: number; count: number }) {
   const full = Math.floor(rating);
   const half = rating - full >= 0.5;
@@ -80,7 +82,9 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
               {rating.toLocaleString("fa-IR", { maximumFractionDigits: 1 })}
             </span>
             {count > 0 && (
-              <span className="text-[10px] text-gray-300 leading-none">({count.toLocaleString("fa-IR")})</span>
+              <span className="text-[10px] text-gray-300 leading-none">
+                ({count.toLocaleString("fa-IR")})
+              </span>
             )}
           </div>
         }
@@ -99,20 +103,16 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
   const priceAmount     = (p.priceAmount && p.priceAmount > 0) ? p.priceAmount : parsePriceLabel(p.priceLabel);
   const discount        = p.discountPercent ?? 0;
   const discountedPrice = discount > 0 ? Math.round(priceAmount * (1 - discount / 100)) : priceAmount;
-
-  // Show all 4 spec slots — always Bay/CPU/RAM/Network Card
-  // Each slot hidden if N/A
-  const validSpecs = SPEC_DEFS.filter(({ key }) => !isNA(specs[key]));
-
-  const orig = formatPrice(priceAmount);
-  const disc = formatPrice(discountedPrice);
+  const validSpecs      = SPEC_DEFS.filter(({ key }) => !isNA(specs[key]));
+  const orig            = formatPrice(priceAmount);
+  const disc            = formatPrice(discountedPrice);
 
   return (
     <Link
       href={`/shop/${p.slug}`}
       className="relative flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
     >
-      {/* Discount badge + countdown — top-right */}
+      {/* ── Discount badge + countdown — top-right ── */}
       {discount > 0 && !isUnavailable && (
         <div className="absolute top-2 right-2 z-10 flex flex-col items-end">
           <span className="rounded-md bg-red-500 px-1.5 py-0.5 text-[11px] font-bold text-white leading-tight">
@@ -122,7 +122,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </div>
       )}
 
-      {/* Image — white bg, keep size small via px padding */}
+      {/* ── Image ── */}
       <div className="relative w-full bg-white" style={{ paddingBottom: "70%" }}>
         <div className="absolute inset-0 flex items-center justify-center px-10 py-6">
           <Image
@@ -136,10 +136,10 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </div>
       </div>
 
-      {/* Card body */}
+      {/* ── Card body ── */}
       <div className="flex flex-col gap-2 px-4 pt-2 pb-4 flex-1">
 
-        {/* Title — no hover color, RTL-aligned */}
+        {/* Title */}
         <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug min-h-[2.5rem] text-right" dir="rtl">
           {p.title}
         </h3>
@@ -155,13 +155,13 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           </div>
         )}
 
-        {/* Spec icons — Bay / CPU / RAM / Network Card, only when not N/A */}
+        {/* ── Spec icons — tooltip shows only the value, no Farsi label ── */}
         {validSpecs.length > 0 && (
           <div
             className="grid gap-1 py-2 border-y border-gray-100"
             style={{ gridTemplateColumns: `repeat(${validSpecs.length}, 1fr)` }}
           >
-            {validSpecs.map(({ Icon, key, label }) => {
+            {validSpecs.map(({ Icon, key }) => {
               const value = specs[key];
               return (
                 <Tooltip key={key}>
@@ -175,18 +175,34 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
                       </div>
                     }
                   />
-                  <TooltipContent side="bottom">{label}: {value}</TooltipContent>
+                  {/* Tooltip: only the spec value, no Farsi label */}
+                  <TooltipContent side="bottom">{value}</TooltipContent>
                 </Tooltip>
               );
             })}
           </div>
         )}
 
-        {/* Price row — warranty icon on right, price on left (RTL: price right, icon left) */}
-        <div className="mt-auto flex items-end justify-between gap-2" dir="rtl">
+        {/* ── Price row: price RIGHT, warranty icon LEFT ── */}
+        {/* In LTR layout: warranty on the left, price on the right */}
+        <div className="mt-auto flex items-end justify-between gap-2">
 
-          {/* Price — right-justified in RTL */}
-          <div className="flex flex-col items-start">
+          {/* Warranty icon — LEFT side */}
+          {p.warranty && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <div className="flex items-center justify-center cursor-default shrink-0">
+                    <ShieldCheck className="size-5 text-green-500" />
+                  </div>
+                }
+              />
+              <TooltipContent>دارای گارانتی — {p.warranty}</TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Price — RIGHT side, always pushed right */}
+          <div className="flex flex-col items-end mr-auto" dir="rtl">
             {isUnavailable ? (
               <span className="text-sm font-bold text-red-500">ناموجود</span>
             ) : priceAmount <= 0 ? (
@@ -211,21 +227,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
             )}
           </div>
 
-          {/* Warranty icon — left side of price row (RTL = after price visually) */}
-          {p.warranty && (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <div className="flex items-center justify-center cursor-default shrink-0 mb-0.5">
-                    <ShieldCheck className="size-5 text-green-500" />
-                  </div>
-                }
-              />
-              <TooltipContent>دارای گارانتی — {p.warranty}</TooltipContent>
-            </Tooltip>
-          )}
         </div>
-
       </div>
     </Link>
   );
