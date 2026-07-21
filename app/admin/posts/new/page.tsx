@@ -138,6 +138,21 @@ function NewPostInner() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [lastDraftKey, setLastDraftKey] = useState("");
+  const [currencyRates, setCurrencyRates] = useState({ USD: 189000, EUR: 200000, AED: 51500, global: 0 });
+
+  useEffect(() => {
+    fetch("/api/admin/settings", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => {
+        setCurrencyRates({
+          USD: parseFloat(d["currency.usd_rate"] || "189000"),
+          EUR: parseFloat(d["currency.eur_rate"] || "200000"),
+          AED: parseFloat(d["currency.aed_rate"] || "51500"),
+          global: parseFloat(d["currency.global_adjustment_percent"] || "0"),
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   const form = useForm<any>({
     resolver: zodResolver(postSchema as any),
@@ -728,10 +743,27 @@ function NewPostInner() {
                               </FormItem>
                             )} />
                           </div>
-                          <div className="mt-3 rounded-md bg-muted/40 p-3 text-[11px] leading-5">
-                            <p className="font-bold">محاسبه زنده:</p>
-                            <p dir="ltr" className="font-mono text-[11px]">Final Toman = Source × Rate(Currency) × (1+Global%) × (1+Product%)</p>
-                            <p className="mt-1 text-muted-foreground">قیمت نهایی در فرانت‌اند به تومان نمایش داده می‌شود. قیمت مبدا هرگز به کاربر نمایش داده نمی‌شود.</p>
+                          <div className="mt-3 rounded-md bg-muted/40 p-3 text-[11px] leading-5 space-y-2">
+                            <p className="font-bold">محاسبه زنده نهایی تومان (قابل مشاهده در فرانت):</p>
+                            <p dir="ltr" className="font-mono text-[11px]">Final = Source × Rate × (1+Global%) × (1+Product%)</p>
+                            {(() => {
+                              const src = parseFloat((form.watch("sourcePriceAmount") as string) || "0");
+                              const curr = (form.watch("sourceCurrency") as string) || "USD";
+                              const prodAdj = parseFloat((form.watch("priceAdjustmentPercent") as string) || "0");
+                              const rate = curr === "EUR" ? currencyRates.EUR : curr === "AED" ? currencyRates.AED : currencyRates.USD;
+                              const base = src * rate;
+                              const afterGlobal = base * (1 + currencyRates.global / 100);
+                              const final = afterGlobal * (1 + prodAdj / 100);
+                              if (!src) return <p className="text-muted-foreground">قیمت مبدا را وارد کنید تا قیمت نهایی محاسبه شود</p>;
+                              return (
+                                <div className="space-y-1">
+                                  <p>نرخ {curr}: {rate.toLocaleString("fa-IR")} تومان (از تنظیمات → قیمت و ارز)</p>
+                                  <p>پایه: {src.toLocaleString("fa-IR")} {curr} × {rate.toLocaleString("fa-IR")} = {base.toLocaleString("fa-IR")} تومان</p>
+                                  <p>پس از تعدیل جهانی {currencyRates.global}%: {afterGlobal.toLocaleString("fa-IR")} تومان</p>
+                                  <p className="font-bold text-[12px] text-primary">قیمت نهایی نمایش به کاربر: {final.toLocaleString("fa-IR")} تومان</p>
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
 
@@ -763,36 +795,156 @@ function NewPostInner() {
                         </div>
                       </div>
 
-                      <Separator />
-
-                      {/* Specs */}
-                      <div>
-                        <p className="text-sm font-semibold mb-3">مشخصات فنی</p>
+                      <Separator />                      {/* Specs – Farsi categorized, dropdowns for limited specs */}
+                      <div className="space-y-4">
+                        <p className="text-sm font-semibold mb-1">مشخصات فنی (۲۵ مورد مهم – فارسی)</p>
+                        <p className="text-[11px] text-muted-foreground mb-3">۴ مشخصه مهم روی کارت: CPU / RAM / Bay / Network Card از همین لیست پر می‌شود. برای فیلتر فروشگاه فقط ۷ فاکتور مهم استفاده می‌شود.</p>
                         <div className="grid gap-3 md:grid-cols-2">
-                          {(["CPU", "RAM", "Bay", "Network Card", "Form Factor", "Drive Type", "Throughput"] as const).map((key) => {
+                          {/* CPU – text */}
+                          {(() => {
+                            const key = "CPU";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
-                            const labels: Record<string, string> = {
-                              "CPU": "CPU / پردازنده", "RAM": "RAM / حافظه", "Bay": "Bay / درایو",
-                              "Network Card": "کارت شبکه", "Form Factor": "فرم فاکتور",
-                              "Drive Type": "نوع درایو (All-Flash / Hybrid / All-HDD)", "Throughput": "پهنای باند",
-                            };
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">{labels[key]}</label>
-                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""}
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    let obj: Record<string, string> = {};
-                                    try { obj = JSON.parse(specsStr); } catch {}
-                                    if (val.trim()) obj[key] = val; else delete obj[key];
-                                    form.setValue("specs", JSON.stringify(obj, null, 2));
-                                  }}
-                                />
+                                <label className="text-xs font-medium text-muted-foreground">CPU / پردازنده (مهم – روی کارت)</label>
+                                <Input dir="ltr" placeholder="Intel Xeon D-2123IT 4-core 3.0GHz" className="mt-1" value={specsObj[key] || ""} onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
                               </div>
                             );
-                          })}
+                          })()}
+                          {(() => {
+                            const key = "RAM";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">RAM / حافظه (مهم – روی کارت)</label>
+                                <Input dir="ltr" placeholder="32GB DDR4 ECC" className="mt-1" value={specsObj[key] || ""} onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
+                              </div>
+                            );
+                          })()}
+                          {/* Bay – dropdown limited */}
+                          {(() => {
+                            const key = "Bay";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            const val = specsObj[key] || "";
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">Bay / تعداد جایگاه دیسک (مهم – روی کارت + فیلتر)</label>
+                                <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
+                                  <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب تعداد Bay..." /></SelectTrigger>
+                                  <SelectContent>
+                                    {["1 Bay", "2 Bay", "4 Bay", "6 Bay", "8 Bay", "12 Bay", "16 Bay", "24 Bay", "36 Bay"].map((b) => (
+                                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            );
+                          })()}
+                          {/* Network Card – dropdown */}
+                          {(() => {
+                            const key = "Network Card";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            const val = specsObj[key] || "";
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">کارت شبکه (مهم – روی کارت + فیلتر 10GbE)</label>
+                                <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
+                                  <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب..." /></SelectTrigger>
+                                  <SelectContent>
+                                    {["1GbE", "2.5GbE", "10GbE", "25GbE", "40GbE", "10GbE SFP+", "25GbE SFP28"].map((b) => (
+                                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "Form Factor";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            const val = specsObj[key] || "";
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">فرم فاکتور (محدود)</label>
+                                <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
+                                  <SelectTrigger className="mt-1"><SelectValue placeholder="Tower / Rackmount..." /></SelectTrigger>
+                                  <SelectContent>
+                                    {["Tower", "Desktop", "Rackmount 1U", "Rackmount 2U", "Rackmount 3U", "Rackmount 4U", "Short-depth 1U", "Short-depth 2U"].map((b) => (
+                                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "Drive Type";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            const val = specsObj[key] || "";
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">نوع درایو (محدود)</label>
+                                <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
+                                  <SelectTrigger className="mt-1"><SelectValue placeholder="All-Flash / Hybrid..." /></SelectTrigger>
+                                  <SelectContent>
+                                    {["All-Flash", "Hybrid (HDD+SSD)", "All-HDD", "All-NVMe", "SAS HDD", "SATA HDD", "U.2 NVMe"].map((b) => (
+                                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "Throughput";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">پهنای باند / توان عملیاتی</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="e.g. 2,500 MB/s" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
+                              </div>
+                            );
+                          })()}
+                          {/* Fast shipping toggle */}
+                          {(() => {
+                            const key = "ارسال سریع";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            const isFast = specsObj[key] === "دارد";
+                            return (
+                              <div className="flex items-center justify-between rounded-md border p-3">
+                                <div>
+                                  <div className="text-xs font-medium">ارسال سریع</div>
+                                  <div className="text-[11px] text-muted-foreground">آیا این محصول ارسال سریع دارد؟</div>
+                                </div>
+                                <Switch checked={isFast} onCheckedChange={(checked) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (checked) obj[key] = "دارد"; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
+                              </div>
+                            );
+                          })()}
+                        </div>
+                        <div className="mt-4">
+                          <p className="text-xs font-medium mb-2">JSON خام Specs (۲۵ مورد مهم – قابل ویرایش مستقیم)</p>
+                          <FormField control={form.control as any} name="specs" render={({ field }) => (
+                            <FormItem>
+                              <FormControl><Textarea className="min-h-[120px] font-mono text-[11px]" dir="ltr" {...field} /></FormControl>
+                              <FormDescription className="text-[11px]">کلیدهای فارسی دسته‌بندی شده در مشخصات فنی نمایش داده می‌شوند. ۴ مورد اول روی کارت محصول می‌آیند.</FormDescription>
+                            </FormItem>
+                          )} />
                         </div>
                       </div>
 
