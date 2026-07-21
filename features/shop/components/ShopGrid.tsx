@@ -142,12 +142,16 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
 
   const [onlyAvailable, setOnlyAvailable] = useState(false);
 
-  // open states for filter sections
+  // open states for filter sections – only practical filters
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({
-    fast: true,
-    price: false,
+    fast: false,
+    price: true,
     brand: true,
     category: false,
+    bay: true,
+    cpu: false,
+    memory: false,
+    features: true,
   });
   const toggleSection = (k: string) => setOpenMap((m) => ({ ...m, [k]: !m[k] }));
 
@@ -172,53 +176,103 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const [selectedCats, setSelectedCats] = useState<Set<string>>(new Set());
   const filteredCats = allCategories.filter((c) => c.toLowerCase().includes(catSearch.toLowerCase()));
 
-  // ── Spec based filters (to cover Digikala-like filters: RAM, CPU, etc.) ──
-  const specMap = useMemo(() => {
-    const map: Record<string, Set<string>> = {};
-    for (const it of items) {
-      const s = it.specs as Record<string, unknown> | null;
-      if (!s || typeof s !== "object") continue;
-      for (const [k, v] of Object.entries(s)) {
-        const val = String(v).trim();
-        if (!val || ["n/a", "na", "-", "N/A"].includes(val.toLowerCase())) continue;
-        if (!map[k]) map[k] = new Set();
-        map[k].add(val);
+  // ── Curated practical filters – only 7 important + brand/price (per user request) ──
+  // Helpers to extract normalized values from QNAP specs
+  const parseBayNumber = (specs: any): number | null => {
+    if (!specs || typeof specs !== "object") return null;
+    const raw = specs["Drive Bay"] || specs["Bay"] || specs["تعداد جایگاه دیسک"] || "";
+    const m = String(raw).match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : null;
+  };
+  const parseCpuFamily = (specs: any): string | null => {
+    if (!specs || typeof specs !== "object") return null;
+    const cpu = String(specs["CPU"] || specs["پردازنده"] || "").toLowerCase();
+    if (!cpu) return null;
+    if (cpu.includes("celeron")) return "Celeron";
+    if (cpu.includes("pentium")) return "Pentium";
+    if (cpu.includes("atom")) return "Atom";
+    if (cpu.includes("xeon")) return "Xeon";
+    if (cpu.includes("ryzen")) return "Ryzen";
+    if (cpu.includes("epyc")) return "EPYC";
+    if (cpu.includes("arm")) return "ARM";
+    if (cpu.includes("cortex")) return "ARM";
+    return "سایر";
+  };
+  const parseMaxMemory = (specs: any): string | null => {
+    if (!specs || typeof specs !== "object") return null;
+    const raw = String(specs["Maximum Memory"] || specs["حداکثر حافظه"] || specs["System Memory"] || "");
+    const m = raw.match(/(\d+)\s*GB/i);
+    return m ? `${m[1]}GB` : null;
+  };
+  const has10GbE = (specs: any): boolean => {
+    if (!specs || typeof specs !== "object") return false;
+    const keys = Object.keys(specs).filter((k) => k.toLowerCase().includes("10 gigabit") || k.toLowerCase().includes("10gbase") || k.toLowerCase().includes("10 gb"));
+    for (const k of keys) {
+      const v = String((specs as any)[k] || "").toLowerCase();
+      if (v && v !== "" && !v.includes("optional via") && !v.includes("optional") ) {
+        // If it has a count or mentions port, consider true
+        if (v.includes("x") || v.match(/\d/) || v.includes("port")) return true;
       }
+      // Even if optional, if it mentions 10GbE we could consider as capability? For filter we want built-in
+      // Let's check if value contains digit
+      if (v && v.match(/\d/)) return true;
     }
-    return map;
+    // Also check in general specs values for 10GbE
+    const allVals = Object.values(specs as any).join(" ").toLowerCase();
+    return allVals.includes("10gbe") || allVals.includes("10gbase");
+  };
+  const parseM2Count = (specs: any): string | null => {
+    if (!specs || typeof specs !== "object") return null;
+    const raw = String(specs["M.2 Slot"] || specs["M.2"] || "");
+    const m = raw.match(/(\d+)\s*x\s*M\.2/i) || raw.match(/(\d+)\s*M\.2/i);
+    if (m) return `${m[1]} اسلات`;
+    if (raw) return raw.slice(0, 30);
+    return null;
+  };
+  const hasRedundantPower = (specs: any): boolean => {
+    if (!specs || typeof specs !== "object") return false;
+    const psu = String(specs["Power Supply Unit"] || specs["منبع تغذیه"] || "").toLowerCase();
+    return psu.includes("redundant") || psu.includes("2 x") || psu.includes("2x") || psu.includes("redundant");
+  };
+  const parseWarranty = (specs: any): string | null => {
+    if (!specs || typeof specs !== "object") return null;
+    return String(specs["Standard Warranty"] || specs["Warranty"] || specs["گارانتی"] || "").trim().slice(0, 50) || null;
+  };
+
+  const allBays = useMemo(() => {
+    const set = new Set<number>();
+    for (const it of items) {
+      const b = parseBayNumber(it.specs as any);
+      if (b) set.add(b);
+    }
+    return Array.from(set).sort((a, b) => a - b);
   }, [items]);
 
-  const [selectedSpecs, setSelectedSpecs] = useState<Record<string, Set<string>>>({});
-  const [specSearch, setSpecSearch] = useState<Record<string, string>>({});
+  const allCpuFamilies = useMemo(() => {
+    const set = new Set<string>();
+    for (const it of items) {
+      const f = parseCpuFamily(it.specs as any);
+      if (f) set.add(f);
+    }
+    return Array.from(set).sort();
+  }, [items]);
 
-  const toggleSpecValue = (key: string, value: string) => {
-    setSelectedSpecs((prev) => {
-      const next = { ...prev };
-      const set = new Set(next[key] ?? []);
-      if (set.has(value)) set.delete(value);
-      else set.add(value);
-      if (set.size === 0) delete next[key];
-      else next[key] = set;
-      return next;
-    });
-  };
+  const allMaxMemories = useMemo(() => {
+    const set = new Set<string>();
+    for (const it of items) {
+      const m = parseMaxMemory(it.specs as any);
+      if (m) set.add(m);
+    }
+    // Sort by numeric GB
+    return Array.from(set).sort((a, b) => parseInt(a) - parseInt(b));
+  }, [items]);
 
-  // Map spec English keys to Persian labels matching screenshot
-  const SPEC_FA: Record<string, string> = {
-    Bay: "ظرفیت حافظه داخلی",
-    CPU: "سری پردازنده",
-    RAM: "ظرفیت حافظه رم (RAM)",
-    "Network Card": "سازنده پردازنده",
-    Brand: "برند",
-    Model: "مدل",
-    Storage: "ظرفیت حافظه داخلی",
-    Color: "رنگ",
-    "Screen Size": "سایز صفحه نمایش",
-    "Graphics": "مدل پردازنده گرافیکی",
-    "GPU Memory": "حافظه اختصاصی پردازنده گرافیکی",
-    Generation: "نسل پردازنده",
-    Usage: "کاربری",
-  };
+  const [selectedBays, setSelectedBays] = useState<Set<number>>(new Set());
+  const [selectedCpuFamilies, setSelectedCpuFamilies] = useState<Set<string>>(new Set());
+  const [selectedMemories, setSelectedMemories] = useState<Set<string>>(new Set());
+  const [filter10GbE, setFilter10GbE] = useState(false);
+  const [filterRedundant, setFilterRedundant] = useState(false);
+  const [filterM2, setFilterM2] = useState(false);
 
   const sorted = useMemo(() => {
     let list = [...items];
@@ -232,14 +286,35 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     if (selectedBrands.size > 0) list = list.filter((i) => i.brand && selectedBrands.has(i.brand));
     if (selectedCats.size > 0) list = list.filter((i) => i.category && selectedCats.has(i.category));
 
-    // spec filters
-    for (const [sk, svSet] of Object.entries(selectedSpecs)) {
-      if (svSet.size === 0) continue;
+    // ── Practical filters – 7 important factors ──
+    if (selectedBays.size > 0) {
       list = list.filter((it) => {
-        const s = (it.specs as Record<string, unknown>) ?? {};
-        const v = s[sk];
-        if (v == null) return false;
-        return svSet.has(String(v));
+        const b = parseBayNumber(it.specs as any);
+        return b !== null && selectedBays.has(b);
+      });
+    }
+    if (selectedCpuFamilies.size > 0) {
+      list = list.filter((it) => {
+        const f = parseCpuFamily(it.specs as any);
+        return f !== null && selectedCpuFamilies.has(f);
+      });
+    }
+    if (selectedMemories.size > 0) {
+      list = list.filter((it) => {
+        const m = parseMaxMemory(it.specs as any);
+        return m !== null && selectedMemories.has(m);
+      });
+    }
+    if (filter10GbE) {
+      list = list.filter((it) => has10GbE(it.specs as any));
+    }
+    if (filterRedundant) {
+      list = list.filter((it) => hasRedundantPower(it.specs as any));
+    }
+    if (filterM2) {
+      list = list.filter((it) => {
+        const c = parseM2Count(it.specs as any);
+        return c !== null;
       });
     }
 
@@ -279,14 +354,14 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         break;
     }
     return list;
-  }, [items, sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedSpecs]);
+  }, [items, sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2]);
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedSpecs]);
+  }, [sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2]);
 
   useEffect(() => {
     const el = loaderRef.current;
@@ -307,14 +382,25 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     (priceFilter ? 1 : 0) +
     selectedBrands.size +
     selectedCats.size +
-    Object.values(selectedSpecs).reduce((acc, s) => acc + s.size, 0);
+    selectedBays.size +
+    selectedCpuFamilies.size +
+    selectedMemories.size +
+    (filter10GbE ? 1 : 0) +
+    (filterRedundant ? 1 : 0) +
+    (filterM2 ? 1 : 0) +
+    0;
 
   const clearAllFilters = useCallback(() => {
     setOnlyAvailable(false);
     setPriceFilter(null);
     setSelectedBrands(new Set());
     setSelectedCats(new Set());
-    setSelectedSpecs({});
+    setSelectedBays(new Set());
+    setSelectedCpuFamilies(new Set());
+    setSelectedMemories(new Set());
+    setFilter10GbE(false);
+    setFilterRedundant(false);
+    setFilterM2(false);
   }, []);
 
   const fmtSliderPrice = (v: number) => {
@@ -467,68 +553,70 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         </div>
       </FilterSection>
 
-      {/* Dynamic spec filters — covers رنگ, سری پردازنده, RAM, GPU, etc. */}
-      {Object.entries(specMap).map(([key, valuesSet]) => {
-        const values = Array.from(valuesSet).sort();
-        const isOpen = !!openMap[`spec-${key}`];
-        const searchVal = specSearch[key] ?? "";
-        const filtered = values.filter((v) => v.toLowerCase().includes(searchVal.toLowerCase()));
-        const selectedCount = selectedSpecs[key]?.size ?? 0;
-        const titleFa = SPEC_FA[key] ?? key;
-        // Skip huge sets to keep UI clean, but still show top values
-        if (values.length === 0) return null;
-        return (
-          <FilterSection
-            key={key}
-            title={titleFa}
-            open={isOpen}
-            onToggle={() => toggleSection(`spec-${key}`)}
-            badgeCount={selectedCount}
-          >
-            <div className="space-y-2">
-              {values.length > 6 && (
-                <div className="relative">
-                  <Search className="absolute right-2 top-1/2 -translate-y-1/2 size-3 text-muted-foreground" />
-                  <Input
-                    value={searchVal}
-                    onChange={(e) => setSpecSearch((m) => ({ ...m, [key]: e.target.value }))}
-                    placeholder={`جستجوی ${titleFa}…`}
-                    className="h-7 text-[11px] pr-6 bg-muted/40"
-                  />
-                </div>
-              )}
-              <div className="space-y-0.5 max-h-56 overflow-y-auto scrollbar-thin pr-1">
-                {filtered.slice(0, 30).map((val) => (
-                  <label key={val} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-muted/30 rounded px-1">
-                    <input
-                      type="checkbox"
-                      checked={!!selectedSpecs[key]?.has(val)}
-                      onChange={() => toggleSpecValue(key, val)}
-                      className="rounded border-border size-3.5 accent-primary shrink-0"
-                    />
-                    <span className="text-[11px] leading-4 line-clamp-1" dir="auto">
-                      {val}
-                    </span>
-                  </label>
-                ))}
-                {filtered.length === 0 && <p className="text-[11px] text-muted-foreground">موردی یافت نشد</p>}
-              </div>
-            </div>
-          </FilterSection>
-        );
-      })}
+      {/* ── Practical filters – 7 important for IT buyer ── */}
+      <FilterSection title="تعداد جایگاه دیسک (Bay)" open={!!openMap.bay} onToggle={() => toggleSection("bay")} badgeCount={selectedBays.size}>
+        <div className="grid grid-cols-3 gap-2">
+          {allBays.map((bay) => (
+            <label key={bay} className={`flex items-center justify-center gap-1 rounded-md border px-2 py-2 text-[11px] cursor-pointer transition ${selectedBays.has(bay) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"}`}>
+              <input type="checkbox" className="sr-only" checked={selectedBays.has(bay)} onChange={(e) => {
+                const n = new Set(selectedBays);
+                e.target.checked ? n.add(bay) : n.delete(bay);
+                setSelectedBays(n);
+              }} />
+              {bay} Bay
+            </label>
+          ))}
+        </div>
+      </FilterSection>
 
-      {/* Static placeholders to fully match screenshot visual density (optional) */}
-      {allCategories.length === 0 && (
-        <>
-          <FilterSection title="رنگ" open={!!openMap.color} onToggle={() => toggleSection("color")}>
-            <p className="text-[11px] text-muted-foreground py-2">فیلتر رنگ به زودی</p>
-          </FilterSection>
-          <FilterSection title="سری پردازنده" open={!!openMap.cpu_series} onToggle={() => toggleSection("cpu_series")}>
-            <p className="text-[11px] text-muted-foreground py-2">بر اساس پردازنده فیلتر می‌شود</p>
-          </FilterSection>
-        </>
-      )}
+      <FilterSection title="خانواده پردازنده (CPU)" open={!!openMap.cpu} onToggle={() => toggleSection("cpu")} badgeCount={selectedCpuFamilies.size}>
+        <div className="space-y-1">
+          {allCpuFamilies.map((fam) => (
+            <label key={fam} className="flex items-center gap-2 py-1.5 cursor-pointer hover:bg-muted/40 rounded px-1">
+              <input type="checkbox" checked={selectedCpuFamilies.has(fam)} onChange={(e) => {
+                const n = new Set(selectedCpuFamilies);
+                e.target.checked ? n.add(fam) : n.delete(fam);
+                setSelectedCpuFamilies(n);
+              }} className="rounded border-border size-4 accent-primary" />
+              <span className="text-[12px]">{fam}</span>
+            </label>
+          ))}
+          {allCpuFamilies.length===0 && <p className="text-[11px] text-muted-foreground">اطلاعات CPU در دیتابیس یافت نشد</p>}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="حداکثر حافظه رم" open={!!openMap.memory} onToggle={() => toggleSection("memory")} badgeCount={selectedMemories.size}>
+        <div className="space-y-1">
+          {allMaxMemories.map((mem) => (
+            <label key={mem} className="flex items-center gap-2 py-1.5 cursor-pointer hover:bg-muted/40 rounded px-1">
+              <input type="checkbox" checked={selectedMemories.has(mem)} onChange={(e) => {
+                const n = new Set(selectedMemories);
+                e.target.checked ? n.add(mem) : n.delete(mem);
+                setSelectedMemories(n);
+              }} className="rounded border-border size-4 accent-primary" />
+              <span className="text-[12px]">{mem}</span>
+            </label>
+          ))}
+          {allMaxMemories.length===0 && <p className="text-[11px] text-muted-foreground">اطلاعات حافظه یافت نشد</p>}
+        </div>
+      </FilterSection>
+
+      <FilterSection title="ویژگی‌های مهم" open={!!openMap.features} onToggle={() => toggleSection("features")}>
+        <div className="space-y-2">
+          <label className="flex items-center justify-between py-2 cursor-pointer">
+            <span className="text-[12px]">فقط 10GbE دار</span>
+            <Switch checked={filter10GbE} onCheckedChange={setFilter10GbE} />
+          </label>
+          <label className="flex items-center justify-between py-2 cursor-pointer">
+            <span className="text-[12px]">پاور افزونه (Redundant)</span>
+            <Switch checked={filterRedundant} onCheckedChange={setFilterRedundant} />
+          </label>
+          <label className="flex items-center justify-between py-2 cursor-pointer">
+            <span className="text-[12px]">دارای اسلات M.2</span>
+            <Switch checked={filterM2} onCheckedChange={setFilterM2} />
+          </label>
+        </div>
+      </FilterSection>
     </div>
   );
 
