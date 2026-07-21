@@ -9,7 +9,7 @@ import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 
 export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
-export type Drive = { id: string; sizeTb: number; label: string };
+export type Drive = { id: string; sizeTb: number; label: string; type: "HDD" | "SSD" };
 export type RaidResult = {
   usableTb: number;
   protectionTb: number;
@@ -348,7 +348,7 @@ export default function RaidCalculator() {
   }, [drives]);
 
   const addDrive = (sizeTb: number, label: string) => {
-    setDrives((prev) => [...prev, { id: uid(), sizeTb, label }]);
+    setDrives((prev) => [...prev, { id: uid(), sizeTb, label, type: driveType }]);
   };
   const removeDrive = (id: string) => setDrives((p) => p.filter((d) => d.id !== id));
   const reset = () => setDrives([]);
@@ -374,7 +374,17 @@ export default function RaidCalculator() {
             {(["HDD", "SSD"] as const).map((t) => (
               <button
                 key={t}
-                onClick={() => setDriveType(t)}
+                onClick={() => {
+                  // Synology behavior: switching drive type resets calculator – mixing HDD+SSD in same RAID is blocked by vendors
+                  if (t !== driveType && drives.length > 0) {
+                    if (confirm(`تغییر نوع دیسک از ${driveType} به ${t} باعث پاک شدن دیسک‌های انتخابی فعلی می‌شود (همان رفتار سینولوژی). آیا مطمئن هستید؟\nSwitching drive type will reset selection because HDD+SSD cannot be mixed in same RAID (QNAP/Dell/Synology).`)) {
+                      setDrives([]);
+                    } else {
+                      return;
+                    }
+                  }
+                  setDriveType(t);
+                }}
                 className={cn(
                   "relative px-5 py-2.5 text-[13px] font-bold border-b-2 -mb-px transition-colors",
                   driveType === t
@@ -431,10 +441,16 @@ export default function RaidCalculator() {
                 drives.map((d) => (
                   <div
                     key={d.id}
-                    className="group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md bg-[#3e444e] dark:bg-[#252a33] text-white border border-white/15 hover:border-white/30 hover:bg-[#4a505c] transition-colors shadow-sm"
+                    className={cn(
+                      "group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border text-white shadow-sm transition-colors",
+                      d.type === "SSD"
+                        ? "bg-[#2a5a8a] dark:bg-[#1e3a5a] border-blue-300/30 hover:border-blue-200/50 hover:bg-[#325f8f]"
+                        : "bg-[#3e444e] dark:bg-[#252a33] border-white/15 hover:border-white/30 hover:bg-[#4a505c]"
+                    )}
                   >
-                    <HardDrive className="size-6 text-white/70 group-hover:text-white transition" />
+                    <HardDrive className={cn("size-6 transition", d.type === "SSD" ? "text-blue-200 group-hover:text-white" : "text-white/70 group-hover:text-white")} />
                     <span className="text-[11px] font-bold">{d.label}</span>
+                    <span className={cn("text-[9px] px-1 rounded", d.type === "SSD" ? "bg-blue-400/30 text-blue-100" : "bg-white/10 text-white/60")}>{d.type}</span>
                     <button
                       onClick={() => removeDrive(d.id)}
                       className="absolute -top-2 -right-2 size-6 rounded-full bg-white text-black flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all"
