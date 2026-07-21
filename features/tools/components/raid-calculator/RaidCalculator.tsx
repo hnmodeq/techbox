@@ -17,6 +17,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
 export type Drive = { id: string; sizeTb: number; label: string; type: "HDD" | "SSD" };
@@ -292,16 +293,13 @@ function UsageBar({ result, driveCount }: { result: RaidResult; driveCount: numb
 
   return (
     <div className="space-y-3">
-      {/* Strong height bar – h-11 with smooth transition */}
-      <div className="flex h-11 w-full overflow-hidden rounded-lg bg-muted border shadow-inner">
+      {/* Strong height bar – h-12 animated */}
+      <div className="flex h-12 w-full overflow-hidden rounded-lg bg-muted border shadow-inner">
         {segs.map((s, i) => (
           <Tooltip key={i}>
             <TooltipTrigger
               render={
-                <div
-                  className={cn("h-full transition-all duration-700 ease-out hover:brightness-110 cursor-pointer", s.color)}
-                  style={{ width: `${(s.value / total) * 100}%` }}
-                />
+                <div className={cn("h-full transition-all duration-700 ease-out hover:brightness-110 cursor-pointer", s.color)} style={{ width: `${(s.value / total) * 100}%` }} />
               }
             />
             <TooltipContent side="top" className="text-[11px]">
@@ -398,9 +396,7 @@ export default function RaidCalculator() {
                   >
                     <span className="truncate">{o.label}</span>
                     {isSelected ? (
-                      <span className="mr-2 inline-flex size-5 items-center justify-center rounded-full bg-primary-foreground text-primary text-[11px] font-black">
-                        {c.toLocaleString("fa-IR")}
-                      </span>
+                      <span className="mr-2 inline-flex size-5 items-center justify-center rounded-full bg-primary-foreground text-primary text-[11px] font-black">{c.toLocaleString("fa-IR")}</span>
                     ) : (
                       <span className="mr-2 opacity-0 group-hover:opacity-100 transition text-[10px]">+ افزودن</span>
                     )}
@@ -452,7 +448,7 @@ export default function RaidCalculator() {
           </div>
         </div>
 
-        {/* Step 2 – single RAID calculator */}
+        {/* Step 2 – single RAID calculator with buttons on left (blue box area) */}
         {hasDrives && (
           <div className="bg-[#f6f6f7] dark:bg-muted/20 border border-border rounded-xl overflow-hidden">
             <div className="px-5 sm:px-6 py-5 space-y-5">
@@ -461,71 +457,67 @@ export default function RaidCalculator() {
                 <h2 className="text-[16px] sm:text-[18px] font-black">برآورد فضای قابل استفاده</h2>
               </div>
 
-              <div className="bg-card rounded-xl border p-4 sm:p-6 space-y-5">
-                {/* RAID Buttons – short titles, tooltip with description */}
-                <div className="flex flex-wrap gap-2">
-                  {RAID_OPTIONS.map((o) => {
-                    const isActive = raid === o.key;
-                    return (
-                      <Tooltip key={o.key}>
-                        <TooltipTrigger
-                          render={
-                            <button
-                              onClick={() => setRaid(o.key)}
-                              className={cn(
-                                "rounded-full px-4 py-2 text-[12px] font-bold border transition-all duration-200",
-                                isActive
-                                  ? "bg-primary text-primary-foreground border-primary shadow-md scale-[1.02]"
-                                  : "bg-card border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:border-primary/30 hover:scale-[1.02]"
-                              )}
-                            >
-                              {o.label}
-                            </button>
-                          }
-                        />
-                        <TooltipContent className="max-w-[260px] text-right leading-5 text-[11px]">
-                          <p className="font-bold">{o.label} – {o.faultTolerance}</p>
-                          <p className="text-muted-foreground mt-1">{o.description}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    );
-                  })}
-                </div>
-
-                {/* Animated strong height bar */}
-                <div className="space-y-4">
-                  <UsageBar result={result} driveCount={drives.length} />
-
-                  {/* Information area below progress bar – like other infos */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 rounded-lg bg-muted/30 border p-4">
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-muted-foreground">قابل استفاده</div>
-                      <div className="text-[14px] font-black">{formatFaBinary(result.usableTb)}</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-muted-foreground">تحمل خطا</div>
-                      <div className="text-[13px] font-bold">{selectedOption?.faultTolerance || result.faultTolerance}</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-muted-foreground">بازده</div>
-                      <div className="text-[13px] font-bold">{nfFa0.format(result.efficiency)}٪</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-[11px] text-muted-foreground">توضیح</div>
-                      <div className="text-[11px] leading-5">{selectedOption?.description}</div>
+              <div className="bg-card rounded-xl border p-4 sm:p-6">
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {/* Left – Buttons in 3x3 grid, less curves, shadcn Button */}
+                  <div className="lg:w-[300px] shrink-0">
+                    <div className="grid grid-cols-3 gap-2">
+                      {RAID_OPTIONS.map((o) => {
+                        const isActive = raid === o.key;
+                        return (
+                          <Button
+                            key={o.key}
+                            variant={isActive ? "primary" : "outline"}
+                            size="sm"
+                            onClick={() => setRaid(o.key)}
+                            className={cn(
+                              "h-auto min-h-[48px] rounded-md px-2 py-3 text-[12px] font-bold flex flex-col gap-0.5 transition-all duration-200",
+                              isActive ? "shadow-md scale-[1.02]" : "hover:border-primary/40"
+                            )}
+                          >
+                            <span>{o.label}</span>
+                            <span className={cn("text-[10px] font-normal", isActive ? "text-primary-foreground/70" : "text-muted-foreground")}>{o.short}</span>
+                          </Button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {result.warnings.length > 0 && (
-                    <div className="rounded-md bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3 text-[11px] leading-5 text-amber-800 dark:text-amber-200">
-                      {result.warnings.map((w, i) => (
-                        <div key={i}>⚠ {w}</div>
-                      ))}
-                    </div>
-                  )}
+                  {/* Right – Progress bar + info */}
+                  <div className="flex-1 space-y-4 min-w-0">
+                    <UsageBar result={result} driveCount={drives.length} />
 
-                  <div className="pt-3 border-t text-[10px] text-muted-foreground leading-4">
-                    نتایج بر اساس محاسبه باینری است. مجموع خام: {formatFaTb(result.rawTb)} • فضای رزرو سیستم حدود ۱۰ گیگابایت به ازای هر دیسک • فضای کل: {formatFaBinary(result.rawTb)} باینری.
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-lg bg-muted/30 border p-4">
+                      <div className="space-y-1">
+                        <div className="text-[11px] text-muted-foreground">قابل استفاده</div>
+                        <div className="text-[14px] font-black">{formatFaBinary(result.usableTb)}</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-[11px] text-muted-foreground">تحمل خطا</div>
+                        <div className="text-[13px] font-bold">{selectedOption?.faultTolerance || result.faultTolerance}</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-[11px] text-muted-foreground">بازده</div>
+                        <div className="text-[13px] font-bold">{nfFa0.format(result.efficiency)}٪</div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-[11px] text-muted-foreground">توضیح</div>
+                        <div className="text-[11px] leading-5">{selectedOption?.description}</div>
+                      </div>
+                      <div className="sm:col-span-2 lg:col-span-4 pt-2 border-t mt-1">
+                        <div className="text-[10px] text-muted-foreground leading-5">
+                          نتایج بر اساس محاسبه باینری است. مجموع خام: {formatFaTb(result.rawTb)} • فضای رزرو سیستم حدود ۱۰ گیگابایت به ازای هر دیسک • فضای کل باینری: {formatFaBinary(result.rawTb)}.
+                        </div>
+                      </div>
+                    </div>
+
+                    {result.warnings.length > 0 && (
+                      <div className="rounded-md bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 p-3 text-[11px] leading-5 text-amber-800 dark:text-amber-200">
+                        {result.warnings.map((w, i) => (
+                          <div key={i}>⚠ {w}</div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
