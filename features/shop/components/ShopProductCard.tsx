@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { GitCompareArrows, Star, ShieldCheck, Cpu, MemoryStick, HardDrive, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// ── Price helpers ─────────────────────────────────────────────────────────────
 function formatPrice(amount: number): string {
   if (amount >= 1_000_000_000) {
     const b = amount / 1_000_000_000;
@@ -22,6 +23,24 @@ function formatPrice(amount: number): string {
   return m.toLocaleString("fa-IR") + " میلیون تومان";
 }
 
+/**
+ * Parse numeric Toman value from a Persian price label.
+ * Fallback when priceAmount column is null on older deployed builds.
+ * e.g. "1.85 میلیارد تومان" → 1_850_000_000
+ *      "920 میلیون تومان"  → 920_000_000
+ */
+function parsePriceLabel(label: string | null | undefined): number {
+  if (!label) return 0;
+  // Persian digits → ASCII
+  const ascii = label.replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
+  const num = parseFloat(ascii.replace(/[^\d.]/g, ""));
+  if (isNaN(num) || num <= 0) return 0;
+  if (/میلیارد/.test(label)) return Math.round(num * 1_000_000_000);
+  if (/میلیون/.test(label))  return Math.round(num * 1_000_000);
+  return Math.round(num);
+}
+
+// ── Spec defs ─────────────────────────────────────────────────────────────────
 const SPEC_DEFS: Array<{ Icon: React.ElementType; key: string; label: string }> = [
   { Icon: Cpu,         key: "CPU",          label: "پردازنده" },
   { Icon: MemoryStick, key: "RAM",          label: "حافظه" },
@@ -34,6 +53,7 @@ function isNA(v: unknown): boolean {
   return !v || NA_VALUES.has(String(v).trim());
 }
 
+// ── Countdown timer ───────────────────────────────────────────────────────────
 function DiscountTimer({ endsAt }: { endsAt: string }) {
   const t = useCountdown(endsAt);
   if (!t || t.expired) return null;
@@ -41,61 +61,53 @@ function DiscountTimer({ endsAt }: { endsAt: string }) {
   return (
     <div className="flex items-center gap-px text-[9px] font-mono font-bold text-red-400 mt-0.5 leading-none" dir="ltr">
       {t.days > 0 && <span>{pad(t.days)}d&nbsp;</span>}
-      <span>{pad(t.hours)}</span>
-      <span className="animate-pulse mx-px">:</span>
-      <span>{pad(t.minutes)}</span>
-      <span className="animate-pulse mx-px">:</span>
+      <span>{pad(t.hours)}</span><span className="animate-pulse mx-px">:</span>
+      <span>{pad(t.minutes)}</span><span className="animate-pulse mx-px">:</span>
       <span>{pad(t.seconds)}</span>
     </div>
   );
 }
 
+// ── Star rating ───────────────────────────────────────────────────────────────
 function StarRating({ rating, count }: { rating: number; count: number }) {
   const full = Math.floor(rating);
   const half = rating - full >= 0.5;
   return (
     <div className="flex items-center gap-1">
       <div className="flex gap-px">
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star
-            key={s}
-            className={cn(
-              "size-3",
-              s <= full
-                ? "fill-amber-400 text-amber-400"
-                : s === full + 1 && half
-                  ? "fill-amber-200 text-amber-400"
-                  : "fill-gray-200 text-gray-200"
-            )}
-          />
+        {[1,2,3,4,5].map((s) => (
+          <Star key={s} className={cn("size-3",
+            s <= full ? "fill-amber-400 text-amber-400"
+            : s === full + 1 && half ? "fill-amber-200 text-amber-400"
+            : "fill-gray-200 text-gray-200"
+          )} />
         ))}
       </div>
       <span className="text-[10px] text-gray-500 leading-none">
         {rating.toLocaleString("fa-IR", { maximumFractionDigits: 1 })}
       </span>
       {count > 0 && (
-        <span className="text-[10px] text-gray-300 leading-none">
-          ({count.toLocaleString("fa-IR")})
-        </span>
+        <span className="text-[10px] text-gray-300 leading-none">({count.toLocaleString("fa-IR")})</span>
       )}
     </div>
   );
 }
 
+// ── Main card ─────────────────────────────────────────────────────────────────
 export default function ShopProductCard({ product: p }: { product: ContentItem }) {
   const { addToComparison, removeFromComparison, isInComparison } = useProductComparison();
   const inCompare = isInComparison(p.slug);
 
   const isUnavailable = p.availability === "ناموجود" || p.availability === "اتمام موجودی";
   const specs = (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs))
-    ? (p.specs as Record<string, string>)
-    : {};
+    ? (p.specs as Record<string, string>) : {};
 
-  const priceAmount     = p.priceAmount ?? 0;
+  // Use priceAmount from new column; fall back to parsing priceLabel string
+  const priceAmount     = (p.priceAmount && p.priceAmount > 0) ? p.priceAmount : parsePriceLabel(p.priceLabel);
   const discount        = p.discountPercent ?? 0;
   const discountedPrice = discount > 0 ? Math.round(priceAmount * (1 - discount / 100)) : priceAmount;
 
-  // Only show specs that have a real (non-N/A) value
+  // Only specs with real (non-N/A) values
   const validSpecs = SPEC_DEFS.filter(({ key }) => !isNA(specs[key]));
 
   return (
@@ -113,59 +125,41 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
 
       {/* Compare button */}
       <Tooltip>
-        <TooltipTrigger
-          render={
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                inCompare ? removeFromComparison(p.slug) : addToComparison(p);
-              }}
-              className={cn(
-                "absolute top-2 left-2 z-10 flex items-center justify-center rounded-md p-1.5 transition-colors",
-                inCompare
-                  ? "bg-blue-600 text-white"
-                  : "bg-white/90 text-gray-400 hover:text-blue-600 border border-gray-200"
-              )}
-            >
-              <GitCompareArrows className="size-3.5" />
-            </button>
-          }
-        />
+        <TooltipTrigger render={
+          <button type="button"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); inCompare ? removeFromComparison(p.slug) : addToComparison(p); }}
+            className={cn("absolute top-2 left-2 z-10 flex items-center justify-center rounded-md p-1.5 transition-colors",
+              inCompare ? "bg-blue-600 text-white" : "bg-white/90 text-gray-400 hover:text-blue-600 border border-gray-200"
+            )}
+          >
+            <GitCompareArrows className="size-3.5" />
+          </button>
+        } />
         <TooltipContent>{inCompare ? "حذف از مقایسه" : "افزودن به مقایسه"}</TooltipContent>
       </Tooltip>
 
-      {/* Image — white bg with generous padding */}
+      {/* Image */}
       <Link href={`/shop/${p.slug}`} className="block">
         <div className="relative w-full bg-white" style={{ paddingBottom: "75%" }}>
           <div className="absolute inset-0 flex items-center justify-center p-8">
-            <Image
-              src={p.image || "/assets/blog-1.jpg"}
-              alt={p.title}
-              fill
+            <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill
               sizes="(min-width:1280px) 20vw, (min-width:768px) 33vw, 50vw"
-              className="object-contain"
-              {...blurProps(p.image || "/assets/blog-1.jpg")}
-            />
+              className="object-contain" {...blurProps(p.image || "/assets/blog-1.jpg")} />
           </div>
         </div>
       </Link>
 
-      {/* Card body */}
+      {/* Body */}
       <div className="flex flex-col gap-2 p-3 flex-1">
 
         {/* Warranty */}
         {p.warranty && (
           <Tooltip>
-            <TooltipTrigger
-              render={
-                <div className="inline-flex w-fit items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] text-green-700 cursor-default">
-                  <ShieldCheck className="size-3 shrink-0" />
-                  <span>دارای گارانتی</span>
-                </div>
-              }
-            />
+            <TooltipTrigger render={
+              <div className="inline-flex w-fit items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] text-green-700 cursor-default">
+                <ShieldCheck className="size-3 shrink-0" /><span>دارای گارانتی</span>
+              </div>
+            } />
             <TooltipContent>{p.warranty}</TooltipContent>
           </Tooltip>
         )}
@@ -182,32 +176,24 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           <StarRating rating={p.rating!} count={p.ratingCount!} />
         ) : (
           <div className="flex gap-px">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star key={s} className="size-3 fill-gray-200 text-gray-200" />
-            ))}
+            {[1,2,3,4,5].map((s) => <Star key={s} className="size-3 fill-gray-200 text-gray-200" />)}
           </div>
         )}
 
-        {/* Spec icons — only specs with real values, hidden if N/A */}
+        {/* Spec icons — only real values, hidden if N/A */}
         {validSpecs.length > 0 && (
-          <div
-            className="grid gap-1 py-1.5 border-y border-gray-100"
-            style={{ gridTemplateColumns: `repeat(${validSpecs.length}, 1fr)` }}
-          >
+          <div className="grid gap-1 py-1.5 border-y border-gray-100"
+            style={{ gridTemplateColumns: `repeat(${validSpecs.length}, 1fr)` }}>
             {validSpecs.map(({ Icon, key, label }) => {
               const value = specs[key];
               return (
                 <Tooltip key={key}>
-                  <TooltipTrigger
-                    render={
-                      <div className="flex flex-col items-center gap-1 cursor-default py-1 px-0.5 rounded hover:bg-gray-50 transition-colors">
-                        <Icon className="size-4 text-gray-400 shrink-0" />
-                        <span className="text-[8px] text-gray-500 font-medium leading-tight text-center line-clamp-2 w-full">
-                          {value}
-                        </span>
-                      </div>
-                    }
-                  />
+                  <TooltipTrigger render={
+                    <div className="flex flex-col items-center gap-1 cursor-default py-1 px-0.5 rounded hover:bg-gray-50 transition-colors">
+                      <Icon className="size-4 text-gray-400 shrink-0" />
+                      <span className="text-[8px] text-gray-500 font-medium leading-tight text-center line-clamp-2 w-full">{value}</span>
+                    </div>
+                  } />
                   <TooltipContent side="bottom">{label}: {value}</TooltipContent>
                 </Tooltip>
               );
@@ -224,9 +210,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           ) : (
             <div className="flex flex-col" dir="rtl">
               {discount > 0 && (
-                <span className="text-[11px] text-gray-400 line-through leading-none">
-                  {formatPrice(priceAmount)}
-                </span>
+                <span className="text-[11px] text-gray-400 line-through leading-none">{formatPrice(priceAmount)}</span>
               )}
               <span className={cn("text-sm font-bold leading-snug", discount > 0 ? "text-red-600" : "text-gray-900")}>
                 {formatPrice(discountedPrice)}
@@ -234,7 +218,6 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
