@@ -154,15 +154,6 @@ const KEY_MODULE_TITLES = "modules.titles";
 
 // ─── Read Config (cached) ─────────────────────────────────────────────
 
-async function getSetting(key: string): Promise<string | null> {
-  try {
-    const row = await prisma.siteSetting.findUnique({ where: { key } });
-    return row?.value ?? null;
-  } catch {
-    return null;
-  }
-}
-
 function parseJsonSafe<T>(value: string | null, fallback: T): T {
   if (!value) return fallback;
   try {
@@ -175,24 +166,51 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
 /**
  * Get the full module configuration map.
  * Cached for 30 seconds via Next.js unstable_cache.
+ * OPTIMIZED: Single DB query for all 12 keys to avoid P2024 pool timeout (was 12 parallel findUnique)
  */
 async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const defaults = getDefaultModuleConfigMap();
 
-  const [enabledRaw, homeVisRaw, homeOrderRaw, homeTitlesRaw, homeMoreRaw, homeShowTitleRaw, homeShowMoreLabelRaw, heroVisibleRaw, colorsEnabledRaw, unifiedColorRaw, moduleColorsRaw, moduleTitlesRaw] = await Promise.all([
-    getSetting(KEY_ENABLED),
-    getSetting(KEY_HOME_VISIBILITY),
-    getSetting(KEY_HOME_ORDER),
-    getSetting(KEY_HOME_TITLES),
-    getSetting(KEY_HOME_MORE_LABELS),
-    getSetting(KEY_HOME_SHOW_TITLE),
-    getSetting(KEY_HOME_SHOW_MORE_LABEL),
-    getSetting(KEY_HERO_VISIBLE),
-    getSetting(KEY_MODULE_COLORS_ENABLED),
-    getSetting(KEY_UNIFIED_MODULE_COLOR),
-    getSetting(KEY_MODULE_COLORS),
-    getSetting(KEY_MODULE_TITLES),
-  ]);
+  // Single query instead of 12 parallel – prevents connection pool exhaustion
+  let settingsMap = new Map<string, string>();
+  try {
+    const allKeys = [
+      KEY_ENABLED,
+      KEY_HOME_VISIBILITY,
+      KEY_HOME_ORDER,
+      KEY_HOME_TITLES,
+      KEY_HOME_MORE_LABELS,
+      KEY_HOME_SHOW_TITLE,
+      KEY_HOME_SHOW_MORE_LABEL,
+      KEY_HERO_VISIBLE,
+      KEY_MODULE_COLORS_ENABLED,
+      KEY_UNIFIED_MODULE_COLOR,
+      KEY_MODULE_COLORS,
+      KEY_MODULE_TITLES,
+    ];
+    const rows = await prisma.siteSetting.findMany({
+      where: { key: { in: allKeys } },
+      select: { key: true, value: true },
+    });
+    settingsMap = new Map(rows.map((r) => [r.key, r.value]));
+  } catch {
+    // DB unavailable – use defaults
+  }
+
+  const getRaw = (k: string) => settingsMap.get(k) ?? null;
+
+  const enabledRaw = getRaw(KEY_ENABLED);
+  const homeVisRaw = getRaw(KEY_HOME_VISIBILITY);
+  const homeOrderRaw = getRaw(KEY_HOME_ORDER);
+  const homeTitlesRaw = getRaw(KEY_HOME_TITLES);
+  const homeMoreRaw = getRaw(KEY_HOME_MORE_LABELS);
+  const homeShowTitleRaw = getRaw(KEY_HOME_SHOW_TITLE);
+  const homeShowMoreLabelRaw = getRaw(KEY_HOME_SHOW_MORE_LABEL);
+  const heroVisibleRaw = getRaw(KEY_HERO_VISIBLE);
+  const colorsEnabledRaw = getRaw(KEY_MODULE_COLORS_ENABLED);
+  const unifiedColorRaw = getRaw(KEY_UNIFIED_MODULE_COLOR);
+  const moduleColorsRaw = getRaw(KEY_MODULE_COLORS);
+  const moduleTitlesRaw = getRaw(KEY_MODULE_TITLES);
 
   const enabledMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(enabledRaw, {});
   const homeVisMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(homeVisRaw, {});

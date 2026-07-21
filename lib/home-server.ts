@@ -184,21 +184,31 @@ async function getHomeDataUncached(): Promise<HomeData> {
     Object.entries(moduleTakes).filter(([module]) => enabledModules.includes(module as any))
   );
 
-  const entries = await Promise.all(
-    Object.entries(activeModuleTakes).map(async ([module, take]) => [module, await findPosts(module, take)] as const)
-  );
-  const modules = Object.fromEntries(entries) as HomeData["modules"];
+  // Sequential to avoid P2024 pool exhaustion – was Promise.all of 7 modules each doing 2-3 queries = up to 21 concurrent
+  const modules: Record<string, any> = {};
+  for (const [module, take] of Object.entries(activeModuleTakes)) {
+    try {
+      modules[module] = await findPosts(module, take as number);
+    } catch {
+      modules[module] = [];
+    }
+  }
 
   // Ticker: only include posts from enabled modules
-  const tickerPosts = await prisma.post.findMany({
-    where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
-    orderBy: { date: "desc" },
-    take: 30,
-    select: cardSelect,
-  });
+  let tickerPosts: any[] = [];
+  try {
+    tickerPosts = await prisma.post.findMany({
+      where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
+      orderBy: { date: "desc" },
+      take: 30,
+      select: cardSelect,
+    });
+  } catch {
+    tickerPosts = [];
+  }
 
   return {
-    modules,
+    modules: modules as HomeData["modules"],
     ticker: tickerPosts.map(normalizeCard),
     generatedAt: new Date().toISOString(),
   };

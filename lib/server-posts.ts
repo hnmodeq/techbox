@@ -11,33 +11,39 @@ export async function getDbModulePosts(
   if (!process.env.DATABASE_URL) return [];
 
   try {
-    const [posts, rates] = await Promise.all([
-      prisma.post.findMany({
-        where: {
-          module,
-          published: true,
-          deletedAt: null,
-          date: publicPostDateWhere(),
-        },
-        orderBy: { date: "desc" },
-        take,
-        include: {
-          author: {
-            select: {
-              name: true,
-              username: true,
-              role: true,
-              roleFa: true,
-              job: true,
-              avatar: true,
-              verifiedType: true,
-              verifiedLabel: true,
-            },
+    const posts = await prisma.post.findMany({
+      where: {
+        module,
+        published: true,
+        deletedAt: null,
+        date: publicPostDateWhere(),
+      },
+      orderBy: { date: "desc" },
+      take,
+      include: {
+        author: {
+          select: {
+            name: true,
+            username: true,
+            role: true,
+            roleFa: true,
+            job: true,
+            avatar: true,
+            verifiedType: true,
+            verifiedLabel: true,
           },
         },
-      }),
-      module === "shop" ? getCurrencyRates() : Promise.resolve(null),
-    ]);
+      },
+    });
+
+    let rates: any = null;
+    if (module === "shop") {
+      try {
+        rates = await getCurrencyRates();
+      } catch {
+        rates = null;
+      }
+    }
 
     return posts.map((p: any) => {
       let finalPriceAmount = p.priceAmount ?? null;
@@ -114,8 +120,14 @@ export async function getDbModulePosts(
 
 export async function getAllDbModulePosts(takePerModule = 30) {
   const modules: ModuleSlug[] = ["blog", "news", "media", "review", "download", "shop", "forum"];
-  const results = await Promise.all(
-    modules.map(async (m) => [m, await getDbModulePosts(m, takePerModule)] as const)
-  );
-  return Object.fromEntries(results);
+  const result: Record<string, ContentItem[]> = {};
+  // Sequential to avoid pool exhaustion – was Promise.all of 7 modules = 7 concurrent connections > limit 5
+  for (const m of modules) {
+    try {
+      result[m] = await getDbModulePosts(m, takePerModule);
+    } catch {
+      result[m] = [];
+    }
+  }
+  return result;
 }
