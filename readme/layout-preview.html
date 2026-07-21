@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Layout Preview</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #0f172a;
+        color: #e5e7eb;
+      }
+      .parent {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-auto-rows: 120px;
+        gap: 20px;
+        padding: 20px;
+        background-color: #020617;
+        min-height: 100vh;
+        justify-content: center;
+      }
+      .parent > div {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f8fafc;
+        font-size: 13px;
+        font-weight: 700;
+        background: linear-gradient(180deg, #1e293b, #0f172a);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        padding: 8px;
+      }
+      .parent > div:hover { border-color: rgba(255, 255, 255, 0.24); }
+
+      .div19 { grid-column: span 6; grid-row: span 6; background: linear-gradient(135deg, #4338ca, #7c3aed); font-size: 22px; }
+      .div10 { grid-column: span 1; grid-row: span 3; background: linear-gradient(135deg, #0f766e, #065f46); }
+      .div16 { grid-column: span 3; grid-row: span 6; background: linear-gradient(135deg, #1d4ed8, #1e3a5f); font-size: 15px; }
+      .div17 { grid-column: span 3; grid-row: span 3; background: linear-gradient(135deg, #1e40af, #1e3a8a); }
+      .div18 { grid-column: span 2; grid-row: span 8; background: linear-gradient(135deg, #7c2d12, #991b1b); }
+      .div20 { grid-column: span 4; grid-row: span 4; background: linear-gradient(135deg, #9a3412, #7c2d12); }
+      .div21 { grid-column: span 1; grid-row: span 4; background: linear-gradient(135deg, #92400e, #78350f); }
+      .div28 { grid-column: span 4; grid-row: span 3; background: linear-gradient(135deg, #166534, #14532d); }
+      .div29 { grid-column: span 2; grid-row: span 3; background: linear-gradient(135deg, #15803d, #166534); }
+      .div24, .div23, .div26, .div32, .div33, .div34 { grid-column: span 2; grid-row: span 1; background: linear-gradient(135deg, #1a3a2a, #0f2a1a); font-size: 11px; }
+      .div36 { grid-column: span 2; grid-row: span 4; background: linear-gradient(135deg, #6b21a8, #4c1d95); }
+      .div35 { grid-column: span 4; grid-row: span 4; background: linear-gradient(135deg, #7e22ce, #6b21a8); }
+      .div39, .div40, .div37, .div38, .div41, .div42 { grid-column: span 1; grid-row: span 2; background: linear-gradient(135deg, #581c87, #4c1d95); font-size: 11px; }
+      .div45 { grid-column: span 6; grid-row: span 4; background: linear-gradient(135deg, #0c4a6e, #075985); }
+      .div43 { grid-column: span 6; grid-row: span 4; background: linear-gradient(135deg, #1c1c2e, #2d2d44); }
+
+      /* Labels */
+      .label { font-size: 10px; opacity: 0.6; display: block; margin-top: 4px; font-weight: 400; }
+    </style>
+  </head>
+  <body>
+    <div class="parent">
+      <div class="div19">🎯 HERO<span class="label">span 6 cols × 6 rows</span></div>
+
+      <div class="div17">📰 Magazine Title + "مشاهده همه"<span class="label">3 cols × 3 rows</span></div>
+      <div class="div16">⭐ Latest Article — BIG CARD<span class="label">3 cols × 6 rows (tall featured)</span></div>
+      <div class="div10">📄 Small Article<span class="label">1 col × 3 rows</span></div>
+      <div class="div10">📄 Small Article<span class="label">1 col × 3 rows</span></div>
+      <div class="div10">📄 Small Article<span class="label">1 col × 3 rows</span></div>
+
+      <div class="div18">🎬 Latest Video — BIG<span class="label">2 cols × 8 rows (tall)</span></div>
+      <div class="div20">🎥 Media Title + "مشاهده همه"<span class="label">4 cols × 4 rows</span></div>
+      <div class="div21">📹 Video<span class="label">1 col × 4 rows</span></div>
+      <div class="div21">📹 Video<span class="label">1 col × 4 rows</span></div>
+      <div class="div21">📹 Video<span class="label">1 col × 4 rows</span></div>
+      <div class="div21">📹 Video<span class="label">1 col × 4 rows</span></div>
+
+      <div class="div28">💬 Forum Title + "مشاهده همه"<span class="label">4 cols × 3 rows</span></div>
+      <div class="div29">✅ Latest Solved Topic + Best Answer<span class="label">2 cols × 3 rows</span></div>
+
+      <div class="div24">❓ Small Topic<span class="label">2 cols × 1 row</span></div>
+      <div class="div23">❓ Small Topic<span class="label">2 cols × 1 row</span></div>
+      <div class="div26">❓ Small Topic<span class="label">2 cols × 1 row</span></div>
+
+      <div class="div32">❓ Small Topic<span class="label">2 cols × 1 row</span></div>
+      <div class="div33">❓ Small Topic<span class="label">2 cols × 1 row</span></div>
+      <div class="div34">❓ Small Topic<span class="label">2 cols × 1 row</span></div>
+
+      <div class="div36">🛒 Big Featured Product<span class="label">2 cols × 4 rows</span></div>
+      <div class="div35">🏪 Shop Title + "بازدید از فروشگاه"<span class="label">4 cols × 4 rows</span></div>
+
+      <div class="div39">📦 Product<span class="label">1×2</span></div>
+      <div class="div40">📦 Product<span class="label">1×2</span></div>
+      <div class="div37">📦 Product<span class="label">1×2</span></div>
+      <div class="div38">📦 Product<span class="label">1×2</span></div>
+      <div class="div41">📦 Product<span class="label">1×2</span></div>
+      <div class="div42">📦 Product<span class="label">1×2</span></div>
+
+      <div class="div45">⏱️ Timeline Scroll Area<span class="label">6 cols × 4 rows</span></div>
+      <div class="div43">🔗 Footer<span class="label">6 cols × 4 rows</span></div>
+    </div>
+  </body>
+</html>
