@@ -1,5 +1,5 @@
 import { pageMetadata } from "@/lib/seo";
-import { Button } from "@/components/ui/button";
+
 import PageHeader from "@/components/effects/PageHeader";
 import ContactForm from "@/features/contact/components/ContactForm";
 

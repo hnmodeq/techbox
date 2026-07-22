@@ -75,7 +75,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // Fall back to bundled content if the database is temporarily unavailable.
     }
   }
-
-
   return routes;
 }

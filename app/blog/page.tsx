@@ -6,8 +6,6 @@ export const metadata = modulePageMetadata(
   "blog",
   "مقالات تخصصی زیرساخت، شبکه، امنیت، ذخیره‌سازی و تجربه‌های اجرایی تیم تکباکس."
 );
-
-
 export default async function BlogPage() {
   const dbItems = await getDbModulePosts("blog", 100);
   return <BlogGrid serverItems={dbItems.length > 0 ? dbItems : undefined} />;

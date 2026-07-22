@@ -2,7 +2,7 @@ import Image from "next/image";
 import { blurProps } from "@/lib/image-placeholder";
 import { type ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
-import { Icon } from "@/design/icons";
+
 import { LikeButton } from "@/components/ui/like-button";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import CommentSection from "@/features/comment/components/CommentSection";

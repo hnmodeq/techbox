@@ -60,8 +60,6 @@ export const seedUsers: SeedUser[] = [
   { username: "pouryamodeq", name: "پوریا مدق", role: "user", roleFa: "کاربر عضو", avatar: `${BLOB}/avatars/pouryamodeq.jpg` },
   { username: "raminrastegaar", name: "رامین رستگار", role: "user", roleFa: "کاربر عضو", avatar: `${BLOB}/avatars/raminrastegaar.jpg` },
 ];
-
-
 type SeedPost = {
   slug: string;
   module: string;
@@ -96,12 +94,6 @@ type SeedPost = {
   warranty?: string;
   specs?: Record<string, string>;
 };
-
-
-
-
-
-
 
 const productPosts: SeedPost[] = Array.from({ length: 20 }, (_, i) => {
   const n = i + 1;
@@ -628,8 +620,6 @@ async function upsertPosts(posts: SeedPost[]) {
   }
   console.log(`Upserted ${posts.length} posts.`);
 }
-
-
 const engagementUsers = ["alirastegaar", "amiralmasi", "aylingharagozloo", "mohsenakbari", "mohsenshafaat", "nazaninrastegaar", "parsaghahremanpoor", "pouryamodeq", "raminrastegaar", "hannamasoumy", "fatamehrastegaar"];
 
 const commentPools: Record<string, string[]> = {
@@ -734,8 +724,6 @@ async function seedEngagement(posts: SeedPost[]) {
   console.log(`Seeded varied engagement for ${posts.length} posts and ${timelineEventsDb.length} timeline events.`);
 }
 
-
-
 const timelineEvents = [
   { title: "نخستین ابزارهای سنگی", description: "آغاز فناوری با ابزارهای سنگی ساده، توان انسان را برای شکار، ساخت و بقا چند برابر کرد.", image: `${BLOB}/timeline-images/timeline1.jpg`, dateGr: "0001-01-01T00:00:00.000Z", dateFa: "حدود ۳.۳ میلیون سال پیش", year: 1, yearFa: 1, importance: 9, tags: ["ابزار", "سنگ", "آغاز فناوری"] },
   { title: "مهار آتش", description: "کنترل آتش مسیر پخت غذا، گرمایش، امنیت و شکل‌گیری اجتماع‌های انسانی را دگرگون کرد.", image: `${BLOB}/timeline-images/timeline2.jpg`, dateGr: "0002-01-01T00:00:00.000Z", dateFa: "حدود ۱ میلیون سال پیش", year: 2, yearFa: 2, importance: 9, tags: ["آتش", "انرژی", "تمدن"] },
@@ -826,8 +814,6 @@ async function cleanOldContent() {
 
   console.log(`${DRY_RUN ? "Dry-run checked" : "Cleaned"} old content/users. Kept ${seedPosts.length} posts and ${seedUsers.length} users.`);
 }
-
-
 const defaultRedirects = [
   { sourceModule: "news", sourceSlug: "open-source-siem-growth", targetModule: "news", targetSlug: "news-03", reason: "old static news slug" },
   { sourceModule: "blog", sourceSlug: "zero-trust-for-smb-iran", targetModule: "blog", targetSlug: "article-06-zero-trust", reason: "old static article slug" },

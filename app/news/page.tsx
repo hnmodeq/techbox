@@ -6,8 +6,6 @@ export const metadata = modulePageMetadata(
   "news",
   "آخرین خبرهای فناوری اطلاعات، زیرساخت، امنیت، شبکه و سخت‌افزار از نگاه تکباکس."
 );
-
-
 export default async function NewsPage() {
   const dbItems = await getDbModulePosts("news", 100);
   return <NewsList serverItems={dbItems.length > 0 ? dbItems : undefined} />;

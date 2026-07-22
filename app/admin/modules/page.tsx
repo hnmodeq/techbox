@@ -82,8 +82,6 @@ export default function AdminModulesPage() {
       setNamesSaving(false);
     }
   };
-
-
   const load = useCallback(async () => {
     setLoading(true);
     setMessage("");
@@ -575,8 +573,6 @@ export default function AdminModulesPage() {
             </CardContent>
           </Card>
         )}
-
-
         {/* Tab: Module Names (source of truth) */}
         {tab === "names" && (
           <Card className="p-5 space-y-4">

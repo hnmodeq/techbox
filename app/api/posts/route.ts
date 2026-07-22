@@ -327,8 +327,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
-
-
 const patchSchema = z.object({
   module: z.string().min(1).max(40),
   slug: z.string().min(1).max(200),

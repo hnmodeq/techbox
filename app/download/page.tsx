@@ -6,8 +6,6 @@ export const metadata = modulePageMetadata(
   "download",
   "مرکز دانلود تکباکس برای فایل‌ها، PDFها، آرشیوها، ابزارها، فریم‌ورها و منابع فنی."
 );
-
-
 export default async function DownloadPage() {
   const dbItems = await getDbModulePosts("download", 60);
   return <DownloadTable serverItems={dbItems.length > 0 ? dbItems : undefined} />;

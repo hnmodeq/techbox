@@ -9,9 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import { VerifiedBadge } from "@/components/ui/verified-badge";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { toast } from "sonner";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 

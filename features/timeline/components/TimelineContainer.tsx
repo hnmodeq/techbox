@@ -3,8 +3,6 @@
 import React, { useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
-
-
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
   if (isNaN(d.getTime())) return '';
