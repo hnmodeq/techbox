@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  BarChart3,
   FileText,
   Clock,
   Newspaper,
@@ -42,6 +43,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     label: "عمومی",
     items: [
       { title: "داشبورد", href: "/admin", icon: LayoutDashboard },
+      { title: "آمار و تحلیل", href: "/admin/analytics", icon: BarChart3 },
     ],
   },
   {
