@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
+import Image from "next/image";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -260,8 +261,7 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
         {filtered.map((p) => (
           <Link key={p.slug} href={`/shop/${p.slug}`} className="group bg-card p-4 flex flex-col items-center gap-3 hover:bg-accent hover:text-accent-foreground transition-colors">
             <div className="relative w-full aspect-[4/3] bg-transparent">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.image || "/assets/blog-1.jpg"} alt={p.title} className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform" />
+              <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-contain group-hover:scale-[1.02] transition-transform" />
             </div>
             <div className="text-center">
               <div className="text-[12px] font-bold line-clamp-2 leading-5">{p.model || p.title.slice(0, 50)}</div>

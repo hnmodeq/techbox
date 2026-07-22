@@ -6,6 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { TriangleAlert } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ const passwordSchema = z.object({
 });
 
 export default function AccountPage() {
+  const router = useRouter();
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -339,6 +341,11 @@ export default function AccountPage() {
                     <Button disabled={authBusy} type="submit" className="w-full" loading={authBusy}>
                       ورود
                     </Button>
+                    <div className="text-center">
+                      <Button type="button" variant="link" size="xs" className="text-xs text-muted-foreground" onClick={() => router.push("/auth/forgot-password")}>
+                        رمز عبور خود را فراموش کرده‌اید؟
+                      </Button>
+                    </div>
                   </form>
                 </Form>
               </TabsContent>

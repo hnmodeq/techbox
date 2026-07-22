@@ -91,6 +91,9 @@ export default async function RootLayout({
         <OrganizationJsonLd />
       </head>
       <body className="font-sans antialiased text-foreground">
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[9999] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:text-sm focus:font-medium">
+          رد شدن به محتوای اصلی
+        </a>
         <RuntimeEffects />
         <ModuleColorApplier />
         <TooltipProvider>

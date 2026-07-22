@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { getDbModulePosts } from "@/lib/server-posts";
 
@@ -89,8 +90,9 @@ export default async function StorageLandingPage() {
             <div className="relative grid grid-cols-2 gap-3">
               {nasProducts.slice(0, 4).map((p) => (
                 <div key={p.slug} className="rounded-xl bg-white/5 backdrop-blur border border-white/10 p-3 flex flex-col items-center gap-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.image || "/assets/blog-1.jpg"} alt={p.title} className="w-full h-[80px] object-contain" />
+                  <div className="relative w-full h-[80px]">
+                    <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="120px" className="object-contain" />
+                  </div>
                   <span className="text-[10px] font-bold line-clamp-1">{p.title}</span>
                 </div>
               ))}
@@ -132,8 +134,7 @@ export default async function StorageLandingPage() {
           {nasProducts.map((p) => (
             <Link key={p.slug} href={`/shop/${p.slug}`} className="bg-card p-3 flex flex-col gap-2 hover:bg-accent/50 transition-colors group">
               <div className="relative aspect-[4/3] bg-transparent">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.image || "/assets/blog-1.jpg"} alt={p.title} className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform" />
+                <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(max-width: 640px) 50vw, 25vw" className="object-contain group-hover:scale-[1.02] transition-transform" />
               </div>
               <h3 className="text-[11px] sm:text-[12px] font-bold line-clamp-2 leading-5">{p.title}</h3>
               <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
