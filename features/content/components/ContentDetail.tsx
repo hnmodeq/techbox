@@ -7,6 +7,7 @@ import { LikeButton } from "@/components/ui/like-button";
 import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
+import { RelatedPosts } from "@/components/seo/RelatedPosts";
 import Link from "next/link";
 import { ShareButton } from "@/components/ui/share-button";
 import { SaveButton } from "@/components/ui/save-button";
@@ -131,6 +132,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
         </div>
 
         <CommentSection module={item.module} slug={item.slug} initialComments={item.comments || 0} />
+        <RelatedPosts module={item.module} slug={item.slug} tags={item.tags} category={item.category} />
         <SuggestionGrid current={item} />
       </article>
     </>
