@@ -47,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   if (process.env.DATABASE_URL) {
     try {
-      const [posts, timeline] = await Promise.all([
+      const [posts, timeline, categories] = await Promise.all([
         prisma.post.findMany({
           where: { published: true, deletedAt: null, date: publicPostDateWhere() },
           select: { module: true, slug: true, date: true },
@@ -60,6 +60,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           orderBy: { dateGr: "desc" },
           take: 1,
         }).catch(() => []),
+        // Get unique categories for indexable category pages
+        prisma.post.findMany({
+          where: { published: true, deletedAt: null, category: { not: null } },
+          select: { module: true, category: true },
+          distinct: ["module", "category"],
+          take: 200,
+        }).catch(() => []),
       ]);
 
       for (const post of posts) {
@@ -68,6 +75,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
       if (timeline[0]?.updatedAt) {
         routes.push(entry(`${base}/timeline`, timeline[0].updatedAt, 0.78, "weekly"));
+      }
+
+      // Add category index pages
+      for (const cat of categories) {
+        if (cat.category) {
+          routes.push(entry(`${base}/${cat.module}/category/${encodeURIComponent(cat.category)}`, undefined, 0.6, "weekly"));
+        }
       }
 
       return routes;
