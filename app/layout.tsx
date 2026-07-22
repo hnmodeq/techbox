@@ -36,7 +36,12 @@ export const metadata: Metadata = {
   },
   description: defaultSeo.description,
   manifest: "/manifest.json",
-  alternates: { canonical: siteUrl() },
+  alternates: {
+    canonical: siteUrl(),
+    types: {
+      "application/rss+xml": [{ url: `${siteUrl()}/feed.xml`, title: "تکباکس RSS Feed" }],
+    },
+  },
   openGraph: {
     type: "website",
     locale: "fa_IR",
