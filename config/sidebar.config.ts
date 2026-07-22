@@ -47,11 +47,14 @@ export const navItems: NavItem[] = [
  },
  {
  title: "فروشگاه",
- href: "/shop",
+ href: "/landing/storage/shop",
  icon: ShoppingBag,
  iconClassName: moduleColors.shop.base,
  iconHoverClassName: moduleColors.shop.hover,
  iconActiveClassName: moduleColors.shop.active,
+ children: [
+   { title: "ذخیره‌ساز", href: "/landing/storage/shop", icon: ShoppingBag, iconClassName: moduleColors.shop.base, iconHoverClassName: moduleColors.shop.hover, iconActiveClassName: moduleColors.shop.active },
+ ],
  },
  {
  title: "ابزارهای زیرساخت",

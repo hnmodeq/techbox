@@ -100,20 +100,6 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
     <>
       <ProductJsonLd item={item} />
       <main className="mx-auto max-w-[1680px] px-3 sm:px-4 lg:px-6 py-4" dir="rtl">
-        {/* Breadcrumb */}
-        <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">خانه</Link>
-          <span>/</span>
-          <Link href="/landing/storage/shop" className="hover:text-foreground">فروشگاه</Link>
-          {item.category && (
-            <>
-              <span>/</span>
-              <span className="text-foreground">{item.category}</span>
-            </>
-          )}
-          <span>/</span>
-          <span className="line-clamp-1 max-w-[300px] text-foreground/70">{item.title}</span>
-        </nav>
 
         {/* Amazing top bar if discount */}
         {discount >= 15 && item.discountEndsAt && !isUnavailable && (
@@ -253,12 +239,12 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
                     </Button>
                   </div>
 
-                  {/* ضمانت اصالت (item 1) */}
+                  {/* گارانتی اصالت و سلامت محصول (item 14) */}
                   <div className="rounded-md bg-muted/40 p-2.5 text-[11px] leading-5 flex items-start gap-2">
                     <ShieldCheck className="size-4 shrink-0 text-emerald-600 mt-0.5" />
                     <div>
-                      <p className="font-bold text-foreground">ضمانت اصالت</p>
-                      <p className="text-muted-foreground">تمام محصولات تکباکس دارای ضمانت اصالت و سلامت کالا هستند.</p>
+                      <p className="font-bold text-foreground">گارانتی اصالت و سلامت محصول</p>
+                      <p className="text-muted-foreground">تمام محصولات تکباکس دارای گارانتی هونامیک ارتباط رستاک هستند.</p>
                     </div>
                   </div>
                 </div>

@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal, X, Search, ChevronDown, ChevronUp, ArrowUpDown, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -151,16 +150,16 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
 
   const [onlyAvailable, setOnlyAvailable] = useState(false);
 
-  // open states for filter sections – only practical filters
+  // Item 3: All sections collapsed by default
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({
     fast: false,
-    price: true,
-    brand: true,
+    price: false,
+    brand: false,
     category: false,
-    bay: true,
+    bay: false,
     cpu: false,
     memory: false,
-    features: true,
+    features: false,
   });
   const toggleSection = (k: string) => setOpenMap((m) => ({ ...m, [k]: !m[k] }));
 
@@ -447,10 +446,9 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
 
       {/* Fast shipping */}
       <FilterSection
-        title="ارسال سریع"
+        title="فقط کالای موجود"
         open={!!openMap.fast}
         onToggle={() => toggleSection("fast")}
-        subtitle="دیجی‌کالا فروشنده و ۳ ساعته"
       >
         <div className="flex items-center justify-between py-1">
           <div className="flex items-center gap-2">
@@ -461,50 +459,43 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         </div>
       </FilterSection>
 
-      {/* Price */}
+      {/* Price — Item 15: rebuilt with simple inputs instead of buggy slider */}
       <FilterSection title="محدوده قیمت" open={!!openMap.price} onToggle={() => toggleSection("price")} badgeCount={priceFilter ? 1 : 0}>
-        <div className="space-y-4 pt-2">
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-            <span>{fmtSliderPrice(effectivePrice[0])}</span>
-            <span>{fmtSliderPrice(effectivePrice[1])}</span>
-          </div>
-          <Slider
-            min={priceRange.min}
-            max={priceRange.max}
-            step={Math.max(1, Math.round((priceRange.max - priceRange.min) / 100))}
-            value={effectivePrice}
-            onValueChange={(v) => {
-              if (Array.isArray(v) && v.length === 2) setPriceFilter([v[0], v[1]]);
-            }}
-            className="py-2"
-          />
+        <div className="space-y-3 pt-2">
           <div className="flex items-center gap-2">
             <Input
               type="number"
-              value={Math.round(effectivePrice[0])}
+              value={priceFilter ? Math.round(effectivePrice[0]) : ""}
               onChange={(e) => {
                 const vv = parseInt(e.target.value, 10);
-                if (!isNaN(vv)) setPriceFilter([vv, effectivePrice[1]]);
+                if (!isNaN(vv)) setPriceFilter([vv, priceFilter ? priceFilter[1] : priceRange.max]);
+                else setPriceFilter(null);
               }}
               className="h-8 text-[11px]"
-              placeholder="از"
+              placeholder="از (تومان)"
             />
-            <span className="text-muted-foreground">-</span>
+            <span className="text-muted-foreground text-xs">تا</span>
             <Input
               type="number"
-              value={Math.round(effectivePrice[1])}
+              value={priceFilter ? Math.round(effectivePrice[1]) : ""}
               onChange={(e) => {
                 const vv = parseInt(e.target.value, 10);
-                if (!isNaN(vv)) setPriceFilter([effectivePrice[0], vv]);
+                if (!isNaN(vv)) setPriceFilter([priceFilter ? priceFilter[0] : priceRange.min, vv]);
+                else setPriceFilter(null);
               }}
               className="h-8 text-[11px]"
-              placeholder="تا"
+              placeholder="تا (تومان)"
             />
           </div>
           {priceFilter && (
-            <button onClick={() => setPriceFilter(null)} className="text-[11px] text-destructive hover:underline w-full text-right">
-              حذف فیلتر قیمت
-            </button>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-muted-foreground">
+                {fmtSliderPrice(effectivePrice[0])} — {fmtSliderPrice(effectivePrice[1])}
+              </span>
+              <button onClick={() => setPriceFilter(null)} className="text-[11px] text-destructive hover:underline">
+                حذف
+              </button>
+            </div>
           )}
         </div>
       </FilterSection>
@@ -535,8 +526,8 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
                   className="rounded border-border size-4 accent-primary"
                 />
                 <span className="flex-1 flex items-center justify-between min-w-0">
-                  <span className="text-[12px] font-medium group-hover:text-foreground">{brand}</span>
-                  {BRAND_FA[brand] && <span className="text-[11px] text-muted-foreground">{BRAND_FA[brand]}</span>}
+                  <span className="text-[12px] font-medium group-hover:text-foreground">{BRAND_FA[brand] || brand}</span>
+                  {BRAND_FA[brand] && <span className="text-[11px] text-muted-foreground" dir="ltr">{brand}</span>}
                 </span>
               </label>
             ))}

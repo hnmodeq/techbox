@@ -5,7 +5,7 @@ import Link from "next/link";
 import { blurProps } from "@/lib/image-placeholder";
 import type { ContentItem } from "@/lib/content";
 import { useCountdown } from "@/hooks/useCountdown";
-import { Star, Cpu, MemoryStick, HardDrive, Network, Truck } from "lucide-react";
+import { Star, Cpu, MemoryStick, HardDrive, Network, Truck, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -97,8 +97,8 @@ function DiscountTimer({ endsAt, small = false }: { endsAt: string; small?: bool
   );
 }
 
-// ── Rating ────────────────────────────────────────────────────────────────────
-function RatingLine({ rating }: { rating?: number | null }) {
+// ── Rating with count (item 13) ───────────────────────────────────────────────
+function RatingLine({ rating, count }: { rating?: number | null; count?: number }) {
   if (!rating || rating <= 0) return <div className="h-[14px]" />;
   return (
     <div className="flex items-center gap-1">
@@ -106,6 +106,9 @@ function RatingLine({ rating }: { rating?: number | null }) {
         {rating.toLocaleString("fa-IR", { maximumFractionDigits: 1 })}
       </span>
       <Star className="size-3 fill-[#f9bc00] text-[#f9bc00]" />
+      {count && count > 0 && (
+        <span className="text-[9px] text-muted-foreground">({count.toLocaleString("fa-IR")})</span>
+      )}
     </div>
   );
 }
@@ -130,6 +133,10 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
 
   const badgeText = discount >= 25 ? "پیشنهاد شگفت‌انگیز" : discount > 0 ? "فروش ویژه" : null;
 
+  // Warranty tooltip logic (item 11)
+  const warrantyText = p.warranty || "";
+  const hasWarranty = warrantyText && warrantyText !== "بدون گارانتی";
+
   return (
     <Link
       href={`/shop/${p.slug}`}
@@ -143,15 +150,10 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       )}
       dir="rtl"
     >
-      <div className="flex items-center justify-between px-3 pt-3 h-6">
-        <span
-          className={cn(
-            "size-[6px] rounded-full shrink-0",
-            isUnavailable ? "bg-zinc-300 dark:bg-zinc-600" : "bg-emerald-500/70"
-          )}
-          aria-hidden
-        />
+      {/* Item 1: all dots black. Item 2: swap positions (badge left, dot right in RTL = badge right visually, dot left visually) */}
+      <div className="flex items-center justify-between px-3 pt-3 h-6" dir="ltr">
         {badgeText && <span className="text-[10px] font-bold leading-none text-[#ef394e] tracking-tight">{badgeText}</span>}
+        <span className="size-[6px] rounded-full shrink-0 bg-foreground/60" aria-hidden />
       </div>
 
       <div className="relative w-full aspect-[4/3] p-4 flex items-center justify-center bg-transparent">
@@ -171,8 +173,21 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </h3>
 
         <div className="flex items-center justify-between mt-1">
-          <RatingLine rating={p.rating} />
-          {!isUnavailable && p.warranty && <span className="hidden sm:inline text-[9px] text-muted-foreground truncate max-w-[90px]">{p.warranty}</span>}
+          <RatingLine rating={p.rating} count={p.ratingCount} />
+          {/* Item 11: warranty with tooltip */}
+          {hasWarranty && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="hidden sm:inline-flex items-center gap-0.5 text-[9px] text-muted-foreground truncate max-w-[90px] cursor-default">
+                    <ShieldCheck className="size-3 text-emerald-500/70" />
+                    {warrantyText}
+                  </span>
+                }
+              />
+              <TooltipContent side="bottom">گارانتی هونامیک ارتباط رستاک</TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         <div className="flex items-center gap-1 text-[10px] text-muted-foreground min-h-[16px]">

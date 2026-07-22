@@ -30,6 +30,7 @@ const sidebarModuleMap: Record<string, string> = {
   "/news": "news",
   "/media": "media",
   "/shop": "shop",
+  "/landing/storage/shop": "shop",
   "/tools": "tools",
   "/forum": "forum",
   "/review": "review",

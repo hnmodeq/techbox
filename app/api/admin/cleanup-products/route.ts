@@ -25,6 +25,9 @@ const REQUIRED_SPEC_KEYS = [
   "حداکثر ظرفیت Volume",
 ];
 
+// Minimum number of specs a product must have (out of 18)
+const MIN_SPECS_REQUIRED = 8;
+
 // Map English QNAP keys to the 18 required Persian keys
 const ENGLISH_TO_PERSIAN: Record<string, string> = {
   "CPU": "پردازنده",
@@ -58,16 +61,12 @@ function normalizeSpecs(specs: Record<string, unknown>): Record<string, string> 
     const val = String(value).trim();
     if (["n/a", "na", "-"].includes(val.toLowerCase())) continue;
 
-    // Check if it's an English key that maps to Persian
     const persianKey = ENGLISH_TO_PERSIAN[key];
     if (persianKey) {
       result[persianKey] = val;
-    }
-    // If it's already a Persian key we want, keep it
-    else if (REQUIRED_SPEC_KEYS.includes(key)) {
+    } else if (REQUIRED_SPEC_KEYS.includes(key)) {
       result[key] = val;
     }
-    // Skip all other specs (we only want the 18)
   }
 
   return result;
@@ -90,6 +89,7 @@ export async function POST(req: NextRequest) {
     deletedIncomplete: 0,
     specsNormalized: 0,
     specsDeleted: 0,
+    deletedSlugs: [] as string[],
     errors: [] as string[],
   };
 
@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
       });
     }
     results.deletedOld = oldProducts.length;
+    results.deletedSlugs.push(...oldProducts.map((p) => p.slug));
 
     // 2. Get remaining products
     const remaining = await prisma.post.findMany({
@@ -140,20 +141,21 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4. Delete products with no specs at all
+    // 4. Delete products with insufficient specs (item 10)
     if (deleteIncomplete) {
-      const noSpecs = remaining.filter((p) => {
+      const insufficient = remaining.filter((p) => {
         const specs = (p.specs as Record<string, unknown>) || {};
         const normalized = normalizeSpecs(specs);
-        return Object.keys(normalized).length === 0;
+        return Object.keys(normalized).length < MIN_SPECS_REQUIRED;
       });
 
-      if (!dryRun && noSpecs.length > 0) {
+      if (!dryRun && insufficient.length > 0) {
         await prisma.post.deleteMany({
-          where: { id: { in: noSpecs.map((p) => p.id) } },
+          where: { id: { in: insufficient.map((p) => p.id) } },
         });
       }
-      results.deletedIncomplete = noSpecs.length;
+      results.deletedIncomplete = insufficient.length;
+      results.deletedSlugs.push(...insufficient.map((p) => p.slug));
     }
   } catch (e: any) {
     results.errors.push(e.message || String(e));

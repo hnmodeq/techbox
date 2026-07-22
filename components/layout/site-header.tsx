@@ -65,6 +65,12 @@ const pageTitleFa: Record<string, string> = {
   timeline: "تایم‌لاین",
   tools: "ابزارها",
   "work-with-us": "همکاری با ما",
+  landing: "لندینگ محصولات",
+  storage: "ذخیره‌ساز",
+  shop: "لیست محصولات",
+  buying: "تکمیل خرید",
+  compare: "مقایسه محصولات",
+  order: "سفارش",
 }
 
 const contentModules: ModuleSlug[] = ["blog", "news", "media", "review", "download", "shop", "forum", "tools"]

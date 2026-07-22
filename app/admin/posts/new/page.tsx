@@ -683,15 +683,13 @@ function NewPostInner() {
                         )} />
                         <FormField control={form.control as any} name="warranty" render={({ field }) => (
                           <FormItem>
-                            <FormLabel>گارانتی (خالی = بدون گارانتی)</FormLabel>
+                            <FormLabel>نوع گارانتی</FormLabel>
                             <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger><SelectValue placeholder="انتخاب…" /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="">بدون گارانتی</SelectItem>
-                                <SelectItem value="گارانتی اصالت و سلامت فیزیکی تکباکس">گارانتی تکباکس</SelectItem>
-                                <SelectItem value="گارانتی ۱۲ ماهه تکباکس">گارانتی ۱۲ ماهه</SelectItem>
-                                <SelectItem value="گارانتی ۲۴ ماهه تکباکس">گارانتی ۲۴ ماهه</SelectItem>
-                                <SelectItem value="گارانتی رسمی برند">گارانتی رسمی برند</SelectItem>
+                                <SelectItem value="هونامیک ارتباط رستاک">هونامیک ارتباط رستاک</SelectItem>
+                                <SelectItem value="گارانتی اصالت و سلامت محصول">گارانتی اصالت و سلامت محصول</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>
