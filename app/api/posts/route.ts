@@ -5,6 +5,7 @@ import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 import { createPostRevision } from "@/lib/revision";
+import { logAudit } from "@/lib/audit-log";
 import { createSlugRedirectOnChange } from "@/lib/slug-redirects";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { getEnabledModules } from "@/lib/module-config";
@@ -322,6 +323,7 @@ export async function POST(req: NextRequest) {
     revalidatePath(`/${data.module}`);
     revalidatePath(`/${data.module}/${data.slug}`);
     revalidatePath('/sitemap.xml');
+    logAudit({ userId: user.id, userName: user.name, action: "post.create", target: `${data.module}/${data.slug}`, details: { title: data.title } });
     return NextResponse.json(post, { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
@@ -420,6 +422,13 @@ export async function PATCH(req: NextRequest) {
   }
   revalidatePath('/sitemap.xml');
 
+  // Audit log for publish/unpublish status changes
+  if (typeof body.published === "boolean") {
+    logAudit({ userId: user.id, userName: user.name, action: body.published ? "post.publish" : "post.unpublish", target: `${moduleKey}/${slug}` });
+  } else {
+    logAudit({ userId: user.id, userName: user.name, action: "post.update", target: `${moduleKey}/${slug}`, details: { fields: Object.keys(data) } });
+  }
+
   return NextResponse.json(updated, { headers: cacheHeaders(PRIVATE_NO_STORE) });
 }
 
@@ -456,6 +465,7 @@ export async function DELETE(req: NextRequest) {
   revalidatePath(`/${moduleKey}`);
   revalidatePath(`/${moduleKey}/${slug}`);
   revalidatePath('/sitemap.xml');
+  logAudit({ userId: user.id, userName: user.name, action: "post.delete", target: `${moduleKey}/${slug}` });
   return NextResponse.json({ ok: true, softDeleted: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
 }
 

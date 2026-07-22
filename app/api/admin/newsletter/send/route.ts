@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { sendEmail } from "@/lib/email";
+import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 import { renderNewsletterEmail, buildUnsubscribeUrl, type NewsletterItem } from "@/lib/newsletter";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
@@ -83,6 +84,8 @@ export async function POST(req: NextRequest) {
         sentBy: user.id,
       },
     });
+
+    logAudit({ userId: user.id, userName: user.name, action: "newsletter.send", details: { subject: body.subject, sent, failed, total: subscribers.length } });
 
     return NextResponse.json(
       { ok: true, sent, failed, total: subscribers.length, campaignId: campaign.id },
