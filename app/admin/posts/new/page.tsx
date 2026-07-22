@@ -25,6 +25,7 @@ import { ModuleBadge } from "@/components/ui/module-badge";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { ShopSpecsField } from "@/components/admin/shop-specs-field";
 import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
+import { RevisionHistory } from "@/components/admin/revision-history";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -144,6 +145,7 @@ function NewPostInner() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [lastDraftKey, setLastDraftKey] = useState("");
+  const [editPostId, setEditPostId] = useState<string | null>(null);
   const [currencyRates, setCurrencyRates] = useState({ USD: 189000, EUR: 200000, AED: 51500, global: 0 });
 
   useEffect(() => {
@@ -236,6 +238,7 @@ function NewPostInner() {
       } catch {}
       if (!it) it = getBySlug(moduleWatch, editSlug);
       if (!mounted || !it) return;
+      setEditPostId(it.id || null);
       form.reset({
         module: moduleWatch,
         title: it.title || "",
@@ -864,6 +867,17 @@ function NewPostInner() {
               <p className="text-xs text-muted-foreground line-clamp-3">{excerptWatch || "خلاصه مطلب اینجا دیده می‌شود."}</p>
             </CardContent>
           </Card>
+
+          {/* Revision History — only shown when editing */}
+          {editPostId && (
+            <RevisionHistory
+              postId={editPostId}
+              onRestored={() => {
+                // Reload the edit data after restore
+                window.location.reload();
+              }}
+            />
+          )}
 
           <Card className="p-4 text-xs text-muted-foreground">
             <b className="text-foreground">راهنمای CMS</b>
