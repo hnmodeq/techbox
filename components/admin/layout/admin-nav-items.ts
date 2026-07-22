@@ -23,6 +23,7 @@ import {
   Upload,
   Terminal,
   ScrollText,
+  ImageIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -94,6 +95,7 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "ابزارها",
     items: [
+      { title: "کتابخانه رسانه", href: "/admin/media", icon: ImageIcon, superAdminOnly: true },
       { title: "فایل‌های Blob", href: "/admin/blob", icon: Database, superAdminOnly: true },
       { title: "آپلود فایل", href: "/admin/upload", icon: Upload, superAdminOnly: true },
       { title: "دیزاین سیستم", href: "/admin/design-system", icon: Palette, superAdminOnly: true },
