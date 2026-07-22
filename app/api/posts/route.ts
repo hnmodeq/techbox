@@ -243,7 +243,7 @@ const createSchema = z.object({
   fileSize: z.string().max(50).optional(),
   downloadCount: z.number().int().min(0).optional(),
   published: z.boolean().optional(),
-  status: z.enum(["draft", "review", "published", "archived"]).optional(),
+  status: z.enum(["draft", "review", "published", "scheduled", "archived"]).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -337,7 +337,7 @@ const patchSchema = z.object({
   content: z.string().max(100000).optional(),
   image: z.string().max(1000).optional(),
   published: z.boolean().optional(),
-  status: z.enum(["draft", "review", "published", "archived"]).optional(),
+  status: z.enum(["draft", "review", "published", "scheduled", "archived"]).optional(),
   solved: z.boolean().optional(),
   category: z.string().max(100).optional(),
   newSlug: z.string().min(1).max(200).optional(),
@@ -367,7 +367,7 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.content === "string") data.content = body.content;
   if (typeof body.image === "string") data.image = body.image;
   if (typeof body.published === "boolean") data.published = body.published;
-  if (typeof body.status === "string" && ["draft", "review", "published", "archived"].includes(body.status)) {
+  if (typeof body.status === "string" && ["draft", "review", "published", "scheduled", "archived"].includes(body.status)) {
     data.status = body.status;
     data.published = body.status === "published";
   }

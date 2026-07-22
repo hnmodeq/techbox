@@ -1,13 +1,27 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 /**
  * POST /api/admin/scheduled
  * Publishes all scheduled posts whose date has passed.
- * Can be called by Vercel Cron Jobs or manually.
- * No auth required — this is a safe, idempotent operation.
+ * Called by Vercel Cron Jobs every 5 minutes.
+ * Also callable manually by admins or via CRON_SECRET.
  */
-export async function POST() {
+export async function POST(req?: NextRequest) {
+  // Allow access via Vercel Cron Secret or admin session
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const authHeader = req?.headers.get("authorization");
+    const isCronCall = authHeader === `Bearer ${cronSecret}`;
+    if (!isCronCall) {
+      // Not a cron call — require admin auth
+      const user = await getSessionUserPublic();
+      if (!user || user.role !== "super_admin") {
+        return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      }
+    }
+  }
   try {
     const now = new Date();
 
