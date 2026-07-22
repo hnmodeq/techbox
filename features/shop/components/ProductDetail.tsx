@@ -158,29 +158,29 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
           {/* Center — Details */}
           <div className="lg:col-span-4 xl:col-span-5 order-2 space-y-5">
             {/* Title — left justified (item 2) */}
-            <h1 className="text-[16px] sm:text-[20px] font-bold leading-7 sm:leading-8 text-foreground text-left" dir="ltr">
+            <h1 className="text-[15px] sm:text-[17px] font-bold leading-6 sm:leading-7 text-foreground text-left" dir="ltr">
               {item.title}
             </h1>
 
-            {/* Rating + model name + comments + views — same row (item 5) */}
+            {/* English model name / Views / Comments / Rating (item 2) */}
             <div className="flex flex-wrap items-center gap-3 text-[12px] border-b border-border pb-4">
+              {item.model && (
+                <>
+                  <span className="text-[11px] text-muted-foreground font-medium" dir="ltr">
+                    {item.brand ? `${item.brand} ` : ""}{item.model}
+                  </span>
+                  <span className="text-muted-foreground">•</span>
+                </>
+              )}
+              <span className="text-muted-foreground">{item.views.toLocaleString("fa-IR")} بازدید</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-[#19bfd3] font-medium">{(item.comments ?? 0).toLocaleString("fa-IR")} دیدگاه</span>
+              <span className="text-muted-foreground">•</span>
               <div className="flex items-center gap-1">
                 <Star className="size-4 fill-[#f9bc00] text-[#f9bc00]" />
                 <span className="font-bold">{(item.rating ?? 0).toLocaleString("fa-IR", { maximumFractionDigits: 1 })}</span>
                 <span className="text-muted-foreground">({(item.ratingCount ?? 0).toLocaleString("fa-IR")})</span>
               </div>
-              {item.model && (
-                <>
-                  <span className="text-muted-foreground">•</span>
-                  <span className="text-[11px] text-muted-foreground" dir="ltr">
-                    {item.brand ? `${item.brand} ` : ""}{item.model}
-                  </span>
-                </>
-              )}
-              <span className="text-muted-foreground">•</span>
-              <span className="text-[#19bfd3]">{(item.comments ?? 0).toLocaleString("fa-IR")} دیدگاه</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">{item.views.toLocaleString("fa-IR")} بازدید</span>
             </div>
           </div>
 

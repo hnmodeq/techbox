@@ -168,7 +168,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       </div>
 
       <div className="flex flex-1 flex-col gap-1 px-3">
-        <h3 className="line-clamp-2 min-h-[40px] text-right text-[12px] font-normal leading-5 text-foreground/85 group-hover:text-foreground">
+        <h3 className="line-clamp-2 min-h-[40px] text-left text-[12px] font-normal leading-5 text-foreground/85 group-hover:text-foreground" dir="ltr">
           {p.title}
         </h3>
 
@@ -190,13 +190,26 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           )}
         </div>
 
+        {/* Availability & fast shipping labels */}
         <div className="flex items-center gap-1 text-[10px] text-muted-foreground min-h-[16px]">
-          {!isUnavailable ? (
-            <span className="inline-flex items-center gap-1">
-              <Truck className="size-3 text-sky-500" />
-              <span className="text-[10px]">موجود در انبار</span>
+          {/* Fast shipping label from DB */}
+          {specs["ارسال سریع"] === "دارد" && (
+            <span className="inline-flex items-center gap-1 bg-[#19bfd3]/10 text-[#19bfd3] px-1.5 py-0.5 rounded text-[9px] font-bold">
+              <Truck className="size-3" /> ارسال سریع
             </span>
-          ) : (
+          )}
+          {/* Other admin-defined status labels from availability */}
+          {p.availability === "پیش‌سفارش" && (
+            <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold">
+              📦 پیش‌سفارش
+            </span>
+          )}
+          {p.availability === "موجود برای مشاوره" && (
+            <span className="inline-flex items-center gap-1 bg-emerald-600/10 text-emerald-600 px-1.5 py-0.5 rounded text-[9px] font-bold">
+              ✅ مشاوره
+            </span>
+          )}
+          {isUnavailable && (
             <span className="text-[10px] text-red-500/80">ناموجود</span>
           )}
         </div>
@@ -210,7 +223,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
                   render={
                     <div className="flex flex-col items-center gap-0.5 text-center cursor-default">
                       <Icon className="size-3.5 text-muted-foreground/70" />
-                      <span className="line-clamp-1 w-full text-[9px] leading-3 text-foreground/80">{String(value).slice(0, 22)}</span>
+                      <span className="line-clamp-1 w-full text-[9px] leading-3 text-foreground/80 invisible">{String(value).slice(0, 22)}</span>
                     </div>
                   }
                 />

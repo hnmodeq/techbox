@@ -108,8 +108,9 @@ export default function CommentSection({ module, slug, initialComments, compact 
   // ─── Top-level comment form state ───────────────────────────
   const [topText, setTopText] = React.useState("");
   const [topSubmitting, setTopSubmitting] = React.useState(false);
-  const [pros, setPros] = React.useState("");
-  const [cons, setCons] = React.useState("");
+  const [pros, setPros] = React.useState<string[]>([""]);
+  const [cons, setCons] = React.useState<string[]>([""]);
+  const [hoverRating, setHoverRating] = React.useState(0);
   const [myRating, setMyRating] = React.useState(0);
   const [ratingSubmitting, setRatingSubmitting] = React.useState(false);
 
@@ -151,15 +152,15 @@ export default function CommentSection({ module, slug, initialComments, compact 
 
     // Build the full text with pros/cons prepended
     let fullText = formData.get("text") as string;
-    const prosList = pros.split("\n").map((p) => p.trim()).filter(Boolean);
-    const consList = cons.split("\n").map((c) => c.trim()).filter(Boolean);
+    const prosList = pros.map((p) => p.trim()).filter(Boolean);
+    const consList = cons.map((c) => c.trim()).filter(Boolean);
 
     let prefix = "";
     if (prosList.length > 0) {
-      prefix += "✅ نقاط قوت:\n" + prosList.map((p) => `• ${p}`).join("\n") + "\n\n";
+      prefix += "نقاط قوت\n" + prosList.map((p) => `• ${p}`).join("\n") + "\n\n";
     }
     if (consList.length > 0) {
-      prefix += "❌ نقاط ضعف:\n" + consList.map((c) => `• ${c}`).join("\n") + "\n\n";
+      prefix += "نقاط ضعف\n" + consList.map((c) => `• ${c}`).join("\n") + "\n\n";
     }
     if (prefix) {
       fullText = prefix + (fullText || "").trim();
@@ -173,8 +174,8 @@ export default function CommentSection({ module, slug, initialComments, compact 
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
         setTopText("");
-        setPros("");
-        setCons("");
+        setPros([""]);
+        setCons([""]);
         toast.success((res as any)?.message || "دیدگاه شما با موفقیت ثبت شد");
         startTransition(() => { load(); });
       } else {
@@ -367,9 +368,52 @@ export default function CommentSection({ module, slug, initialComments, compact 
                     </Tooltip>
                   </div>
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--paragraph-color)] paragraph-color leading-7">
-                  {(c as any).text}
-                </p>
+                {/* Parsed comment: show text above strength/weakness */}
+                {(() => {
+                  const raw = (c as any).text || "";
+                  const consBlock = raw.match(/نقاط ضعف\n([\s\S]*?)(?=\nنقاط قوت|$)/);
+                  const prosBlock = raw.match(/نقاط قوت\n([\s\S]*?)(?=\nنقاط ضعف|$)/);
+                  // Main text is everything before the first "نقاط"
+                  let mainText = raw;
+                  const splitPoint = raw.indexOf("نقاط");
+                  if (splitPoint > 0) {
+                    mainText = raw.slice(0, splitPoint).trim();
+                  }
+                  const weaknessLines = consBlock ? consBlock[1].split("\n").map((line: string) => line.replace(/^•\s*/, "").trim()).filter(Boolean) : [];
+                  const strengthLines = prosBlock ? prosBlock[1].split("\n").map((line: string) => line.replace(/^•\s*/, "").trim()).filter(Boolean) : [];
+
+                  return (
+                    <div className="space-y-2">
+                      {mainText && (
+                        <p className="whitespace-pre-wrap text-sm text-[var(--paragraph-color)] paragraph-color leading-7">
+                          {mainText}
+                        </p>
+                      )}
+                      {/* Weakness first */}
+                      {weaknessLines.length > 0 && (
+                        <div className="rounded-md bg-red-500/5 border border-red-500/20 p-3 mt-2">
+                          <p className="text-[11px] font-bold text-red-500 mb-1">نقاط ضعف</p>
+                          <ul className="space-y-0.5">
+                            {weaknessLines.map((line: string, i: number) => (
+                              <li key={i} className="text-[12px] text-red-600 leading-5">{line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {/* Strength second */}
+                      {strengthLines.length > 0 && (
+                        <div className="rounded-md bg-emerald-600/5 border border-emerald-600/20 p-3 mt-2">
+                          <p className="text-[11px] font-bold text-emerald-600 mb-1">نقاط قوت</p>
+                          <ul className="space-y-0.5">
+                            {strengthLines.map((line: string, i: number) => (
+                              <li key={i} className="text-[12px] text-emerald-600 leading-5">{line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="flex items-center gap-4 mt-3">
                   <CommentVote
                     id={c.id}
@@ -498,7 +542,26 @@ export default function CommentSection({ module, slug, initialComments, compact 
     );
   };
 
-  const totalCount = comments.reduce((s, c: any) => {
+  const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
+
+  const sortedComments = React.useMemo(() => {
+    const list = [...comments];
+    switch (sortBy) {
+      case "newest":
+        list.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+        break;
+      case "oldest":
+        list.sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
+        break;
+      case "popular":
+      default:
+        list.sort((a, b) => ((b.likes ?? 0) + (b.dislikes ?? 0) * -0.5) - ((a.likes ?? 0) + (a.dislikes ?? 0) * -0.5));
+        break;
+    }
+    return list;
+  }, [comments, sortBy]);
+
+  const totalCount = sortedComments.reduce((s, c: any) => {
     if (isSoftDeleted(c)) return s;
     const replyCount = (c.replies || []).filter((r: any) => !isSoftDeleted(r)).length;
     return s + 1 + replyCount;
@@ -511,12 +574,29 @@ export default function CommentSection({ module, slug, initialComments, compact 
           {loading ? (
             <Skeleton className="h-7 w-48 rounded-md" />
           ) : (
-            <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
-              دیدگاه شما{" "}
-              <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-                ({totalCount.toLocaleString("fa-IR")})
-              </span>
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-[length:var(--h2-font-size)] text-[var(--h2-font-color)] font-bold">
+                دیدگاه شما{" "}
+                <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+                  ({totalCount.toLocaleString("fa-IR")})
+                </span>
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-muted-foreground">مرتب‌سازی:</span>
+                {(["popular", "newest", "oldest"] as const).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setSortBy(key)}
+                    className={`text-[11px] px-2 py-0.5 rounded-full transition ${
+                      sortBy === key ? "bg-primary text-white font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {key === "popular" ? "محبوب‌ترین" : key === "newest" ? "جدیدترین" : "قدیمی‌ترین"}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -546,23 +626,26 @@ export default function CommentSection({ module, slug, initialComments, compact 
           {module === "shop" && (
             <div className="flex items-center gap-3 py-2">
               <span className="text-[12px] font-medium text-[var(--paragraph-color)]">امتیاز شما:</span>
-              <div className="flex items-center gap-1" dir="ltr">
+              <div className="flex items-center gap-1" dir="rtl">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
                     type="button"
                     onClick={() => handleRating(star)}
                     disabled={ratingSubmitting}
-                    className="p-0.5 transition-transform hover:scale-110"
+                    className="p-0.5 transition-transform hover:scale-110 relative"
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
                   >
                     <svg
-                      className={`size-6 ${star <= myRating ? "fill-[#f9bc00] text-[#f9bc00]" : "fill-transparent text-muted-foreground hover:text-[#f9bc00]"}`}
+                      className={`size-6 ${(star <= (hoverRating || myRating)) ? "fill-[#f9bc00] text-[#f9bc00]" : "fill-transparent text-muted-foreground hover:text-[#f9bc00]"}`}
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       strokeWidth={1.5}
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] text-muted-foreground pointer-events-none opacity-0 group-hover:opacity-100">{star}</span>
                   </button>
                 ))}
               </div>
@@ -572,34 +655,80 @@ export default function CommentSection({ module, slug, initialComments, compact 
             </div>
           )}
 
-          {/* Pros/Cons (item 9) — only for shop module, not compact */}
+          {/* Strength / Weakness — dynamic single-line fields (item 9) */}
           {module === "shop" && !compact && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                  <span>✅</span> نقاط قوت
-                </label>
-                <textarea
-                  value={pros}
-                  onChange={(e) => setPros(e.target.value)}
-                  placeholder={"هر مورد در یک خط...\nمثلاً: کیفیت ساخت بالا"}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 resize-none min-h-[60px] text-[var(--paragraph-color)]"
-                  rows={2}
-                  disabled={topSubmitting}
-                />
-              </div>
-              <div className="space-y-1.5">
+            <div className="space-y-4">
+              {/* Weakness first */}
+              <div className="space-y-2">
                 <label className="text-[11px] font-bold text-red-500 flex items-center gap-1">
-                  <span>❌</span> نقاط ضعف
+                  نقاط ضعف
                 </label>
-                <textarea
-                  value={cons}
-                  onChange={(e) => setCons(e.target.value)}
-                  placeholder={"هر مورد در یک خط...\nمثلاً: قیمت بالا"}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 resize-none min-h-[60px] text-[var(--paragraph-color)]"
-                  rows={2}
-                  disabled={topSubmitting}
-                />
+                {cons.map((val, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={val}
+                      onChange={(e) => {
+                        const updated = [...cons];
+                        updated[idx] = e.target.value;
+                        setCons(updated);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          const updated = [...cons];
+                          updated[idx] = e.currentTarget.value.trim();
+                          updated.push("");
+                          setCons(updated);
+                          setTimeout(() => {
+                            const el = document.getElementById(`cons-field-${idx + 1}`);
+                            if (el) (el as HTMLInputElement).focus();
+                          }, 10);
+                        }
+                      }}
+                      id={`cons-field-${idx}`}
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 text-red-600"
+                      placeholder="هر مورد در یک خط..."
+                      disabled={topSubmitting}
+                    />
+                  </div>
+                ))}
+              </div>
+              {/* Strength second */}
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                  نقاط قوت
+                </label>
+                {pros.map((val, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={val}
+                      onChange={(e) => {
+                        const updated = [...pros];
+                        updated[idx] = e.target.value;
+                        setPros(updated);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          const updated = [...pros];
+                          updated[idx] = e.currentTarget.value.trim();
+                          updated.push("");
+                          setPros(updated);
+                          setTimeout(() => {
+                            const el = document.getElementById(`pros-field-${idx + 1}`);
+                            if (el) (el as HTMLInputElement).focus();
+                          }, 10);
+                        }
+                      }}
+                      id={`pros-field-${idx}`}
+                      className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 text-emerald-600"
+                      placeholder="هر مورد در یک خط..."
+                      disabled={topSubmitting}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -647,7 +776,7 @@ export default function CommentSection({ module, slug, initialComments, compact 
         ) : comments.length === 0 ? (
           <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (
-          comments.map(c => renderNode(c, 0))
+          sortedComments.map(c => renderNode(c, 0))
         )}
       </div>
     </section>

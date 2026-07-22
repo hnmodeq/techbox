@@ -675,7 +675,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         <div className="flex gap-0 lg:gap-4 items-start">
           {/* ── Desktop Sidebar ── */}
           {sidebarOpen && (
-            <aside className="hidden lg:block w-[280px] shrink-0 sticky top-[3.5rem] self-start max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin rounded-lg border border-border bg-card">
+            <aside className="hidden lg:block w-[280px] shrink-0 sticky top-[3.5rem] self-start max-h-[calc(100vh-2rem)] overflow-y-auto scrollbar-thin rounded-lg border border-border bg-card">
               {SidebarContent}
             </aside>
           )}
