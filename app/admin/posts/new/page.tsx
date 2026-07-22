@@ -26,7 +26,9 @@ import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { ShopSpecsField } from "@/components/admin/shop-specs-field";
 import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
 import { RevisionHistory } from "@/components/admin/revision-history";
+import { getTemplatesForModule, type ContentTemplate } from "@/config/content-templates";
 import { toast } from "sonner";
+import { FileText, ChevronDown } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 
 export const dynamic = "force-dynamic";
@@ -540,6 +542,41 @@ function NewPostInner() {
                 accept="image/*"
                 onUploaded={(r) => form.setValue("image", r.url)}
               />
+
+              {/* Content Templates */}
+              {!editSlug && (() => {
+                const templates = getTemplatesForModule(moduleWatch);
+                if (templates.length === 0) return null;
+                return (
+                  <div className="space-y-2">
+                    <div className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                      <FileText className="size-3.5" />
+                      قالب‌های آماده
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {templates.map((tpl) => (
+                        <Button
+                          key={tpl.id}
+                          type="button"
+                          variant="outline"
+                          size="xs"
+                          onClick={() => {
+                            if (form.getValues("content")?.trim() && !confirm("محتوای فعلی با قالب جایگزین شود؟")) return;
+                            if (tpl.category) form.setValue("category", tpl.category);
+                            if (tpl.tags) form.setValue("tags", tpl.tags.join(", "));
+                            if (tpl.excerpt) form.setValue("excerpt", tpl.excerpt);
+                            form.setValue("content", tpl.content);
+                            toast.success(`قالب «${tpl.nameFa}» اعمال شد`);
+                          }}
+                          title={tpl.description}
+                        >
+                          {tpl.nameFa}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
             </Card>
 
             <Accordion className="w-full space-y-4">
