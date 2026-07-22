@@ -209,6 +209,7 @@ function NewPostInner() {
   const sourceCurrencyWatch = form.watch("sourceCurrency");
   const priceAdjustmentPercentWatch = form.watch("priceAdjustmentPercent");
   const sellerBenefitPercentWatch = form.watch("sellerBenefitPercent");
+  const specsWatch = form.watch("specs");
 
   const parsedTags = useMemo(() => (tagsWatch || "").split(",").map((t: any) => t.trim()).filter(Boolean), [tagsWatch]);
   const resolvedSlug = (form.watch("slug") || "").trim() || slugify(titleWatch || "");
@@ -826,7 +827,7 @@ function NewPostInner() {
                           {/* CPU – text */}
                           {(() => {
                             const key = "CPU";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -838,7 +839,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "RAM";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -850,7 +851,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "Bay";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const selectedVal = specsObj[key] || "";
@@ -870,7 +871,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "Network Card";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const selectedVal = specsObj[key] || "";
@@ -890,7 +891,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "Form Factor";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -902,7 +903,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "اسلات M.2";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -914,7 +915,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "پورت 2.5 گیگ";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const selectedVal = specsObj[key] || "";
@@ -934,7 +935,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "اسلات توسعه PCIe";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -946,7 +947,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "فرم فاکتور";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const selectedVal = specsObj[key] || "";
@@ -971,7 +972,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "منبع تغذیه";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -983,7 +984,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "مصرف برق معمولی";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -995,7 +996,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "گارانتی استاندارد";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1007,7 +1008,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "فن";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1019,7 +1020,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "سیستم عامل";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1031,7 +1032,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "انواع RAID پشتیبانی شده";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1043,7 +1044,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "حداکثر ظرفیت Pool";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1055,7 +1056,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "نوع Volume";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1067,7 +1068,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "حداکثر اتصالات همزمان";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1079,7 +1080,7 @@ function NewPostInner() {
                           })()}
                           {(() => {
                             const key = "حداکثر ظرفیت Volume";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
@@ -1092,7 +1093,7 @@ function NewPostInner() {
                           {/* Fast shipping toggle */}
                           {(() => {
                             const key = "ارسال سریع";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            const specsStr: string = (specsWatch as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const isFast = specsObj[key] === "دارد";
