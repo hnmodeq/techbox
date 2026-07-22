@@ -51,7 +51,6 @@ function AdminApplicationsInner() {
         <div className="flex gap-2">
           {jobId && <ButtonLink href="/admin/jobs/applications" variant="ghost" size="xs">نمایش همه</ButtonLink>}
           <ButtonLink href="/admin/jobs" variant="secondary" size="xs">مدیریت مشاغل</ButtonLink>
-          <ButtonLink href="/admin" variant="ghost" size="xs">داشبورد</ButtonLink>
         </div>
       </div>
 

@@ -71,7 +71,6 @@ export default function ContentHealthPage() {
       <section className="mx-auto max-w-7xl space-y-6">
         <PageHeader colorVar="--admin" title="سلامت محتوا" titleClassName="text-[var(--admin)]" description="بررسی کمبودهای محتوا، URLهای خراب Blob و وضعیت redirectها">
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
             <ButtonLink href="/admin/redirects" variant="ghost" size="sm">مدیریت Redirect</ButtonLink>
             <Button type="button" size="sm" onClick={() => load(false)} disabled={loading}>به‌روزرسانی</Button>
             <Button type="button" size="sm" variant="ghost" onClick={() => load(true)} disabled={checking}>{checking ? "در حال بررسی URL…" : "بررسی URLها"}</Button>

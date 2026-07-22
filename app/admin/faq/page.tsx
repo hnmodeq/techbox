@@ -137,7 +137,6 @@ export default function AdminFaqPage() {
             <p className="text-sm text-muted-foreground mt-1">پرسش و پاسخ‌های صفحه درباره ما — با Accordion نمایش داده می‌شود</p>
           </div>
           <div className="flex gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
             <ButtonLink href="/about" variant="outline" size="sm">نمایش درباره ما</ButtonLink>
           </div>
         </div>

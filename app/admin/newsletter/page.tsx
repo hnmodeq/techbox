@@ -179,7 +179,6 @@ export default function AdminNewsletterPage() {
       <Toaster dir="rtl" />
       <section className="mx-auto max-w-5xl space-y-6">
         <PageHeader colorVar="--admin" title="خبرنامه" titleClassName="text-[var(--admin)]" description="انتخاب اخبار، ویرایش قالب و ارسال ایمیل هفتگی">
-          <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
         </PageHeader>
 
         {/* Stats */}

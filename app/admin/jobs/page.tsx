@@ -88,7 +88,6 @@ function AdminJobsInner() {
         <div className="flex gap-2">
           <ButtonLink href="/admin/jobs/applications" variant="secondary" size="sm">مشاهده رزومه‌ها</ButtonLink>
           <ButtonLink href="/admin/jobs/new" size="sm">آگهی جدید +</ButtonLink>
-          <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
         </div>
       </div>
 

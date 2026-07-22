@@ -121,7 +121,6 @@ export default function ModerationPage() {
       <section className="mx-auto max-w-7xl space-y-6">
         <PageHeader colorVar="--admin" title="Moderation / مدیریت گفتگو" titleClassName="text-[var(--admin)]" description="مدیریت دیدگاه‌ها، اسپم، مخفی‌سازی و وضعیت کاربران">
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
             <Button type="button" size="sm" onClick={() => (tab === "comments" ? loadComments() : loadUsers())}>به‌روزرسانی</Button>
           </div>
         </PageHeader>
