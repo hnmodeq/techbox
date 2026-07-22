@@ -1,3 +1,6 @@
+// react-hook-form's useForm().watch() is incompatible with React Compiler memoization.
+// The compiler skips this component, which is fine — it still works correctly.
+/* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
