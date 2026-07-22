@@ -5,6 +5,7 @@ import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { AdminLoading, AdminEmpty } from "@/components/admin/admin-states";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type ConsultationRequest = {
@@ -84,9 +85,9 @@ export default function AdminConsultationsPage() {
         {message && <Card className="p-3 text-sm text-muted-foreground">{message}</Card>}
 
         {loading ? (
-          <div className="text-center py-10 text-muted-foreground">در حال بارگذاری...</div>
+          <AdminLoading rows={3} />
         ) : requests.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">هنوز درخواست مشاوره‌ای ثبت نشده است.</div>
+          <AdminEmpty title="هنوز درخواست مشاوره‌ای ثبت نشده است." />
         ) : (
           <div className="space-y-3">
             {requests.map((req) => {

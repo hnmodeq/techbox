@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { AdminLoading, AdminEmpty } from "@/components/admin/admin-states";
 import { formatRelativeDate } from "@/lib/date-format";
 
 type TicketReply = {
@@ -136,11 +137,9 @@ export default function AdminInboxPage() {
 
           <TabsContent value={tab} className="space-y-3 pt-4">
             {loading ? (
-              Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-lg" />)
+              <AdminLoading rows={4} />
             ) : items.length === 0 ? (
-              <Card className="p-8 text-center text-sm text-muted-foreground">
-                {TAB_LABELS[tab] || "موردی"} جدیدی وجود ندارد.
-              </Card>
+              <AdminEmpty title={`${TAB_LABELS[tab] || "موردی"} جدیدی وجود ندارد.`} />
             ) : (
               activeTicket ? (
                 <Card className="p-4 space-y-3">
