@@ -891,7 +891,7 @@ function NewPostInner() {
                             return (
                               <div key={key}>
                                 <label className="text-xs font-medium text-muted-foreground">سازگاری درایو</label>
-                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="3.5" / 2.5" SATA / SAS / NVMe" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="3.5&quot; / 2.5&quot; SATA / SAS / NVMe" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
                               </div>
                             );
                           })()}
