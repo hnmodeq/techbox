@@ -95,12 +95,6 @@ export default function SpecsTableCategorized({ specs, showAll = false }: Props)
         );
       })}
 
-      {/* If showAll is false, show hint */}
-      {!showAll && entries.length > finalKeys.length && (
-        <p className="text-[11px] text-muted-foreground text-center pt-2">
-          {entries.length.toLocaleString("fa-IR")} مشخصه در دیتابیس ثبت شده، {finalKeys.length.toLocaleString("fa-IR")} مورد مهم نمایش داده شد. برای مشاهده همه، از تب «همه مشخصات» استفاده کنید.
-        </p>
-      )}
     </div>
   );
 }

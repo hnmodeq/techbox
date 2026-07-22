@@ -31,11 +31,6 @@ export default async function StorageShopPage() {
         <span className="text-muted-foreground">• {nas.length.toLocaleString("fa-IR")} محصول واقعی QNAP</span>
       </div>
 
-      <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 mb-4 mx-4 lg:mx-0 text-[11px] leading-5">
-        <b>این صفحه /landing/storage/shop است:</b> فروشگاه فیلتر شده فقط NAS سازمانی با قیمت دلاری مخفی و تومان لحظه‌ای. قیمت مبدا (USD) فقط در <Link href="/admin/posts?module=shop" className="underline">ادمین → محصولات</Link> و نرخ ارز در{" "}
-        <Link href="/admin/settings" className="underline">ادمین → تنظیمات → قیمت و ارز</Link> قابل مدیریت است. اسلایدر جهانی و اسلایدر هر محصول برای تعدیل قیمت فعال است.
-      </div>
-
       <ShopGrid serverItems={nas.length > 0 ? nas : undefined} />
     </main>
   );

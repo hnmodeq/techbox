@@ -10,6 +10,7 @@ import {
   MoonIcon,
   NewspaperIcon,
   PanelLeftIcon,
+  ShoppingCartIcon,
   SunIcon,
 } from "lucide-react"
 
@@ -45,6 +46,7 @@ import {
   jalaliToGregorian,
 } from "@/lib/jalali"
 import { cn } from "@/lib/utils"
+import { useConsultation } from "@/providers/consultation.provider"
 
 type Crumb = {
   label: string
@@ -590,6 +592,35 @@ type SiteHeaderProps = {
   onToggleNews?: () => void
 }
 
+function CartButton() {
+  const { count, setOpen } = useConsultation()
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="relative"
+            onClick={() => setOpen(true)}
+            aria-label="سبد خرید"
+          />
+        }
+      >
+        <ShoppingCartIcon className="size-4" />
+        {count > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ef394e] px-0.5 text-[9px] font-bold text-white">
+            {count.toLocaleString("fa-IR")}
+          </span>
+        )}
+      </TooltipTrigger>
+      <TooltipContent>سبد خرید</TooltipContent>
+    </Tooltip>
+  )
+}
+
 export function SiteHeader({
   hasUnreadNews = false,
   newsOpen = false,
@@ -621,6 +652,7 @@ export function SiteHeader({
             <TooltipContent>{sidebarTooltip}</TooltipContent>
           </Tooltip>
           <Separator orientation="vertical" className="data-vertical:h-4 data-vertical:self-auto" />
+          <CartButton />
           <NotificationsButton />
           <ThemeToggle />
           <TechboxBreadcrumb />

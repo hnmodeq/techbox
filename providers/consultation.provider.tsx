@@ -1,14 +1,13 @@
 "use client";
 import Image from "next/image";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { zIndex } from "@/design";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
 import { Icon } from "@/design/icons";
-import { useAuth } from "@/providers/auth.provider";
-import { toast } from "sonner";
 
-export type ConsultationItem = { slug: string; title: string; image?: string; notes?: string };
+export type ConsultationItem = { slug: string; title: string; image?: string; notes?: string; quantity?: number; price?: number };
 
 type ConsultationCtx = {
   items: ConsultationItem[];
@@ -21,7 +20,7 @@ type ConsultationCtx = {
 };
 
 const Ctx = createContext<ConsultationCtx | null>(null);
-const KEY = "tb_consultation_v1";
+const KEY = "tb_cart_v1";
 
 export function ConsultationProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<ConsultationItem[]>([]);
@@ -41,7 +40,7 @@ export function ConsultationProvider({ children }: { children: React.ReactNode }
   const add = (item: ConsultationItem) => {
     setItems((prev) => {
       if (prev.find((p) => p.slug === item.slug)) return prev;
-      return [...prev, item];
+      return [...prev, { ...item, quantity: 1 }];
     });
     setOpen(true);
   };
@@ -53,16 +52,14 @@ export function ConsultationProvider({ children }: { children: React.ReactNode }
   return (
     <Ctx.Provider value={{ items, count, add, remove, clear, open, setOpen }}>
       {children}
-      <ConsultationDrawer />
+      <CartDrawer />
     </Ctx.Provider>
   );
 }
 
-function ConsultationDrawer() {
+function CartDrawer() {
   const ctx = useContext(Ctx);
-  const { user } = useAuth();
-  const [submitting, setSubmitting] = useState(false);
-  const [notes, setNotes] = useState("");
+  const router = useRouter();
 
   const open = ctx?.open ?? false;
   const setOpenFn = ctx?.setOpen;
@@ -77,31 +74,11 @@ function ConsultationDrawer() {
   }, [open, setOpenFn]);
 
   if (!ctx || !ctx.open) return null;
-  const { items, setOpen, remove, clear, count } = ctx;
+  const { items, setOpen, remove, count } = ctx;
 
-  const handleSubmit = async () => {
-    if (items.length === 0) return;
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/consultation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: items.map((i) => ({ slug: i.slug, title: i.title })),
-          notes: notes.trim(),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "submit_failed");
-      toast.success("درخواست مشاوره شما ثبت شد! تیم فروش ما به‌زودی با شما تماس خواهد گرفت.");
-      clear();
-      setNotes("");
-      setOpen(false);
-    } catch {
-      toast.error("خطا در ثبت درخواست مشاوره. لطفاً دوباره تلاش کنید.");
-    } finally {
-      setSubmitting(false);
-    }
+  const handleContinueShopping = () => {
+    setOpen(false);
+    router.push("/buying");
   };
 
   return (
@@ -112,16 +89,11 @@ function ConsultationDrawer() {
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
             <Icon name="cart" size={20} className="text-[var(--primary)]" />
-            <h3 className="text-lg font-bold">اتاق مشاوره ({(count ?? 0).toLocaleString("fa-IR")})</h3>
+            <h3 className="text-lg font-bold">سبد خرید ({(count ?? 0).toLocaleString("fa-IR")})</h3>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="بستن">
             <XIcon className="h-4 w-4" />
           </Button>
-        </div>
-
-        {/* Info banner */}
-        <div className="px-4 py-3 bg-[var(--primary)]/5 border-b text-xs text-muted-foreground leading-5">
-          محصولاتی که نیاز دارید را اضافه کنید و درخواست مشاوره بدهید. تیم متخصصین ما با شما تماس می‌گیرند و بهترین پیکربندی را پیشنهاد می‌دهند.
         </div>
 
         {/* Items */}
@@ -129,7 +101,7 @@ function ConsultationDrawer() {
           {items.length === 0 && (
             <div className="text-center py-10">
               <Icon name="cart" size={40} className="mx-auto text-muted-foreground/30 mb-3" />
-              <p className="text-muted-foreground">هنوز محصولی اضافه نشده است</p>
+              <p className="text-muted-foreground">سبد خرید شما خالی است</p>
               <p className="text-xs text-muted-foreground mt-1">از فروشگاه محصول مورد نظر خود را اضافه کنید</p>
             </div>
           )}
@@ -148,30 +120,15 @@ function ConsultationDrawer() {
           ))}
         </div>
 
-        {/* Submit section */}
+        {/* Continue shopping button */}
         {items.length > 0 && (
           <div className="border-t p-4 space-y-3">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground">توضیحات نیاز شما (اختیاری)</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="مثلاً: نیاز به سرور با ۲۰۰ کاربر داریم..."
-                className="w-full rounded-[var(--corner-radius)] border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 resize-none min-h-[70px]"
-                rows={2}
-              />
-            </div>
             <Button
               type="button"
-              onClick={handleSubmit}
-              disabled={submitting}
-              loading={submitting}
-              className="w-full"
+              onClick={handleContinueShopping}
+              className="w-full bg-[#ef4056] hover:bg-[#e03a4f] text-white h-11 text-[13px] font-bold rounded-lg"
             >
-              {submitting ? "در حال ارسال..." : "ثبت درخواست مشاوره"}
-            </Button>
-            <Button onClick={clear} variant="ghost" className="w-full text-sm">
-              خالی کردن اتاق مشاوره
+              ادامه خرید
             </Button>
           </div>
         )}
