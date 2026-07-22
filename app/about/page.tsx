@@ -1,4 +1,4 @@
-import { pageMetadata } from "@/lib/seo";
+import { pageMetadata, siteUrl } from "@/lib/seo";
 import { prisma } from "@/lib/db";
 import { ButtonLink } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -28,6 +28,27 @@ export default async function About() {
 
   return (
     <main className="max-w-6xl mx-auto px-4 py-14 space-y-14" dir="rtl">
+      {/* FAQPage structured data */}
+      {faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: faq.answer,
+                },
+              })),
+            }).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
+
       <PageHeader colorVar="--about" title="درباره تکباکس" titleClassName="text-[var(--about)]" description="تکباکس – رسانه تخصصی فناوری اطلاعات، زیرساخت، شبکه، سرور، ذخیره‌سازی و امنیت." />
 
       <div className="grid md:grid-cols-3 gap-5">
