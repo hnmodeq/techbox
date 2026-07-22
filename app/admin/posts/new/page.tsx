@@ -205,6 +205,10 @@ function NewPostInner() {
   const imageWatch = form.watch("image");
   const statusWatch = form.watch("status");
   const publishedWatch = form.watch("published");
+  const sourcePriceAmountWatch = form.watch("sourcePriceAmount");
+  const sourceCurrencyWatch = form.watch("sourceCurrency");
+  const priceAdjustmentPercentWatch = form.watch("priceAdjustmentPercent");
+  const sellerBenefitPercentWatch = form.watch("sellerBenefitPercent");
 
   const parsedTags = useMemo(() => (tagsWatch || "").split(",").map((t: any) => t.trim()).filter(Boolean), [tagsWatch]);
   const resolvedSlug = (form.watch("slug") || "").trim() || slugify(titleWatch || "");
@@ -762,10 +766,10 @@ function NewPostInner() {
                             <p className="font-bold">محاسبه زنده نهایی تومان (قابل مشاهده در فرانت):</p>
                             <p dir="ltr" className="font-mono text-[11px]">Final = Source × Rate × (1+Global%) × (1+Product%) × (1+SellerBenefit%)</p>
                             {(() => {
-                              const src = parseFloat((form.watch("sourcePriceAmount") as string) || "0");
-                              const curr = (form.watch("sourceCurrency") as string) || "USD";
-                              const prodAdj = parseFloat((form.watch("priceAdjustmentPercent") as string) || "0");
-                              const sellerBenefit = parseFloat((form.watch("sellerBenefitPercent") as string) || "35");
+                              const src = parseFloat((sourcePriceAmountWatch as string) || "0");
+                              const curr = (sourceCurrencyWatch as string) || "USD";
+                              const prodAdj = parseFloat((priceAdjustmentPercentWatch as string) || "0");
+                              const sellerBenefit = parseFloat((sellerBenefitPercentWatch as string) || "35");
                               const rate = curr === "EUR" ? currencyRates.EUR : curr === "AED" ? currencyRates.AED : currencyRates.USD;
                               const base = src * rate;
                               const afterGlobal = base * (1 + currencyRates.global / 100);

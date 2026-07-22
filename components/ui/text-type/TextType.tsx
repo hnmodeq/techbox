@@ -169,7 +169,6 @@ const TextType = ({
   const shouldHideCursor =
     hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
 
-  // eslint-disable-next-line react-hooks/refs
   return createElement(
     Component,
     {
