@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,14 @@ function labelIssue(issue: string) {
 }
 
 export default function ContentHealthPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <ContentHealthContent />}
+    </AdminGuard>
+  );
+}
+
+function ContentHealthContent() {
   const [data, setData] = useState<Health | null>(null);
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);

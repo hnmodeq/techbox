@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,14 @@ import { Badge } from "@/components/ui/badge";
 type RedirectRow = { id: string; sourceModule: string; sourceSlug: string; targetModule: string; targetSlug: string; reason?: string };
 
 export default function RedirectsAdminPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <RedirectsContent />}
+    </AdminGuard>
+  );
+}
+
+function RedirectsContent() {
   const [rows, setRows] = useState<RedirectRow[]>([]);
   const [form, setForm] = useState({ sourceModule: "blog", sourceSlug: "", targetModule: "blog", targetSlug: "", reason: "" });
   const [msg, setMsg] = useState("");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,14 @@ import type { ShopBannerItem } from "@/features/shop/components/ShopBanner";
 function uid() { return Math.random().toString(36).slice(2, 10); }
 
 export default function AdminShopBannersPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <ShopBannersContent />}
+    </AdminGuard>
+  );
+}
+
+function ShopBannersContent() {
   const [banners, setBanners] = useState<ShopBannerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

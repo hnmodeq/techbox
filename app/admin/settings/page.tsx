@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,14 @@ const DEFAULTS: Settings = {
 };
 
 export default function AdminSettingsPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <SettingsContent />}
+    </AdminGuard>
+  );
+}
+
+function SettingsContent() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

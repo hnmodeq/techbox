@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { ModuleBadge } from "@/components/ui/module-badge";
@@ -27,6 +28,14 @@ interface EditingUser {
 }
 
 export default function RolesPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <RolesContent />}
+    </AdminGuard>
+  );
+}
+
+function RolesContent() {
   const [roles, setRoles] = useState<RoleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

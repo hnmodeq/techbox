@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,6 +52,14 @@ function statusVariant(status: string) {
 }
 
 export default function ModerationPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <ModerationContent />}
+    </AdminGuard>
+  );
+}
+
+function ModerationContent() {
   const [tab, setTab] = useState<"comments" | "users">("comments");
   const [status, setStatus] = useState("all");
   const [comments, setComments] = useState<ModerationComment[]>([]);

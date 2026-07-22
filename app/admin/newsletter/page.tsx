@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -35,6 +36,14 @@ type Campaign = {
 };
 
 export default function AdminNewsletterPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <NewsletterContent />}
+    </AdminGuard>
+  );
+}
+
+function NewsletterContent() {
   const [loading, setLoading] = useState(true);
   const [latestNews, setLatestNews] = useState<NewsItem[]>([]);
   const [subscriberCount, setSubscriberCount] = useState(0);

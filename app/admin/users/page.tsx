@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,14 @@ function statusVariant(status: string) {
 }
 
 export default function AdminUsersPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <UsersContent />}
+    </AdminGuard>
+  );
+}
+
+function UsersContent() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [selected, setSelected] = useState<AdminUser | null>(null);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -34,6 +35,14 @@ const SEED_HOLIDAYS: Holiday[] = [
 ];
 
 export default function AdminHolidaysPage() {
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <HolidaysContent />}
+    </AdminGuard>
+  );
+}
+
+function HolidaysContent() {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [enabled, setEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
