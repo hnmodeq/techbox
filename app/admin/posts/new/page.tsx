@@ -120,6 +120,7 @@ const postSchema = z.object({
   priceAdjustmentPercent: z.string().max(10).optional(),
   discountPercent: z.string().max(5).optional(),
   discountEndsAt: z.string().max(30).optional(),
+  sellerBenefitPercent: z.string().max(10).optional(),
   availability: z.string().max(100).optional(),
   warranty: z.string().max(200).optional(),
   specs: z.string().max(5000).optional(),
@@ -187,6 +188,7 @@ function NewPostInner() {
       priceAdjustmentPercent: "0",
       discountPercent: "",
       discountEndsAt: "",
+      sellerBenefitPercent: "35",
       availability: "",
       warranty: "",
       specs: "",
@@ -255,6 +257,7 @@ function NewPostInner() {
         priceAdjustmentPercent: (it as any).priceAdjustmentPercent ? String((it as any).priceAdjustmentPercent) : "0",
         discountPercent: it.discountPercent ? String(it.discountPercent) : "",
         discountEndsAt: it.discountEndsAt ? new Date(it.discountEndsAt).toISOString().slice(0, 16) : "",
+        sellerBenefitPercent: (it as any).sellerBenefitPercent || "35",
         availability: it.availability || "",
         warranty: it.warranty || "",
         specs: it.specs ? JSON.stringify(it.specs, null, 2) : "",
@@ -327,6 +330,7 @@ function NewPostInner() {
       priceAdjustmentPercent: (values as any).priceAdjustmentPercent ? Number((values as any).priceAdjustmentPercent) : 0,
       discountPercent: (values.discountPercent || "").trim() ? Number(values.discountPercent) : undefined,
       discountEndsAt: (values.discountEndsAt || "").trim() ? new Date(values.discountEndsAt!).toISOString() : undefined,
+      sellerBenefitPercent: (values as any).sellerBenefitPercent ? String((values as any).sellerBenefitPercent) : "35",
       availability: (values.availability || "").trim() || undefined,
       warranty: (values.warranty || "").trim() || undefined,
       specs: parseSpecs(values.specs || ""),
@@ -740,24 +744,41 @@ function NewPostInner() {
                                 <FormDescription className="text-[11px]">افزایش/کاهش قیمت فقط این محصول نسبت به نرخ محاسبه شده</FormDescription>
                               </FormItem>
                             )} />
+                            <FormField control={form.control as any} name="sellerBenefitPercent" render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>سود فروشنده (سود شرکت) (%) – {field.value || "35"}%</FormLabel>
+                                <FormControl>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[10px]">۰٪</span>
+                                    <input type="range" min={0} max={100} step={1} value={parseFloat(field.value || "35")} onChange={(e) => field.onChange(e.target.value)} className="flex-1" />
+                                    <span className="text-[10px]">۱۰۰٪</span>
+                                  </div>
+                                </FormControl>
+                                <FormDescription className="text-[11px]">سود فروشنده بر اساس قیمت نهایی محاسبه شده (پیش‌فرض ۳۵٪)</FormDescription>
+                              </FormItem>
+                            )} />
                           </div>
                           <div className="mt-3 rounded-md bg-muted/40 p-3 text-[11px] leading-5 space-y-2">
                             <p className="font-bold">محاسبه زنده نهایی تومان (قابل مشاهده در فرانت):</p>
-                            <p dir="ltr" className="font-mono text-[11px]">Final = Source × Rate × (1+Global%) × (1+Product%)</p>
+                            <p dir="ltr" className="font-mono text-[11px]">Final = Source × Rate × (1+Global%) × (1+Product%) × (1+SellerBenefit%)</p>
                             {(() => {
                               const src = parseFloat((form.watch("sourcePriceAmount") as string) || "0");
                               const curr = (form.watch("sourceCurrency") as string) || "USD";
                               const prodAdj = parseFloat((form.watch("priceAdjustmentPercent") as string) || "0");
+                              const sellerBenefit = parseFloat((form.watch("sellerBenefitPercent") as string) || "35");
                               const rate = curr === "EUR" ? currencyRates.EUR : curr === "AED" ? currencyRates.AED : currencyRates.USD;
                               const base = src * rate;
                               const afterGlobal = base * (1 + currencyRates.global / 100);
-                              const final = afterGlobal * (1 + prodAdj / 100);
+                              const afterProduct = afterGlobal * (1 + prodAdj / 100);
+                              const final = afterProduct * (1 + sellerBenefit / 100);
                               if (!src) return <p className="text-muted-foreground">قیمت مبدا را وارد کنید تا قیمت نهایی محاسبه شود</p>;
                               return (
                                 <div className="space-y-1">
                                   <p>نرخ {curr}: {rate.toLocaleString("fa-IR")} تومان (از تنظیمات → قیمت و ارز)</p>
                                   <p>پایه: {src.toLocaleString("fa-IR")} {curr} × {rate.toLocaleString("fa-IR")} = {base.toLocaleString("fa-IR")} تومان</p>
                                   <p>پس از تعدیل جهانی {currencyRates.global}%: {afterGlobal.toLocaleString("fa-IR")} تومان</p>
+                                  <p>پس از تعدیل محصول {prodAdj}%: {afterProduct.toLocaleString("fa-IR")} تومان</p>
+                                  <p>پس از سود فروشنده {sellerBenefit}%: {final.toLocaleString("fa-IR")} تومان</p>
                                   <p className="font-bold text-[12px] text-primary">قیمت نهایی نمایش به کاربر: {final.toLocaleString("fa-IR")} تومان</p>
                                 </div>
                               );
