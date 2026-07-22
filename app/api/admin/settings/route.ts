@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
 import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
@@ -106,6 +107,8 @@ export async function PATCH(req: NextRequest) {
         create: { key, value, updatedBy: user.id },
       });
     }
+
+    logAudit({ userId: user.id, userName: user.name, action: "settings.update", details: { keys: Object.keys(updates) } });
 
     return NextResponse.json({ ok: true });
   } catch (e: any) {

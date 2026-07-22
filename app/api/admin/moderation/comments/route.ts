@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 
 const statusSchema = z.enum(["approved", "pending", "hidden", "spam"]);
@@ -36,6 +37,7 @@ export async function PATCH(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const { id, status } = patchSchema.parse(await req.json());
   const updated = await prisma.comment.update({ where: { id }, data: { status } });
+  logAudit({ userId: user.id, userName: user.name, action: "comment.status", target: `comment:${id}`, details: { newStatus: status } });
   return NextResponse.json(updated);
 }
 
@@ -46,6 +48,7 @@ export async function DELETE(req: NextRequest) {
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
   await prisma.comment.delete({ where: { id } });
+  logAudit({ userId: user.id, userName: user.name, action: "comment.delete", target: `comment:${id}` });
   return NextResponse.json({ ok: true });
 }
 

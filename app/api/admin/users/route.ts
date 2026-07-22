@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic, hashPassword } from "@/lib/auth-server";
+import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 
 const updateSchema = z.object({
@@ -107,6 +108,8 @@ export async function PATCH(req: NextRequest) {
     data,
     include: { _count: { select: { posts: true, comments: true, ratings: true } } },
   });
+
+  logAudit({ userId: current.id, userName: current.name, action: "user.update", target: `user:${body.id}`, details: { fields: Object.keys(data), targetName: updated.name } });
 
   return NextResponse.json(publicUser(updated));
 }

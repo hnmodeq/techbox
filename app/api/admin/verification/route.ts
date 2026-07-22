@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 
 async function requireAdmin() {
@@ -104,6 +105,8 @@ export async function PATCH(req: NextRequest) {
     update: { value: notifValue, updatedBy: admin.id },
     create: { key: notifKey, value: notifValue, updatedBy: admin.id },
   });
+
+  logAudit({ userId: admin.id, userName: admin.name, action: `verification.${decision}`, target: `user:${request.userId}`, details: { type: request.type, userName: request.user?.name } });
 
   return NextResponse.json({ ok: true });
 }
