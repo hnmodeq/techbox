@@ -69,6 +69,7 @@ export function calculateFinalTomanPrice(params: {
   sourcePrice: number | null | undefined;
   sourceCurrency: CurrencyCode | string | null | undefined;
   productAdjustmentPercent?: number | null | undefined;
+  sellerBenefitPercent?: number | null | undefined;
   rates: CurrencyRates;
 }): number {
   const source = params.sourcePrice ?? 0;
@@ -82,11 +83,13 @@ export function calculateFinalTomanPrice(params: {
 
   const productAdj = params.productAdjustmentPercent ?? 0;
   const globalAdj = params.rates.globalAdjustmentPercent ?? 0;
+  const sellerBenefit = params.sellerBenefitPercent ?? 35;
 
   const afterGlobal = baseToman * (1 + globalAdj / 100);
   const afterProduct = afterGlobal * (1 + productAdj / 100);
+  const afterSeller = afterProduct * (1 + sellerBenefit / 100);
 
-  return Math.round(afterProduct);
+  return Math.round(afterSeller);
 }
 
 export async function calculateFinalPriceForPost(post: {
@@ -103,6 +106,7 @@ export async function calculateFinalPriceForPost(post: {
     sourcePrice: post.sourcePriceAmount,
     sourceCurrency: post.sourceCurrency as CurrencyCode,
     productAdjustmentPercent: post.priceAdjustmentPercent,
+    sellerBenefitPercent: (post as any).sellerBenefitPercent ?? 35,
     rates,
   });
 }

@@ -112,6 +112,7 @@ export async function GET(req: NextRequest) {
             sourcePrice: (p as any).sourcePriceAmount,
             sourceCurrency: ((p as any).sourceCurrency as CurrencyCode) || "USD",
             productAdjustmentPercent: (p as any).priceAdjustmentPercent ?? 0,
+            sellerBenefitPercent: (p as any).sellerBenefitPercent ?? 35,
             rates: currencyRates,
           });
         } catch {}
@@ -157,6 +158,7 @@ export async function GET(req: NextRequest) {
       sourcePriceAmount: (p as any).sourcePriceAmount ?? null,
       sourceCurrency: (p as any).sourceCurrency ?? null,
       priceAdjustmentPercent: (p as any).priceAdjustmentPercent ?? null,
+      sellerBenefitPercent: (p as any).sellerBenefitPercent ?? 35,
       discountPercent: p.discountPercent ?? null,
       discountEndsAt: p.discountEndsAt ? p.discountEndsAt.toISOString() : null,
       availability: p.availability,
@@ -227,6 +229,7 @@ const createSchema = z.object({
   sourcePriceAmount: z.number().min(0).optional(),
   sourceCurrency: z.string().max(10).optional(),
   priceAdjustmentPercent: z.number().min(-90).max(500).optional(),
+  sellerBenefitPercent: z.number().min(0).max(100).optional(),
   discountPercent: z.number().int().min(0).max(99).optional(),
   discountEndsAt: z.string().optional(),
   availability: z.string().max(100).optional(),
@@ -297,6 +300,7 @@ export async function POST(req: NextRequest) {
       sourcePriceAmount: (data as any).sourcePriceAmount ?? undefined,
       sourceCurrency: (data as any).sourceCurrency ?? undefined,
       priceAdjustmentPercent: (data as any).priceAdjustmentPercent ?? undefined,
+      sellerBenefitPercent: (data as any).sellerBenefitPercent ?? 35,
       discountPercent: data.discountPercent ?? undefined,
       discountEndsAt: data.discountEndsAt ? new Date(data.discountEndsAt) : undefined,
       authorId: user.id,

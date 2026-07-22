@@ -197,8 +197,8 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
                     </span>
                   </div>
 
-                  {/* Price */}
-                  {!isUnavailable && disc && orig && (
+                  {/* Price — always show price */}
+                  {disc && orig ? (
                     <div className="space-y-1 text-left">
                       {discount > 0 && (
                         <div className="flex items-center justify-between gap-2">
@@ -219,18 +219,9 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
                         </div>
                       )}
                     </div>
-                  )}
-
-                  {isUnavailable && (
-                    <div className="text-center py-3">
-                      <p className="text-[13px] font-bold text-muted-foreground">ناموجود</p>
-                      <p className="text-[11px] text-muted-foreground mt-1">این کالا در حال حاضر موجود نیست</p>
-                    </div>
-                  )}
-
-                  {priceAmount <= 0 && !item.priceLabel && !isUnavailable && (
+                  ) : priceAmount <= 0 ? (
                     <div className="text-center py-2 text-[13px]">تماس بگیرید برای قیمت</div>
-                  )}
+                  ) : null}
 
                   {/* CTA */}
                   <div className="space-y-2 pt-1">

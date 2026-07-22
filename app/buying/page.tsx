@@ -33,6 +33,7 @@ const DELIVERY_TIME_OPTIONS = [
 ];
 
 const TAX_RATE = 0.09; // 9% VAT
+const SHIPPING_RATE = 0.01; // 1% shipping fee
 
 export default function BuyingPage() {
   const { items, remove, count } = useConsultation();
@@ -60,7 +61,8 @@ export default function BuyingPage() {
   }, [items]);
 
   const tax = Math.round(subtotal * TAX_RATE);
-  const total = subtotal + shippingCost + tax;
+  const shippingFee = Math.round(subtotal * SHIPPING_RATE);
+  const total = subtotal + shippingCost + shippingFee + tax;
 
   const handlePayment = async () => {
     if (!form.name || !form.phone || !form.address || !form.postalCode) {
@@ -84,6 +86,7 @@ export default function BuyingPage() {
           shipping: { method: shipping, time: deliveryTime, cost: shippingCost },
           subtotal,
           tax,
+          shippingFee,
           total,
         }),
       });
@@ -325,6 +328,10 @@ export default function BuyingPage() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">هزینه ارسال</span>
                   <span className="font-bold">{shippingCost === 0 ? "رایگان" : `${shippingCost.toLocaleString("fa-IR")} تومان`}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">هزینه ارسال سریع (۱٪)</span>
+                  <span className="font-bold">{shippingFee > 0 ? `${shippingFee.toLocaleString("fa-IR")} تومان` : "—"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">مالیات بر ارزش افزوده (۹٪)</span>
