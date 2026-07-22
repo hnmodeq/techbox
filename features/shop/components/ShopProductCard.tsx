@@ -7,6 +7,7 @@ import type { ContentItem } from "@/lib/content";
 import { useCountdown } from "@/hooks/useCountdown";
 import { Star, Cpu, MemoryStick, HardDrive, Network, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ── Price helpers ─────────────────────────────────────────────────────────────
 function formatPrice(amount: number): { number: string; unit: string } {
@@ -20,35 +21,31 @@ function formatPrice(amount: number): { number: string; unit: string } {
 function parsePriceLabel(label: string | null | undefined): number {
   if (!label) return 0;
   const ascii = label.replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
-  const num = parseFloat(ascii.replace(/[^\\d.]/g, ""));
+  const num = parseFloat(ascii.replace(/[^\d.]/g, ""));
   if (isNaN(num) || num <= 0) return 0;
   if (/میلیارد/.test(label)) return Math.round(num * 1_000_000_000);
   if (/میلیون/.test(label)) return Math.round(num * 1_000_000);
   return Math.round(num);
 }
 
-// ── Major specs – 4 as requested: CPU / Network Card / RAM / Bay – from spec list ──
+// ── Major specs – 4: CPU / RAM / Bay / Network ──
 type MajorSpecDef = {
   Icon: React.ElementType;
   possibleKeys: string[];
-  labelFa: string;
 };
 
 const MAJOR_SPECS: MajorSpecDef[] = [
   {
     Icon: HardDrive,
     possibleKeys: ["Drive Bay", "Bay", "تعداد جایگاه دیسک", "تعداد جایگاه دیسک (Bay)", "جایگاه"],
-    labelFa: "Bay",
   },
   {
     Icon: Cpu,
     possibleKeys: ["CPU", "پردازنده", "Processor"],
-    labelFa: "پردازنده",
   },
   {
     Icon: MemoryStick,
     possibleKeys: ["System Memory", "RAM", "حافظه رم", "رم", "Memory", "حافظه"],
-    labelFa: "رم",
   },
   {
     Icon: Network,
@@ -62,7 +59,6 @@ const MAJOR_SPECS: MajorSpecDef[] = [
       "کارت شبکه",
       "شبکه",
     ],
-    labelFa: "شبکه",
   },
 ];
 
@@ -73,12 +69,9 @@ function isNA(v: unknown): boolean {
 
 function getSpecValue(specs: Record<string, string>, possibleKeys: string[]): string | null {
   for (const k of possibleKeys) {
-    // exact match
     if (specs[k] && !isNA(specs[k])) return String(specs[k]);
-    // case-insensitive
     const foundKey = Object.keys(specs).find((sk) => sk.toLowerCase() === k.toLowerCase());
     if (foundKey && !isNA(specs[foundKey])) return String(specs[foundKey]);
-    // partial match
     const partial = Object.keys(specs).find((sk) => sk.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(sk.toLowerCase()));
     if (partial && !isNA(specs[partial])) return String(specs[partial]);
   }
@@ -105,7 +98,7 @@ function DiscountTimer({ endsAt, small = false }: { endsAt: string; small?: bool
 }
 
 // ── Rating ────────────────────────────────────────────────────────────────────
-function RatingLine({ rating, count }: { rating?: number | null; count?: number }) {
+function RatingLine({ rating }: { rating?: number | null }) {
   if (!rating || rating <= 0) return <div className="h-[14px]" />;
   return (
     <div className="flex items-center gap-1">
@@ -117,7 +110,7 @@ function RatingLine({ rating, count }: { rating?: number | null; count?: number 
   );
 }
 
-// ── Main card — Digikala style, 4 major specs from spec list ─────────────────
+// ── Main card ─────────────────────────────────────────────────────────────────
 export default function ShopProductCard({ product: p }: { product: ContentItem }) {
   const isUnavailable = p.availability === "ناموجود" || p.availability === "اتمام موجودی";
   const specs = (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? (p.specs as Record<string, string>) : {};
@@ -178,7 +171,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </h3>
 
         <div className="flex items-center justify-between mt-1">
-          <RatingLine rating={p.rating} count={p.ratingCount} />
+          <RatingLine rating={p.rating} />
           {!isUnavailable && p.warranty && <span className="hidden sm:inline text-[9px] text-muted-foreground truncate max-w-[90px]">{p.warranty}</span>}
         </div>
 
@@ -193,15 +186,21 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
           )}
         </div>
 
-        {/* 4 major specs from spec list – CPU / RAM / Bay / Network */}
+        {/* 4 major specs with shadcn tooltips — icons only, no labels */}
         {validMajorSpecs.length > 0 && (
           <div className="mt-1 grid grid-cols-4 gap-1 border-y border-border/40 py-2">
-            {validMajorSpecs.slice(0, 4).map(({ Icon, labelFa, value }, idx) => (
-              <div key={idx} className="flex flex-col items-center gap-0.5 text-center" title={`${labelFa}: ${value}`}>
-                <Icon className="size-3.5 text-muted-foreground/70" />
-                <span className="line-clamp-1 w-full text-[8px] leading-3 text-muted-foreground font-medium">{labelFa}</span>
-                <span className="line-clamp-1 w-full text-[9px] leading-3 text-foreground/80">{String(value).slice(0, 22)}</span>
-              </div>
+            {validMajorSpecs.slice(0, 4).map(({ Icon, value }, idx) => (
+              <Tooltip key={idx}>
+                <TooltipTrigger
+                  render={
+                    <div className="flex flex-col items-center gap-0.5 text-center cursor-default">
+                      <Icon className="size-3.5 text-muted-foreground/70" />
+                      <span className="line-clamp-1 w-full text-[9px] leading-3 text-foreground/80">{String(value).slice(0, 22)}</span>
+                    </div>
+                  }
+                />
+                <TooltipContent side="bottom">{String(value).slice(0, 60)}</TooltipContent>
+              </Tooltip>
             ))}
           </div>
         )}
@@ -240,7 +239,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </div>
         {p.discountEndsAt && discount > 0 && !isUnavailable && (
           <div className="flex items-center justify-between gap-1 border-t border-border/30 pt-1.5 mt-0.5">
-            <span className="text-[10px] font-medium text-[#ef394e]">اتمام پیشنهاد:</span>
+            <span className="text-[10px] font-medium text-[#ef394e]">اتمام پیشنهاد</span>
             <DiscountTimer endsAt={p.discountEndsAt} small />
           </div>
         )}

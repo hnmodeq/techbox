@@ -124,7 +124,16 @@ function FilterSection({
           {open ? <ChevronUp className="size-4 text-muted-foreground" /> : <ChevronDown className="size-4 text-muted-foreground" />}
         </span>
       </button>
-      {open && <div className="px-4 pb-4">{children}</div>}
+      <div
+        className={cn(
+          "grid transition-[grid-template-rows,opacity] duration-200 ease-in-out",
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        )}
+      >
+        <div className="overflow-hidden">
+          <div className="px-4 pb-4">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -349,10 +358,20 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         break;
       case "relevant":
       default:
-        // relevant = weighted: rating* views
         list.sort((a, b) => (b.rating ?? 0) * 0.6 + b.views * 0.4 - ((a.rating ?? 0) * 0.6 + a.views * 0.4));
         break;
     }
+
+    // Item 25: Always push ناموجود items to end, products with price first
+    list.sort((a, b) => {
+      const aUnavail = (a.availability === "ناموجود" || a.availability === "اتمام موجودی") ? 1 : 0;
+      const bUnavail = (b.availability === "ناموجود" || b.availability === "اتمام موجودی") ? 1 : 0;
+      if (aUnavail !== bUnavail) return aUnavail - bUnavail;
+      const aPrice = resolvePrice(a) > 0 ? 0 : 1;
+      const bPrice = resolvePrice(b) > 0 ? 0 : 1;
+      return aPrice - bPrice;
+    });
+
     return list;
   }, [items, sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2]);
 
@@ -452,6 +471,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
           <Slider
             min={priceRange.min}
             max={priceRange.max}
+            step={Math.max(1, Math.round((priceRange.max - priceRange.min) / 100))}
             value={effectivePrice}
             onValueChange={(v) => {
               if (Array.isArray(v) && v.length === 2) setPriceFilter([v[0], v[1]]);
@@ -725,7 +745,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
               <>
                 <div
                   className={cn(
-                    "grid bg-border gap-px border-x lg:border border-border lg:rounded-b-lg overflow-hidden mt-0",
+                    "grid bg-border gap-px border-x lg:border border-border lg:rounded-b-lg overflow-hidden mt-3",
                     sidebarOpen
                       ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
                       : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
