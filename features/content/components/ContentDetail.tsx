@@ -8,6 +8,7 @@ import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import CommentSection from "@/features/comment/components/CommentSection";
 import SuggestionGrid from "@/features/content/components/SuggestionGrid";
 import { RelatedPosts } from "@/components/seo/RelatedPosts";
+import { SeriesNav } from "@/components/seo/SeriesNav";
 import Link from "next/link";
 import { ShareButton } from "@/components/ui/share-button";
 import { SaveButton } from "@/components/ui/save-button";
@@ -128,6 +129,16 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
               </Link>
             ))}
           </div>
+        )}
+
+        {/* Series navigation */}
+        {(item as any).series && (
+          <SeriesNav
+            module={item.module}
+            slug={item.slug}
+            series={(item as any).series}
+            seriesOrder={(item as any).seriesOrder}
+          />
         )}
 
         {/* Social actions */}

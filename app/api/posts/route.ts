@@ -236,6 +236,8 @@ const createSchema = z.object({
   availability: z.string().max(100).optional(),
   warranty: z.string().max(200).optional(),
   specs: z.record(z.any()).default({}),
+  series: z.string().max(200).optional(),
+  seriesOrder: z.number().int().min(1).optional(),
   rating: z.number().min(0).max(5).optional(),
   ratingCount: z.number().int().min(0).optional(),
   fileName: z.string().max(200).optional(),

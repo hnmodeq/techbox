@@ -108,6 +108,8 @@ model Post {
   downloadCount Int      @default(0)
   published     Boolean  @default(true)
   status        String   @default("published")
+  series        String?             // Series name for multi-part articles (e.g. "RAID Masterclass")
+  seriesOrder   Int?                // Order within the series (1, 2, 3...)
   deletedAt     DateTime?
   deletedBy     String?
 

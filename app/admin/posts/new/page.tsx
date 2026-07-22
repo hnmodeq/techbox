@@ -133,6 +133,8 @@ const postSchema = z.object({
   availability: z.string().max(100).optional(),
   warranty: z.string().max(200).optional(),
   specs: z.string().max(5000).optional(),
+  series: z.string().max(200).optional(),
+  seriesOrder: z.string().max(10).optional(),
   status: z.enum(["published", "scheduled", "review", "draft", "archived"]).default("published"),
   published: z.boolean().default(true),
   scheduledAt: z.string().max(30).optional(),
@@ -203,6 +205,8 @@ function NewPostInner() {
       availability: "",
       warranty: "",
       specs: "",
+      series: "",
+      seriesOrder: "",
       status: "published",
       published: true,
       scheduledAt: "",
@@ -255,6 +259,8 @@ function NewPostInner() {
         image: it.image || "",
         published: typeof it.published === "boolean" ? it.published : true,
         status: it.status || (it.published ? "published" : "draft"),
+        series: (it as any).series || "",
+        seriesOrder: (it as any).seriesOrder ? String((it as any).seriesOrder) : "",
         scheduledAt: it.status === "scheduled" && it.date ? new Date(it.date).toISOString().slice(0, 16) : "",
         videoUrl: it.videoUrl || "",
         videoDuration: it.videoDuration || "",
@@ -356,6 +362,8 @@ function NewPostInner() {
       availability: (values.availability || "").trim() || undefined,
       warranty: (values.warranty || "").trim() || undefined,
       specs: parseSpecs(values.specs || ""),
+      series: (values.series || "").trim() || undefined,
+      seriesOrder: (values.seriesOrder || "").trim() ? Number(values.seriesOrder) : undefined,
     };
 
     try {
@@ -611,6 +619,34 @@ function NewPostInner() {
                               <Input {...field} />
                             </FormControl>
                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <FormField
+                        control={form.control as any}
+                        name="series"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>مجموعه مقالات (اختیاری)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="مثلاً: آموزش RAID از صفر تا صد" {...field} />
+                            </FormControl>
+                            <FormDescription className="text-[11px]">اگر این مطلب بخشی از یک مجموعه است، نام مجموعه را وارد کنید.</FormDescription>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control as any}
+                        name="seriesOrder"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>شماره در مجموعه</FormLabel>
+                            <FormControl>
+                              <Input type="number" min="1" placeholder="1" {...field} />
+                            </FormControl>
+                            <FormDescription className="text-[11px]">ترتیب این مطلب در مجموعه (۱ = بخش اول)</FormDescription>
                           </FormItem>
                         )}
                       />
