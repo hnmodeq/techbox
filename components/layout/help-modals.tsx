@@ -45,7 +45,7 @@ export function HelpModals() {
       window.removeEventListener("tb_open_support", openSupport);
       window.removeEventListener("tb_open_verification", openVerification);
     };
-  }, []);
+  }, [[loadTickets]]);
 
   const defaultName = user?.name || "";
   const defaultEmail = user?.email || "";

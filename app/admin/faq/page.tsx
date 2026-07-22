@@ -54,7 +54,7 @@ export default function AdminFaqPage() {
   useEffect(() => {
     setUser(getCurrentUserClient());
     load();
-  }, []);
+  }, [form]);
 
   useEffect(() => {
     if (editing) {
