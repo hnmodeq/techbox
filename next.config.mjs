@@ -34,12 +34,9 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
       },
-      // Content-Security-Policy in REPORT-ONLY mode. We start here to collect
-      // violations from real traffic before enforcing, so nothing breaks. Once
-      // stable, flip the header key to Content-Security-Policy and tighten
-      // script-src toward nonces. Tune the blob/Sentry hosts to your real origins.
+      // Content-Security-Policy — enforced. Tune the blob/Sentry hosts to your real origins.
       {
-        key: 'Content-Security-Policy-Report-Only',
+        key: 'Content-Security-Policy',
         value: [
           "default-src 'self'",
           "base-uri 'self'",
