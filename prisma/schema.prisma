@@ -543,3 +543,18 @@ model ConsultationRequest {
   @@index([status, createdAt], name: "consultation_status_created_idx")
   @@index([createdAt], name: "consultation_created_idx")
 }
+
+/// Audit log for tracking admin actions across the platform.
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?             // who performed the action
+  userName  String   @default("") // denormalized for display
+  action    String              // e.g. "post.publish", "user.ban", "settings.update"
+  target    String?             // e.g. "post:blog/my-slug", "user:abc123"
+  details   String?  @db.Text   // JSON string with additional context
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+  @@index([userId, createdAt])
+}
