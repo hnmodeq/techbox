@@ -77,7 +77,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
     setMounted(true);
     // Hydrate from localStorage immediately on mount
     const cached = getCachedLiked(contentType, slug);
-    if (cached !== undefined && liked === null) {
+    if (cached !== undefined) {
       setLiked(cached);
     }
 

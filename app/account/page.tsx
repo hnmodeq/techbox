@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -76,7 +76,7 @@ export default function AccountPage() {
     defaultValues: { currentPassword: "", newPassword: "" },
   });
 
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/auth/me");
@@ -102,7 +102,7 @@ export default function AccountPage() {
     setUser(null);
     localStorage.removeItem("tb_auth_user");
     setLoading(false);
-  };
+  }, [profileForm]);
 
   useEffect(() => {
     loadUser();

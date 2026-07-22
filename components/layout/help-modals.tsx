@@ -45,7 +45,7 @@ export function HelpModals() {
       window.removeEventListener("tb_open_support", openSupport);
       window.removeEventListener("tb_open_verification", openVerification);
     };
-  }, [[loadTickets]]);
+  }, []);
 
   const defaultName = user?.name || "";
   const defaultEmail = user?.email || "";
@@ -240,7 +240,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
   const [replyText, setReplyText] = useState("");
   const [replyBusy, setReplyBusy] = useState(false);
 
-  const loadTickets = async (emailToLoad?: string) => {
+  const loadTickets = React.useCallback(async (emailToLoad?: string) => {
     const em = (emailToLoad || email).toLowerCase().trim();
     if (!em) return;
     setTicketsLoading(true);
@@ -253,7 +253,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
     } finally {
       setTicketsLoading(false);
     }
-  };
+  }, [email]);
 
   useEffect(() => {
     if (open) {
@@ -270,7 +270,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
         setView("new");
       }
     }
-  }, [open, defaultName, defaultEmail]);
+  }, [open, defaultName, defaultEmail, loadTickets]);
 
   const refreshThread = async (ticketId: string) => {
     try {

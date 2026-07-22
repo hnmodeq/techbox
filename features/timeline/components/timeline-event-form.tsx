@@ -65,7 +65,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
       });
       setDateFa(event.dateFa);
     }
-  }, [event]);
+  }, [event, form]);
 
   useEffect(() => {
     if (dateGrWatch) {

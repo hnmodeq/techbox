@@ -309,7 +309,7 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
       if (index % 7 === 6) set.add(day)
     })
     return set
-  }, [])
+  }, [cells])
 
   // Only fetch custom holidays (non-Friday off days)
   const [customHolidayDays, setCustomHolidayDays] = React.useState<Set<number>>(new Set())
@@ -333,7 +333,7 @@ const MonthCalendar = React.memo(function MonthCalendar({ today }: { today: Tehr
         })
         .catch(() => {})
     }
-  }, [year, month])
+  }, [year, month, fridays])
 
   return (
     <div className="space-y-3" dir="rtl">

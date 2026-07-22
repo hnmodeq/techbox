@@ -145,7 +145,7 @@ function NewsCard({ item }: { item: any }) {
 // ─── Page component ──────────────────────────────────────────────────────────
 
 export default function NewsList({ serverItems }: { serverItems?: ContentItem[] }) {
-  const items = serverItems ?? [];
+  const items = useMemo(() => serverItems ?? [], [serverItems]);
   const [page, setPage] = useState(1);
 
   const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));

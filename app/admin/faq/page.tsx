@@ -62,7 +62,7 @@ export default function AdminFaqPage() {
     } else {
       form.reset({ question: "", answer: "", order: faqs.length, isActive: true });
     }
-  }, [editing, faqs.length]);
+  }, [editing, faqs.length, form]);
 
   if (!user || (user.role !== "super_admin" && user.role !== "editor")) {
     return (

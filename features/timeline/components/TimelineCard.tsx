@@ -68,18 +68,23 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     return () => el.removeEventListener('wheel', onWheel);
   }, [showComments]);
 
+  // Extract event sub-properties for stable dependency tracking
+  const eventLikesCount = (event as any).likesCount;
+  const eventCommentsCount = (event as any).commentsCount;
+  const eventComments = (event as any).comments;
+
   // Keep local state in sync if the parent re-fetches the event payload.
   useEffect(() => {
-    if (typeof (event as any).likesCount === 'number') setLikesCount((event as any).likesCount);
-  }, [(event as any).likesCount]);
+    if (typeof eventLikesCount === 'number') setLikesCount(eventLikesCount);
+  }, [eventLikesCount]);
 
   useEffect(() => {
-    if (typeof (event as any).commentsCount === 'number') setCommentsCount((event as any).commentsCount);
-  }, [(event as any).commentsCount]);
+    if (typeof eventCommentsCount === 'number') setCommentsCount(eventCommentsCount);
+  }, [eventCommentsCount]);
 
   useEffect(() => {
-    if (Array.isArray((event as any).comments)) {
-      const filtered = (event as any).comments
+    if (Array.isArray(eventComments)) {
+      const filtered = eventComments
         .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
         .map((c: any) => ({
           id: c.id,
@@ -89,7 +94,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         }));
       setComments(filtered);
     }
-  }, [(event as any).comments]);
+  }, [eventComments]);
 
   const widthClass =
     importance >= 8

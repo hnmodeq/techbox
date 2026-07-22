@@ -51,7 +51,7 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
   React.useEffect(() => {
     setMounted(true)
     const cachedSaved = getCachedSaved(module, slug)
-    if (cachedSaved !== undefined && saved === null) {
+    if (cachedSaved !== undefined) {
       setSaved(cachedSaved)
     }
 

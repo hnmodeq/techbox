@@ -15,7 +15,7 @@ import {
 const PAGE_SIZE = 8;
 
 export default function MediaGallery({ serverItems }: { serverItems?: ContentItem[] }) {
-  const items = serverItems ?? [];
+  const items = useMemo(() => serverItems ?? [], [serverItems]);
 
   const [page, setPage] = useState(1);
 

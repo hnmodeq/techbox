@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,7 +53,7 @@ export default function OrderTrackPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const loadOrder = async () => {
+  const loadOrder = useCallback(async () => {
     if (!orderId) {
       setError("شناسه سفارش یافت نشد.");
       setLoading(false);
@@ -78,11 +78,11 @@ export default function OrderTrackPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
 
   useEffect(() => {
     loadOrder();
-  }, [orderId]);
+  }, [loadOrder]);
 
   if (loading) {
     return (

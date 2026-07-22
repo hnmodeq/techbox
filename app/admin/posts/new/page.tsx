@@ -153,7 +153,7 @@ function NewPostInner() {
         });
       })
       .catch(() => {});
-  }, [[form]]);
+  }, []);
 
   const form = useForm<any>({
     resolver: zodResolver(postSchema as any),
@@ -211,7 +211,7 @@ function NewPostInner() {
 
   useEffect(() => {
     getMe().then(setUser);
-  }, [[form]]);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -267,7 +267,7 @@ function NewPostInner() {
     return () => {
       mounted = false;
     };
-  }, [editSlug, moduleWatch]);
+  }, [editSlug, moduleWatch, form]);
 
   if (!user)
     return (
