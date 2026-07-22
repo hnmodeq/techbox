@@ -19,6 +19,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { RuntimeEffects } from "@/components/layout/RuntimeEffects";
 import { ModuleColorApplier } from "@/components/layout/ModuleColorApplier";
+import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/SiteJsonLd";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
@@ -86,6 +87,8 @@ export default async function RootLayout({
     >
       <head>
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} suppressHydrationWarning />
+        <WebSiteJsonLd />
+        <OrganizationJsonLd />
       </head>
       <body className="font-sans antialiased text-foreground">
         <RuntimeEffects />
