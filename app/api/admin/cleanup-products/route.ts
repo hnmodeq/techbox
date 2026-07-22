@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
           if (!dryRun) {
             await prisma.post.update({
               where: { id: product.id },
-              data: { specs: Object.keys(normalized).length > 0 ? normalized : null },
+              data: { specs: Object.keys(normalized).length > 0 ? (normalized as any) : undefined },
             });
           }
           results.specsNormalized++;
