@@ -210,9 +210,11 @@ function NewPostInner() {
   const priceAdjustmentPercentWatch = form.watch("priceAdjustmentPercent");
   const sellerBenefitPercentWatch = form.watch("sellerBenefitPercent");
   const specsWatch = form.watch("specs");
+  const categoryWatch = form.watch("category");
+  const slugWatch = form.watch("slug");
 
   const parsedTags = useMemo(() => (tagsWatch || "").split(",").map((t: any) => t.trim()).filter(Boolean), [tagsWatch]);
-  const resolvedSlug = (form.watch("slug") || "").trim() || slugify(titleWatch || "");
+  const resolvedSlug = (slugWatch || "").trim() || slugify(titleWatch || "");
 
   useEffect(() => {
     getMe().then(setUser);
@@ -1214,7 +1216,7 @@ function NewPostInner() {
             <h2 className="text-sm font-bold">پیش‌نمایش منبع</h2>
             <div className="mt-3 space-y-2 text-xs text-muted-foreground">
               <div>مسیر: <code dir="ltr">/{moduleWatch}/{resolvedSlug || "slug"}</code></div>
-              <div>دسته: {form.watch("category") || "—"}</div>
+              <div>دسته: {categoryWatch || "—"}</div>
               <div>برچسب‌ها: {parsedTags.length.toLocaleString("fa-IR")}</div>
               <div>خلاصه: {(excerptWatch || "").length.toLocaleString("fa-IR")} کاراکتر</div>
               <div>محتوا: {(contentWatch || "").length.toLocaleString("fa-IR")} کاراکتر</div>
