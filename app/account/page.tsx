@@ -106,7 +106,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [loadUser]);
 
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     setAuthBusy(true);
@@ -439,6 +439,7 @@ export default function AccountPage() {
             </label>
           </div>
           <div className="pt-2">
+            {/* eslint-disable-next-line react-hooks/incompatible-library */}
             <div className="font-bold">{profileForm.watch("name") || user.name}</div>
             <div className="font-mono text-xs text-muted-foreground mt-1" dir="ltr">
               @{user.username}
