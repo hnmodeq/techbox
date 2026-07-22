@@ -24,6 +24,7 @@ import { getCurrentUserClient } from "@/lib/auth";
 import { ModuleBadge } from "@/components/ui/module-badge";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { ShopSpecsField } from "@/components/admin/shop-specs-field";
+import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -710,117 +711,14 @@ function NewPostInner() {
 
                       <Separator />
 
-                      {/* Pricing – New dual-price system */}
-                      <div className="space-y-5">
-                        <div>
-                          <p className="text-sm font-semibold mb-1">قیمت‌گذاری دو مرحله‌ای (ارز مبدا → تومان)</p>
-                          <p className="text-[11px] text-muted-foreground mb-3">
-                            قیمت مبدا (USD/EUR/AED) فقط در ادمین قابل مشاهده است. قیمت نهایی تومان = قیمت مبدا × نرخ روز ارز × (1+تعدیل جهانی%) × (1+تعدیل محصول%). نرخ ارز و تعدیل جهانی در صفحه تنظیمات سایت مدیریت می‌شود.
-                          </p>
-                          <div className="grid gap-3 md:grid-cols-3">
-                            <FormField control={form.control as any} name="sourcePriceAmount" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>قیمت مبدا (پنهان – فقط ادمین)</FormLabel>
-                                <FormControl><Input type="number" dir="ltr" placeholder="1000" {...field} /></FormControl>
-                                <FormDescription className="text-[11px]">مثلاً 1000 دلار – از QNAP پر شده</FormDescription>
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control as any} name="sourceCurrency" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>واحد ارز مبدا</FormLabel>
-                                <Select value={field.value || "USD"} onValueChange={field.onChange}>
-                                  <SelectTrigger><SelectValue /></SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="USD">USD – دلار آمریکا (پیش‌فرض)</SelectItem>
-                                    <SelectItem value="EUR">EUR – یورو</SelectItem>
-                                    <SelectItem value="AED">AED – درهم امارات</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormDescription className="text-[11px]">پیش‌فرض USD، در صورت یورو/درهم تغییر دهید</FormDescription>
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control as any} name="priceAdjustmentPercent" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>تعدیل این محصول (%) – {field.value || "0"}%</FormLabel>
-                                <FormControl>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px]">-۵۰٪</span>
-                                    <input type="range" min={-50} max={100} step={1} value={parseFloat(field.value || "0")} onChange={(e) => field.onChange(e.target.value)} className="flex-1" />
-                                    <span className="text-[10px]">+۱۰۰٪</span>
-                                  </div>
-                                </FormControl>
-                                <FormDescription className="text-[11px]">افزایش/کاهش قیمت فقط این محصول نسبت به نرخ محاسبه شده</FormDescription>
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control as any} name="sellerBenefitPercent" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>سود فروشنده (سود شرکت) (%) – {field.value || "35"}%</FormLabel>
-                                <FormControl>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-[10px]">۰٪</span>
-                                    <input type="range" min={0} max={100} step={1} value={parseFloat(field.value || "35")} onChange={(e) => field.onChange(e.target.value)} className="flex-1" />
-                                    <span className="text-[10px]">۱۰۰٪</span>
-                                  </div>
-                                </FormControl>
-                                <FormDescription className="text-[11px]">سود فروشنده بر اساس قیمت نهایی محاسبه شده (پیش‌فرض ۳۵٪)</FormDescription>
-                              </FormItem>
-                            )} />
-                          </div>
-                          <div className="mt-3 rounded-md bg-muted/40 p-3 text-[11px] leading-5 space-y-2">
-                            <p className="font-bold">محاسبه زنده نهایی تومان (قابل مشاهده در فرانت):</p>
-                            <p dir="ltr" className="font-mono text-[11px]">Final = Source × Rate × (1+Global%) × (1+Product%) × (1+SellerBenefit%)</p>
-                            {(() => {
-                              const src = parseFloat((sourcePriceAmountWatch as string) || "0");
-                              const curr = (sourceCurrencyWatch as string) || "USD";
-                              const prodAdj = parseFloat((priceAdjustmentPercentWatch as string) || "0");
-                              const sellerBenefit = parseFloat((sellerBenefitPercentWatch as string) || "35");
-                              const rate = curr === "EUR" ? currencyRates.EUR : curr === "AED" ? currencyRates.AED : currencyRates.USD;
-                              const base = src * rate;
-                              const afterGlobal = base * (1 + currencyRates.global / 100);
-                              const afterProduct = afterGlobal * (1 + prodAdj / 100);
-                              const final = afterProduct * (1 + sellerBenefit / 100);
-                              if (!src) return <p className="text-muted-foreground">قیمت مبدا را وارد کنید تا قیمت نهایی محاسبه شود</p>;
-                              return (
-                                <div className="space-y-1">
-                                  <p>نرخ {curr}: {rate.toLocaleString("fa-IR")} تومان (از تنظیمات → قیمت و ارز)</p>
-                                  <p>پایه: {src.toLocaleString("fa-IR")} {curr} × {rate.toLocaleString("fa-IR")} = {base.toLocaleString("fa-IR")} تومان</p>
-                                  <p>پس از تعدیل جهانی {currencyRates.global}%: {afterGlobal.toLocaleString("fa-IR")} تومان</p>
-                                  <p>پس از تعدیل محصول {prodAdj}%: {afterProduct.toLocaleString("fa-IR")} تومان</p>
-                                  <p>پس از سود فروشنده {sellerBenefit}%: {final.toLocaleString("fa-IR")} تومان</p>
-                                  <p className="font-bold text-[12px] text-primary">قیمت نهایی نمایش به کاربر: {final.toLocaleString("fa-IR")} تومان</p>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
-
-                        <Separator />
-
-                        <div>
-                          <p className="text-sm font-semibold mb-3">قیمت نهایی و تخفیف (قابل override دستی)</p>
-                          <div className="grid gap-3 md:grid-cols-3">
-                            <FormField control={form.control as any} name="priceAmount" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>قیمت نهایی دستی (تومان) – اختیاری</FormLabel>
-                                <FormControl><Input type="number" dir="ltr" placeholder="مثلاً 189000000 (خالی = محاسبه خودکار)" {...field} /></FormControl>
-                                <FormDescription className="text-[11px]">اگر خالی باشد، از فرمول بالا محاسبه می‌شود. اگر پر کنید، override می‌شود.</FormDescription>
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control as any} name="discountPercent" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>درصد تخفیف (۰-۹۹)</FormLabel>
-                                <FormControl><Input type="number" min="0" max="99" dir="ltr" placeholder="15" {...field} /></FormControl>
-                              </FormItem>
-                            )} />
-                            <FormField control={form.control as any} name="discountEndsAt" render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>پایان تخفیف</FormLabel>
-                                <FormControl><Input type="datetime-local" dir="ltr" {...field} /></FormControl>
-                              </FormItem>
-                            )} />
-                          </div>
-                        </div>
-                      </div>
+                      <ShopPricingFields
+                        control={form.control as any}
+                        sourcePriceAmount={sourcePriceAmountWatch as string}
+                        sourceCurrency={sourceCurrencyWatch as string}
+                        priceAdjustmentPercent={priceAdjustmentPercentWatch as string}
+                        sellerBenefitPercent={sellerBenefitPercentWatch as string}
+                        currencyRates={currencyRates}
+                      />
 
                       <Separator />
                       <div className="space-y-4">
