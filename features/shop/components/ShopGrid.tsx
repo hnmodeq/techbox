@@ -675,7 +675,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         <div className="flex gap-0 lg:gap-4 items-start">
           {/* ── Desktop Sidebar ── */}
           {sidebarOpen && (
-            <aside className="hidden lg:block w-[280px] shrink-0 sticky top-[4.5rem] self-start max-h-[calc(100vh-5rem)] overflow-y-auto scrollbar-thin rounded-lg border border-border bg-card">
+            <aside className="hidden lg:block w-[280px] shrink-0 sticky top-[3.5rem] self-start max-h-[calc(100vh-4rem)] overflow-y-auto scrollbar-thin rounded-lg border border-border bg-card">
               {SidebarContent}
             </aside>
           )}
@@ -683,7 +683,7 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
           {/* ── Main content ── */}
           <div className="flex-1 min-w-0 flex flex-col">
             {/* Sort bar — Digikala style */}
-            <div className="w-full bg-card border-b lg:border lg:rounded-lg border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3 sm:px-4 py-2.5 sticky top-0 lg:static z-20">
+            <div className="w-full bg-card border-b lg:border lg:rounded-lg border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-3 sm:px-4 py-2.5 sticky top-[3.5rem] lg:static z-20">
               <div className="flex items-center gap-2 w-full sm:w-auto overflow-hidden">
                 {/* Filter toggle */}
                 <button

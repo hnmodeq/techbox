@@ -163,7 +163,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         />
 
         <div
-          className="flex min-h-[calc(100svh-var(--header-height))] w-full overflow-x-hidden"
+          className="flex min-h-[calc(100svh-var(--header-height))] w-full"
           dir="rtl"
         >
           <TechboxAppSidebar />

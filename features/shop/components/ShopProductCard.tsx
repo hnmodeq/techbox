@@ -150,10 +150,10 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       )}
       dir="rtl"
     >
-      {/* Item 1: all dots black. Item 2: swap positions (badge left, dot right in RTL = badge right visually, dot left visually) */}
+      {/* Dot left, badge right */}
       <div className="flex items-center justify-between px-3 pt-3 h-6" dir="ltr">
-        {badgeText && <span className="text-[10px] font-bold leading-none text-[#ef394e] tracking-tight">{badgeText}</span>}
         <span className="size-[6px] rounded-full shrink-0 bg-foreground/60" aria-hidden />
+        {badgeText && <span className="text-[10px] font-bold leading-none text-[#ef394e] tracking-tight">{badgeText}</span>}
       </div>
 
       <div className="relative w-full aspect-[4/3] p-4 flex items-center justify-center bg-transparent">
