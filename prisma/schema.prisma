@@ -558,3 +558,15 @@ model AuditLog {
   @@index([action, createdAt])
   @@index([userId, createdAt])
 }
+
+/// Search query analytics — tracks what users search for on the public site.
+model SearchLog {
+  id        String   @id @default(cuid())
+  query     String              // the search term
+  results   Int      @default(0) // number of results returned
+  userId    String?             // null for anonymous
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([query, createdAt])
+}

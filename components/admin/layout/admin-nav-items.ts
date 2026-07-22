@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   BarChart3,
+  Search,
   FileText,
   Clock,
   Newspaper,
@@ -46,6 +47,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       { title: "داشبورد", href: "/admin", icon: LayoutDashboard },
       { title: "آمار و تحلیل", href: "/admin/analytics", icon: BarChart3 },
+      { title: "آمار جستجو", href: "/admin/search-analytics", icon: Search, superAdminOnly: true },
     ],
   },
   {

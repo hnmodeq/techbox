@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 import { advancedSearch } from "@/lib/search";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { logSearch } from "@/lib/search-log";
 
 function normalizeQuery(q: string) {
   return q.trim().replace(/\s+/g, " ").slice(0, 120);
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const { results, count } = await advancedSearch({ q, moduleKey, take });
+    logSearch({ query: normalizeQuery(q), results: count }); // fire-and-forget
     return NextResponse.json({ q, results, count }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "search_failed", q, results: [], count: 0 }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
