@@ -64,7 +64,6 @@ export function FollowStats({
         }
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username, viewerId]);
 
   const openModal = useCallback(
