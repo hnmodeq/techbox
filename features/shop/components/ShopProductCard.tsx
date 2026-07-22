@@ -209,9 +209,6 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
               ✅ مشاوره
             </span>
           )}
-          {isUnavailable && (
-            <span className="text-[10px] text-red-500/80">ناموجود</span>
-          )}
         </div>
 
         {/* 4 major specs with shadcn tooltips — icons only, no labels */}
