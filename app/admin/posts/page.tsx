@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-
+import { Checkbox } from "@/components/ui/checkbox";
 import { ModuleBadge } from "@/components/ui/module-badge";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +50,7 @@ function AdminPostsInner({ user }: { user: AppUser }) {
   const router = useRouter();
   const initialModule = (sp.get("module") as ModuleSlug) || "blog";
   const [module, setModule] = useState<ModuleSlug>(initialModule);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const m = sp.get("module") as ModuleSlug | null;
@@ -136,6 +137,59 @@ function AdminPostsInner({ user }: { user: AppUser }) {
     loadItems();
   };
 
+  // Selection helpers
+  const selectedItems = useMemo(() => filteredItems.filter((it) => selected.has(it.slug)), [filteredItems, selected]);
+  const allSelected = filteredItems.length > 0 && filteredItems.every((it) => selected.has(it.slug));
+  const toggleSelectAll = () => {
+    if (allSelected) setSelected(new Set());
+    else setSelected(new Set(filteredItems.map((it) => it.slug)));
+  };
+  const toggleSelect = (slug: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
+
+  // Bulk operations
+  const bulkPublish = async (published: boolean) => {
+    const items = selectedItems;
+    if (items.length === 0) return;
+    if (!confirm(`${published ? "انتشار" : "پیش‌نویس"} ${items.length.toLocaleString("fa-IR")} مورد؟`)) return;
+    let ok = 0;
+    for (const it of items) {
+      const res = await fetch("/api/posts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ module: it.module, slug: it.slug, published }),
+      });
+      if (res.ok) ok++;
+    }
+    setMsg(`${ok} مورد ${published ? "منتشر" : "پیش‌نویس"} شد.`);
+    setSelected(new Set());
+    loadItems();
+  };
+
+  const bulkDelete = async () => {
+    const items = selectedItems;
+    if (items.length === 0) return;
+    if (!confirm(`حذف ${items.length.toLocaleString("fa-IR")} مورد؟ این عمل قابل بازگشت نیست.`)) return;
+    let ok = 0;
+    for (const it of items) {
+      const res = await fetch(`/api/posts?module=${encodeURIComponent(it.module)}&slug=${encodeURIComponent(it.slug)}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) ok++;
+    }
+    setMsg(`${ok} مورد حذف شد.`);
+    setSelected(new Set());
+    loadItems();
+  };
+
   if (!canEdit(user, module))
     return (
       <main className="p-10 text-center" dir="rtl">
@@ -207,6 +261,29 @@ function AdminPostsInner({ user }: { user: AppUser }) {
 
       {msg && <Card className="p-3 text-sm text-muted-foreground">{msg}</Card>}
 
+      {/* Bulk action bar */}
+      {selected.size > 0 && (
+        <Card className="p-3 flex flex-wrap items-center gap-3 bg-primary/5 border-primary/20">
+          <span className="text-sm font-medium">
+            {selected.size.toLocaleString("fa-IR")} مورد انتخاب شده
+          </span>
+          <div className="flex gap-2 ms-auto">
+            <Button size="sm" variant="outline" onClick={() => bulkPublish(true)}>
+              انتشار همه
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => bulkPublish(false)}>
+              پیش‌نویس همه
+            </Button>
+            <Button size="sm" variant="danger" onClick={bulkDelete}>
+              حذف همه
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setSelected(new Set())}>
+              لغو انتخاب
+            </Button>
+          </div>
+        </Card>
+      )}
+
       <div className="flex flex-wrap gap-2">
         {allowedModules.map((m) => (
           <Button key={m} onClick={() => { setModule(m); router.push(`/admin/posts?module=${m}`); }} variant={m === module ? "secondary" : "ghost"} size="xs">
@@ -220,6 +297,13 @@ function AdminPostsInner({ user }: { user: AppUser }) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-8">
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="انتخاب همه"
+                  />
+                </TableHead>
                 <TableHead className="text-right">عنوان</TableHead>
                 <TableHead className="text-right">وضعیت</TableHead>
                 <TableHead className="text-right hidden md:table-cell">دسته</TableHead>
@@ -230,10 +314,17 @@ function AdminPostsInner({ user }: { user: AppUser }) {
             </TableHeader>
             <TableBody>
               {loading ? (
-                <TableRow><TableCell colSpan={6} className="p-8 text-center text-muted-foreground">در حال دریافت از دیتابیس…</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="p-8 text-center text-muted-foreground">در حال دریافت از دیتابیس…</TableCell></TableRow>
               ) : (
                 filteredItems.map((it) => (
-                  <TableRow key={it.slug} className="hover:bg-muted/20">
+                  <TableRow key={it.slug} className="hover:bg-muted/20" data-state={selected.has(it.slug) ? "selected" : undefined}>
+                    <TableCell className="align-top">
+                      <Checkbox
+                        checked={selected.has(it.slug)}
+                        onCheckedChange={() => toggleSelect(it.slug)}
+                        aria-label={`انتخاب ${it.title}`}
+                      />
+                    </TableCell>
                     <TableCell className="align-top">
                       <div className="font-medium">{it.title}</div>
                       <div className="mt-1 font-mono text-xs text-muted-foreground" dir="ltr">/{it.module}/{it.slug}</div>
