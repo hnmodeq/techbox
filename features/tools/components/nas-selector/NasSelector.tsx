@@ -4,10 +4,10 @@ import * as React from "react";
 import { Icon } from "@/design/icons";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
+
 import {
   defaultSelectorState,
   estimateUsableCapacity,
@@ -561,7 +561,7 @@ function ProductResultCard({
               <div className="text-[10px] text-muted-foreground">تومان</div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Button
+              <ButtonLink
                 size="sm"
                 className={cn(
                   "text-[11px] font-bold h-9 px-4 rounded-xl",
@@ -569,23 +569,19 @@ function ProductResultCard({
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "bg-muted text-foreground hover:bg-muted/80"
                 )}
-                asChild
+                href={product.href || `/shop/${product.shopSlug || product.id}`}
               >
-                <Link href={product.href || `/shop/${product.shopSlug || product.id}`}>
-                  مشاهده محصول
-                </Link>
-              </Button>
-              <Button
+                مشاهده محصول
+              </ButtonLink>
+              <ButtonLink
                 size="sm"
                 variant="outline"
                 className="text-[10px] h-8 rounded-xl border-border/50"
-                asChild
+                href={product.href || `/shop/${product.shopSlug || product.id}`}
               >
-                <Link href={product.href || `/shop/${product.shopSlug || product.id}`}>
-                  <Icon name="cart" className="h-3 w-3 ml-1" />
-                  خرید
-                </Link>
-              </Button>
+                <Icon name="cart" className="h-3 w-3 ml-1" />
+                خرید
+              </ButtonLink>
             </div>
           </div>
         </div>
@@ -957,9 +953,7 @@ export default function NasSelector({
                     تغییر تنظیمات
                   </Button>
                   {consultationHref && (
-                    <Button asChild size="sm">
-                      <Link href={consultationHref}>مشاوره رایگان</Link>
-                    </Button>
+                    <ButtonLink size="sm" href={consultationHref}>مشاوره رایگان</ButtonLink>
                   )}
                 </div>
               </Card>
@@ -991,20 +985,16 @@ export default function NasSelector({
                 بازگشت به تنظیمات
               </Button>
               {compareHref && (
-                <Button variant="secondary" asChild className="rounded-xl text-[12px]">
-                  <Link href={compareHref}>
-                    <Icon name="shuffle" className="ml-1 h-4 w-4" />
-                    مقایسه محصولات
-                  </Link>
-                </Button>
+                <ButtonLink variant="secondary" className="rounded-xl text-[12px]" href={compareHref}>
+                  <Icon name="shuffle" className="ml-1 h-4 w-4" />
+                  مقایسه محصولات
+                </ButtonLink>
               )}
               {consultationHref && (
-                <Button asChild className="rounded-xl text-[12px]">
-                  <Link href={consultationHref}>
-                    <Icon name="headset" className="ml-1 h-4 w-4" />
-                    مشاوره رایگان تخصصی
-                  </Link>
-                </Button>
+                <ButtonLink className="rounded-xl text-[12px]" href={consultationHref}>
+                  <Icon name="headset" className="ml-1 h-4 w-4" />
+                  مشاوره رایگان تخصصی
+                </ButtonLink>
               )}
             </div>
           </motion.div>
