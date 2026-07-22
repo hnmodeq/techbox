@@ -570,3 +570,61 @@ model SearchLog {
   @@index([createdAt])
   @@index([query, createdAt])
 }
+
+/// Orders for the shop.
+model Order {
+  id            String   @id @default(cuid())
+  orderNumber   String   @unique   // e.g. "ORD-1720000000-abc123"
+  userId        String?             // null for guest checkout
+  status        String   @default("pending") // pending | paid | processing | shipped | delivered | cancelled | refunded
+
+  // Customer info
+  customerName  String
+  customerEmail String?
+  customerPhone String
+  customerAddress String @db.Text
+  customerPostalCode String
+  customerCity  String?
+
+  // Pricing
+  subtotal      Float
+  shippingCost  Float    @default(0)
+  tax           Float    @default(0)
+  total         Float
+  currency      String   @default("IRR")
+
+  // Payment
+  paymentMethod String?  // zarinpal | manual
+  paymentId     String?  // Zarinpal authority/ref_id
+  paidAt        DateTime?
+
+  // Notes
+  adminNote     String?  @db.Text
+  customerNote  String?  @db.Text
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items         OrderItem[]
+
+  @@index([userId])
+  @@index([status, createdAt])
+  @@index([orderNumber])
+}
+
+/// Individual items within an order.
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  postId    String?            // link to Post if exists
+  slug      String
+  module    String
+  title     String
+  image     String?
+  price     Float              // price at time of order
+  quantity  Int    @default(1)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}

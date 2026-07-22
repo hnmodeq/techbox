@@ -12,6 +12,7 @@ import {
   MessageSquare,
   MessageCircle,
   Store,
+  ShoppingCart,
   Image,
   CreditCard,
   Layers,
@@ -78,6 +79,7 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "فروشگاه",
     items: [
+      { title: "سفارشات", href: "/admin/orders", icon: ShoppingCart, superAdminOnly: true },
       { title: "بنرهای فروشگاه", href: "/admin/shop-banners", icon: Image, superAdminOnly: true },
     ],
   },
