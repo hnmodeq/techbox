@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 
 // Required 18 spec keys (Persian) that all products must have
