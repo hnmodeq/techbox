@@ -284,6 +284,38 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
 
   const sorted = useMemo(() => {
     let list = [...items];
+
+    // ── Filter out products with no specs or insufficient specs ──
+    // A product must have at least 2 of the 4 major specs to be shown
+    list = list.filter((item) => {
+      const specs = (item.specs && typeof item.specs === "object" && !Array.isArray(item.specs))
+        ? item.specs as Record<string, unknown>
+        : {};
+
+      // Count how many of the 4 major specs exist with non-empty values
+      const hasBay = !!(specs["Drive Bay"] || specs["Bay"] || specs["تعداد جایگاه دیسک"]);
+      const hasCpu = !!(specs["CPU"] || specs["پردازنده"]);
+      const hasRam = !!(specs["System Memory"] || specs["RAM"] || specs["حافظه رم"]);
+      const hasNetwork = !!(
+        specs["10 Gigabit Ethernet Port"] ||
+        specs["2.5 Gigabit Ethernet Port (2.5G/1G/100M)"] ||
+        specs["2.5 Gigabit Ethernet Port"] ||
+        specs["Network Card"]
+      );
+
+      const majorSpecCount = [hasBay, hasCpu, hasRam, hasNetwork].filter(Boolean).length;
+
+      // Also count total non-empty specs
+      const totalSpecs = Object.values(specs).filter((v) => {
+        if (!v) return false;
+        const s = String(v).trim().toLowerCase();
+        return s && !["n/a", "na", "-", ""].includes(s);
+      }).length;
+
+      // Must have at least 2 major specs AND at least 3 total specs
+      return majorSpecCount >= 2 && totalSpecs >= 3;
+    });
+
     if (onlyAvailable) list = list.filter((i) => i.availability !== "ناموجود" && i.availability !== "اتمام موجودی");
     if (priceFilter) {
       list = list.filter((i) => {

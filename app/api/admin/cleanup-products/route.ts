@@ -26,7 +26,7 @@ const REQUIRED_SPEC_KEYS = [
 ];
 
 // Minimum number of specs a product must have (out of 18)
-const MIN_SPECS_REQUIRED = 8;
+const MIN_SPECS_REQUIRED = 3;
 
 // Map English QNAP keys to the 18 required Persian keys
 const ENGLISH_TO_PERSIAN: Record<string, string> = {
@@ -142,11 +142,31 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Delete products with insufficient specs (item 10)
+    // A product needs EITHER:
+    //   - At least MIN_SPECS_REQUIRED of the 18 normalized specs, OR
+    //   - At least 3 total non-empty specs of any kind
+    // Also delete obvious test/dummy products (slug matches "product-N" pattern)
     if (deleteIncomplete) {
+      const testSlugPattern = /^product-\d+$/;
+
       const insufficient = remaining.filter((p) => {
+        // Delete obvious test products
+        if (testSlugPattern.test(p.slug)) return true;
+
         const specs = (p.specs as Record<string, unknown>) || {};
         const normalized = normalizeSpecs(specs);
-        return Object.keys(normalized).length < MIN_SPECS_REQUIRED;
+
+        // Count total non-empty specs
+        const totalNonEmpty = Object.values(specs).filter((v) => {
+          if (!v) return false;
+          const s = String(v).trim().toLowerCase();
+          return s && !["n/a", "na", "-"].includes(s);
+        }).length;
+
+        const normalizedCount = Object.keys(normalized).length;
+
+        // Product is insufficient if it has <3 normalized specs AND <3 total specs
+        return normalizedCount < MIN_SPECS_REQUIRED && totalNonEmpty < MIN_SPECS_REQUIRED;
       });
 
       if (!dryRun && insufficient.length > 0) {
