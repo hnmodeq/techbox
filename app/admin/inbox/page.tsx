@@ -125,7 +125,6 @@ export default function AdminInboxPage() {
       <Toaster dir="rtl" />
       <section className="mx-auto max-w-4xl space-y-6">
         <PageHeader colorVar="--admin" title="صندوق پیام‌ها" titleClassName="text-[var(--admin)]" description="بازخوردها، تیکت‌های پشتیبانی و پیام‌های تماس">
-          <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
         </PageHeader>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>

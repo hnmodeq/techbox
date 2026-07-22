@@ -147,7 +147,6 @@ export default function AdminUsersPage() {
       <section className="mx-auto max-w-7xl space-y-6">
         <PageHeader colorVar="--admin" title="مدیریت کاربران" titleClassName="text-[var(--admin)]" description="ویرایش پروفایل، نقش، دسترسی ماژول‌ها، وضعیت حساب و مشاهده فعالیت کاربران">
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
             <ButtonLink href="/admin/moderation" variant="ghost" size="sm">Moderation</ButtonLink>
             <Button type="button" size="sm" onClick={loadUsers}>به‌روزرسانی</Button>
           </div>

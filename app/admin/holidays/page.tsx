@@ -135,7 +135,6 @@ export default function AdminHolidaysPage() {
           description="مدیریت روزهای تعطیل تقویم شمسی. جمعه‌ها به‌صورت خودکار تعطیل نشان داده می‌شوند."
         >
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
           </div>
         </PageHeader>
 

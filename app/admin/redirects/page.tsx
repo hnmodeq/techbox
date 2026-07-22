@@ -43,7 +43,6 @@ export default function RedirectsAdminPage() {
       <section className="mx-auto max-w-6xl space-y-6">
         <PageHeader colorVar="--admin" title="مدیریت Redirect اسلاگ‌ها" titleClassName="text-[var(--admin)]" description="برای جلوگیری از 404 بعد از حذف/تغییر اسلاگ‌ها">
           <div className="flex gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
             <ButtonLink href="/admin/content-health" variant="ghost" size="sm">سلامت محتوا</ButtonLink>
           </div>
         </PageHeader>

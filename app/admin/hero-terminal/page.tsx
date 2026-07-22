@@ -58,7 +58,6 @@ export default function HeroTerminalAdminPage() {
     <main className="mx-auto max-w-4xl px-4 py-10 space-y-8" dir="rtl">
       <PageHeader colorVar="--admin" title="ترمینال هیرو" description="متن‌هایی که در ترمینال صفحه اصلی نمایش داده می‌شوند را اینجا ویرایش کنید.">
         <div className="flex gap-2">
-          <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
         </div>
       </PageHeader>
 

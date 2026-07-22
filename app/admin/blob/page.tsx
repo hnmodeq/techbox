@@ -337,7 +337,6 @@ export default function AdminBlobPage() {
           description="نمای درختی فولدرها و فایل‌ها، اندازه، نوع، URL و ابزار کپی لینک‌ها"
         >
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد ادمین</ButtonLink>
             <ButtonLink href="/admin/posts" variant="ghost" size="sm">مدیریت محتوا</ButtonLink>
           </div>
         </PageHeader>

@@ -77,7 +77,6 @@ export default function AdminConsultationsPage() {
           description={`${pendingCount} درخواست در انتظار پاسخ`}
         >
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
             <Button type="button" variant="ghost" size="sm" onClick={load} disabled={loading}>به‌روزرسانی</Button>
           </div>
         </PageHeader>
