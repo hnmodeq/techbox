@@ -27,6 +27,7 @@ import { ShopSpecsField } from "@/components/admin/shop-specs-field";
 import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
 import { RevisionHistory } from "@/components/admin/revision-history";
 import { getTemplatesForModule, type ContentTemplate } from "@/config/content-templates";
+import { MarkdownEditor } from "@/components/admin/markdown-editor";
 import { toast } from "sonner";
 import { FileText, ChevronDown } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
@@ -813,7 +814,12 @@ function NewPostInner() {
                   <FormItem>
                     <FormLabel>محتوا</FormLabel>
                     <FormControl>
-                      <Textarea className="min-h-[260px]" placeholder="متن کامل / HTML / Markdown…" {...field} />
+                      <MarkdownEditor
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        placeholder="متن کامل / Markdown…"
+                        minHeight="300px"
+                      />
                     </FormControl>
                   </FormItem>
                 )}
