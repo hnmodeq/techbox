@@ -334,7 +334,15 @@ function AdminPostsInner({ user }: { user: AppUser }) {
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="align-top">{it.published ? <Badge variant="default">منتشرشده</Badge> : <Badge variant="outline">پیش‌نویس</Badge>}</TableCell>
+                    <TableCell className="align-top">
+                      {it.published ? (
+                        <Badge variant="default">منتشرشده</Badge>
+                      ) : (it as any).status === "scheduled" ? (
+                        <Badge variant="secondary">زمان‌بندی</Badge>
+                      ) : (
+                        <Badge variant="outline">پیش‌نویس</Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="align-top hidden md:table-cell">{it.category ? <Badge variant="secondary">{it.category}</Badge> : <Badge variant="outline">بدون دسته</Badge>}</TableCell>
                     <TableCell className="align-top hidden lg:table-cell text-xs"><div>{it.date_fa}</div><div className="mt-1 text-muted-foreground">{it.author?.name}</div></TableCell>
                     <TableCell className="align-top text-xs"><div>👁 {it.views.toLocaleString("fa-IR")}</div><div className="mt-1 text-muted-foreground">♥ {it.likes.toLocaleString("fa-IR")}</div></TableCell>

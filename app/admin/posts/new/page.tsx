@@ -130,8 +130,9 @@ const postSchema = z.object({
   availability: z.string().max(100).optional(),
   warranty: z.string().max(200).optional(),
   specs: z.string().max(5000).optional(),
-  status: z.enum(["published", "review", "draft", "archived"]).default("published"),
+  status: z.enum(["published", "scheduled", "review", "draft", "archived"]).default("published"),
   published: z.boolean().default(true),
+  scheduledAt: z.string().max(30).optional(),
 });
 
 type PostValues = z.infer<typeof postSchema>;
@@ -201,6 +202,7 @@ function NewPostInner() {
       specs: "",
       status: "published",
       published: true,
+      scheduledAt: "",
     },
   });
 
@@ -250,6 +252,7 @@ function NewPostInner() {
         image: it.image || "",
         published: typeof it.published === "boolean" ? it.published : true,
         status: it.status || (it.published ? "published" : "draft"),
+        scheduledAt: it.status === "scheduled" && it.date ? new Date(it.date).toISOString().slice(0, 16) : "",
         videoUrl: it.videoUrl || "",
         videoDuration: it.videoDuration || "",
         videoMimeType: it.videoMimeType || "",
@@ -319,8 +322,9 @@ function NewPostInner() {
       excerpt: (values.excerpt || "").trim(),
       content: (values.content || "").trim(),
       image: (values.image || "").trim() || undefined,
-      published: values.published,
+      published: values.status === "scheduled" ? false : values.published,
       status: values.status,
+      date: values.status === "scheduled" && values.scheduledAt ? new Date(values.scheduledAt).toISOString() : undefined,
       videoUrl: (values.videoUrl || "").trim() || undefined,
       videoDuration: (values.videoDuration || "").trim() || undefined,
       videoMimeType: (values.videoMimeType || "").trim() || undefined,
@@ -791,6 +795,7 @@ function NewPostInner() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="published">منتشر شده</SelectItem>
+                          <SelectItem value="scheduled">زمان‌بندی شده</SelectItem>
                           <SelectItem value="review">در حال بررسی</SelectItem>
                           <SelectItem value="draft">پیش‌نویس</SelectItem>
                           <SelectItem value="archived">آرشیو شده</SelectItem>
@@ -799,6 +804,19 @@ function NewPostInner() {
                     </FormItem>
                   )}
                 />
+                {statusWatch === "scheduled" ? (
+                  <FormField
+                    control={form.control as any}
+                    name="scheduledAt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>زمان انتشار</FormLabel>
+                        <FormControl><Input type="datetime-local" dir="ltr" {...field} /></FormControl>
+                        <FormDescription className="text-[11px]">مطلب در این زمان به‌طور خودکار منتشر می‌شود.</FormDescription>
+                      </FormItem>
+                    )}
+                  />
+                ) : (
                 <FormField
                   control={form.control as any}
                   name="published"
@@ -814,6 +832,7 @@ function NewPostInner() {
                     </FormItem>
                   )}
                 />
+                )}
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
