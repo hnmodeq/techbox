@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { AdminLoading } from "@/components/admin/admin-states";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,7 +65,7 @@ function ShopBannersContent() {
       <PageHeader colorVar="--shop" title="بنرهای فروشگاه" />
       <div className="space-y-4 mt-6">
         {loading ? (
-          <p className="text-muted-foreground text-sm">در حال بارگذاری…</p>
+          <AdminLoading rows={2} />
         ) : banners.length === 0 ? (
           <p className="text-muted-foreground text-sm text-center py-8">هیچ بنری تعریف نشده</p>
         ) : (

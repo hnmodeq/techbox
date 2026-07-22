@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { AdminLoading, AdminEmpty } from "@/components/admin/admin-states";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -157,7 +158,7 @@ function ModerationContent() {
           </div>
 
           {msg && <Card className="p-3 text-sm text-muted-foreground mt-4">{msg}</Card>}
-          {loading && <div className="text-sm text-muted-foreground mt-4">در حال دریافت…</div>}
+          {loading && <div className="mt-4"><AdminLoading rows={3} /></div>}
 
           <TabsContent value="comments" className="space-y-3 mt-4">
             {comments.map((comment) => (
@@ -196,7 +197,7 @@ function ModerationContent() {
                 </div>
               </Card>
             ))}
-            {!comments.length && !loading && <Card className="p-6 text-center text-sm text-muted-foreground">دیدگاهی برای این فیلتر وجود ندارد.</Card>}
+            {!comments.length && !loading && <AdminEmpty title="دیدگاهی برای این فیلتر وجود ندارد." />}
           </TabsContent>
 
           <TabsContent value="users" className="mt-4">
@@ -217,7 +218,7 @@ function ModerationContent() {
                     </div>
                   </div>
                 ))}
-                {!users.length && !loading && <div className="p-6 text-center text-sm text-muted-foreground">کاربری یافت نشد.</div>}
+                {!users.length && !loading && <AdminEmpty title="کاربری یافت نشد." />}
               </div>
             </Card>
           </TabsContent>

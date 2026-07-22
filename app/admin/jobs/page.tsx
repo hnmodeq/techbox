@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { AdminLoading } from "@/components/admin/admin-states";
 import { canEdit, type AppUser } from "@/lib/auth";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -109,7 +110,7 @@ function AdminJobsInner({ user }: { user: AppUser }) {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={5} className="p-8 text-center text-muted-foreground">در حال دریافت داده‌ها...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="p-4"><AdminLoading rows={2} /></TableCell></TableRow>
             ) : jobs.length === 0 ? (
               <TableRow><TableCell colSpan={5} className="p-8 text-center text-muted-foreground">هیچ موقعیت شغلی ثبت نشده است.</TableCell></TableRow>
             ) : (

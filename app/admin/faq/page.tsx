@@ -18,6 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { AdminLoading, AdminEmpty } from "@/components/admin/admin-states";
 
 const faqSchema = z.object({
   question: z.string().min(3, "حداقل ۳ کاراکتر").max(500),
@@ -221,9 +222,9 @@ function FaqContent() {
             </CardHeader>
             <CardContent className="p-0">
               {loading ? (
-                <div className="p-6 text-center text-sm text-muted-foreground">در حال بارگذاری…</div>
+                <div className="p-4"><AdminLoading rows={3} /></div>
               ) : faqs.length === 0 ? (
-                <div className="p-6 text-center text-sm text-muted-foreground">هنوز FAQ ثبت نشده</div>
+                <div className="p-4"><AdminEmpty title="هنوز FAQ ثبت نشده" /></div>
               ) : (
                 <div className="rounded-md border overflow-hidden">
                   <Table>

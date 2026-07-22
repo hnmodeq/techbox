@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { AdminLoading } from "@/components/admin/admin-states";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { Button } from "@/components/ui/button";
 import { ModuleBadge } from "@/components/ui/module-badge";
@@ -110,8 +111,8 @@ function RolesContent() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-6xl px-4 py-10" dir="rtl">
-        <p className="text-sm text-muted-foreground">در حال بارگذاری...</p>
+      <main className="p-4 md:p-6" dir="rtl">
+        <AdminLoading rows={3} />
       </main>
     );
   }

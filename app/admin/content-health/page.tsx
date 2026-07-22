@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { AdminLoading } from "@/components/admin/admin-states";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -87,7 +88,7 @@ function ContentHealthContent() {
         </PageHeader>
 
         {error && <Card className="p-4 border-destructive/40 text-destructive text-sm">{error}</Card>}
-        {loading && <Card className="p-6 text-sm text-muted-foreground">در حال دریافت گزارش…</Card>}
+        {loading && <AdminLoading rows={4} />}
 
         {data && (
           <>
