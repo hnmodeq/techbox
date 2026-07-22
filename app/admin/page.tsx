@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/providers/auth.provider";
-import { type AppUser, canEdit } from "@/lib/auth";
+import { canEdit } from "@/lib/auth";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
-import { useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { ModuleBadge } from "@/components/ui/module-badge";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +30,6 @@ export default function AdminPage() {
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardLoaded, setDashboardLoaded] = useState(false);
   const [dashboardError, setDashboardError] = useState("");
-  const router = useRouter();
 
   useEffect(() => {
     if (!user) return;

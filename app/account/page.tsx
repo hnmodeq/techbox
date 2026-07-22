@@ -9,17 +9,15 @@ import { TriangleAlert } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+;
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/design/icons";
 import { toast } from "sonner";
 import { AccountProfileTabs } from "@/components/profile/AccountProfileTabs";
-import { VerifiedBadge } from "@/components/ui/verified-badge";
-
 const loginSchema = z.object({
   username: z.string().min(2),
   password: z.string().min(6),
@@ -57,8 +55,6 @@ export default function AccountPage() {
   const [pwdStatus, setPwdStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [verifyEmail, setVerifyEmail] = useState<string | null>(null);
   const [resendBusy, setResendBusy] = useState(false);
-
-
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: { username: "", password: "" },

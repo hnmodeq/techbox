@@ -11,7 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
 import { formatRelativeTime } from "@/lib/date-format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
+
 import { toast } from "sonner";
 import { useAuth } from "@/providers/auth.provider";
 import { CommentFormSkeleton, CommentListSkeleton, CommentSectionSkeleton } from "@/components/ui/skeleton-layouts";

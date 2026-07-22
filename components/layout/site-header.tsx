@@ -13,8 +13,6 @@ import {
   ShoppingCartIcon,
   SunIcon,
 } from "lucide-react"
-
-import { SearchForm } from "./search-form"
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -132,23 +132,9 @@ export function Icon({ name, ...props }: { name: IconName } & LucideProps) {
 }
 
 // Convenience named exports (used where a direct component is cleaner)
-export const LikeIcon = Heart;
-export const ViewIcon = Eye;
-export const CommentIcon = MessageCircle;
-export const DownloadIcon = Download;
-export const StarIcon = Star;
-export const PlayIcon = Play;
-export const ClockIcon = Clock;
-export const DateIcon = Calendar;
-export const TagIcon = Tag;
-export const ChatIcon = MessageSquare;
-export const CloseIcon = X;
 export const ChevronLeftIcon = ChevronLeft;
 export const ChevronRightIcon = ChevronRight;
 export const PlusIcon = Plus;
-export const MinusIcon = Minus;
-export const DiskIcon = HardDrive;
-export const ServerIcon = Server;
 export const NasIcon = Database;
 export const NvrIcon = Cctv;
 export const TimelineIcon = History;

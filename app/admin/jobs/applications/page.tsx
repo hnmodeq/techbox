@@ -4,8 +4,6 @@ import { useEffect, useState, useCallback, Suspense } from "react";
 import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-
 function AdminApplicationsInner() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [apps, setApps] = useState<any[]>([]);

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getDbModulePosts } from "@/lib/server-posts";
-import { Card } from "@/components/ui/card";
+
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { HardDrive, Server, Cpu, Shield, Database, Video, Cloud, Building, Home, Briefcase, Camera } from "lucide-react";
+import { HardDrive, Server, Cpu, Cloud, Building, Home, Briefcase, Camera } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "انتخاب ذخیره‌ساز سازمانی – تکباکس",

@@ -23,8 +23,6 @@ import CommentSection from "@/features/comment/components/CommentSection";
 import { blurProps } from "@/lib/image-placeholder";
 import { formatRelativeDate } from "@/lib/date-format";
 import { zIndex } from "@/design";
-import { Skeleton } from "@/components/ui/skeleton";
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface VideoItem {

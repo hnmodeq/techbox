@@ -5,7 +5,7 @@ import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
 function AdminJobsInner() {

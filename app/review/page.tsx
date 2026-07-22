@@ -6,8 +6,6 @@ export const metadata = modulePageMetadata(
   "review",
   "نقد و بررسی تخصصی تجهیزات شبکه، سرور، ذخیره‌سازی، امنیت و زیرساخت."
 );
-
-
 export default async function ReviewPage() {
   const dbItems = await getDbModulePosts("review", 60);
   return <ReviewGrid serverItems={dbItems.length > 0 ? dbItems : undefined} />;

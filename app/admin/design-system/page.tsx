@@ -558,8 +558,6 @@ export default function DesignSystemPage() {
               </ul>
             </DSSection>
           </TabsContent>
-
-
         </Tabs>
 
         <Separator />

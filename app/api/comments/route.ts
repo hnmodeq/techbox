@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { sendEmail, emailTemplates, escapeHtml } from "@/lib/email";
+import { "@/lib/email";
 import { getSettings } from "@/lib/settings";
 
 const postSchema = z.object({
