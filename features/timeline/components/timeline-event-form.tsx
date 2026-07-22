@@ -49,6 +49,7 @@ export default function TimelineEventForm({ event, onClose }: TimelineEventFormP
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const dateGrWatch = form.watch('dateGr');
   const importanceWatch = form.watch('importance');
 
