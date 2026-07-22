@@ -108,18 +108,73 @@ export default function CommentSection({ module, slug, initialComments, compact 
   // ─── Top-level comment form state ───────────────────────────
   const [topText, setTopText] = React.useState("");
   const [topSubmitting, setTopSubmitting] = React.useState(false);
+  const [pros, setPros] = React.useState("");
+  const [cons, setCons] = React.useState("");
+  const [myRating, setMyRating] = React.useState(0);
+  const [ratingSubmitting, setRatingSubmitting] = React.useState(false);
+
+  // Load existing rating
+  useEffect(() => {
+    if (module !== "shop") return;
+    fetch(`/api/rating?module=${module}&slug=${slug}`)
+      .then((r) => r.json())
+      .then((d) => { if (d.myRating) setMyRating(d.myRating); })
+      .catch(() => {});
+  }, [module, slug]);
+
+  const handleRating = async (value: number) => {
+    if (!user) {
+      window.dispatchEvent(new CustomEvent("tb_open_auth"));
+      return;
+    }
+    setRatingSubmitting(true);
+    try {
+      const res = await fetch("/api/rating", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ module, slug, value }),
+      });
+      if (res.ok) {
+        setMyRating(value);
+        toast.success("امتیاز شما ثبت شد");
+      }
+    } catch {
+      toast.error("خطا در ثبت امتیاز");
+    } finally {
+      setRatingSubmitting(false);
+    }
+  };
 
   const handleTopSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const text = formData.get("text") as string;
-    if (!text?.trim() || text.trim().length < 2) return;
+
+    // Build the full text with pros/cons prepended
+    let fullText = formData.get("text") as string;
+    const prosList = pros.split("\n").map((p) => p.trim()).filter(Boolean);
+    const consList = cons.split("\n").map((c) => c.trim()).filter(Boolean);
+
+    let prefix = "";
+    if (prosList.length > 0) {
+      prefix += "✅ نقاط قوت:\n" + prosList.map((p) => `• ${p}`).join("\n") + "\n\n";
+    }
+    if (consList.length > 0) {
+      prefix += "❌ نقاط ضعف:\n" + consList.map((c) => `• ${c}`).join("\n") + "\n\n";
+    }
+    if (prefix) {
+      fullText = prefix + (fullText || "").trim();
+    }
+
+    if (!fullText?.trim() || fullText.trim().length < 2) return;
+    formData.set("text", fullText);
 
     setTopSubmitting(true);
     try {
       const res = await createCommentAction(null, formData);
       if ((res as any)?.ok) {
         setTopText("");
+        setPros("");
+        setCons("");
         toast.success((res as any)?.message || "دیدگاه شما با موفقیت ثبت شد");
         startTransition(() => { load(); });
       } else {
@@ -486,6 +541,69 @@ export default function CommentSection({ module, slug, initialComments, compact 
               <div className="text-[11px] paragraph-color font-mono" dir="ltr">@{user.username}</div>
             </div>
           </div>
+
+          {/* Star rating (item 8) — only for shop module */}
+          {module === "shop" && (
+            <div className="flex items-center gap-3 py-2">
+              <span className="text-[12px] font-medium text-[var(--paragraph-color)]">امتیاز شما:</span>
+              <div className="flex items-center gap-1" dir="ltr">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => handleRating(star)}
+                    disabled={ratingSubmitting}
+                    className="p-0.5 transition-transform hover:scale-110"
+                  >
+                    <svg
+                      className={`size-6 ${star <= myRating ? "fill-[#f9bc00] text-[#f9bc00]" : "fill-transparent text-muted-foreground hover:text-[#f9bc00]"}`}
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+              {myRating > 0 && (
+                <span className="text-[11px] text-muted-foreground">({myRating.toLocaleString("fa-IR")} از ۵)</span>
+              )}
+            </div>
+          )}
+
+          {/* Pros/Cons (item 9) — only for shop module, not compact */}
+          {module === "shop" && !compact && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                  <span>✅</span> نقاط قوت
+                </label>
+                <textarea
+                  value={pros}
+                  onChange={(e) => setPros(e.target.value)}
+                  placeholder={"هر مورد در یک خط...\nمثلاً: کیفیت ساخت بالا"}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 resize-none min-h-[60px] text-[var(--paragraph-color)]"
+                  rows={2}
+                  disabled={topSubmitting}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-red-500 flex items-center gap-1">
+                  <span>❌</span> نقاط ضعف
+                </label>
+                <textarea
+                  value={cons}
+                  onChange={(e) => setCons(e.target.value)}
+                  placeholder={"هر مورد در یک خط...\nمثلاً: قیمت بالا"}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 resize-none min-h-[60px] text-[var(--paragraph-color)]"
+                  rows={2}
+                  disabled={topSubmitting}
+                />
+              </div>
+            </div>
+          )}
+
           <Textarea
             name="text"
             placeholder={compact ? "دیدگاه شما..." : "دیدگاه خود را درباره این مطلب بنویسید..."}

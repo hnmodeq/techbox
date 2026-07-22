@@ -3,17 +3,19 @@
 import type { ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { ProductGallery } from "@/components/ui/product-gallery";
-import { LikeButton } from "@/components/ui/like-button";
 import { SaveButton } from "@/components/ui/save-button";
 import { ShareButton } from "@/components/ui/share-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useConsultation } from "@/providers/consultation.provider";
+import { useCompare } from "@/providers/compare.provider";
 import { ProductJsonLd } from "@/components/seo/StructuredData";
 import { useCountdown } from "@/hooks/useCountdown";
-import { Star, Package, GitCompareArrows, Bookmark } from "lucide-react";
+import { Star, Package, GitCompareArrows, ShieldCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 import SpecsTableCategorized from "@/features/shop/components/SpecsTableCategorized";
+import { toast } from "sonner";
 
 type ProductItem = ContentItem & {
   brand?: string | null;
@@ -61,6 +63,7 @@ function DiscountTimer({ endsAt }: { endsAt: string }) {
 export default function ProductDetail({ item }: { item: ProductItem }) {
   const gallery = Array.isArray(item.gallery) && item.gallery.length > 0 ? item.gallery : item.image ? [item.image] : [];
   const { add } = useConsultation();
+  const { add: addCompare, isInList, items: compareItems } = useCompare();
 
   const isUnavailable = item.availability === "ناموجود" || item.availability === "اتمام موجودی";
   const priceAmount = item.priceAmount && item.priceAmount > 0 ? item.priceAmount : parsePriceLabel(item.priceLabel);
@@ -70,8 +73,27 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
   const orig = formatPrice(priceAmount);
   const disc = formatPrice(discountedPrice);
 
+  const inCompare = isInList(item.slug);
+
   const addToCart = () => {
-    add({ slug: item.slug, title: item.title, image: item.image || "" });
+    add({ slug: item.slug, title: item.title, image: item.image || "", price: priceAmount || 0 });
+  };
+
+  const handleCompare = () => {
+    if (inCompare) {
+      toast.info("این محصول قبلاً به لیست مقایسه اضافه شده است");
+      return;
+    }
+    addCompare({
+      slug: item.slug,
+      title: item.title,
+      image: item.image || "",
+      brand: item.brand || "",
+      model: item.model || "",
+      priceAmount: priceAmount || 0,
+      specs: (item.specs as Record<string, unknown>) || {},
+    });
+    toast.success("به لیست مقایسه اضافه شد");
   };
 
   return (
@@ -82,7 +104,7 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
         <nav className="mb-4 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
           <Link href="/" className="hover:text-foreground">خانه</Link>
           <span>/</span>
-          <Link href="/shop" className="hover:text-foreground">فروشگاه</Link>
+          <Link href="/landing/storage/shop" className="hover:text-foreground">فروشگاه</Link>
           {item.category && (
             <>
               <span>/</span>
@@ -118,12 +140,27 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground border border-border rounded-lg p-2 bg-card">
                 <ShareButton />
                 <span className="h-3 w-px bg-border" />
-                <button type="button" className="flex items-center gap-1 hover:text-foreground transition-colors px-1">
+                <button
+                  type="button"
+                  onClick={handleCompare}
+                  className={cn(
+                    "flex items-center gap-1 hover:text-foreground transition-colors px-1",
+                    inCompare && "text-primary font-bold"
+                  )}
+                >
                   <GitCompareArrows className="size-3.5" />
-                  <span>مقایسه</span>
+                  <span>{inCompare ? "در لیست مقایسه" : "مقایسه"}</span>
                 </button>
                 <span className="h-3 w-px bg-border" />
                 <SaveButton module="shop" slug={item.slug} />
+                {compareItems.length > 1 && (
+                  <>
+                    <span className="h-3 w-px bg-border" />
+                    <Link href="/compare" className="text-primary font-bold hover:underline">
+                      مقایسه ({compareItems.length.toLocaleString("fa-IR")})
+                    </Link>
+                  </>
+                )}
               </div>
 
               {item.sku && (
@@ -134,46 +171,47 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
 
           {/* Center — Details */}
           <div className="lg:col-span-4 xl:col-span-5 order-2 space-y-5">
-            {/* Title */}
-            <div className="space-y-2">
-              <h1 className="text-[16px] sm:text-[20px] font-bold leading-7 sm:leading-8 text-foreground">
-                {item.title}
-              </h1>
-              {item.model && (
-                <p className="text-[11px] text-muted-foreground" dir="ltr">
-                  {item.brand ? `${item.brand} ` : ""}{item.model}
-                </p>
-              )}
-            </div>
+            {/* Title — left justified (item 2) */}
+            <h1 className="text-[16px] sm:text-[20px] font-bold leading-7 sm:leading-8 text-foreground text-left" dir="ltr">
+              {item.title}
+            </h1>
 
-            {/* Rating + comments + views */}
+            {/* Rating + model name + comments + views — same row (item 5) */}
             <div className="flex flex-wrap items-center gap-3 text-[12px] border-b border-border pb-4">
               <div className="flex items-center gap-1">
                 <Star className="size-4 fill-[#f9bc00] text-[#f9bc00]" />
                 <span className="font-bold">{(item.rating ?? 0).toLocaleString("fa-IR", { maximumFractionDigits: 1 })}</span>
                 <span className="text-muted-foreground">({(item.ratingCount ?? 0).toLocaleString("fa-IR")})</span>
               </div>
+              {item.model && (
+                <>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="text-[11px] text-muted-foreground" dir="ltr">
+                    {item.brand ? `${item.brand} ` : ""}{item.model}
+                  </span>
+                </>
+              )}
               <span className="text-muted-foreground">•</span>
               <span className="text-[#19bfd3]">{(item.comments ?? 0).toLocaleString("fa-IR")} دیدگاه</span>
               <span className="text-muted-foreground">•</span>
               <span className="text-muted-foreground">{item.views.toLocaleString("fa-IR")} بازدید</span>
             </div>
-
-            {/* Availability status */}
-            <div className="flex items-center gap-2 text-[12px]">
-              <Package className="size-4 text-muted-foreground" />
-              <span className={isUnavailable ? "text-red-500" : "text-emerald-600"}>
-                {isUnavailable ? "ناموجود" : "موجود در انبار"}
-              </span>
-            </div>
           </div>
 
-          {/* Left — Price Card */}
+          {/* Left — Price Card (items 1, 4) */}
           <div className="lg:col-span-3 order-3">
             <div className="lg:sticky lg:top-24 space-y-3">
               <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
-                {/* Price */}
                 <div className="p-4 space-y-3">
+                  {/* Availability (item 4) */}
+                  <div className="flex items-center gap-2 text-[12px]">
+                    <Package className="size-4 text-muted-foreground" />
+                    <span className={isUnavailable ? "text-red-500 font-bold" : "text-emerald-600 font-bold"}>
+                      {isUnavailable ? "ناموجود" : "موجود در انبار"}
+                    </span>
+                  </div>
+
+                  {/* Price */}
                   {!isUnavailable && disc && orig && (
                     <div className="space-y-1 text-left">
                       {discount > 0 && (
@@ -214,6 +252,15 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
                       {isUnavailable ? "ناموجود" : "افزودن به سبد خرید"}
                     </Button>
                   </div>
+
+                  {/* ضمانت اصالت (item 1) */}
+                  <div className="rounded-md bg-muted/40 p-2.5 text-[11px] leading-5 flex items-start gap-2">
+                    <ShieldCheck className="size-4 shrink-0 text-emerald-600 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-foreground">ضمانت اصالت</p>
+                      <p className="text-muted-foreground">تمام محصولات تکباکس دارای ضمانت اصالت و سلامت کالا هستند.</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -221,33 +268,23 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
         </div>
 
         {/* Tabs — مشخصات / دیدگاه */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-9">
-            <Tabs defaultValue="specs" className="w-full" dir="rtl">
-              <TabsList variant="line" className="w-full justify-start border-b rounded-none bg-transparent h-auto p-0 gap-6">
-                <TabsTrigger value="specs" id="specs" className="rounded-none border-b-2 border-transparent data-active:border-[#ef394e] data-active:text-[#ef394e] px-1 py-3 text-[13px]">مشخصات</TabsTrigger>
-                <TabsTrigger value="comments" className="rounded-none border-b-2 border-transparent data-active:border-[#ef394e] data-active:text-[#ef394e] px-1 py-3 text-[13px]">دیدگاه‌ها ({(item.comments ?? 0).toLocaleString("fa-IR")})</TabsTrigger>
-              </TabsList>
+        <div className="mt-8">
+          <Tabs defaultValue="specs" className="w-full" dir="rtl">
+            <TabsList variant="line" className="w-full justify-start border-b rounded-none bg-transparent h-auto p-0 gap-6">
+              <TabsTrigger value="specs" id="specs" className="rounded-none border-b-2 border-transparent data-active:border-[#ef394e] data-active:text-[#ef394e] px-1 py-3 text-[13px]">مشخصات</TabsTrigger>
+              <TabsTrigger value="comments" className="rounded-none border-b-2 border-transparent data-active:border-[#ef394e] data-active:text-[#ef394e] px-1 py-3 text-[13px]">دیدگاه‌ها ({(item.comments ?? 0).toLocaleString("fa-IR")})</TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="specs" className="pt-6">
-                <div className="rounded-xl border border-border bg-card p-4 sm:p-6">
-                  <SpecsTableCategorized specs={item.specs as Record<string, unknown>} />
-                </div>
-              </TabsContent>
+            <TabsContent value="specs" className="pt-6">
+              <div className="rounded-xl border border-border bg-card p-4 sm:p-6">
+                <SpecsTableCategorized specs={item.specs as Record<string, unknown>} />
+              </div>
+            </TabsContent>
 
-              <TabsContent value="comments" className="pt-2">
-                <CommentSection module="shop" slug={item.slug} initialComments={item.comments || 0} />
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Left side in tabs area */}
-          <div className="lg:col-span-3 hidden lg:block">
-            <div className="rounded-lg border border-border bg-card p-3 text-[11px] text-muted-foreground leading-5">
-              <p className="font-bold text-foreground mb-2">ضمانت اصالت</p>
-              <p>تمام محصولات تکباکس دارای ضمانت اصالت و سلامت کالا هستند.</p>
-            </div>
-          </div>
+            <TabsContent value="comments" className="pt-2">
+              <CommentSection module="shop" slug={item.slug} initialComments={item.comments || 0} />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </>

@@ -9,6 +9,7 @@ import { TechboxNewsSidebar } from "./techbox-news-sidebar"
 import { SiteHeader } from "./site-header"
 import FooterSection from "@/components/layout/Footer"
 import { ConsultationProvider } from "@/providers/consultation.provider"
+import { CompareProvider } from "@/providers/compare.provider"
 import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
 import { AuthProvider, useAuth } from "@/providers/auth.provider"
@@ -50,7 +51,8 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
     <ThemeProvider>
       <AuthProvider>
         <ConsultationProvider>
-          <StatsProvider>
+          <CompareProvider>
+            <StatsProvider>
             <HomeDataProvider initialData={homeData}>
               <ModuleConfigProvider serverConfig={serverModuleConfig}>
                 <TimelineLikesProvider>
@@ -64,7 +66,8 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
                 <FloatingSearch />
               </React.Suspense>
             </HomeDataProvider>
-          </StatsProvider>
+            </StatsProvider>
+          </CompareProvider>
         </ConsultationProvider>
       </AuthProvider>
     </ThemeProvider>

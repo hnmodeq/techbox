@@ -86,8 +86,8 @@ export default function SpecsTableCategorized({ specs, showAll = false }: Props)
             <div className="divide-y divide-border/60 rounded-lg border bg-card overflow-hidden">
               {items.map((it) => (
                 <div key={it.key} className="grid grid-cols-1 sm:grid-cols-[180px_1fr] gap-2 py-3 px-4 hover:bg-muted/30 transition-colors">
-                  <div className="text-[11px] sm:text-[12px] text-muted-foreground font-medium">{it.titleFa}</div>
-                  <div className="text-[12px] sm:text-[13px] text-foreground leading-6">{it.value}</div>
+                  <div className="text-[11px] sm:text-[12px] text-muted-foreground font-medium text-right" dir="rtl">{it.titleFa}</div>
+                  <div className="text-[12px] sm:text-[13px] text-foreground leading-6 text-left" dir="ltr">{it.value}</div>
                 </div>
               ))}
             </div>
