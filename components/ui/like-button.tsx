@@ -164,6 +164,7 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
                 : (displayLiked ? "text-red-500" : "text-[var(--paragraph-color)] hover:text-red-500")
             } ${hideText ? "text-[11px]" : "text-[length:var(--paragraph-font-size)]"}`}
             aria-pressed={displayLiked}
+            aria-label={displayLiked ? "لغو پسند" : "پسندیدن"}
           />
         }>
           <Heart size={16} fill={displayLiked ? "currentColor" : "none"} strokeWidth={2} className={`transition-transform duration-200 ${displayLiked ? "scale-110" : "scale-100"}`} aria-hidden />

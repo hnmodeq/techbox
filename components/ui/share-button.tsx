@@ -26,7 +26,7 @@ export function ShareButton({ url, label = "اشتراک‌گذاری", classNam
 
   return (
     <Tooltip>
-      <TooltipTrigger render={<Button type="button" variant="ghost" size="sm" className={className} onClick={copy} />}>
+      <TooltipTrigger render={<Button type="button" variant="ghost" size="sm" className={className} onClick={copy} aria-label="اشتراک‌گذاری" />}>
         <Share2Icon className="size-4" />
         {label}
       </TooltipTrigger>

@@ -108,7 +108,7 @@ export function SaveButton({ module, slug }: { module: string; slug: string }) {
 
   return (
     <Tooltip>
-      <TooltipTrigger render={<Button type="button" variant="ghost" size="sm" onClick={toggle} />}>
+      <TooltipTrigger render={<Button type="button" variant="ghost" size="sm" onClick={toggle} aria-label={saved ? "لغو ذخیره" : "ذخیره"} />}>
         <BookmarkIcon className={displaySaved ? "size-4 fill-current" : "size-4"} />
         {displaySaved ? "ذخیره‌شده" : "ذخیره"}
       </TooltipTrigger>

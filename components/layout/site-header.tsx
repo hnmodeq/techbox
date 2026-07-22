@@ -648,6 +648,7 @@ export function SiteHeader({
                   variant="ghost"
                   size="icon"
                   onClick={toggleSidebar}
+                  aria-label="باز/بسته کردن نوار کناری"
                 />
               }
             >
