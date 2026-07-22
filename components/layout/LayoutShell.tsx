@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import dynamic from "next/dynamic"
+import { usePathname } from "next/navigation"
 
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { TechboxAppSidebar } from "./techbox-app-sidebar"
@@ -47,6 +48,20 @@ type LayoutShellProps = {
 }
 
 export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutShellProps) {
+  const pathname = usePathname()
+  const isAdmin = pathname.startsWith("/admin")
+
+  // Admin pages have their own layout — skip the main site chrome
+  if (isAdmin) {
+    return (
+      <ThemeProvider>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </ThemeProvider>
+    )
+  }
+
   return (
     <ThemeProvider>
       <AuthProvider>

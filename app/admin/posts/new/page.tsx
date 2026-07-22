@@ -882,7 +882,7 @@ function NewPostInner() {
                             const selectedVal = specsObj[key] || "";
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">تعداد جایگاه دیسک (مهم – روی کارت + فیلتر)</label>
+                                <label className="text-xs font-medium text-muted-foreground">کارت شبکه (Network Card)</label>
                                 <Select value={selectedVal} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
                                   <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب..." /></SelectTrigger>
                                   <SelectContent>
@@ -930,8 +930,8 @@ function NewPostInner() {
                                 <Select value={selectedVal} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
                                   <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب..." /></SelectTrigger>
                                   <SelectContent>
-                                    {["Tower", "Desktop", "Rackmount 1U", "Rackmount 2U", "Rackmount 3U", "Rackmount 4U", "Short-depth 1U", "Short-depth 2U"].map((b) => (
-                                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                                    {["0", "1", "2", "4"].map((b) => (
+                                      <SelectItem key={b} value={b}>{b === "0" ? "ندارد" : `${b} پورت`}</SelectItem>
                                     ))}
                                   </SelectContent>
                                 </Select>

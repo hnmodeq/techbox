@@ -1,0 +1,98 @@
+import {
+  LayoutDashboard,
+  FileText,
+  Clock,
+  Newspaper,
+  Briefcase,
+  Users,
+  Shield,
+  BadgeCheck,
+  MessageSquare,
+  MessageCircle,
+  Store,
+  Image,
+  CreditCard,
+  Layers,
+  CalendarDays,
+  Link2,
+  Activity,
+  Palette,
+  HelpCircle,
+  Database,
+  Upload,
+  Terminal,
+  type LucideIcon,
+} from "lucide-react";
+
+export type AdminNavItem = {
+  title: string;
+  href: string;
+  icon: LucideIcon;
+  superAdminOnly?: boolean;
+  badge?: string;
+};
+
+export type AdminNavGroup = {
+  label: string;
+  items: AdminNavItem[];
+};
+
+export const adminNavGroups: AdminNavGroup[] = [
+  {
+    label: "عمومی",
+    items: [
+      { title: "داشبورد", href: "/admin", icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: "محتوا",
+    items: [
+      { title: "مدیریت محتوا", href: "/admin/posts", icon: FileText },
+      { title: "تایم‌لاین", href: "/admin/timeline", icon: Clock },
+      { title: "خبرنامه", href: "/admin/newsletter", icon: Newspaper, superAdminOnly: true },
+      { title: "آگهی استخدام", href: "/admin/jobs", icon: Briefcase },
+    ],
+  },
+  {
+    label: "کاربران و اجتماع",
+    items: [
+      { title: "کاربران", href: "/admin/users", icon: Users, superAdminOnly: true },
+      { title: "نقش‌ها و دسترسی", href: "/admin/roles", icon: Shield, superAdminOnly: true },
+      { title: "مدیریت گفتگو", href: "/admin/moderation", icon: Shield, superAdminOnly: true },
+      { title: "تایید هویت", href: "/admin/verification", icon: BadgeCheck, superAdminOnly: true },
+    ],
+  },
+  {
+    label: "ارتباطات",
+    items: [
+      { title: "صندوق پیام‌ها", href: "/admin/inbox", icon: MessageCircle, superAdminOnly: true },
+      { title: "مشاوره‌ها", href: "/admin/consultations", icon: MessageSquare, superAdminOnly: true },
+    ],
+  },
+  {
+    label: "فروشگاه",
+    items: [
+      { title: "بنرهای فروشگاه", href: "/admin/shop-banners", icon: Image, superAdminOnly: true },
+    ],
+  },
+  {
+    label: "تنظیمات",
+    items: [
+      { title: "ماژول‌ها", href: "/admin/modules", icon: Layers, superAdminOnly: true },
+      { title: "تنظیمات سایت", href: "/admin/settings", icon: CreditCard, superAdminOnly: true },
+      { title: "تعطیلات", href: "/admin/holidays", icon: CalendarDays, superAdminOnly: true },
+      { title: "Redirectها", href: "/admin/redirects", icon: Link2, superAdminOnly: true },
+      { title: "سلامت محتوا", href: "/admin/content-health", icon: Activity, superAdminOnly: true },
+      { title: "FAQ", href: "/admin/faq", icon: HelpCircle },
+      { title: "ترمینال هیرو", href: "/admin/hero-terminal", icon: Terminal, superAdminOnly: true },
+    ],
+  },
+  {
+    label: "ابزارها",
+    items: [
+      { title: "فایل‌های Blob", href: "/admin/blob", icon: Database, superAdminOnly: true },
+      { title: "آپلود فایل", href: "/admin/upload", icon: Upload, superAdminOnly: true },
+      { title: "دیزاین سیستم", href: "/admin/design-system", icon: Palette, superAdminOnly: true },
+    ],
+  },
+];
