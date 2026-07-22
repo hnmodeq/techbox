@@ -286,6 +286,23 @@ function NewsletterContent() {
             <Button onClick={send} disabled={sending || previewing} loading={sending}>
               ارسال خبرنامه
             </Button>
+            <Button variant="secondary" onClick={async () => {
+              if (!confirm("ارسال خلاصه هفتگی خودکار؟ آخرین محتوای هفته انتخاب و ارسال می‌شود.")) return;
+              setSending(true);
+              try {
+                const res = await fetch("/api/admin/newsletter/digest", { method: "POST" });
+                const data = await res.json();
+                if (res.ok && data.ok) {
+                  toast.success(`خلاصه هفتگی ارسال شد: ${data.sent} موفق / ${data.contentCount} محتوا`);
+                  load();
+                } else {
+                  toast.error(data.message || data.error || "خطا");
+                }
+              } catch { toast.error("خطا"); }
+              finally { setSending(false); }
+            }} disabled={sending} loading={sending}>
+              📨 خلاصه هفتگی خودکار
+            </Button>
           </div>
         </Card>
 
