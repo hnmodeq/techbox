@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/providers/auth.provider";
-import { useRouter } from "next/navigation";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -12,15 +11,17 @@ import { TerminalHero } from "@/components/effects/TerminalHero";
 import { PlusIcon, TrashIcon, GripVerticalIcon } from "lucide-react";
 
 export default function HeroTerminalAdminPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <HeroTerminalContent />}
+    </AdminGuard>
+  );
+}
+
+function HeroTerminalContent() {
   const [lines, setLines] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [fetching, setFetching] = useState(true);
-
-  useEffect(() => {
-    if (!loading && (!user || user.role !== "super_admin")) router.push("/admin");
-  }, [user, loading, router]);
 
   useEffect(() => {
     fetch("/api/admin/hero-terminal")
@@ -51,8 +52,6 @@ export default function HeroTerminalAdminPage() {
   const removeLine = (i: number) => setLines((prev) => prev.filter((_, idx) => idx !== i));
   const updateLine = (i: number, val: string) =>
     setLines((prev) => prev.map((l, idx) => (idx === i ? val : l)));
-
-  if (loading) return null;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10 space-y-8" dir="rtl">

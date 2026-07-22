@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState, useMemo, Suspense, useCallback } from "react";
-import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { canEdit, type AppUser } from "@/lib/auth";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,14 @@ import { Badge } from "@/components/ui/badge";
 import { ModuleBadge } from "@/components/ui/module-badge";
 
 export const dynamic = "force-dynamic";
+
+export default function AdminPostsPage() {
+  return (
+    <AdminGuard>
+      {(user) => <AdminPostsInner user={user} />}
+    </AdminGuard>
+  );
+}
 
 type DraftSummary = { count: number; latest?: string };
 type AdminPost = {
@@ -30,8 +38,7 @@ type AdminPost = {
   published: boolean;
 };
 
-function AdminPostsInner() {
-  const [user, setUser] = useState<AppUser | null>(null);
+function AdminPostsInner({ user }: { user: AppUser }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState<"all" | "published" | "draft">("all");
@@ -44,9 +51,6 @@ function AdminPostsInner() {
   const initialModule = (sp.get("module") as ModuleSlug) || "blog";
   const [module, setModule] = useState<ModuleSlug>(initialModule);
 
-  useEffect(() => {
-    setUser(getCurrentUserClient());
-  }, []);
   useEffect(() => {
     const m = sp.get("module") as ModuleSlug | null;
     if (m) {
@@ -74,7 +78,7 @@ function AdminPostsInner() {
   }, [module]);
 
   useEffect(() => {
-    if (user && canEdit(user, module)) loadItems();
+    if (canEdit(user, module)) loadItems();
   }, [user, module, loadItems]);
 
   useEffect(() => {
@@ -132,18 +136,6 @@ function AdminPostsInner() {
     loadItems();
   };
 
-  if (!user)
-    return (
-      <main className="p-10 text-center" dir="rtl">
-        <p>
-          لطفا ابتدا{" "}
-          <Link href="/admin/login" className="text-primary underline">
-            وارد شوید
-          </Link>
-          .
-        </p>
-      </main>
-    );
   if (!canEdit(user, module))
     return (
       <main className="p-10 text-center" dir="rtl">
@@ -169,9 +161,6 @@ function AdminPostsInner() {
           </Button>
           <ButtonLink href={`/admin/posts/new?module=${module}`} size="sm">
             مطلب جدید +
-          </ButtonLink>
-          <ButtonLink href="/admin" variant="ghost" size="sm">
-            داشبورد
           </ButtonLink>
         </div>
       </div>
@@ -287,13 +276,5 @@ function AdminPostsInner() {
         {draftSummary.latest && <span className="block mt-2">آخرین پیش‌نویس لوکال این ماژول: {draftSummary.latest}</span>}
       </p>
     </main>
-  );
-}
-
-export default function AdminPostsPage() {
-  return (
-    <Suspense fallback={<div className="p-10 text-center">در حال بارگذاری...</div>}>
-      <AdminPostsInner />
-    </Suspense>
   );
 }

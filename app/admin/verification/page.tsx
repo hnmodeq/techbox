@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/providers/auth.provider";
-import { useRouter } from "next/navigation";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -182,17 +181,17 @@ function RequestCard({ req, onReviewed }: { req: Request; onReviewed: () => void
 }
 
 export default function AdminVerificationPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  return (
+    <AdminGuard superAdminOnly>
+      {() => <VerificationContent />}
+    </AdminGuard>
+  );
+}
+
+function VerificationContent() {
   const [tab, setTab] = useState("pending");
   const [requests, setRequests] = useState<Request[]>([]);
   const [fetching, setFetching] = useState(false);
-
-  useEffect(() => {
-    if (!loading && user && !["super_admin", "admin"].includes(user.role)) {
-      router.push("/admin");
-    }
-  }, [user, loading, router]);
 
   const load = async (status: string) => {
     setFetching(true);
@@ -208,8 +207,6 @@ export default function AdminVerificationPage() {
   };
 
   useEffect(() => { load(tab); }, [tab]);
-
-  if (loading) return null;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10" dir="rtl">

@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +17,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { getCurrentUserClient } from "@/lib/auth";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 
 const faqSchema = z.object({
   question: z.string().min(3, "حداقل ۳ کاراکتر").max(500),
@@ -31,7 +30,14 @@ type FaqValues = z.infer<typeof faqSchema>;
 type Faq = FaqValues & { id: string; createdAt: string; updatedAt: string };
 
 export default function AdminFaqPage() {
-  const [user, setUser] = React.useState(() => getCurrentUserClient());
+  return (
+    <AdminGuard>
+      {() => <FaqContent />}
+    </AdminGuard>
+  );
+}
+
+function FaqContent() {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Faq | null>(null);
@@ -52,7 +58,6 @@ export default function AdminFaqPage() {
   };
 
   useEffect(() => {
-    setUser(getCurrentUserClient());
     load();
   }, [form]);
 
@@ -63,19 +68,6 @@ export default function AdminFaqPage() {
       form.reset({ question: "", answer: "", order: faqs.length, isActive: true });
     }
   }, [editing, faqs.length, form]);
-
-  if (!user || (user.role !== "super_admin" && user.role !== "editor")) {
-    return (
-      <main className="min-h-dvh p-8" dir="rtl">
-        <Card className="max-w-xl mx-auto">
-          <CardHeader>
-            <CardTitle>عدم دسترسی</CardTitle>
-            <CardDescription>فقط super_admin و editor</CardDescription>
-          </CardHeader>
-        </Card>
-      </main>
-    );
-  }
 
   const onSubmit = async (values: any) => {
     try {

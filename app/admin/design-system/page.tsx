@@ -33,7 +33,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { ModuleBadge } from "@/components/ui/module-badge";
 
-import { getCurrentUserClient } from "@/lib/auth";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 
 // small helper section wrapper
@@ -78,38 +78,16 @@ function ModuleSwatch({ slug }: { slug: string }) {
 }
 
 export default function DesignSystemPage() {
-  const [user, setUser] = React.useState(() => getCurrentUserClient());
+  return (
+    <AdminGuard>
+      {() => <DesignSystemContent />}
+    </AdminGuard>
+  );
+}
+
+function DesignSystemContent() {
   const [switchOn, setSwitchOn] = useState(true);
   const [radioValue, setRadioValue] = useState("1");
-
-  React.useEffect(() => {
-    setUser(getCurrentUserClient());
-  }, []);
-
-  if (!user) {
-    return (
-      <main className="min-h-dvh px-4 py-16" dir="rtl">
-        <div className="mx-auto max-w-md">
-          <Card>
-            <CardHeader><CardTitle>دسترسی محدود</CardTitle><CardDescription>برای مشاهده سیستم دیزاین وارد شوید.</CardDescription></CardHeader>
-            <CardContent className="flex gap-2">
-              <ButtonLink href="/admin/login">ورود ادمین</ButtonLink>
-              <ButtonLink href="/" variant="ghost">خانه</ButtonLink>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    );
-  }
-
-  const isAdmin = user.role === "super_admin" || user.role === "editor";
-  if (!isAdmin) {
-    return (
-      <main className="min-h-dvh p-8" dir="rtl">
-        <Card className="max-w-xl mx-auto"><CardHeader><CardTitle>عدم دسترسی</CardTitle><CardDescription>فقط super_admin و editor می‌توانند این صفحه را ببینند.</CardDescription></CardHeader></Card>
-      </main>
-    );
-  }
 
   const themeColors = [
     { name: "Background", var: "--background" },

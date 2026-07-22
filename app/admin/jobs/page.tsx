@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
-import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
+import { useEffect, useState, useCallback } from "react";
+import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { canEdit, type AppUser } from "@/lib/auth";
 import Link from "next/link";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
-function AdminJobsInner() {
-  const [user, setUser] = useState<AppUser | null>(null);
+export default function AdminJobsPage() {
+  return (
+    <AdminGuard>
+      {(user) => <AdminJobsInner user={user} />}
+    </AdminGuard>
+  );
+}
+
+function AdminJobsInner({ user }: { user: AppUser }) {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
-
-  useEffect(() => {
-    setUser(getCurrentUserClient());
-  }, []);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);
@@ -34,7 +38,7 @@ function AdminJobsInner() {
   }, []);
 
   useEffect(() => {
-    if (user && canEdit(user, "workwithus")) {
+    if (canEdit(user, "workwithus")) {
       loadJobs();
     }
   }, [user, loadJobs]);
@@ -69,7 +73,6 @@ function AdminJobsInner() {
     }
   };
 
-  if (!user) return <div className="p-10 text-center">در حال بارگذاری...</div>;
   if (!canEdit(user, "workwithus")) {
     return (
       <main className="p-10 text-center space-y-4" dir="rtl">
@@ -141,13 +144,5 @@ function AdminJobsInner() {
         </Table>
       </Card>
     </main>
-  );
-}
-
-export default function AdminJobsPage() {
-  return (
-    <Suspense fallback={<div className="p-10 text-center">در حال بارگذاری...</div>}>
-      <AdminJobsInner />
-    </Suspense>
   );
 }
