@@ -17,6 +17,7 @@ import VideoPlayer from "@/features/media/components/VideoPlayer";
 import MarkdownContent from "@/features/content/components/MarkdownContent";
 import { formatRelativeDate } from "@/lib/date-format";
 import { ContentJsonLd } from "@/components/seo/StructuredData";
+import { PageBreadcrumb } from "@/components/ui/page-breadcrumb";
 import { getReadingTimeLabel } from "@/lib/reading-time";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -34,6 +35,11 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
     <>
       <ContentJsonLd item={item} />
       <article className="mx-auto max-w-3xl px-5 md:px-0 py-10" dir="rtl">
+        <PageBreadcrumb items={[
+          { label: "خانه", href: "/" },
+          { label: meta.titleFa, href: `/${item.module}` },
+          { label: item.title },
+        ]} />
 
         {/* Hero image */}
         {item.module === "shop" && gallery.length > 0 ? (
