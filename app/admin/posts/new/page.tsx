@@ -849,10 +849,11 @@ function NewPostInner() {
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
+                            const selectedVal = specsObj[key] || "";
                             return (
                               <div key={key}>
                                 <label className="text-xs font-medium text-muted-foreground">Bay / تعداد جایگاه دیسک (مهم – روی کارت + فیلتر)</label>
-                                <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
+                                <Select value={selectedVal} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
                                   <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب تعداد Bay..." /></SelectTrigger>
                                   <SelectContent>
                                     {["1 Bay", "2 Bay", "4 Bay", "6 Bay", "8 Bay", "12 Bay", "16 Bay", "24 Bay", "36 Bay"].map((b) => (
