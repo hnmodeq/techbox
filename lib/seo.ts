@@ -89,11 +89,15 @@ export function detailMetadata(module: ModuleSlug, item: any | null, fallbackTit
 
   const title = item.seoTitle || `${item.title} | ${meta.titleFa} تکباکس`;
   const description = item.seoDescription || item.excerpt || item.content || `${meta.titleFa} تکباکس`;
+
+  // Use post image, or generate dynamic OG image as fallback
+  const image = item.image || `/api/og?title=${encodeURIComponent(item.title)}&module=${module}${item.category ? `&category=${encodeURIComponent(item.category)}` : ""}`;
+
   return pageMetadata({
     title,
     description,
     path: `/${module}/${item.slug}`,
-    image: item.image,
+    image,
     type: ["blog", "news", "review", "media", "forum"].includes(module) ? "article" : "website",
   });
 }
