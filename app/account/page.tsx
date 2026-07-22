@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/design/icons";
 import { toast } from "sonner";
 import { AccountProfileTabs } from "@/components/profile/AccountProfileTabs";
+import { NotificationPreferences } from "@/components/profile/NotificationPreferences";
 const loginSchema = z.object({
   username: z.string().min(2),
   password: z.string().min(6),
