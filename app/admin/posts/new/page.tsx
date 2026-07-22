@@ -814,127 +814,273 @@ function NewPostInner() {
                         </div>
                       </div>
 
-                      <Separator />                      {/* Specs – Farsi categorized, dropdowns for limited specs */}
+                      <Separator />
                       <div className="space-y-4">
-                        <p className="text-sm font-semibold mb-1">مشخصات فنی (۲۵ مورد مهم – فارسی)</p>
-                        <p className="text-[11px] text-muted-foreground mb-3">۴ مشخصه مهم روی کارت: CPU / RAM / Bay / Network Card از همین لیست پر می‌شود. برای فیلتر فروشگاه فقط ۷ فاکتور مهم استفاده می‌شود.</p>
+                        <p className="text-sm font-semibold mb-1">مشخصات فنی (۱۸ مورد مهم – فارسی)</p>
+                        <p className="text-[11px] text-muted-foreground mb-3">تمام مشخصات فنی اصلی از همین لیست پر می‌شوند و مستقیماً به پایگاه داده متصل هستند. ۴ مشخصه مهم روی کارت محصول نمایش داده می‌شوند.</p>
                         <div className="grid gap-3 md:grid-cols-2">
-                          {/* CPU – text */}
-                          {(() => {
-                            const key = "CPU";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">CPU / پردازنده (مهم – روی کارت)</label>
-                                <Input dir="ltr" placeholder="Intel Xeon D-2123IT 4-core 3.0GHz" className="mt-1" value={specsObj[key] || ""} onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
+                                <label className="text-xs font-medium text-muted-foreground">پردازنده (مهم – روی کارت)</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="Intel Xeon D-2123IT 4-core 3.0GHz" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
                               </div>
                             );
                           })()}
                           {(() => {
-                            const key = "RAM";
+                            const key = "حافظه رم";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">RAM / حافظه (مهم – روی کارت)</label>
-                                <Input dir="ltr" placeholder="32GB DDR4 ECC" className="mt-1" value={specsObj[key] || ""} onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
+                                <label className="text-xs font-medium text-muted-foreground">حافظه رم (مهم – روی کارت)</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="32GB DDR4 ECC" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
                               </div>
                             );
                           })()}
-                          {/* Bay – dropdown limited */}
                           {(() => {
-                            const key = "Bay";
+                            const key = "حداکثر حافظه";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">حداکثر حافظه</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="128GB DDR4 ECC" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "تعداد جایگاه دیسک";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const val = specsObj[key] || "";
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">Bay / تعداد جایگاه دیسک (مهم – روی کارت + فیلتر)</label>
-                                <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
-                                  <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب تعداد Bay..." /></SelectTrigger>
-                                  <SelectContent>
-                                    {["1 Bay", "2 Bay", "4 Bay", "6 Bay", "8 Bay", "12 Bay", "16 Bay", "24 Bay", "36 Bay"].map((b) => (
-                                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            );
-                          })()}
-                          {/* Network Card – dropdown */}
-                          {(() => {
-                            const key = "Network Card";
-                            const specsStr: string = (form.watch("specs") as string) || "{}";
-                            let specsObj: Record<string, string> = {};
-                            try { specsObj = JSON.parse(specsStr); } catch {}
-                            const val = specsObj[key] || "";
-                            return (
-                              <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">کارت شبکه (مهم – روی کارت + فیلتر 10GbE)</label>
+                                <label className="text-xs font-medium text-muted-foreground">تعداد جایگاه دیسک (مهم – روی کارت + فیلتر)</label>
                                 <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
                                   <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب..." /></SelectTrigger>
                                   <SelectContent>
-                                    {["1GbE", "2.5GbE", "10GbE", "25GbE", "40GbE", "10GbE SFP+", "25GbE SFP28"].map((b) => (
-                                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                                    ))}
+                                    <SelectItem key="1 Bay" value="1 Bay">1 Bay</SelectItem>
+                                    <SelectItem key="2 Bay" value="2 Bay">2 Bay</SelectItem>
+                                    <SelectItem key="4 Bay" value="4 Bay">4 Bay</SelectItem>
+                                    <SelectItem key="6 Bay" value="6 Bay">6 Bay</SelectItem>
+                                    <SelectItem key="8 Bay" value="8 Bay">8 Bay</SelectItem>
+                                    <SelectItem key="12 Bay" value="12 Bay">12 Bay</SelectItem>
+                                    <SelectItem key="16 Bay" value="16 Bay">16 Bay</SelectItem>
+                                    <SelectItem key="24 Bay" value="24 Bay">24 Bay</SelectItem>
+                                    <SelectItem key="36 Bay" value="36 Bay">36 Bay</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
                             );
                           })()}
                           {(() => {
-                            const key = "Form Factor";
+                            const key = "سازگاری درایو";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">سازگاری درایو</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="3.5" / 2.5" SATA / SAS / NVMe" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "اسلات M.2";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">اسلات M.2</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="2x M.2 NVMe" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "پورت 2.5 گیگ";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const val = specsObj[key] || "";
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">فرم فاکتور (محدود)</label>
+                                <label className="text-xs font-medium text-muted-foreground">پورت 2.5 گیگابیت (مهم – روی کارت + فیلتر)</label>
                                 <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
-                                  <SelectTrigger className="mt-1"><SelectValue placeholder="Tower / Rackmount..." /></SelectTrigger>
+                                  <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب..." /></SelectTrigger>
                                   <SelectContent>
-                                    {["Tower", "Desktop", "Rackmount 1U", "Rackmount 2U", "Rackmount 3U", "Rackmount 4U", "Short-depth 1U", "Short-depth 2U"].map((b) => (
-                                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                                    ))}
+                                    <SelectItem key="1GbE" value="1GbE">1GbE</SelectItem>
+                                    <SelectItem key="2.5GbE" value="2.5GbE">2.5GbE</SelectItem>
+                                    <SelectItem key="10GbE" value="10GbE">10GbE</SelectItem>
+                                    <SelectItem key="25GbE" value="25GbE">25GbE</SelectItem>
+                                    <SelectItem key="40GbE" value="40GbE">40GbE</SelectItem>
+                                    <SelectItem key="10GbE SFP+" value="10GbE SFP+">10GbE SFP+</SelectItem>
+                                    <SelectItem key="25GbE SFP28" value="25GbE SFP28">25GbE SFP28</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
                             );
                           })()}
                           {(() => {
-                            const key = "Drive Type";
+                            const key = "اسلات توسعه PCIe";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">اسلات توسعه PCIe</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="2x PCIe 4.0 x8" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "فرم فاکتور";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             const val = specsObj[key] || "";
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">نوع درایو (محدود)</label>
+                                <label className="text-xs font-medium text-muted-foreground">فرم فاکتور</label>
                                 <Select value={val} onValueChange={(v) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (v) obj[key] = v; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }}>
-                                  <SelectTrigger className="mt-1"><SelectValue placeholder="All-Flash / Hybrid..." /></SelectTrigger>
+                                  <SelectTrigger className="mt-1"><SelectValue placeholder="انتخاب..." /></SelectTrigger>
                                   <SelectContent>
-                                    {["All-Flash", "Hybrid (HDD+SSD)", "All-HDD", "All-NVMe", "SAS HDD", "SATA HDD", "U.2 NVMe"].map((b) => (
-                                      <SelectItem key={b} value={b}>{b}</SelectItem>
-                                    ))}
+                                    <SelectItem key="Tower" value="Tower">Tower</SelectItem>
+                                    <SelectItem key="Desktop" value="Desktop">Desktop</SelectItem>
+                                    <SelectItem key="Rackmount 1U" value="Rackmount 1U">Rackmount 1U</SelectItem>
+                                    <SelectItem key="Rackmount 2U" value="Rackmount 2U">Rackmount 2U</SelectItem>
+                                    <SelectItem key="Rackmount 3U" value="Rackmount 3U">Rackmount 3U</SelectItem>
+                                    <SelectItem key="Rackmount 4U" value="Rackmount 4U">Rackmount 4U</SelectItem>
+                                    <SelectItem key="Short-depth 1U" value="Short-depth 1U">Short-depth 1U</SelectItem>
+                                    <SelectItem key="Short-depth 2U" value="Short-depth 2U">Short-depth 2U</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
                             );
                           })()}
                           {(() => {
-                            const key = "Throughput";
+                            const key = "منبع تغذیه";
                             const specsStr: string = (form.watch("specs") as string) || "{}";
                             let specsObj: Record<string, string> = {};
                             try { specsObj = JSON.parse(specsStr); } catch {}
                             return (
                               <div key={key}>
-                                <label className="text-xs font-medium text-muted-foreground">پهنای باند / توان عملیاتی</label>
-                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="e.g. 2,500 MB/s" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); }} />
+                                <label className="text-xs font-medium text-muted-foreground">منبع تغذیه</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="750W Redundant" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "مصرف برق معمولی";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">مصرف برق معمولی</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="350W" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "گارانتی استاندارد";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">گارانتی استاندارد</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="۳۶ ماه" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "فن";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">فن</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="4x Hot-swap 40mm" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "سیستم عامل";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">سیستم عامل</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="DSM / QTS / TrueNAS" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "انواع RAID پشتیبانی شده";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">انواع RAID پشتیبانی شده</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="RAID 0,1,5,6,10" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "حداکثر ظرفیت Pool";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">حداکثر ظرفیت Pool</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="200TB" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "نوع Volume";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">نوع Volume</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="Thick / Thin / Hybrid" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "حداکثر اتصالات همزمان";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">حداکثر اتصالات همزمان</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="500" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
+                              </div>
+                            );
+                          })()}
+                          {(() => {
+                            const key = "حداکثر ظرفیت Volume";
+                            const specsStr: string = (form.watch("specs") as string) || "{}";
+                            let specsObj: Record<string, string> = {};
+                            try { specsObj = JSON.parse(specsStr); } catch {}
+                            return (
+                              <div key={key}>
+                                <label className="text-xs font-medium text-muted-foreground">حداکثر ظرفیت Volume</label>
+                                <Input dir="ltr" className="mt-1" value={specsObj[key] || ""} placeholder="108TB" onChange={(e) => { let obj: Record<string, string> = {}; try { obj = JSON.parse(specsStr); } catch {} if (e.target.value.trim()) obj[key] = e.target.value; else delete obj[key]; form.setValue("specs", JSON.stringify(obj, null, 2)); } } />
                               </div>
                             );
                           })()}
@@ -957,7 +1103,7 @@ function NewPostInner() {
                           })()}
                         </div>
                         <div className="mt-4">
-                          <p className="text-xs font-medium mb-2">JSON خام Specs (۲۵ مورد مهم – قابل ویرایش مستقیم)</p>
+                          <p className="text-xs font-medium mb-2">JSON خام Specs (۱۸ مورد مهم – قابل ویرایش مستقیم)</p>
                           <FormField control={form.control as any} name="specs" render={({ field }) => (
                             <FormItem>
                               <FormControl><Textarea className="min-h-[120px] font-mono text-[11px]" dir="ltr" {...field} /></FormControl>
@@ -966,7 +1112,6 @@ function NewPostInner() {
                           )} />
                         </div>
                       </div>
-
                       <Separator />
 
                       {/* Images */}

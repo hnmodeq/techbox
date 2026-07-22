@@ -86,6 +86,7 @@ model Post {
   sourcePriceAmount Float?   // Source price (e.g. 1000 USD) – hidden, admin only
   sourceCurrency String? @default("USD") // USD, EUR, AED
   priceAdjustmentPercent Float? @default(0) // Per-product adjustment % (-100..+100)
+  sellerBenefitPercent Float? @default(35) // Company benefit % (e.g. 35)
   discountPercent Int?
   discountEndsAt DateTime?
   availability String?

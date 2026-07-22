@@ -209,6 +209,16 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
               ✅ مشاوره
             </span>
           )}
+          {p.availability === "ناموجود" && (
+            <span className="inline-flex items-center gap-1 bg-red-500/10 text-red-500 px-1.5 py-0.5 rounded text-[9px] font-bold">
+              ❌ ناموجود
+            </span>
+          )}
+          {p.availability === "اتمام موجودی" && (
+            <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded text-[9px] font-bold">
+              ⚠️ اتمام موجودی
+            </span>
+          )}
         </div>
 
         {/* 4 major specs with shadcn tooltips — icons only, no labels */}
@@ -234,7 +244,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       <div className="mt-auto flex flex-col gap-1 px-3 pb-3 pt-2">
         <div className="flex items-end justify-between gap-2">
           <div className="shrink-0">
-            {discount > 0 && !isUnavailable ? (
+            {discount > 0 ? (
               <span className="inline-flex h-5 min-w-7 items-center justify-center rounded-full bg-[#ef394e] px-1.5 text-[11px] font-bold leading-none text-white">
                 {discount.toLocaleString("fa-IR")}٪
               </span>
@@ -243,9 +253,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
             )}
           </div>
           <div className="flex flex-col items-end text-left" dir="rtl">
-            {isUnavailable ? (
-              <span className="text-[12px] font-bold text-muted-foreground">ناموجود</span>
-            ) : priceAmount <= 0 ? (
+            {priceAmount <= 0 ? (
               <span className="text-[11px] font-semibold text-muted-foreground">تماس بگیرید</span>
             ) : (
               <>
@@ -262,7 +270,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
             )}
           </div>
         </div>
-        {p.discountEndsAt && discount > 0 && !isUnavailable && (
+        {p.discountEndsAt && discount > 0 && (
           <div className="flex items-center justify-between gap-1 border-t border-border/30 pt-1.5 mt-0.5">
             <span className="text-[10px] font-medium text-[#ef394e]">اتمام پیشنهاد</span>
             <DiscountTimer endsAt={p.discountEndsAt} small />
