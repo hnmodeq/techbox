@@ -104,6 +104,7 @@ export default function BuyingPage() {
         }),
       });
 
+      /* eslint-disable react-hooks/immutability */
       const payData = await payRes.json();
       if (payData.paymentUrl) {
         window.location.href = payData.paymentUrl;
@@ -111,6 +112,7 @@ export default function BuyingPage() {
         // If payment not enabled, redirect to success directly
         window.location.href = `/order/success?id=${orderData.orderId}`;
       }
+      /* eslint-enable react-hooks/immutability */
     } catch (err) {
       alert("خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.");
     } finally {
