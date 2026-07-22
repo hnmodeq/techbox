@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { CardStats } from "@/components/ui/card-stats"
 import { UserActivityList, type UserActivity } from "@/components/profile/UserActivityList"
+import { NotificationPreferences } from "@/components/profile/NotificationPreferences"
 import { useModuleTitles } from "@/providers/module-config.provider"
 import type { ModuleSlug } from "@/lib/content"
 import { blurProps } from "@/lib/image-placeholder"
@@ -142,10 +143,12 @@ export function AccountProfileTabs({ profileEditor }: { profileEditor: React.Rea
         <TabsTrigger value="activity">فعالیت کاربر</TabsTrigger>
         <TabsTrigger value="saved">ذخیره شده ها</TabsTrigger>
         <TabsTrigger value="author">فعالیت محتوایی</TabsTrigger>
+        <TabsTrigger value="notifications">اعلان‌ها</TabsTrigger>
       </TabsList>
       <TabsContent value="profile">{profileEditor}</TabsContent>
       <TabsContent value="activity"><UserActivityList activities={activities} /></TabsContent>
       <TabsContent value="saved"><SavedPosts posts={savedPosts} loading={savedLoading} /></TabsContent>
+      <TabsContent value="notifications"><NotificationPreferences /></TabsContent>
       <TabsContent value="author">
         {isAuthor ? (
           <AuthorPosts posts={authoredPosts} />
