@@ -18,6 +18,7 @@ function makeMockClient(overrides: Record<string, any>) {
     comment: { findMany: vi.fn().mockResolvedValue([]) },
     like: { findMany: vi.fn().mockResolvedValue([]) },
     user: { findMany: vi.fn().mockResolvedValue([]) },
+    siteSetting: { findMany: vi.fn().mockResolvedValue([]) },
     ...overrides,
   } as any;
 }
