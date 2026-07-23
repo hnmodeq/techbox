@@ -60,7 +60,7 @@ function HeroTerminalContent() {
         </div>
       </PageHeader>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-6">
         {/* Editor */}
         <Card dir="rtl">
           <CardHeader>
@@ -112,12 +112,12 @@ function HeroTerminalContent() {
           </CardContent>
         </Card>
 
-        {/* Live preview */}
+        {/* Live preview — full width below the editor */}
         <div className="space-y-3">
           <p className="text-sm font-bold text-muted-foreground">پیش‌نمایش زنده</p>
-          <TerminalHero lines={lines.filter(Boolean)} />
+          <TerminalHero lines={lines.filter(Boolean)} fullWidth />
           <p className="text-xs text-muted-foreground">
-            متن‌ها به ترتیب تایپ می‌شوند و بعد از پایان، دوباره از ابتدا شروع می‌شوند.
+            متن‌ها به ترتیب تایپ می‌شوند و پس از پایان، خطوط باقی می‌مانند.
           </p>
         </div>
       </div>

@@ -44,18 +44,20 @@ function Caret() {
 
 interface TerminalHeroProps {
   lines?: string[];
+  fullWidth?: boolean;
 }
 
-export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
+export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps) {
   const sentences = propLines && propLines.length > 0 ? propLines : DEFAULT_LINES;
   const terminalLines = useMemo(() => buildLines(sentences), [sentences]);
 
-  const [displayedLines, setDisplayedLines] = useState<
-    Array<{ command: string; output?: string; commandDone: boolean; outputDone: boolean }>
-  >([]);
+  // Completed lines stay forever (never cleared)
+  const [completedLines, setCompletedLines] = useState<string[]>([]);
+  // Current typing state
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [phase, setPhase] = useState<"command" | "output" | "pause">("command");
+  const [currentTyped, setCurrentTyped] = useState("");
+  const [phase, setPhase] = useState<"command" | "pause">("command");
   const [done, setDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
@@ -63,9 +65,7 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
   // If reduced motion, show everything instantly
   useEffect(() => {
     if (shouldReduceMotion) {
-      setDisplayedLines(
-        terminalLines.map((l) => ({ command: l.command, output: l.output, commandDone: true, outputDone: true }))
-      );
+      setCompletedLines(terminalLines.map((l) => l.command));
       setDone(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,42 +80,19 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
     if (phase === "command") {
       if (currentCharIndex < line.command.length) {
         const t = setTimeout(() => {
-          setDisplayedLines((prev) => {
-            const next = [...prev];
-            if (!next[currentLineIndex]) {
-              next[currentLineIndex] = { command: "", commandDone: false, outputDone: false };
-            }
-            next[currentLineIndex] = {
-              ...next[currentLineIndex],
-              command: line.command.slice(0, currentCharIndex + 1),
-            };
-            return next;
-          });
+          setCurrentTyped(line.command.slice(0, currentCharIndex + 1));
           setCurrentCharIndex((c) => c + 1);
         }, 28 + Math.random() * 20);
         return () => clearTimeout(t);
       } else {
-        // Command typed — mark done, move to output phase
-        setDisplayedLines((prev) => {
-          const next = [...prev];
-          next[currentLineIndex] = { ...next[currentLineIndex], commandDone: true };
-          return next;
-        });
-        const t = setTimeout(() => setPhase("output"), 200);
+        // Command fully typed — commit to completed lines
+        const t = setTimeout(() => {
+          setCompletedLines((prev) => [...prev, line.command]);
+          setCurrentTyped("");
+          setPhase("pause");
+        }, 200);
         return () => clearTimeout(t);
       }
-    }
-
-    if (phase === "output") {
-      if (line.output) {
-        setDisplayedLines((prev) => {
-          const next = [...prev];
-          next[currentLineIndex] = { ...next[currentLineIndex], output: line.output, outputDone: true };
-          return next;
-        });
-      }
-      const t = setTimeout(() => setPhase("pause"), 300);
-      return () => clearTimeout(t);
     }
 
     if (phase === "pause") {
@@ -128,24 +105,29 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
     }
   }, [currentLineIndex, currentCharIndex, phase, done, shouldReduceMotion, terminalLines]);
 
-  // Auto-scroll
+  // Auto-scroll on every change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [displayedLines]);
+  }, [completedLines, currentTyped]);
 
-  // When all lines are typed, just stop — no loop, no clear
+  // When all lines are typed, restart from the beginning (keep old lines)
   useEffect(() => {
     if (!done) return;
-    // All lines have been displayed. Terminal stays as-is with the final caret.
+    const t = setTimeout(() => {
+      setCurrentLineIndex(0);
+      setCurrentCharIndex(0);
+      setCurrentTyped("");
+      setPhase("command");
+      setDone(false);
+    }, 3000);
+    return () => clearTimeout(t);
   }, [done]);
-
-  const currentLine = displayedLines[currentLineIndex];
 
   return (
     <div
-      className="w-full max-w-4xl mx-auto rounded-xl overflow-hidden border border-border shadow-2xl bg-[#0d1117] font-mono text-sm"
+      className={`w-full ${fullWidth ? "max-w-full" : "max-w-4xl"} mx-auto rounded-xl overflow-hidden border border-border shadow-2xl bg-[#0d1117] font-mono text-sm`}
       dir="ltr"
     >
       {/* Window chrome */}
@@ -162,32 +144,25 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
         className="p-4 min-h-[200px] max-h-[400px] overflow-y-auto space-y-1 text-left"
         style={{ scrollbarWidth: "none" }}
       >
-        {displayedLines.map((l, i) => (
-          // Skip the current line — it's rendered in the "Currently typing" section below
-          i === currentLineIndex && !done ? null : (
-            <div key={i} className="space-y-0.5">
-              <div className="flex flex-wrap items-center gap-1">
-                <TerminalPrompt />
-                <span className="text-[#e6edf3] break-all">{l.command}</span>
-              </div>
-            </div>
-          )
+        {/* All completed lines — stay forever */}
+        {completedLines.map((cmd, i) => (
+          <div key={`done-${i}`} className="flex flex-wrap items-center gap-1">
+            <TerminalPrompt />
+            <span className="text-[#e6edf3] break-all">{cmd}</span>
+          </div>
         ))}
 
-        {/* Currently typing line — only when not done */}
-        {!done && currentLine && (
-          <div>
-            <div className="flex flex-wrap items-center gap-1">
-              <TerminalPrompt />
-              <span className="text-[#e6edf3] break-all">
-                {currentLine?.command ?? ""}
-              </span>
-              {phase === "command" && !currentLine?.commandDone && <Caret />}
-            </div>
+        {/* Currently typing line */}
+        {currentTyped && (
+          <div className="flex flex-wrap items-center gap-1">
+            <TerminalPrompt />
+            <span className="text-[#e6edf3] break-all">{currentTyped}</span>
+            {phase === "command" && <Caret />}
           </div>
         )}
 
-        {done && (
+        {/* Idle caret when all done */}
+        {done && !currentTyped && (
           <div className="flex items-center gap-1">
             <TerminalPrompt />
             <Caret />
