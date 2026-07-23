@@ -5,9 +5,9 @@ import { useReducedMotion } from "framer-motion";
 
 // Fallback phrases (used when API is unavailable)
 const FALLBACK_ECHO = [
-  'echo "به تکباکس خوش اومدی"',
-  'echo "خونه مهندسای IT ایران"',
-  'echo "ما سرور می‌فروشیم. بعضی وقتا هم بغلشون می‌کنیم."',
+  'echo "Welcome to TechBox — home of Iranian IT engineers"',
+  'echo "A box full of technologies, not just a box"',
+  'echo "We sell servers. We also hug them sometimes."',
 ];
 
 const FALLBACK_CODE = [
@@ -123,12 +123,13 @@ export function TerminalHero({
   const scrollRef = useRef<HTMLDivElement>(null);
   const userScrolledUp = useRef(false);
   const shouldReduceMotion = useReducedMotion();
+  const initializedRef = useRef(false);
+  const prevConfigRef = useRef<string>("");
 
-  // Build a new sequence when lists change
+  // Build a new sequence
   const buildNewSequence = () => {
     const activeEcho = echoEnabled ? echoLines : [];
     const activeCode = codeEnabled ? codeLines : [];
-    // Random total between 5 and 12 lines per cycle
     const total = Math.floor(Math.random() * 8) + 5;
     const seq = buildMixedSequence(activeEcho, activeCode, echoWeight, total);
     if (seq.length > 0) {
@@ -142,11 +143,18 @@ export function TerminalHero({
     }
   };
 
-  // Initialize on mount
+  // Only rebuild when config actually changes (not on every re-render)
   useEffect(() => {
+    const configKey = `${echoEnabled}-${codeEnabled}-${echoWeight}-${echoLines.length}-${codeLines.length}`;
+    if (prevConfigRef.current === configKey) return;
+    prevConfigRef.current = configKey;
+
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+    }
     buildNewSequence();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [echoEnabled, codeEnabled, echoWeight]);
+  }, [echoEnabled, codeEnabled, echoWeight, echoLines.length, codeLines.length]);
 
   // If reduced motion, show everything instantly
   useEffect(() => {
