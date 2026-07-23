@@ -170,19 +170,22 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
         style={{ scrollbarWidth: "none" }}
       >
         {displayedLines.map((l, i) => (
-          <div key={i} className="space-y-0.5">
-            <div className="flex flex-wrap items-center gap-1">
-              <TerminalPrompt />
-              <span className="text-[#e6edf3] break-all">{l.command}</span>
+          // Skip the current line — it's rendered in the "Currently typing" section below
+          i === currentLineIndex && !done ? null : (
+            <div key={i} className="space-y-0.5">
+              <div className="flex flex-wrap items-center gap-1">
+                <TerminalPrompt />
+                <span className="text-[#e6edf3] break-all">{l.command}</span>
+              </div>
+              {l.outputDone && l.output && (
+                <div className="text-green-300 pl-2 leading-relaxed">{l.output}</div>
+              )}
             </div>
-            {l.outputDone && l.output && (
-              <div className="text-green-300 pl-2 leading-relaxed">{l.output}</div>
-            )}
-          </div>
+          )
         ))}
 
-        {/* Currently typing line */}
-        {!done && (
+        {/* Currently typing line — only when not done */}
+        {!done && currentLine && (
           <div>
             <div className="flex flex-wrap items-center gap-1">
               <TerminalPrompt />
