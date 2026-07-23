@@ -1,6 +1,5 @@
 import React from 'react';
 import HeroSection from '@/features/home/components/HeroSection';
-import ToolsShowcase from '@/features/home/components/ToolsShowcase';
 import WhyTechBox from '@/features/home/components/WhyTechBox';
 import CtaSection from '@/features/home/components/CtaSection';
 import MagazineRow from '@/features/home/components/MagazineRow';
@@ -24,10 +23,6 @@ const ROW_COMPONENTS: Record<string, React.ComponentType<{ homeTitle?: string; h
   timeline: HomeTimelineRow,
 };
 
-function GradientDivider() {
-  return <hr className="home-divider" />;
-}
-
 export default async function Page() {
   const config = await getModuleConfig();
 
@@ -36,21 +31,12 @@ export default async function Page() {
     .sort((a, b) => (config[a]?.homeOrder ?? 99) - (config[b]?.homeOrder ?? 99));
 
   return (
-    <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
-      {/* Hero with terminal */}
+    <main className="flex flex-col">
+      {/* Hero — full height, gradient, terminal */}
       {config.heroVisible !== false && <HeroSection />}
 
-      <GradientDivider />
-
-      {/* Why TechBox */}
+      {/* 6 feature icons — minimal */}
       <WhyTechBox />
-
-      <GradientDivider />
-
-      {/* Tools showcase */}
-      <ToolsShowcase />
-
-      <GradientDivider />
 
       {/* Module rows */}
       {visibleRows.map((slug) => {
@@ -58,30 +44,25 @@ export default async function Page() {
         if (!Component) return null;
         const cfg = config[slug];
         return (
-          <React.Fragment key={slug}>
-            <Component
-              homeTitle={cfg?.homeTitle || undefined}
-              homeMoreLabel={cfg?.homeMoreLabel || undefined}
-              showHomeTitle={cfg?.showHomeTitle}
-              showHomeMoreLabel={cfg?.showHomeMoreLabel}
-            />
-            <GradientDivider />
-          </React.Fragment>
+          <Component
+            key={slug}
+            homeTitle={cfg?.homeTitle || undefined}
+            homeMoreLabel={cfg?.homeMoreLabel || undefined}
+            showHomeTitle={cfg?.showHomeTitle}
+            showHomeMoreLabel={cfg?.showHomeMoreLabel}
+          />
         );
       })}
 
       {/* Recommendations */}
       {visibleRows.length > 0 && (
-        <>
-          <RecommendationRow
-            items={getHomepageRecommendations(8)}
-            title="پیشنهادهای هوشمند برای شما"
-          />
-          <GradientDivider />
-        </>
+        <RecommendationRow
+          items={getHomepageRecommendations(8)}
+          title="پیشنهادهای هوشمند برای شما"
+        />
       )}
 
-      {/* CTA */}
+      {/* CTA — clean, minimal */}
       <CtaSection />
     </main>
   );
