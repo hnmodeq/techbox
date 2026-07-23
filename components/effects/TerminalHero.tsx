@@ -135,24 +135,17 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
     }
   }, [displayedLines]);
 
-  // After all lines done, loop from the start after a pause
+  // When all lines are typed, just stop — no loop, no clear
   useEffect(() => {
     if (!done) return;
-    const t = setTimeout(() => {
-      setDisplayedLines([]);
-      setCurrentLineIndex(0);
-      setCurrentCharIndex(0);
-      setPhase("command");
-      setDone(false);
-    }, 4000);
-    return () => clearTimeout(t);
+    // All lines have been displayed. Terminal stays as-is with the final caret.
   }, [done]);
 
   const currentLine = displayedLines[currentLineIndex];
 
   return (
     <div
-      className="w-full max-w-2xl mx-auto rounded-xl overflow-hidden border border-border shadow-2xl bg-[#0d1117] font-mono text-sm"
+      className="w-full max-w-4xl mx-auto rounded-xl overflow-hidden border border-border shadow-2xl bg-[#0d1117] font-mono text-sm"
       dir="ltr"
     >
       {/* Window chrome */}
@@ -166,7 +159,7 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
       {/* Terminal body */}
       <div
         ref={scrollRef}
-        className="p-4 min-h-[200px] max-h-[300px] overflow-y-auto space-y-1 text-left"
+        className="p-4 min-h-[200px] max-h-[400px] overflow-y-auto space-y-1 text-left"
         style={{ scrollbarWidth: "none" }}
       >
         {displayedLines.map((l, i) => (
