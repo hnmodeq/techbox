@@ -48,7 +48,8 @@ interface TerminalHeroProps {
 }
 
 export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps) {
-  const sentences = propLines && propLines.length > 0 ? propLines : DEFAULT_LINES;
+  // Only use defaults when propLines is undefined/null, not when it's an empty array
+  const sentences = propLines != null ? (propLines.length > 0 ? propLines : []) : DEFAULT_LINES;
   const terminalLines = useMemo(() => buildLines(sentences), [sentences]);
 
   // Completed lines stay forever (never cleared)
@@ -70,6 +71,19 @@ export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldReduceMotion]);
+
+  // Reset state when terminalLines change (e.g. API response arrives)
+  useEffect(() => {
+    if (terminalLines.length > 0) {
+      setCompletedLines([]);
+      setCurrentLineIndex(0);
+      setCurrentCharIndex(0);
+      setCurrentTyped("");
+      setPhase("command");
+      setDone(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [terminalLines]);
 
   useEffect(() => {
     if (shouldReduceMotion || done) return;
@@ -141,7 +155,7 @@ export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps)
       {/* Terminal body */}
       <div
         ref={scrollRef}
-        className="p-4 min-h-[200px] max-h-[400px] overflow-y-auto space-y-1 text-left"
+        className="p-4 min-h-[200px] max-h-[600px] overflow-y-auto space-y-1 text-left"
         style={{ scrollbarWidth: "none" }}
       >
         {/* All completed lines — stay forever */}
