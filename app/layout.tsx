@@ -13,6 +13,7 @@ import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { defaultSeo, siteUrl } from "@/lib/seo";
 import { getHomeData } from "@/lib/home-server";
 import { getModuleConfig, type SiteLayoutConfig } from "@/lib/module-config";
+import { autoPublishScheduled } from "@/lib/auto-publish";
 import type { HomeData } from "@/features/home/lib/home-data";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -82,6 +83,9 @@ export default async function RootLayout({
     homeData = undefined;
     moduleConfig = undefined;
   }
+
+  // Fire-and-forget: auto-publish any overdue scheduled posts (60s cooldown built in)
+  autoPublishScheduled().catch(() => {});
   return (
     <html
       lang="fa"
