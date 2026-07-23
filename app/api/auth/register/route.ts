@@ -25,6 +25,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Check IP bans — prevent registration from banned IPs
+  const ipBan = await prisma.ipBan.findUnique({ where: { ip } });
+  if (ipBan) {
+    return NextResponse.json(
+      { error: "ip_banned", message: "دسترسی شما مسدود شده است." },
+      { status: 403 }
+    );
+  }
+
   // Check AUTH_SECRET before attempting auth operations
   if (!process.env.AUTH_SECRET || process.env.AUTH_SECRET.length < 32) {
     console.error("[register] AUTH_SECRET is missing or too short. Set it in Vercel environment variables (≥32 chars).");
