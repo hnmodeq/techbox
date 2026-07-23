@@ -28,6 +28,7 @@ import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
 import { RevisionHistory } from "@/components/admin/revision-history";
 import { getTemplatesForModule, type ContentTemplate } from "@/config/content-templates";
 import { MarkdownEditor } from "@/components/admin/markdown-editor";
+import { PermissionGate } from "@/components/admin/permission-gate";
 import { toast } from "sonner";
 import { FileText, ChevronDown } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
@@ -792,16 +793,19 @@ function NewPostInner() {
 
                       <Separator />
 
-                      <ShopPricingFields
-                        control={form.control as any}
-                        sourcePriceAmount={sourcePriceAmountWatch as string}
-                        sourceCurrency={sourceCurrencyWatch as string}
-                        priceAdjustmentPercent={priceAdjustmentPercentWatch as string}
-                        sellerBenefitPercent={sellerBenefitPercentWatch as string}
-                        currencyRates={currencyRates}
-                      />
+                      <PermissionGate permission="product:price:view">
+                        <ShopPricingFields
+                          control={form.control as any}
+                          sourcePriceAmount={sourcePriceAmountWatch as string}
+                          sourceCurrency={sourceCurrencyWatch as string}
+                          priceAdjustmentPercent={priceAdjustmentPercentWatch as string}
+                          sellerBenefitPercent={sellerBenefitPercentWatch as string}
+                          currencyRates={currencyRates}
+                        />
+                      </PermissionGate>
 
                       <Separator />
+                      <PermissionGate permission="product:specs:view">
                       <div className="space-y-4">
                         <p className="text-sm font-semibold mb-1">مشخصات فنی</p>
                         <p className="text-[11px] text-muted-foreground mb-3">مشخصات فنی اصلی محصول. فیلدهایی که برچسب «روی کارت» دارند روی کارت محصول نمایش داده می‌شوند.</p>
@@ -819,9 +823,11 @@ function NewPostInner() {
                           )} />
                         </div>
                       </div>
+                      </PermissionGate>
                       <Separator />
 
                       {/* Images */}
+                      <PermissionGate permission="product:gallery:view">
                       <div className="space-y-3">
                         <p className="text-sm font-semibold">تصاویر محصول</p>
                         <BlobUploadField label="آپلود تصویر اصلی" kind="image" folder="products" accept="image/*"
@@ -835,6 +841,7 @@ function NewPostInner() {
                           </FormItem>
                         )} />
                       </div>
+                      </PermissionGate>
 
                     </AccordionContent>
                   </Card>
