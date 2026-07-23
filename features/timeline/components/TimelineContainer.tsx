@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
 import { TimelineSuggestions } from './TimelineSuggestions';
@@ -28,16 +28,20 @@ interface TimelineContainerProps {
 
 export function TimelineContainer({ events, heightClassName }: TimelineContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const controls = useAnimation();
+  // canScrollRight = we can scroll toward OLDER (left in RTL)
+  // canScrollLeft  = we can scroll toward NEWER/today (right in RTL)
+  const [canScrollTowardOlder, setCanScrollTowardOlder] = useState(false);
+  const [canScrollTowardNewer, setCanScrollTowardNewer] = useState(false);
 
   const checkScroll = () => {
     const el = scrollRef.current;
     if (!el) return;
-    // RTL: scrollLeft is negative or 0; scrollRight = scrollLeft + clientWidth < scrollWidth
-    setCanScrollLeft(el.scrollLeft < -10);
-    setCanScrollRight(Math.abs(el.scrollLeft) + el.clientWidth < el.scrollWidth - 10);
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const absLeft = Math.abs(el.scrollLeft);
+    // At the right end (scrollLeft ≈ 0) = newest/today → can't scroll toward newer
+    setCanScrollTowardNewer(absLeft > 10);
+    // At the left end (absLeft ≈ maxScroll) = oldest → can't scroll toward older
+    setCanScrollTowardOlder(absLeft < maxScroll - 10);
   };
 
   useEffect(() => {
@@ -46,9 +50,12 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     if (!el) return;
     el.addEventListener('scroll', checkScroll, { passive: true });
     window.addEventListener('resize', checkScroll);
+    // Initial check after layout settles
+    const t = setTimeout(checkScroll, 100);
     return () => {
       el.removeEventListener('scroll', checkScroll);
       window.removeEventListener('resize', checkScroll);
+      clearTimeout(t);
     };
   }, []);
 
@@ -61,32 +68,41 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const scrollToOldest = () => {
     const el = scrollRef.current;
     if (!el) return;
-    // In RTL, oldest is at the left end → scrollLeft = -scrollWidth
-    el.scrollTo({ left: -el.scrollWidth, behavior: 'smooth' });
+    el.scrollTo({ left: -(el.scrollWidth - el.clientWidth), behavior: 'smooth' });
   };
 
   const scrollToToday = () => {
     const el = scrollRef.current;
     if (!el) return;
-    // Today is at the right end → scrollLeft = 0
     el.scrollTo({ left: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="relative w-full" dir="rtl">
-      {/* Scroll arrows — bigger, centered vertically */}
+      {/* Grid background — gives the "traveling through time" feel */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
+
+      {/* Scroll arrow — RIGHT (toward today/newer) */}
       <button
         onClick={() => smoothScroll(400)}
-        className={`absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-11 h-11 rounded-full bg-background/80 backdrop-blur border border-border shadow-md text-foreground hover:bg-accent transition-all select-none ${canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        aria-label="اسکرول به راست"
+        className={`absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardNewer ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
+        aria-label="اسکرول به سمت امروز"
       >
         <ChevronRight className="size-5" />
       </button>
 
+      {/* Scroll arrow — LEFT (toward older) */}
       <button
         onClick={() => smoothScroll(-400)}
-        className={`absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-11 h-11 rounded-full bg-background/80 backdrop-blur border border-border shadow-md text-foreground hover:bg-accent transition-all select-none ${canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        aria-label="اسکرول به چپ"
+        className={`absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardOlder ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
+        aria-label="اسکرول به سمت قدیمی‌ترین"
       >
         <ChevronLeft className="size-5" />
       </button>
@@ -110,10 +126,10 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%' }}
           onDragStart={(e) => e.preventDefault()}
         >
-          {/* Continuous horizontal line — vertically centered */}
+          {/* Continuous horizontal line — aligned with dot centers */}
           <div
-            className="pointer-events-none absolute left-0 h-1 rounded-full bg-border"
-            style={{ top: 'calc(50% - 44px)', width: '100%' }}
+            className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border"
+            style={{ top: 'calc(50% - 8px)', width: '100%' }}
           />
 
           {events.map((event, idx) => (
@@ -130,7 +146,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
                 {relativeDate(event.dateGr)}
               </div>
 
-              {/* Dot on the line */}
+              {/* Dot — sits ON the line */}
               <div className="relative z-10 size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
 
               {/* Card */}
@@ -145,21 +161,22 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         </div>
       </div>
 
-      {/* Navigation buttons below the timeline */}
-      <div className="flex items-center justify-center gap-3 mt-4">
-        <button
-          onClick={scrollToOldest}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium text-foreground hover:bg-accent transition-colors"
-        >
-          <ChevronsLeft className="size-4" />
-          برو به قدیمی‌ترین
-        </button>
+      {/* Navigation buttons — close to timeline, ghost style, swapped */}
+      <div className="flex items-center justify-center gap-2 mt-2">
         <button
           onClick={scrollToToday}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card text-sm font-medium text-foreground hover:bg-accent transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           برو به امروز
+          <ChevronsLeft className="size-4" />
+        </button>
+        <span className="text-border text-xs">|</span>
+        <button
+          onClick={scrollToOldest}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
           <ChevronsRight className="size-4" />
+          برو به قدیمی‌ترین
         </button>
       </div>
     </div>
