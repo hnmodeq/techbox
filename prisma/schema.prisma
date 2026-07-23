@@ -43,6 +43,9 @@ model User {
   followers Follow[] @relation("UserFollowers")
   following Follow[] @relation("UserFollowing")
 
+  // Role system
+  userRoles UserRole[]
+
   @@index([role, status], name: "user_role_status_idx")
   @@index([status], name: "user_status_idx")
 }
@@ -559,6 +562,40 @@ model AuditLog {
   @@index([createdAt])
   @@index([action, createdAt])
   @@index([userId, createdAt])
+}
+
+/// Roles for the permission system. Each role has a set of permissions.
+/// Users can have multiple roles (many-to-many via UserRole).
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique          // Internal name: "content_writer"
+  nameFa      String                    // Display name: "تولید محتوا"
+  description String?                   // What this role is for
+  permissions Json                      // ["content:blog:view", "content:blog:edit", ...]
+  isSystem    Boolean  @default(false)  // true = can't delete (super_admin, user)
+  color       String?                   // Badge color for UI display
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users UserRole[]
+
+  @@index([isSystem])
+}
+
+/// Junction table: assigns roles to users (many-to-many).
+model UserRole {
+  id         String   @id @default(cuid())
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+  assignedBy String?              // Who assigned this role
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])      // Can't assign same role twice
+  @@index([userId])
+  @@index([roleId])
 }
 
 /// Search query analytics — tracks what users search for on the public site.
