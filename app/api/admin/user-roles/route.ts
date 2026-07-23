@@ -72,6 +72,14 @@ export async function POST(req: NextRequest) {
     const role = await prisma.role.findUnique({ where: { id: roleId }, select: { name: true, nameFa: true } });
     const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
 
+    // Auto-assign blue badge when content_writer role is given
+    if (role?.name === "content_writer") {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { verifiedType: "content" },
+      });
+    }
+
     await logAudit({
       userId: user.id,
       userName: user.name,
@@ -107,6 +115,20 @@ export async function DELETE(req: NextRequest) {
 
     const role = await prisma.role.findUnique({ where: { id: roleId }, select: { name: true, nameFa: true } });
     const targetUser = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+
+    // Remove blue badge when content_writer role is removed
+    if (role?.name === "content_writer") {
+      // Check if user still has a verification request approval (yellow/purple badge)
+      const hasVerification = await prisma.verificationRequest.findFirst({
+        where: { userId, status: "approved" },
+      });
+      if (!hasVerification) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { verifiedType: null, verifiedLabel: null },
+        });
+      }
+    }
 
     await logAudit({
       userId: user.id,
