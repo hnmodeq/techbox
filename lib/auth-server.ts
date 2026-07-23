@@ -173,6 +173,9 @@ export async function getSessionUserPublic(){
         sessionsInvalidatedAt: true,
         verifiedType: true,
         verifiedLabel: true,
+        mutedUntil: true,
+        bannedAt: true,
+        banReason: true,
       },
     });
     if (!user) return null;

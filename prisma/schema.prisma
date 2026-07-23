@@ -16,6 +16,13 @@ model User {
   role     String
   roleFa   String?
   status   String  @default("active")
+  // "active" | "muted" | "banned" | "suspended"
+  // muted: can login but can't like/comment
+  // banned: can't login
+  // suspended: temporary restriction
+  mutedUntil    DateTime?             // null = not muted, date = muted until this time
+  bannedAt      DateTime?             // null = not banned
+  banReason     String?               // reason for ban/mute
   job      String?
   bio      String?
   birthday String?
@@ -48,6 +55,18 @@ model User {
 
   @@index([role, status], name: "user_role_status_idx")
   @@index([status], name: "user_status_idx")
+}
+
+/// IP bans — prevents registration and login from banned IPs.
+model IpBan {
+  id        String   @id @default(cuid())
+  ip        String   @unique
+  reason    String?
+  bannedBy  String?
+  createdAt DateTime @default(now())
+
+  @@index([ip])
+  @@index([createdAt])
 }
 
 model Follow {

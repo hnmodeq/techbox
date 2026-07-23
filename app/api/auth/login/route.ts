@@ -64,11 +64,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Reject banned/suspended users with same generic error
-    if (user.status === "banned" || user.status === "suspended") {
+    // Check IP bans
+    const ipBan = await prisma.ipBan.findUnique({ where: { ip } });
+    if (ipBan) {
       return NextResponse.json(
-        { error: "invalid_credentials", message: "نام کاربری یا رمز عبور اشتباه است." },
-        { status: 401 }
+        { error: "ip_banned", message: "دسترسی شما مسدود شده است." },
+        { status: 403 }
+      );
+    }
+
+    // Reject banned users
+    if (user.status === "banned") {
+      return NextResponse.json(
+        { error: "banned", message: "حساب شما مسدود شده است." + (user.banReason ? ` دلیل: ${user.banReason}` : "") },
+        { status: 403 }
+      );
+    }
+
+    // Reject suspended users
+    if (user.status === "suspended") {
+      return NextResponse.json(
+        { error: "suspended", message: "حساب شما به حالت تعلیق درآمده است." },
+        { status: 403 }
       );
     }
 

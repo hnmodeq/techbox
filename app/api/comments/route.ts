@@ -63,6 +63,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Check if user is muted
+  if (user.status === "muted") {
+    const stillMuted = !user.mutedUntil || new Date(user.mutedUntil) > new Date();
+    if (stillMuted) {
+      return NextResponse.json(
+        { error: "muted", message: "حساب شما در حالت سکوت است. امکان ثبت دیدگاه وجود ندارد." },
+        { status: 403 }
+      );
+    }
+  }
+
   // Check if comments are hidden globally — block new comments
   const settings = await getSettings(["comments.hidden_globally", "comments.mode"]);
   if (settings["comments.hidden_globally"] === "true") {
