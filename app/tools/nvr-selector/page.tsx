@@ -1,31 +1,15 @@
-import { NvrSelector } from "@/features/tools/components/nvr-selector";
-import { getNvrProducts } from "@/lib/nvr";
-import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
+import { NvrCalculator } from "@/features/tools/components/nvr-calculator";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "انتخاب‌گر NVR | TechBox",
-  description: "بهترین دستگاه NVR را بر اساس دوربین، رزولوشن، مدت ضبط و AI انتخاب کنید.",
+  title: "محاسبه‌گر فضای ذخیره‌سازی دوربین | TechBox",
+  description: "محاسبه فضای مورد نیاز و پهنای باند برای سیستم دوربین مداربسته.",
 };
 
-export default async function NvrSelectorPage() {
-  const products = await getNvrProducts();
-
+export default function NvrSelectorPage() {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <ToolPageHeader
-        title="NVR Selector"
-        subtitle="پیشنهاد مدل NVR مناسب پروژه دوربین مداربسته"
-        accent="var(--raid)"
-        breadcrumbs={[
-          { label: "خانه", href: "/" },
-          { label: "ابزارها", href: "/tools" },
-          { label: "NVR Selector" },
-        ]}
-      />
-      <div className="mt-8">
-        <NvrSelector products={products} consultationHref="/consultation" />
-      </div>
+    <main className="min-h-[80vh] flex items-center justify-center px-4 py-10" dir="rtl">
+      <NvrCalculator />
     </main>
   );
 }
