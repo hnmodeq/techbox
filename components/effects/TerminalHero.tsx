@@ -177,9 +177,6 @@ export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
                 <TerminalPrompt />
                 <span className="text-[#e6edf3] break-all">{l.command}</span>
               </div>
-              {l.outputDone && l.output && (
-                <div className="text-green-300 pl-2 leading-relaxed">{l.output}</div>
-              )}
             </div>
           )
         ))}
