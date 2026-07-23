@@ -17,6 +17,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
+import { toast } from "sonner";
+import { Shield, Plus, X } from "lucide-react";
 
 type AdminUser = {
   id: string;
@@ -67,6 +69,24 @@ export default function AdminUsersPage() {
   );
 }
 
+type Role = {
+  id: string;
+  name: string;
+  nameFa: string;
+  color: string | null;
+  isSystem: boolean;
+  permissions: string[];
+};
+
+type UserRole = {
+  id: string;
+  name: string;
+  nameFa: string;
+  color: string | null;
+  isSystem: boolean;
+  assignedAt: string;
+};
+
 function UsersContent() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -76,6 +96,8 @@ function UsersContent() {
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [password, setPassword] = useState("");
+  const [allRoles, setAllRoles] = useState<Role[]>([]);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
 
   const allModules = Object.keys(moduleMeta) as ModuleSlug[];
 
@@ -98,9 +120,21 @@ function UsersContent() {
 
   useEffect(() => {
     loadUsers();
+    // Load all available roles
+    fetch("/api/admin/roles-v2", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => { if (data.roles) setAllRoles(data.roles); })
+      .catch(() => {});
   }, []);
   useEffect(() => {
-    if (selectedId) loadUser(selectedId);
+    if (selectedId) {
+      loadUser(selectedId);
+      // Load user's roles
+      fetch(`/api/admin/user-roles?userId=${selectedId}`, { cache: "no-store" })
+        .then((r) => r.json())
+        .then((data) => { if (data.roles) setUserRoles(data.roles); })
+        .catch(() => {});
+    }
   }, [selectedId]);
 
   const filtered = useMemo(() => {
@@ -110,6 +144,44 @@ function UsersContent() {
   }, [users, query]);
 
   const updateSelected = (patch: Partial<AdminUser>) => setSelected((prev) => (prev ? { ...prev, ...patch } : prev));
+  const assignRole = async (roleId: string) => {
+    if (!selected) return;
+    try {
+      const res = await fetch("/api/admin/user-roles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: selected.id, roleId }),
+      });
+      if (res.ok) {
+        // Reload user roles
+        const rolesRes = await fetch(`/api/admin/user-roles?userId=${selected.id}`, { cache: "no-store" });
+        const rolesData = await rolesRes.json();
+        if (rolesData.roles) setUserRoles(rolesData.roles);
+        // Reload user to get updated verifiedType
+        loadUser(selected.id);
+        toast.success("نقش اختصاص داده شد");
+      }
+    } catch {}
+  };
+
+  const removeRole = async (roleId: string) => {
+    if (!selected) return;
+    try {
+      const res = await fetch("/api/admin/user-roles", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: selected.id, roleId }),
+      });
+      if (res.ok) {
+        const rolesRes = await fetch(`/api/admin/user-roles?userId=${selected.id}`, { cache: "no-store" });
+        const rolesData = await rolesRes.json();
+        if (rolesData.roles) setUserRoles(rolesData.roles);
+        loadUser(selected.id);
+        toast.success("نقش حذف شد");
+      }
+    } catch {}
+  };
+
   const toggleModule = (mod: string) => {
     if (!selected) return;
     const set = new Set(selected.modules || []);
@@ -279,8 +351,59 @@ function UsersContent() {
 
                   <BlobUploadField label="آپلود آواتار" kind="avatar" folder="avatars" accept="image/jpeg,image/png,image/webp" onUploaded={(r) => updateSelected({ avatar: r.url })} />
 
+                  {/* Role Assignment */}
                   <div>
-                    <div className="mb-2 font-bold text-sm">دسترسی ماژول‌ها</div>
+                    <div className="mb-2 font-bold text-sm flex items-center gap-2">
+                      <Shield className="size-4" />
+                      نقش‌های اختصاص داده شده
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        {userRoles.map((role) => (
+                          <div
+                            key={role.id}
+                            className="flex items-center gap-2 rounded-md border px-3 py-1.5"
+                          >
+                            <div className="size-2.5 rounded-full" style={{ backgroundColor: role.color || "#3b82f6" }} />
+                            <span className="text-xs font-medium">{role.nameFa}</span>
+                            <button
+                              type="button"
+                              onClick={() => removeRole(role.id)}
+                              className="text-muted-foreground hover:text-destructive transition-colors"
+                            >
+                              <X className="size-3" />
+                            </button>
+                          </div>
+                        ))}
+                        {userRoles.length === 0 && (
+                          <span className="text-xs text-muted-foreground">نقشی اختصاص داده نشده</span>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Select onValueChange={(v) => { if (v) assignRole(v as string); }}>
+                          <SelectTrigger className="w-60 h-8">
+                            <SelectValue placeholder="افزودن نقش..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {allRoles
+                              .filter((r) => !userRoles.some((ur) => ur.id === r.id))
+                              .map((role) => (
+                                <SelectItem key={role.id} value={role.id}>
+                                  <div className="flex items-center gap-2">
+                                    <div className="size-2 rounded-full" style={{ backgroundColor: role.color || "#3b82f6" }} />
+                                    {role.nameFa}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Module Access (legacy) */}
+                  <div>
+                    <div className="mb-2 font-bold text-sm">دسترسی ماژول‌ها (قدیمی)</div>
                     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                       {allModules.map((m) => (
                         <Label key={m} className="flex items-center gap-2 rounded-md border p-2 cursor-pointer hover:bg-muted/30">
