@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,8 +14,6 @@ import { Card } from "@/components/ui/card";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import ModuleHeader from "@/components/effects/ModuleHeader";
-import { CardStats } from "@/components/ui/card-stats";
 import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
@@ -47,11 +45,8 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
       : null
   );
   const [loadingTopics, setLoadingTopics] = useState(true);
-  const [topicsError, setTopicsError] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [local, setLocal] = useState<(ForumPost & { avatar: string })[]>([]);
-  const [filter, setFilter] = useState<"داغ" | "جدید" | "برتر" | "حل‌شده">("داغ");
-  const [search, setSearch] = useState("");
   const [submitError, setSubmitError] = useState("");
 
   const newTopicForm = useForm<NewTopicValues>({
@@ -75,13 +70,9 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
             }))
           : [];
         setDbItems(nextItems as (ForumPost & { avatar: string })[]);
-        setTopicsError(false);
       })
       .catch(() => {
-        if (mounted) {
-          setDbItems(null);
-          setTopicsError(true);
-        }
+        if (mounted) setDbItems(null);
       })
       .finally(() => {
         if (mounted) setLoadingTopics(false);
@@ -91,27 +82,13 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
     };
   }, []);
 
-  const realLikes = (t: ForumPost) => stats[`forum:${t.slug}`]?.likes ?? t.likes ?? 0;
-  const realViews = (t: ForumPost) => stats[`forum:${t.slug}`]?.views ?? t.views ?? 0;
   const realSolved = (t: ForumPost) => stats[`forum:${t.slug}`]?.solved ?? (typeof (t as any).solved === "boolean" ? (t as any).solved : false);
 
   const sourceItems = dbItems ?? [];
-  const merged = [...local, ...sourceItems].filter((t) => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return `${t.title} ${t.excerpt}`.toLowerCase().includes(q);
-  });
-  const all = (() => {
-    const list = [...merged];
-    if (filter === "جدید") return list.sort((a, b) => +new Date(b.date) - +new Date(a.date));
-    if (filter === "برتر") return list.sort((a, b) => realLikes(b) - realLikes(a));
-    if (filter === "حل‌شده") return list.filter((t) => realSolved(t));
-    return list.sort((a, b) => realViews(b) - realViews(a));
-  })();
+  const all = [...local, ...sourceItems].sort((a, b) => +new Date(b.date) - +new Date(a.date));
 
   const submitTopic = async (values: NewTopicValues) => {
     setSubmitError("");
-    // eslint-disable-next-line react-hooks/purity
     const slug = values.title.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").slice(0, 60) + "-" + Date.now().toString(36);
     try {
       const res = await fetch("/api/posts", {
@@ -164,72 +141,77 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   };
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
-      <ModuleHeader module="forum" description="پرسش و پاسخ تخصصی زیرساخت و شبکه" count={loadingTopics ? "در حال دریافت…" : `${all.length.toLocaleString("fa-IR")} موضوع`}>
-        <div className="flex gap-2">
-          <Input placeholder="جستجو در انجمن…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-56" />
-          <Button onClick={() => setShowNew(true)}>+ موضوع جدید</Button>
-        </div>
-      </ModuleHeader>
-
-      <div className="flex gap-2">
-        {(["داغ", "جدید", "برتر", "حل‌شده"] as const).map((t) => (
-          <Button key={t} variant={filter === t ? "secondary" : "ghost"} size="sm" onClick={() => setFilter(t)} className={filter === t ? "ring-1 ring-[var(--primary)]" : ""}>
-            {t}
-          </Button>
-        ))}
+    <main className="mx-auto max-w-4xl px-4 py-8 space-y-5" dir="rtl">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-extrabold text-foreground">انجمن</h1>
+        <Button onClick={() => setShowNew(true)} size="sm">+ موضوع جدید</Button>
       </div>
 
-      <Card className="p-0 overflow-hidden divide-y divide-border/60">
-        <div className="hidden sm:grid grid-cols-12 text-xs text-muted-foreground px-4 py-2.5 bg-muted/30 font-bold">
-          <div className="col-span-7">عنوان موضوع و نویسنده</div>
-          <div className="col-span-1 text-center">امتیاز</div>
-          <div className="col-span-2 text-center">پاسخ / بازدید</div>
-          <div className="col-span-2 text-left">آخرین فعالیت</div>
-        </div>
-        {loadingTopics && all.length === 0 ? (
-          Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="grid grid-cols-12 px-3 sm:px-4 py-3.5 gap-2 items-center animate-pulse">
-              <div className="col-span-12 sm:col-span-6 flex gap-3.5 items-center">
-                <div className="h-11 w-11 rounded-full bg-muted" />
-                <div className="flex-1 space-y-2"><div className="h-5 w-4/5 bg-muted rounded" /><div className="h-4 w-1/2 bg-muted rounded" /></div>
+      {/* Topic list */}
+      {loadingTopics && all.length === 0 ? (
+        <div className="space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card animate-pulse">
+              <div className="h-10 w-10 rounded-full bg-muted shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-3/4 bg-muted rounded" />
+                <div className="h-3 w-1/2 bg-muted rounded" />
               </div>
             </div>
-          ))
-        ) : all.length === 0 ? (
-          <div className="px-4 py-8 text-center text-sm text-muted-foreground">هنوز موضوعی در دیتابیس انجمن ثبت نشده است.</div>
-        ) : (
-          all.map((t) => (
-            <Link key={t.slug} href={`/forum/${t.slug}`} className="group grid grid-cols-12 px-3 sm:px-4 py-3.5 hover:bg-muted/20 gap-2 items-center transition-colors">
-              <div className="hidden sm:flex col-span-1 flex-col items-center text-xs text-muted-foreground">
-                <span className="font-bold text-foreground">{realLikes(t).toLocaleString("fa-IR")}</span>
-              </div>
-              <div className="col-span-12 sm:col-span-6 flex gap-3.5 items-center">
-                <Image src={t.avatar} alt={t.author?.name || "کاربر"} width={40} height={40} className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-border" />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-sm group-hover:text-[var(--primary)] transition-colors line-clamp-1">{t.title}</span>
-                    <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1 flex-wrap">
-                    ارسال‌شده توسط
-                    <b className="text-foreground">{t.author?.name || "کاربر تکباکس"}</b>
-                    {(t.author as any)?.verifiedType && (
-                      <VerifiedBadge type={(t.author as any).verifiedType as "content" | "org" | "user"} label={(t.author as any)?.verifiedLabel} size={13} />
-                    )}
-                    • {formatRelativeDate(t.date)}
-                  </div>
+          ))}
+        </div>
+      ) : all.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-muted-foreground text-sm">هنوز موضوعی ثبت نشده است.</p>
+          <Button onClick={() => setShowNew(true)} size="sm" className="mt-4">اولین موضوع را ایجاد کنید</Button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {all.map((t) => (
+            <Link
+              key={t.slug}
+              href={`/forum/${t.slug}`}
+              className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/30 hover:bg-accent/30 transition-all duration-200"
+            >
+              {/* Avatar */}
+              <Image
+                src={t.avatar}
+                alt={t.author?.name || "کاربر"}
+                width={40}
+                height={40}
+                className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-border"
+              />
+
+              {/* Content */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                    {t.title}
+                  </span>
+                  <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
+                  ایجاد شده توسط
+                  <span className="font-semibold text-foreground/80">{t.author?.name || "کاربر تکباکس"}</span>
+                  {(t.author as any)?.verifiedType && (
+                    <VerifiedBadge type={(t.author as any).verifiedType as "content" | "org" | "user"} label={(t.author as any)?.verifiedLabel} size={13} />
+                  )}
+                  <span className="text-border">•</span>
+                  <span>{formatRelativeDate(t.date)}</span>
                 </div>
               </div>
-              <div className="col-span-12 sm:col-span-4 flex items-center justify-end">
-                <CardStats module="forum" slug={t.slug} initialViews={t.views} initialLikes={t.likes} initialComments={t.comments || 0} showComments={true} />
-              </div>
-              <div className="hidden sm:block col-span-1 text-left text-xs text-muted-foreground">{t.date_fa.split(" ")[0]}<br />{t.author?.name.split(" ")[0]}</div>
-            </Link>
-          ))
-        )}
-      </Card>
 
+              {/* Arrow */}
+              <svg className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* New topic dialog */}
       <Dialog open={showNew} onOpenChange={setShowNew}>
         <DialogContent className="sm:max-w-2xl" dir="rtl">
           <DialogHeader>
