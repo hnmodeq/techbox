@@ -66,6 +66,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Check if user is muted
+  if (user.status === "muted") {
+    const stillMuted = !user.mutedUntil || new Date(user.mutedUntil) > new Date();
+    if (stillMuted) {
+      return NextResponse.json(
+        { error: "muted", message: "حساب شما در حالت سکوت است. امکان پسندیدن مطالب وجود ندارد." },
+        { status: 403 }
+      );
+    }
+  }
+
   const ip = getClientIp(req);
   const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "like");
 
