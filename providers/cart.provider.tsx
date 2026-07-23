@@ -102,9 +102,13 @@ function CartDrawer(){
  );
 }
 
-export function useCart(){
+const NOOP = () => {};
+const emptyCart: CartCtx = { items: [], count: 0, add: NOOP, remove: NOOP, clear: NOOP, setQty: NOOP, open: false, setOpen: NOOP };
+
+export function useCart(): CartCtx {
  const c = useContext(Ctx);
- if(!c) throw new Error("CartProvider missing – wrap LayoutShell with <CartProvider>");
+ // Return safe defaults when used outside CartProvider (e.g. during build prerender)
+ if (!c) return emptyCart;
  return c;
 }
 
