@@ -241,7 +241,7 @@ function RolesContent() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isCreating} onOpenChange={(o) => { if (!o) setIsCreating(false); }}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto sm:max-w-2xl" dir="rtl">
           <DialogHeader>
             <DialogTitle>{editingRole ? `ویرایش: ${editingRole.nameFa}` : "ایجاد نقش جدید"}</DialogTitle>
           </DialogHeader>
