@@ -31,7 +31,7 @@ type Answer = {
 type Question = {
   id: keyof Answer;
   question: string;
-  options: { value: string; label: string; desc: string; icon: string }[];
+  options: { value: string; label: string; desc: string }[];
 };
 
 const QUESTIONS: Question[] = [
@@ -39,50 +39,50 @@ const QUESTIONS: Question[] = [
     id: "useCase",
     question: "NAS را برای چه کاری می‌خواهید؟",
     options: [
-      { value: "home", label: "خانگی", desc: "ذخیره عکس، فیلم، بکاپ شخصی و استریم", icon: "🏠" },
-      { value: "office", label: "اداری", desc: "اشتراک‌گذاری فایل، همکاری تیمی، بکاپ سازمانی", icon: "🏢" },
-      { value: "surveillance", label: "دوربین مداربسته", desc: "ضبط و مدیریت تصاویر دوربین‌های امنیتی", icon: "📹" },
-      { value: "enterprise", label: "سازمانی", desc: "مجازی‌سازی، دیتابیس، Docker و سرویس‌های سنگین", icon: "🏗️" },
+      { value: "home", label: "خانگی", desc: "ذخیره عکس، فیلم، بکاپ شخصی و استریم" },
+      { value: "office", label: "اداری", desc: "اشتراک‌گذاری فایل، همکاری تیمی، بکاپ سازمانی" },
+      { value: "surveillance", label: "دوربین مداربسته", desc: "ضبط و مدیریت تصاویر دوربین‌های امنیتی" },
+      { value: "enterprise", label: "سازمانی", desc: "مجازی‌سازی، دیتابیس، Docker و سرویس‌های سنگین" },
     ],
   },
   {
     id: "users",
     question: "چند نفر همزمان از NAS استفاده می‌کنند؟",
     options: [
-      { value: "1-5", label: "۱ تا ۵ نفر", desc: "خانواده یا تیم کوچک", icon: "👤" },
-      { value: "5-20", label: "۵ تا ۲۰ نفر", desc: "دفتر کوچک یا استارتاپ", icon: "👥" },
-      { value: "20-50", label: "۲۰ تا ۵۰ نفر", desc: "شرکت متوسط", icon: "🏢" },
-      { value: "50+", label: "بیش از ۵۰ نفر", desc: "سازمان بزرگ یا دیتاسنتر", icon: "🏗️" },
+      { value: "1-5", label: "۱ تا ۵ نفر", desc: "خانواده یا تیم کوچک" },
+      { value: "5-20", label: "۵ تا ۲۰ نفر", desc: "دفتر کوچک یا استارتاپ" },
+      { value: "20-50", label: "۲۰ تا ۵۰ نفر", desc: "شرکت متوسط" },
+      { value: "50+", label: "بیش از ۵۰ نفر", desc: "سازمان بزرگ یا دیتاسنتر" },
     ],
   },
   {
     id: "storage",
     question: "چقدر فضای ذخیره‌سازی نیاز دارید؟",
     options: [
-      { value: "small", label: "تا ۱۰ ترابایت", desc: "اسناد، عکس، بکاپ شخصی", icon: "📁" },
-      { value: "medium", label: "۱۰ تا ۵۰ ترابایت", desc: "آرشیو ویدیو، پروژه‌های تیمی", icon: "📂" },
-      { value: "large", label: "۵۰ تا ۱۰۰ ترابایت", desc: "آرشیو بزرگ، چندین سرویس", icon: "🗃️" },
-      { value: "enterprise", label: "بیش از ۱۰۰ ترابایت", desc: "زیرساخت سازمانی، دوربین متعدد", icon: "🏛️" },
+      { value: "small", label: "تا ۱۰ ترابایت", desc: "اسناد، عکس، بکاپ شخصی" },
+      { value: "medium", label: "۱۰ تا ۵۰ ترابایت", desc: "آرشیو ویدیو، پروژه‌های تیمی" },
+      { value: "large", label: "۵۰ تا ۱۰۰ ترابایت", desc: "آرشیو بزرگ، چندین سرویس" },
+      { value: "enterprise", label: "بیش از ۱۰۰ ترابایت", desc: "زیرساخت سازمانی، دوربین متعدد" },
     ],
   },
   {
     id: "priority",
     question: "کدام ویژگی برای شما مهم‌تر است؟",
     options: [
-      { value: "speed", label: "سرعت بالا", desc: "NVMe cache، پردازنده قوی، ۱۰GbE", icon: "⚡" },
-      { value: "capacity", label: "ظرفیت زیاد", desc: "تعداد Bay بالا، پشتیبانی از دیسک‌های بزرگ", icon: "📦" },
-      { value: "reliability", label: "قابلیت اطمینان", desc: "RAID 6، Redundancy، Hot-swap", icon: "🛡️" },
-      { value: "balanced", label: "متعادل", desc: "ترکیب مناسب سرعت، ظرفیت و اطمینان", icon: "⚖️" },
+      { value: "speed", label: "سرعت بالا", desc: "کش پرسرعت، پردازنده قوی، شبکه ۱۰ گیگابیت اترنت" },
+      { value: "capacity", label: "ظرفیت زیاد", desc: "تعداد درایو بالا، پشتیبانی از دیسک‌های بزرگ" },
+      { value: "reliability", label: "قابلیت اطمینان", desc: "رید ۶، تعویض داغ، افزونگی" },
+      { value: "balanced", label: "متعادل", desc: "ترکیب مناسب سرعت، ظرفیت و اطمینان" },
     ],
   },
   {
     id: "network",
     question: "چه سرعت شبکه‌ای نیاز دارید؟",
     options: [
-      { value: "1gbe", label: "۱ گیگابیت", desc: "کافی برای اشتراک‌گذاری فایل معمولی", icon: "🔌" },
-      { value: "2.5gbe", label: "۲.۵ گیگابیت", desc: "استاندارد برای اکثر کاربردها", icon: "🔌" },
-      { value: "10gbe", label: "۱۰ گیگابیت", desc: "ویرایش ویدیو، VM، I/O سنگین", icon: "⚡" },
-      { value: "any", label: "مطمئن نیستم", desc: "مشاوره رایگان دریافت کنید", icon: "❓" },
+      { value: "1gbe", label: "۱ گیگابیت اترنت", desc: "کافی برای اشتراک‌گذاری فایل معمولی" },
+      { value: "2.5gbe", label: "۲.۵ گیگابیت اترنت", desc: "استاندارد برای اکثر کاربردها" },
+      { value: "10gbe", label: "۱۰ گیگابیت اترنت", desc: "ویرایش ویدیو، مجازی‌سازی، ورودی/خروجی سنگین" },
+      { value: "any", label: "مطمئن نیستم", desc: "مشاوره رایگان دریافت کنید" },
     ],
   },
 ];
@@ -277,20 +277,21 @@ export function NasSelectorWizard({ products }: { products: Product[] }) {
             <h2 className="text-2xl font-bold">{currentQuestion.question}</h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             {currentQuestion.options.map((option) => (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => selectOption(option.value)}
-                className="group flex flex-col items-center gap-2 rounded-xl border-2 border-border/50 p-5 text-center hover:border-primary/50 hover:bg-primary/5 transition-all"
+                className="group flex items-center gap-4 rounded-xl border-2 border-border/50 p-4 text-right hover:border-primary/50 hover:bg-primary/5 transition-all"
               >
-                <span className="text-2xl">{option.icon}</span>
-                <div className="text-sm font-bold group-hover:text-primary transition-colors">
-                  {option.label}
-                </div>
-                <div className="text-xs text-muted-foreground leading-5">
-                  {option.desc}
+                <div className="flex-1">
+                  <div className="text-sm font-bold group-hover:text-primary transition-colors">
+                    {option.label}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {option.desc}
+                  </div>
                 </div>
               </button>
             ))}

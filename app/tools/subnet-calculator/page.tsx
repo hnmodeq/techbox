@@ -1,27 +1,15 @@
 import { SubnetCalculator } from "@/features/tools/components/subnet-calculator";
-import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Subnet Calculator | TechBox",
-  description: "ماشین حساب ساب‌نت – بدون تغییر",
+export const metadata: Metadata = {
+  title: "محاسبه‌گر ساب‌نت | TechBox",
+  description: "محاسبه آدرس شبکه، ماسک، محدوده IP و تعداد میزبان قابل استفاده.",
 };
 
 export default function SubnetCalculatorPage() {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <ToolPageHeader
-        title="Subnet Calculator"
-        subtitle="بدون تغییر – نسخه فعلی شما"
-        accent="var(--subnet)"
-        breadcrumbs={[
-          { label: "خانه", href: "/" },
-          { label: "ابزارها", href: "/tools" },
-          { label: "Subnet Calculator" },
-        ]}
-      />
-      <div className="mt-8">
-        <SubnetCalculator />
-      </div>
+    <main className="min-h-[80vh] flex items-center justify-center px-4 py-10" dir="rtl">
+      <SubnetCalculator />
     </main>
   );
 }
