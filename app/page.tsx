@@ -1,5 +1,8 @@
 import React from 'react';
 import HeroSection from '@/features/home/components/HeroSection';
+import ToolsShowcase from '@/features/home/components/ToolsShowcase';
+import WhyTechBox from '@/features/home/components/WhyTechBox';
+import CtaSection from '@/features/home/components/CtaSection';
 import MagazineRow from '@/features/home/components/MagazineRow';
 import VideoReelsRow from '@/features/home/components/VideoReelsRow';
 import ShopRow from '@/features/home/components/ShopRow';
@@ -31,8 +34,16 @@ export default async function Page() {
 
   return (
     <main className="relative overflow-x-hidden w-full max-w-full flex flex-col">
+      {/* Hero with terminal */}
       {config.heroVisible !== false && <HeroSection />}
 
+      {/* Why TechBox */}
+      <WhyTechBox />
+
+      {/* Tools showcase */}
+      <ToolsShowcase />
+
+      {/* Module rows */}
       {visibleRows.map((slug) => {
         const Component = ROW_COMPONENTS[slug];
         if (!Component) return null;
@@ -48,13 +59,16 @@ export default async function Page() {
         );
       })}
 
-      {/* Only show recommendations if at least some modules are enabled */}
+      {/* Recommendations */}
       {visibleRows.length > 0 && (
         <RecommendationRow
           items={getHomepageRecommendations(8)}
           title="پیشنهادهای هوشمند برای شما"
         />
       )}
+
+      {/* CTA */}
+      <CtaSection />
     </main>
   );
 }
