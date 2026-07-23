@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
+import { TimelineSuggestions } from './TimelineSuggestions';
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
   if (isNaN(d.getTime())) return '';
@@ -99,6 +100,9 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
               </div>
             </div>
           ))}
+
+          {/* Suggestion box — at the end (oldest side in RTL) */}
+          <TimelineSuggestions />
         </div>
       </div>
     </div>
