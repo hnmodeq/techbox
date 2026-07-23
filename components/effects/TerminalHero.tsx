@@ -247,7 +247,7 @@ export function TerminalHero({
 
       <div
         ref={scrollRef}
-        className="p-4 h-[250px] overflow-y-auto space-y-1 text-left terminal-scroll"
+        className="p-4 h-[180px] sm:h-[220px] md:h-[250px] lg:h-[300px] overflow-y-auto space-y-1 text-left terminal-scroll"
       >
         {displayLines.map((cmd, i) => (
           <div key={`done-${i}`} className="flex flex-wrap items-center gap-1">
