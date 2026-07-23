@@ -7,7 +7,6 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight, RotateCcw, HardDrive, Check } from "lucide-react";
-import Image from "next/image";
 
 type Product = {
   slug: string;
