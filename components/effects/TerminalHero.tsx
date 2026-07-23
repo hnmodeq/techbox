@@ -66,6 +66,7 @@ export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps)
   const [phase, setPhase] = useState<"command" | "pause">("command");
   const [done, setDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const userScrolledUp = useRef(false);
   const shouldReduceMotion = useReducedMotion();
 
   // If reduced motion, show everything instantly
@@ -124,9 +125,21 @@ export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps)
     }
   }, [currentLineIndex, currentCharIndex, phase, done, shouldReduceMotion, terminalLines]);
 
-  // Auto-scroll on every change
+  // Detect when user scrolls up manually
   useEffect(() => {
-    if (scrollRef.current) {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+      userScrolledUp.current = !atBottom;
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Auto-scroll only when user is at the bottom
+  useEffect(() => {
+    if (scrollRef.current && !userScrolledUp.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [completedLines, currentTyped]);
@@ -160,8 +173,7 @@ export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps)
       {/* Terminal body */}
       <div
         ref={scrollRef}
-        className="p-4 h-[250px] overflow-y-auto space-y-1 text-left"
-        style={{ scrollbarWidth: "none" }}
+        className="p-4 h-[250px] overflow-y-auto space-y-1 text-left terminal-scroll"
       >
         {/* All completed lines — stay forever */}
         {completedLines.map((cmd, i) => (
