@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, RotateCcw, Check, HardDrive } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, RotateCcw, Check, HardDrive } from "lucide-react";
 
 type Product = {
   slug: string;
@@ -30,7 +31,6 @@ type Answer = {
 type Question = {
   id: keyof Answer;
   question: string;
-  description: string;
   options: { value: string; label: string; desc: string; icon: string }[];
 };
 
@@ -38,7 +38,6 @@ const QUESTIONS: Question[] = [
   {
     id: "useCase",
     question: "NAS را برای چه کاری می‌خواهید؟",
-    description: "نوع استفاده شما بهترین گزینه را مشخص می‌کند",
     options: [
       { value: "home", label: "خانگی", desc: "ذخیره عکس، فیلم، بکاپ شخصی و استریم", icon: "🏠" },
       { value: "office", label: "اداری", desc: "اشتراک‌گذاری فایل، همکاری تیمی، بکاپ سازمانی", icon: "🏢" },
@@ -49,7 +48,6 @@ const QUESTIONS: Question[] = [
   {
     id: "users",
     question: "چند نفر همزمان از NAS استفاده می‌کنند؟",
-    description: "تعداد کاربران همزمان روی عملکرد تأثیر می‌گذارد",
     options: [
       { value: "1-5", label: "۱ تا ۵ نفر", desc: "خانواده یا تیم کوچک", icon: "👤" },
       { value: "5-20", label: "۵ تا ۲۰ نفر", desc: "دفتر کوچک یا استارتاپ", icon: "👥" },
@@ -60,7 +58,6 @@ const QUESTIONS: Question[] = [
   {
     id: "storage",
     question: "چقدر فضای ذخیره‌سازی نیاز دارید؟",
-    description: "حجم داده‌هایی که می‌خواهید ذخیره کنید",
     options: [
       { value: "small", label: "تا ۱۰ ترابایت", desc: "اسناد، عکس، بکاپ شخصی", icon: "📁" },
       { value: "medium", label: "۱۰ تا ۵۰ ترابایت", desc: "آرشیو ویدیو، پروژه‌های تیمی", icon: "📂" },
@@ -71,7 +68,6 @@ const QUESTIONS: Question[] = [
   {
     id: "priority",
     question: "کدام ویژگی برای شما مهم‌تر است؟",
-    description: "اولویت اصلی شما در انتخاب NAS",
     options: [
       { value: "speed", label: "سرعت بالا", desc: "NVMe cache، پردازنده قوی، ۱۰GbE", icon: "⚡" },
       { value: "capacity", label: "ظرفیت زیاد", desc: "تعداد Bay بالا، پشتیبانی از دیسک‌های بزرگ", icon: "📦" },
@@ -82,7 +78,6 @@ const QUESTIONS: Question[] = [
   {
     id: "network",
     question: "چه سرعت شبکه‌ای نیاز دارید؟",
-    description: "سرعت انتقال داده بین NAS و دستگاه‌های شما",
     options: [
       { value: "1gbe", label: "۱ گیگابیت", desc: "کافی برای اشتراک‌گذاری فایل معمولی", icon: "🔌" },
       { value: "2.5gbe", label: "۲.۵ گیگابیت", desc: "استاندارد برای اکثر کاربردها", icon: "🔌" },
@@ -92,7 +87,7 @@ const QUESTIONS: Question[] = [
   },
 ];
 
-// ─── Scoring ────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function getBayCount(product: Product): number {
   const specs = product.specs || {};
@@ -102,8 +97,16 @@ function getBayCount(product: Product): number {
   return m ? parseInt(m[1], 10) : 0;
 }
 
+function getAnswerLabel(questionId: keyof Answer, value: string): string {
+  const q = QUESTIONS.find((q) => q.id === questionId);
+  const opt = q?.options.find((o) => o.value === value);
+  return opt?.label || value;
+}
+
+// ─── Scoring ────────────────────────────────────────────────────────────────
+
 function scoreProduct(product: Product, answers: Answer): number {
-  let score = 40; // base
+  let score = 40;
   const bay = getBayCount(product);
   const specs = product.specs || {};
   const title = (product.title || "").toLowerCase();
@@ -149,69 +152,67 @@ function scoreProduct(product: Product, answers: Answer): number {
     if (netCard.includes("2.5") || netCard.includes("10") || title.includes("2.5g")) score += 8;
   }
 
-  // Availability bonus
   if (product.availability?.includes("موجود")) score += 5;
 
   return Math.max(0, Math.min(100, score));
 }
 
-// ─── Description Generator ───────────────────────────────────────────────────
+// ─── Explanation Generator ──────────────────────────────────────────────────
 
-function generateDescription(answers: Answer): { title: string; body: string; specs: string[] } {
-  const parts: string[] = [];
-  const specs: string[] = [];
+function generateExplanation(answers: Answer): string[] {
+  const lines: string[] = [];
 
   // Use case
-  const useCaseMap: Record<string, { desc: string; spec: string }> = {
-    home: { desc: "استفاده خانگی شامل ذخیره عکس، فیلم و بکاپ شخصی", spec: "CPU اقتصادی، ۲-۴ Bay" },
-    office: { desc: "اشتراک‌گذاری فایل در محیط اداری و همکاری تیمی", spec: "CPU متوسط، ۴-۸ Bay، شبکه ۲.۵GbE" },
-    surveillance: { desc: "ضبط و مدیریت تصاویر دوربین‌های امنیتی", spec: "CPU قوی، ۴+ Bay، ظرفیت بالا" },
-    enterprise: { desc: "مجازی‌سازی، دیتابیس، Docker و سرویس‌های سازمانی", spec: "CPU Xeon/Ryzen، ۶+ Bay، ۱۰GbE، RAM بالا" },
-  };
-  const uc = useCaseMap[answers.useCase] || useCaseMap.home;
-  parts.push(uc.desc);
-  specs.push(uc.spec);
+  if (answers.useCase === "home")
+    lines.push("برای استفاده خانگی، یک NAS با ۲ تا ۴ Bay و پردازنده اقتصادی کافی است.");
+  if (answers.useCase === "office")
+    lines.push("برای محیط اداری، به NAS با ۴ تا ۸ Bay، پردازنده متوسط و شبکه ۲.۵GbE نیاز دارید.");
+  if (answers.useCase === "surveillance")
+    lines.push("برای دوربین مداربسته، NAS با ۴+ Bay، ظرفیت بالا و پردازنده قوی برای ضبط همزمان لازم است.");
+  if (answers.useCase === "enterprise")
+    lines.push("برای کاربردهای سازمانی، NAS با پردازنده سروری، ۶+ Bay، ۱۰GbE و RAM بالا ضروری است.");
 
   // Users
-  const userMap: Record<string, string> = {
-    "1-5": "۱-۵ کاربر همزمان → CPU دو هسته‌ای کافی است",
-    "5-20": "۵-۲۰ کاربر همزمان → CPU چهار هسته‌ای و ۸GB+ RAM پیشنهاد می‌شود",
-    "20-50": "۲۰-۵۰ کاربر همزمان → CPU قوی و ۱۶GB+ RAM نیاز است",
-    "50+": "بیش از ۵۰ کاربر → CPU سروری و ۳۲GB+ RAM ضروری است",
-  };
-  specs.push(userMap[answers.users] || "");
+  if (answers.users === "1-5")
+    lines.push("با ۱-۵ کاربر همزمان، پردازنده دو هسته‌ای و ۴GB RAM کافی است.");
+  if (answers.users === "5-20")
+    lines.push("با ۵-۲۰ کاربر همزمان، پردازنده ۴ هسته‌ای و حداقل ۸GB RAM پیشنهاد می‌شود.");
+  if (answers.users === "20-50")
+    lines.push("با ۲۰-۵۰ کاربر همزمان، پردازنده قوی و حداقل ۱۶GB RAM نیاز است.");
+  if (answers.users === "50+")
+    lines.push("با بیش از ۵۰ کاربر، پردازنده سروری و حداقل ۳۲GB RAM ضروری است.");
 
   // Storage
-  const storageMap: Record<string, string> = {
-    small: "ظرفیت تا ۱۰TB → ۲-۴ Bay با دیسک ۴-۸TB کافی است",
-    medium: "ظرفیت ۱۰-۵۰TB → ۴-۸ Bay با دیسک ۸-۱۶TB پیشنهاد می‌شود",
-    large: "ظرفیت ۵۰-۱۰۰TB → ۸-۱۲ Bay با RAID 6 توصیه می‌شود",
-    enterprise: "ظرفیت ۱۰۰TB+ → ۱۲+ Bay با RAID 6 و بکاپ خارجی ضروری است",
-  };
-  specs.push(storageMap[answers.storage] || "");
+  if (answers.storage === "small")
+    lines.push("برای ذخیره‌سازی تا ۱۰ ترابایت، ۲ تا ۴ Bay با دیسک ۴ تا ۸ ترابایتی کافی است.");
+  if (answers.storage === "medium")
+    lines.push("برای ۱۰ تا ۵۰ ترابایت، ۴ تا ۸ Bay با دیسک ۸ تا ۱۶ ترابایتی پیشنهاد می‌شود.");
+  if (answers.storage === "large")
+    lines.push("برای ۵۰ تا ۱۰۰ ترابایت، ۸ تا ۱۲ Bay با RAID 6 توصیه می‌شود.");
+  if (answers.storage === "enterprise")
+    lines.push("برای بیش از ۱۰۰ ترابایت، ۱۲+ Bay با RAID 6 و بکاپ خارجی ضروری است.");
 
   // Priority
-  const priorityMap: Record<string, string> = {
-    speed: "اولویت: سرعت → NVMe cache، شبکه ۱۰GbE، CPU قوی",
-    capacity: "اولویت: ظرفیت → تعداد Bay بالا، دیسک‌های بزرگ",
-    reliability: "اولویت: اطمینان → RAID 6/SHR-2، Hot-swap، Redundancy",
-    balanced: "اولویت: تعادل → ترکیب مناسب همه ویژگی‌ها",
-  };
-  specs.push(priorityMap[answers.priority] || "");
+  if (answers.priority === "speed")
+    lines.push("اولویت شما سرعت است → NVMe cache، شبکه ۱۰GbE و پردازنده قوی انتخاب کنید.");
+  if (answers.priority === "capacity")
+    lines.push("اولویت شما ظرفیت است → تعداد Bay بالا و دیسک‌های بزرگ مهم‌تر هستند.");
+  if (answers.priority === "reliability")
+    lines.push("اولویت شما اطمینان است → RAID 6 یا SHR-2 و قابلیت Hot-swap توصیه می‌شود.");
+  if (answers.priority === "balanced")
+    lines.push("اولویت شما تعادل است → ترکیب مناسب سرعت، ظرفیت و اطمینان.");
 
   // Network
-  const networkMap: Record<string, string> = {
-    "1gbe": "شبکه ۱GbE → کافی برای اشتراک‌گذاری فایل معمولی",
-    "2.5gbe": "شبکه ۲.۵GbE → استاندارد برای اکثر کاربردها",
-    "10gbe": "شبکه ۱۰GbE → ضروری برای ویرایش ویدیو و I/O سنگین",
-    any: "شبکه → هر سرعتی قابل قبول است",
-  };
-  specs.push(networkMap[answers.network] || "");
+  if (answers.network === "1gbe")
+    lines.push("شبکه ۱GbE برای اشتراک‌گذاری فایل معمولی کافی است.");
+  if (answers.network === "2.5gbe")
+    lines.push("شبکه ۲.۵GbE استاندارد فعلی برای اکثر کاربردها است.");
+  if (answers.network === "10gbe")
+    lines.push("شبکه ۱۰GbE برای ویرایش ویدیو، VM و I/O سنگین ضروری است.");
+  if (answers.network === "any")
+    lines.push("هر سرعت شبکه‌ای قابل قبول است — ۲.۵GbE پیش‌فرض خوبی است.");
 
-  const title = parts[0];
-  const body = `بر اساس نیازهای شما، یک NAS با مشخصات زیر پیشنهاد می‌شود:`;
-
-  return { title, body, specs: specs.filter(Boolean) };
+  return lines;
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -241,13 +242,12 @@ export function NasSelectorWizard({ products }: { products: Product[] }) {
     return products
       .map((p) => ({ ...p, score: scoreProduct(p, answers as Answer) }))
       .filter((p) => p.score > 35)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
+      .sort((a, b) => b.score - a.score);
   }, [products, answers, isComplete]);
 
-  const description = useMemo(() => {
-    if (!isComplete) return null;
-    return generateDescription(answers as Answer);
+  const explanation = useMemo(() => {
+    if (!isComplete) return [];
+    return generateExplanation(answers as Answer);
   }, [answers, isComplete]);
 
   return (
@@ -274,7 +274,6 @@ export function NasSelectorWizard({ products }: { products: Product[] }) {
               سؤال {step + 1} از {QUESTIONS.length}
             </p>
             <h2 className="text-2xl font-bold">{currentQuestion.question}</h2>
-            <p className="text-sm text-muted-foreground">{currentQuestion.description}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -298,91 +297,108 @@ export function NasSelectorWizard({ products }: { products: Product[] }) {
 
           {step > 0 && (
             <Button variant="ghost" size="sm" onClick={goBack} className="gap-1">
-              <ArrowRight className="size-3" />
               مرحله قبل
             </Button>
           )}
         </div>
       )}
 
-      {/* Results */}
-      {isComplete && description && (
-        <div className="space-y-6">
-          {/* Description */}
-          <Card className="p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
-                <HardDrive className="size-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold">نتیجه تحلیل نیاز شما</h2>
-                <p className="text-xs text-muted-foreground">بر اساس ۵ سؤال انتخاب شده</p>
-              </div>
-            </div>
-
-            <p className="text-sm leading-6">{description.body}</p>
-
+      {/* Results — all below the questions */}
+      {isComplete && (
+        <div className="space-y-8">
+          {/* 1. Questions & Answers Summary */}
+          <Card className="p-5">
+            <h3 className="text-sm font-bold mb-4">پاسخ‌های شما</h3>
             <div className="space-y-2">
-              {description.specs.map((spec, i) => (
-                <div key={i} className="flex items-start gap-2 text-xs">
-                  <Check className="size-3.5 text-primary shrink-0 mt-0.5" />
-                  <span>{spec}</span>
+              {QUESTIONS.map((q) => (
+                <div key={q.id} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{q.question}</span>
+                  <Badge variant="secondary">{getAnswerLabel(q.id, (answers as any)[q.id])}</Badge>
                 </div>
               ))}
             </div>
           </Card>
 
-          {/* Product recommendations */}
-          {rankedProducts.length > 0 ? (
-            <div className="space-y-3">
-              <h3 className="text-sm font-bold">پیشنهادات ما بر اساس نیاز شما</h3>
-              {rankedProducts.map((product, idx) => (
-                <Link
-                  key={product.slug}
-                  href={`/shop/${product.slug}`}
-                  className="group block"
-                >
-                  <Card className="overflow-hidden hover:border-primary/30 transition-colors">
-                    <div className="flex gap-4 p-4">
-                      {product.image && (
-                        <div className="relative w-20 h-16 shrink-0 rounded overflow-hidden bg-muted">
-                          <Image src={product.image} alt={product.title} fill sizes="80px" className="object-cover" />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <Badge variant={idx === 0 ? "default" : "secondary"} className="text-[9px]">
-                            {idx === 0 ? "⭐ بهترین پیشنهاد" : `#${idx + 1}`}
-                          </Badge>
-                          {product.brand && <Badge variant="outline" className="text-[9px]">{product.brand}</Badge>}
-                          <span className="text-[10px] font-bold text-primary">{product.score}% تطابق</span>
-                        </div>
-                        <div className="text-sm font-bold mt-1 group-hover:text-primary transition-colors truncate">
-                          {product.title}
-                        </div>
-                        {product.excerpt && (
-                          <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{product.excerpt}</div>
-                        )}
-                        <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
-                          {getBayCount(product) > 0 && <span>{getBayCount(product)} Bay</span>}
-                          {product.price && <span className="font-bold text-primary">{product.price.toLocaleString("fa-IR")} تومان</span>}
-                        </div>
-                      </div>
-                      <ArrowLeft className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors self-center" />
-                    </div>
-                  </Card>
-                </Link>
+          {/* 2. Explanation */}
+          <Card className="p-5">
+            <h3 className="text-sm font-bold mb-3">تحلیل نیاز شما</h3>
+            <div className="space-y-2">
+              {explanation.map((line, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm">
+                  <Check className="size-4 text-primary shrink-0 mt-0.5" />
+                  <span>{line}</span>
+                </div>
               ))}
             </div>
-          ) : (
-            <Card className="p-8 text-center">
-              <p className="text-muted-foreground">محصولی با مشخصات شما یافت نشد.</p>
-              <p className="text-xs text-muted-foreground mt-2">لطفاً با مشاوران ما تماس بگیرید.</p>
-            </Card>
-          )}
+          </Card>
 
-          {/* Actions */}
-          <div className="flex justify-center gap-3 pt-2">
+          <Separator />
+
+          {/* 3. Product Recommendations */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold">پیشنهادات ما</h3>
+
+            {rankedProducts.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">محصولی با مشخصات شما یافت نشد.</p>
+                <p className="text-xs text-muted-foreground mt-2">لطفاً با مشاوران ما تماس بگیرید.</p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {rankedProducts.map((product, idx) => {
+                  const isTop3 = idx < 3;
+                  return (
+                    <Link
+                      key={product.slug}
+                      href={`/shop/${product.slug}`}
+                      className="group block"
+                    >
+                      <Card className={`overflow-hidden transition-colors ${isTop3 ? "border-primary/30" : "hover:border-primary/20"}`}>
+                        <div className="flex gap-4 p-4">
+                          {product.image && (
+                            <div className="relative w-20 h-16 shrink-0 rounded overflow-hidden bg-muted">
+                              <Image src={product.image} alt={product.title} fill sizes="80px" className="object-cover" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              {idx === 0 && <Badge className="text-[9px]">⭐ بهترین</Badge>}
+                              {idx === 1 && <Badge variant="secondary" className="text-[9px]">🥈 دوم</Badge>}
+                              {idx === 2 && <Badge variant="secondary" className="text-[9px]">🥉 سوم</Badge>}
+                              {product.brand && <Badge variant="outline" className="text-[9px]">{product.brand}</Badge>}
+                            </div>
+                            <div className="text-sm font-bold mt-1 group-hover:text-primary transition-colors truncate">
+                              {product.title}
+                            </div>
+                            {product.excerpt && (
+                              <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{product.excerpt}</div>
+                            )}
+                            <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
+                              {getBayCount(product) > 0 && <span>{getBayCount(product)} Bay</span>}
+                              {product.price && <span className="font-bold text-primary">{product.price.toLocaleString("fa-IR")} تومان</span>}
+                            </div>
+                          </div>
+                          {/* Match percentage */}
+                          <div className="flex flex-col items-center justify-center shrink-0">
+                            <div className={`text-lg font-black ${product.score >= 80 ? "text-green-500" : product.score >= 60 ? "text-yellow-500" : "text-muted-foreground"}`}>
+                              {product.score}%
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">تطابق</div>
+                          </div>
+                          <ArrowLeft className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors self-center" />
+                        </div>
+                      </Card>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <Separator />
+
+          {/* 4. Actions */}
+          <div className="flex justify-center gap-3">
             <Button variant="outline" onClick={restart} className="gap-1.5">
               <RotateCcw className="size-3" />
               شروع مجدد
