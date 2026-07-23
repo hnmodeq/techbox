@@ -242,7 +242,8 @@ export function NasSelectorWizard({ products }: { products: Product[] }) {
     return products
       .map((p) => ({ ...p, score: scoreProduct(p, answers as Answer) }))
       .filter((p) => p.score > 35)
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
   }, [products, answers, isComplete]);
 
   const explanation = useMemo(() => {
