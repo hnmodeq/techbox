@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -109,22 +110,25 @@ export function AdminHeader({ user }: { user: AppUser | null }) {
 
       <Breadcrumb className="hidden sm:flex flex-1 min-w-0">
         <BreadcrumbList>
-          {breadcrumbs.map((crumb, idx) => (
-            <BreadcrumbItem key={crumb.href}>
-              {idx < breadcrumbs.length - 1 ? (
-                <>
-                  <BreadcrumbLink href={crumb.href} className="text-xs">
-                    {crumb.label}
-                  </BreadcrumbLink>
-                  <BreadcrumbSeparator />
-                </>
-              ) : (
-                <BreadcrumbPage className="text-xs font-medium">
-                  {crumb.label}
-                </BreadcrumbPage>
-              )}
-            </BreadcrumbItem>
-          ))}
+          {breadcrumbs.map((crumb, idx) => {
+            const isLast = idx === breadcrumbs.length - 1;
+            return (
+              <React.Fragment key={crumb.href}>
+                {idx > 0 && <BreadcrumbSeparator />}
+                <BreadcrumbItem>
+                  {isLast ? (
+                    <BreadcrumbPage className="text-xs font-medium">
+                      {crumb.label}
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink href={crumb.href} className="text-xs">
+                      {crumb.label}
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+              </React.Fragment>
+            );
+          })}
         </BreadcrumbList>
       </Breadcrumb>
 
