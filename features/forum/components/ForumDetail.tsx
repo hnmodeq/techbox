@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { LiveViewCounter } from "@/components/ui/live-view-counter";
 import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { LikeButton } from "@/components/ui/like-button";
@@ -12,7 +11,6 @@ import { ForumJsonLd } from "@/components/seo/StructuredData";
 import { ShareButton } from "@/components/ui/share-button";
 import { SaveButton } from "@/components/ui/save-button";
 import { AuthorLink } from "@/components/ui/author-link";
-import { useModuleTitle } from "@/providers/module-config.provider";
 
 type ForumDetailProps = {
   slug: string;
@@ -21,20 +19,19 @@ type ForumDetailProps = {
 
 function ForumDetailSkeleton() {
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
-      <div className="mb-6 h-5 w-64 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-      <article className="bg-[var(--card-background)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] p-6 sm:p-8 space-y-6">
-        <div className="flex items-center gap-4">
-          <div className="h-14 w-14 animate-pulse rounded-full bg-[var(--muted-background)]" />
+    <main className="mx-auto max-w-3xl px-4 py-8" dir="rtl">
+      <article className="border border-border rounded-xl bg-card p-6 space-y-6">
+        <div className="flex items-start gap-4">
+          <div className="h-11 w-11 animate-pulse rounded-full bg-muted" />
           <div className="flex-1 space-y-3">
-            <div className="h-8 w-4/5 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-            <div className="h-4 w-1/2 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+            <div className="h-6 w-4/5 animate-pulse rounded bg-muted" />
+            <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
           </div>
         </div>
-        <div className="space-y-3 pt-6 border-t-[length:var(--border-size)] border-[var(--border-color)]">
-          <div className="h-4 w-full animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-          <div className="h-4 w-11/12 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
-          <div className="h-4 w-2/3 animate-pulse rounded-[var(--corner-radius)] bg-[var(--muted-background)]" />
+        <div className="space-y-3 pt-4 border-t border-border">
+          <div className="h-4 w-full animate-pulse rounded bg-muted" />
+          <div className="h-4 w-11/12 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
         </div>
       </article>
     </main>
@@ -45,7 +42,14 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
   const [item, setItem] = useState<any | null>(initialItem);
   const [loading, setLoading] = useState(!initialItem);
   const [notFound, setNotFound] = useState(false);
-  const forumTitle = useModuleTitle('forum', 'انجمن');
+
+  // Use initialItem immediately — no flash of skeleton when we already have data
+  useEffect(() => {
+    if (initialItem && !item) {
+      setItem(initialItem);
+      setLoading(false);
+    }
+  }, [initialItem, item]);
 
   useEffect(() => {
     let mounted = true;
@@ -69,7 +73,11 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
       })
       .catch(() => {
         if (!mounted) return;
-        setNotFound(true);
+        if (initialItem) {
+          setItem(initialItem);
+        } else {
+          setNotFound(true);
+        }
       })
       .finally(() => {
         if (mounted) setLoading(false);
@@ -80,76 +88,74 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
     };
   }, [slug, initialItem]);
 
-  if (loading) return <ForumDetailSkeleton />;
+  if (loading && !item) return <ForumDetailSkeleton />;
 
   if (notFound || !item) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-16 text-center" dir="rtl">
-        <h1 className="text-[length:var(--h1-font-size)] font-black text-[var(--primary-text)]">موضوع پیدا نشد</h1>
-        <p className="mt-3 paragraph-color">این موضوع در دیتابیس انجمن وجود ندارد یا موقتاً در دسترس نیست.</p>
-        <Link href="/forum" className="mt-6 inline-flex text-[var(--primary)] font-bold hover:underline">
+        <div className="text-4xl mb-4">🔍</div>
+        <h1 className="text-xl font-black text-foreground">موضوع پیدا نشد</h1>
+        <p className="mt-3 text-sm text-muted-foreground">این موضوع وجود ندارد یا موقتاً در دسترس نیست.</p>
+        <Link href="/forum" className="mt-6 inline-flex text-primary font-bold hover:underline text-sm">
           بازگشت به انجمن
         </Link>
       </main>
     );
   }
 
+  const viewCount = item.views ?? 0;
+
   return (
     <>
     <ForumJsonLd item={item} />
-    <main className="mx-auto max-w-5xl px-4 py-10" dir="rtl">
-      {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
-        <Link href="/" className="hover:text-[var(--primary-text)]">
-          خانه
-        </Link>
-        <span>/</span>
-        <Link href="/forum" className="hover:text-[var(--primary-text)]">
-          {forumTitle}
-        </Link>
-        <span>/</span>
-        <span className="truncate text-[var(--primary-text)] max-w-xs">{item.title}</span>
-      </nav>
-
-      {/* Main Topic Question Card */}
-      <article className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 sm:p-8 space-y-6">
-        <header className="flex flex-wrap items-start justify-between gap-4 border-b-[length:var(--border-size)] border-[var(--border-color)] pb-6">
-          <div className="flex items-center gap-4">
-            <AuthorLink name={item.author?.name || "کاربر انجمن"} username={item.author?.username} avatar={item.author?.avatar || "/assets/hooman.png"} verifiedType={(item.author as any)?.verifiedType} verifiedLabel={(item.author as any)?.verifiedLabel} />
-            <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-black text-[var(--primary-text)]">{item.title}</h1>
+    <main className="mx-auto max-w-3xl px-4 py-8" dir="rtl">
+      {/* Topic Card */}
+      <article className="border border-border rounded-xl bg-card overflow-hidden">
+        {/* Header */}
+        <div className="p-6 pb-0">
+          <div className="flex items-start gap-3.5">
+            <AuthorLink
+              name={item.author?.name || "کاربر انجمن"}
+              username={item.author?.username}
+              avatar={item.author?.avatar || "/assets/hooman.png"}
+              verifiedType={(item.author as any)?.verifiedType}
+              verifiedLabel={(item.author as any)?.verifiedLabel}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-lg sm:text-xl font-black text-foreground leading-7">{item.title}</h1>
                 <ForumBadge slug={item.slug} fallback={typeof item.solved === "boolean" ? item.solved : null} />
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                 <span>
-                  ارسال‌شده توسط{" "}
-                  <b className="text-[var(--primary-text)]">{item.author?.name || "کاربر انجمن"}</b>
+                  ایجاد شده توسط{" "}
+                  <span className="font-semibold text-foreground/80">{item.author?.name || "کاربر انجمن"}</span>
                 </span>
-                <span>•</span>
+                <span className="text-border">•</span>
                 <span>{formatRelativeDate(item.date)}</span>
-                <span>•</span>
-                <LiveViewCounter module="forum" slug={item.slug} showLabel={true} />
+                <span className="text-border">•</span>
+                <span>{viewCount.toLocaleString("fa-IR")} بازدید</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Actions row */}
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
             <LikeButton contentType="forum" slug={item.slug} initial={item.likes || 0} />
             <SaveButton module="forum" slug={item.slug} />
             <ShareButton />
           </div>
-        </header>
+        </div>
 
-        {/* Problem Paragraph Sent by User */}
-        <div className="prose max-w-none leading-8 text-[15px] text-[var(--primary-text)] whitespace-pre-line">
-          {item.content || item.excerpt || "توضیحات تکمیلی برای این پرسش ثبت نشده است."}
+        {/* Content */}
+        <div className="px-6 py-5">
+          <div className="prose prose-sm max-w-none leading-8 text-[15px] text-foreground whitespace-pre-line">
+            {item.content || item.excerpt || "توضیحات تکمیلی برای این پرسش ثبت نشده است."}
+          </div>
         </div>
       </article>
 
-      {/* Replies & Solutions Section — backed by the database, so replies and
-          new answers persist across refreshes (no more mock data / local-only
-          state). */}
+      {/* Comments / Replies */}
       <CommentSection module="forum" slug={item.slug} initialComments={item.comments || 0} />
     </main>
     </>

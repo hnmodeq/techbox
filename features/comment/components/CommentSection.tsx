@@ -588,8 +588,8 @@ export default function CommentSection({ module, slug, initialComments, compact 
                     key={key}
                     type="button"
                     onClick={() => setSortBy(key)}
-                    className={`text-[11px] px-2 py-0.5 rounded-full transition ${
-                      sortBy === key ? "bg-primary text-white font-bold" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    className={`text-[11px] px-2.5 py-1 rounded-md transition font-medium ${
+                      sortBy === key ? "bg-foreground text-background font-bold" : "text-foreground/70 hover:text-foreground hover:bg-muted border border-border"
                     }`}
                   >
                     {key === "popular" ? "محبوب‌ترین" : key === "newest" ? "جدیدترین" : "قدیمی‌ترین"}
