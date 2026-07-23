@@ -17,9 +17,23 @@ type ToolCard = {
 
 const TOOLS: ToolCard[] = [
   {
+    slug: "raid-calculator",
+    title: "RAID Calculator",
+    titleFa: "محاسبه فضای ذخیره‌ساز",
+    descFa: "RAID 0/1/5/6/10 + SHR-1/SHR-2، دیسک ترکیبی، Hot Spare، نقشه ظرفیت زنده.",
+    icon: "disk",
+    accent: "var(--raid)",
+    badge: "v2",
+    href: "/tools/raid-calculator",
+    stats: [
+      { label: "RAID", value: "۹ حالت" },
+      { label: "SHR", value: "۱/۲" },
+    ],
+  },
+  {
     slug: "nas-selector",
     title: "NAS Selector",
-    titleFa: "انتخاب‌گر NAS",
+    titleFa: "انتخاب ذخیره‌ساز شبکه",
     descFa: "بهترین NAS را بر اساس کاربران، ظرفیت، RAID، سرویس‌ها و بودجه پیدا کنید. رتبه‌بندی زنده + دلیل پیشنهاد.",
     icon: "nas",
     accent: "var(--nas)",
@@ -33,7 +47,7 @@ const TOOLS: ToolCard[] = [
   {
     slug: "nvr-selector",
     title: "NVR Selector",
-    titleFa: "انتخاب‌گر NVR",
+    titleFa: "انتخاب ذخیره‌ساز دوربین",
     descFa: "تعداد دوربین، رزولوشن و مدت ضبط را وارد کنید تا NVR مناسب با AI پیشنهاد شود.",
     icon: "nvr",
     accent: "var(--nvr)",
@@ -45,24 +59,10 @@ const TOOLS: ToolCard[] = [
     ],
   },
   {
-    slug: "raid-calculator",
-    title: "RAID Calculator",
-    titleFa: "ماشین حساب RAID",
-    descFa: "RAID 0/1/5/6/10 + SHR-1/SHR-2، دیسک ترکیبی، Hot Spare، نقشه ظرفیت زنده.",
-    icon: "disk",
-    accent: "var(--raid)",
-    badge: "v2",
-    href: "/tools/raid-calculator",
-    stats: [
-      { label: "RAID", value: "۹ حالت" },
-      { label: "SHR", value: "۱/۲" },
-    ],
-  },
-  {
     slug: "subnet-calculator",
     title: "Subnet Calculator",
-    titleFa: "ماشین حساب ساب‌نت",
-    descFa: "محاسبه سریع IP، ماسک، تعداد هاست و محدوده شبکه – بدون تغییر.",
+    titleFa: "محاسبه زیرشبکه",
+    descFa: "محاسبه سریع IP، ماسک، تعداد هاست و محدوده شبکه.",
     icon: "tools",
     accent: "var(--subnet)",
     href: "/tools/subnet-calculator",

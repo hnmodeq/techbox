@@ -86,7 +86,7 @@ export function NvrCalculator({ products = [] }: { products?: Product[] }) {
     <div className="w-full max-w-xl space-y-8">
       {/* Title */}
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">محاسبه‌گر فضای ذخیره‌سازی دوربین</h1>
+        <h1 className="text-2xl font-bold">انتخاب ذخیره‌ساز دوربین</h1>
         <p className="text-sm text-muted-foreground">
           مشخصات سیستم دوربین مداربسته خود را وارد کنید تا فضای مورد نیاز را محاسبه کنیم.
         </p>

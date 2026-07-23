@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "ابزارها | TechBox",
-  description: "NAS Selector، NVR Selector، RAID Calculator، Subnet Calculator",
+  description: "محاسبه فضای ذخیره‌ساز، انتخاب ذخیره‌ساز شبکه، انتخاب ذخیره‌ساز دوربین، محاسبه زیرشبکه",
 };
 
 export default function ToolsPage() {
@@ -13,7 +13,7 @@ export default function ToolsPage() {
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <ToolPageHeader
         title="ابزارهای TechBox"
-        subtitle="انتخاب‌گر NAS و NVR، محاسبه RAID/SHR و ساب‌نت"
+        subtitle="محاسبه فضای ذخیره‌ساز، انتخاب ذخیره‌ساز شبکه و دوربین، محاسبه زیرشبکه"
         accent="primary"
         breadcrumbs={[{ label: "خانه", href: "/" }, { label: "ابزارها" }]}
       />
@@ -29,10 +29,10 @@ export default function ToolsPage() {
           این ابزارها برای کمک به مهندسین در انتخاب بهینه‌ترین سخت‌افزار بر اساس نیازهای پروژه طراحی شده‌اند.
         </p>
         <div className="mt-4 flex flex-wrap gap-2 text-[12px]">
-          <Link href="/tools/nas-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-muted text-foreground border border-border hover:bg-muted/80">NAS Selector</Link>
-          <Link href="/tools/nvr-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-primary text-primary-foreground border border-border hover:bg-primary/90">NVR Selector</Link>
-          <Link href="/tools/raid-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-transparent text-foreground border border-border hover:bg-muted/50">RAID Calculator v2</Link>
-          <Link href="/tools/subnet-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-transparent text-foreground border border-border hover:bg-muted/50">Subnet Calculator</Link>
+          <Link href="/tools/raid-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-muted text-foreground border border-border hover:bg-muted/80">محاسبه فضای ذخیره‌ساز</Link>
+          <Link href="/tools/nas-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-primary text-primary-foreground border border-border hover:bg-primary/90">انتخاب ذخیره‌ساز شبکه</Link>
+          <Link href="/tools/nvr-selector" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-transparent text-foreground border border-border hover:bg-muted/50">انتخاب ذخیره‌ساز دوربین</Link>
+          <Link href="/tools/subnet-calculator" className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-semibold transition-all cursor-pointer bg-transparent text-foreground border border-border hover:bg-muted/50">محاسبه زیرشبکه</Link>
         </div>
       </section>
     </main>

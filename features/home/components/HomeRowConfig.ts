@@ -10,7 +10,7 @@ export const HOME_ROW_SIZES = {
   forumMinHeight: 'min-h-[40vh]',      // ردیف انجمن و پرسش و پاسخ
   reviewMinHeight: 'min-h-[45vh]',     // ردیف نقد و بررسی آزمایشگاهی
   downloadMinHeight: 'min-h-[35vh]',   // ردیف مرکز دانلود
-  toolsMinHeight: 'min-h-[50vh]',      // ردیف ابزارهای محاسباتی (ماشین حساب RAID)
+  toolsMinHeight: 'min-h-[50vh]',      // ردیف ابزارهای محاسباتی (محاسبه فضای ذخیره‌ساز)
   timelineMinHeight: 'min-h-[38vh]',   // ردیف تایم‌لاین کامل تعاملی
   containerMaxWidth: 'max-w-[full]', // عرض کانتینر ردیف‌ها برای نمایش حداکثری آیتم‌ها از چپ به راست
 };

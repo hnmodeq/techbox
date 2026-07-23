@@ -7,7 +7,7 @@ import { HardDrive, Network, ArrowLeft } from "lucide-react";
 const tools = [
   {
     title: "RAID Calculator",
-    titleFa: "ماشین‌حساب RAID",
+    titleFa: "محاسبه فضای ذخیره‌ساز",
     description: "محاسبه ظرفیت قابل استفاده برای RAID 0/1/5/6/10 و SHR",
     href: "/tools/raid-calculator",
     icon: HardDrive,
@@ -33,7 +33,7 @@ const tools = [
   },
   {
     title: "NAS Selector",
-    titleFa: "انتخاب‌گر NAS",
+    titleFa: "انتخاب ذخیره‌ساز شبکه",
     description: "پیدا کردن NAS مناسب بر اساس نیاز شما",
     href: "/tools/nas-selector",
     icon: HardDrive,
@@ -57,7 +57,7 @@ const tools = [
   },
   {
     title: "Subnet Calculator",
-    titleFa: "ماشین‌حساب Subnet",
+    titleFa: "محاسبه زیرشبکه",
     description: "محاسبه شبکه، ماسک، آدرس‌های قابل استفاده",
     href: "/tools/subnet-calculator",
     icon: Network,

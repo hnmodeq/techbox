@@ -2,7 +2,7 @@ import { SubnetCalculator } from "@/features/tools/components/subnet-calculator"
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "محاسبه‌گر ساب‌نت | TechBox",
+  title: "محاسبه زیرشبکه | TechBox",
   description: "محاسبه آدرس شبکه، ماسک، محدوده IP و تعداد میزبان قابل استفاده.",
 };
 
