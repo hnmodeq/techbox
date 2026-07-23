@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useReducedMotion } from "framer-motion";
 
 const DEFAULT_LINES = [
@@ -48,7 +48,7 @@ interface TerminalHeroProps {
 
 export function TerminalHero({ lines: propLines }: TerminalHeroProps) {
   const sentences = propLines && propLines.length > 0 ? propLines : DEFAULT_LINES;
-  const terminalLines = buildLines(sentences);
+  const terminalLines = useMemo(() => buildLines(sentences), [sentences]);
 
   const [displayedLines, setDisplayedLines] = useState<
     Array<{ command: string; output?: string; commandDone: boolean; outputDone: boolean }>
