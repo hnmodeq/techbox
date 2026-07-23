@@ -94,6 +94,12 @@ export async function GET(req: NextRequest) {
             verifiedLabel: true,
           },
         },
+        acceptedComment: {
+          select: {
+            text: true,
+            authorName: true,
+          },
+        },
       },
     });
 
@@ -165,6 +171,10 @@ export async function GET(req: NextRequest) {
       availability: p.availability,
       warranty: p.warranty,
       specs: (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? p.specs : {},
+      acceptedAnswer: p.acceptedComment ? {
+        text: (p.acceptedComment.text || "").slice(0, 200),
+        authorName: p.acceptedComment.authorName || "کاربر",
+      } : null,
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         username: p.author?.username || "",

@@ -30,11 +30,8 @@ export function ForumBadge({ slug, fallback = null, className = "" }: { slug: st
   }, [slug, shared, status]);
 
   if (solved === null) {
-    return (
-      <Badge variant="ghost" className={`text-[11px] text-[var(--info)] ${className}`}>
-        در حال بررسی…
-      </Badge>
-    );
+    // Don't show "در حال بررسی…" — just return null to avoid flash
+    return null;
   }
 
   return (

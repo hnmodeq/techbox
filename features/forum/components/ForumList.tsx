@@ -19,7 +19,11 @@ import { ForumBadge } from "@/components/ui/forum-badge";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { useStats } from "@/providers/stats.provider";
 
-type ForumPost = ReturnType<typeof getModuleItems>[0] & { solved?: boolean };
+type ForumPost = ReturnType<typeof getModuleItems>[0] & {
+  solved?: boolean;
+  comments?: number;
+  acceptedAnswer?: { text: string; authorName: string } | null;
+};
 
 const newTopicSchema = z.object({
   title: z.string().min(5, "عنوان حداقل ۵ کاراکتر").max(200),
@@ -27,6 +31,23 @@ const newTopicSchema = z.object({
 });
 
 type NewTopicValues = z.infer<typeof newTopicSchema>;
+
+const PAGE_SIZE = 20;
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`]*`/g, "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/#{1,6}\s*/g, "")
+    .replace(/[*_~]{1,3}([^*_~]+)[*_~]{1,3}/g, "$1")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/\n{2,}/g, " ")
+    .replace(/\n/g, " ")
+    .trim();
+}
 
 export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   const { stats } = useStats();
@@ -47,6 +68,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   const [loadingTopics, setLoadingTopics] = useState(true);
   const [showNew, setShowNew] = useState(false);
   const [local, setLocal] = useState<(ForumPost & { avatar: string })[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [submitError, setSubmitError] = useState("");
 
   const newTopicForm = useForm<NewTopicValues>({
@@ -82,14 +104,22 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
     };
   }, []);
 
-  const realSolved = (t: ForumPost) => stats[`forum:${t.slug}`]?.solved ?? (typeof (t as any).solved === "boolean" ? (t as any).solved : false);
+  const realSolved = (t: ForumPost) =>
+    stats[`forum:${t.slug}`]?.solved ?? (typeof (t as any).solved === "boolean" ? (t as any).solved : false);
 
   const sourceItems = dbItems ?? [];
-  const all = [...local, ...sourceItems].sort((a, b) => +new Date(b.date) - +new Date(a.date));
+  const all = [...local, ...sourceItems].sort(
+    (a, b) => +new Date(b.date) - +new Date(a.date)
+  );
+  const visible = all.slice(0, visibleCount);
+  const hasMore = visibleCount < all.length;
 
   const submitTopic = async (values: NewTopicValues) => {
     setSubmitError("");
-    const slug = values.title.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").slice(0, 60) + "-" + Date.now().toString(36);
+    const slug =
+      values.title.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").slice(0, 60) +
+      "-" +
+      Date.now().toString(36);
     try {
       const res = await fetch("/api/posts", {
         method: "POST",
@@ -129,8 +159,10 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
         date_fa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
         likes: 0,
         views: 1,
+        comments: 0,
         category: "پرسش",
         solved: false,
+        acceptedAnswer: null,
       };
       setLocal((l) => [nt as ForumPost & { avatar: string }, ...l]);
       newTopicForm.reset();
@@ -141,7 +173,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   };
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 space-y-5" dir="rtl">
+    <main className="mx-auto max-w-3xl px-4 py-8 space-y-5" dir="rtl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-extrabold text-foreground">انجمن</h1>
@@ -152,62 +184,116 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
       {loadingTopics && all.length === 0 ? (
         <div className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card animate-pulse">
-              <div className="h-10 w-10 rounded-full bg-muted shrink-0" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-3/4 bg-muted rounded" />
-                <div className="h-3 w-1/2 bg-muted rounded" />
+            <div key={i} className="p-4 rounded-xl border border-border bg-card animate-pulse space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-3/4 bg-muted rounded" />
+                  <div className="h-3 w-1/2 bg-muted rounded" />
+                </div>
               </div>
             </div>
           ))}
         </div>
       ) : all.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-muted-foreground text-sm">هنوز موضوعی ثبت نشده است.</p>
-          <Button onClick={() => setShowNew(true)} size="sm" className="mt-4">اولین موضوع را ایجاد کنید</Button>
+        <div className="text-center py-20">
+          <div className="text-4xl mb-4">💬</div>
+          <p className="text-foreground font-bold mb-1">هنوز موضوعی ثبت نشده</p>
+          <p className="text-muted-foreground text-sm mb-4">اولین نفری باشید که سؤال یا بحثی را شروع می‌کند.</p>
+          <Button onClick={() => setShowNew(true)} size="sm">اولین موضوع را ایجاد کنید</Button>
         </div>
       ) : (
         <div className="space-y-2">
-          {all.map((t) => (
-            <Link
-              key={t.slug}
-              href={`/forum/${t.slug}`}
-              className="group flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/30 hover:bg-accent/30 transition-all duration-200"
-            >
-              {/* Avatar */}
-              <Image
-                src={t.avatar}
-                alt={t.author?.name || "کاربر"}
-                width={40}
-                height={40}
-                className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-border"
-              />
+          {visible.map((t) => {
+            const solved = realSolved(t);
+            const replyCount = t.comments ?? 0;
+            const excerpt = t.excerpt ? stripMarkdown(t.excerpt) : "";
+            const accepted = (t as any).acceptedAnswer as { text: string; authorName: string } | null;
 
-              {/* Content */}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                    {t.title}
-                  </span>
-                  <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? realSolved(t) : null} />
-                </div>
-                <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
-                  ایجاد شده توسط
-                  <span className="font-semibold text-foreground/80">{t.author?.name || "کاربر تکباکس"}</span>
-                  {(t.author as any)?.verifiedType && (
-                    <VerifiedBadge type={(t.author as any).verifiedType as "content" | "org" | "user"} label={(t.author as any)?.verifiedLabel} size={13} />
-                  )}
-                  <span className="text-border">•</span>
-                  <span>{formatRelativeDate(t.date)}</span>
-                </div>
-              </div>
+            return (
+              <Link
+                key={t.slug}
+                href={`/forum/${t.slug}`}
+                className="group block p-4 rounded-xl border border-border bg-card hover:border-primary/30 hover:bg-accent/30 transition-all duration-200"
+              >
+                <div className="flex items-start gap-3.5">
+                  {/* Avatar */}
+                  <Image
+                    src={t.avatar}
+                    alt={t.author?.name || "کاربر"}
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-border mt-0.5"
+                  />
 
-              {/* Arrow */}
-              <svg className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </Link>
-          ))}
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    {/* Title + badges */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                        {t.title}
+                      </span>
+                      <ForumBadge slug={t.slug} fallback={typeof (t as any).solved === "boolean" ? solved : null} />
+                      {replyCount > 0 && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                          {replyCount.toLocaleString("fa-IR")} پاسخ
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Excerpt */}
+                    {excerpt && (
+                      <p className="text-xs text-muted-foreground mt-1.5 line-clamp-1 leading-5">
+                        {excerpt}
+                      </p>
+                    )}
+
+                    {/* Author + time */}
+                    <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5">
+                      ایجاد شده توسط
+                      <span className="font-semibold text-foreground/80">{t.author?.name || "کاربر تکباکس"}</span>
+                      {(t.author as any)?.verifiedType && (
+                        <VerifiedBadge
+                          type={(t.author as any).verifiedType as "content" | "org" | "user"}
+                          label={(t.author as any)?.verifiedLabel}
+                          size={12}
+                        />
+                      )}
+                      <span className="text-border">•</span>
+                      <span>{formatRelativeDate(t.date)}</span>
+                    </div>
+
+                    {/* Best answer preview (solved topics only) */}
+                    {solved && accepted && (
+                      <div className="mt-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-2.5">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-[10px] font-bold text-emerald-600">✓ پاسخ برتر</span>
+                          <span className="text-[10px] text-emerald-600/60">از {accepted.authorName}</span>
+                        </div>
+                        <p className="text-[11px] text-emerald-700/80 line-clamp-2 leading-5">
+                          {stripMarkdown(accepted.text)}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Arrow */}
+                  <svg className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </div>
+              </Link>
+            );
+          })}
+
+          {/* Load more */}
+          {hasMore && (
+            <div className="text-center pt-2">
+              <Button variant="ghost" size="sm" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
+                نمایش موضوعات بیشتر ({(all.length - visibleCount).toLocaleString("fa-IR")} باقی‌مانده)
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
