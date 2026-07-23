@@ -107,7 +107,7 @@ function SettingsContent() {
 
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
-      <section className="mx-auto max-w-4xl space-y-6">
+        <section className="mx-auto max-w-5xl space-y-6">
         <PageHeader colorVar="--admin" title="تنظیمات سایت" titleClassName="text-[var(--admin)]" description="سیاست دیدگاه‌ها و نگهداری رزومه‌ها">
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="ghost" size="sm" onClick={load} disabled={loading}>به‌روزرسانی</Button>

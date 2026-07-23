@@ -403,7 +403,7 @@ function NewPostInner() {
   const statusClass = isSuccess ? "text-green-600" : isDraft ? "text-amber-600" : "text-muted-foreground";
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
+    <main className="mx-auto max-w-7xl px-4 py-10 space-y-6" dir="rtl">
       <Toaster dir="rtl" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>

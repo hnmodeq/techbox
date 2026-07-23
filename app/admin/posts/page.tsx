@@ -199,7 +199,7 @@ function AdminPostsInner({ user }: { user: AppUser }) {
     );
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10 space-y-6" dir="rtl">
+    <main className="mx-auto max-w-7xl px-4 py-10 space-y-6" dir="rtl">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">مدیریت محتوا</h1>
