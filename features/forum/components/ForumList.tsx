@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 import { formatRelativeDate } from "@/lib/date-format";
 import { ForumBadge } from "@/components/ui/forum-badge";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
@@ -51,6 +52,7 @@ function stripMarkdown(text: string): string {
 
 export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   const { stats } = useStats();
+  const router = useRouter();
 
   const fallbackItems = getModuleItems("forum").map((t) => ({
     ...t,
@@ -217,11 +219,15 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                 className="group block p-4 rounded-xl border border-border bg-card hover:border-primary/30 hover:bg-accent/30 transition-all duration-200"
               >
                 <div className="flex items-start gap-3.5">
-                  {/* Avatar — clickable to author profile */}
-                  <Link
-                    href={`/author/${encodeURIComponent(t.author?.username || (t.author?.name || "").trim().toLowerCase().replace(/[^a-z0-9_]+/g, "-"))}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="shrink-0 mt-0.5 hover:opacity-80 transition-opacity"
+                  {/* Avatar — clickable to author profile (button, not Link, to avoid <a> inside <a>) */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      router.push(`/author/${encodeURIComponent(t.author?.username || (t.author?.name || "").trim().toLowerCase().replace(/[^a-z0-9_]+/g, "-"))}`);
+                    }}
+                    className="shrink-0 mt-0.5 hover:opacity-80 transition-opacity cursor-pointer"
                   >
                     <Image
                       src={t.avatar}
@@ -230,7 +236,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                       height={40}
                       className="h-10 w-10 rounded-full object-cover ring-1 ring-border"
                     />
-                  </Link>
+                  </button>
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
