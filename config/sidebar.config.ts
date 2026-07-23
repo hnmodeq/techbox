@@ -65,10 +65,10 @@ export const navItems: NavItem[] = [
  iconActiveClassName: moduleColors.tools.active,
  tooltipClassName: "text-[var(--tools)]",
  children: [
-   { title: "NAS Selector", href: "/tools/nas-selector", icon: NasIcon, iconClassName: moduleColors.nas.base, iconHoverClassName: moduleColors.nas.hover, iconActiveClassName: moduleColors.nas.active },
-   { title: "NVR Selector", href: "/tools/nvr-selector", icon: NvrIcon, iconClassName: moduleColors.nvr.base, iconHoverClassName: moduleColors.nvr.hover, iconActiveClassName: moduleColors.nvr.active },
-   { title: "RAID Calculator", href: "/tools/raid-calculator", icon: Calculator, iconClassName: moduleColors.raid.base, iconHoverClassName: moduleColors.raid.hover, iconActiveClassName: moduleColors.raid.active },
-   { title: "Subnet Calculator", href: "/tools/subnet-calculator", icon: Network, iconClassName: moduleColors.subnet.base, iconHoverClassName: moduleColors.subnet.hover, iconActiveClassName: moduleColors.subnet.active },
+   { title: "محاسبه فضای ذخیره‌ساز", href: "/tools/raid-calculator", icon: Calculator, iconClassName: moduleColors.raid.base, iconHoverClassName: moduleColors.raid.hover, iconActiveClassName: moduleColors.raid.active },
+   { title: "انتخاب ذخیره‌ساز شبکه", href: "/tools/nas-selector", icon: NasIcon, iconClassName: moduleColors.nas.base, iconHoverClassName: moduleColors.nas.hover, iconActiveClassName: moduleColors.nas.active },
+   { title: "انتخاب ذخیره‌ساز دوربین", href: "/tools/nvr-selector", icon: NvrIcon, iconClassName: moduleColors.nvr.base, iconHoverClassName: moduleColors.nvr.hover, iconActiveClassName: moduleColors.nvr.active },
+   { title: "محاسبه زیرشبکه", href: "/tools/subnet-calculator", icon: Network, iconClassName: moduleColors.subnet.base, iconHoverClassName: moduleColors.subnet.hover, iconActiveClassName: moduleColors.subnet.active },
  ],
  },
  {

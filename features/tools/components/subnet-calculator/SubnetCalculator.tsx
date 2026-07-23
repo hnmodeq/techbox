@@ -56,7 +56,7 @@ export default function SubnetCalculator() {
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
           <Network className="size-6" />
-          محاسبه‌گر ساب‌نت
+          محاسبه زیرشبکه
         </h1>
         <p className="text-sm text-muted-foreground">
           آدرس IP و پیشوند شبکه را وارد کنید تا اطلاعات شبکه محاسبه شود.

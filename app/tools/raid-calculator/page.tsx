@@ -2,7 +2,7 @@ import { RaidCalculator } from "@/features/tools/components/raid-calculator";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ماشین حساب RAID / SHR | TechBox",
+  title: "محاسبه فضای ذخیره‌ساز | TechBox",
   description: "محاسبه ظرفیت RAID 0/1/5/6/10 و SHR-1/SHR-2 با ظرفیت‌های ترکیبی.",
 };
 

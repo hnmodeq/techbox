@@ -74,8 +74,8 @@ export default async function StorageLandingPage() {
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <ButtonLink href="/landing/storage/shop" size="lg" className="bg-white text-black hover:bg-white/90">ورود به فروشگاه ذخیره‌ساز</ButtonLink>
-              <ButtonLink href="/tools/nas-selector" variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10">انتخاب‌گر هوشمند NAS</ButtonLink>
-              <ButtonLink href="/tools/raid-calculator" variant="ghost" size="lg" className="text-white/70 hover:text-white">ماشین‌حساب RAID</ButtonLink>
+              <ButtonLink href="/tools/nas-selector" variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10">انتخاب ذخیره‌ساز شبکه</ButtonLink>
+              <ButtonLink href="/tools/raid-calculator" variant="ghost" size="lg" className="text-white/70 hover:text-white">محاسبه فضای ذخیره‌ساز</ButtonLink>
             </div>
             <div className="flex flex-wrap gap-2 pt-4 text-[11px] text-white/50">
               <span>✓ قیمت مبدا دلاری مخفی، تومان لحظه‌ای</span>
@@ -210,17 +210,17 @@ export default async function StorageLandingPage() {
             </p>
           </div>
           <div className="flex gap-2 mt-4">
-            <ButtonLink href="/tools/raid-calculator" className="bg-white text-black hover:bg-white/90" size="sm">ماشین‌حساب RAID</ButtonLink>
-            <ButtonLink href="/tools/nas-selector" variant="outline" className="border-white/20 text-white hover:bg-white/10" size="sm">انتخاب‌گر NAS</ButtonLink>
+            <ButtonLink href="/tools/raid-calculator" className="bg-white text-black hover:bg-white/90" size="sm">محاسبه فضای ذخیره‌ساز</ButtonLink>
+            <ButtonLink href="/tools/nas-selector" variant="outline" className="border-white/20 text-white hover:bg-white/10" size="sm">انتخاب ذخیره‌ساز شبکه</ButtonLink>
           </div>
         </div>
         <div className="rounded-xl border bg-card p-5">
           <h4 className="text-[13px] font-bold mb-3">ابزارهای تکباکس برای IT</h4>
           <div className="grid grid-cols-2 gap-2">
-            <Link href="/tools/nas-selector" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">NAS Selector →</Link>
-            <Link href="/tools/raid-calculator" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">RAID Calculator →</Link>
-            <Link href="/tools/nvr-selector" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">NVR Selector →</Link>
-            <Link href="/tools/subnet-calculator" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">Subnet Calculator →</Link>
+            <Link href="/tools/raid-calculator" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">محاسبه فضای ذخیره‌ساز ←</Link>
+            <Link href="/tools/nas-selector" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">انتخاب ذخیره‌ساز شبکه ←</Link>
+            <Link href="/tools/nvr-selector" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">انتخاب ذخیره‌ساز دوربین ←</Link>
+            <Link href="/tools/subnet-calculator" className="rounded-lg border p-3 hover:bg-accent text-[11px] font-medium">محاسبه زیرشبکه ←</Link>
           </div>
         </div>
       </section>

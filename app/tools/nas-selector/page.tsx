@@ -3,7 +3,7 @@ import { getDbModulePosts } from "@/lib/server-posts";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "انتخاب‌گر هوشمند NAS | TechBox",
+  title: "انتخاب ذخیره‌ساز شبکه | TechBox",
   description: "با پاسخ به ۴ سؤال ساده، بهترین NAS را برای نیاز خود پیدا کنید.",
 };
 

@@ -911,7 +911,7 @@ export default function NasSelector({
                     <Icon name="star" className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-[15px]">نتایج انتخاب‌گر NAS</CardTitle>
+                    <CardTitle className="text-[15px]">نتایج انتخاب ذخیره‌ساز شبکه</CardTitle>
                     <p className="text-[11px] text-muted-foreground">
                       {state.persona && personaLabels[state.persona]?.title} • {state.workloads.length} سرویس • {persianNumber(state.usableTb)} TB • {raidLabels[state.raid]?.title}
                     </p>
