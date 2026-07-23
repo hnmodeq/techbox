@@ -24,10 +24,13 @@ const ROW_COMPONENTS: Record<string, React.ComponentType<{ homeTitle?: string; h
   timeline: HomeTimelineRow,
 };
 
+function GradientDivider() {
+  return <hr className="home-divider" />;
+}
+
 export default async function Page() {
   const config = await getModuleConfig();
 
-  // Build ordered list of visible rows
   const visibleRows = (Object.keys(ROW_COMPONENTS) as ModuleSlug[])
     .filter((slug) => config[slug]?.enabled && config[slug]?.showOnHome)
     .sort((a, b) => (config[a]?.homeOrder ?? 99) - (config[b]?.homeOrder ?? 99));
@@ -37,11 +40,17 @@ export default async function Page() {
       {/* Hero with terminal */}
       {config.heroVisible !== false && <HeroSection />}
 
+      <GradientDivider />
+
       {/* Why TechBox */}
       <WhyTechBox />
 
+      <GradientDivider />
+
       {/* Tools showcase */}
       <ToolsShowcase />
+
+      <GradientDivider />
 
       {/* Module rows */}
       {visibleRows.map((slug) => {
@@ -49,22 +58,27 @@ export default async function Page() {
         if (!Component) return null;
         const cfg = config[slug];
         return (
-          <Component
-            key={slug}
-            homeTitle={cfg?.homeTitle || undefined}
-            homeMoreLabel={cfg?.homeMoreLabel || undefined}
-            showHomeTitle={cfg?.showHomeTitle}
-            showHomeMoreLabel={cfg?.showHomeMoreLabel}
-          />
+          <React.Fragment key={slug}>
+            <Component
+              homeTitle={cfg?.homeTitle || undefined}
+              homeMoreLabel={cfg?.homeMoreLabel || undefined}
+              showHomeTitle={cfg?.showHomeTitle}
+              showHomeMoreLabel={cfg?.showHomeMoreLabel}
+            />
+            <GradientDivider />
+          </React.Fragment>
         );
       })}
 
       {/* Recommendations */}
       {visibleRows.length > 0 && (
-        <RecommendationRow
-          items={getHomepageRecommendations(8)}
-          title="پیشنهادهای هوشمند برای شما"
-        />
+        <>
+          <RecommendationRow
+            items={getHomepageRecommendations(8)}
+            title="پیشنهادهای هوشمند برای شما"
+          />
+          <GradientDivider />
+        </>
       )}
 
       {/* CTA */}
