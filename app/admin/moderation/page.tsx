@@ -8,7 +8,8 @@ import { AdminLoading, AdminEmpty } from "@/components/admin/admin-states";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
@@ -38,17 +39,25 @@ type ModerationUser = {
 };
 
 const commentStatuses = ["all", "approved", "pending", "hidden", "spam"];
-const userStatuses = ["active", "suspended", "banned"] as const;
+type IpBan = {
+  id: string;
+  ip: string;
+  reason: string | null;
+  bannedBy: string | null;
+  createdAt: string;
+};
+
+const userStatuses = ["active", "muted", "banned"] as const;
 
 function statusLabel(status: string) {
-  const map: Record<string, string> = { approved: "تایید", pending: "در انتظار", hidden: "مخفی", spam: "اسپم", active: "فعال", suspended: "تعلیق", banned: "مسدود" };
+  const map: Record<string, string> = { approved: "تایید", pending: "در انتظار", hidden: "مخفی", spam: "اسپم", active: "فعال", muted: "سکوت", suspended: "تعلیق", banned: "مسدود" };
   return map[status] || status;
 }
 
 function statusVariant(status: string) {
   if (status === "approved" || status === "active") return "default" as const;
   if (status === "spam" || status === "banned") return "destructive" as const;
-  if (status === "hidden" || status === "suspended") return "secondary" as const;
+  if (status === "hidden" || status === "suspended" || status === "muted") return "secondary" as const;
   return "outline" as const;
 }
 
@@ -61,12 +70,15 @@ export default function ModerationPage() {
 }
 
 function ModerationContent() {
-  const [tab, setTab] = useState<"comments" | "users">("comments");
+  const [tab, setTab] = useState<"comments" | "users" | "ip_bans">("comments");
   const [status, setStatus] = useState("all");
   const [comments, setComments] = useState<ModerationComment[]>([]);
   const [users, setUsers] = useState<ModerationUser[]>([]);
+  const [ipBans, setIpBans] = useState<IpBan[]>([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [banReason, setBanReason] = useState("");
+  const [ipBanInput, setIpBanInput] = useState("");
 
   const loadComments = useCallback(async () => {
     setLoading(true);
@@ -84,7 +96,8 @@ function ModerationContent() {
     try {
       const res = await fetch(`/api/admin/moderation/users`, { cache: "no-store" });
       const data = await res.json();
-      if (Array.isArray(data)) setUsers(data);
+      if (data.users) setUsers(data.users);
+      if (data.ipBans) setIpBans(data.ipBans);
     } finally {
       setLoading(false);
     }
@@ -113,6 +126,77 @@ function ModerationContent() {
     setMsg("");
     const res = await fetch("/api/admin/moderation/users", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: nextStatus }) });
     setMsg(res.ok ? "وضعیت کاربر تغییر کرد." : "خطا در تغییر وضعیت کاربر.");
+    loadUsers();
+  };
+
+  const muteUser = async (id: string) => {
+    setMsg("");
+    const res = await fetch("/api/admin/moderation/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "mute", reason: banReason || undefined }),
+    });
+    setMsg(res.ok ? "کاربر سکوت شد." : "خطا");
+    setBanReason("");
+    loadUsers();
+  };
+
+  const unmuteUser = async (id: string) => {
+    setMsg("");
+    const res = await fetch("/api/admin/moderation/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "unmute" }),
+    });
+    setMsg(res.ok ? "سکوت برداشته شد." : "خطا");
+    loadUsers();
+  };
+
+  const banUser = async (id: string) => {
+    if (!confirm("آیا از مسدود کردن این کاربر اطمینان دارید؟")) return;
+    setMsg("");
+    const res = await fetch("/api/admin/moderation/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "ban", reason: banReason || undefined }),
+    });
+    setMsg(res.ok ? "کاربر مسدود شد." : "خطا");
+    setBanReason("");
+    loadUsers();
+  };
+
+  const unbanUser = async (id: string) => {
+    setMsg("");
+    const res = await fetch("/api/admin/moderation/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "unban" }),
+    });
+    setMsg(res.ok ? "مسدودی برداشته شد." : "خطا");
+    loadUsers();
+  };
+
+  const ipBanUser = async (ip: string) => {
+    if (!confirm(`آیا از مسدود کردن IP ${ip} اطمینان دارید؟`)) return;
+    setMsg("");
+    const res = await fetch("/api/admin/moderation/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "ip_ban", ip, reason: banReason || undefined }),
+    });
+    setMsg(res.ok ? "IP مسدود شد." : "خطا");
+    setBanReason("");
+    loadUsers();
+  };
+
+  const ipUnban = async (ip: string) => {
+    setMsg("");
+    const res = await fetch("/api/admin/moderation/users", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "ip_unban", ip }),
+    });
+    setMsg(res.ok ? "مسدودی IP برداشته شد." : "خطا");
     loadUsers();
   };
 
@@ -201,26 +285,94 @@ function ModerationContent() {
           </TabsContent>
 
           <TabsContent value="users" className="mt-4">
+            {/* IP Ban Input */}
+            <Card className="p-3 mb-4">
+              <div className="flex gap-2 items-end">
+                <div className="flex-1 space-y-1">
+                  <label className="text-xs text-muted-foreground">مسدود کردن IP</label>
+                  <Input value={ipBanInput} onChange={(e) => setIpBanInput(e.target.value)} placeholder="192.168.1.1" dir="ltr" className="h-8" />
+                </div>
+                <div className="flex-1 space-y-1">
+                  <label className="text-xs text-muted-foreground">دلیل (اختیاری)</label>
+                  <Input value={banReason} onChange={(e) => setBanReason(e.target.value)} placeholder="دلیل مسدودی..." className="h-8" />
+                </div>
+                <Button size="sm" variant="danger" onClick={() => ipBanInput.trim() && ipBanUser(ipBanInput.trim())} disabled={!ipBanInput.trim()}>
+                  مسدود کردن IP
+                </Button>
+              </div>
+            </Card>
+
             <Card className="p-0 overflow-hidden">
               <div className="divide-y divide-border/30">
                 {users.map((user) => (
                   <div key={user.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
                     <div className="flex items-center gap-3">
                       {user.avatar && <Image src={user.avatar} width={42} height={42} alt={user.name} className="h-10 w-10 rounded-full object-cover" />}
-                      <div><div className="font-bold text-sm">{user.name}</div><div className="font-mono text-xs text-muted-foreground" dir="ltr">@{user.username}</div></div>
+                      <div>
+                        <div className="font-bold text-sm flex items-center gap-1.5">
+                          {user.name}
+                          {(user as any).verifiedType && (
+                            <VerifiedBadge type={(user as any).verifiedType as "content" | "org" | "user"} label={(user as any).verifiedLabel} size={13} />
+                          )}
+                        </div>
+                        <div className="font-mono text-xs text-muted-foreground" dir="ltr">@{user.username}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">
+                          {user._count.posts} مطلب · {user._count.comments} دیدگاه · {user._count.ratings} امتیاز
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant={statusVariant(user.status)}>{statusLabel(user.status)}</Badge>
-                      <span className="text-xs text-muted-foreground">{user._count.posts} posts • {user._count.comments} comments • {user._count.ratings} ratings</span>
-                      {userStatuses.map((s) => (
-                        <Button key={s} size="xs" variant={user.status === s ? "secondary" : "ghost"} onClick={() => setUserStatus(user.id, s)}>{statusLabel(s)}</Button>
-                      ))}
+                    <div className="flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={statusVariant(user.status)}>{statusLabel(user.status)}</Badge>
+                        {(user as any).mutedUntil && (
+                          <span className="text-[10px] text-muted-foreground">
+                            تا {new Date((user as any).mutedUntil).toLocaleDateString("fa-IR")}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {user.status === "muted" ? (
+                          <Button size="xs" variant="outline" onClick={() => unmuteUser(user.id)}>لغو سکوت</Button>
+                        ) : (
+                          <Button size="xs" variant="ghost" onClick={() => muteUser(user.id)}>سکوت</Button>
+                        )}
+                        {user.status === "banned" ? (
+                          <Button size="xs" variant="outline" onClick={() => unbanUser(user.id)}>لغو مسدودی</Button>
+                        ) : (
+                          <Button size="xs" variant="ghost" className="text-destructive" onClick={() => banUser(user.id)}>مسدود کردن</Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
                 {!users.length && !loading && <AdminEmpty title="کاربری یافت نشد." />}
               </div>
             </Card>
+
+            {/* IP Bans List */}
+            {ipBans.length > 0 && (
+              <Card className="mt-4">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm">IP های مسدود شده ({ipBans.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y">
+                    {ipBans.map((ban) => (
+                      <div key={ban.id} className="flex items-center justify-between gap-3 px-4 py-2">
+                        <div>
+                          <code className="text-xs font-mono" dir="ltr">{ban.ip}</code>
+                          {ban.reason && <span className="text-xs text-muted-foreground ms-2">— {ban.reason}</span>}
+                          <div className="text-[10px] text-muted-foreground">{new Date(ban.createdAt).toLocaleString("fa-IR")}</div>
+                        </div>
+                        <Button size="xs" variant="ghost" className="text-destructive" onClick={() => ipUnban(ban.ip)}>
+                          لغو مسدودی
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </section>
