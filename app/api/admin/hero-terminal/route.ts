@@ -6,11 +6,16 @@ import { cacheHeaders, PUBLIC_CONTENT_CACHE, PRIVATE_NO_STORE } from "@/lib/cach
 const KEY = "hero.terminal.lines";
 
 export const DEFAULT_LINES = [
-  "به تکباکس خوش اومدی 👋",
-  "پلتفرم تخصصی زیرساخت و فناوری اطلاعات",
-  "مقاله، ویدیو، انجمن، ابزار، فروشگاه و بیشتر...",
-  "محتوای تخصصی برای مهندسان زیرساخت ایران",
-  "سرور، شبکه، استوریج، امنیت — همه اینجاست",
+  'ssh iradmin@techbox.ir "Welcome home, engineer"',
+  'cat /etc/motto && echo "Home of Iranian IT"',
+  'curl -s techbox.ir/api/vibes | jq ".warmth"',
+  'figlet -f slant "TechBox" | lolcat',
+  'echo "A box full of technologies, not just a box"',
+  'uname -a && echo "Built by engineers, for engineers"',
+  'whoami && echo "An Iranian IT engineer who never gives up"',
+  'echo "We sell servers. We also hug them sometimes."',
+  'echo "Threadripper 7995WX? Yes please. Two of them."',
+  'echo "We travel the world to bring servers home. Customs loves us."',
 ];
 
 export async function GET() {
