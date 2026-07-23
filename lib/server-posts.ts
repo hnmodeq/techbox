@@ -33,6 +33,12 @@ export async function getDbModulePosts(
             verifiedLabel: true,
           },
         },
+        acceptedComment: {
+          select: {
+            text: true,
+            authorName: true,
+          },
+        },
       },
     });
 
@@ -44,6 +50,20 @@ export async function getDbModulePosts(
         rates = null;
       }
     }
+
+    // Bulk comment counts
+    const commentMap = new Map<string, number>();
+    try {
+      const postIds = posts.map((p: any) => p.id);
+      if (postIds.length > 0) {
+        const counts = await prisma.comment.groupBy({
+          by: ["postId"],
+          _count: { _all: true },
+          where: { postId: { in: postIds }, status: "approved" },
+        });
+        counts.forEach((c: any) => commentMap.set(c.postId, c._count._all || 0));
+      }
+    } catch {}
 
     return posts.map((p: any) => {
       let finalPriceAmount = p.priceAmount ?? null;
@@ -110,6 +130,11 @@ export async function getDbModulePosts(
         fileSize: p.fileSize,
         downloadCount: p.downloadCount,
         solved: p.solved ?? undefined,
+        comments: commentMap.get(p.id) || 0,
+        acceptedAnswer: p.acceptedComment ? {
+          text: (p.acceptedComment.text || "").slice(0, 200),
+          authorName: p.acceptedComment.authorName || "کاربر",
+        } : null,
       };
     });
   } catch (error) {
