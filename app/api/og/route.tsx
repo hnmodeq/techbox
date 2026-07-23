@@ -10,7 +10,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get("title") || "تکباکس";
-  const module = searchParams.get("module") || "";
+  const moduleKey = searchParams.get("module") || "";
   const category = searchParams.get("category") || "";
 
   const moduleColors: Record<string, string> = {
@@ -37,8 +37,8 @@ export async function GET(req: NextRequest) {
     timeline: "تایم‌لاین",
   };
 
-  const color = moduleColors[module] || "#8b5cf6";
-  const label = moduleLabels[module] || module;
+  const color = moduleColors[moduleKey] || "#8b5cf6";
+  const label = moduleLabels[moduleKey] || moduleKey;
 
   // Truncate title to fit
   const displayTitle = title.length > 80 ? title.slice(0, 77) + "…" : title;

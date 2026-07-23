@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import { AdminLoading, AdminEmpty, AdminError } from "@/components/admin/admin-states";
 import { Button } from "@/components/ui/button";
@@ -188,7 +189,7 @@ function MediaContent() {
               >
                 <div className="aspect-square bg-muted flex items-center justify-center relative overflow-hidden">
                   {isImage ? (
-                    <img src={file.url} alt={file.name} className="w-full h-full object-cover" loading="lazy" />
+                    <Image src={file.url} alt={file.name} fill sizes="200px" className="object-cover" />
                   ) : (
                     <Icon className={`size-8 ${kind.color}`} />
                   )}
@@ -251,8 +252,8 @@ function MediaContent() {
           {selected && (
             <div className="space-y-4">
               {selected.contentType.startsWith("image/") && (
-                <div className="rounded-lg overflow-hidden bg-muted">
-                  <img src={selected.url} alt={selected.name} className="w-full max-h-64 object-contain" />
+                <div className="relative rounded-lg overflow-hidden bg-muted aspect-video">
+                  <Image src={selected.url} alt={selected.name} fill sizes="(max-width: 640px) 100vw, 500px" className="object-contain" />
                 </div>
               )}
               {selected.contentType.startsWith("video/") && (
