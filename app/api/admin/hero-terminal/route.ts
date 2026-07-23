@@ -7,15 +7,15 @@ const KEY = "hero.terminal.lines";
 
 export const DEFAULT_LINES = [
   'ssh iradmin@techbox.ir "Welcome home, engineer"',
-  'cat /etc/motto && echo "Home of Iranian IT"',
   'curl -s techbox.ir/api/vibes | jq ".warmth"',
-  'figlet -f slant "TechBox" | lolcat',
-  'echo "A box full of technologies, not just a box"',
+  'figlet -f slant "TechBox"',
   'uname -a && echo "Built by engineers, for engineers"',
-  'whoami && echo "An Iranian IT engineer who never gives up"',
-  'echo "We sell servers. We also hug them sometimes."',
-  'echo "Threadripper 7995WX? Yes please. Two of them."',
-  'echo "We travel the world to bring servers home. Customs loves us."',
+  'whoami && echo "Iranian IT engineer who never gives up"',
+  'cat /etc/motto && echo "Home of Iranian IT"',
+  'id -u && echo "uid=0(root) gid=0(iran-devs) groups=storage,servers,network"',
+  'hostname && echo "techbox.ir — where servers feel at home"',
+  'echo "A box full of technologies, not just a box"',
+  'echo "We are not just a website. We are a movement."',
 ];
 
 export async function GET() {

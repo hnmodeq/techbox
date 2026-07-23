@@ -7,16 +7,14 @@ import { useReducedMotion } from "framer-motion";
 const DEFAULT_LINES = [
   // ── Welcome ──
   'ssh iradmin@techbox.ir "Welcome home, engineer"',
-  'cat /etc/motto && echo "Home of Iranian IT"',
   'curl -s techbox.ir/api/vibes | jq ".warmth"',
-  'figlet -f slant "TechBox" | lolcat',
-
-  // ── Who we are ──
-  'echo "A box full of technologies, not just a box"',
+  'figlet -f slant "TechBox"',
   'uname -a && echo "Built by engineers, for engineers"',
-  'whoami && echo "An Iranian IT engineer who never gives up"',
+  'whoami && echo "Iranian IT engineer who never gives up"',
+  'cat /etc/motto && echo "Home of Iranian IT"',
   'id -u && echo "uid=0(root) gid=0(iran-devs) groups=storage,servers,network"',
   'hostname && echo "techbox.ir — where servers feel at home"',
+  'echo "A box full of technologies, not just a box"',
   'echo "We are not just a website. We are a movement."',
 
   // ── Servers & Storage ──
@@ -26,14 +24,16 @@ const DEFAULT_LINES = [
   'echo "We sell servers. We also hug them sometimes."',
   'dmidecode -t memory | head -5 && echo "128GB DDR5 ECC, just for starters"',
   'echo "A server without RAID is like tea without sugar"',
+  'nvme list && echo "All NVMe. All flash. All day."',
   'cat /proc/cpuinfo | grep "model name" | head -1 && echo "This is art"',
+  'echo "Storage? We have more options than a Turkish bazaar."',
+  'echo "We travel the world to bring servers home. Customs loves us."',
+
+  // ── Shipping & Delivery ──
   'echo "We ship servers to Bandar Abbas. Also to Mashhad. Also to your office."',
   'echo "Shipping a 42U rack to Mazandaran? Hold my chai."',
   'echo "We deliver servers everywhere. Even where Google Maps gives up."',
   'echo "FedEx: We cannot deliver there. Us: Watch us."',
-  'echo "Storage? We have more options than a Turkish bazaar."',
-  'nvme list && echo "All NVMe. All flash. All day."',
-  'echo "We travel the world to bring servers home. Customs loves us."',
   'echo "Our warehouse looks like a spaceship hangar"',
   'echo "Every server we sell gets a personal goodbye letter"',
   'echo "We do not just sell hardware. We sell peace of mind."',
@@ -71,6 +71,8 @@ const DEFAULT_LINES = [
   'echo "Red flowers for Hormozgan. Red flowers for Jask. Red flowers for the South."',
   'echo "Red flowers for Bandar Abbas — where servers meet the sea"',
   'echo "If you are from the South, you get free shipping. Just kidding. Maybe."',
+
+  // ── Tech Wars ──
   'echo "We like iPads and MacBooks. We pretend Surface does not exist."',
   'echo "Next.js: Fast. .NET: ... let us change the subject."',
   'echo "React makes us happy. jQuery makes us cry."',
@@ -93,10 +95,10 @@ const DEFAULT_LINES = [
   'echo "I would tell you a UDP joke, but you might not get it."',
   'echo "Debugging: Being the detective in a crime movie where you are also the murderer"',
   'echo "It works on my NAS. Ship it."',
-  'echo "sudo make-me-a-sandwich && echo Done, boss"',
+  'sudo echo "Done, boss" && echo "Just kidding. Please do not sudo randomly."',
   'echo "Have you tried turning the datacenter off and on again?"',
-  'echo "rm -rf /problems && echo All fixed"',
-  'echo "git commit -m \'fix: everything\' && echo Pushed to production. Pray."',
+  'git commit -m "fix: everything" && echo "Pushed to production. Pray."',
+  'rm -rf /problems && echo "All fixed"',
   'echo "404: Sleep not found. Server room too loud."',
 
   // ── Website Features ──
@@ -109,7 +111,6 @@ const DEFAULT_LINES = [
   'echo "Confirm your identity to unlock badges and more features"',
   'echo "Let us know who you are. We are curious about our community."',
   'echo "Let us support each other. Engineers helping engineers."',
-  'echo "Your feedback makes us better. Your complaints make us stronger."',
   'echo "techbox.ir — bookmark it before your colleague does"',
   'echo "We have NAS selectors, RAID calculators, and subnet tools"',
   'echo "Our RAID calculator does not judge your disk choices"',
