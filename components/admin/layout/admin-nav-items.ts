@@ -64,7 +64,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     label: "کاربران و اجتماع",
     items: [
       { title: "کاربران", href: "/admin/users", icon: Users, superAdminOnly: true },
-      { title: "نقش‌ها و دسترسی", href: "/admin/roles", icon: Shield, superAdminOnly: true },
+      { title: "نقش‌ها و دسترسی", href: "/admin/roles-v2", icon: Shield, superAdminOnly: true },
       { title: "مدیریت گفتگو", href: "/admin/moderation", icon: Shield, superAdminOnly: true },
       { title: "تایید هویت", href: "/admin/verification", icon: BadgeCheck, superAdminOnly: true },
     ],
