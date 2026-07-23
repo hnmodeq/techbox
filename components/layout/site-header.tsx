@@ -140,13 +140,20 @@ function TechboxBreadcrumb() {
     const slug = parts[1]
 
     if (firstPart === "author" && slug) {
+      // Use document.title from SSR immediately — no flash of English slug
+      const ssrName = document.title
+        .replace(/\s*[|–—]\s*تکباکس\s*$/i, "")
+        .replace(/\s*[|–—]\s*TechBox\s*$/i, "")
+        .trim();
+      if (ssrName && ssrName !== "تکباکس" && ssrName.length > 1) {
+        setAuthorName((prev) => (prev === ssrName ? prev : ssrName));
+      }
       setDynamicTitle("")
       let cancelled = false
       fetch(`/api/users/public/${encodeURIComponent(slug)}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((profile) => {
           if (!cancelled && profile?.name) {
-            // Only update state when value actually changes to avoid re-render loops
             setAuthorName((prev) => (prev === profile.name ? prev : profile.name))
           }
         })
@@ -154,7 +161,7 @@ function TechboxBreadcrumb() {
       return () => { cancelled = true }
     }
 
-    // Non-author route: clear author name without triggering extra renders
+    // Non-author route: clear author name
     setAuthorName((prev) => (prev === "" ? prev : ""))
 
     if (!moduleKey || !slug || !contentModules.includes(moduleKey)) {
@@ -162,6 +169,17 @@ function TechboxBreadcrumb() {
       return
     }
 
+    // Use document.title from SSR immediately — no flash of English slug.
+    // Strip "| TechBox" or "– TechBox" suffix that Next.js metadata adds.
+    const ssrTitle = document.title
+      .replace(/\s*[|–—]\s*تکباکس\s*$/i, "")
+      .replace(/\s*[|–—]\s*TechBox\s*$/i, "")
+      .trim();
+    if (ssrTitle && ssrTitle !== "تکباکس" && ssrTitle.length > 2) {
+      setDynamicTitle((prev) => (prev === ssrTitle ? prev : ssrTitle));
+    }
+
+    // Also fetch from API to get the freshest title (background update)
     let cancelled = false
     fetch(`/api/posts?module=${encodeURIComponent(moduleKey)}&slug=${encodeURIComponent(slug)}`)
       .then((res) => (res.ok ? res.json() : null))
@@ -172,7 +190,7 @@ function TechboxBreadcrumb() {
         }
       })
       .catch(() => {
-        if (!cancelled) setDynamicTitle("")
+        if (!cancelled && !ssrTitle) setDynamicTitle("")
       })
 
     return () => { cancelled = true }

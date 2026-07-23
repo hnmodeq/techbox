@@ -217,14 +217,20 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                 className="group block p-4 rounded-xl border border-border bg-card hover:border-primary/30 hover:bg-accent/30 transition-all duration-200"
               >
                 <div className="flex items-start gap-3.5">
-                  {/* Avatar */}
-                  <Image
-                    src={t.avatar}
-                    alt={t.author?.name || "کاربر"}
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-border mt-0.5"
-                  />
+                  {/* Avatar — clickable to author profile */}
+                  <Link
+                    href={`/author/${encodeURIComponent(t.author?.username || (t.author?.name || "").trim().toLowerCase().replace(/[^a-z0-9_]+/g, "-"))}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="shrink-0 mt-0.5 hover:opacity-80 transition-opacity"
+                  >
+                    <Image
+                      src={t.avatar}
+                      alt={t.author?.name || "کاربر"}
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 rounded-full object-cover ring-1 ring-border"
+                    />
+                  </Link>
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
