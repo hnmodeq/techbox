@@ -4,11 +4,16 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useReducedMotion } from "framer-motion";
 
 const DEFAULT_LINES = [
-  "به تکباکس خوش اومدی 👋",
-  "پلتفرم تخصصی زیرساخت و فناوری اطلاعات",
-  "مقاله، ویدیو، انجمن، ابزار، فروشگاه و بیشتر...",
-  "محتوای تخصصی برای مهندسان زیرساخت ایران",
-  "سرور، شبکه، استوریج، امنیت — همه اینجاست",
+  'python3 -c "print(\'Welcome to TechBox 👋\')"',
+  "curl -s https://techbox.ir/status | jq '.platform'",
+  "SELECT * FROM modules WHERE category = 'infrastructure';",
+  "docker compose up -d --build techbox-stack",
+  "ping -c 5 server network storage security | grep 'all here'",
+  "git log --oneline --grep='IT engineers love this'",
+  "npm run deploy --env=production --target=iran-devs",
+  'echo "Articles | Videos | Forum | Tools | Shop"',
+  "traceroute techbox.ir --show-hops=community",
+  "sudo systemctl status techbox-platform ● active",
 ];
 
 interface TerminalLine {
@@ -155,7 +160,7 @@ export function TerminalHero({ lines: propLines, fullWidth }: TerminalHeroProps)
       {/* Terminal body */}
       <div
         ref={scrollRef}
-        className="p-4 min-h-[200px] max-h-[600px] overflow-y-auto space-y-1 text-left"
+        className="p-4 h-[250px] overflow-y-auto space-y-1 text-left"
         style={{ scrollbarWidth: "none" }}
       >
         {/* All completed lines — stay forever */}
