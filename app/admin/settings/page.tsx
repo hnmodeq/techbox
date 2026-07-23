@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
+import { PermissionGate } from "@/components/admin/permission-gate";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,6 +114,7 @@ function SettingsContent() {
           </div>
         </PageHeader>
 
+        <PermissionGate permission="settings:comments:view">
         <Card className="p-5 space-y-5">
           <CardHeader className="p-0 flex flex-row items-center justify-between">
             <div>
@@ -147,7 +149,9 @@ function SettingsContent() {
             </Card>
           </CardContent>
         </Card>
+        </PermissionGate>
 
+        <PermissionGate permission="settings:resume:view">
         <Card className="p-5 space-y-4">
           <CardHeader className="p-0">
             <CardTitle>رزومه‌ها</CardTitle>
@@ -166,7 +170,9 @@ function SettingsContent() {
             </div>
           </CardContent>
         </Card>
+        </PermissionGate>
 
+        <PermissionGate permission="settings:email:view">
         <Card className="p-6 border shadow-sm space-y-6">
           <CardHeader className="p-0">
             <CardTitle>تنظیمات ایمیل و ثبت‌نام</CardTitle>
@@ -255,7 +261,9 @@ function SettingsContent() {
             </div>
           </CardContent>
         </Card>
+        </PermissionGate>
 
+        <PermissionGate permission="settings:price:view">
         <Card className="p-6 border shadow-sm space-y-6">
           <CardHeader className="p-0">
             <CardTitle>تنظیمات قیمت و ارز (قیمت‌گذاری فروشگاه)</CardTitle>
@@ -332,6 +340,7 @@ function SettingsContent() {
             </div>
           </CardContent>
         </Card>
+        </PermissionGate>
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={load} disabled={loading || saving}>انصراف</Button>
