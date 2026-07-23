@@ -64,12 +64,13 @@ export function NvrCalculator({ products = [] }: { products?: Product[] }) {
   const selectedRes = RESOLUTIONS.find((r) => r.value === resolution) || RESOLUTIONS[1];
 
   const result = useMemo(() => {
-    const totalGb = Math.ceil((cameras * hours * days * selectedRes.mbps * 3600) / 8 / 1024 / 1024);
+    // Storage: cameras × (Mbps/8 → MB/s) × 3600s × hours/day × days → MB, then /1024 → GB
+    const totalGb = Math.ceil((cameras * (selectedRes.mbps / 8) * 3600 * hours * days) / 1024);
     const bandwidthMbps = cameras * selectedRes.mbps;
     const raid = cameras >= 16 ? "رید ۶" : cameras >= 4 ? "رید ۵" : "رید ۱";
     const driveSizeTb = 4;
     const baysNeeded = Math.ceil(totalGb / 1024 / driveSizeTb);
-    const recommendedBays = baysNeeded <= 1 ? 2 : baysNeeded <= 2 ? 4 : baysNeeded <= 4 ? 8 : 12;
+    const recommendedBays = baysNeeded <= 1 ? 2 : baysNeeded <= 2 ? 4 : baysNeeded <= 4 ? 8 : baysNeeded <= 8 ? 12 : 16;
     return { totalGb, bandwidthMbps, raid, recommendedBays };
   }, [cameras, days, hours, selectedRes.mbps]);
 
