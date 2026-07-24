@@ -1,7 +1,7 @@
 import { pageMetadata } from "@/lib/seo";
 import { prisma } from "@/lib/db";
-import { AuthorLink } from "@/components/ui/author-link";
-import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import Link from "next/link";
 
 export const metadata = pageMetadata({
   title: "درباره تکباکس | تکباکس",
@@ -52,18 +52,35 @@ export default async function AboutPage() {
       {/* Team sections */}
       {sections.map((section) => (
         section.members.length > 0 && (
-          <section key={section.id} className="space-y-4">
+          <section key={section.id} className="space-y-5">
             <h2 className="text-lg font-bold text-foreground">{section.title}</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {section.members.map((member: any) => (
-                <Card key={member.id} className="p-4">
-                  <AuthorLink
-                    name={member.name}
-                    avatar={member.avatar || ""}
-                    role={member.role || ""}
-                  />
-                </Card>
-              ))}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {section.members.map((member: any) => {
+                const slug = (member.name || "").trim().toLowerCase().replace(/[^a-z0-9_\u0600-\u06FF]+/g, "-");
+                return (
+                  <div key={member.id} className="flex items-center gap-4">
+                    <Link href={`/author/${encodeURIComponent(slug)}`} className="shrink-0">
+                      <div className="relative h-[72px] w-[72px] rounded-full overflow-hidden ring-2 ring-border hover:ring-primary transition-all">
+                        <Image
+                          src={member.avatar || "/assets/hooman.png"}
+                          alt={member.name}
+                          fill
+                          sizes="72px"
+                          className="object-cover"
+                        />
+                      </div>
+                    </Link>
+                    <div className="min-w-0">
+                      <Link href={`/author/${encodeURIComponent(slug)}`} className="text-sm font-extrabold text-foreground hover:text-primary transition-colors truncate block">
+                        {member.name}
+                      </Link>
+                      {member.role && (
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate">{member.role}</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </section>
         )
@@ -73,28 +90,30 @@ export default async function AboutPage() {
       {(address || email || mapUrl) && (
         <section className="grid lg:grid-cols-5 gap-5 items-start">
           {mapUrl && (
-            <Card className="lg:col-span-3 p-0 overflow-hidden">
-              <div className="border-b px-5 py-3">
+            <div className="lg:col-span-3 rounded-xl border border-border overflow-hidden">
+              <div className="px-5 py-3 border-b border-border">
                 <h3 className="text-base font-bold">{addressTitle}</h3>
                 {address && <p className="text-sm text-muted-foreground mt-1">{address}</p>}
               </div>
-              <div>
-                <iframe title="map" src={mapUrl} className="w-full h-[320px] border-0" loading="lazy" />
-              </div>
-            </Card>
-          )}
-          <Card className={mapUrl ? "lg:col-span-2 p-5" : "p-5"}>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              {address && !mapUrl && (
-                <div>
-                  <span className="font-semibold text-foreground">{addressTitle}</span>
-                  <p className="mt-1">{address}</p>
-                </div>
-              )}
-              {email && <p>ایمیل: {email}</p>}
-              {hours && <p>ساعت کاری: {hours}</p>}
+              <iframe
+                title="map"
+                src={mapUrl}
+                className="w-full h-[320px] border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
             </div>
-          </Card>
+          )}
+          <div className={mapUrl ? "lg:col-span-2 space-y-3 text-sm text-muted-foreground" : "space-y-3 text-sm text-muted-foreground"}>
+            {address && !mapUrl && (
+              <div>
+                <span className="font-semibold text-foreground">{addressTitle}</span>
+                <p className="mt-1">{address}</p>
+              </div>
+            )}
+            {email && <p>ایمیل: {email}</p>}
+            {hours && <p>ساعت کاری: {hours}</p>}
+          </div>
         </section>
       )}
     </main>
