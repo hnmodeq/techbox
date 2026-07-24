@@ -36,6 +36,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { moduleMeta, type ModuleSlug } from "@/lib/content"
+import { moduleMap } from "@/config/modules.config"
 import {
   getDaysInJalaliMonth,
   getPersianDayName,
@@ -98,14 +99,15 @@ function buildCrumbs(pathname: string, dynamicTitle?: string, searchQuery?: stri
     const meta = moduleMeta[part as ModuleSlug]
 
     if (part === "author") {
-      // Always show "حساب کاربری" — never the job title
       crumbs.push({ label: "حساب کاربری", href: isCurrent ? undefined : accumulated })
     } else if (parts[0] === "author" && i === 1) {
-      // Show Persian name once loaded; decoded slug until then (no flicker with English)
       const fallback = decodeURIComponent(part).replace(/-/g, " ")
       crumbs.push({ label: authorName || fallback })
     } else if (meta) {
       crumbs.push({ label: meta.titleFa || meta.title || part, href: isCurrent ? undefined : accumulated })
+    } else if (moduleMap[part]) {
+      // Use source of truth for tool names and other modules
+      crumbs.push({ label: moduleMap[part].titleFa || moduleMap[part].title || part, href: isCurrent ? undefined : accumulated })
     } else if (part === "search") {
       crumbs.push({ label: searchQuery ? `جستجو: ${searchQuery}` : "جستجو", href: isCurrent ? undefined : accumulated })
     } else if (dynamicTitle && isCurrent) {

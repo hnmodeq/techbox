@@ -11,8 +11,8 @@ import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 
 const navigation = {
   main: [
-    { name: "ارتباط با ما", href: "/contact" },
     { name: "درباره ما", href: "/about" },
+    { name: "ارتباط با ما", href: "/contact" },
     { name: "فرصت‌های شغلی", href: "/work-with-us" },
   ],
   social: [
