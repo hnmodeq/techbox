@@ -48,7 +48,7 @@ const nextConfig = {
           "media-src 'self' https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com https://*.public.blob.vercel-storage.com",
           "font-src 'self' data:",
           "connect-src 'self' https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com https://*.public.blob.vercel-storage.com https://vitals.vercel-insights.com https://o*.ingest.sentry.io https://va.vercel-scripts.com",
-          "frame-src 'self'",
+          "frame-src 'self' https://www.openstreetmap.org",
           "form-action 'self'",
         ].join('; '),
       },
