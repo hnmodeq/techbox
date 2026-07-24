@@ -1,105 +1,102 @@
-import { pageMetadata, siteUrl } from "@/lib/seo";
+import { pageMetadata } from "@/lib/seo";
 import { prisma } from "@/lib/db";
-import { ButtonLink } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { AuthorLink } from "@/components/ui/author-link";
-import PageHeader from "@/components/effects/PageHeader";
+import { Card, CardContent } from "@/components/ui/card";
 
-export const metadata = pageMetadata({ title: "درباره تکباکس | تکباکس", description: "درباره ماموریت تکباکس، رسانه تخصصی فناوری اطلاعات و زیرساخت.", path: "/about" });
-export const revalidate = 86400;
+export const metadata = pageMetadata({
+  title: "درباره تکباکس | تکباکس",
+  description: "درباره ماموریت تکباکس، رسانه تخصصی فناوری اطلاعات و زیرساخت.",
+  path: "/about",
+});
+export const revalidate = 3600;
 
-export default async function About() {
-  let dbUsers: any[] = [];
-  let faqs: { id: string; question: string; answer: string }[] = [];
-
+export default async function AboutPage() {
+  // Fetch team sections + members
+  let sections: any[] = [];
   try {
-    dbUsers = await prisma.user.findMany({
-      where: { role: { in: ["super_admin", "admin", "editor"] }, status: "active" },
-      take: 6,
-      select: { id: true, name: true, roleFa: true, role: true, avatar: true, username: true, job: true },
+    sections = await prisma.teamSection.findMany({
+      where: { enabled: true },
+      orderBy: { order: "asc" },
+      include: { members: { orderBy: { order: "asc" } } },
     });
   } catch {}
 
+  // Fetch about settings
+  let settings: any = {};
   try {
-    faqs = await prisma.faq.findMany({ where: { isActive: true }, orderBy: [{ order: "asc" }, { createdAt: "asc" }], select: { id: true, question: true, answer: true } });
+    const row = await prisma.siteSetting.findUnique({ where: { key: "about.settings" } });
+    if (row?.value) settings = JSON.parse(row.value);
   } catch {}
 
+  const description: string = settings.description || "";
+  const addressTitle: string = settings.addressTitle || "دفتر تهران";
+  const address: string = settings.address || "";
+  const email: string = settings.email || process.env.CONTACT_EMAIL || "info@techbox.ir";
+  const hours: string = settings.hours || "شنبه–چهارشنبه ۹–۱۷";
+  const mapUrl: string = settings.mapUrl || "";
+
   return (
-    <main className="max-w-6xl mx-auto px-4 py-14 space-y-14" dir="rtl">
-      {/* FAQPage structured data */}
-      {faqs.length > 0 && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: faqs.map((faq) => ({
-                "@type": "Question",
-                name: faq.question,
-                acceptedAnswer: {
-                  "@type": "Answer",
-                  text: faq.answer,
-                },
-              })),
-            }).replace(/</g, "\\u003c"),
-          }}
-        />
+    <main className="max-w-5xl mx-auto px-4 py-10 space-y-12" dir="rtl">
+      {/* Header */}
+      <header>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">درباره تکباکس</h1>
+      </header>
+
+      {/* Description */}
+      {description && (
+        <section className="prose prose-sm max-w-none leading-8 text-foreground">
+          <div dangerouslySetInnerHTML={{ __html: description }} />
+        </section>
       )}
 
-      <PageHeader colorVar="--about" title="درباره تکباکس" titleClassName="text-[var(--about)]" description="تکباکس – رسانه تخصصی فناوری اطلاعات، زیرساخت، شبکه، سرور، ذخیره‌سازی و امنیت." />
+      {/* Team sections */}
+      {sections.map((section) => (
+        section.members.length > 0 && (
+          <section key={section.id} className="space-y-4">
+            <h2 className="text-lg font-bold text-foreground">{section.title}</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {section.members.map((member: any) => (
+                <Card key={member.id} className="p-4">
+                  <AuthorLink
+                    name={member.name}
+                    avatar={member.avatar || ""}
+                    role={member.role || ""}
+                  />
+                </Card>
+              ))}
+            </div>
+          </section>
+        )
+      ))}
 
-      <div className="grid md:grid-cols-3 gap-5">
-        {[["۸ ماژول", "محتوای یکپارچه"], ["تیم تخصصی", "تحریریه و کارشناسان"], ["۱۴۰۵", "هونامیک ارتباط رستاک"]].map(([k, v]) => (
-          <Card key={k} className="text-center p-0">
-            <CardContent className="p-5">
-              <div className="text-2xl font-extrabold text-primary">{k}</div>
-              <div className="text-sm text-muted-foreground mt-1">{v}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <section className="space-y-4">
-        <h2 className="text-xl font-bold">تیم تحریریه</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {dbUsers.map((user) => (
-            <Card key={user.id} className="p-4">
-              <AuthorLink name={user.name} username={user.username} avatar={user.avatar || ""} role={user.roleFa || user.job || user.role} />
-              <p className="mt-3 text-xs leading-6 text-muted-foreground">
-                عضو تیم تکباکس در تولید و بررسی محتوای تخصصی فناوری اطلاعات.
-              </p>
+      {/* Contact / Address */}
+      {(address || email || mapUrl) && (
+        <section className="grid lg:grid-cols-5 gap-5 items-start">
+          {mapUrl && (
+            <Card className="lg:col-span-3 p-0 overflow-hidden">
+              <div className="border-b px-5 py-3">
+                <h3 className="text-base font-bold">{addressTitle}</h3>
+                {address && <p className="text-sm text-muted-foreground mt-1">{address}</p>}
+              </div>
+              <div>
+                <iframe title="map" src={mapUrl} className="w-full h-[320px] border-0" loading="lazy" />
+              </div>
             </Card>
-          ))}
-        </div>
-      </section>
-
-      <div className="grid lg:grid-cols-5 gap-5 items-start">
-        <Card className="lg:col-span-3 p-0 overflow-hidden">
-          <CardHeader className="border-b"><CardTitle className="text-base">دفتر تهران</CardTitle><p className="text-sm text-muted-foreground mt-1">میرداماد، هونامیک ارتباط رستاک</p></CardHeader>
-          <CardContent className="p-0"><iframe title="map" src="https://www.openstreetmap.org/export/embed.html?bbox=51.41%2C35.75%2C51.45%2C35.77&layer=mapnik&marker=35.76%2C51.43" className="w-full h-[320px] border-0" loading="lazy" /></CardContent>
-        </Card>
-        <Card className="lg:col-span-2 p-5 space-y-3">
-          <p className="text-sm text-muted-foreground">ایمیل: {process.env.CONTACT_EMAIL || "info@techbox.ir"}</p>
-          <p className="text-sm text-muted-foreground">ساعت کاری: شنبه–چهارشنبه ۹–۱۷</p>
-          <Separator />
-          <ButtonLink href="/contact" className="w-full">ارتباط با ما</ButtonLink>
-          <ButtonLink href="/consultation" variant="ghost" className="w-full">درخواست مشاوره VIP</ButtonLink>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader><CardTitle>پرسش‌های متداول</CardTitle><p className="text-sm text-muted-foreground">پاسخ به سوالات پرتکرار درباره تکباکس</p></CardHeader>
-        <CardContent>
-          {faqs.length === 0 ? <div className="text-sm text-muted-foreground text-center py-8">هنوز پرسشی ثبت نشده.</div> : (
-            <Accordion className="w-full" defaultValue={[faqs[0]?.id]}>
-              {faqs.map((faq) => <AccordionItem key={faq.id} value={faq.id}><AccordionTrigger className="text-right text-sm font-medium">{faq.question}</AccordionTrigger><AccordionContent className="text-sm text-muted-foreground leading-7 whitespace-pre-wrap">{faq.answer}</AccordionContent></AccordionItem>)}
-            </Accordion>
           )}
-        </CardContent>
-      </Card>
+          <Card className={mapUrl ? "lg:col-span-2 p-5" : "p-5"}>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              {address && !mapUrl && (
+                <div>
+                  <span className="font-semibold text-foreground">{addressTitle}</span>
+                  <p className="mt-1">{address}</p>
+                </div>
+              )}
+              {email && <p>ایمیل: {email}</p>}
+              {hours && <p>ساعت کاری: {hours}</p>}
+            </div>
+          </Card>
+        </section>
+      )}
     </main>
   );
 }

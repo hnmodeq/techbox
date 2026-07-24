@@ -194,6 +194,7 @@ export const SIDEBAR_PERMISSIONS: SidebarPermissionItem[] = [
   { href: "/admin/content-health", permission: "health:view" },
   { href: "/admin/seo-audit", permission: "seo:view" },
   { href: "/admin/faq", permission: "faq:view" },
+  { href: "/admin/about", permission: "settings:view" },
   { href: "/admin/hero-terminal", permission: "hero:view" },
 
   // Tools

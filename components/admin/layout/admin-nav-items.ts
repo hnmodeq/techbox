@@ -93,6 +93,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       { title: "سلامت محتوا", href: "/admin/content-health", icon: Activity, superAdminOnly: true },
       { title: "ممیزی SEO", href: "/admin/seo-audit", icon: Search, superAdminOnly: true },
       { title: "FAQ", href: "/admin/faq", icon: HelpCircle },
+      { title: "درباره ما", href: "/admin/about", icon: Users, superAdminOnly: true },
       { title: "لاگ فعالیت‌ها", href: "/admin/audit-log", icon: ScrollText, superAdminOnly: true },
       { title: "ترمینال هیرو", href: "/admin/hero-terminal", icon: Terminal, superAdminOnly: true },
     ],

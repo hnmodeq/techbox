@@ -686,3 +686,32 @@ model OrderItem {
 
   @@index([orderId])
 }
+
+/// Team sections for the About page (e.g. "تیم مدیریت", "تیم تحریریه").
+model TeamSection {
+  id        String   @id @default(cuid())
+  title     String
+  order     Int      @default(0)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members TeamMember[]
+
+  @@index([enabled, order])
+}
+
+/// Individual team members within a section.
+model TeamMember {
+  id        String   @id @default(cuid())
+  sectionId String
+  name      String
+  role      String?  @default("")
+  avatar    String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  section TeamSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@index([sectionId, order])
+}
