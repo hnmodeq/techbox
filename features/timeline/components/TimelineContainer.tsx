@@ -201,28 +201,16 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
-<<<<<<< Updated upstream
-      {/* Navigation bar — centered, close to timeline */}
-      <div className="flex items-center justify-center gap-1 mb-0.5">
-=======
       <div className="flex items-center pt-30 justify-center gap-5">
-
-
-
->>>>>>> Stashed changes
         <button
           onClick={scrollToToday}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-                    <ChevronsRight className="size-3.5" />
+          <ChevronsRight className="size-3.5" />
           امروز
-
         </button>
 
-
-
         <span className="text-border text-[10px]">|</span>
-
 
         <button
           onClick={scrollToPrev}
@@ -234,7 +222,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
         <span className="text-border text-[10px]">|</span>
 
-
         <button
           onClick={scrollToNext}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
@@ -243,19 +230,13 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           <ChevronLeft className="size-3.5" />
         </button>
 
-
-
-
         <button
           onClick={scrollToOldest}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs  font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-  
           قدیمی‌ترین
-                  <ChevronsLeft className="size-3.5" />
+          <ChevronsLeft className="size-3.5" />
         </button>
-
-
 
         <span className="text-border text-[10px] mx-1">·</span>
         <span className="text-[11px] text-muted-foreground font-medium">
@@ -263,10 +244,8 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         </span>
       </div>
 
-      {/* Timeline wrapper — arrows positioned relative to this */}
+      {/* Timeline wrapper */}
       <div className="relative">
-        {/* Scroll arrows */}
-
         {/* Scroll container */}
         <div
           ref={scrollRef}
