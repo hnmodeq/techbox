@@ -27,11 +27,6 @@ function relativeDate(dateGr: Date | string): string {
   return `${years.toLocaleString('fa-IR')} سال پیش`;
 }
 
-function getYear(dateGr: Date | string): number {
-  const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
-  return d.getFullYear();
-}
-
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
 function TodayMarker() {
@@ -48,19 +43,6 @@ function TodayMarker() {
   );
 }
 
-function YearTick({ year }: { year: number }) {
-  return (
-    <div className="relative flex shrink-0 flex-col items-center" style={{ width: 56 }}>
-      <div className="h-6 flex items-center justify-center">
-        <span className="text-[10px] font-bold text-muted-foreground/60">{year.toLocaleString('fa-IR')}</span>
-      </div>
-      <div className="relative z-10 flex items-center justify-center">
-        <div className="w-[2px] h-5 bg-muted-foreground/25 rounded-full" />
-      </div>
-    </div>
-  );
-}
-
 function EventItem({ event, index }: { event: TimelineEvent; index: number }) {
   return (
     <motion.div
@@ -70,6 +52,7 @@ function EventItem({ event, index }: { event: TimelineEvent; index: number }) {
       className="relative flex shrink-0 flex-col items-center"
       style={{ width: 320 }}
       data-parallax
+      data-event-index={index}
     >
       {/* Date label */}
       <div className="mb-2 text-center text-xs font-bold text-muted-foreground h-6 flex items-center justify-center">
@@ -102,7 +85,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const [canScrollTowardOlder, setCanScrollTowardOlder] = useState(false);
   const [canScrollTowardNewer, setCanScrollTowardNewer] = useState(false);
 
-  // ── Vertical centering: calculate top padding ──
+  // ── Vertical centering ──
   useEffect(() => {
     const update = () => {
       const el = scrollRef.current;
@@ -152,7 +135,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  // ── Parallax depth effect ──
+  // ── Parallax depth ──
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -181,51 +164,76 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     return () => { el.removeEventListener('scroll', handleScroll); cancelAnimationFrame(rafId); };
   }, [events]);
 
-  // ── Build timeline items (events + year ticks + today marker) ──
-  const timelineItems = useMemo(() => {
-    const items: Array<{ type: 'today' } | { type: 'year'; year: number } | { type: 'event'; event: TimelineEvent; index: number }> = [];
-    let lastYear: number | null = null;
-
-    items.push({ type: 'today' });
-
-    events.forEach((event, index) => {
-      const year = getYear(event.dateGr);
-      if (year !== lastYear) {
-        items.push({ type: 'year', year });
-        lastYear = year;
-      }
-      items.push({ type: 'event', event, index });
+  // ── Find the event card closest to viewport center ──
+  const findCenteredIndex = useCallback((): number => {
+    const el = scrollRef.current;
+    if (!el) return 0;
+    const centerX = el.getBoundingClientRect().left + el.clientWidth / 2;
+    let closest = -1;
+    let minDist = Infinity;
+    el.querySelectorAll<HTMLElement>('[data-event-index]').forEach((card) => {
+      const cardCenterX = card.getBoundingClientRect().left + card.offsetWidth / 2;
+      const dist = Math.abs(cardCenterX - centerX);
+      if (dist < minDist) { minDist = dist; closest = parseInt(card.dataset.eventIndex || '0', 10); }
     });
+    return closest >= 0 ? closest : 0;
+  }, []);
 
-    return items;
-  }, [events]);
+  // ── Scroll to a specific event by index ──
+  const scrollToEvent = useCallback((index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const target = el.querySelector<HTMLElement>(`[data-event-index="${index}"]`);
+    if (!target) return;
+    const elRect = el.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const offset = targetRect.left - elRect.left - (el.clientWidth / 2) + (target.offsetWidth / 2);
+    el.scrollBy({ left: offset, behavior: 'smooth' });
+  }, []);
+
+  // ── Navigation actions ──
+  const scrollToOldest = () => scrollRef.current?.scrollTo({ left: -(scrollRef.current.scrollWidth - scrollRef.current.clientWidth), behavior: 'smooth' });
+  const scrollToToday = () => scrollRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
+  const scrollToPrev = () => { const idx = findCenteredIndex(); if (idx > 0) scrollToEvent(idx - 1); };
+  const scrollToNext = () => { const idx = findCenteredIndex(); if (idx < events.length - 1) scrollToEvent(idx + 1); };
 
   const lineTop = topPad + SPACER_H + DOT_SIZE / 2;
 
-  const scrollToOldest = () => scrollRef.current?.scrollTo({ left: -(scrollRef.current.scrollWidth - scrollRef.current.clientWidth), behavior: 'smooth' });
-  const scrollToToday = () => scrollRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
-
   return (
     <div className="relative w-full" dir="rtl">
-      {/* Top bar: buttons on one side, event count on the other */}
-      <div className="flex items-center justify-between px-4 mb-2">
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={scrollToToday}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <ChevronsRight className="size-3.5" />
-            برو به امروز
-          </button>
-          <span className="text-border text-[10px]">|</span>
-          <button
-            onClick={scrollToOldest}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            برو به قدیمی‌ترین
-            <ChevronsLeft className="size-3.5" />
-          </button>
-        </div>
+      {/* Navigation bar — centered, close to timeline */}
+      <div className="flex items-center justify-center gap-1 mb-2">
+        <button
+          onClick={scrollToOldest}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <ChevronsRight className="size-3.5" />
+          قدیمی‌ترین
+        </button>
+        <span className="text-border text-[10px]">|</span>
+        <button
+          onClick={scrollToPrev}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <ChevronRight className="size-3.5" />
+          رویداد قبلی
+        </button>
+        <button
+          onClick={scrollToNext}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          رویداد بعدی
+          <ChevronLeft className="size-3.5" />
+        </button>
+        <span className="text-border text-[10px]">|</span>
+        <button
+          onClick={scrollToToday}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          امروز
+          <ChevronsLeft className="size-3.5" />
+        </button>
+        <span className="text-border text-[10px] mx-1">·</span>
         <span className="text-[11px] text-muted-foreground font-medium">
           {events.length.toLocaleString('fa-IR')} رویداد
         </span>
@@ -265,17 +273,19 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
             style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
             onDragStart={(e) => e.preventDefault()}
           >
-            {/* Continuous horizontal line — aligned with dot centers */}
+            {/* Continuous horizontal line */}
             <div
               className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
               style={{ top: lineTop, width: '100%' }}
             />
 
-            {timelineItems.map((item) => {
-              if (item.type === 'today') return <TodayMarker key="today" />;
-              if (item.type === 'year') return <YearTick key={`year-${item.year}`} year={item.year} />;
-              return <EventItem key={item.event.id} event={item.event} index={item.index} />;
-            })}
+            {/* Today marker */}
+            <TodayMarker />
+
+            {/* Events */}
+            {events.map((event, index) => (
+              <EventItem key={event.id} event={event} index={index} />
+            ))}
 
             {/* Suggestion box — at the end (oldest side in RTL) */}
             <TimelineSuggestions />
