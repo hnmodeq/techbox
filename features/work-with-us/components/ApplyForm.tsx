@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Badge } from "@/components/ui/badge";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
+import { TermsModal } from "./TermsModal";
 
 const applySchema = z.object({
   name: z.string().min(3, "حداقل ۳ کاراکتر").max(100),
@@ -24,7 +25,7 @@ const applySchema = z.object({
 
 type ApplyValues = z.infer<typeof applySchema>;
 
-export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
+export default function ApplyForm({ jobSlug, termsContent }: { jobSlug: string; termsContent?: string }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +174,13 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
           </CardFooter>
 
           <p className="text-xs text-muted-foreground">
-            با کلیک روی دکمه ارسال، شما با <Link href="/terms" className="text-primary underline">شرایط همکاری</Link> تکباکس موافقت می‌کنید.
+            با کلیک روی دکمه ارسال، شما با{" "}
+            {termsContent ? (
+              <TermsModal content={termsContent} trigger={<span className="text-primary underline cursor-pointer">شرایط همکاری</span>} />
+            ) : (
+              <span className="text-primary">شرایط همکاری</span>
+            )}{" "}
+            تکباکس موافقت می‌کنید.
           </p>
         </form>
       </Form>

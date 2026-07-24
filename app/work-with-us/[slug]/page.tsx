@@ -1,13 +1,12 @@
 import { prisma } from "@/lib/db";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import ApplyForm from "@/features/work-with-us/components/ApplyForm";
+import { TermsModal } from "@/features/work-with-us/components/TermsModal";
 import { pageMetadata } from "@/lib/seo";
 import { Metadata } from "next";
-import { Check } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const { slug } = await params;
@@ -29,6 +28,13 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
   const benefits: string[] = (job as any).benefits ? (job as any).benefits.split("\n").filter(Boolean) : [];
 
   const formatSalary = (v: number) => v.toLocaleString("fa-IR");
+
+  // Fetch terms content
+  let termsContent = "";
+  try {
+    const row = await (await import("@/lib/db")).prisma.siteSetting.findUnique({ where: { key: "terms.content" } });
+    if (row?.value) termsContent = row.value;
+  } catch {}
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10" dir="rtl">
@@ -64,55 +70,56 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
         </section>
       )}
 
-      {/* Description */}
-      <section className="border border-border rounded-xl bg-card p-6 mb-8">
-        <div className="prose prose-sm max-w-none leading-8 text-foreground whitespace-pre-line">{job.description}</div>
-      </section>
-
-      {/* پیش‌نیازها */}
+      {/* پیش‌نیازها — circle icon, no bg/border */}
       {requirements.length > 0 && (
-        <section className="border border-border rounded-xl bg-card p-6 mb-8">
+        <section className="mb-8">
           <h2 className="text-lg font-bold text-foreground mb-4">پیش‌نیازها</h2>
           <ul className="space-y-2">
             {requirements.map((req, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <Check className="size-4 text-primary shrink-0 mt-0.5" /><span>{req}</span>
+              <li key={i} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                <span className="size-1.5 rounded-full bg-foreground shrink-0" />
+                <span>{req}</span>
               </li>
             ))}
           </ul>
         </section>
       )}
 
-      {/* مزایا و امکانات — dot list with green check */}
+      {/* مزایا و امکانات — no bg/border */}
       {benefits.length > 0 && (
-        <section className="border border-border rounded-xl bg-card p-6 mb-8">
+        <section className="mb-8">
           <h2 className="text-lg font-bold text-foreground mb-4">مزایا و امکانات</h2>
           <ul className="grid grid-cols-2 gap-2">
             {benefits.map((b, i) => (
               <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Check className="size-4 text-emerald-500 shrink-0" /><span>{b}</span>
+                <svg className="size-4 text-emerald-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                </svg>
+                <span>{b}</span>
               </li>
             ))}
           </ul>
         </section>
       )}
 
-      {/* سوالات متداول */}
+      {/* سوالات متداول — RTL */}
       {faq.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-bold text-foreground mb-4">سوالات متداول</h2>
           <Accordion className="w-full" type="multiple">
             {faq.map((item, i) => (
               <AccordionItem key={String(i)} value={`faq-${i}`}>
-                <AccordionTrigger className="text-right text-sm font-medium">{item.question}</AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground leading-7 whitespace-pre-line">{item.answer}</AccordionContent>
+                <AccordionTrigger className="text-right text-sm font-medium" dir="rtl">{item.question}</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-sm text-muted-foreground leading-7 whitespace-pre-line text-right" dir="rtl">{item.answer}</p>
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </section>
       )}
 
-      <ApplyForm jobSlug={job.slug} />
+      <ApplyForm jobSlug={job.slug} termsContent={termsContent} />
     </main>
   );
 }
