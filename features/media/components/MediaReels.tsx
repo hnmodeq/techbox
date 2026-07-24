@@ -16,6 +16,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<"up" | "down">("up");
   const galleryRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const current = items[currentIndex] ?? null;
 
@@ -43,6 +44,14 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
     return () => window.removeEventListener("keydown", handleKey);
   }, [goNext, goPrev]);
 
+  // Force play when video source changes
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid || !current?.videoUrl) return;
+    vid.load();
+    vid.play().catch(() => {});
+  }, [currentIndex, current?.videoUrl]);
+
   if (items.length === 0) {
     return (
       <div className="flex items-center justify-center h-[60vh] text-muted-foreground" dir="rtl">
@@ -53,8 +62,8 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
 
   return (
     <div className="flex gap-4 h-[calc(100svh-var(--header-height)-2rem)] px-4 py-4" dir="rtl">
-      {/* ── Col 1: Video player ── */}
-      <div className="flex-1 min-w-0 flex flex-col gap-2">
+      {/* ── Col 1 (LEFT in RTL): Video player ── */}
+      <div className="w-[320px] shrink-0 flex flex-col gap-2">
         {/* Previous button */}
         <div className="flex justify-center">
           <button
@@ -73,20 +82,21 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
             {current && (
               <motion.div
                 key={current.slug}
-                initial={{ opacity: 0, y: direction === "up" ? 80 : -80 }}
+                initial={{ opacity: 0, y: direction === "up" ? 60 : -60 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: direction === "up" ? -80 : 80 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
+                exit={{ opacity: 0, y: direction === "up" ? -60 : 60 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
                 className="absolute inset-0 flex items-center justify-center"
               >
                 <video
-                  key={current.slug}
+                  ref={videoRef}
                   src={current.videoUrl || undefined}
                   poster={current.image}
                   controls
                   autoPlay
+                  muted
                   playsInline
-                  preload="metadata"
+                  preload="auto"
                   className="w-full h-full object-contain bg-black"
                 />
               </motion.div>
@@ -107,8 +117,8 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
         </div>
       </div>
 
-      {/* ── Col 2: Info + comments ── */}
-      <div className="w-[360px] shrink-0 flex flex-col border border-border rounded-xl bg-card overflow-hidden">
+      {/* ── Col 2 (CENTER): Info + comments ── */}
+      <div className="flex-1 min-w-0 flex flex-col border border-border rounded-xl bg-card overflow-hidden">
         {current && (
           <>
             {/* Title + actions */}
@@ -134,7 +144,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
         )}
       </div>
 
-      {/* ── Col 3: Vertical gallery (existing VideoCard components) ── */}
+      {/* ── Col 3 (RIGHT in RTL): Vertical gallery ── */}
       <div
         ref={galleryRef}
         className="w-[200px] shrink-0 overflow-y-auto space-y-3"
