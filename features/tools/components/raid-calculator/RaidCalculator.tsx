@@ -305,7 +305,7 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
                     )}
                     <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
                       {product.bay > 0 && <span>{product.bay.toLocaleString("fa-IR")} درایو</span>}
-                      {product.price && <span className="font-bold text-primary">{product.price.toLocaleString("fa-IR")} تومان</span>}
+                      {product.priceAmount && <span className="font-bold text-primary">{product.priceAmount.toLocaleString("fa-IR")} تومان</span>}
                     </div>
                   </div>
                   <div className="flex flex-col items-center justify-center shrink-0">
