@@ -46,7 +46,6 @@ import {
 } from "@/lib/jalali"
 import { cn } from "@/lib/utils"
 import { useConsultation } from "@/providers/consultation.provider"
-import { TopBarSearch } from "@/components/layout/top-bar-search"
 
 type Crumb = {
   label: string
@@ -707,7 +706,7 @@ export function SiteHeader({
         </div>
 
         <div className="flex flex-[1.2] justify-center px-2">
-          <TopBarSearch />
+          {/* Search is the floating bottom-center component */}
         </div>
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1">

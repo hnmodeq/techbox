@@ -89,13 +89,13 @@ function FaqModal({ open, onClose }: { open: boolean; onClose: () => void }) {
         ) : faqs.length === 0 ? (
           <Card className="p-6 text-center text-sm text-muted-foreground">هنوز سوالی ثبت نشده است.</Card>
         ) : (
-          <Accordion className="text-right">
+          <Accordion className="text-right" dir="rtl">
             {faqs.map((f) => (
               <AccordionItem key={f.id} value={f.id} className="border-b">
-                <AccordionTrigger className="text-sm font-bold text-right justify-start hover:no-underline [&>svg]:hidden">
+                <AccordionTrigger className="text-sm font-bold hover:no-underline [&>svg]:hidden" style={{ textAlign: 'right', justifyContent: 'flex-start' }}>
                   {f.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground leading-6 text-right pb-3">
+                <AccordionContent className="text-sm text-muted-foreground leading-6 pb-3" style={{ textAlign: 'right' }}>
                   {f.answer}
                 </AccordionContent>
               </AccordionItem>
