@@ -202,7 +202,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   return (
     <div className="relative w-full" dir="rtl">
       {/* Navigation bar — centered, close to timeline */}
-      <div className="flex items-center justify-center gap-1 mb-2">
+      <div className="flex items-center justify-center gap-1 mb-0.5">
         <button
           onClick={scrollToOldest}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
