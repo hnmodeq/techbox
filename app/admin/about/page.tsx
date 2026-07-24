@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
@@ -10,9 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 
+type User = { id: string; name: string; username: string; job: string | null; roleFa: string | null; avatar: string | null; verifiedType: string | null; verifiedLabel: string | null };
 type Member = { id: string; sectionId: string; name: string; role: string; avatar: string | null; order: number };
 type Section = { id: string; title: string; order: number; enabled: boolean; members: Member[] };
 
@@ -23,6 +23,124 @@ const DEFAULT_SECTIONS = [
 ];
 
 type TabId = "sections" | "description" | "contact";
+
+// ─── User Picker ────────────────────────────────────────────────────────────
+
+function UserPicker({ sectionId, onAdd }: { sectionId: string; onAdd: () => void }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<User[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  useEffect(() => {
+    if (query.length < 1) { setResults([]); return; }
+    setLoading(true);
+    const t = setTimeout(() => {
+      fetch(`/api/admin/users/search?q=${encodeURIComponent(query)}`)
+        .then((r) => r.ok ? r.json() : [])
+        .then((data) => { setResults(data); setOpen(true); })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    }, 300);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const selectUser = async (u: User) => {
+    await fetch("/api/admin/about/members", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sectionId, userId: u.id }),
+    });
+    setQuery("");
+    setOpen(false);
+    onAdd();
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <Input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => query.length >= 1 && setOpen(true)}
+        placeholder="جستجوی کاربر..."
+        className="h-8 text-sm"
+      />
+      {open && results.length > 0 && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+          {results.map((u) => (
+            <button
+              key={u.id}
+              onClick={() => selectUser(u)}
+              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-accent transition-colors text-right cursor-pointer"
+            >
+              {u.avatar ? (
+                <Image src={u.avatar} alt={u.name} width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+              ) : (
+                <div className="h-7 w-7 rounded-full bg-muted" />
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold truncate">{u.name}</div>
+                <div className="text-[10px] text-muted-foreground truncate">{u.job || u.roleFa || u.username}</div>
+              </div>
+              {u.verifiedType && <Badge variant="secondary" className="text-[9px] shrink-0">✓</Badge>}
+            </button>
+          ))}
+        </div>
+      )}
+      {open && query.length >= 1 && results.length === 0 && !loading && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg p-3 text-xs text-muted-foreground text-center">
+          کاربری یافت نشد
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Auto-populate verified users ───────────────────────────────────────────
+
+function AutoPopulateButton({ sectionId, sectionTitle, onDone }: { sectionId: string; sectionTitle: string; onDone: () => void }) {
+  const [loading, setLoading] = useState(false);
+
+  const isFamily = sectionTitle.includes("خانواده");
+
+  const populate = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/admin/users/search?verified=1`);
+      const users: User[] = await res.json();
+      let added = 0;
+      for (const u of users) {
+        await fetch("/api/admin/about/members", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionId, userId: u.id }),
+        });
+        added++;
+      }
+      if (added > 0) onDone();
+    } catch {}
+    setLoading(false);
+  };
+
+  if (!isFamily) return null;
+
+  return (
+    <Button variant="outline" size="sm" onClick={populate} loading={loading} className="text-[11px]">
+      افزودن خودکار کاربران تایید شده
+    </Button>
+  );
+}
+
+// ─── Main Page ──────────────────────────────────────────────────────────────
 
 export default function AdminAboutPage() {
   const [tab, setTab] = useState<TabId>("sections");
@@ -47,7 +165,6 @@ export default function AdminAboutPage() {
 
   useEffect(() => { loadAll(); }, [loadAll]);
 
-  // ── Settings save ──
   const saveSettings = async () => {
     setSaving(true);
     try {
@@ -57,7 +174,6 @@ export default function AdminAboutPage() {
     setSaving(false);
   };
 
-  // ── Section CRUD ──
   const addSection = async (title: string) => {
     const res = await fetch("/api/admin/about/sections", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title, order: sections.length }) });
     if (res.ok) { const s = await res.json(); setSections((prev) => [...prev, { ...s, members: [] }]); }
@@ -72,18 +188,6 @@ export default function AdminAboutPage() {
     setSections((prev) => prev.filter((s) => s.id !== id));
   };
 
-  // ── Member CRUD ──
-  const addMember = async (sectionId: string) => {
-    const res = await fetch("/api/admin/about/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sectionId, name: "عضو جدید", role: "", order: 0 }) });
-    if (res.ok) {
-      const m = await res.json();
-      setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, members: [...s.members, m] } : s)));
-    }
-  };
-  const updateMember = async (id: string, sectionId: string, patch: Partial<Member>) => {
-    await fetch("/api/admin/about/members", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, ...patch }) });
-    setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, members: s.members.map((m) => (m.id === id ? { ...m, ...patch } : m)) } : s)));
-  };
   const deleteMember = async (id: string, sectionId: string) => {
     await fetch("/api/admin/about/members", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, members: s.members.filter((m) => m.id !== id) } : s)));
@@ -93,8 +197,7 @@ export default function AdminAboutPage() {
     const next = [...sections];
     const target = idx + dir;
     if (target < 0 || target >= next.length) return;
-    [next[idx], next[next.indexOf(sections[target])]] = [next[target], next[idx]];
-    // Update order
+    [next[idx], next[target]] = [next[target], next[idx]];
     const reordered = next.map((s, i) => ({ ...s, order: i }));
     setSections(reordered);
     reordered.forEach((s) => updateSection(s.id, { order: s.order }));
@@ -116,7 +219,6 @@ export default function AdminAboutPage() {
           <ButtonLink href="/about" variant="ghost" size="sm">پیش‌نمایش</ButtonLink>
         </PageHeader>
 
-        {/* Tabs */}
         <div className="flex gap-1 border-b border-border pb-0">
           {tabs.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 -mb-px ${tab === t.id ? "border-[var(--admin)] text-[var(--admin)]" : "border-transparent text-muted-foreground hover:text-foreground"}`}>{t.label}</button>
@@ -157,17 +259,30 @@ export default function AdminAboutPage() {
                     <Button variant="ghost" size="xs" onClick={() => deleteSection(section.id)} className="text-destructive">حذف</Button>
                   </div>
                 </div>
-                <div className="p-4 space-y-3">
+                <div className="p-4 space-y-2">
+                  {/* Existing members */}
                   {section.members.map((member) => (
-                    <div key={member.id} className="flex items-center gap-3">
-                      {member.avatar && <Image src={member.avatar} alt={member.name} width={32} height={32} className="h-8 w-8 rounded-full object-cover" />}
-                      <Input value={member.name} onChange={(e) => updateMember(member.id, section.id, { name: e.target.value })} className="h-8 flex-1" placeholder="نام" />
-                      <Input value={member.role || ""} onChange={(e) => updateMember(member.id, section.id, { role: e.target.value })} className="h-8 flex-1" placeholder="سمت" />
-                      <Input value={member.avatar || ""} onChange={(e) => updateMember(member.id, section.id, { avatar: e.target.value || null })} className="h-8 flex-1 text-[11px]" placeholder="URL آواتار" dir="ltr" />
+                    <div key={member.id} className="flex items-center gap-3 bg-muted/20 rounded-lg px-3 py-2">
+                      {member.avatar ? (
+                        <Image src={member.avatar} alt={member.name} width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+                      ) : (
+                        <div className="h-7 w-7 rounded-full bg-muted" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs font-bold truncate block">{member.name}</span>
+                        <span className="text-[10px] text-muted-foreground truncate block">{member.role || "—"}</span>
+                      </div>
                       <Button variant="ghost" size="xs" onClick={() => deleteMember(member.id, section.id)} className="text-destructive shrink-0">×</Button>
                     </div>
                   ))}
-                  <Button variant="ghost" size="sm" onClick={() => addMember(section.id)}>+ افزودن عضو</Button>
+
+                  {/* Add user by search */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex-1">
+                      <UserPicker sectionId={section.id} onAdd={loadAll} />
+                    </div>
+                    <AutoPopulateButton sectionId={section.id} sectionTitle={section.title} onDone={loadAll} />
+                  </div>
                 </div>
               </Card>
             ))}

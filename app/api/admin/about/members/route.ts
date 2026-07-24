@@ -14,11 +14,31 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user || user.role !== "super_admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
-  const { sectionId, name, role, avatar, order } = await req.json();
-  if (!sectionId || !name) return NextResponse.json({ error: "sectionId and name required" }, { status: 400 });
+  const body = await req.json();
+  const { sectionId, userId, name, role, avatar, order } = body;
+  if (!sectionId) return NextResponse.json({ error: "sectionId required" }, { status: 400 });
+
+  let memberName = name || "";
+  let memberRole = role || "";
+  let memberAvatar = avatar || null;
+
+  // If userId provided, auto-fill from user record
+  if (userId) {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, job: true, roleFa: true, avatar: true },
+    });
+    if (dbUser) {
+      memberName = memberName || dbUser.name;
+      memberRole = memberRole || dbUser.job || dbUser.roleFa || "";
+      memberAvatar = memberAvatar || dbUser.avatar;
+    }
+  }
+
+  if (!memberName) return NextResponse.json({ error: "name required" }, { status: 400 });
 
   const member = await prisma.teamMember.create({
-    data: { sectionId, name, role: role || "", avatar, order: order ?? 0 },
+    data: { sectionId, name: memberName, role: memberRole, avatar: memberAvatar, order: order ?? 0 },
   });
   return NextResponse.json(member, { status: 201 });
 }
