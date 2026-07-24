@@ -108,7 +108,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
       {faq.length > 0 && (
         <section className="mt-8">
           <h2 className="text-lg font-bold text-foreground mb-4">سوالات متداول</h2>
-          <Accordion className="w-full" type="multiple">
+          <Accordion className="w-full">
             {faq.map((item, i) => (
               <AccordionItem key={String(i)} value={`faq-${i}`}>
                 <AccordionTrigger className="text-right text-sm font-medium" dir="rtl">{item.question}</AccordionTrigger>
