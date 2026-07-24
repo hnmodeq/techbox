@@ -269,12 +269,12 @@ export default function Chatbot() {
                 onValueChange={(v) => setActiveTab(v as TabType)}
                 className="flex-1 flex flex-col min-h-0"
               >
-                <TabsList className="w-full justify-start rounded-none bg-transparent px-2 h-auto pt-3 pb-2 border-b border-border/50">
-                  <TabsTrigger value="chatbot" className="gap-1 text-xs">
+                <TabsList className="w-full justify-start rounded-none bg-transparent px-2 h-auto pt-2 pb-3 border-b border-border/50">
+                  <TabsTrigger value="chatbot" className="gap-1 text-xs bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none">
                     <Sparkles className="size-3" />
                     پشتیبانی هوشمند
                   </TabsTrigger>
-                  <TabsTrigger value="support" className="gap-1 text-xs">
+                  <TabsTrigger value="support" className="gap-1 text-xs bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none">
                     <LifeBuoy className="size-3" />
                     پشتیبانی برخط
                   </TabsTrigger>

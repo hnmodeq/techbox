@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -174,13 +172,7 @@ export default function ApplyForm({ jobSlug, termsContent }: { jobSlug: string; 
           </CardFooter>
 
           <p className="text-xs text-muted-foreground">
-            با کلیک روی دکمه ارسال، شما با{" "}
-            {termsContent ? (
-              <TermsModal content={termsContent} trigger={<span className="text-primary underline cursor-pointer">شرایط همکاری</span>} />
-            ) : (
-              <span className="text-primary">شرایط همکاری</span>
-            )}{" "}
-            تکباکس موافقت می‌کنید.
+            با کلیک روی دکمه ارسال، شما با <TermsModal content={termsContent} /> تکباکس موافقت می‌کنید.
           </p>
         </form>
       </Form>

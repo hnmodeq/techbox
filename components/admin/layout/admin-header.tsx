@@ -49,8 +49,26 @@ export function AdminHeader({ user }: { user: AppUser | null }) {
   const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [jobTitle, setJobTitle] = useState<string>("");
   const breadcrumbs = getBreadcrumbs(pathname);
   const isSuperAdmin = user?.role === "super_admin";
+
+  // Fetch job title for admin job edit pages
+  useEffect(() => {
+    const parts = pathname.split("/").filter(Boolean);
+    if (parts[0] === "admin" && parts[1] === "jobs" && parts[2] && parts[3] === "edit") {
+      const jobId = parts[2];
+      fetch(`/api/admin/jobs`, { cache: "no-store" })
+        .then((r) => r.json())
+        .then((jobs: any[]) => {
+          const job = jobs.find((j) => j.id === jobId);
+          if (job?.title) setJobTitle(job.title);
+        })
+        .catch(() => {});
+    } else {
+      setJobTitle("");
+    }
+  }, [pathname]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -112,17 +130,24 @@ export function AdminHeader({ user }: { user: AppUser | null }) {
         <BreadcrumbList>
           {breadcrumbs.map((crumb, idx) => {
             const isLast = idx === breadcrumbs.length - 1;
+            // For job edit pages, show job title instead of ID
+            let label = crumb.label;
+            const parts = crumb.href.split("/").filter(Boolean);
+            if (parts[1] === "jobs" && parts[2] && !["new", "applications"].includes(parts[2]) && parts[3] !== "applications") {
+              label = jobTitle || crumb.label;
+              if (parts[3] === "edit") label = "ویرایش آگهی استخدام";
+            }
             return (
               <React.Fragment key={crumb.href}>
                 {idx > 0 && <BreadcrumbSeparator />}
                 <BreadcrumbItem>
                   {isLast ? (
                     <BreadcrumbPage className="text-xs font-medium">
-                      {crumb.label}
+                      {label}
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink href={crumb.href} className="text-xs">
-                      {crumb.label}
+                      {label}
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
