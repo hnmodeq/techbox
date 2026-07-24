@@ -1,3 +1,4 @@
+import * as React from "react";
 import { pageMetadata } from "@/lib/seo";
 import { prisma } from "@/lib/db";
 import Image from "next/image";
@@ -111,10 +112,10 @@ export default async function AboutPage() {
         )}
 
         {/* Team sections */}
-        {sections.map((section, idx) => (
+        {sections.map((section) => (
           section.members.length > 0 && (
-            <>
-              <section key={section.id} className="space-y-5">
+            <React.Fragment key={section.id}>
+              <section className="space-y-5">
                 <h2 className="text-lg font-bold text-foreground">{section.title}</h2>
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {section.members.map((member: any) => {
@@ -146,7 +147,7 @@ export default async function AboutPage() {
                 </div>
               </section>
               <Separator />
-            </>
+            </React.Fragment>
           )
         ))}
 
