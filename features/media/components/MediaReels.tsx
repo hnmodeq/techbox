@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { type ContentItem } from "@/lib/content";
 import { VideoCard } from "@/components/content/VideoCard";
@@ -14,16 +13,14 @@ import { formatRelativeDate } from "@/lib/date-format";
 export default function MediaReels({ serverItems }: { serverItems?: ContentItem[] }) {
   const items = useMemo(() => serverItems ?? [], [serverItems]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState<"up" | "down">("up");
   const galleryRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const current = items[currentIndex] ?? null;
 
   const goTo = useCallback(
-    (idx: number, dir: "up" | "down") => {
+    (idx: number) => {
       if (idx < 0 || idx >= items.length) return;
-      setDirection(dir);
       setCurrentIndex(idx);
       const el = galleryRef.current?.querySelector(`[data-idx="${idx}"]`);
       el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -31,8 +28,8 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
     [items.length]
   );
 
-  const goNext = useCallback(() => goTo(currentIndex + 1, "up"), [currentIndex, goTo]);
-  const goPrev = useCallback(() => goTo(currentIndex - 1, "down"), [currentIndex, goTo]);
+  const goNext = useCallback(() => goTo(currentIndex + 1), [currentIndex, goTo]);
+  const goPrev = useCallback(() => goTo(currentIndex - 1), [currentIndex, goTo]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -44,13 +41,15 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
     return () => window.removeEventListener("keydown", handleKey);
   }, [goNext, goPrev]);
 
-  // Force play when video source changes
+  // Play video when index changes — use a small delay to let the src update
   useEffect(() => {
     const vid = videoRef.current;
-    if (!vid || !current?.videoUrl) return;
-    vid.load();
-    vid.play().catch(() => {});
-  }, [currentIndex, current?.videoUrl]);
+    if (!vid) return;
+    const timer = setTimeout(() => {
+      vid.play().catch(() => {});
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [currentIndex]);
 
   if (items.length === 0) {
     return (
@@ -76,32 +75,20 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
           </button>
         </div>
 
-        {/* Video player with slide animation */}
+        {/* Video player */}
         <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden border border-border bg-black">
-          <AnimatePresence mode="wait" initial={false}>
-            {current && (
-              <motion.div
-                key={current.slug}
-                initial={{ opacity: 0, y: direction === "up" ? 60 : -60 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: direction === "up" ? -60 : 60 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <video
-                  ref={videoRef}
-                  src={current.videoUrl || undefined}
-                  poster={current.image}
-                  controls
-                  autoPlay
-                  muted
-                  playsInline
-                  preload="auto"
-                  className="w-full h-full object-contain bg-black"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <video
+            ref={videoRef}
+            key={current?.slug}
+            src={current?.videoUrl || undefined}
+            poster={current?.image}
+            controls
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            className="w-full h-full object-contain bg-black"
+          />
         </div>
 
         {/* Next button */}
@@ -136,25 +123,53 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
                 <ShareButton />
               </div>
             </div>
-            {/* Comments */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <CommentSection module="media" slug={current.slug} initialComments={current.comments || 0} compact />
+            {/* Comments — hidden scrollbar */}
+            <div className="flex-1 overflow-y-auto p-4" style={{ scrollbarWidth: "none" }}>
+              <style>{`.media-comments::-webkit-scrollbar { display: none; }`}</style>
+              <div className="media-comments">
+                <CommentSection module="media" slug={current.slug} initialComments={current.comments || 0} compact />
+              </div>
             </div>
           </>
         )}
       </div>
 
-      {/* ── Col 3 (RIGHT in RTL): Vertical gallery ── */}
-      <div
-        ref={galleryRef}
-        className="w-[200px] shrink-0 overflow-y-auto space-y-3"
-        style={{ scrollbarWidth: "thin" }}
-      >
-        {items.map((vid, idx) => (
-          <div key={vid.slug} data-idx={idx} className={idx === currentIndex ? "ring-2 ring-primary rounded-[var(--corner-radius)]" : ""}>
-            <VideoCard video={vid} onOpen={() => goTo(idx, idx > currentIndex ? "up" : "down")} />
-          </div>
-        ))}
+      {/* ── Col 3 (RIGHT in RTL): Vertical gallery with buttons ── */}
+      <div className="w-[200px] shrink-0 flex flex-col gap-1.5">
+        {/* Gallery up button */}
+        <div className="flex justify-center">
+          <button
+            onClick={goPrev}
+            disabled={currentIndex === 0}
+            className="flex items-center justify-center w-full py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer border border-border"
+          >
+            <ChevronUp className="size-4" />
+          </button>
+        </div>
+
+        {/* Gallery cards — hidden scrollbar */}
+        <div
+          ref={galleryRef}
+          className="flex-1 min-h-0 overflow-y-auto space-y-3"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {items.map((vid, idx) => (
+            <div key={vid.slug} data-idx={idx} className={idx === currentIndex ? "ring-2 ring-primary rounded-[var(--corner-radius)]" : ""}>
+              <VideoCard video={vid} onOpen={() => goTo(idx)} />
+            </div>
+          ))}
+        </div>
+
+        {/* Gallery down button */}
+        <div className="flex justify-center">
+          <button
+            onClick={goNext}
+            disabled={currentIndex === items.length - 1}
+            className="flex items-center justify-center w-full py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer border border-border"
+          >
+            <ChevronDown className="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
