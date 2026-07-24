@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
+import { Upload } from "lucide-react";
 import { toast } from "sonner";
 
 const applySchema = z.object({
@@ -36,7 +37,7 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
 
   const onSubmit = async (values: ApplyValues) => {
     if (!file) {
-      setError("لطفاً رزومه را انتخاب کنید");
+      setError("لطفاً فایل رزومه را انتخاب کنید");
       return;
     }
     setLoading(true);
@@ -67,7 +68,7 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
 
   if (success) {
     return (
-      <Card className="p-8 text-center space-y-4 mt-6">
+      <Card className="p-8 text-center space-y-4">
         <div className="text-4xl">✅</div>
         <h3 className="text-2xl font-bold">درخواست شما با موفقیت ثبت شد</h3>
         <p className="text-sm text-muted-foreground">تیم منابع انسانی تکباکس رزومه شما را بررسی کرده و در صورت تایید با شما تماس خواهند گرفت.</p>
@@ -77,11 +78,9 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
   }
 
   return (
-    <Card className="p-5 mt-6">
+    <Card className="p-5">
       <CardHeader className="px-0 pt-0">
-        <CardTitle className="text-xl flex items-center gap-2">
-          ارسال درخواست <Badge variant="outline">Attachment — رزومه</Badge>
-        </CardTitle>
+        <CardTitle className="text-xl">ارسال رزومه</CardTitle>
       </CardHeader>
 
       <Form {...form}>
@@ -107,7 +106,7 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>ایمیل *</FormLabel>
+                  <FormLabel>آدرس پست الکترونیکی *</FormLabel>
                   <FormControl>
                     <Input placeholder="email@example.com" type="email" dir="ltr" {...field} />
                   </FormControl>
@@ -128,18 +127,27 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
                 </FormItem>
               )}
             />
+
+            {/* File upload */}
             <div className="space-y-2">
-              <FormLabel>رزومه (PDF / Word) *</FormLabel>
-              <div className="rounded-md border border-dashed p-3 bg-muted/20">
-                <Input type="file" accept=".pdf,.doc,.docx" required onChange={(e) => setFile(e.target.files?.[0] || null)} className="text-xs" />
+              <FormLabel>فایل رزومه *</FormLabel>
+              <label className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/20 p-4 cursor-pointer hover:border-primary/50 hover:bg-accent/30 transition-colors">
+                <Upload className="size-5 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {file ? file.name : "بارگذاری فایل"}
+                </span>
                 {file && (
-                  <div className="mt-2 text-xs flex items-center gap-2">
-                    <Badge variant="secondary">{file.name}</Badge>
-                    <span className="text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
-                  </div>
+                  <span className="text-[10px] text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</span>
                 )}
-                <FormDescription className="mt-2 text-[11px]">در آینده از Attachment shadcn استفاده خواهد شد (AttachmentMedia + AttachmentContent + AttachmentActions).</FormDescription>
-              </div>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  required
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  className="sr-only"
+                />
+              </label>
+              <FormDescription className="text-[11px]">ترجیحا با فرمت PDF</FormDescription>
             </div>
           </div>
 
@@ -150,7 +158,7 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
               <FormItem>
                 <FormLabel>کمی درباره خودتان و چرا تکباکس؟</FormLabel>
                 <FormControl>
-                  <Textarea className="min-h-[120px]" placeholder="توضیحات تکمیلی..." {...field} />
+                  <Textarea className="min-h-[120px]" placeholder="توضیحات..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -160,12 +168,12 @@ export default function ApplyForm({ jobSlug }: { jobSlug: string }) {
           <CardFooter className="flex justify-end gap-2 p-0 pt-2">
             <ButtonLink href="/work-with-us" variant="ghost">انصراف</ButtonLink>
             <Button type="submit" loading={loading || form.formState.isSubmitting}>
-              {loading ? "در حال ارسال..." : "ارسال درخواست همکاری"}
+              {loading ? "در حال ارسال..." : "ارسال رزومه"}
             </Button>
           </CardFooter>
 
           <p className="text-xs text-muted-foreground">
-            با کلیک روی دکمه ارسال، شما با <Link href="/terms" className="text-primary underline">شرایط حفظ حریم خصوصی</Link> تکباکس موافقت می‌کنید.
+            با کلیک روی دکمه ارسال، شما با <Link href="/terms" className="text-primary underline">شرایط همکاری</Link> تکباکس موافقت می‌کنید.
           </p>
         </form>
       </Form>
