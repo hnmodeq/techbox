@@ -202,7 +202,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   return (
     <div className="flex flex-col w-full" dir="rtl" style={{ gap: 0 }}>
       {/* Row 1: Navigation buttons */}
-      <div className="flex items-center justify-center gap-5">
+      <div className="flex items-center pt-30 pb-10 justify-center gap-5">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <ChevronsRight className="size-3.5" /> امروز
         </button>
@@ -225,7 +225,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         ref={scrollRef}
         tabIndex={0}
         dir="rtl"
-        className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none ${heightClassName ?? 'h-[560px]'}`}
+        className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none h-120`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
@@ -255,7 +255,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
       </div>
 
       {/* Row 3: Event counter */}
-      <p className="text-center text-[10px] text-muted-foreground">
+      <p className="text-center pb-50 text-[10px] text-muted-foreground">
         {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
       </p>
     </div>
