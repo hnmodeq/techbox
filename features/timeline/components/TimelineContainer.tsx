@@ -278,16 +278,16 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           onClick={scrollToToday}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          برو به امروز
           <ChevronsRight className="size-3.5" />
+          برو به امروز
         </button>
         <span className="text-border text-[10px]">|</span>
         <button
           onClick={scrollToOldest}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          <ChevronsLeft className="size-3.5" />
           برو به قدیمی‌ترین
+          <ChevronsLeft className="size-3.5" />
         </button>
       </div>
     </div>
