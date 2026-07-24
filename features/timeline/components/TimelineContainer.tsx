@@ -200,9 +200,9 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const lineTop = topPad + SPACER_H + DOT_SIZE / 2;
 
   return (
-    <div className="relative w-full" dir="rtl">
-      {/* Row 1: Navigation buttons + event count */}
-      <div className="flex items-center justify-center gap-5 mb-0.5">
+    <div className="flex flex-col w-full" dir="rtl" style={{ gap: 0 }}>
+      {/* Row 1: Navigation buttons */}
+      <div className="flex items-center justify-center gap-5">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <ChevronsRight className="size-3.5" /> امروز
         </button>
@@ -218,8 +218,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         <button onClick={scrollToOldest} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           قدیمی‌ترین <ChevronsLeft className="size-3.5" />
         </button>
-        <span className="text-border text-[10px]">·</span>
-        <span className="text-[10px] text-muted-foreground">{events.length.toLocaleString('fa-IR')} رویداد ثبت شده</span>
       </div>
 
       {/* Row 2: Timeline */}
@@ -255,6 +253,11 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           <TimelineSuggestions />
         </div>
       </div>
+
+      {/* Row 3: Event counter */}
+      <p className="text-center text-[10px] text-muted-foreground">
+        {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
+      </p>
     </div>
   );
 }
