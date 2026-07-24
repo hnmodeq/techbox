@@ -221,9 +221,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
       </div>
 
       {/* Event count centered above timeline */}
-      <p className="text-center text-[11px] text-muted-foreground font-medium mb-1">
-        {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
-      </p>
 
       {/* Timeline wrapper */}
       <div className="relative">
@@ -258,8 +255,15 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
             {/* Suggestion box — at the end (oldest side in RTL) */}
             <TimelineSuggestions />
+            
           </div>
+          
         </div>
+
+                <p className="text-center text-[11px] text-muted-foreground font-medium">
+        {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
+      </p>
+
       </div>
     </div>
   );
