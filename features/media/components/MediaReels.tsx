@@ -41,15 +41,43 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
     return () => window.removeEventListener("keydown", handleKey);
   }, [goNext, goPrev]);
 
-  // Play video when index changes — use a small delay to let the src update
+  // Load and play video when index changes — handle HLS streams too
   useEffect(() => {
     const vid = videoRef.current;
-    if (!vid) return;
-    const timer = setTimeout(() => {
-      vid.play().catch(() => {});
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [currentIndex]);
+    if (!vid || !current?.videoUrl) return;
+    let hls: any;
+
+    const isHls = current.videoUrl.includes('.m3u8');
+
+    if (isHls) {
+      (async () => {
+        try {
+          const Hls = (await import('hls.js')).default;
+          if (Hls.isSupported()) {
+            hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+            hls.loadSource(current.videoUrl);
+            hls.attachMedia(vid);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+              vid.play().catch(() => {});
+            });
+          } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+            vid.src = current.videoUrl;
+            vid.play().catch(() => {});
+          }
+        } catch {}
+      })();
+    } else {
+      // Regular video — src is already set via JSX, just play
+      const timer = setTimeout(() => {
+        vid.play().catch(() => {});
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+
+    return () => {
+      try { hls?.destroy(); } catch {}
+    };
+  }, [currentIndex, current?.videoUrl]);
 
   if (items.length === 0) {
     return (
@@ -77,18 +105,26 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
 
         {/* Video player */}
         <div className="relative flex-1 min-h-0 rounded-xl overflow-hidden border border-border bg-black">
-          <video
-            ref={videoRef}
-            key={current?.slug}
-            src={current?.videoUrl || undefined}
-            poster={current?.image}
-            controls
-            autoPlay
-            muted
-            playsInline
-            preload="auto"
-            className="w-full h-full object-contain bg-black"
-          />
+                <video
+                  ref={videoRef}
+                  key={current?.slug}
+                  src={current?.videoUrl || undefined}
+                  poster={current?.image}
+                  controls
+                  autoPlay
+                  muted
+                  playsInline
+                  preload="auto"
+                  onError={(e) => {
+                    // If direct playback fails, try as HLS
+                    const vid = e.currentTarget;
+                    if (current?.videoUrl && !current.videoUrl.includes('.m3u8')) {
+                      // Try with different source approach
+                      vid.load();
+                    }
+                  }}
+                  className="w-full h-full object-contain bg-black"
+                />
         </div>
 
         {/* Next button */}

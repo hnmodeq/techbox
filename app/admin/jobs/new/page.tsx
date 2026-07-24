@@ -78,7 +78,7 @@ export default function NewJobPage() {
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <Label>نوع همکاری</Label>
-              <Select value={form.type || "تمام وقت"} onValueChange={(v) => update({ type: v })}>
+              <Select value={form.type ?? "تمام وقت"} onValueChange={(v: string) => update({ type: v })}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="نوع همکاری" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="تمام وقت">تمام وقت</SelectItem>
