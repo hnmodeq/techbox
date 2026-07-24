@@ -9,6 +9,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "@/components/ui/alert-dialog";
 
 export default function AdminJobsPage() {
   return (
@@ -22,6 +23,7 @@ function AdminJobsInner({ user }: { user: AppUser }) {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const loadJobs = useCallback(async () => {
     setLoading(true);
@@ -39,15 +41,13 @@ function AdminJobsInner({ user }: { user: AppUser }) {
   }, []);
 
   useEffect(() => {
-    if (canEdit(user, "workwithus")) {
-      loadJobs();
-    }
+    if (canEdit(user, "workwithus")) loadJobs();
   }, [user, loadJobs]);
 
-  const deleteJob = async (id: string, title: string) => {
-    if (!confirm(`آیا از حذف موقعیت شغلی «${title}» اطمینان دارید؟`)) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const res = await fetch(`/api/admin/jobs/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/jobs/${deleteTarget.id}`, { method: "DELETE" });
       if (res.ok) {
         setMsg("موقعیت شغلی حذف شد");
         loadJobs();
@@ -57,6 +57,7 @@ function AdminJobsInner({ user }: { user: AppUser }) {
     } catch (e: any) {
       setMsg(e.message);
     }
+    setDeleteTarget(null);
   };
 
   const toggleActive = async (job: any) => {
@@ -66,9 +67,7 @@ function AdminJobsInner({ user }: { user: AppUser }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ active: !job.active }),
       });
-      if (res.ok) {
-        loadJobs();
-      }
+      if (res.ok) loadJobs();
     } catch (e: any) {
       setMsg(e.message);
     }
@@ -110,7 +109,7 @@ function AdminJobsInner({ user }: { user: AppUser }) {
           </TableHeader>
           <TableBody>
             {loading ? (
-                <TableRow><TableCell colSpan={5} className="p-4"><AdminLoading rows={2} /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="p-4"><AdminLoading rows={2} /></TableCell></TableRow>
             ) : jobs.length === 0 ? (
               <TableRow><TableCell colSpan={5} className="p-8 text-center text-muted-foreground">هیچ موقعیت شغلی ثبت نشده است.</TableCell></TableRow>
             ) : (
@@ -133,10 +132,10 @@ function AdminJobsInner({ user }: { user: AppUser }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1 flex-wrap">
-                      <ButtonLink href={`/admin/jobs/${job.id}/edit`} variant="ghost" size="xs">ویرایش</ButtonLink>
+                      <ButtonLink href={`/admin/jobs/${job.id}/edit`} variant="ghost" size="xs">ویرایش آگهی استخدام</ButtonLink>
                       <ButtonLink href={`/work-with-us/${job.slug}`} target="_blank" variant="ghost" size="xs">مشاهده</ButtonLink>
                       <Button variant="ghost" size="xs" onClick={() => toggleActive(job)}>{job.active ? "غیرفعال‌سازی" : "فعال‌سازی"}</Button>
-                      <Button size="xs" variant="ghost" onClick={() => deleteJob(job.id, job.title)} className="text-destructive hover:text-destructive">حذف</Button>
+                      <Button size="xs" variant="ghost" onClick={() => setDeleteTarget({ id: job.id, title: job.title })} className="text-destructive hover:text-destructive">حذف</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -145,6 +144,22 @@ function AdminJobsInner({ user }: { user: AppUser }) {
           </TableBody>
         </Table>
       </Card>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>حذف موقعیت شغلی</AlertDialogTitle>
+            <AlertDialogDescription>
+              آیا از حذف موقعیت شغلی «{deleteTarget?.title}» اطمینان دارید؟ این عمل قابل بازگشت نیست.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteTarget(null)}>انصراف</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">حذف</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }

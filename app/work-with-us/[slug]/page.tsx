@@ -13,11 +13,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const { slug } = await params;
   const job = await prisma.job.findFirst({ where: { slug, active: true } });
   if (!job) return pageMetadata({ title: "شغل یافت نشد", path: "/work-with-us" });
-  return pageMetadata({
-    title: `${job.title} | تکباکس`,
-    description: job.excerpt,
-    path: `/work-with-us/${job.slug}`
-  });
+  return pageMetadata({ title: `${job.title} | تکباکس`, description: job.excerpt, path: `/work-with-us/${job.slug}` });
 }
 
 export default async function JobPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -30,18 +26,12 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
   const faq: Array<{ question: string; answer: string }> = Array.isArray((job as any).faq) ? (job as any).faq : [];
   const salaryMin = (job as any).salaryMin as number | null;
   const salaryMax = (job as any).salaryMax as number | null;
+  const benefits: string[] = (job as any).benefits ? (job as any).benefits.split("\n").filter(Boolean) : [];
 
   const formatSalary = (v: number) => v.toLocaleString("fa-IR");
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10" dir="rtl">
-      {/* Breadcrumb */}
-      <nav className="text-xs text-muted-foreground mb-6">
-        <Link href="/work-with-us" className="hover:text-foreground transition-colors">موقعیت‌های شغلی</Link>
-        <span className="mx-1.5">/</span>
-        <span className="text-foreground font-medium">{job.title}</span>
-      </nav>
-
       {/* Title + meta */}
       <header className="mb-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-3">{job.title}</h1>
@@ -52,9 +42,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
             <Badge variant="outline" className="text-primary">
               {salaryMin && salaryMax
                 ? `${formatSalary(salaryMin)} – ${formatSalary(salaryMax)} تومان`
-                : salaryMin
-                ? `از ${formatSalary(salaryMin)} تومان`
-                : `تا ${formatSalary(salaryMax!)} تومان`}
+                : salaryMin ? `از ${formatSalary(salaryMin)} تومان` : `تا ${formatSalary(salaryMax!)} تومان`}
             </Badge>
           )}
           <TooltipProvider>
@@ -72,17 +60,13 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
       {(job as any).positionDescription && (
         <section className="mb-8">
           <h2 className="text-lg font-bold text-foreground mb-3">شرح موقعیت شغلی</h2>
-          <div className="text-sm text-muted-foreground leading-7 whitespace-pre-line">
-            {(job as any).positionDescription}
-          </div>
+          <div className="text-sm text-muted-foreground leading-7 whitespace-pre-line">{(job as any).positionDescription}</div>
         </section>
       )}
 
       {/* Description */}
       <section className="border border-border rounded-xl bg-card p-6 mb-8">
-        <div className="prose prose-sm max-w-none leading-8 text-foreground whitespace-pre-line">
-          {job.description}
-        </div>
+        <div className="prose prose-sm max-w-none leading-8 text-foreground whitespace-pre-line">{job.description}</div>
       </section>
 
       {/* پیش‌نیازها */}
@@ -92,21 +76,24 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
           <ul className="space-y-2">
             {requirements.map((req, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <Check className="size-4 text-primary shrink-0 mt-0.5" />
-                <span>{req}</span>
+                <Check className="size-4 text-primary shrink-0 mt-0.5" /><span>{req}</span>
               </li>
             ))}
           </ul>
         </section>
       )}
 
-      {/* مزایا و امکانات */}
-      {(job as any).benefits && (
+      {/* مزایا و امکانات — dot list with green check */}
+      {benefits.length > 0 && (
         <section className="border border-border rounded-xl bg-card p-6 mb-8">
-          <h2 className="text-lg font-bold text-foreground mb-3">مزایا و امکانات</h2>
-          <div className="text-sm text-muted-foreground leading-7 whitespace-pre-line">
-            {(job as any).benefits}
-          </div>
+          <h2 className="text-lg font-bold text-foreground mb-4">مزایا و امکانات</h2>
+          <ul className="grid grid-cols-2 gap-2">
+            {benefits.map((b, i) => (
+              <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Check className="size-4 text-emerald-500 shrink-0" /><span>{b}</span>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
@@ -117,19 +104,14 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
           <Accordion className="w-full" type="multiple">
             {faq.map((item, i) => (
               <AccordionItem key={String(i)} value={`faq-${i}`}>
-                <AccordionTrigger className="text-right text-sm font-medium">
-                  {item.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm text-muted-foreground leading-7 whitespace-pre-line">
-                  {item.answer}
-                </AccordionContent>
+                <AccordionTrigger className="text-right text-sm font-medium">{item.question}</AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground leading-7 whitespace-pre-line">{item.answer}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </section>
       )}
 
-      {/* Apply form */}
       <ApplyForm jobSlug={job.slug} />
     </main>
   );
