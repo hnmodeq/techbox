@@ -95,7 +95,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
         <div className="flex justify-center">
           <button
             onClick={goPrev}
-            disabled={currentIndex === 0}
+            disabled={currentIndex === 0 ? true : undefined} suppressHydrationWarning
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
           >
             <ChevronUp className="size-4" />
@@ -131,7 +131,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
         <div className="flex justify-center">
           <button
             onClick={goNext}
-            disabled={currentIndex === items.length - 1}
+            disabled={currentIndex === items.length - 1 ? true : undefined} suppressHydrationWarning
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
           >
             ویدیوی بعدی
@@ -176,7 +176,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
         <div className="flex justify-center">
           <button
             onClick={goPrev}
-            disabled={currentIndex === 0}
+            disabled={currentIndex === 0 ? true : undefined} suppressHydrationWarning
             className="flex items-center justify-center w-full py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer border border-border"
           >
             <ChevronUp className="size-4" />
@@ -200,7 +200,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
         <div className="flex justify-center">
           <button
             onClick={goNext}
-            disabled={currentIndex === items.length - 1}
+            disabled={currentIndex === items.length - 1 ? true : undefined} suppressHydrationWarning
             className="flex items-center justify-center w-full py-1.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer border border-border"
           >
             <ChevronDown className="size-4" />
