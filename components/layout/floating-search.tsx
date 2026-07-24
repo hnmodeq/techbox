@@ -253,8 +253,8 @@ export function FloatingSearch() {
           <div
             ref={catWrapRef}
             className={cn(
-              "relative overflow-visible transition-[width] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]",
-              expanded ? "w-24" : "w-0 pointer-events-none"
+              "relative transition-[width] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
+              expanded ? "w-24" : "w-0"
             )}
           >
             {/* ── Category drop-up — anchored above the category wrapper ── */}
