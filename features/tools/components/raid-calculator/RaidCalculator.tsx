@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
 
 export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
 export type Drive = { id: string; sizeTb: number; label: string; type: "HDD" | "SSD" };
@@ -233,7 +235,8 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
   const fallback = getModuleItems("shop");
   const { items: dbItems } = useDbPosts("shop", fallback, 120);
   const items = dbItems.length > 0 ? dbItems : fallback;
-  const filtered = useMemo(() => {
+
+  const ranked = useMemo(() => {
     if (driveCount === 0) return [];
     const candidates = items.filter((p) => {
       const brand = (p.brand || "").toLowerCase();
@@ -243,35 +246,81 @@ function RecommendedModels({ driveCount }: { driveCount: number }) {
       const bay = parseBay(p.specs);
       return isNasBrand || isNasCat || bay !== null;
     });
-    const withBay = candidates
-      .map((p) => ({ p, bay: parseBay(p.specs) ?? 999 }))
-      .filter(({ bay }) => bay >= driveCount)
-      .sort((a, b) => a.bay - b.bay)
-      .slice(0, 10)
-      .map(({ p }) => p);
-    if (withBay.length >= 2) return withBay;
-    return items.filter((p) => p.image).slice(0, 10);
+    return candidates
+      .map((p) => {
+        const bay = parseBay(p.specs) ?? 0;
+        // Score based on bay count match
+        let score = 40;
+        if (bay >= driveCount) {
+          const diff = bay - driveCount;
+          score += diff === 0 ? 35 : diff <= 2 ? 25 : 15;
+        } else if (bay === driveCount - 1) {
+          score += 10;
+        } else {
+          score -= 10;
+        }
+        if (p.availability?.includes("موجود")) score += 10;
+        return { ...p, score: Math.max(0, Math.min(100, score)), bay };
+      })
+      .filter((p) => p.score > 30 && p.bay >= driveCount)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
   }, [items, driveCount]);
+
   if (driveCount === 0) return null;
+
   return (
     <div className="space-y-4">
       <h3 className="text-[18px] font-black">مدل‌های پیشنهادی</h3>
       <p className="text-[12px] text-muted-foreground">بر اساس {driveCount.toLocaleString("fa-IR")} دیسک – مدل‌های واقعی از فروشگاه تکباکس</p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-px bg-border border rounded-lg overflow-hidden">
-        {filtered.map((p) => (
-          <Link key={p.slug} href={`/shop/${p.slug}`} className="group bg-card p-4 flex flex-col items-center gap-3 hover:bg-accent hover:text-accent-foreground transition-colors">
-            <div className="relative w-full aspect-[4/3] bg-transparent">
-              <Image src={p.image || "/assets/blog-1.jpg"} alt={p.title} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-contain group-hover:scale-[1.02] transition-transform" />
-            </div>
-            <div className="text-center">
-              <div className="text-[12px] font-bold line-clamp-2 leading-5">{p.model || p.title.slice(0, 50)}</div>
-              <div className="text-[10px] text-muted-foreground group-hover:text-accent-foreground/70 mt-1">
-                {p.brand ? `${p.brand}` : ""} {parseBay(p.specs) ? `• ${parseBay(p.specs)} Bay` : ""}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {ranked.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">محصولی با مشخصات شما یافت نشد.</p>
+      ) : (
+        <div className="space-y-3">
+          {ranked.map((product, idx) => (
+            <Link
+              key={product.slug}
+              href={`/shop/${product.slug}`}
+              className="group block"
+            >
+              <Card className="overflow-hidden border border-border hover:border-primary/30 transition-colors">
+                <div className="flex gap-4 p-4">
+                  {product.image && (
+                    <div className="relative w-20 h-16 shrink-0 rounded overflow-hidden bg-muted">
+                      <Image src={product.image} alt={product.title} fill sizes="80px" className="object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      {idx === 0 && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-bold">⭐ بهترین</span>}
+                      {idx === 1 && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-bold">🥈 دوم</span>}
+                      {idx === 2 && <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-bold">🥉 سوم</span>}
+                      {product.brand && <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-border text-muted-foreground">{product.brand}</span>}
+                    </div>
+                    <div className="text-sm font-bold mt-1 group-hover:text-primary transition-colors truncate">
+                      {product.title}
+                    </div>
+                    {product.excerpt && (
+                      <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{product.excerpt}</div>
+                    )}
+                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
+                      {product.bay > 0 && <span>{product.bay.toLocaleString("fa-IR")} درایو</span>}
+                      {product.price && <span className="font-bold text-primary">{product.price.toLocaleString("fa-IR")} تومان</span>}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center justify-center shrink-0">
+                    <div className={`text-lg font-black ${product.score >= 80 ? "text-green-500" : product.score >= 60 ? "text-yellow-500" : "text-muted-foreground"}`}>
+                      {product.score}%
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">تطابق</div>
+                  </div>
+                  <ArrowLeft className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors self-center" />
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
