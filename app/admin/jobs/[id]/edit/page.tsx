@@ -23,9 +23,10 @@ export default function EditJobPage() {
   const [form, setForm] = useState({
     title: "", slug: "", type: "تمام وقت", remote: false, team: "",
     excerpt: "", description: "", positionDescription: "", benefits: "",
-    active: true, order: 0,
+    active: true, order: 0, salaryMin: 0, salaryMax: 0,
   });
   const [requirements, setRequirements] = useState<string[]>([""]);
+  const [faq, setFaq] = useState<Array<{ question: string; answer: string }>>([]);
 
   const update = (patch: Partial<typeof form>) => setForm((f) => ({ ...f, ...patch }));
 
@@ -40,8 +41,10 @@ export default function EditJobPage() {
             remote: job.remote || false, team: job.team || "", excerpt: job.excerpt || "",
             description: job.description || "", positionDescription: job.positionDescription || "",
             benefits: job.benefits || "", active: job.active ?? true, order: job.order || 0,
+            salaryMin: job.salaryMin || 0, salaryMax: job.salaryMax || 0,
           });
           setRequirements(Array.isArray(job.requirements) && job.requirements.length > 0 ? job.requirements : [""]);
+          setFaq(Array.isArray(job.faq) ? job.faq : []);
         }
       })
       .catch(() => {})
@@ -58,7 +61,10 @@ export default function EditJobPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
+          salaryMin: form.salaryMin || undefined,
+          salaryMax: form.salaryMax || undefined,
           requirements: requirements.filter((r) => r.trim()),
+          faq: faq.filter((f) => f.question.trim() && f.answer.trim()),
         }),
       });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error || "خطا"); }
@@ -127,6 +133,38 @@ export default function EditJobPage() {
           <div>
             <Label>مزایا و امکانات</Label>
             <Textarea value={form.benefits} onChange={(e) => update({ benefits: e.target.value })} className="mt-1 min-h-[100px]" />
+          </div>
+
+          <Separator />
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <Label>حداقل حقوق (تومان)</Label>
+              <Input type="number" value={form.salaryMin || ""} onChange={(e) => update({ salaryMin: parseInt(e.target.value) || 0 })} className="mt-1" placeholder="0" dir="ltr" />
+            </div>
+            <div>
+              <Label>حداکثر حقوق (تومان)</Label>
+              <Input type="number" value={form.salaryMax || ""} onChange={(e) => update({ salaryMax: parseInt(e.target.value) || 0 })} className="mt-1" placeholder="0" dir="ltr" />
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <Label>سوالات متداول</Label>
+            <div className="space-y-3 mt-2">
+              {faq.map((item, i) => (
+                <div key={i} className="border border-border rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">سوال {i + 1}</span>
+                    <button onClick={() => setFaq(faq.filter((_, j) => j !== i))} className="text-destructive text-xs cursor-pointer">×</button>
+                  </div>
+                  <Input value={item.question} onChange={(e) => { const next = [...faq]; next[i] = { ...next[i], question: e.target.value }; setFaq(next); }} placeholder="سوال" />
+                  <Textarea value={item.answer} onChange={(e) => { const next = [...faq]; next[i] = { ...next[i], answer: e.target.value }; setFaq(next); }} placeholder="پاسخ" className="min-h-[60px]" />
+                </div>
+              ))}
+              <Button variant="ghost" size="sm" onClick={() => setFaq([...faq, { question: "", answer: "" }])}>+ افزودن سوال</Button>
+            </div>
           </div>
 
           <Separator />

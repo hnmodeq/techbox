@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import ApplyForm from "@/features/work-with-us/components/ApplyForm";
 import { pageMetadata } from "@/lib/seo";
 import { Metadata } from "next";
@@ -26,6 +27,11 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
 
   const dateFa = new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(job.createdAt);
   const requirements: string[] = Array.isArray((job as any).requirements) ? (job as any).requirements : [];
+  const faq: Array<{ question: string; answer: string }> = Array.isArray((job as any).faq) ? (job as any).faq : [];
+  const salaryMin = (job as any).salaryMin as number | null;
+  const salaryMax = (job as any).salaryMax as number | null;
+
+  const formatSalary = (v: number) => v.toLocaleString("fa-IR");
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-10" dir="rtl">
@@ -42,6 +48,15 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary">{job.type}</Badge>
           <Badge variant="outline">{job.remote ? "دورکاری" : "حضوری"}</Badge>
+          {(salaryMin || salaryMax) && (
+            <Badge variant="outline" className="text-primary">
+              {salaryMin && salaryMax
+                ? `${formatSalary(salaryMin)} – ${formatSalary(salaryMax)} تومان`
+                : salaryMin
+                ? `از ${formatSalary(salaryMin)} تومان`
+                : `تا ${formatSalary(salaryMax!)} تومان`}
+            </Badge>
+          )}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger render={<span className="text-xs text-muted-foreground cursor-default" />}>
@@ -92,6 +107,25 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
           <div className="text-sm text-muted-foreground leading-7 whitespace-pre-line">
             {(job as any).benefits}
           </div>
+        </section>
+      )}
+
+      {/* سوالات متداول */}
+      {faq.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-lg font-bold text-foreground mb-4">سوالات متداول</h2>
+          <Accordion className="w-full" type="multiple">
+            {faq.map((item, i) => (
+              <AccordionItem key={String(i)} value={`faq-${i}`}>
+                <AccordionTrigger className="text-right text-sm font-medium">
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground leading-7 whitespace-pre-line">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </section>
       )}
 
