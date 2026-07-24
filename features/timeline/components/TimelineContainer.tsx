@@ -207,88 +207,80 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
-      {/* Grid background — time-travel feel */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          opacity: 0.06,
-          backgroundImage:
-            'linear-gradient(to right, var(--foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }}
-      />
-
-      {/* Scroll arrow — RIGHT (toward today/newer) */}
-      <button
-        onClick={() => scrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-        className={`absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardNewer ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
-        aria-label="اسکرول به سمت امروز"
-      >
-        <ChevronRight className="size-5" />
-      </button>
-
-      {/* Scroll arrow — LEFT (toward older) */}
-      <button
-        onClick={() => scrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
-        className={`absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardOlder ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
-        aria-label="اسکرول به سمت قدیمی‌ترین"
-      >
-        <ChevronLeft className="size-5" />
-      </button>
-
-      {/* Scroll container */}
-      <div
-        ref={scrollRef}
-        tabIndex={0}
-        dir="rtl"
-        className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none ${heightClassName ?? 'h-[560px]'}`}
-        style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-      >
-        <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-
-        <div
-          className="relative flex min-w-max items-start gap-6 px-[8%]"
-          style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
-          onDragStart={(e) => e.preventDefault()}
-        >
-          {/* Continuous horizontal line — aligned with dot centers */}
-          <div
-            className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
-            style={{ top: lineTop, width: '100%' }}
-          />
-
-          {timelineItems.map((item) => {
-            if (item.type === 'today') return <TodayMarker key="today" />;
-            if (item.type === 'year') return <YearTick key={`year-${item.year}`} year={item.year} />;
-            return <EventItem key={item.event.id} event={item.event} index={item.index} />;
-          })}
-
-          {/* Suggestion box — at the end (oldest side in RTL) */}
-          <TimelineSuggestions />
+      {/* Top bar: buttons on one side, event count on the other */}
+      <div className="flex items-center justify-between px-4 mb-2">
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={scrollToToday}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            <ChevronsRight className="size-3.5" />
+            برو به امروز
+          </button>
+          <span className="text-border text-[10px]">|</span>
+          <button
+            onClick={scrollToOldest}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          >
+            برو به قدیمی‌ترین
+            <ChevronsLeft className="size-3.5" />
+          </button>
         </div>
-      </div>
-
-      {/* Navigation + event counter */}
-      <div className="flex items-center justify-center gap-2 mt-2">
         <span className="text-[11px] text-muted-foreground font-medium">
           {events.length.toLocaleString('fa-IR')} رویداد
         </span>
-        <span className="text-border text-[10px]">•</span>
+      </div>
+
+      {/* Timeline wrapper — arrows positioned relative to this */}
+      <div className="relative">
+        {/* Scroll arrows */}
         <button
-          onClick={scrollToToday}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          onClick={() => scrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardNewer ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
+          aria-label="اسکرول به سمت امروز"
         >
-          <ChevronsRight className="size-3.5" />
-          برو به امروز
+          <ChevronRight className="size-5" />
         </button>
-        <span className="text-border text-[10px]">|</span>
+
         <button
-          onClick={scrollToOldest}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          onClick={() => scrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
+          className={`absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardOlder ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
+          aria-label="اسکرول به سمت قدیمی‌ترین"
         >
-          برو به قدیمی‌ترین
-          <ChevronsLeft className="size-3.5" />
+          <ChevronLeft className="size-5" />
         </button>
+
+        {/* Scroll container */}
+        <div
+          ref={scrollRef}
+          tabIndex={0}
+          dir="rtl"
+          className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none ${heightClassName ?? 'h-[560px]'}`}
+          style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+        >
+          <style>{`div::-webkit-scrollbar { display: none; }`}</style>
+
+          <div
+            className="relative flex min-w-max items-start gap-6 px-[8%]"
+            style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
+            onDragStart={(e) => e.preventDefault()}
+          >
+            {/* Continuous horizontal line — aligned with dot centers */}
+            <div
+              className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
+              style={{ top: lineTop, width: '100%' }}
+            />
+
+            {timelineItems.map((item) => {
+              if (item.type === 'today') return <TodayMarker key="today" />;
+              if (item.type === 'year') return <YearTick key={`year-${item.year}`} year={item.year} />;
+              return <EventItem key={item.event.id} event={item.event} index={item.index} />;
+            })}
+
+            {/* Suggestion box — at the end (oldest side in RTL) */}
+            <TimelineSuggestions />
+          </div>
+        </div>
       </div>
     </div>
   );
