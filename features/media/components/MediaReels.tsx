@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp, ChevronDown, Play } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { type ContentItem } from "@/lib/content";
+import { VideoCard } from "@/components/content/VideoCard";
 import { LikeButton } from "@/components/ui/like-button";
 import { SaveButton } from "@/components/ui/save-button";
 import { ShareButton } from "@/components/ui/share-button";
-import { CardStats } from "@/components/ui/card-stats";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { formatRelativeDate } from "@/lib/date-format";
-import { blurProps } from "@/lib/image-placeholder";
 
 export default function MediaReels({ serverItems }: { serverItems?: ContentItem[] }) {
   const items = useMemo(() => serverItems ?? [], [serverItems]);
@@ -26,7 +24,6 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
       if (idx < 0 || idx >= items.length) return;
       setDirection(dir);
       setCurrentIndex(idx);
-      // Scroll the gallery to keep the active thumbnail visible
       const el = galleryRef.current?.querySelector(`[data-idx="${idx}"]`);
       el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     },
@@ -56,70 +53,8 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
 
   return (
     <div className="flex gap-4 h-[calc(100svh-var(--header-height)-2rem)] px-4 py-4" dir="rtl">
-      {/* ── Right side: vertical gallery ── */}
-      <div
-        ref={galleryRef}
-        className="w-[280px] shrink-0 overflow-y-auto space-y-2 pr-1"
-        style={{ scrollbarWidth: "thin" }}
-      >
-        {items.map((vid, idx) => (
-          <button
-            key={vid.slug}
-            data-idx={idx}
-            type="button"
-            onClick={() => goTo(idx, idx > currentIndex ? "up" : "down")}
-            className={`group relative w-full flex gap-3 p-2 rounded-lg border transition-all cursor-pointer text-right ${
-              idx === currentIndex
-                ? "border-primary bg-primary/5"
-                : "border-border bg-card hover:border-primary/30 hover:bg-accent/30"
-            }`}
-          >
-            {/* Thumbnail */}
-            <div className="relative w-[60px] h-[80px] shrink-0 rounded overflow-hidden bg-muted">
-              <Image
-                src={vid.image || "/assets/blog-1.jpg"}
-                alt={vid.title}
-                fill
-                sizes="60px"
-                className="object-cover"
-                {...blurProps(vid.image || "/assets/blog-1.jpg")}
-              />
-              {idx === currentIndex && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                  <Play className="size-4 text-white fill-white" />
-                </div>
-              )}
-              {vid.videoDuration && (
-                <span className="absolute bottom-0.5 right-0.5 text-[8px] bg-black/70 text-white px-1 rounded">
-                  {vid.videoDuration}
-                </span>
-              )}
-            </div>
-            {/* Info */}
-            <div className="flex-1 min-w-0 py-0.5">
-              <p className={`text-[11px] font-bold leading-4 line-clamp-2 ${idx === currentIndex ? "text-primary" : "text-foreground"}`}>
-                {vid.title}
-              </p>
-              <p className="text-[9px] text-muted-foreground mt-1">
-                {formatRelativeDate(vid.date)}
-              </p>
-              <div className="mt-1" dir="ltr">
-                <CardStats
-                  module="media"
-                  slug={vid.slug}
-                  initialViews={vid.views}
-                  initialLikes={vid.likes}
-                  initialComments={vid.comments}
-                  showComments
-                />
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* ── Left side: video player + info ── */}
-      <div className="flex-1 min-w-0 flex flex-col gap-3">
+      {/* ── Col 1: Video player ── */}
+      <div className="flex-1 min-w-0 flex flex-col gap-2">
         {/* Previous button */}
         <div className="flex justify-center">
           <button
@@ -170,29 +105,46 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
             <ChevronDown className="size-4" />
           </button>
         </div>
+      </div>
 
-        {/* Info + comments */}
+      {/* ── Col 2: Info + comments ── */}
+      <div className="w-[360px] shrink-0 flex flex-col border border-border rounded-xl bg-card overflow-hidden">
         {current && (
-          <div className="rounded-xl border border-border bg-card p-5 space-y-4 max-h-[40vh] overflow-y-auto">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h2 className="text-lg font-black text-foreground leading-7">{current.title}</h2>
+          <>
+            {/* Title + actions */}
+            <div className="p-4 border-b border-border space-y-3">
+              <div>
+                <h2 className="text-base font-black text-foreground leading-6">{current.title}</h2>
                 {current.excerpt && (
-                  <p className="text-sm text-muted-foreground mt-1 leading-6">{current.excerpt}</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-5 line-clamp-2">{current.excerpt}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-2">{formatRelativeDate(current.date)}</p>
+                <p className="text-[10px] text-muted-foreground mt-1.5">{formatRelativeDate(current.date)}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <LikeButton contentType="media" slug={current.slug} initial={current.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
+                <SaveButton module="media" slug={current.slug} />
+                <ShareButton />
               </div>
             </div>
-
-            <div className="flex items-center gap-3">
-              <LikeButton contentType="media" slug={current.slug} initial={current.likes || 0} tooltipLabel="پسند کردن این ویدیو" />
-              <SaveButton module="media" slug={current.slug} />
-              <ShareButton />
+            {/* Comments */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <CommentSection module="media" slug={current.slug} initialComments={current.comments || 0} compact />
             </div>
-
-            <CommentSection module="media" slug={current.slug} initialComments={current.comments || 0} compact />
-          </div>
+          </>
         )}
+      </div>
+
+      {/* ── Col 3: Vertical gallery (existing VideoCard components) ── */}
+      <div
+        ref={galleryRef}
+        className="w-[200px] shrink-0 overflow-y-auto space-y-3"
+        style={{ scrollbarWidth: "thin" }}
+      >
+        {items.map((vid, idx) => (
+          <div key={vid.slug} data-idx={idx} className={idx === currentIndex ? "ring-2 ring-primary rounded-[var(--corner-radius)]" : ""}>
+            <VideoCard video={vid} onOpen={() => goTo(idx, idx > currentIndex ? "up" : "down")} />
+          </div>
+        ))}
       </div>
     </div>
   );
