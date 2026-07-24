@@ -46,6 +46,7 @@ import {
 } from "@/lib/jalali"
 import { cn } from "@/lib/utils"
 import { useConsultation } from "@/providers/consultation.provider"
+import { TopBarSearch } from "@/components/layout/top-bar-search"
 
 type Crumb = {
   label: string
@@ -228,7 +229,7 @@ function TechboxBreadcrumb() {
       <BreadcrumbList className="flex-nowrap whitespace-nowrap">
         {crumbs.map((crumb, index) => {
           const isCurrent = index === crumbs.length - 1
-          const tooltipText = isCurrent ? "اینجا هستید" : `رفتن به ${crumb.label}`
+          const tooltipText = isCurrent ? "شما الان اینجا هستید" : `رفتن به ${crumb.label}`
 
           return (
             <React.Fragment key={index}>
@@ -706,7 +707,7 @@ export function SiteHeader({
         </div>
 
         <div className="flex flex-[1.2] justify-center px-2">
-          {/* Search moved to floating bottom-center component */}
+          <TopBarSearch />
         </div>
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1">

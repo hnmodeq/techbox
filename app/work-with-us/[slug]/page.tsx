@@ -102,9 +102,11 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
         </section>
       )}
 
+      <ApplyForm jobSlug={job.slug} termsContent={termsContent} />
+
       {/* سوالات متداول — RTL */}
       {faq.length > 0 && (
-        <section className="mb-8">
+        <section className="mt-8">
           <h2 className="text-lg font-bold text-foreground mb-4">سوالات متداول</h2>
           <Accordion className="w-full" type="multiple">
             {faq.map((item, i) => (
@@ -118,8 +120,6 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
           </Accordion>
         </section>
       )}
-
-      <ApplyForm jobSlug={job.slug} termsContent={termsContent} />
     </main>
   );
 }

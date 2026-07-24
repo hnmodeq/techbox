@@ -52,8 +52,7 @@ export default async function AboutPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-0">
         {/* Team sections */}
-        {sections.map((section) => (
-          section.members.length > 0 && (
+        {sections.filter((s) => s.members.length > 0).map((section, idx, arr) => (
             <React.Fragment key={section.id}>
               <section className="space-y-5">
                 <h2 className="text-lg font-bold text-foreground">{section.title}</h2>
@@ -78,9 +77,8 @@ export default async function AboutPage() {
                   })}
                 </div>
               </section>
-              <Separator />
+              {idx < arr.length - 1 && <Separator />}
             </React.Fragment>
-          )
         ))}
 
         {/* Careers CTA — no background */}
