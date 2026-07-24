@@ -61,9 +61,9 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
   }
 
   return (
-    <div className="flex gap-4 h-[calc(100svh-var(--header-height)-2rem)] px-4 py-4" dir="rtl">
+    <div className="flex flex-row-reverse gap-4 h-[calc(100svh-var(--header-height)-2rem)] px-4 py-4" dir="rtl">
       {/* ── Col 1 (LEFT in RTL): Video player ── */}
-      <div className="w-[320px] shrink-0 flex flex-col gap-2">
+      <div className="w-[420px] shrink-0 flex flex-col gap-2">
         {/* Previous button */}
         <div className="flex justify-center">
           <button
@@ -118,7 +118,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
       </div>
 
       {/* ── Col 2 (CENTER): Info + comments ── */}
-      <div className="flex-1 min-w-0 flex flex-col border border-border rounded-xl bg-card overflow-hidden">
+      <div className="flex-1 min-w-0 flex align-center flex-col border border-border rounded-xl bg-card overflow-hidden">
         {current && (
           <>
             {/* Title + actions */}
