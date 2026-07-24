@@ -11,6 +11,8 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve", // "auto_approve" | "require_approval"
   "comments.hidden_globally": "false", // "true" | "false"
   "jobs.resume_retention_days": "30",
+  "jobs.pageTitle": "موقعیت‌های شغلی تکباکس",
+  "terms.content": "",
   "modules.enabled": "{}",
   "modules.home_visibility": "{}",
   "modules.home_order": "{}",

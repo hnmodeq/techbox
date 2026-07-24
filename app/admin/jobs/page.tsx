@@ -133,6 +133,7 @@ function AdminJobsInner({ user }: { user: AppUser }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1 flex-wrap">
+                      <ButtonLink href={`/admin/jobs/${job.id}/edit`} variant="ghost" size="xs">ویرایش</ButtonLink>
                       <ButtonLink href={`/work-with-us/${job.slug}`} target="_blank" variant="ghost" size="xs">مشاهده</ButtonLink>
                       <Button variant="ghost" size="xs" onClick={() => toggleActive(job)}>{job.active ? "غیرفعال‌سازی" : "فعال‌سازی"}</Button>
                       <Button size="xs" variant="ghost" onClick={() => deleteJob(job.id, job.title)} className="text-destructive hover:text-destructive">حذف</Button>

@@ -58,6 +58,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       { title: "تایم‌لاین", href: "/admin/timeline", icon: Clock },
       { title: "خبرنامه", href: "/admin/newsletter", icon: Newspaper, superAdminOnly: true },
       { title: "آگهی استخدام", href: "/admin/jobs", icon: Briefcase },
+      { title: "شرایط همکاری", href: "/admin/terms", icon: Briefcase },
     ],
   },
   {
