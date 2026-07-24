@@ -11,6 +11,9 @@ const jobSchema = z.object({
   team: z.string().min(2).max(100).optional(),
   excerpt: z.string().max(500).optional(),
   description: z.string().optional(),
+  positionDescription: z.string().optional(),
+  benefits: z.string().optional(),
+  requirements: z.array(z.string()).optional(),
   active: z.boolean().optional(),
   order: z.number().int().optional(),
 });

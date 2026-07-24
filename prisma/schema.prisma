@@ -422,6 +422,10 @@ model Job {
   team        String
   excerpt     String
   description String   @db.Text
+  // Extended fields for detailed job pages
+  positionDescription String? @db.Text  // شرح موقعیت شغلی
+  benefits    String?  @db.Text         // مزایا و امکانات
+  requirements Json?                    // پیش‌نیازها (array of strings)
   active      Boolean  @default(true)
   order       Int      @default(0)
   createdAt   DateTime @default(now())
