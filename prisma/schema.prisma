@@ -426,6 +426,9 @@ model Job {
   positionDescription String? @db.Text  // شرح موقعیت شغلی
   benefits    String?  @db.Text         // مزایا و امکانات
   requirements Json?                    // پیش‌نیازها (array of strings)
+  salaryMin   Float?                    // حداقل حقوق
+  salaryMax   Float?                    // حداکثر حقوق
+  faq         Json?                     // سوالات متداول (array of {question, answer})
   active      Boolean  @default(true)
   order       Int      @default(0)
   createdAt   DateTime @default(now())

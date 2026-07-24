@@ -4,6 +4,7 @@ import { put } from "@vercel/blob";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
+import { sendEmail, escapeHtml } from "@/lib/email";
 
 const applySchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ کاراکتر باشد").max(100),
@@ -87,6 +88,24 @@ export async function POST(
         resumeName: file.name,
       },
     });
+
+    // Notify admin about new application (fire-and-forget)
+    sendEmail({
+      to: process.env.CONTACT_EMAIL || "info@techbox.ir",
+      subject: `رزومه جدید: ${escapeHtml(data.name)} – ${escapeHtml(job.title)}`,
+      html: `
+        <div style="font-family: system-ui, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; direction: rtl;">
+          <h2 style="color: #111;">رزومه جدید دریافت شد</h2>
+          <p><strong>${escapeHtml(data.name)}</strong> برای موقعیت شغلی <strong>${escapeHtml(job.title)}</strong> رزومه ارسال کرد.</p>
+          <p>ایمیل: ${escapeHtml(data.email)}</p>
+          <p>تلفن: ${escapeHtml(data.phone)}</p>
+          ${data.message ? `<p>پیام: ${escapeHtml(data.message)}</p>` : ""}
+          <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://techbox.ir"}/admin/jobs/applications" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
+            مشاهده رزومه‌ها
+          </a>
+        </div>
+      `,
+    }).catch(() => {});
 
     return NextResponse.json({ ok: true, id: application.id }, { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (error: any) {
