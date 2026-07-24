@@ -201,8 +201,8 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
-      {/* Navigation buttons */}
-      <div className="flex items-center justify-center gap-5 mb-1">
+      {/* Row 1: Navigation buttons + event count */}
+      <div className="flex items-center justify-center gap-5 mb-0.5">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <ChevronsRight className="size-3.5" /> امروز
         </button>
@@ -218,52 +218,42 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         <button onClick={scrollToOldest} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           قدیمی‌ترین <ChevronsLeft className="size-3.5" />
         </button>
+        <span className="text-border text-[10px]">·</span>
+        <span className="text-[10px] text-muted-foreground">{events.length.toLocaleString('fa-IR')} رویداد ثبت شده</span>
       </div>
 
-      {/* Event count centered above timeline */}
+      {/* Row 2: Timeline */}
+      <div
+        ref={scrollRef}
+        tabIndex={0}
+        dir="rtl"
+        className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none ${heightClassName ?? 'h-[560px]'}`}
+        style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+      >
+        <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
-      {/* Timeline wrapper */}
-      <div className="relative">
-        {/* Scroll container */}
         <div
-          ref={scrollRef}
-          tabIndex={0}
-          dir="rtl"
-          className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none ${heightClassName ?? 'h-[560px]'}`}
-          style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+          className="relative flex min-w-max items-start gap-6 px-[8%]"
+          style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
+          onDragStart={(e) => e.preventDefault()}
         >
-          <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-
+          {/* Continuous horizontal line */}
           <div
-            className="relative flex min-w-max items-start gap-6 px-[8%]"
-            style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
-            onDragStart={(e) => e.preventDefault()}
-          >
-            {/* Continuous horizontal line */}
-            <div
-              className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
-              style={{ top: lineTop, width: '100%' }}
-            />
+            className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
+            style={{ top: lineTop, width: '100%' }}
+          />
 
-            {/* Today marker */}
-            <TodayMarker />
+          {/* Today marker */}
+          <TodayMarker />
 
-            {/* Events */}
-            {events.map((event, index) => (
-              <EventItem key={event.id} event={event} index={index} />
-            ))}
+          {/* Events */}
+          {events.map((event, index) => (
+            <EventItem key={event.id} event={event} index={index} />
+          ))}
 
-            {/* Suggestion box — at the end (oldest side in RTL) */}
-            <TimelineSuggestions />
-            
-          </div>
-          
+          {/* Suggestion box */}
+          <TimelineSuggestions />
         </div>
-
-                <p className="text-center text-[11px] text-muted-foreground font-medium">
-        {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
-      </p>
-
       </div>
     </div>
   );
