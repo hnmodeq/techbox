@@ -1,11 +1,17 @@
-in media page (/media):
-i want to do a full re-design in this page.
-1-the whole page gonna be spread in 2 vertical sections, want to do a redesign
-2-the first section is on the right side of the page, its a vertical gallery which we gonna have all of our reels in 1 column after eachother
-3-the second section is on the left side of the page, it's a video player. the player play the latest video once a user enter the page. also if he choose a video from the right side the video player gonna play it.
-4-in the left side we gonna have a button top of the video player as " previous video" and a button below of the video player as "next video"
-5-when the video is going to next it needs a transiton to move the currenct video to up and out of the page. and the next video gonna move up from out of the page bottom to sit in center and play the video. it is just like what the youtube shorts is working. this mechanism gonna be reverse if someone click on previous buttn.
-6-about the title/caption/comment/like section of the video let it be just like what it is (check the video modal, when you click on a video we have a pop-up modal open with 2 side, the right side is the video and the left side is the title/caption/comment/like section) in this situation we can reverse the video modal (the left side be the title/caption/comment/like section and the right side is the video player auto play)
+1-the searchbar needs to be more visible and some final touchs
+2-the sub footer needs less height
+3-chat box tabs need to get background to be removed
+4-magazine page need a re-design
+5-homepage need a design
+6-raid calulator needs a re-design
+7-media page needs final touchs
+8-files need to get optimize and get upload to supabase
+9-remove breadcrumb from magazine
+10-landing page needs to get remove
+11-mobile version need to get a re-design
+12-security check by the prompt that we have
+
+
 
 
 
