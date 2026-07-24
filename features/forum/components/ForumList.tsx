@@ -118,11 +118,12 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
 
   const submitTopic = async (values: NewTopicValues) => {
     setSubmitError("");
-    const slug =
-      values.title.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").slice(0, 60) +
-      "-" +
-      Date.now().toString(36);
     try {
+      // eslint-disable-next-line react-hooks/purity -- slug generation only runs on form submit, not during render
+      const slug =
+        values.title.toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]+/g, "-").slice(0, 60) +
+        "-" +
+        Date.now().toString(36);
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
