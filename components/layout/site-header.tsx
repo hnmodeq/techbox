@@ -164,6 +164,27 @@ function TechboxBreadcrumb() {
     // Non-author route: clear author name
     setAuthorName((prev) => (prev === "" ? prev : ""))
 
+    // work-with-us/[slug] — fetch job title from jobs API
+    if (firstPart === "work-with-us" && slug) {
+      const ssrTitle = document.title
+        .replace(/\s*[|–—]\s*تکباکس\s*$/i, "")
+        .replace(/\s*[|–—]\s*TechBox\s*$/i, "")
+        .trim();
+      if (ssrTitle && ssrTitle !== "تکباکس" && ssrTitle.length > 2) {
+        setDynamicTitle((prev) => (prev === ssrTitle ? prev : ssrTitle));
+      }
+      let cancelled = false
+      fetch(`/api/jobs/${encodeURIComponent(slug)}`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((job) => {
+          if (!cancelled && job?.title) {
+            setDynamicTitle((prev) => (prev === job.title ? prev : job.title))
+          }
+        })
+        .catch(() => {})
+      return () => { cancelled = true }
+    }
+
     if (!moduleKey || !slug || !contentModules.includes(moduleKey)) {
       setDynamicTitle("")
       return

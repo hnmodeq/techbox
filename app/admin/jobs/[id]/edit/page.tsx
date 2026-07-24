@@ -109,8 +109,8 @@ export default function EditJobPage() {
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <Label>نوع همکاری</Label>
-              <Select value={form.type} onValueChange={(v) => update({ type: v })}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <Select value={form.type || "تمام وقت"} onValueChange={(v) => update({ type: v })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="نوع همکاری" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="تمام وقت">تمام وقت</SelectItem>
                   <SelectItem value="نیمه وقت">نیمه وقت</SelectItem>
@@ -119,11 +119,11 @@ export default function EditJobPage() {
             </div>
             <div>
               <Label>محل کار</Label>
-              <Select value={form.remote ? "true" : "false"} onValueChange={(v) => update({ remote: v === "true" })}>
-                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+              <Select value={form.remote ? "remote" : "onsite"} onValueChange={(v) => update({ remote: v === "remote" })}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="محل کار" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="false">حضوری</SelectItem>
-                  <SelectItem value="true">دورکاری</SelectItem>
+                  <SelectItem value="onsite">حضوری</SelectItem>
+                  <SelectItem value="remote">دورکاری</SelectItem>
                 </SelectContent>
               </Select>
             </div>
