@@ -61,7 +61,7 @@ export default function MediaReels({ serverItems }: { serverItems?: ContentItem[
               vid.play().catch(() => {});
             });
           } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-            vid.src = current.videoUrl;
+            vid.src = current.videoUrl || "";
             vid.play().catch(() => {});
           }
         } catch {}
