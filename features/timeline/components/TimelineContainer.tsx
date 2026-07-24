@@ -201,38 +201,62 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
+<<<<<<< Updated upstream
       {/* Navigation bar — centered, close to timeline */}
       <div className="flex items-center justify-center gap-1 mb-0.5">
+=======
+      <div className="flex items-center pt-30 justify-center gap-5">
+
+
+
+>>>>>>> Stashed changes
         <button
-          onClick={scrollToOldest}
+          onClick={scrollToToday}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          <ChevronsRight className="size-3.5" />
-          قدیمی‌ترین
+                    <ChevronsRight className="size-3.5" />
+          امروز
+
         </button>
+
+
+
         <span className="text-border text-[10px]">|</span>
+
+
         <button
           onClick={scrollToPrev}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <ChevronRight className="size-3.5" />
-          رویداد قبلی
+          رویداد بعدی
         </button>
+
+        <span className="text-border text-[10px]">|</span>
+
+
         <button
           onClick={scrollToNext}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          رویداد بعدی
+          رویداد قبلی
           <ChevronLeft className="size-3.5" />
         </button>
-        <span className="text-border text-[10px]">|</span>
+
+
+
+
         <button
-          onClick={scrollToToday}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          onClick={scrollToOldest}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs  font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          امروز
-          <ChevronsLeft className="size-3.5" />
+  
+          قدیمی‌ترین
+                  <ChevronsLeft className="size-3.5" />
         </button>
+
+
+
         <span className="text-border text-[10px] mx-1">·</span>
         <span className="text-[11px] text-muted-foreground font-medium">
           {events.length.toLocaleString('fa-IR')} رویداد
@@ -242,21 +266,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
       {/* Timeline wrapper — arrows positioned relative to this */}
       <div className="relative">
         {/* Scroll arrows */}
-        <button
-          onClick={() => scrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-          className={`absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardNewer ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
-          aria-label="اسکرول به سمت امروز"
-        >
-          <ChevronRight className="size-5" />
-        </button>
-
-        <button
-          onClick={() => scrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
-          className={`absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 rounded-full bg-background/80 backdrop-blur border border-border shadow-lg text-foreground hover:bg-accent transition-all duration-300 select-none cursor-pointer ${canScrollTowardOlder ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`}
-          aria-label="اسکرول به سمت قدیمی‌ترین"
-        >
-          <ChevronLeft className="size-5" />
-        </button>
 
         {/* Scroll container */}
         <div
