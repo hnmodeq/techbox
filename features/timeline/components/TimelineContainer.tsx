@@ -32,40 +32,6 @@ function getYear(dateGr: Date | string): number {
   return d.getFullYear();
 }
 
-function getDecade(year: number): number {
-  return Math.floor(year / 10) * 10;
-}
-
-const ERA_LABELS: Record<number, string> = {
-  1960: 'آغاز عصر کامپیوتر',
-  1970: 'میکروکامپیوترها',
-  1980: 'رایانه‌های شخصی',
-  1990: 'انقلاب اینترنت',
-  2000: 'موبایل و وب ۲',
-  2010: 'رایانش ابری',
-  2020: 'عصر هوش مصنوعی',
-};
-
-function getEraLabel(decade: number): string {
-  return ERA_LABELS[decade] || `دهه ${decade}`;
-}
-
-function getPrimaryTag(event: TimelineEvent): string | null {
-  const tags = (event as any).tags;
-  if (Array.isArray(tags) && tags.length > 0) return String(tags[0]);
-  if (typeof tags === 'string') {
-    try { const p = JSON.parse(tags); if (Array.isArray(p) && p.length > 0) return String(p[0]); } catch {}
-  }
-  return null;
-}
-
-// ─── Timeline item types ────────────────────────────────────────────────────
-type TimelineItem =
-  | { type: 'today' }
-  | { type: 'era'; decade: number; label: string }
-  | { type: 'year'; year: number }
-  | { type: 'event'; event: TimelineEvent; index: number };
-
 // ─── Sub-components ─────────────────────────────────────────────────────────
 
 function TodayMarker() {
@@ -77,24 +43,6 @@ function TodayMarker() {
       <div className="relative z-10 flex items-center justify-center">
         <div className="size-5 rounded-full bg-primary shadow-md shadow-primary/30" />
         <div className="absolute size-5 rounded-full bg-primary animate-ping opacity-25" />
-      </div>
-    </div>
-  );
-}
-
-function EraMarker({ label, decade }: { label: string; decade: number }) {
-  return (
-    <div className="relative flex shrink-0 flex-col items-center" style={{ width: 140 }}>
-      <div className="h-6 flex items-center justify-center">
-        <span className="text-[10px] font-black text-muted-foreground/40 tracking-wider">
-          {decade}s
-        </span>
-      </div>
-      <div className="relative z-10 flex items-center justify-center">
-        <div className="size-3 rounded-full bg-muted-foreground/20 border border-muted-foreground/10" />
-      </div>
-      <div className="mt-2 px-2 py-1 rounded-md bg-muted/40 border border-border/40">
-        <span className="text-[10px] font-bold text-muted-foreground/50 whitespace-nowrap">{label}</span>
       </div>
     </div>
   );
@@ -113,22 +61,7 @@ function YearTick({ year }: { year: number }) {
   );
 }
 
-function EventItem({
-  event,
-  index,
-  hoveredTag,
-  onDotEnter,
-  onDotLeave,
-}: {
-  event: TimelineEvent;
-  index: number;
-  hoveredTag: string | null;
-  onDotEnter: (tag: string) => void;
-  onDotLeave: () => void;
-}) {
-  const tag = getPrimaryTag(event);
-  const isHighlighted = hoveredTag && tag && hoveredTag === tag;
-
+function EventItem({ event, index }: { event: TimelineEvent; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -144,15 +77,8 @@ function EventItem({
       </div>
 
       {/* Dot — sits on the line */}
-      <div
-        className="relative z-10 flex items-center justify-center cursor-pointer"
-        onMouseEnter={() => tag && onDotEnter(tag)}
-        onMouseLeave={onDotLeave}
-      >
-        <div className={`size-4 rounded-full border-2 border-background shadow-sm transition-all duration-200 ${isHighlighted ? 'bg-primary scale-125' : 'bg-foreground'}`} />
-        {isHighlighted && (
-          <div className="absolute size-8 rounded-full bg-primary/10 animate-pulse" />
-        )}
+      <div className="relative z-10 flex items-center justify-center">
+        <div className="size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
       </div>
 
       {/* Card */}
@@ -160,41 +86,6 @@ function EventItem({
         <TimelineCard event={event} importance={event.importance} />
       </div>
     </motion.div>
-  );
-}
-
-function TimelineMiniMap({ scrollRef }: { scrollRef: React.RefObject<HTMLDivElement | null> }) {
-  const [thumbLeft, setThumbLeft] = useState(0);
-  const [thumbWidth, setThumbWidth] = useState(100);
-
-  useEffect(() => {
-    const update = () => {
-      const el = scrollRef.current;
-      if (!el) return;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-      if (maxScroll <= 0) { setThumbLeft(0); setThumbWidth(100); return; }
-      const absLeft = Math.abs(el.scrollLeft);
-      const w = Math.max(8, (el.clientWidth / el.scrollWidth) * 100);
-      setThumbWidth(w);
-      setThumbLeft((absLeft / maxScroll) * (100 - w));
-    };
-    const el = scrollRef.current;
-    el?.addEventListener('scroll', update, { passive: true });
-    update();
-    const t = setTimeout(update, 200);
-    window.addEventListener('resize', update);
-    return () => { el?.removeEventListener('scroll', update); window.removeEventListener('resize', update); clearTimeout(t); };
-  }, [scrollRef]);
-
-  return (
-    <div className="mx-auto max-w-xs mt-2">
-      <div className="relative h-1 bg-muted rounded-full overflow-hidden">
-        <div
-          className="absolute top-0 h-full bg-primary/25 rounded-full transition-all duration-150"
-          style={{ width: `${thumbWidth}%`, left: `${thumbLeft}%` }}
-        />
-      </div>
-    </div>
   );
 }
 
@@ -210,7 +101,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const [topPad, setTopPad] = useState(0);
   const [canScrollTowardOlder, setCanScrollTowardOlder] = useState(false);
   const [canScrollTowardNewer, setCanScrollTowardNewer] = useState(false);
-  const [hoveredTag, setHoveredTag] = useState<string | null>(null);
 
   // ── Vertical centering: calculate top padding ──
   useEffect(() => {
@@ -218,7 +108,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
       const el = scrollRef.current;
       if (!el) return;
       const containerH = el.clientHeight;
-      // Approximate content height: spacer + dot + gap + card
       const contentH = SPACER_H + DOT_SIZE + DOT_GAP + 460;
       setTopPad(Math.max(0, (containerH - contentH) / 2));
     };
@@ -253,7 +142,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     const handleKey = (e: KeyboardEvent) => {
       const el = scrollRef.current;
       if (!el) return;
-      // Only respond if the timeline or a child is focused
       if (!el.contains(document.activeElement) && document.activeElement !== document.body) return;
       if (e.key === 'ArrowLeft') { el.scrollBy({ left: -400, behavior: 'smooth' }); e.preventDefault(); }
       if (e.key === 'ArrowRight') { el.scrollBy({ left: 400, behavior: 'smooth' }); e.preventDefault(); }
@@ -293,27 +181,19 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     return () => { el.removeEventListener('scroll', handleScroll); cancelAnimationFrame(rafId); };
   }, [events]);
 
-  // ── Build timeline items ──
+  // ── Build timeline items (events + year ticks + today marker) ──
   const timelineItems = useMemo(() => {
-    const items: TimelineItem[] = [];
+    const items: Array<{ type: 'today' } | { type: 'year'; year: number } | { type: 'event'; event: TimelineEvent; index: number }> = [];
     let lastYear: number | null = null;
-    let lastDecade: number | null = null;
 
     items.push({ type: 'today' });
 
     events.forEach((event, index) => {
       const year = getYear(event.dateGr);
-      const decade = getDecade(year);
-
-      if (decade !== lastDecade) {
-        items.push({ type: 'era', decade, label: getEraLabel(decade) });
-        lastDecade = decade;
-      }
       if (year !== lastYear) {
         items.push({ type: 'year', year });
         lastYear = year;
       }
-
       items.push({ type: 'event', event, index });
     });
 
@@ -329,10 +209,11 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     <div className="relative w-full" dir="rtl">
       {/* Grid background — time-travel feel */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05]"
+        className="absolute inset-0 pointer-events-none"
         style={{
+          opacity: 0.06,
           backgroundImage:
-            'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+            'linear-gradient(to right, var(--foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--foreground) 1px, transparent 1px)',
           backgroundSize: '48px 48px',
         }}
       />
@@ -378,27 +259,14 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
           {timelineItems.map((item) => {
             if (item.type === 'today') return <TodayMarker key="today" />;
-            if (item.type === 'era') return <EraMarker key={`era-${item.decade}`} decade={item.decade} label={item.label} />;
             if (item.type === 'year') return <YearTick key={`year-${item.year}`} year={item.year} />;
-            return (
-              <EventItem
-                key={item.event.id}
-                event={item.event}
-                index={item.index}
-                hoveredTag={hoveredTag}
-                onDotEnter={setHoveredTag}
-                onDotLeave={() => setHoveredTag(null)}
-              />
-            );
+            return <EventItem key={item.event.id} event={item.event} index={item.index} />;
           })}
 
           {/* Suggestion box — at the end (oldest side in RTL) */}
           <TimelineSuggestions />
         </div>
       </div>
-
-      {/* Mini-map */}
-      <TimelineMiniMap scrollRef={scrollRef} />
 
       {/* Navigation + event counter */}
       <div className="flex items-center justify-center gap-2 mt-2">
@@ -411,14 +279,14 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           برو به امروز
-          <ChevronsLeft className="size-3.5" />
+          <ChevronsRight className="size-3.5" />
         </button>
         <span className="text-border text-[10px]">|</span>
         <button
           onClick={scrollToOldest}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
-          <ChevronsRight className="size-3.5" />
+          <ChevronsLeft className="size-3.5" />
           برو به قدیمی‌ترین
         </button>
       </div>
