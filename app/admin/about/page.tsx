@@ -356,7 +356,13 @@ export default function AdminAboutPage() {
               <div><Label>آدرس</Label><Input value={settings.address} onChange={(e) => setSettings((s) => ({ ...s, address: e.target.value }))} className="mt-1" /></div>
               <div><Label>ایمیل</Label><Input value={settings.email} onChange={(e) => setSettings((s) => ({ ...s, email: e.target.value }))} className="mt-1" dir="ltr" /></div>
               <div><Label>ساعت کاری</Label><Input value={settings.hours} onChange={(e) => setSettings((s) => ({ ...s, hours: e.target.value }))} className="mt-1" /></div>
-              <div><Label>URL نقشه</Label><Input value={settings.mapUrl} onChange={(e) => setSettings((s) => ({ ...s, mapUrl: e.target.value }))} className="mt-1 font-mono text-[11px]" dir="ltr" /></div>
+              <div>
+                <Label>URL نقشه</Label>
+                <Input value={settings.mapUrl} onChange={(e) => setSettings((s) => ({ ...s, mapUrl: e.target.value }))} className="mt-1 font-mono text-[11px]" dir="ltr" />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  هر لینک OpenStreetMap قابل قبول است — مثلاً لینک مرورگر (<code>openstreetmap.org/?mlat=...&mlon=...#map=...</code>) یا لینک embed.
+                </p>
+              </div>
               <Button onClick={saveSettings} loading={saving}>ذخیره اطلاعات تماس</Button>
             </CardContent>
           </Card>
