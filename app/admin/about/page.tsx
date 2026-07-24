@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
-type User = { id: string; name: string; username: string; job: string | null; roleFa: string | null; avatar: string | null; verifiedType: string | null; verifiedLabel: string | null };
+type User = { id: string; name: string; username: string; job: string | null; roleFa: string | null; avatar: string | null; verifiedType: string | null };
 type Member = { id: string; sectionId: string; name: string; role: string; avatar: string | null; order: number };
 type Section = { id: string; title: string; order: number; enabled: boolean; members: Member[] };
 
@@ -24,119 +24,129 @@ const DEFAULT_SECTIONS = [
 
 type TabId = "sections" | "description" | "contact";
 
-// ─── User Picker ────────────────────────────────────────────────────────────
+// ─── User Pool ──────────────────────────────────────────────────────────────
 
-function UserPicker({ sectionId, onAdd }: { sectionId: string; onAdd: () => void }) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<User[]>([]);
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+function UserPool({ sections, onRefresh }: { sections: Section[]; onRefresh: () => void }) {
+  const [users, setUsers] = useState<User[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [addingTo, setAddingTo] = useState<string | null>(null); // userId being assigned
+  const [showDropdown, setShowDropdown] = useState<string | null>(null); // which user's dropdown is open
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    setLoading(true);
+    fetch("/api/admin/users/search", { cache: "no-store" })
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setUsers(data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (query.length < 1) { setResults([]); return; }
-    setLoading(true);
-    const t = setTimeout(() => {
-      fetch(`/api/admin/users/search?q=${encodeURIComponent(query)}`)
-        .then((r) => r.ok ? r.json() : [])
-        .then((data) => { setResults(data); setOpen(true); })
-        .catch(() => {})
-        .finally(() => setLoading(false));
-    }, 300);
-    return () => clearTimeout(t);
-  }, [query]);
+  // Which sections is a user already in?
+  const userSections = (userId: string) => {
+    const result: string[] = [];
+    for (const s of sections) {
+      if (s.members.some((m) => m.name === users.find((u) => u.id === userId)?.name)) {
+        result.push(s.title);
+      }
+    }
+    return result;
+  };
 
-  const selectUser = async (u: User) => {
+  const addUserToSection = async (user: User, sectionId: string) => {
+    setAddingTo(user.id);
+    setShowDropdown(null);
     await fetch("/api/admin/about/members", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sectionId, userId: u.id }),
+      body: JSON.stringify({ sectionId, userId: user.id }),
     });
-    setQuery("");
-    setOpen(false);
-    onAdd();
+    setAddingTo(null);
+    onRefresh();
   };
 
+  const filtered = users.filter((u) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return u.name.toLowerCase().includes(q) || (u.job || "").toLowerCase().includes(q) || u.username.toLowerCase().includes(q);
+  });
+
   return (
-    <div ref={ref} className="relative">
+    <Card className="p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-bold">کاربران ثبت‌نام شده</h3>
+        <Badge variant="secondary" className="text-[10px]">{filtered.length.toLocaleString("fa-IR")} نفر</Badge>
+      </div>
       <Input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={() => query.length >= 1 && setOpen(true)}
-        placeholder="جستجوی کاربر..."
-        className="h-8 text-sm"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="جستجوی نام، سمت یا نام کاربری..."
+        className="h-8 text-sm mb-3"
       />
-      {open && results.length > 0 && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-          {results.map((u) => (
-            <button
-              key={u.id}
-              onClick={() => selectUser(u)}
-              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-accent transition-colors text-right cursor-pointer"
-            >
-              {u.avatar ? (
-                <Image src={u.avatar} alt={u.name} width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
-              ) : (
-                <div className="h-7 w-7 rounded-full bg-muted" />
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold truncate">{u.name}</div>
-                <div className="text-[10px] text-muted-foreground truncate">{u.job || u.roleFa || u.username}</div>
+      <div className="max-h-[400px] overflow-y-auto space-y-1" style={{ scrollbarWidth: "thin" }}>
+        {loading ? (
+          <div className="space-y-2 p-2">
+            {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-muted rounded-lg animate-pulse" />)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <p className="text-xs text-muted-foreground text-center py-6">کاربری یافت نشد</p>
+        ) : (
+          filtered.map((user) => {
+            const inSections = userSections(user.id);
+            return (
+              <div key={user.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/50 transition-colors group relative">
+                {user.avatar ? (
+                  <Image src={user.avatar} alt={user.name} width={32} height={32} className="h-8 w-8 rounded-full object-cover shrink-0" />
+                ) : (
+                  <div className="h-8 w-8 rounded-full bg-muted shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold truncate">{user.name}</span>
+                    {user.verifiedType && <Badge variant="secondary" className="text-[8px] px-1 py-0">✓</Badge>}
+                  </div>
+                  <span className="text-[10px] text-muted-foreground truncate block">{user.job || user.roleFa || user.username}</span>
+                </div>
+                {/* Sections this user is in */}
+                {inSections.length > 0 && (
+                  <div className="flex flex-wrap gap-1 shrink-0 max-w-[140px]">
+                    {inSections.map((s) => (
+                      <span key={s} className="text-[8px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full truncate">{s}</span>
+                    ))}
+                  </div>
+                )}
+                {/* Add button */}
+                <div className="relative shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={() => setShowDropdown(showDropdown === user.id ? null : user.id)}
+                    disabled={addingTo === user.id}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    {addingTo === user.id ? "..." : "+ افزودن"}
+                  </Button>
+                  {showDropdown === user.id && sections.length > 0 && (
+                    <div className="absolute z-50 left-0 top-full mt-1 bg-card border border-border rounded-lg shadow-lg min-w-[200px] max-h-48 overflow-y-auto">
+                      {sections.map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => addUserToSection(user, s.id)}
+                          className="w-full text-right px-3 py-2 text-xs hover:bg-accent transition-colors flex items-center justify-between cursor-pointer"
+                        >
+                          <span>{s.title}</span>
+                          <span className="text-[10px] text-muted-foreground">{s.members.length} عضو</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              {u.verifiedType && <Badge variant="secondary" className="text-[9px] shrink-0">✓</Badge>}
-            </button>
-          ))}
-        </div>
-      )}
-      {open && query.length >= 1 && results.length === 0 && !loading && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg p-3 text-xs text-muted-foreground text-center">
-          کاربری یافت نشد
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Auto-populate verified users ───────────────────────────────────────────
-
-function AutoPopulateButton({ sectionId, sectionTitle, onDone }: { sectionId: string; sectionTitle: string; onDone: () => void }) {
-  const [loading, setLoading] = useState(false);
-
-  const isFamily = sectionTitle.includes("خانواده");
-
-  const populate = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/users/search?verified=1`);
-      const users: User[] = await res.json();
-      let added = 0;
-      for (const u of users) {
-        await fetch("/api/admin/about/members", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sectionId, userId: u.id }),
-        });
-        added++;
-      }
-      if (added > 0) onDone();
-    } catch {}
-    setLoading(false);
-  };
-
-  if (!isFamily) return null;
-
-  return (
-    <Button variant="outline" size="sm" onClick={populate} loading={loading} className="text-[11px]">
-      افزودن خودکار کاربران تایید شده
-    </Button>
+            );
+          })
+        )}
+      </div>
+    </Card>
   );
 }
 
@@ -187,12 +197,10 @@ export default function AdminAboutPage() {
     await fetch("/api/admin/about/sections", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     setSections((prev) => prev.filter((s) => s.id !== id));
   };
-
   const deleteMember = async (id: string, sectionId: string) => {
     await fetch("/api/admin/about/members", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
     setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, members: s.members.filter((m) => m.id !== id) } : s)));
   };
-
   const moveSection = (idx: number, dir: -1 | 1) => {
     const next = [...sections];
     const target = idx + dir;
@@ -201,6 +209,23 @@ export default function AdminAboutPage() {
     const reordered = next.map((s, i) => ({ ...s, order: i }));
     setSections(reordered);
     reordered.forEach((s) => updateSection(s.id, { order: s.order }));
+  };
+
+  const autoPopulateVerified = async () => {
+    const familySection = sections.find((s) => s.title.includes("خانواده"));
+    if (!familySection) { setMessage("ابتدا بخش «خانواده تکباکس» را ایجاد کنید"); return; }
+    try {
+      const res = await fetch("/api/admin/users/search?verified=1");
+      const users: User[] = await res.json();
+      for (const u of users) {
+        await fetch("/api/admin/about/members", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionId: familySection.id, userId: u.id }),
+        });
+      }
+      setMessage(`${users.length.toLocaleString("fa-IR")} کاربر تایید شده اضافه شدند ✓`);
+      loadAll();
+    } catch { setMessage("خطا"); }
   };
 
   const tabs: { id: TabId; label: string }[] = [
@@ -213,7 +238,7 @@ export default function AdminAboutPage() {
 
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
-      <section className="mx-auto max-w-4xl space-y-6">
+      <section className="mx-auto max-w-5xl space-y-6">
         <PageHeader colorVar="--admin" title="مدیریت صفحه درباره ما" titleClassName="text-[var(--admin)]" description="توضیحات، تیم‌ها و اطلاعات تماس">
           <ButtonLink href="/admin" variant="ghost" size="sm">داشبورد</ButtonLink>
           <ButtonLink href="/about" variant="ghost" size="sm">پیش‌نمایش</ButtonLink>
@@ -241,61 +266,68 @@ export default function AdminAboutPage() {
 
         {/* Tab: Team Sections */}
         {tab === "sections" && (
-          <div className="space-y-4">
-            {sections.map((section, idx) => (
-              <Card key={section.id} className={`p-0 overflow-hidden ${!section.enabled ? "opacity-50" : ""}`}>
-                <div className="flex items-center justify-between p-4 bg-muted/30 border-b">
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-col gap-0.5">
-                      <button onClick={() => moveSection(idx, -1)} disabled={idx === 0} className="text-[10px] text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer">▲</button>
-                      <button onClick={() => moveSection(idx, 1)} disabled={idx === sections.length - 1} className="text-[10px] text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer">▼</button>
-                    </div>
-                    <Input value={section.title} onChange={(e) => updateSection(section.id, { title: e.target.value })} className="h-8 w-52 font-bold" />
-                    <Badge variant="secondary" className="text-[10px]">{section.members.length} عضو</Badge>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Label className="text-[10px] text-muted-foreground">فعال</Label>
-                    <Switch checked={section.enabled} onCheckedChange={(v) => updateSection(section.id, { enabled: v })} />
-                    <Button variant="ghost" size="xs" onClick={() => deleteSection(section.id)} className="text-destructive">حذف</Button>
-                  </div>
-                </div>
-                <div className="p-4 space-y-2">
-                  {/* Existing members */}
-                  {section.members.map((member) => (
-                    <div key={member.id} className="flex items-center gap-3 bg-muted/20 rounded-lg px-3 py-2">
-                      {member.avatar ? (
-                        <Image src={member.avatar} alt={member.name} width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
-                      ) : (
-                        <div className="h-7 w-7 rounded-full bg-muted" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <span className="text-xs font-bold truncate block">{member.name}</span>
-                        <span className="text-[10px] text-muted-foreground truncate block">{member.role || "—"}</span>
+          <div className="grid lg:grid-cols-[1fr_340px] gap-4 items-start">
+            {/* Left: Sections */}
+            <div className="space-y-4">
+              {sections.map((section, idx) => (
+                <Card key={section.id} className={`p-0 overflow-hidden ${!section.enabled ? "opacity-50" : ""}`}>
+                  <div className="flex items-center justify-between p-4 bg-muted/30 border-b">
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <button onClick={() => moveSection(idx, -1)} disabled={idx === 0} className="text-[10px] text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer">▲</button>
+                        <button onClick={() => moveSection(idx, 1)} disabled={idx === sections.length - 1} className="text-[10px] text-muted-foreground hover:text-foreground disabled:opacity-30 cursor-pointer">▼</button>
                       </div>
-                      <Button variant="ghost" size="xs" onClick={() => deleteMember(member.id, section.id)} className="text-destructive shrink-0">×</Button>
+                      <Input value={section.title} onChange={(e) => updateSection(section.id, { title: e.target.value })} className="h-8 w-52 font-bold" />
+                      <Badge variant="secondary" className="text-[10px]">{section.members.length} عضو</Badge>
                     </div>
-                  ))}
-
-                  {/* Add user by search */}
-                  <div className="flex items-center gap-2 mt-2">
-                    <div className="flex-1">
-                      <UserPicker sectionId={section.id} onAdd={loadAll} />
+                    <div className="flex items-center gap-2">
+                      <Label className="text-[10px] text-muted-foreground">فعال</Label>
+                      <Switch checked={section.enabled} onCheckedChange={(v) => updateSection(section.id, { enabled: v })} />
+                      <Button variant="ghost" size="xs" onClick={() => deleteSection(section.id)} className="text-destructive">حذف</Button>
                     </div>
-                    <AutoPopulateButton sectionId={section.id} sectionTitle={section.title} onDone={loadAll} />
                   </div>
-                </div>
-              </Card>
-            ))}
+                  <div className="p-4 space-y-1">
+                    {section.members.length === 0 ? (
+                      <p className="text-[11px] text-muted-foreground text-center py-3">هنوز عضوی ندارد — از لیست کاربران اضافه کنید</p>
+                    ) : (
+                      section.members.map((member) => (
+                        <div key={member.id} className="flex items-center gap-3 px-3 py-1.5 rounded-md hover:bg-accent/30 group/mem">
+                          {member.avatar ? (
+                            <Image src={member.avatar} alt={member.name} width={24} height={24} className="h-6 w-6 rounded-full object-cover" />
+                          ) : (
+                            <div className="h-6 w-6 rounded-full bg-muted" />
+                          )}
+                          <span className="text-xs font-medium flex-1 truncate">{member.name}</span>
+                          <span className="text-[10px] text-muted-foreground truncate">{member.role || ""}</span>
+                          <button onClick={() => deleteMember(member.id, section.id)} className="text-destructive text-xs opacity-0 group-hover/mem:opacity-100 transition-opacity cursor-pointer">×</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </Card>
+              ))}
 
-            {/* Quick-add default sections */}
-            <Card className="p-4">
-              <p className="text-xs text-muted-foreground mb-3">افزودن بخش پیش‌فرض:</p>
-              <div className="flex flex-wrap gap-2">
-                {DEFAULT_SECTIONS.filter((t) => !sections.some((s) => s.title === t)).map((title) => (
-                  <Button key={title} variant="outline" size="sm" onClick={() => addSection(title)}>{title}</Button>
-                ))}
-              </div>
-            </Card>
+              {/* Quick-add default sections */}
+              {DEFAULT_SECTIONS.filter((t) => !sections.some((s) => s.title === t)).length > 0 && (
+                <Card className="p-4">
+                  <p className="text-xs text-muted-foreground mb-3">افزودن بخش پیش‌فرض:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {DEFAULT_SECTIONS.filter((t) => !sections.some((s) => s.title === t)).map((title) => (
+                      <Button key={title} variant="outline" size="sm" onClick={() => addSection(title)}>{title}</Button>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+              <Button variant="outline" size="sm" onClick={autoPopulateVerified}>
+                افزودن خودکار کاربران تایید شده به «خانواده تکباکس»
+              </Button>
+            </div>
+
+            {/* Right: User Pool */}
+            <div className="lg:sticky lg:top-4">
+              <UserPool sections={sections} onRefresh={loadAll} />
+            </div>
           </div>
         )}
 
