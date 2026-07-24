@@ -91,7 +91,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
       const el = scrollRef.current;
       if (!el) return;
       const containerH = el.clientHeight;
-      const contentH = SPACER_H + DOT_SIZE + DOT_GAP + 460;
+      const contentH = SPACER_H + DOT_SIZE + DOT_GAP + 360;
       setTopPad(Math.max(0, (containerH - contentH) / 2));
     };
     update();
@@ -201,48 +201,29 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative w-full" dir="rtl">
-      <div className="flex items-center pt-30 justify-center gap-5">
-        <button
-          onClick={scrollToToday}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
-          <ChevronsRight className="size-3.5" />
-          امروز
+      {/* Navigation buttons */}
+      <div className="flex items-center justify-center gap-5 mb-1">
+        <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+          <ChevronsRight className="size-3.5" /> امروز
         </button>
-
         <span className="text-border text-[10px]">|</span>
-
-        <button
-          onClick={scrollToPrev}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
-          <ChevronRight className="size-3.5" />
-          رویداد بعدی
+        <button onClick={scrollToPrev} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+          <ChevronRight className="size-3.5" /> رویداد بعدی
         </button>
-
         <span className="text-border text-[10px]">|</span>
-
-        <button
-          onClick={scrollToNext}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
-          رویداد قبلی
-          <ChevronLeft className="size-3.5" />
+        <button onClick={scrollToNext} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+          رویداد قبلی <ChevronLeft className="size-3.5" />
         </button>
-
-        <button
-          onClick={scrollToOldest}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-        >
-          قدیمی‌ترین
-          <ChevronsLeft className="size-3.5" />
+        <span className="text-border text-[10px]">|</span>
+        <button onClick={scrollToOldest} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+          قدیمی‌ترین <ChevronsLeft className="size-3.5" />
         </button>
-
-        <span className="text-border text-[10px] mx-1">·</span>
-        <span className="text-[11px] text-muted-foreground font-medium">
-          {events.length.toLocaleString('fa-IR')} رویداد
-        </span>
       </div>
+
+      {/* Event count centered above timeline */}
+      <p className="text-center text-[11px] text-muted-foreground font-medium mb-1">
+        {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
+      </p>
 
       {/* Timeline wrapper */}
       <div className="relative">

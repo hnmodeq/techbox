@@ -214,7 +214,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       className={`${widthClass} shrink-0 flex flex-col justify-start relative select-none`}
       onDragStart={(e) => e.preventDefault()}
     >
-      <div className="relative h-[440px] sm:h-[460px] w-full rounded-lg overflow-hidden shadow-sm border border-border flex flex-col justify-end bg-card">
+      <div className="relative h-[340px] sm:h-[360px] w-full rounded-lg overflow-hidden shadow-sm border border-border flex flex-col justify-end bg-card">
         {/* Background image + gradient */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           {event.image ? (
@@ -297,7 +297,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         {/* Comments overlay */}
         {showComments && (
           <div
-            className="absolute inset-0 z-30 flex flex-col bg-background/90 backdrop-blur-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
+            className="absolute inset-0 z-30 flex flex-col bg-background/95 animate-in fade-in-0 slide-in-from-bottom-4 duration-200"
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             onDragStart={(e) => e.preventDefault()}
