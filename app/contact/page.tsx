@@ -1,6 +1,5 @@
 import { pageMetadata } from "@/lib/seo";
 import { prisma } from "@/lib/db";
-import PageHeader from "@/components/effects/PageHeader";
 import ContactForm from "@/features/contact/components/ContactForm";
 
 export const metadata = pageMetadata({
@@ -24,6 +23,15 @@ function TelegramIcon({ className }: { className?: string }) {
 function EmailIcon({ className }: { className?: string }) {
   return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>;
 }
+function PhoneIcon({ className }: { className?: string }) {
+  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>;
+}
+function MapPinIcon({ className }: { className?: string }) {
+  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>;
+}
+function ClockIcon({ className }: { className?: string }) {
+  return <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>;
+}
 
 export default async function Contact() {
   let settings: any = {};
@@ -45,57 +53,74 @@ export default async function Contact() {
     { name: "تلگرام", href: "https://t.me/techbox_ir", icon: TelegramIcon },
   ];
 
+  const contactItems = [
+    { icon: MapPinIcon, label: addressTitle, value: address },
+    { icon: ClockIcon, label: "ساعت کاری", value: hours },
+    { icon: EmailIcon, label: "آدرس پست الکترونیکی", value: email },
+  ];
+
   return (
-    <main className="max-w-5xl mx-auto px-4 py-12 space-y-10" dir="rtl">
-      <PageHeader
-        colorVar="--contact"
-        title="ارتباط با ما"
-        titleClassName="text-[var(--contact)]"
-        description="پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک"
-      />
+    <main className="max-w-5xl mx-auto px-4 py-12 space-y-12" dir="rtl">
+      {/* Header */}
+      <header>
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">ارتباط با ما</h1>
+        <p className="mt-3 text-base text-muted-foreground max-w-2xl leading-7">
+          پاتوق بچه‌های فناوری اطلاعات – هونامیک ارتباط رستاک
+        </p>
+      </header>
 
-      {/* Contact form */}
-      <div className="bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 space-y-4">
-        <ContactForm />
-      </div>
+      {/* Map */}
+      {mapUrl && (
+        <section className="rounded-xl border border-border overflow-hidden">
+          <iframe title="map" src={mapUrl} className="w-full h-[360px] border-0" loading="lazy" referrerPolicy="no-referrer" />
+        </section>
+      )}
 
-      {/* Map + contact info */}
-      <section className="grid lg:grid-cols-5 gap-5 items-start">
-        {/* Map */}
-        <div className="lg:col-span-3 rounded-xl border border-border overflow-hidden">
-          <div className="px-5 py-3 border-b border-border">
-            <h3 className="text-base font-bold">{addressTitle}</h3>
-            {address && <p className="text-sm text-muted-foreground mt-1">{address}</p>}
-            {hours && <p className="text-xs text-muted-foreground mt-1">ساعت کاری: {hours}</p>}
-          </div>
-          <iframe title="map" src={mapUrl} className="w-full h-[320px] border-0" loading="lazy" referrerPolicy="no-referrer" />
+      {/* Contact info + social */}
+      <section className="grid sm:grid-cols-2 gap-8">
+        {/* Left: contact details */}
+        <div className="space-y-5">
+          {contactItems.filter((c) => c.value).map((item) => (
+            <div key={item.label} className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border text-muted-foreground">
+                <item.icon className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-0.5">{item.label}</div>
+                <div className="text-sm font-medium text-foreground">{item.value}</div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Right side */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Email */}
+        {/* Right: social links */}
+        <div className="space-y-5">
           <div>
-            <p className="text-xs text-muted-foreground mb-2">ارتباط با ما</p>
-            <div className="flex items-center gap-3">
-              <a href={`mailto:${email}`} className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors">
-                <EmailIcon className="w-4.5 h-4.5" />
-              </a>
-              <span className="text-sm text-muted-foreground font-mono" dir="ltr">{email}</span>
-            </div>
-          </div>
-
-          {/* Social links */}
-          <div>
-            <p className="text-xs text-muted-foreground mb-2">شبکه‌های اجتماعی</p>
-            <div className="flex items-center gap-2.5">
+            <div className="text-xs text-muted-foreground mb-3">شبکه‌های اجتماعی</div>
+            <div className="flex flex-wrap gap-3">
               {socials.map((s) => (
-                <a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" title={s.name}
-                  className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors">
-                  <s.icon className="w-4 h-4" />
+                <a
+                  key={s.name}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={s.name}
+                  className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg border border-border text-sm font-medium text-foreground hover:border-foreground/30 hover:bg-accent transition-colors"
+                >
+                  <s.icon className="w-4 h-4 text-muted-foreground" />
+                  {s.name}
                 </a>
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Contact form — below everything */}
+      <section>
+        <h2 className="text-xl font-bold text-foreground mb-4">فرم تماس</h2>
+        <div className="bg-card border border-border rounded-xl p-6">
+          <ContactForm />
         </div>
       </section>
     </main>
