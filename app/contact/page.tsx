@@ -1,6 +1,7 @@
 import { pageMetadata } from "@/lib/seo";
 import { prisma } from "@/lib/db";
 import ContactForm from "@/features/contact/components/ContactForm";
+import { toOsmEmbedUrl } from "@/lib/map-url";
 
 export const metadata = pageMetadata({
   title: "ارتباط با ما | تکباکس",
@@ -44,7 +45,8 @@ export default async function Contact() {
   const address: string = settings.address || "";
   const email: string = settings.email || process.env.CONTACT_EMAIL || "info@techbox.ir";
   const hours: string = settings.hours || "شنبه–چهارشنبه ۹–۱۷";
-  const mapUrl = "https://www.openstreetmap.org/export/embed.html?bbox=50.83%2C35.78%2C50.88%2C35.81&layer=mapnik&marker=35.809%2C50.857";
+  const rawMapUrl: string = settings.mapUrl || "";
+  const mapUrl = toOsmEmbedUrl(rawMapUrl) || (rawMapUrl.includes("openstreetmap.org") ? null : rawMapUrl) || null;
 
   const socials = [
     { name: "لینکدین", href: "https://linkedin.com/company/techbox", icon: LinkedInIcon },
