@@ -278,25 +278,45 @@ export default function LinearInspiredPreview() {
       <section className={styles.hero} aria-labelledby="preview-home-title">
         <div className={styles.heroGrid} aria-hidden="true" /><div className={styles.heroGlow} aria-hidden="true" />
         <div className={styles.container}>
-
-          <h1 id="preview-home-title">تکباکس</h1>
-          <p className={styles.heroLead}>پاتوق بچه‌های فناوری اطلاعات</p>
+          <div className={styles.eyebrow}><span /> ۹ ماژول، یک اکوسیستم فناوری</div>
+          <h1 id="preview-home-title">همه دنیای فناوری،<br /><em>در یک تکباکس</em></h1>
+          <p className={styles.heroLead}>مجله، اخبار، ویدیو، فروشگاه، ابزار، انجمن، تایم‌لاین، مشاوره و پشتیبانی؛ متصل و متمرکز در یک تجربه واحد.</p>
+          <div className={styles.heroActions}>
+            <Link href="/blog" className={styles.primaryAction}>ورود به مجله <ArrowLeft size={16} /></Link>
+            <Link href="/tools" className={styles.secondaryAction}><Calculator size={15} /> ابزارهای مهندسی</Link>
+          </div>
+          <div className={styles.previewStage}><ProductWindow /></div>
         </div>
       </section>
+
+      <div className={styles.container}><ModuleStrip /></div>
+      <AmbientOrbit />
 
       <section className={`${styles.featureSection} ${styles.violetSection}`} aria-labelledby="editorial-title">
         <div className={styles.sectionGlow} aria-hidden="true" />
         <div className={styles.container}>
           <div className={styles.sectionIntro}>
-            <h2 id="editorial-title">از دنیای تکنولوژی باخبر شو</h2>
+            <span><Newspaper size={14} /> Magazine · News · Reels</span>
+            <h2 id="editorial-title">بخوانید. ببینید.<br /><em>در جریان بمانید.</em></h2>
+            <p>سه قالب متفاوت برای یک هدف: فهم عمیق‌تر فناوری، از تحلیل بلند تا خبر فوری و ویدیوی کوتاه.</p>
           </div>
+          <EditorialPreview />
         </div>
       </section>
 
       <section className={styles.cardsSection} aria-labelledby="modules-title">
         <div className={styles.container}>
           <div className={styles.sectionIntroSmall}>
-            <h2 id="modules-title">مقاله‌های تخصصی بخون</h2>
+            <span><Command size={14} /> Shop · Tools · Forum · Timeline</span>
+            <h2 id="modules-title">از انتخاب و محاسبه،<br />تا گفت‌وگو و کشف تاریخ.</h2>
+          </div>
+          <div className={styles.cardGrid}>
+            {capabilityCards.map(({ icon: Icon, title, english, href, text, visual }) => (
+              <Link href={href} className={styles.capabilityCard} key={title}>
+                <div className={styles.cardCopy}><span className={styles.cardIcon}><Icon size={18} /></span><small>{english}</small><h3>{title}</h3><p>{text}</p></div>
+                <CardVisual type={visual} />
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -304,7 +324,15 @@ export default function LinearInspiredPreview() {
       <section className={`${styles.featureSection} ${styles.blueSection}`} aria-labelledby="service-title">
         <div className={styles.container}>
           <div className={styles.sectionIntro}>
-            <h2 id="service-title">ویدیوهای جدید ببین</h2>
+            <span><Headphones size={14} /> Consultation · Support</span>
+            <h2 id="service-title">از سؤال تا راه‌حل،<br /><em>یک مسیر مستقیم.</em></h2>
+            <p>برای تصمیم‌های فنی مشاوره بگیرید یا درخواست پشتیبانی را با دسترسی امن و تاریخچه شفاف پیگیری کنید.</p>
+          </div>
+          <ServiceCenter />
+          <div className={styles.featureFacts}>
+            <div><Headphones size={18} /><strong>مشاوره تخصصی</strong><span>انتخاب معماری و محصول متناسب با نیاز واقعی</span></div>
+            <div><TicketCheck size={18} /><strong>تیکت امن</strong><span>گفت‌وگوی خصوصی با قابلیت پیگیری مرحله‌به‌مرحله</span></div>
+            <div><Zap size={18} /><strong>دسترسی سریع</strong><span>ورود مستقیم از خانه تکباکس به مسیر درست</span></div>
           </div>
         </div>
       </section>
@@ -312,8 +340,10 @@ export default function LinearInspiredPreview() {
       <section className={styles.roadmapSection} aria-labelledby="timeline-title">
         <div className={styles.container}>
           <div className={styles.splitIntro}>
-            <div><h2 id="timeline-title">مستقیم خرید کن</h2></div>
+            <div><span><Clock3 size={14} /> Timeline</span><h2 id="timeline-title">گذشته را ببینید.<br />آینده را بهتر بفهمید.</h2></div>
+            <p>رویدادهای اثرگذار فناوری، از زیرساخت و اینترنت تا هوش مصنوعی، در یک مسیر زمانی قابل کاوش.</p>
           </div>
+          <TimelinePreview />
         </div>
       </section>
 
@@ -321,7 +351,12 @@ export default function LinearInspiredPreview() {
         <div className={styles.finalGlow} aria-hidden="true" />
         <div className={styles.container}>
           <span className={styles.finalMark}><Sparkles size={24} /></span>
-          <h2 id="preview-cta-title">از ابزارها استفاده کن</h2>
+          <h2 id="preview-cta-title">خانه جدید تکباکس، ماژول به ماژول.</h2>
+          <p>این شِمای بصری آماده است تا در گام‌های بعدی با داده‌ها، کارت‌ها و تعاملات واقعی هر ماژول تکمیل شود.</p>
+          <div className={styles.heroActions}>
+            <Link href="/consultation" className={styles.primaryAction}>درخواست مشاوره <ArrowLeft size={16} /></Link>
+            <Link href="/support" className={styles.secondaryAction}>پشتیبانی تکباکس</Link>
+          </div>
         </div>
       </section>
     </div>
