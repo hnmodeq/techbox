@@ -1,0 +1,40 @@
+/* Full Screen Blue-to-Black Gradient */
+.gradient-page {
+  position: fixed;
+  inset: 0;
+  z-index: -9999;
+  min-height: 100vh;
+  min-height: 100dvh;
+  
+  /* Blue to Black gradient */
+  background: linear-gradient(
+    180deg,
+    oklch(0.15 0.10 250) 0%,
+    oklch(0.10 0.06 250) 40%,
+    oklch(0.05 0.03 250) 70%,
+    oklch(0.02 0.02 250) 100%
+  );
+}
+
+/* White Grid Lines */
+.gradient-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -9998;
+  background-image: 
+    linear-gradient(to right, oklch(1 0 0 / 3%) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 3%) 1px, transparent 1px);
+  background-size: 80px 80px;
+  pointer-events: none;
+}
+
+/* Blue Glow from top */
+.gradient-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -9997;
+  background: radial-gradient(ellipse 100% 60% at 50% 0%, oklch(0.20 0.12 250 / 25%) 0%, transparent 60%);
+  pointer-events: none;
+}
