@@ -17,7 +17,7 @@ function uid() { return Math.random().toString(36).slice(2, 10); }
 
 export default function AdminShopBannersPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <ShopBannersContent />}
     </AdminGuard>
   );

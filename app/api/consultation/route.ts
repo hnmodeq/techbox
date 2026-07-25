@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -49,10 +50,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("consultation:view");
+  if (user instanceof NextResponse) return user;
 
   try {
     const requests = await prisma.consultationRequest.findMany({
@@ -67,10 +66,8 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("consultation:manage");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();

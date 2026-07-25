@@ -1,6 +1,9 @@
-"use client";
+// Shared client-safe authentication types and permission helpers.
+// Session identity is never persisted in browser storage; AuthProvider obtains
+// it from the HTTP-only cookie through /api/auth/me.
 
-// Client-side authentication types
+import { hasAnyPermission } from "@/lib/permissions";
+
 export type AppUser = {
   id: string;
   name: string;
@@ -8,41 +11,41 @@ export type AppUser = {
   username: string;
   role: string;
   modules: string[];
+  permissions: string[];
   avatar?: string;
   roleFa?: string;
   job?: string;
   bio?: string;
+  status?: string;
+  emailVerified?: boolean;
   verifiedType?: string | null;
   verifiedLabel?: string | null;
 };
 
-const KEY = "tb_auth_user";
+export function moduleViewPermissions(module: string): string[] {
+  if (module === "shop") return ["product:list:view", "product:basic:view"];
+  if (module === "workwithus" || module === "jobs") return ["job:view"];
+  if (module === "timeline") return ["content:timeline:view", "timeline:view"];
+  return [`content:${module}:view`, `content:${module}:edit`, `content:${module}:create`];
+}
 
-// Client-side login cache mechanism (only used to sync state across tabs instantly after successful server login)
-export function login(user: AppUser): AppUser {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(KEY, JSON.stringify(user));
-    window.dispatchEvent(new StorageEvent("storage", { key: KEY }));
+export function moduleEditPermissions(module: string): string[] {
+  if (module === "shop") {
+    return ["product:create", "product:basic:edit", "product:content:edit", "product:status:edit"];
   }
-  return user;
+  if (module === "workwithus" || module === "jobs") return ["job:edit"];
+  if (module === "timeline") return ["content:timeline:edit", "timeline:edit"];
+  return [`content:${module}:edit`, `content:${module}:create`, `content:${module}:publish`];
 }
 
-export function logout() {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem(KEY);
-    window.dispatchEvent(new StorageEvent("storage", { key: KEY }));
-  }
-}
-
-export function getCurrentUserClient(): AppUser | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(KEY);
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-
-export function canEdit(user: AppUser | null, module: string) {
+export function canView(user: AppUser | null, module: string): boolean {
   if (!user) return false;
   if (user.role === "super_admin") return true;
-  return user.modules.includes(module);
+  return hasAnyPermission(user.permissions || [], moduleViewPermissions(module));
+}
+
+export function canEdit(user: AppUser | null, module: string): boolean {
+  if (!user) return false;
+  if (user.role === "super_admin") return true;
+  return hasAnyPermission(user.permissions || [], moduleEditPermissions(module));
 }

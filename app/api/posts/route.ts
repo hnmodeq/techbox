@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
+import { getSessionUserPublic } from "@/lib/auth-server";
+import { modulePermissions, requireModulePermission, requireStaff } from "@/lib/api-permissions";
+import { deriveModulesFromPermissions, getEffectivePermissions } from "@/lib/user-permissions";
+import { hasAnyPermission } from "@/lib/permissions";
 import { z } from "zod";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PUBLIC_DETAIL_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
@@ -65,13 +68,14 @@ export async function GET(req: NextRequest) {
     }
 
     if (includeAllPublishedStates) {
-      const user = await getSessionUserPublic();
-      if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
       if (postModule) {
-        if (!canEditModule(user as any, postModule)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-      } else if (user.role !== "super_admin") {
-        const modules = Array.isArray((user as any).modules) ? ((user as any).modules as string[]) : [];
-        where = { ...where, module: { in: modules } };
+        const authorized = await requireModulePermission(postModule, "view");
+        if (authorized instanceof NextResponse) return authorized;
+      } else {
+        const authorized = await requireStaff();
+        if (authorized instanceof NextResponse) return authorized;
+        const modules = deriveModulesFromPermissions(authorized.role, authorized.permissions);
+        if (authorized.role !== "super_admin") where = { ...where, module: { in: modules } };
       }
     }
 
@@ -262,7 +266,9 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
   const data = createSchema.parse(await req.json());
-  const canManageModule = canEditModule(user as any, data.module);
+  const permissions = await getEffectivePermissions(user);
+  const canManageModule = user.role === "super_admin" ||
+    hasAnyPermission(permissions, modulePermissions(data.module, "create"));
 
   if (!canManageModule && data.module !== "forum") {
     return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
@@ -365,7 +371,11 @@ export async function PATCH(req: NextRequest) {
   }
   const body = parsed.data;
   const { module: moduleKey, slug } = body;
-  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  const authorized = await requireModulePermission(
+    moduleKey,
+    body.published !== undefined || body.status !== undefined ? "publish" : "edit"
+  );
+  if (authorized instanceof NextResponse) return authorized;
 
   // Find current post (for revision + slug change detection)
   const current = await prisma.post.findUnique({
@@ -451,7 +461,8 @@ export async function DELETE(req: NextRequest) {
   const moduleKey = searchParams.get("module") || "";
   const slug = searchParams.get("slug") || "";
   if (!moduleKey || !slug) return NextResponse.json({ error: "module+slug required" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  if (!canEditModule(user as any, moduleKey)) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  const authorized = await requireModulePermission(moduleKey, "delete");
+  if (authorized instanceof NextResponse) return authorized;
 
   const post = await prisma.post.findUnique({ where: { module_slug: { module: moduleKey, slug } }, select: { id: true } });
   if (!post) return NextResponse.json({ ok: true }, { headers: cacheHeaders(PRIVATE_NO_STORE) });

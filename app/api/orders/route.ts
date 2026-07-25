@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { getCurrencyRates } from "@/lib/currency";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
@@ -211,9 +212,8 @@ export async function GET(req: NextRequest) {
 
   try {
     if (scope === "admin") {
-      if (!user || user.role !== "super_admin") {
-        return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-      }
+      const authorized = await requirePermission("order:list:view");
+      if (authorized instanceof NextResponse) return authorized;
       const requestedStatus = searchParams.get("status");
       const validStatuses = ["pending", "paid", "processing", "shipped", "delivered", "cancelled", "refunded"];
       const status = requestedStatus && validStatuses.includes(requestedStatus) ? requestedStatus : undefined;
@@ -256,10 +256,8 @@ export async function GET(req: NextRequest) {
 // Administrative fulfilment updates. A paid state can only be produced by the
 // verified gateway callback, never by this general admin endpoint.
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+  const authorized = await requirePermission("order:status:edit");
+  if (authorized instanceof NextResponse) return authorized;
 
   try {
     const body = updateOrderSchema.parse(await req.json());

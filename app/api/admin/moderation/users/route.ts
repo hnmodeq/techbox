@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 
@@ -43,14 +43,9 @@ const actionSchema = z.discriminatedUnion("action", [
   muteSchema, banSchema, unmuteSchema, unbanSchema, ipBanSchema, ipUnbanSchema,
 ]);
 
-async function requireSuperAdmin() {
-  const user = await getSessionUserPublic();
-  return user && user.role === "super_admin" ? user : null;
-}
-
 export async function GET() {
-  const user = await requireSuperAdmin();
-  if (!user) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const user = await requirePermission("user:list:view");
+  if (user instanceof NextResponse) return user;
 
   const users = await prisma.user.findMany({
     orderBy: [{ role: "asc" }, { username: "asc" }],
@@ -72,8 +67,8 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  const current = await requireSuperAdmin();
-  if (!current) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const current = await requirePermission("user:ban");
+  if (current instanceof NextResponse) return current;
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });

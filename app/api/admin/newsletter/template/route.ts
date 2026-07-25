@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 import { z } from "zod";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
@@ -18,10 +18,8 @@ const KEY_MAP: Record<string, string> = {
 };
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+  const user = await requirePermission("newsletter:template");
+  if (user instanceof NextResponse) return user;
 
   try {
     await ensureSiteSettingsTable();

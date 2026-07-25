@@ -20,7 +20,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getCurrentUserClient } from "@/lib/auth";
+import { canEdit as canEditModule } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
 import { ModuleBadge } from "@/components/ui/module-badge";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { ShopSpecsField } from "@/components/admin/shop-specs-field";
@@ -34,16 +35,6 @@ import { FileText, ChevronDown } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 
 export const dynamic = "force-dynamic";
-
-async function getMe() {
-  try {
-    const r = await fetch("/api/auth/me", { cache: "no-store" });
-    const j = await r.json();
-    return j.user || getCurrentUserClient();
-  } catch {
-    return getCurrentUserClient();
-  }
-}
 
 function slugify(input: string) {
   return input
@@ -148,7 +139,7 @@ function NewPostInner() {
   const router = useRouter();
   const modParam = (sp.get("module") as ModuleSlug) || "blog";
   const editSlug = sp.get("edit");
-  const [user, setUser] = useState<any>(null);
+  const { user, loading: authLoading } = useAuth();
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [lastDraftKey, setLastDraftKey] = useState("");
@@ -234,10 +225,6 @@ function NewPostInner() {
   const resolvedSlug = (slugWatch || "").trim() || slugify(titleWatch || "");
 
   useEffect(() => {
-    getMe().then(setUser);
-  }, []);
-
-  useEffect(() => {
     let mounted = true;
     async function loadEdit() {
       if (!editSlug) return;
@@ -297,6 +284,9 @@ function NewPostInner() {
     };
   }, [editSlug, moduleWatch, form]);
 
+  if (authLoading)
+    return <main className="p-10 text-center" dir="rtl">در حال بررسی نشست…</main>;
+
   if (!user)
     return (
       <main className="p-10 text-center" dir="rtl">
@@ -307,15 +297,15 @@ function NewPostInner() {
       </main>
     );
 
-  const canEdit = user.role === "super_admin" || (user.modules || []).includes(moduleWatch);
-  if (!canEdit)
+  const canEditCurrentModule = canEditModule(user, moduleWatch);
+  if (!canEditCurrentModule)
     return (
       <main className="p-10 text-center text-destructive" dir="rtl">
         دسترسی به ماژول {moduleMeta[moduleWatch]?.titleFa} ندارید.
       </main>
     );
 
-  const allowed: ModuleSlug[] = user.role === "super_admin" ? (Object.keys(moduleMeta) as ModuleSlug[]) : user.modules || [];
+  const allowed = (Object.keys(moduleMeta) as ModuleSlug[]).filter((module) => canEditModule(user, module));
 
   const onSubmit = async (values: PostValues) => {
     if (!values.title.trim()) {

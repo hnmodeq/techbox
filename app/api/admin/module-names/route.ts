@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { DEFAULT_MODULE_TITLES, type ModuleSlug } from "@/lib/module-config";
@@ -14,14 +14,9 @@ const schema = z.record(z.string(), z.string().max(60)).refine(
   { message: "unknown module slug" }
 );
 
-async function requireSuperAdmin() {
-  const user = await getSessionUserPublic();
-  return user && user.role === "super_admin" ? user : null;
-}
-
 export async function GET() {
-  const admin = await requireSuperAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  const admin = await requirePermission("module:view");
+  if (admin instanceof NextResponse) return admin;
 
   try {
     const row = await prisma.siteSetting.findUnique({ where: { key: KEY } });
@@ -34,8 +29,8 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  const admin = await requireSuperAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  const admin = await requirePermission("module:edit");
+  if (admin instanceof NextResponse) return admin;
 
   try {
     const body = schema.parse(await req.json());

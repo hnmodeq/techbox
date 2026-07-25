@@ -106,8 +106,7 @@ export function AuthModal() {
 
       if (res.ok && data.ok) {
         setIsOpen(false);
-        login(data.user);
-        window.dispatchEvent(new CustomEvent("tb_auth_changed", { detail: data.user }));
+        await login();
         toast.success("خوش آمدید!");
         router.refresh();
         return;
@@ -158,8 +157,7 @@ export function AuthModal() {
       // Bootstrap path (first user) returns a user + logs in immediately.
       if (res.ok && data.ok && data.user) {
         setIsOpen(false);
-        login(data.user);
-        window.dispatchEvent(new CustomEvent("tb_auth_changed", { detail: data.user }));
+        await login();
         toast.success("حساب مدیر با موفقیت ساخته شد!");
         router.refresh();
         return;

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { login } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
@@ -22,6 +22,7 @@ type LoginValues = z.infer<typeof loginSchema>;
 export default function AdminLogin() {
   const [serverError, setServerError] = useState("");
   const router = useRouter();
+  const { login } = useAuth();
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -38,9 +39,10 @@ export default function AdminLogin() {
       });
       const data = await res.json();
       if (res.ok && data.user) {
-        login(data.user);
+        await login();
         toast.success("ورود موفق");
         router.push("/admin");
+        router.refresh();
       } else {
         setServerError(data.message || "خطا در ورود");
       }

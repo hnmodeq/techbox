@@ -182,7 +182,7 @@ function RequestCard({ req, onReviewed }: { req: Request; onReviewed: () => void
 
 export default function AdminVerificationPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <VerificationContent />}
     </AdminGuard>
   );

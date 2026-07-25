@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -25,10 +25,8 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getSessionUserPublic();
-  if (!user || !canEditModule(user as any, "workwithus")) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("job:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const { id } = await params;
@@ -50,10 +48,8 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await getSessionUserPublic();
-  if (!user || !canEditModule(user as any, "workwithus")) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("job:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const { id } = await params;

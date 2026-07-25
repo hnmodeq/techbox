@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requireModulePermission } from "@/lib/api-permissions";
 
-// GET /api/admin/revisions?postId=xxx — fetch revisions for a post
 export async function GET(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-
   const postId = req.nextUrl.searchParams.get("postId");
   if (!postId) return NextResponse.json({ error: "postId required" }, { status: 400 });
-
   try {
+    const post = await prisma.post.findUnique({ where: { id: postId }, select: { module: true } });
+    if (!post) return NextResponse.json({ error: "post_not_found" }, { status: 404 });
+    const user = await requireModulePermission(post.module, "view");
+    if (user instanceof NextResponse) return user;
     const revisions = await prisma.postRevision.findMany({
       where: { postId },
       orderBy: { editedAt: "desc" },
@@ -23,25 +22,17 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PATCH /api/admin/revisions — restore a revision
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
   try {
     const { revisionId } = await req.json();
     if (!revisionId) return NextResponse.json({ error: "revisionId required" }, { status: 400 });
-
     const revision = await prisma.postRevision.findUnique({ where: { id: revisionId } });
     if (!revision) return NextResponse.json({ error: "not_found" }, { status: 404 });
-
-    // Get current post to create a revision of the current state before restoring
     const currentPost = await prisma.post.findUnique({ where: { id: revision.postId } });
     if (!currentPost) return NextResponse.json({ error: "post_not_found" }, { status: 404 });
+    const user = await requireModulePermission(currentPost.module, "edit");
+    if (user instanceof NextResponse) return user;
 
-    // Save current state as a new revision
     await prisma.postRevision.create({
       data: {
         postId: currentPost.id,
@@ -51,8 +42,6 @@ export async function PATCH(req: NextRequest) {
         editedBy: user.id,
       },
     });
-
-    // Restore the old values
     const updated = await prisma.post.update({
       where: { id: revision.postId },
       data: {
@@ -61,7 +50,6 @@ export async function PATCH(req: NextRequest) {
         image: revision.oldImage ?? currentPost.image,
       },
     });
-
     return NextResponse.json({ ok: true, post: updated });
   } catch (error) {
     console.error("[revisions]", error);

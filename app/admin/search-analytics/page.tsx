@@ -23,7 +23,7 @@ function formatDate(iso: string) {
 
 export default function AdminSearchAnalyticsPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <SearchAnalyticsContent />}
     </AdminGuard>
   );

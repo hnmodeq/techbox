@@ -11,12 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BlobUploadField } from "@/components/admin/BlobUploadField";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
-import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { toast } from "sonner";
 import { Shield, Plus, X } from "lucide-react";
 
@@ -44,11 +42,6 @@ type Activity = {
   likes: Array<{ id: string; module: string; slug: string; createdAt: string }>;
 };
 
-const roleOptions = [
-  { value: "super_admin", label: "مدیر کل" },
-  { value: "editor", label: "ویراستار" },
-  { value: "user", label: "کاربر" },
-];
 const statusOptions = [
   { value: "active", label: "فعال" },
   { value: "suspended", label: "تعلیق" },
@@ -63,7 +56,7 @@ function statusVariant(status: string) {
 
 export default function AdminUsersPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <UsersContent />}
     </AdminGuard>
   );
@@ -99,7 +92,6 @@ function UsersContent() {
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
 
-  const allModules = Object.keys(moduleMeta) as ModuleSlug[];
 
   const loadUsers = async () => {
     const res = await fetch("/api/admin/users", { cache: "no-store" });
@@ -182,14 +174,6 @@ function UsersContent() {
     } catch {}
   };
 
-  const toggleModule = (mod: string) => {
-    if (!selected) return;
-    const set = new Set(selected.modules || []);
-    if (set.has(mod)) set.delete(mod);
-    else set.add(mod);
-    updateSelected({ modules: [...set] });
-  };
-
   const save = async () => {
     if (!selected) return;
     setBusy(true);
@@ -198,12 +182,9 @@ function UsersContent() {
       id: selected.id,
       name: selected.name,
       email: selected.email,
-      role: selected.role,
-      roleFa: selected.roleFa || undefined,
       status: selected.status,
       job: selected.job || null,
       birthday: selected.birthday || null,
-      modules: selected.modules || [],
       avatar: selected.avatar || null,
       verifiedType: selected.verifiedType || null,
       verifiedLabel: selected.verifiedLabel || null,
@@ -292,7 +273,6 @@ function UsersContent() {
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="space-y-1"><Label className="text-xs">نام</Label><Input value={selected.name} onChange={(e) => updateSelected({ name: e.target.value })} /></div>
                     <div className="space-y-1"><Label className="text-xs">ایمیل</Label><Input value={selected.email} onChange={(e) => updateSelected({ email: e.target.value })} dir="ltr" /></div>
-                    <div className="space-y-1"><Label className="text-xs">عنوان نقش فارسی</Label><Input value={selected.roleFa || ""} onChange={(e) => updateSelected({ roleFa: e.target.value })} /></div>
                     <div className="space-y-1"><Label className="text-xs">شغل/توضیح</Label><Input value={selected.job || ""} onChange={(e) => updateSelected({ job: e.target.value })} /></div>
                     <div className="space-y-1"><Label className="text-xs">تاریخ تولد</Label><Input value={selected.birthday || ""} onChange={(e) => updateSelected({ birthday: e.target.value })} /></div>
                     <div className="space-y-1"><Label className="text-xs">آواتار URL</Label><Input value={selected.avatar || ""} onChange={(e) => updateSelected({ avatar: e.target.value })} dir="ltr" /></div>
@@ -325,17 +305,6 @@ function UsersContent() {
                         />
                       </div>
                     )}
-                    <div className="space-y-1">
-                      <Label className="text-xs">نقش</Label>
-                      <Select value={selected.role} onValueChange={(v) => updateSelected({ role: v as string })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {roleOptions.map((r) => (
-                            <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
                     <div className="space-y-1">
                       <Label className="text-xs">وضعیت</Label>
                       <Select value={selected.status} onValueChange={(v) => updateSelected({ status: v as string })}>
@@ -401,17 +370,8 @@ function UsersContent() {
                     </div>
                   </div>
 
-                  {/* Module Access (legacy) */}
-                  <div>
-                    <div className="mb-2 font-bold text-sm">دسترسی ماژول‌ها (قدیمی)</div>
-                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                      {allModules.map((m) => (
-                        <Label key={m} className="flex items-center gap-2 rounded-md border p-2 cursor-pointer hover:bg-muted/30">
-                          <Checkbox checked={selected.modules.includes(m)} onCheckedChange={() => toggleModule(m)} />
-                          <span className="text-xs">{moduleMeta[m].titleFa}</span>
-                        </Label>
-                      ))}
-                    </div>
+                  <div className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground">
+                    دسترسی‌ها فقط از نقش‌های بالا محاسبه می‌شوند. فهرست قدیمی ماژول‌ها دیگر مرجع مجوز نیست.
                   </div>
 
                   <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">

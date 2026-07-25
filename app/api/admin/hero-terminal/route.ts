@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { cacheHeaders, PUBLIC_CONTENT_CACHE, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 const KEYS = {
@@ -104,10 +104,8 @@ export async function GET() {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("hero:edit");
+  if (user instanceof NextResponse) return user;
 
   const body = await req.json().catch(() => ({}));
   const updates: Record<string, string> = {};

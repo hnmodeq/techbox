@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { sendEmail } from "@/lib/email";
 import { renderNewsletterEmail, buildUnsubscribeUrl, type NewsletterItem } from "@/lib/newsletter";
 import { formatPostDateFa } from "@/lib/post-date";
@@ -10,10 +10,8 @@ import { formatPostDateFa } from "@/lib/post-date";
  * Auto-generates and sends a weekly digest of top content from the past 7 days.
  */
 export async function POST() {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("newsletter:send");
+  if (user instanceof NextResponse) return user;
 
   try {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);

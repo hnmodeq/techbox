@@ -13,7 +13,7 @@ type RedirectRow = { id: string; sourceModule: string; sourceSlug: string; targe
 
 export default function RedirectsAdminPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <RedirectsContent />}
     </AdminGuard>
   );

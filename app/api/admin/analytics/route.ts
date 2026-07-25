@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user || (user.role !== "super_admin" && user.role !== "editor")) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("analytics:view");
+  if (user instanceof NextResponse) return user;
 
   try {
     const now = new Date();

@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("audit:view");
+  if (user instanceof NextResponse) return user;
 
   try {
     const take = Math.min(Number(req.nextUrl.searchParams.get("take") || "50"), 200);

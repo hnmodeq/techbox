@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { z } from "zod";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
@@ -23,10 +23,8 @@ const jobSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || !canEditModule(user as any, "workwithus")) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+  const user = await requirePermission("job:view");
+  if (user instanceof NextResponse) return user;
 
   try {
     const jobs = await prisma.job.findMany({
@@ -44,10 +42,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || !canEditModule(user as any, "workwithus")) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("job:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();

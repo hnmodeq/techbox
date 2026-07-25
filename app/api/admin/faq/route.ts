@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { z } from "zod";
-
-function isEditorOrAdmin(user: { role: string } | null): boolean {
-  return user?.role === "super_admin" || user?.role === "editor";
-}
 
 const createSchema = z.object({
   question: z.string().min(3, "سوال حداقل ۳ کاراکتر").max(500),
@@ -16,10 +12,8 @@ const createSchema = z.object({
 });
 
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("faq:view");
+  if (user instanceof NextResponse) return user;
   try {
     const faqs = await prisma.faq.findMany({
       orderBy: [{ order: "asc" }, { createdAt: "asc" }],
@@ -31,10 +25,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("faq:edit");
+  if (user instanceof NextResponse) return user;
   try {
     const body = await req.json();
     const data = createSchema.parse(body);

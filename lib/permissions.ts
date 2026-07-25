@@ -145,6 +145,8 @@ export const PERMISSION_BUNDLES: PermissionBundle[] = [
   { id: "holidays", name: "Holidays", nameFa: "تعطیلات", description: "مدیریت تعطیلات", category: "system", permissions: ["holiday:view", "holiday:edit"] },
   { id: "blob", name: "Blob Files", nameFa: "فایل‌های Blob", description: "مدیریت فایل‌ها", category: "system", permissions: ["blob:view", "blob:upload", "blob:delete"] },
   { id: "jobs", name: "Jobs", nameFa: "آگهی استخدام", description: "مدیریت آگهی‌های استخدام", category: "system", permissions: ["job:view", "job:edit", "job:applications"] },
+  { id: "about", name: "About", nameFa: "درباره ما", description: "مدیریت صفحه درباره ما و اعضای تیم", category: "system", permissions: ["about:view", "about:edit"] },
+  { id: "terms", name: "Terms", nameFa: "شرایط همکاری", description: "مدیریت متن شرایط همکاری", category: "system", permissions: ["terms:view", "terms:edit"] },
   { id: "audit", name: "Audit Log", nameFa: "لاگ فعالیت‌ها", description: "مشاهده لاگ فعالیت‌ها", category: "system", permissions: ["audit:view"] },
   { id: "search", name: "Search Analytics", nameFa: "آمار جستجو", description: "مشاهده آمار جستجو", category: "system", permissions: ["search:view"] },
 ];
@@ -167,9 +169,10 @@ export const SIDEBAR_PERMISSIONS: SidebarPermissionItem[] = [
 
   // Content
   { href: "/admin/posts", permission: "content:*:view" },
-  { href: "/admin/timeline", permission: "timeline:view" },
+  { href: "/admin/timeline", permission: "content:timeline:view" },
   { href: "/admin/newsletter", permission: "newsletter:view" },
   { href: "/admin/jobs", permission: "job:view" },
+  { href: "/admin/terms", permission: "terms:view" },
 
   // Shop
   { href: "/admin/orders", permission: "order:list:view" },
@@ -178,7 +181,6 @@ export const SIDEBAR_PERMISSIONS: SidebarPermissionItem[] = [
 
   // Users
   { href: "/admin/users", permission: "user:list:view" },
-  { href: "/admin/roles", permission: "role:view" },
   { href: "/admin/roles-v2", permission: "role:view" },
   { href: "/admin/moderation", permission: "comment:view" },
   { href: "/admin/verification", permission: "verification:view" },
@@ -194,7 +196,7 @@ export const SIDEBAR_PERMISSIONS: SidebarPermissionItem[] = [
   { href: "/admin/content-health", permission: "health:view" },
   { href: "/admin/seo-audit", permission: "seo:view" },
   { href: "/admin/faq", permission: "faq:view" },
-  { href: "/admin/about", permission: "settings:view" },
+  { href: "/admin/about", permission: "about:view" },
   { href: "/admin/hero-terminal", permission: "hero:view" },
 
   // Tools
@@ -220,25 +222,16 @@ export function hasPermission(userPermissions: string[], required: string): bool
   // Super_admin check (if "*" is in permissions)
   if (userPermissions.includes("*") || userPermissions.includes("*:*:*")) return true;
 
-  const [reqResource, reqSection, reqAccess] = required.split(":");
+  const requiredParts = required.split(":");
 
-  for (const perm of userPermissions) {
-    const [pResource, pSection, pAccess] = perm.split(":");
-
-    // Exact match
-    if (perm === required) return true;
-
-    // Wildcard match on resource
-    if (pResource === "*" && pSection === reqSection && pAccess === reqAccess) return true;
-
-    // Wildcard match on section
-    if (pResource === reqResource && pSection === "*" && pAccess === reqAccess) return true;
-
-    // Wildcard match on both
-    if (pResource === "*" && pSection === "*" && pAccess === reqAccess) return true;
-
-    // Full wildcard
-    if (pResource === "*" && pSection === "*" && pAccess === "*") return true;
+  for (const permission of userPermissions) {
+    if (permission === required) return true;
+    const grantedParts = permission.split(":");
+    if (grantedParts.length !== requiredParts.length) continue;
+    const matches = grantedParts.every(
+      (part, index) => part === "*" || requiredParts[index] === "*" || part === requiredParts[index]
+    );
+    if (matches) return true;
   }
 
   return false;

@@ -16,7 +16,7 @@ import { PlusIcon, TrashIcon, RefreshCw, Shuffle } from "lucide-react";
 
 export default function HeroTerminalAdminPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <HeroTerminalContent />}
     </AdminGuard>
   );

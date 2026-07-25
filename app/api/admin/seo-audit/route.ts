@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("seo:view");
+  if (user instanceof NextResponse) return user;
 
   try {
     // Find posts with issues

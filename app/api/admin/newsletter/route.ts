@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 import { publicPostDateWhere } from "@/lib/post-date";
 import { formatPostDateFa } from "@/lib/post-date";
@@ -37,14 +37,9 @@ async function getTemplate() {
   }
 }
 
-async function requireSuperAdmin() {
-  const user = await getSessionUserPublic();
-  return user && user.role === "super_admin" ? user : null;
-}
-
 export async function GET() {
-  const admin = await requireSuperAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  const admin = await requirePermission("newsletter:view");
+  if (admin instanceof NextResponse) return admin;
 
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 

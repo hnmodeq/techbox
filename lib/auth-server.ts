@@ -3,34 +3,15 @@ import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { prisma } from "./db";
 import bcrypt from "bcryptjs";
 
-function isDeployedEnv() {
-  return process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL_ENV);
-}
-
 function getAuthSecret(): Uint8Array {
   const envSecret = process.env.AUTH_SECRET;
-
-  // In production/preview: AUTH_SECRET must be set and at least 32 chars.
-  // Keep this check lazy so importing auth helpers during `next build` does not
-  // fail while Next is collecting route/page metadata. Runtime auth operations
-  // still fail closed when the secret is missing or weak.
-  if (isDeployedEnv()) {
-    if (!envSecret || envSecret.length < 32) {
-      throw new Error(
-        "[auth-server] AUTH_SECRET must be set and at least 32 characters in production/preview. " +
-        "Set it in your Vercel project settings → Environment Variables. " +
-        "Generate one with: openssl rand -base64 48"
-      );
-    }
+  if (!envSecret || envSecret.length < 32) {
+    throw new Error(
+      "[auth-server] AUTH_SECRET must be configured and at least 32 characters in every environment. " +
+      "Generate one with: openssl rand -base64 48"
+    );
   }
-
-  // Local dev: allow fallback (not recommended) so contributors can run pages
-  // before they create a .env file. This fallback is never allowed in deploys.
-  const fallback = "dev-secret-please-change-32char!";
-  if (!envSecret) {
-    console.warn("[auth-server] WARNING: AUTH_SECRET not set. Using dev fallback. Do NOT use in production.");
-  }
-  return new TextEncoder().encode(envSecret || fallback);
+  return new TextEncoder().encode(envSecret);
 }
 
 const COOKIE = "tb_session";
@@ -196,14 +177,4 @@ export async function setSessionCookie(token: string){
 export async function clearSession(){
   const c = await cookies();
   c.delete(COOKIE);
-}
-
-export function canEditModule(
-  user: { role: string; modules?: string | string[] | null } | null,
-  module: string
-) {
-  if (!user) return false;
-  if (user.role === "super_admin") return true;
-  const mods = Array.isArray(user.modules) ? (user.modules as string[]) : [];
-  return mods.includes(module);
 }

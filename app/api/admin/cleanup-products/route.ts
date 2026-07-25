@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 
 // Required 18 spec keys (Persian) that all products must have
 const REQUIRED_SPEC_KEYS = [
@@ -73,10 +73,8 @@ function normalizeSpecs(specs: Record<string, unknown>): Record<string, string> 
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || (user.role !== "super_admin" && user.role !== "admin")) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("product:delete");
+  if (user instanceof NextResponse) return user;
 
   const body = await req.json().catch(() => ({}));
   const { dryRun = false, deleteOlderThanDays = 2, cleanSpecs = true, deleteIncomplete = true } = body;

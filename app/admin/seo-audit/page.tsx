@@ -51,7 +51,7 @@ const ISSUE_SEVERITY: Record<string, "destructive" | "secondary" | "outline"> = 
 
 export default function AdminSeoAuditPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <SeoAuditContent />}
     </AdminGuard>
   );

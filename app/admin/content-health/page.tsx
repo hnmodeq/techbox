@@ -39,7 +39,7 @@ function labelIssue(issue: string) {
 
 export default function ContentHealthPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <ContentHealthContent />}
     </AdminGuard>
   );

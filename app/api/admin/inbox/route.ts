@@ -1,29 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
-async function requireSuperAdmin() {
-  const user = await getSessionUserPublic();
-  return user && user.role === "super_admin" ? user : null;
-}
-
 export async function GET(req: NextRequest) {
-  const admin = await requireSuperAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-
-  const { searchParams } = new URL(req.url);
-  const type = searchParams.get("type") || "all";
-
+  const admin = await requirePermission("inbox:view");
+  if (admin instanceof NextResponse) return admin;
+  const type = new URL(req.url).searchParams.get("type") || "all";
   try {
-    const where = type === "all" ? {} : { type };
     const submissions = await prisma.contactSubmission.findMany({
-      where,
+      where: type === "all" ? {} : { type },
       orderBy: { createdAt: "desc" },
       take: 100,
-      include: {
-        replies: { orderBy: { createdAt: "asc" } },
-      },
+      include: { replies: { orderBy: { createdAt: "asc" } } },
     });
     return NextResponse.json(submissions, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch {
@@ -31,14 +20,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/** PATCH: update status (new → read → resolved) */
 export async function PATCH(req: NextRequest) {
-  const admin = await requireSuperAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-
+  const admin = await requirePermission("inbox:close");
+  if (admin instanceof NextResponse) return admin;
   try {
-    const body = await req.json();
-    const { id, status } = body;
+    const { id, status } = await req.json();
     if (!id || !["new", "read", "waiting_user", "closed"].includes(status)) {
       return NextResponse.json({ error: "invalid_request" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
     }

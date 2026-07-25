@@ -47,7 +47,7 @@ function fileKind(contentType: string): { label: string; icon: typeof ImageIcon;
 
 export default function AdminMediaPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <MediaContent />}
     </AdminGuard>
   );

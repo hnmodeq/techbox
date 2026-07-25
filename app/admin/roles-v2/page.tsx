@@ -52,7 +52,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function RolesV2Page() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <RolesContent />}
     </AdminGuard>
   );

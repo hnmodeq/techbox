@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requireAnyPermission, requirePermission } from "@/lib/api-permissions";
 import { logAudit } from "@/lib/audit-log";
+import { hasPermission } from "@/lib/permissions";
 
 // GET /api/admin/roles-v2 — list all roles with user counts
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requireAnyPermission(["role:view", "user:role:assign"]);
+  if (user instanceof NextResponse) return user;
 
   try {
     const roles = await prisma.role.findMany({
@@ -32,10 +31,8 @@ export async function GET() {
 
 // POST /api/admin/roles-v2 — create a new role
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("role:create");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();
@@ -43,6 +40,9 @@ export async function POST(req: NextRequest) {
 
     if (!name || !nameFa || !Array.isArray(permissions)) {
       return NextResponse.json({ error: "name, nameFa, permissions required" }, { status: 400 });
+    }
+    if (user.role !== "super_admin" && permissions.some((permission: string) => !hasPermission(user.permissions, permission))) {
+      return NextResponse.json({ error: "cannot_delegate_unowned_permission" }, { status: 403 });
     }
 
     // Check for duplicate name
@@ -79,10 +79,8 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/admin/roles-v2 — update a role
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("role:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();
@@ -90,6 +88,10 @@ export async function PATCH(req: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: "id required" }, { status: 400 });
+    }
+
+    if (Array.isArray(permissions) && user.role !== "super_admin" && permissions.some((permission: string) => !hasPermission(user.permissions, permission))) {
+      return NextResponse.json({ error: "cannot_delegate_unowned_permission" }, { status: 403 });
     }
 
     const existing = await prisma.role.findUnique({ where: { id } });
@@ -130,10 +132,8 @@ export async function PATCH(req: NextRequest) {
 
 // DELETE /api/admin/roles-v2 — delete a role
 export async function DELETE(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  const user = await requirePermission("role:delete");
+  if (user instanceof NextResponse) return user;
 
   try {
     const id = new URL(req.url).searchParams.get("id");

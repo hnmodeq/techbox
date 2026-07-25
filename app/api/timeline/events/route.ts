@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getSessionUserPublic } from '@/lib/auth-server';
+import { requirePermission } from '@/lib/api-permissions';
 import { z } from 'zod';
 
 const createSchema = z.object({
@@ -14,10 +14,6 @@ const createSchema = z.object({
   importance: z.number().int().min(1).max(10).default(5),
   tags: z.array(z.string()).max(10).default([]),
 });
-
-function isEditorOrAdmin(user: { role: string } | null): boolean {
-  return user?.role === 'super_admin' || user?.role === 'editor';
-}
 
 export async function GET() {
   try {
@@ -55,13 +51,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: 'ساخت رویداد تایم‌لاین نیاز به دسترسی مدیر یا ویراستار دارد.' },
-      { status: 401 }
-    );
-  }
+  const user = await requirePermission("content:timeline:create");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();

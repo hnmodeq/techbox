@@ -1,62 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCurrentUserClient } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
 import { hasPermission } from "@/lib/permissions";
 
-/**
- * Hook to check user permissions in admin pages.
- * Loads the user's roles and returns permission checking functions.
- *
- * Usage:
- *   const { permissions, has, loading } = usePermissions();
- *   if (!has("product:price:edit")) return <AccessDenied />;
- */
+/** Permission checks over the server-validated session returned by /api/auth/me. */
 export function usePermissions() {
-  const [permissions, setPermissions] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const { user, loading } = useAuth();
+  const permissions = user?.permissions || [];
 
-  useEffect(() => {
-    const currentUser = getCurrentUserClient();
-    if (!currentUser) {
-      setLoading(false);
-      return;
-    }
-    setUser(currentUser);
-
-    if (currentUser.role === "super_admin") {
-      setPermissions(["*"]);
-      setLoading(false);
-      return;
-    }
-
-    fetch(`/api/admin/user-roles?userId=${currentUser.id}`, { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.permissions) setPermissions(data.permissions);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  const has = (permission: string): boolean => {
-    if (user?.role === "super_admin") return true;
-    return hasPermission(permissions, permission);
-  };
-
-  const hasAny = (perms: string[]): boolean => {
-    if (user?.role === "super_admin") return true;
-    return perms.some((p) => hasPermission(permissions, p));
-  };
+  const has = useCallback(
+    (permission: string) => user?.role === "super_admin" || hasPermission(permissions, permission),
+    [permissions, user?.role]
+  );
+  const hasAny = useCallback(
+    (required: string[]) => user?.role === "super_admin" || required.some((permission) => hasPermission(permissions, permission)),
+    [permissions, user?.role]
+  );
 
   return { permissions, has, hasAny, loading, user };
 }
 
-/**
- * Hook that redirects to dashboard with toast if user lacks permission.
- */
 export function useRequirePermission(permission: string) {
   const { has, loading } = usePermissions();
   const router = useRouter();
@@ -65,15 +30,13 @@ export function useRequirePermission(permission: string) {
   useEffect(() => {
     if (loading) return;
     if (!has(permission)) {
-      // Unauthorized — redirect to dashboard
-      import("sonner").then(({ toast }) => {
-        toast.error("ورود غیر مجاز");
-      });
-      router.push("/admin");
+      setAuthorized(false);
+      import("sonner").then(({ toast }) => toast.error("ورود غیر مجاز"));
+      router.replace("/admin");
     } else {
       setAuthorized(true);
     }
-  }, [loading, has, permission, router]);
+  }, [has, loading, permission, router]);
 
   return { authorized, loading };
 }

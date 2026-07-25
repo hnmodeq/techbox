@@ -20,6 +20,7 @@ import { Icon } from "@/design/icons";
 import { toast } from "sonner";
 import { AccountProfileTabs } from "@/components/profile/AccountProfileTabs";
 import { NotificationPreferences } from "@/components/profile/NotificationPreferences";
+import { useAuth } from "@/providers/auth.provider";
 const loginSchema = z.object({
   username: z.string().min(2),
   password: z.string().min(6),
@@ -48,6 +49,7 @@ const passwordSchema = z.object({
 
 export default function AccountPage() {
   const router = useRouter();
+  const { refresh: refreshAuth, logout: logoutAuth } = useAuth();
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -92,14 +94,12 @@ export default function AccountPage() {
             bio: data.user.bio || "",
             birthday: data.user.birthday || "",
           });
-          localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
           setLoading(false);
           return;
         }
       }
     } catch {}
     setUser(null);
-    localStorage.removeItem("tb_auth_user");
     setLoading(false);
   }, [profileForm]);
 
@@ -118,7 +118,7 @@ export default function AccountPage() {
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        await loadUser();
+        await Promise.all([loadUser(), refreshAuth()]);
         toast.success("ورود موفق");
       } else if (data.error === "email_not_verified") {
         setAuthError("");
@@ -144,7 +144,7 @@ export default function AccountPage() {
       });
       const data = await res.json();
       if (res.ok && data.ok && data.user) {
-        await loadUser();
+        await Promise.all([loadUser(), refreshAuth()]);
         toast.success("ثبت‌نام موفق");
       } else if (res.ok && data.needsVerification) {
         setAuthError("");
@@ -203,7 +203,7 @@ export default function AccountPage() {
       const data = await res.json();
       if (res.ok && data.ok) {
         setUser(data.user);
-        localStorage.setItem("tb_auth_user", JSON.stringify(data.user));
+        await refreshAuth();
         setSaveStatus({ ok: true, msg: "پروفایل ذخیره شد ✓" });
         toast.success("پروفایل ذخیره شد");
       } else {
@@ -236,8 +236,7 @@ export default function AccountPage() {
   };
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    localStorage.removeItem("tb_auth_user");
+    await logoutAuth();
     setUser(null);
   };
 
