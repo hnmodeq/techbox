@@ -1,6 +1,11 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
 import { requirePermission } from "@/lib/api-permissions";
+import {
+  getSupabasePublicUrl,
+  getSupabaseStorageConfig,
+  uploadSupabaseObject,
+} from "@/lib/supabase-storage";
 import { captureUploadError } from "@/lib/sentry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -20,7 +25,7 @@ const ALLOWED_BY_KIND: Record<string, RegExp[]> = {
     /^application\/(pdf|zip|x-zip-compressed|vnd\.rar|x-7z-compressed|x-iso9660-image|msi|vnd\.microsoft\.portable-executable|octet-stream)$/,
   ],
   // "file" is the generic fallback — allow common document/image/video binaries
-  // but NOT bare text/* (would permit text/html, text/javascript in public Blob)
+  // but NOT bare text/* (would permit active HTML/JavaScript in public storage)
   // and NOT bare application/* (would permit application/javascript etc.).
   file: [
     /^image\//,
@@ -90,10 +95,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json({ error: "blob_not_configured", message: "BLOB_READ_WRITE_TOKEN is not configured." }, { status: 503 });
-  }
-
   let fileNameForError: string | undefined;
 
   try {
@@ -116,29 +117,42 @@ export async function POST(req: NextRequest) {
     }
 
     const folder = sanitizeSegment(String(form.get("folder") || "")) || defaultFolder(kind);
-    const fileName = sanitizeFileName(file.name);
+    const originalName = sanitizeFileName(file.name);
+    const dot = originalName.lastIndexOf(".");
+    const baseName = (dot > 0 ? originalName.slice(0, dot) : originalName).slice(0, 80);
+    const extension = dot > 0 ? originalName.slice(dot).toLowerCase() : "";
+    const fileName = `${baseName}-${randomUUID()}${extension}`;
     const pathname = `${folder}/${fileName}`;
+    const { publicBucket } = getSupabaseStorageConfig();
 
-    const blob = await put(pathname, file, {
-      access: "public",
-      addRandomSuffix: true,
+    await uploadSupabaseObject({
+      bucket: publicBucket,
+      path: pathname,
+      body: file,
       contentType,
     });
+    const url = getSupabasePublicUrl(publicBucket, pathname);
 
     return NextResponse.json({
       ok: true,
+      provider: "supabase",
+      bucket: publicBucket,
       kind,
       fileName,
       contentType,
       size: file.size,
-      pathname: blob.pathname,
-      url: blob.url,
-      downloadUrl: blob.downloadUrl || blob.url,
+      pathname,
+      url,
+      downloadUrl: url,
       uploadedBy: { id: user.id, username: user.username, name: user.name },
     });
   } catch (e: any) {
     captureUploadError(e, fileNameForError);
-    return NextResponse.json({ error: e?.message || "upload_failed" }, { status: 500 });
+    const notConfigured = e?.message === "supabase_storage_not_configured";
+    return NextResponse.json(
+      { error: notConfigured ? "supabase_storage_not_configured" : "upload_failed" },
+      { status: notConfigured ? 503 : 500 }
+    );
   }
 }
 

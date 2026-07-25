@@ -10,9 +10,9 @@ export default function AdminUploadPage() {
   return (
     <main className="min-h-dvh px-4 py-10" dir="rtl">
       <section className="mx-auto max-w-5xl space-y-6">
-        <PageHeader colorVar="--admin" title="آپلود فایل به Vercel Blob" titleClassName="text-[var(--admin)]" description="آپلود امن برای تصاویر، ویدیوها، دانلودها و آواتارها">
+        <PageHeader colorVar="--admin" title="آپلود فایل به Supabase Storage" titleClassName="text-[var(--admin)]" description="آپلود امن برای تصاویر، ویدیوها، دانلودها و آواتارها">
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/admin/blob" variant="ghost" size="sm">فایل‌های Blob</ButtonLink>
+            <ButtonLink href="/admin/blob" variant="ghost" size="sm">فایل‌های Supabase</ButtonLink>
           </div>
         </PageHeader>
 

@@ -1,35 +1,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSessionUserPublic } from "@/lib/auth-server";
+import { verifySupportAccessToken } from "@/lib/support-access";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
-// GET: user looks up their tickets by email → returns tickets + replies
-export async function GET(req: NextRequest) {
-  const email = new URL(req.url).searchParams.get("email");
-  if (!email) {
-    return NextResponse.json({ tickets: [] }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+function publicTicket(ticket: any) {
+  const { accessTokenHash: _accessTokenHash, ...safe } = ticket;
+  return safe;
+}
 
+export async function GET(req: NextRequest) {
+  const user = await getSessionUserPublic();
   try {
-    const tickets = await prisma.contactSubmission.findMany({
-      where: { email: email.toLowerCase().trim(), type: "support" },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      include: {
-        replies: { orderBy: { createdAt: "asc" } },
-      },
+    if (user) {
+      const tickets = await prisma.contactSubmission.findMany({
+        where: { email: user.email.toLowerCase(), type: "support" },
+        orderBy: { createdAt: "desc" },
+        take: 20,
+        include: { replies: { orderBy: { createdAt: "asc" } } },
+      });
+      return NextResponse.json({ tickets: tickets.map(publicTicket) }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+
+    const params = new URL(req.url).searchParams;
+    const ticketId = params.get("ticketId");
+    const accessToken = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || null;
+    if (!ticketId || !accessToken) {
+      return NextResponse.json({ error: "ticket_access_required", tickets: [] }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+    const ticket = await prisma.contactSubmission.findFirst({
+      where: { id: ticketId, type: "support" },
+      include: { replies: { orderBy: { createdAt: "asc" } } },
     });
-    return NextResponse.json({ tickets }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
-  } catch {
-    return NextResponse.json({ tickets: [] }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+    if (!ticket || !verifySupportAccessToken(accessToken, ticket.accessTokenHash)) {
+      return NextResponse.json({ error: "forbidden", tickets: [] }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+    return NextResponse.json({ tickets: [publicTicket(ticket)] }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error) {
+    console.error("[support:tickets]", error);
+    return NextResponse.json({ error: "tickets_unavailable", tickets: [] }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
-// POST: user adds a reply to their own ticket
 const replySchema = z.object({
   ticketId: z.string().min(1),
-  email: z.string().email(),
+  accessToken: z.string().min(32).max(200).optional(),
   name: z.string().min(1).max(100),
   message: z.string().min(2, "حداقل ۲ کاراکتر").max(2000),
 });
@@ -46,37 +63,41 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = replySchema.parse(await req.json());
-    const cleanEmail = body.email.toLowerCase().trim();
-
-    // Verify the ticket belongs to this email
+    const user = await getSessionUserPublic();
     const ticket = await prisma.contactSubmission.findFirst({
-      where: { id: body.ticketId, email: cleanEmail, type: "support" },
+      where: { id: body.ticketId, type: "support" },
     });
     if (!ticket) {
       return NextResponse.json({ error: "ticket_not_found" }, { status: 404, headers: cacheHeaders(PRIVATE_NO_STORE) });
     }
+    const ownsSessionTicket = Boolean(user && user.email.toLowerCase() === ticket.email.toLowerCase());
+    const hasCapability = verifySupportAccessToken(body.accessToken, ticket.accessTokenHash);
+    if (!ownsSessionTicket && !hasCapability) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+    if (ticket.status === "closed") {
+      return NextResponse.json({ error: "ticket_closed" }, { status: 409, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
 
-    // Mark ticket as read again (user activity)
     await prisma.contactSubmission.update({
       where: { id: body.ticketId },
       data: { status: "read" },
     });
-
     const reply = await prisma.ticketReply.create({
       data: {
         ticketId: body.ticketId,
-        authorName: body.name.trim(),
-        authorEmail: cleanEmail,
+        authorName: user?.name || body.name.trim(),
+        authorEmail: user?.email || ticket.email,
         authorRole: "user",
         message: body.message.trim(),
       },
     });
-
     return NextResponse.json({ ok: true, reply }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
-  } catch (e: any) {
-    if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: e.errors[0].message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors[0].message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
     }
+    console.error("[support:reply]", error);
     return NextResponse.json({ error: "خطا در ثبت پاسخ" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }

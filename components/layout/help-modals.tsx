@@ -212,6 +212,27 @@ type TicketReply = {
   createdAt: string;
 };
 
+type TicketAccess = { ticketId: string; token: string; email: string };
+const TICKET_ACCESS_KEY = "tb_support_ticket_access_v1";
+
+function readTicketAccess(): TicketAccess[] {
+  try {
+    const value = JSON.parse(localStorage.getItem(TICKET_ACCESS_KEY) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberTicketAccess(access: TicketAccess) {
+  const current = readTicketAccess().filter((item) => item.ticketId !== access.ticketId);
+  localStorage.setItem(TICKET_ACCESS_KEY, JSON.stringify([access, ...current].slice(0, 20)));
+}
+
+function ticketToken(ticketId: string) {
+  return readTicketAccess().find((item) => item.ticketId === ticketId)?.token;
+}
+
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     new: { label: "جدید", cls: "bg-red-500/15 text-red-600 border-red-500/30" },
@@ -242,18 +263,34 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
 
   const loadTickets = React.useCallback(async (emailToLoad?: string) => {
     const em = (emailToLoad || email).toLowerCase().trim();
-    if (!em) return;
     setTicketsLoading(true);
     try {
-      const res = await fetch(`/api/support/tickets?email=${encodeURIComponent(em)}`, { cache: "no-store" });
-      const data = await res.json();
-      setTickets(data.tickets || []);
+      if (defaultEmail) {
+        const res = await fetch("/api/support/tickets", { cache: "no-store" });
+        const data = await res.json();
+        setTickets(res.ok ? (data.tickets || []) : []);
+        return;
+      }
+
+      const accesses = readTicketAccess().filter((item) => !em || item.email === em);
+      const results = await Promise.all(
+        accesses.map(async (access) => {
+          const query = new URLSearchParams({ ticketId: access.ticketId });
+          const res = await fetch(`/api/support/tickets?${query.toString()}`, {
+            cache: "no-store",
+            headers: { Authorization: `Bearer ${access.token}` },
+          });
+          const data = await res.json().catch(() => ({}));
+          return res.ok ? data.tickets?.[0] : null;
+        })
+      );
+      setTickets(results.filter(Boolean));
     } catch {
       setTickets([]);
     } finally {
       setTicketsLoading(false);
     }
-  }, [email]);
+  }, [defaultEmail, email]);
 
   useEffect(() => {
     if (open) {
@@ -274,9 +311,14 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
 
   const refreshThread = async (ticketId: string) => {
     try {
-      const res = await fetch(`/api/support/tickets?email=${encodeURIComponent(email.toLowerCase().trim())}`, { cache: "no-store" });
+      const token = ticketToken(ticketId);
+      const query = defaultEmail ? "" : `?${new URLSearchParams({ ticketId }).toString()}`;
+      const res = await fetch(`/api/support/tickets${query}`, {
+        cache: "no-store",
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
       const data = await res.json();
-      const found = (data.tickets || []).find((t: Ticket) => t.id === ticketId);
+      const found = (data.tickets || []).find((ticket: Ticket) => ticket.id === ticketId);
       if (found) setActiveTicket(found);
     } catch {}
   };
@@ -297,6 +339,13 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
       });
       const data = await res.json();
       if (res.ok && data.ok) {
+        if (data.ticketId && data.accessToken) {
+          rememberTicketAccess({
+            ticketId: data.ticketId,
+            token: data.accessToken,
+            email: email.toLowerCase().trim(),
+          });
+        }
         toast.success("تیکت شما ثبت شد");
         setSubject("");
         setMessage("");
@@ -322,7 +371,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ticketId: activeTicket.id,
-          email,
+          accessToken: ticketToken(activeTicket.id),
           name,
           message: replyText.trim(),
         }),

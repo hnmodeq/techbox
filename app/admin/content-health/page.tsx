@@ -79,7 +79,7 @@ function ContentHealthContent() {
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
       <section className="mx-auto max-w-7xl space-y-6">
-        <PageHeader colorVar="--admin" title="سلامت محتوا" titleClassName="text-[var(--admin)]" description="بررسی کمبودهای محتوا، URLهای خراب Blob و وضعیت redirectها">
+        <PageHeader colorVar="--admin" title="سلامت محتوا" titleClassName="text-[var(--admin)]" description="بررسی کمبودهای محتوا، URLهای خراب فضای ذخیره‌سازی و وضعیت redirectها">
           <div className="flex flex-wrap gap-2">
             <ButtonLink href="/admin/redirects" variant="ghost" size="sm">مدیریت Redirect</ButtonLink>
             <Button type="button" size="sm" onClick={() => load(false)} disabled={loading}>به‌روزرسانی</Button>

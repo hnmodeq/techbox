@@ -1,6 +1,12 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { put } from "@vercel/blob";
+import {
+  getSupabaseStorageConfig,
+  makePrivateStorageRef,
+  removeSupabaseObjects,
+  uploadSupabaseObject,
+} from "@/lib/supabase-storage";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
@@ -20,6 +26,10 @@ const ALLOWED_RESUME_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
+function safeResumeName(value: string) {
+  return value.replace(/\\/g, "/").split("/").pop()?.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 100) || "resume";
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -34,6 +44,8 @@ export async function POST(
       { status: 429, headers: cacheHeaders(PRIVATE_NO_STORE) }
     );
   }
+
+  let uploadedResume: { bucket: string; path: string } | null = null;
 
   try {
     const job = await prisma.job.findFirst({
@@ -68,26 +80,32 @@ export async function POST(
       return NextResponse.json({ error: "unsupported_file_type", message: "فرمت فایل رزومه باید PDF یا Word باشد." }, { status: 415 });
     }
 
-    // Upload to Vercel Blob — private access where possible
-    // Note: free tier forces public URLs, but we add unguessable paths
-    // and do NOT list resumes in any public API
-    const blob = await put(`resumes/${job.slug}/${Date.now()}-${file.name}`, file, {
-      access: "public", // Free tier limitation; use unguessable path
-      addRandomSuffix: true,
+    // Résumés are stored in a private Supabase bucket. Only the opaque object
+    // reference is persisted; no public or signed URL is stored in PostgreSQL.
+    const { privateBucket } = getSupabaseStorageConfig();
+    const storedName = `${randomUUID()}-${safeResumeName(file.name)}`;
+    const objectPath = `${job.slug}/${storedName}`;
+    await uploadSupabaseObject({
+      bucket: privateBucket,
+      path: objectPath,
+      body: file,
+      contentType: file.type,
     });
+    uploadedResume = { bucket: privateBucket, path: objectPath };
 
-    // Save to DB
     const application = await prisma.jobApplication.create({
       data: {
         jobId: job.id,
         name: data.name,
-        email: data.email,
+        email: data.email.toLowerCase(),
         phone: data.phone,
         message: data.message,
-        resumeUrl: blob.url,
+        resumePath: makePrivateStorageRef(privateBucket, objectPath),
         resumeName: file.name,
       },
     });
+
+    uploadedResume = null;
 
     // Notify admin about new application (fire-and-forget)
     sendEmail({
@@ -109,11 +127,18 @@ export async function POST(
 
     return NextResponse.json({ ok: true, id: application.id }, { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (error: any) {
+    if (uploadedResume) {
+      await removeSupabaseObjects(uploadedResume.bucket, [uploadedResume.path]).catch(() => {});
+    }
     console.error("Job application error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "validation_failed", issues: error.errors }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message || "internal_error" }, { status: 500 });
+    const notConfigured = error?.message === "supabase_storage_not_configured";
+    return NextResponse.json(
+      { error: notConfigured ? "resume_storage_not_configured" : "internal_error" },
+      { status: notConfigured ? 503 : 500 }
+    );
   }
 }
 

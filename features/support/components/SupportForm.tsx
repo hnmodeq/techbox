@@ -36,7 +36,19 @@ export function SupportForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       })
+      const data = await res.json().catch(() => ({}))
       if (res.ok) {
+        if (data.ticketId && data.accessToken) {
+          try {
+            const key = "tb_support_ticket_access_v1"
+            const current = JSON.parse(localStorage.getItem(key) || "[]")
+            const next = [
+              { ticketId: data.ticketId, token: data.accessToken, email: values.email.toLowerCase().trim() },
+              ...(Array.isArray(current) ? current.filter((item: any) => item.ticketId !== data.ticketId) : []),
+            ].slice(0, 20)
+            localStorage.setItem(key, JSON.stringify(next))
+          } catch {}
+        }
         setStatus("success")
         form.reset()
       } else {

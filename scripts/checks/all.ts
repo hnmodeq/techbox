@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 const checks: Array<[string, string[]]> = [
   ['content', ['tsx', 'scripts/checks/content.ts']],
   ['db', ['tsx', 'scripts/checks/db.ts']],
-  ['blob', ['tsx', 'scripts/checks/blob.ts']],
+  ['storage', ['tsx', 'scripts/checks/storage.ts']],
 ];
 
 let failed = false;
