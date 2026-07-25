@@ -1,111 +1,27 @@
 1-the searchbar needs to be more visible and some final touchs
+
 2-the sub footer needs less height
+
 3-chat box tabs need to get background to be removed
-4-magazine page need a re-design
-5-homepage need a design
 
 7-media page needs final touchs
 
 9-remove breadcrumb from magazine
+
 10-landing page needs to get remove
+
+11-price should be big not as a tag in work-with-us slugs
+
+12-RAID Calculator product recommendation showing products with a delay
+
+shop product slugs tab design and merge specs with comments
+
+
+
+------------
+
+4-magazine page need a re-design
+
+5-homepage need a design
+
 11-mobile version need to get a re-design
-12-security check by the prompt that we have
-
-
-
-
-# TASK: Comprehensive Bug Fix, Security Hardening, Performance Optimization & Feature Upgrade for TechBox (Next.js 16)
-You are tasked with fixing all identified issues, security vulnerabilities, bundle bloat, SEO defects, and missing features in the `hnmodeq/techbox` codebase (Next.js 16 App Router, TypeScript, Prisma, Tailwind CSS).
-Please execute the following step-by-step resolution plan cleanly and rigorously:
----
-
-### 1. CRITICAL BUGS & UI BLANKS
-
-1. **Fix Client Auth Desynchronization (`lib/auth.ts` & `lib/auth-server.ts`)**:
-   - Replace persistent `localStorage.setItem('tb_auth_user', ...)` with server-validated session queries via `useSWR` or React Query hitting `/api/account/me`.
-   - Prevent situations where expired HTTP-only cookies (`tb_session`) leave stale logged-in states in `localStorage`.
-
----
-
-### 2. SECURITY HARDENING & DATA LEAK PREVENTION
-
-1. **Eliminate Dev Fallback Auth Secret (`lib/auth-server.ts`)**:
-   - Remove the hardcoded `dev-secret-please-change-32char!` fallback string.
-   - Throw a fatal startup error if `AUTH_SECRET` environment variable is not defined or is less than 32 characters in length across all environments.
-
-2. **Protect Confidential Resume Blob Files (`app/api/admin/jobs/applications/route.ts`)**:
-   - Job applicant PDF resumes are uploaded directly as public Vercel Blob URLs (`*.public.blob.vercel-storage.com`), exposing personal contact details.
-   - Refactor job application uploads to serve resumes through an authenticated API endpoint (`/api/admin/jobs/applications/[id]/resume`) that checks for admin authorization or secure signed tokens before streaming the file.
-
-3. **Enforce Rate Limiting in Production (`lib/rate-limit.ts`)**:
-   - Add a critical log warning in production builds if `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are missing, because serverless in-memory `Map` instances fail to protect against distributed brute-force attacks across Vercel function invocations.
-
----
-
-### 3. PERFORMANCE & BUNDLE SIZE OPTIMIZATION
-
-1. **Deduplicate Motion Animation Libraries (`package.json`)**:
-   - The project installs both `framer-motion` (^12.42.2) and `motion` (^12.42.2), causing duplicate JS bundle bloat (~150KB).
-   - Consolidate all animation imports across the project to `motion/react` or `framer-motion`.
-   - Remove `framer-motion` from `package.json` dependencies and clean up unused imports.
-
-2. **Lazy Load Heavy 3D & Animation Libraries (`components/effects/*`)**:
-   - Three.js (`three`) and GSAP (`gsap`) are currently imported synchronously in visual effect components.
-   - Wrap 3D canvas and particle effect components with `next/dynamic` (`{ ssr: false }`) so Three.js (~600KB) is split into a lazy chunk and loaded only when visible in the viewport.
-
----
-
-### 4. SEO & ACCESSIBILITY
-
-1. **Dynamic Canonical URLs (`lib/seo.ts`)**:
-   - Update `siteUrl()` to dynamically handle incoming request headers or enforce `NEXT_PUBLIC_SITE_URL` to avoid hardcoded fallback canonicals pointing to the Vercel staging URL (`hnmodeq-techbox.vercel.app`) when custom domains are used.
-2. **Meta & Structured Data**:
-   - Ensure all public pages (`/blog/[slug]`, `/news/[slug]`, `/tools`, `/shop`) render valid OpenGraph images, Twitter cards, and `Article` / `WebSite` JSON-LD schemas.
-
----
-
-### 5. UX & RTL PERSIAN MOBILE IMPROVEMENTS
-
-1. **Add Mobile Bottom Navigation Bar (`components/layout/LayoutShell.tsx`)**:
-   - Implement a fixed bottom navigation bar (`sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t`) with touch-friendly icons (Home, News, Tools, Shop, Account) for mobile users in Persian RTL layout.
-
----
-
-### 6. NEW FEATURE: INTERACTIVE IT TOOLS HUB
-
-1. **Expand `/tools` Section (`app/tools/page.tsx`)**:
-   - Build client-side interactive calculators for IT professionals:
-     - **Subnet & CIDR Calculator**: IP range, netmask, usable host count, and broadcast address.
-     - **RAID Storage Calculator**: Usable capacity, parity loss, and fault tolerance for RAID 0, 1, 5, 6, and 10.
-
----
-
-### VERIFICATION & QUALITY CHECKS
-
-1. Run `pnpm run typecheck` or `tsc --noEmit` to verify zero TypeScript errors.
-2. Run `pnpm run lint` to ensure no ESLint warnings or missing dependency arrays in hooks.
-3. Execute `pnpm run test` or `pnpm run test:smoke` to verify all end-to-end and unit tests pass cleanly.
-
-
-
-cd D:\Dev\techbox-blob\avatars
-
-npm install sharp
-
-node -e "
-const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
-
-const files = fs.readdirSync('.').filter(f => /\.(jpg|jpeg|png)$/i.test(f));
-console.log('Found', files.length, 'images');
-
-Promise.all(files.map(f =>
-  sharp(f).webp({ quality: 80 }).toFile(path.parse(f).name + '.webp')
-    .then(() => console.log('✓', f))
-    .catch(e => console.error('✗', f, e.message))
-)).then(() => console.log('Done!'));
-"
-
-02634219054 poore
-
