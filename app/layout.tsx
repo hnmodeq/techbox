@@ -5,6 +5,7 @@ import "@fontsource/vazirmatn/500.css";
 import "@fontsource/vazirmatn/600.css";
 import "@fontsource/vazirmatn/700.css";
 import "@/design/globals.css";
+import "@/app/gradient.css";
 import { kalameh } from "@/lib/fonts";
 import { LayoutShell } from "@/components/layout/LayoutShell";
 import { Analytics } from "@vercel/analytics/next";
@@ -91,7 +92,7 @@ export default async function RootLayout({
       lang="fa"
       dir="rtl"
       data-main-sidebar-open="true"
-      className={cn(kalameh.variable, kalameh.className, "font-sans", "main-sidebar-booting", "news-sidebar-booting")}
+      className={cn(kalameh.variable, kalameh.className, "font-sans", "main-sidebar-booting", "news-sidebar-booting", "gradient-mode")}
       suppressHydrationWarning
     >
       <head>
