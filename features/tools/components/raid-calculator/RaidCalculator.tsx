@@ -42,16 +42,16 @@ export const RAID_OPTIONS: RaidOption[] = [
 ];
 
 const HDD_SIZES = [
-  { tb: 24, label: "۲۴ ترابایت" }, { tb: 20, label: "۲۰ ترابایت" }, { tb: 18, label: "۱۸ ترابایت" },
-  { tb: 16, label: "۱۶ ترابایت" }, { tb: 14, label: "۱۴ ترابایت" }, { tb: 12, label: "۱۲ ترابایت" },
-  { tb: 10, label: "۱۰ ترابایت" }, { tb: 8, label: "۸ ترابایت" }, { tb: 6, label: "۶ ترابایت" },
-  { tb: 4, label: "۴ ترابایت" }, { tb: 3, label: "۳ ترابایت" }, { tb: 2, label: "۲ ترابایت" },
-  { tb: 1, label: "۱ ترابایت" },
+  { tb: 1, label: "۱ ترابایت" }, { tb: 2, label: "۲ ترابایت" }, { tb: 3, label: "۳ ترابایت" },
+  { tb: 4, label: "۴ ترابایت" }, { tb: 6, label: "۶ ترابایت" }, { tb: 8, label: "۸ ترابایت" },
+  { tb: 10, label: "۱۰ ترابایت" }, { tb: 12, label: "۱۲ ترابایت" }, { tb: 14, label: "۱۴ ترابایت" },
+  { tb: 16, label: "۱۶ ترابایت" }, { tb: 18, label: "۱۸ ترابایت" }, { tb: 20, label: "۲۰ ترابایت" },
+  { tb: 24, label: "۲۴ ترابایت" },
 ];
 const SSD_SIZES = [
-  { tb: 7.68, label: "۷.۶۸ ترابایت" }, { tb: 7, label: "۷ ترابایت" },
-  { tb: 3.84, label: "۳.۸۴ ترابایت" }, { tb: 1.92, label: "۱.۹۲ ترابایت" },
-  { tb: 0.96, label: "۹۶۰ گیگابایت" }, { tb: 0.48, label: "۴۸۰ گیگابایت" },
+  { tb: 0.48, label: "۴۸۰ گیگابایت" }, { tb: 0.96, label: "۹۶۰ گیگابایت" },
+  { tb: 1.92, label: "۱.۹۲ ترابایت" }, { tb: 3.84, label: "۳.۸۴ ترابایت" },
+  { tb: 7, label: "۷ ترابایت" }, { tb: 7.68, label: "۷.۶۸ ترابایت" },
 ];
 
 function uid() { return `d-${Math.random().toString(36).slice(2, 10)}`; }
@@ -298,13 +298,19 @@ export default function RaidCalculator() {
           </div>
 
           <div className="p-5 sm:p-6 space-y-6">
-            <div className="flex gap-1 border-b border-border">
+            <div className="flex gap-3">
               {(["HDD", "SSD"] as const).map((t) => (
                 <button key={t} onClick={() => {
                   if (t !== driveType && drives.length > 0) { setPendingType(t); setConfirmOpen(true); return; }
                   setDriveType(t);
-                }} className={cn("relative px-5 py-2.5 text-[13px] font-bold border-b-2 -mb-px transition-all duration-200", driveType === t ? "border-primary text-primary bg-primary/5" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent-foreground/20")}>
-                  {t === "HDD" ? "هارد دیسک (HDD)" : "اس اس دی (SSD)"}
+                }} className={cn(
+                  "flex-1 aspect-square max-h-[80px] rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all duration-200",
+                  driveType === t
+                    ? "border-primary bg-primary/10 text-primary shadow-sm"
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                )}>
+                  <span className="text-2xl font-black">{t}</span>
+                  <span className="text-[10px] font-medium">{t === "HDD" ? "دیسک مکانیکی" : "حافظه حالت جامد"}</span>
                 </button>
               ))}
             </div>
@@ -328,7 +334,7 @@ export default function RaidCalculator() {
 
             <div className="relative rounded-lg border border-border bg-muted dark:bg-muted/40 p-3 sm:p-4 min-h-[130px] shadow-inner">
               <div className="flex flex-wrap gap-2.5 sm:gap-3">
-                {drives.map((d) => (
+                {[...drives].sort((a, b) => a.sizeTb - b.sizeTb).map((d) => (
                   <div key={d.id} className={cn("group relative flex h-[92px] w-[84px] flex-col items-center justify-center gap-1 rounded-md border shadow-sm transition-all duration-300 ease-out animate-in fade-in zoom-in-95", d.type === "SSD" ? "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20" : "bg-card border-border text-card-foreground hover:bg-accent hover:text-accent-foreground")}>
                     <HardDrive className={cn("size-6", d.type === "SSD" ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground")} />
                     <span className="text-[11px] font-bold">{d.label}</span>
