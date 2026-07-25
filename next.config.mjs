@@ -8,6 +8,7 @@ const nextConfig = {
       { protocol: "https", hostname: "cdn.zarinpal.com" },
       { protocol: "https", hostname: "gasy0aqpxehqiy8d.public.blob.vercel-storage.com" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+      { protocol: "https", hostname: "nggwgcfkceuadvhxnczf.supabase.co" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "github.com" },
       { protocol: "https", hostname: "*.githubusercontent.com" },
