@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getSessionUserPublic } from '@/lib/auth-server';
+import { requirePermission } from '@/lib/api-permissions';
 import { z } from 'zod';
 
 const updateSchema = z.object({
@@ -15,10 +15,6 @@ const updateSchema = z.object({
   tags: z.array(z.string()).max(10).optional(),
   published: z.boolean().optional(),
 });
-
-function isEditorOrAdmin(user: { role: string } | null): boolean {
-  return user?.role === 'super_admin' || user?.role === 'editor';
-}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -39,13 +35,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: 'ویرایش رویداد تایم‌لاین نیاز به دسترسی مدیر یا ویراستار دارد.' },
-      { status: 401 }
-    );
-  }
+  const user = await requirePermission("content:timeline:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const { id } = await params;
@@ -72,13 +63,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json(
-      { error: 'unauthorized', message: 'حذف رویداد تایم‌لاین نیاز به دسترسی مدیر یا ویراستار دارد.' },
-      { status: 401 }
-    );
-  }
+  const user = await requirePermission("content:timeline:delete");
+  if (user instanceof NextResponse) return user;
 
   try {
     const { id } = await params;

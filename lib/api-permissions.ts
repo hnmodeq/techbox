@@ -1,77 +1,82 @@
 import { NextResponse } from "next/server";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { hasPermission } from "@/lib/permissions";
+import { getEffectivePermissions } from "@/lib/user-permissions";
 import { prisma } from "@/lib/db";
-import { hasPermission, getUserPermissions } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit-log";
 
-/**
- * Check if the current user has a specific permission.
- * Returns the user if authorized, or a NextResponse error if not.
- *
- * Usage in API routes:
- *   const user = await requirePermission("product:price:edit");
- *   if (user instanceof NextResponse) return user; // unauthorized
- *   // ... continue with authorized logic
- */
-export async function requirePermission(permission: string) {
+export type AuthorizedUser = NonNullable<Awaited<ReturnType<typeof getSessionUserPublic>>> & {
+  permissions: string[];
+};
+
+async function authorize(required: string[], mode: "any" | "all"): Promise<AuthorizedUser | NextResponse> {
   const user = await getSessionUserPublic();
-  if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  // Super_admin bypasses all permission checks
-  if (user.role === "super_admin") return user;
+  const permissions = await getEffectivePermissions(user);
+  const allowed = user.role === "super_admin" ||
+    (mode === "all"
+      ? required.every((permission) => hasPermission(permissions, permission))
+      : required.some((permission) => hasPermission(permissions, permission)));
 
-  // Get user's permissions from their roles
-  const userRoles = await prisma.userRole.findMany({
-    where: { userId: user.id },
-    include: { role: { select: { permissions: true } } },
-  });
-
-  const permissions = getUserPermissions(
-    userRoles.map((ur: any) => ({ permissions: ur.role.permissions as string[] }))
-  );
-
-  if (!hasPermission(permissions, permission)) {
-    // Log unauthorized attempt
+  if (!allowed) {
     await logAudit({
       userId: user.id,
       userName: user.name,
       action: "unauthorized_access",
-      target: permission,
-      details: { attempted: permission, userPermissions: permissions.slice(0, 20) },
+      target: required.join("|"),
+      details: { mode, required },
     }).catch(() => {});
-
-    return NextResponse.json({ error: "forbidden", permission }, { status: 403 });
+    return NextResponse.json({ error: "forbidden", required }, { status: 403 });
   }
 
-  return user;
+  return Object.assign(user, { permissions });
 }
 
-/**
- * Get user's effective permissions from their roles.
- * Returns empty array if user not found.
- */
+export function requirePermission(permission: string) {
+  return authorize([permission], "all");
+}
+
+export function requireAnyPermission(permissions: string[]) {
+  return authorize(permissions, "any");
+}
+
+export function requireAllPermissions(permissions: string[]) {
+  return authorize(permissions, "all");
+}
+
+export async function requireStaff() {
+  const user = await getSessionUserPublic();
+  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  const permissions = await getEffectivePermissions(user);
+  if (user.role !== "super_admin" && permissions.length === 0) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+  return Object.assign(user, { permissions }) as AuthorizedUser;
+}
+
+export function modulePermissions(module: string, access: "view" | "create" | "edit" | "delete" | "publish") {
+  if (module === "shop") {
+    const map = {
+      view: ["product:list:view", "product:basic:view"],
+      create: ["product:create"],
+      edit: ["product:basic:edit", "product:content:edit", "product:status:edit"],
+      delete: ["product:delete"],
+      publish: ["product:status:edit"],
+    } as const;
+    return [...map[access]];
+  }
+  return [`content:${module}:${access}`];
+}
+
+export function requireModulePermission(
+  module: string,
+  access: "view" | "create" | "edit" | "delete" | "publish"
+) {
+  return requireAnyPermission(modulePermissions(module, access));
+}
+
 export async function getUserEffectivePermissions(userId: string): Promise<string[]> {
-  const userRoles = await prisma.userRole.findMany({
-    where: { userId },
-    include: { role: { select: { permissions: true } } },
-  });
-
-  return getUserPermissions(
-    userRoles.map((ur: any) => ({ permissions: ur.role.permissions as string[] }))
-  );
-}
-
-/**
- * Check if user has a specific permission (client-side helper).
- * This is a lightweight check that doesn't make API calls.
- * For server-side checks, use requirePermission.
- */
-export function checkPermissionFromRoles(
-  userRoles: Array<{ permissions: string[] }>,
-  permission: string
-): boolean {
-  const permissions = getUserPermissions(userRoles);
-  return hasPermission(permissions, permission);
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true } });
+  return user ? getEffectivePermissions(user) : [];
 }

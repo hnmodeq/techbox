@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { del } from "@vercel/blob";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic, canEditModule } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { getSetting } from "@/lib/settings";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
@@ -40,10 +40,8 @@ async function cleanupExpiredApplications() {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || !canEditModule(user as any, "workwithus")) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+  const user = await requirePermission("job:applications");
+  if (user instanceof NextResponse) return user;
 
   const { searchParams } = new URL(req.url);
   const jobId = searchParams.get("jobId");

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { PRIVATE_NO_STORE, cacheHeaders } from "@/lib/cache-headers";
 
 export async function GET() {
@@ -12,8 +12,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const user = await requirePermission("about:edit");
+  if (user instanceof NextResponse) return user;
 
   const { title, order } = await req.json();
   const section = await prisma.teamSection.create({ data: { title: title || "بخش جدید", order: order ?? 0 } });
@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const user = await requirePermission("about:edit");
+  if (user instanceof NextResponse) return user;
 
   const { id, title, order, enabled } = await req.json();
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
@@ -37,8 +37,8 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const user = await requirePermission("about:edit");
+  if (user instanceof NextResponse) return user;
 
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });

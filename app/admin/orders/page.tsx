@@ -46,7 +46,7 @@ const STATUS_TRANSITIONS: Record<string, string[]> = {
 
 export default function AdminOrdersPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <OrdersContent />}
     </AdminGuard>
   );

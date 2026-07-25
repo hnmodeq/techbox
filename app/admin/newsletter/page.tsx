@@ -37,7 +37,7 @@ type Campaign = {
 
 export default function AdminNewsletterPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <NewsletterContent />}
     </AdminGuard>
   );

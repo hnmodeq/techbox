@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 
-async function requireAdmin() {
-  const user = await getSessionUserPublic();
-  return user && ["super_admin", "admin"].includes(user.role) ? user : null;
-}
-
 export async function GET(req: NextRequest) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const admin = await requirePermission("verification:view");
+  if (admin instanceof NextResponse) return admin;
 
   const { searchParams } = new URL(req.url);
   const status = searchParams.get("status") || "pending";
@@ -39,8 +34,8 @@ const reviewSchema = z.object({
 });
 
 export async function PATCH(req: NextRequest) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const admin = await requirePermission("verification:review");
+  if (admin instanceof NextResponse) return admin;
 
   const body = await req.json().catch(() => null);
   const parsed = reviewSchema.safeParse(body);

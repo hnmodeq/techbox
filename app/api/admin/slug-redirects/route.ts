@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { z } from "zod";
 
 const schema = z.object({
@@ -11,19 +11,15 @@ const schema = z.object({
   reason: z.string().optional(),
 });
 
-async function requireSuperAdmin() {
-  const user = await getSessionUserPublic();
-  return Boolean(user && user.role === "super_admin");
-}
-
 export async function GET() {
-  if (!(await requireSuperAdmin())) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  const redirects = await prisma.slugRedirect.findMany({ orderBy: { createdAt: "desc" } });
-  return NextResponse.json(redirects);
+  const user = await requirePermission("redirect:view");
+  if (user instanceof NextResponse) return user;
+  return NextResponse.json(await prisma.slugRedirect.findMany({ orderBy: { createdAt: "desc" } }));
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await requireSuperAdmin())) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const user = await requirePermission("redirect:edit");
+  if (user instanceof NextResponse) return user;
   const body = schema.parse(await req.json());
   const redirect = await prisma.slugRedirect.upsert({
     where: { source_module_slug: { sourceModule: body.sourceModule, sourceSlug: body.sourceSlug } },
@@ -34,9 +30,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  if (!(await requireSuperAdmin())) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
+  const user = await requirePermission("redirect:edit");
+  if (user instanceof NextResponse) return user;
+  const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
   await prisma.slugRedirect.delete({ where: { id } });
   return NextResponse.json({ ok: true });

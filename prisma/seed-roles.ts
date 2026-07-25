@@ -23,6 +23,7 @@ const DEFAULT_ROLES = [
       "content:forum:view", "content:forum:create", "content:forum:edit",
       "content:download:view", "content:download:create", "content:download:edit",
       "content:review:view", "content:review:create", "content:review:edit",
+      "blob:upload",
     ],
     isSystem: false,
     color: "#3b82f6",
@@ -44,6 +45,7 @@ const DEFAULT_ROLES = [
       "product:gallery:view", "product:gallery:edit",
       "product:status:view", "product:status:edit",
       "product:series:view", "product:series:edit",
+      "blob:upload",
     ],
     isSystem: false,
     color: "#22c55e",
@@ -150,13 +152,18 @@ async function main() {
   console.log("Seeding roles...");
 
   for (const roleData of DEFAULT_ROLES) {
-    const existing = await prisma.role.findUnique({ where: { name: roleData.name } });
-    if (existing) {
-      console.log(`  ✓ Role "${roleData.name}" already exists, skipping`);
-    } else {
-      await prisma.role.create({ data: roleData });
-      console.log(`  ✚ Created role "${roleData.name}" (${roleData.nameFa})`);
-    }
+    const role = await prisma.role.upsert({
+      where: { name: roleData.name },
+      update: {
+        nameFa: roleData.nameFa,
+        description: roleData.description,
+        permissions: roleData.permissions,
+        isSystem: roleData.isSystem,
+        color: roleData.color,
+      },
+      create: roleData,
+    });
+    console.log(`  ✓ Synced role "${role.name}" (${role.nameFa})`);
   }
 
   console.log("Done!");

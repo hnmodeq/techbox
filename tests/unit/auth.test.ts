@@ -1,21 +1,46 @@
-import { describe, it, expect } from "vitest";
-import { canEdit } from "@/lib/auth";
-import type { AppUser } from "@/lib/auth";
+import { describe, expect, it } from "vitest";
+import { canEdit, canView, type AppUser } from "@/lib/auth";
 
-const sara = { id: "1", role: "editor", modules: ["blog"], name: "Sara", username: "sara", email: "sara@test.com", avatar: null } as unknown as AppUser;
-const admin = { id: "2", role: "super_admin", modules: [], name: "Admin", username: "admin", email: "admin@test.com", avatar: null } as unknown as AppUser;
+const sara = {
+  id: "1",
+  role: "editor",
+  modules: [],
+  permissions: ["content:blog:view", "content:blog:edit"],
+  name: "Sara",
+  username: "sara",
+  email: "sara@test.com",
+  avatar: "",
+} satisfies AppUser;
 
-describe("rbac", () => {
-  it("sara can edit blog", () => {
+const admin = {
+  id: "2",
+  role: "super_admin",
+  modules: [],
+  permissions: ["*"],
+  name: "Admin",
+  username: "admin",
+  email: "admin@test.com",
+  avatar: "",
+} satisfies AppUser;
+
+describe("permission-backed client authorization", () => {
+  it("allows a module granted by effective permissions", () => {
+    expect(canView(sara, "blog")).toBe(true);
     expect(canEdit(sara, "blog")).toBe(true);
   });
-  it("sara cannot edit news", () => {
+
+  it("denies a module without a matching permission", () => {
     expect(canEdit(sara, "news")).toBe(false);
   });
-  it("admin can edit all", () => {
-    expect(canEdit(admin, "shop")).toBe(true);
+
+  it("does not treat the legacy modules array as authority", () => {
+    const legacyOnly = { ...sara, permissions: [], modules: ["news"] };
+    expect(canView(legacyOnly, "news")).toBe(false);
+    expect(canEdit(legacyOnly, "news")).toBe(false);
   });
-  it("null user cannot edit", () => {
+
+  it("allows super administrators and denies anonymous users", () => {
+    expect(canEdit(admin, "shop")).toBe(true);
     expect(canEdit(null, "blog")).toBe(false);
   });
 });

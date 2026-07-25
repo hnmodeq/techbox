@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { PRIVATE_NO_STORE, cacheHeaders } from "@/lib/cache-headers";
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const user = await requirePermission("user:list:view");
+  if (user instanceof NextResponse) return user;
 
   const q = new URL(req.url).searchParams.get("q") || "";
   const verified = new URL(req.url).searchParams.get("verified") === "1";

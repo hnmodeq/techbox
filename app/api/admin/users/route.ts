@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic, hashPassword } from "@/lib/auth-server";
+import { hashPassword } from "@/lib/auth-server";
+import { requireAllPermissions, requirePermission } from "@/lib/api-permissions";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 
@@ -8,22 +9,14 @@ const updateSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1).max(100).optional(),
   email: z.string().email().optional(),
-  role: z.enum(["super_admin", "editor", "user"]).optional(),
-  roleFa: z.string().max(80).nullable().optional(),
   status: z.enum(["active", "suspended", "banned"]).optional(),
   job: z.string().max(120).nullable().optional(),
   birthday: z.string().max(40).nullable().optional(),
-  modules: z.array(z.string()).optional(),
   avatar: z.string().max(500).nullable().optional(),
   password: z.string().min(6).max(100).optional(),
   verifiedType: z.enum(["content", "org", "user"]).nullable().optional(),
   verifiedLabel: z.string().max(300).nullable().optional(),
 });
-
-async function requireSuperAdmin() {
-  const user = await getSessionUserPublic();
-  return user && user.role === "super_admin" ? user : null;
-}
 
 function safeModules(value: unknown): string[] {
   if (Array.isArray(value)) return value.filter((m): m is string => typeof m === "string");
@@ -58,8 +51,8 @@ function publicUser(user: any) {
 }
 
 export async function GET(req: NextRequest) {
-  const current = await requireSuperAdmin();
-  if (!current) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const current = await requirePermission("user:list:view");
+  if (current instanceof NextResponse) return current;
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
@@ -87,20 +80,21 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const current = await requireSuperAdmin();
-  if (!current) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-
   const body = updateSchema.parse(await req.json());
-  if (body.id === current.id && (body.status === "banned" || body.status === "suspended" || (body.role && body.role !== "super_admin"))) {
+  const required = ["user:profile:edit"];
+  if (body.status) required.push("user:ban");
+  if (body.password) required.push("user:password:reset");
+  if (body.verifiedType !== undefined || body.verifiedLabel !== undefined) required.push("verification:review");
+  const current = await requireAllPermissions(required);
+  if (current instanceof NextResponse) return current;
+  if (body.id === current.id && (body.status === "banned" || body.status === "suspended")) {
     return NextResponse.json({ error: "cannot_lock_self" }, { status: 400 });
   }
 
   const data: any = {};
-  for (const key of ["name", "email", "role", "roleFa", "status", "job", "birthday", "avatar", "verifiedType", "verifiedLabel"] as const) {
+  for (const key of ["name", "email", "status", "job", "birthday", "avatar", "verifiedType", "verifiedLabel"] as const) {
     if (key in body) data[key] = body[key] ?? null;
   }
-  if (body.role) data.roleFa = body.roleFa ?? (body.role === "super_admin" ? "مدیر کل" : body.role === "editor" ? "ویراستار" : "کاربر عضو");
-  if (body.modules) data.modules = body.modules;
   if (body.password) data.password = await hashPassword(body.password);
 
   const updated = await prisma.user.update({

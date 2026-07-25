@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { deriveModulesFromPermissions, getEffectivePermissions } from "@/lib/user-permissions";
 
 export async function GET(){
   // Check AUTH_SECRET before attempting auth operations
@@ -10,7 +11,8 @@ export async function GET(){
 
   const user = await getSessionUserPublic();
   if(!user) return NextResponse.json({ user: null });
-  const modules = Array.isArray(user.modules) ? user.modules : [];
+  const permissions = await getEffectivePermissions(user);
+  const modules = deriveModulesFromPermissions(user.role, permissions);
   return NextResponse.json({ user: {
     id: user.id,
     name: user.name,
@@ -23,6 +25,7 @@ export async function GET(){
     bio: user.bio || "",
     birthday: user.birthday || "",
     modules,
+    permissions,
     avatar: user.avatar ?? "",
     emailVerified: user.emailVerified ? true : false,
     verifiedType: (user as any).verifiedType || null,

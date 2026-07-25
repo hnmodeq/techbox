@@ -37,10 +37,7 @@ export default function VerifyEmailPage() {
         if (!active) return;
 
         if (res.ok && data.ok) {
-          if (data.user) {
-            login(data.user);
-            window.dispatchEvent(new CustomEvent("tb_auth_changed", { detail: data.user }));
-          }
+          if (data.user) await login();
           setStatus("success");
           setMessage(
             data.alreadyVerified

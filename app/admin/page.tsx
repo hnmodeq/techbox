@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { getCurrentUserClient, canEdit, type AppUser } from "@/lib/auth";
+import { canEdit } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,15 +53,11 @@ function formatNumber(value: number) {
 }
 
 export default function AdminPage() {
-  const [user, setUser] = useState<AppUser | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentPosts, setRecentPosts] = useState<RecentPost[]>([]);
   const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setUser(getCurrentUserClient());
-  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -165,6 +162,10 @@ export default function AdminPage() {
     if (!user) return [];
     return (Object.keys(moduleMeta) as ModuleSlug[]).filter((m) => canEdit(user, m));
   }, [user]);
+
+  if (authLoading) {
+    return <main className="p-6"><Skeleton className="h-32 w-full" /></main>;
+  }
 
   if (!user) {
     return (

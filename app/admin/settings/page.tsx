@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import { PermissionGate } from "@/components/admin/permission-gate";
+import { usePermissions } from "@/hooks/use-permissions";
 import PageHeader from "@/components/effects/PageHeader";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,15 +51,25 @@ const DEFAULTS: Settings = {
   "currency.global_adjustment_percent": "0",
 };
 
+function editPermissionForSetting(key: keyof Settings) {
+  if (key.startsWith("comments.")) return "settings:comments:edit";
+  if (key.startsWith("jobs.")) return "settings:resume:edit";
+  if (key.startsWith("email.")) return "settings:email:edit";
+  if (key.startsWith("auth.")) return "settings:auth:edit";
+  if (key.startsWith("currency.")) return "settings:price:edit";
+  return "settings:*:edit";
+}
+
 export default function AdminSettingsPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <SettingsContent />}
     </AdminGuard>
   );
 }
 
 function SettingsContent() {
+  const { has } = usePermissions();
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -87,10 +98,14 @@ function SettingsContent() {
     setSaving(true);
     setMessage("");
     try {
+      const updates = Object.fromEntries(
+        Object.entries(settings).filter(([key]) => has(editPermissionForSetting(key as keyof Settings)))
+      );
+      if (Object.keys(updates).length === 0) throw new Error("دسترسی ویرایش تنظیمات ندارید");
       const res = await fetch("/api/admin/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(updates),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "settings_save_failed");

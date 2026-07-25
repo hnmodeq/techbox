@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { getCurrentUserClient, type AppUser } from "@/lib/auth";
+import type { AppUser } from "@/lib/auth";
+import { useAuth } from "@/providers/auth.provider";
 import { SpinnerCenter } from "@/components/ui/spinner";
 
-/**
- * Shared auth guard for all admin pages.
- * Handles loading state, redirect to login, and role-based access.
- */
+/** Client UX guard backed by the server-validated AuthProvider session.
+ * API routes remain the security boundary for every privileged operation. */
 export function AdminGuard({
   children,
   superAdminOnly = false,
@@ -18,29 +17,23 @@ export function AdminGuard({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<AppUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const currentUser = getCurrentUserClient();
-    if (!currentUser) {
-      router.push(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
+    if (loading) return;
+    if (!user) {
+      router.replace(`/admin/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
-    if (superAdminOnly && currentUser.role !== "super_admin") {
-      router.push("/admin");
-      return;
-    }
-    setUser(currentUser);
-    setLoading(false);
-  }, [router, pathname, superAdminOnly]);
+    if (superAdminOnly && user.role !== "super_admin") router.replace("/admin");
+  }, [loading, pathname, router, superAdminOnly, user]);
 
-  if (loading || !user) {
+  if (loading || !user || (superAdminOnly && user.role !== "super_admin")) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex min-h-[60vh] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <SpinnerCenter />
-          <p className="text-xs text-muted-foreground animate-pulse">در حال بررسی دسترسی...</p>
+          <p className="animate-pulse text-xs text-muted-foreground">در حال بررسی دسترسی...</p>
         </div>
       </div>
     );

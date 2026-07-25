@@ -49,7 +49,7 @@ function actionVariant(action: string) {
 
 export default function AdminAuditLogPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <AuditLogContent />}
     </AdminGuard>
   );

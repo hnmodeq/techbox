@@ -10,6 +10,10 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Non-production signing key used only by ephemeral CI runners.
+  AUTH_SECRET: ci-only-auth-secret-48-characters-minimum-change-me
+
 jobs:
   lint:
     name: Lint

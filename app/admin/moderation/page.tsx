@@ -63,7 +63,7 @@ function statusVariant(status: string) {
 
 export default function ModerationPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <ModerationContent />}
     </AdminGuard>
   );

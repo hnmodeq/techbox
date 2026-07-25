@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requireAllPermissions, requireStaff } from "@/lib/api-permissions";
+import { hasPermission } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
@@ -49,35 +50,56 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
 
 const updateSchema = z.record(z.string(), z.string());
 
+function settingPermission(key: string, access: "view" | "edit") {
+  if (key.startsWith("comments.")) return `settings:comments:${access}`;
+  if (key.startsWith("jobs.resume_")) return `settings:resume:${access}`;
+  if (key.startsWith("email.") || key.startsWith("newsletter.email.")) return `settings:email:${access}`;
+  if (key.startsWith("auth.")) return `settings:auth:${access}`;
+  if (key.startsWith("currency.")) return `settings:price:${access}`;
+  if (key === "shop.banners") return `banner:${access}`;
+  if (key.startsWith("terms.")) return `terms:${access}`;
+  if (key.startsWith("modules.")) return `module:${access}`;
+  if (key.startsWith("hero.")) return `hero:${access}`;
+  return `settings:*:${access}`;
+}
+
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requireStaff();
+  if (user instanceof NextResponse) return user;
 
   try {
     await ensureSiteSettingsTable();
     const settings = await prisma.siteSetting.findMany();
     const map: Record<string, string> = { ...SETTINGS_DEFAULTS };
-    for (const s of settings) {
-      map[s.key] = s.value;
+    for (const s of settings) map[s.key] = s.value;
+    if (user.role !== "super_admin") {
+      for (const key of Object.keys(map)) {
+        if (!hasPermission(user.permissions, settingPermission(key, "view"))) delete map[key];
+      }
     }
     return NextResponse.json(map);
   } catch {
-    return NextResponse.json(SETTINGS_DEFAULTS);
+    const fallback: Record<string, string> = { ...SETTINGS_DEFAULTS };
+    if (user.role !== "super_admin") {
+      for (const key of Object.keys(fallback)) {
+        if (!hasPermission(user.permissions, settingPermission(key, "view"))) delete fallback[key];
+      }
+    }
+    return NextResponse.json(fallback);
   }
 }
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-
   try {
-    await ensureSiteSettingsTable();
     const body = await req.json();
     const updates = updateSchema.parse(body);
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "no_settings_to_update" }, { status: 400 });
+    }
+    const required = [...new Set(Object.keys(updates).map((key) => settingPermission(key, "edit")))];
+    const user = await requireAllPermissions(required);
+    if (user instanceof NextResponse) return user;
+    await ensureSiteSettingsTable();
 
     // Validate known keys
     const validKeys = Object.keys(SETTINGS_DEFAULTS);

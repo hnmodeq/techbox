@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { getHolidays, saveHolidays, isHolidaysEnabled, setHolidaysEnabled } from "@/lib/holidays";
 import { z } from "zod";
 
@@ -22,10 +22,8 @@ const holidaySchema = z.object({
 });
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("holiday:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();

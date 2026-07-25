@@ -6,20 +6,12 @@ const COOKIE = "tb_session";
 // Routes that should be accessible without authentication
 const PUBLIC_ADMIN_ROUTES = ["/admin/login"];
 
-function isDeployedEnv() {
-  return process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL_ENV);
-}
-
 function getSecret(): Uint8Array {
   const envSecret = process.env.AUTH_SECRET;
-
-  if (isDeployedEnv() && (!envSecret || envSecret.length < 32)) {
-    throw new Error(
-      "[proxy] AUTH_SECRET must be set and at least 32 characters in production/preview."
-    );
+  if (!envSecret || envSecret.length < 32) {
+    throw new Error("[proxy] AUTH_SECRET must be set and at least 32 characters.");
   }
-
-  return new TextEncoder().encode(envSecret || "dev-secret-please-change-32char!");
+  return new TextEncoder().encode(envSecret);
 }
 
 export async function proxy(req: NextRequest) {

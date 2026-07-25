@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { sendEmail } from "@/lib/email";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
@@ -26,10 +26,8 @@ const schema = z.object({
 });
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+  const user = await requirePermission("newsletter:send");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = schema.parse(await req.json());

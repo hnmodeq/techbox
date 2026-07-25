@@ -207,7 +207,7 @@ function TreeView({
 
 export default function AdminBlobPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <BlobContent />}
     </AdminGuard>
   );

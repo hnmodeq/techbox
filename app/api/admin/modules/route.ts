@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import {
   getModuleConfig,
   saveModuleConfig,
@@ -10,10 +10,8 @@ import {
 import { z } from "zod";
 
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("module:view");
+  if (user instanceof NextResponse) return user;
 
   try {
     const config = await getModuleConfig();
@@ -32,10 +30,8 @@ const TOP_LEVEL_KEYS = new Set([
 ]);
 
 export async function PATCH(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("module:edit");
+  if (user instanceof NextResponse) return user;
 
   try {
     const body = await req.json();

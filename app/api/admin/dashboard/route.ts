@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requireStaff } from "@/lib/api-permissions";
+import { deriveModulesFromPermissions } from "@/lib/user-permissions";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 const CONTENT_MODULES = [
@@ -19,29 +20,12 @@ type ContentModule = typeof CONTENT_MODULES[number];
 type DashboardPostGroup = { module: string; count: number; views: number };
 type LatestPost = { module: ContentModule; post: { date: Date; dateFa: string } | null };
 
-function parseModules(raw: unknown): string[] {
-  if (Array.isArray(raw)) return raw.filter((item): item is string => typeof item === "string");
-  if (typeof raw !== "string") return [];
-  try {
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed.filter((item): item is string => typeof item === "string");
-  } catch {}
-  return raw.split(",").map((item) => item.trim()).filter(Boolean);
-}
-
-function getAllowedModules(user: { role: string; modules?: string | string[] | null }): ContentModule[] {
-  if (user.role === "super_admin") return [...CONTENT_MODULES];
-  const allowed = new Set(parseModules(user.modules));
-  return CONTENT_MODULES.filter((module) => allowed.has(module));
-}
-
 export async function GET() {
-  const user = await getSessionUserPublic();
-  if (!user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  }
+  const user = await requireStaff();
+  if (user instanceof NextResponse) return user;
 
-  const allowedModules = getAllowedModules(user as any);
+  const allowed = new Set(deriveModulesFromPermissions(user.role, user.permissions));
+  const allowedModules = CONTENT_MODULES.filter((module) => allowed.has(module));
   if (allowedModules.length === 0) {
     return NextResponse.json({ modules: [], totals: { count: 0, views: 0 } }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   }

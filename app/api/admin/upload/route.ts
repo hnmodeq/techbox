@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { captureUploadError } from "@/lib/sentry";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -77,10 +77,8 @@ function defaultFolder(kind: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getSessionUserPublic();
-  if (!user || !["super_admin", "editor"].includes(user.role)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("blob:upload");
+  if (user instanceof NextResponse) return user;
 
   const ip = getClientIp(req);
   const rateLimit = await checkRateLimit(`${user.id}:${ip}`, "upload");

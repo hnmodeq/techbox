@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useAuth } from "@/providers/auth.provider";
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +36,14 @@ function isActivePath(pathname: string, href: string) {
 function getPermissionForHref(href: string): string | null {
   const item = SIDEBAR_PERMISSIONS.find((sp) => sp.href === href);
   return item?.permission ?? null;
+}
+
+function canAccessHref(href: string, permissions: string[]) {
+  if (href === "/admin/posts") {
+    return hasPermission(permissions, "content:*:view") || hasPermission(permissions, "product:list:view");
+  }
+  const permission = getPermissionForHref(href);
+  return permission === null || hasPermission(permissions, permission);
 }
 
 function NavItemLink({
@@ -97,20 +105,9 @@ function NavItemLink({
 
 export function AdminSidebar({ user }: { user: AppUser | null }) {
   const pathname = usePathname();
+  const { logout } = useAuth();
   const isSuperAdmin = user?.role === "super_admin";
-  const [userPermissions, setUserPermissions] = useState<string[]>([]);
-
-  // Load user permissions from roles
-  useEffect(() => {
-    if (!user || isSuperAdmin) return;
-
-    fetch(`/api/admin/user-roles?userId=${user.id}`, { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.permissions) setUserPermissions(data.permissions);
-      })
-      .catch(() => {});
-  }, [user, isSuperAdmin]);
+  const userPermissions = user?.permissions || [];
 
   return (
     <Sidebar side="right" collapsible="icon" className="border-l">
@@ -136,9 +133,7 @@ export function AdminSidebar({ user }: { user: AppUser | null }) {
             // Check superAdminOnly flag
             if (item.superAdminOnly) return false;
             // Check permission-based visibility
-            const permission = getPermissionForHref(item.href);
-            if (!permission) return true; // No permission required = always visible
-            return hasPermission(userPermissions, permission);
+            return canAccessHref(item.href, userPermissions);
           });
 
           if (visibleItems.length === 0) return null;
@@ -149,8 +144,7 @@ export function AdminSidebar({ user }: { user: AppUser | null }) {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {visibleItems.map((item) => {
-                    const permission = getPermissionForHref(item.href);
-                    const locked = !isSuperAdmin && permission !== null && !hasPermission(userPermissions, permission);
+                    const locked = !isSuperAdmin && !canAccessHref(item.href, userPermissions);
 
                     return (
                       <NavItemLink
@@ -190,8 +184,7 @@ export function AdminSidebar({ user }: { user: AppUser | null }) {
             size="sm"
             className="w-full justify-start group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-8"
             onClick={async () => {
-              await fetch("/api/auth/logout", { method: "POST" });
-              localStorage.removeItem("tb_auth_user");
+              await logout();
               window.location.href = "/admin/login";
             }}
           >

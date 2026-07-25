@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { requirePermission } from "@/lib/api-permissions";
 import { z } from "zod";
-
-function isEditorOrAdmin(user: { role: string } | null): boolean {
-  return user?.role === "super_admin" || user?.role === "editor";
-}
 
 const updateSchema = z.object({
   question: z.string().min(3).max(500).optional(),
@@ -17,10 +13,8 @@ const updateSchema = z.object({
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("faq:edit");
+  if (user instanceof NextResponse) return user;
   try {
     const body = await req.json();
     const data = updateSchema.parse(body);
@@ -40,10 +34,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await getSessionUserPublic();
-  if (!isEditorOrAdmin(user)) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const user = await requirePermission("faq:edit");
+  if (user instanceof NextResponse) return user;
   try {
     await prisma.faq.delete({ where: { id } });
     revalidatePath("/about");

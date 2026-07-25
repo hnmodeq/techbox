@@ -36,7 +36,7 @@ const SEED_HOLIDAYS: Holiday[] = [
 
 export default function AdminHolidaysPage() {
   return (
-    <AdminGuard superAdminOnly>
+    <AdminGuard>
       {() => <HolidaysContent />}
     </AdminGuard>
   );

@@ -1,92 +1,75 @@
 "use client";
 
 import * as React from "react";
-import {
-  getCurrentUserClient,
-  login as persistLogin,
-  logout as persistLogout,
-  canEdit as canEditModuleForUser,
-  type AppUser,
-} from "@/lib/auth";
+import { canEdit as canEditModuleForUser, type AppUser } from "@/lib/auth";
 
 type AuthContextValue = {
   user: AppUser | null;
   loading: boolean;
-  login: (user: AppUser) => void;
+  login: () => Promise<AppUser | null>;
   logout: () => Promise<void>;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<AppUser | null>;
   canEdit: (module: string) => boolean;
 };
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
+const AUTH_CHANNEL = "techbox-auth";
+
+function broadcastAuthChanged() {
+  if (typeof BroadcastChannel === "undefined") return;
+  const channel = new BroadcastChannel(AUTH_CHANNEL);
+  channel.postMessage("refresh");
+  channel.close();
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<AppUser | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  // Keep React state in sync with the client-side auth cache (localStorage +
-  // cross-tab `storage` events + in-app `tb_auth_changed` events).
-  React.useEffect(() => {
-    const sync = () => setUser(getCurrentUserClient());
-    sync();
-
-    const onCustomAuth = (e: Event) => {
-      const detail = (e as CustomEvent<AppUser | null>).detail;
-      setUser(detail ?? getCurrentUserClient());
-    };
-    const onStorage = () => setUser(getCurrentUserClient());
-
-    window.addEventListener("tb_auth_changed", onCustomAuth);
-    window.addEventListener("storage", onStorage);
-    return () => {
-      window.removeEventListener("tb_auth_changed", onCustomAuth);
-      window.removeEventListener("storage", onStorage);
-    };
-  }, []);
-
-  // Verify the session with the server — but only when a local user exists,
-  // so anonymous visitors don't pay for an extra request on every page load.
-  React.useEffect(() => {
-    let active = true;
-    const verify = async () => {
-      if (!getCurrentUserClient()) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const res = await fetch("/api/auth/me", { cache: "no-store" });
-        const data = await res.json();
-        if (active) setUser(data?.user ?? null);
-      } catch {
-        // Network error: keep the locally cached user.
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-    verify();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const login = React.useCallback((u: AppUser) => {
-    persistLogin(u);
-    setUser(u);
-  }, []);
-
-  const logout = React.useCallback(async () => {
+  const refresh = React.useCallback(async (): Promise<AppUser | null> => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+      const response = await fetch("/api/auth/me", {
+        cache: "no-store",
+        credentials: "include",
+      });
+      const data = await response.json().catch(() => ({}));
+      const nextUser = response.ok ? (data?.user ?? null) : null;
+      setUser(nextUser);
+      return nextUser;
+    } catch {
+      // Do not invent or restore a browser-cached identity on network failure.
+      // Existing in-memory state is retained for transient failures.
+      return null;
     } finally {
-      persistLogout();
-      setUser(null);
+      setLoading(false);
     }
   }, []);
 
-  const refresh = React.useCallback(async () => {
-    const res = await fetch("/api/auth/me", { cache: "no-store" });
-    const data = await res.json();
-    setUser(data?.user ?? null);
+  React.useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  React.useEffect(() => {
+    if (typeof BroadcastChannel === "undefined") return;
+    const channel = new BroadcastChannel(AUTH_CHANNEL);
+    channel.onmessage = () => void refresh();
+    return () => channel.close();
+  }, [refresh]);
+
+  const login = React.useCallback(async () => {
+    const nextUser = await refresh();
+    broadcastAuthChanged();
+    return nextUser;
+  }, [refresh]);
+
+  const logout = React.useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    } finally {
+      setUser(null);
+      setLoading(false);
+      broadcastAuthChanged();
+    }
   }, []);
 
   const canEdit = React.useCallback(
@@ -103,11 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const ctx = React.useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used within an <AuthProvider>");
-  }
-  return ctx;
+  const context = React.useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an <AuthProvider>");
+  return context;
 }
 
 export default AuthProvider;
