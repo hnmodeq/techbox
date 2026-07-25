@@ -2,7 +2,7 @@
 // The compiler skips this component, which is fine — it still works correctly.
 /* eslint-disable react-hooks/incompatible-library */
 "use client";
-import { useEffect, useMemo, useState, Suspense } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,6 +47,25 @@ function slugify(input: string) {
 
 function linesToArray(input: string) {
   return input.split("\n").map((x) => x.trim()).filter(Boolean);
+}
+
+const BLOG_PEOPLE_TAG = "people";
+const BLOG_PEOPLE_TAG_ALIASES = new Set([BLOG_PEOPLE_TAG, "people!", "person", "persons", "people-section", "شخصیت", "شخصیت‌ها", "شخصیت ها", "افراد"]);
+
+function normalizeTag(tag: string) {
+  return tag.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function splitTags(input: string) {
+  return input.split(",").map((tag) => tag.trim()).filter(Boolean);
+}
+
+function hasPeopleTag(tags: string[]) {
+  return tags.some((tag) => BLOG_PEOPLE_TAG_ALIASES.has(normalizeTag(tag)));
+}
+
+function formatTags(tags: string[]) {
+  return Array.from(new Set(tags.map((tag) => tag.trim()).filter(Boolean))).join(", ");
 }
 
 function formatBytes(bytes: number) {
@@ -221,7 +240,13 @@ function NewPostInner() {
   const categoryWatch = form.watch("category");
   const slugWatch = form.watch("slug");
 
-  const parsedTags = useMemo(() => (tagsWatch || "").split(",").map((t: any) => t.trim()).filter(Boolean), [tagsWatch]);
+  const parsedTags = useMemo(() => splitTags(tagsWatch || ""), [tagsWatch]);
+  const isPeopleFeature = moduleWatch === "blog" && hasPeopleTag(parsedTags);
+  const setPeopleFeature = useCallback((checked: boolean) => {
+    const tags = splitTags(form.getValues("tags") || "").filter((tag) => !BLOG_PEOPLE_TAG_ALIASES.has(normalizeTag(tag)));
+    if (checked) tags.unshift(BLOG_PEOPLE_TAG);
+    form.setValue("tags", formatTags(tags), { shouldDirty: true, shouldValidate: true });
+  }, [form]);
   const resolvedSlug = (slugWatch || "").trim() || slugify(titleWatch || "");
 
   useEffect(() => {
@@ -541,6 +566,20 @@ function NewPostInner() {
                 accept="image/*"
                 onUploaded={(r) => form.setValue("image", r.url)}
               />
+
+              {moduleWatch === "blog" && (
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <div className="flex flex-row items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold">نمایش در بخش People مجله</p>
+                      <p className="text-xs leading-6 text-muted-foreground">
+                        برای مقاله‌های درباره افراد و چهره‌های IT فعال کنید. این گزینه برچسب <code dir="ltr">people</code> را به همین مطلب اضافه می‌کند و صفحه /blog آن را در بخش People نشان می‌دهد.
+                      </p>
+                    </div>
+                    <Switch checked={isPeopleFeature} onCheckedChange={setPeopleFeature} />
+                  </div>
+                </div>
+              )}
 
               {/* Content Templates */}
               {!editSlug && (() => {
@@ -933,6 +972,7 @@ function NewPostInner() {
               <div>مسیر: <code dir="ltr">/{moduleWatch}/{resolvedSlug || "slug"}</code></div>
               <div>دسته: {categoryWatch || "—"}</div>
               <div>برچسب‌ها: {parsedTags.length.toLocaleString("fa-IR")}</div>
+              {moduleWatch === "blog" && <div>People: {isPeopleFeature ? "فعال" : "غیرفعال"}</div>}
               <div>خلاصه: {(excerptWatch || "").length.toLocaleString("fa-IR")} کاراکتر</div>
               <div>محتوا: {(contentWatch || "").length.toLocaleString("fa-IR")} کاراکتر</div>
             </div>
@@ -956,6 +996,7 @@ function NewPostInner() {
                 <Badge variant={statusWatch === "published" ? "default" : statusWatch === "review" ? "secondary" : statusWatch === "archived" ? "destructive" : "outline"}>
                   {statusWatch}
                 </Badge>
+                {isPeopleFeature && <Badge variant="outline">People</Badge>}
               </div>
               <h3 className="font-black line-clamp-2">{titleWatch || "عنوان مطلب"}</h3>
               <p className="text-xs text-muted-foreground line-clamp-3">{excerptWatch || "خلاصه مطلب اینجا دیده می‌شود."}</p>
