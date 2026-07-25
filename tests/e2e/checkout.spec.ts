@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Checkout Flow', () => {
-  test('checkout page makes it clear payments are disabled', async ({ page }) => {
-    await page.goto('/shop/checkout?pay=mock&amount=100000');
+  test('live checkout route renders the canonical cart flow', async ({ page }) => {
+    await page.goto('/shop/checkout');
 
     await expect(page.locator('main')).toBeVisible();
-    await expect(page.getByText('فروشگاه در حال حاضر فقط کاتالوگ است')).toBeVisible();
+    await expect(page.getByText('سبد خرید خالی است')).toBeVisible();
     await expect(page.getByText('بازگشت به فروشگاه')).toBeVisible();
+    await expect(page.getByText('فروشگاه در حال حاضر فقط کاتالوگ است')).toHaveCount(0);
   });
 });

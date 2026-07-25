@@ -8,7 +8,7 @@ import { ShareButton } from "@/components/ui/share-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useConsultation } from "@/providers/consultation.provider";
+import { useCart } from "@/providers/cart.provider";
 import { useCompare } from "@/providers/compare.provider";
 import { ProductJsonLd } from "@/components/seo/StructuredData";
 import { useCountdown } from "@/hooks/useCountdown";
@@ -62,12 +62,13 @@ function DiscountTimer({ endsAt }: { endsAt: string }) {
 
 export default function ProductDetail({ item }: { item: ProductItem }) {
   const gallery = Array.isArray(item.gallery) && item.gallery.length > 0 ? item.gallery : item.image ? [item.image] : [];
-  const { add } = useConsultation();
+  const { add } = useCart();
   const { add: addCompare, isInList, items: compareItems } = useCompare();
 
   const isUnavailable = item.availability === "ناموجود" || item.availability === "اتمام موجودی";
   const priceAmount = item.priceAmount && item.priceAmount > 0 ? item.priceAmount : parsePriceLabel(item.priceLabel);
-  const discount = item.discountPercent ?? 0;
+  const discountState = useCountdown(item.discountEndsAt);
+  const discount = discountState?.expired ? 0 : (item.discountPercent ?? 0);
   const discountedPrice = discount > 0 ? Math.round(priceAmount * (1 - discount / 100)) : priceAmount;
 
   const orig = formatPrice(priceAmount);
@@ -76,7 +77,12 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
   const inCompare = isInList(item.slug);
 
   const addToCart = () => {
-    add({ slug: item.slug, title: item.title, image: item.image || "", price: priceAmount || 0 });
+    add({
+      slug: item.slug,
+      title: item.title,
+      image: item.image || "",
+      displayPrice: discountedPrice,
+    });
   };
 
   const handleCompare = () => {
@@ -225,8 +231,8 @@ export default function ProductDetail({ item }: { item: ProductItem }) {
 
                   {/* CTA */}
                   <div className="space-y-2 pt-1">
-                    <Button type="button" onClick={addToCart} disabled={isUnavailable} className="w-full bg-[#ef4056] hover:bg-[#e03a4f] text-white h-11 text-[13px] font-bold rounded-lg">
-                      {isUnavailable ? "ناموجود" : "افزودن به سبد خرید"}
+                    <Button type="button" onClick={addToCart} disabled={isUnavailable || discountedPrice <= 0} className="w-full bg-[#ef4056] hover:bg-[#e03a4f] text-white h-11 text-[13px] font-bold rounded-lg">
+                      {isUnavailable ? "ناموجود" : discountedPrice <= 0 ? "قیمت برای خرید ثبت نشده" : "افزودن به سبد خرید"}
                     </Button>
                   </div>
 

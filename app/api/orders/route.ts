@@ -1,173 +1,299 @@
+import { randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
+import { getCurrencyRates } from "@/lib/currency";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
+import {
+  createOrderAccessToken,
+  hashOrderAccessToken,
+  MAX_ORDER_ITEM_QUANTITY,
+  OrderPricingError,
+  priceOrderItems,
+  verifyOrderAccessToken,
+} from "@/lib/orders";
 import { z } from "zod";
 
 const orderItemSchema = z.object({
-  slug: z.string(),
-  module: z.string(),
-  title: z.string(),
-  image: z.string().optional(),
-  price: z.number().positive(),
-  quantity: z.number().int().positive().default(1),
-  postId: z.string().optional(),
+  slug: z.string().trim().min(1).max(200),
+  quantity: z.number().int().min(1).max(MAX_ORDER_ITEM_QUANTITY).default(1),
 });
 
 const createOrderSchema = z.object({
-  items: z.array(orderItemSchema).min(1),
+  items: z.array(orderItemSchema).min(1).max(50),
   customer: z.object({
-    name: z.string().min(1),
-    email: z.string().email().optional(),
-    phone: z.string().min(5),
-    address: z.string().min(5),
-    postalCode: z.string().min(5),
-    city: z.string().optional(),
+    name: z.string().trim().min(2).max(120),
+    email: z.string().trim().email().max(254).optional(),
+    phone: z.string().trim().min(7).max(30),
+    address: z.string().trim().min(5).max(2000),
+    postalCode: z.string().trim().min(5).max(20),
+    city: z.string().trim().max(120).optional(),
   }),
-  note: z.string().max(500).optional(),
+  note: z.string().trim().max(1000).optional(),
+});
+
+const updateOrderSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(["processing", "shipped", "delivered", "cancelled", "refunded"]),
+  adminNote: z.string().max(2000).optional(),
 });
 
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).slice(2, 6);
+  const random = randomBytes(4).toString("hex");
   return `ORD-${timestamp}-${random}`.toUpperCase();
 }
 
-// POST /api/orders — Create a new order
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  if (!body) return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+function orderResponse(order: any, includeAdmin = false) {
+  return {
+    id: includeAdmin ? order.id : order.orderNumber,
+    orderNumber: order.orderNumber,
+    status: order.status,
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+    subtotal: order.subtotal,
+    shippingCost: order.shippingCost,
+    tax: order.tax,
+    total: order.total,
+    currency: order.currency,
+    paymentMethod: order.paymentMethod,
+    paymentReference: order.paymentReference,
+    paidAt: order.paidAt,
+    items: (order.items || []).map((item: any) => ({
+      slug: item.slug,
+      title: item.title,
+      image: item.image,
+      price: item.price,
+      quantity: item.quantity,
+    })),
+    customer: {
+      name: order.customerName,
+      email: order.customerEmail,
+      phone: order.customerPhone,
+      address: order.customerAddress,
+      postalCode: order.customerPostalCode,
+      city: order.customerCity,
+    },
+    customerNote: order.customerNote,
+    ...(includeAdmin ? { adminNote: order.adminNote } : {}),
+  };
+}
 
-  const parsed = createOrderSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "validation", issues: parsed.error.issues }, { status: 400 });
+async function findOrder(identifier: string) {
+  return prisma.order.findFirst({
+    where: { OR: [{ id: identifier }, { orderNumber: identifier }] },
+    include: { items: true },
+  });
+}
+
+function canReadOrder(
+  user: Awaited<ReturnType<typeof getSessionUserPublic>>,
+  order: { userId: string | null; accessTokenHash: string | null },
+  accessToken: string | null
+) {
+  if (user?.role === "super_admin") return true;
+  if (user && order.userId === user.id) return true;
+  return verifyOrderAccessToken(accessToken, order.accessTokenHash);
+}
+
+// Create an order from canonical database products. Browser-provided names,
+// images, and prices are intentionally ignored and are not accepted by schema.
+export async function POST(req: NextRequest) {
+  const user = await getSessionUserPublic();
+  const ip = getClientIp(req);
+  const rateLimit = await checkRateLimit(`${user?.id || "guest"}:${ip}`, "orders");
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "too_many_requests", message: "تعداد تلاش‌های ثبت سفارش بیش از حد مجاز است." },
+      { status: 429, headers: cacheHeaders(PRIVATE_NO_STORE) }
+    );
   }
 
-  const { items, customer, note } = parsed.data;
-  const user = await getSessionUserPublic();
-
-  // Calculate totals
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippingCost = 0; // Free shipping or calculate based on rules
-  const tax = 0; // Add tax calculation if needed
-  const total = subtotal + shippingCost + tax;
-
   try {
+    const body = createOrderSchema.parse(await req.json());
+    const slugs = [...new Set(body.items.map((item) => item.slug))];
+    const [products, rates] = await Promise.all([
+      prisma.post.findMany({
+        where: { module: "shop", slug: { in: slugs } },
+        select: {
+          id: true,
+          slug: true,
+          module: true,
+          title: true,
+          image: true,
+          published: true,
+          deletedAt: true,
+          availability: true,
+          priceAmount: true,
+          sourcePriceAmount: true,
+          sourceCurrency: true,
+          priceAdjustmentPercent: true,
+          sellerBenefitPercent: true,
+          discountPercent: true,
+          discountEndsAt: true,
+        },
+      }),
+      getCurrencyRates(),
+    ]);
+
+    const priced = priceOrderItems(body.items, products, rates);
+    const shippingCost = 0;
+    const tax = 0;
+    const total = priced.subtotal + shippingCost + tax;
+    const accessToken = createOrderAccessToken();
+
     const order = await prisma.order.create({
       data: {
         orderNumber: generateOrderNumber(),
         userId: user?.id || null,
+        accessTokenHash: hashOrderAccessToken(accessToken),
         status: "pending",
-        customerName: customer.name,
-        customerEmail: customer.email || null,
-        customerPhone: customer.phone,
-        customerAddress: customer.address,
-        customerPostalCode: customer.postalCode,
-        customerCity: customer.city || null,
-        subtotal,
+        customerName: body.customer.name,
+        customerEmail: body.customer.email?.toLowerCase() || null,
+        customerPhone: body.customer.phone,
+        customerAddress: body.customer.address,
+        customerPostalCode: body.customer.postalCode,
+        customerCity: body.customer.city || null,
+        subtotal: priced.subtotal,
         shippingCost,
         tax,
         total,
         currency: "IRR",
-        customerNote: note || null,
-        items: {
-          create: items.map((item) => ({
-            postId: item.postId || null,
-            slug: item.slug,
-            module: item.module,
-            title: item.title,
-            image: item.image || null,
-            price: item.price,
-            quantity: item.quantity,
-          })),
-        },
+        customerNote: body.note || null,
+        items: { create: priced.items },
       },
       include: { items: true },
     });
 
-    return NextResponse.json({
-      ok: true,
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      total: order.total,
-      status: order.status,
-    });
+    return NextResponse.json(
+      {
+        ok: true,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        accessToken,
+        subtotal: order.subtotal,
+        shippingCost: order.shippingCost,
+        tax: order.tax,
+        total: order.total,
+        status: order.status,
+      },
+      { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) }
+    );
   } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "validation", issues: error.issues },
+        { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) }
+      );
+    }
+    if (error instanceof OrderPricingError) {
+      return NextResponse.json(
+        { error: error.code, message: error.message },
+        { status: 409, headers: cacheHeaders(PRIVATE_NO_STORE) }
+      );
+    }
     console.error("[orders:create]", error);
-    return NextResponse.json({ error: error.message || "order_failed" }, { status: 500 });
+    return NextResponse.json(
+      { error: "order_failed", message: "ثبت سفارش انجام نشد." },
+      { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) }
+    );
   }
 }
 
-// GET /api/orders?id=xxx or GET /api/orders?user=me — Fetch order(s)
+// Read an authorized single order, the current user's orders, or the admin list.
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
+  const scope = searchParams.get("scope");
   const userParam = searchParams.get("user");
+  const user = await getSessionUserPublic();
 
-  if (id) {
-    // Fetch single order
-    try {
-      const order = await prisma.order.findFirst({
-        where: { OR: [{ id }, { orderNumber: id }] },
+  try {
+    if (scope === "admin") {
+      if (!user || user.role !== "super_admin") {
+        return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+      }
+      const requestedStatus = searchParams.get("status");
+      const validStatuses = ["pending", "paid", "processing", "shipped", "delivered", "cancelled", "refunded"];
+      const status = requestedStatus && validStatuses.includes(requestedStatus) ? requestedStatus : undefined;
+      const orders = await prisma.order.findMany({
+        where: status ? { status } : undefined,
         include: { items: true },
+        orderBy: { createdAt: "desc" },
+        take: 200,
       });
-      if (!order) return NextResponse.json({ error: "not_found" }, { status: 404 });
-      return NextResponse.json(order);
-    } catch (error: any) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(orders.map((order) => orderResponse(order, true)), { headers: cacheHeaders(PRIVATE_NO_STORE) });
     }
-  }
 
-  if (userParam === "me") {
-    // Fetch current user's orders
-    const user = await getSessionUserPublic();
-    if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    if (id) {
+      const order = await findOrder(id);
+      if (!order) return NextResponse.json({ error: "not_found" }, { status: 404, headers: cacheHeaders(PRIVATE_NO_STORE) });
+      if (!canReadOrder(user, order, searchParams.get("token"))) {
+        return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+      }
+      return NextResponse.json(orderResponse(order), { headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
 
-    try {
+    if (userParam === "me") {
+      if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
       const orders = await prisma.order.findMany({
         where: { userId: user.id },
         orderBy: { createdAt: "desc" },
         take: 50,
         include: { items: true },
       });
-      return NextResponse.json(orders);
-    } catch (error: any) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(orders.map((order) => orderResponse(order)), { headers: cacheHeaders(PRIVATE_NO_STORE) });
     }
-  }
 
-  return NextResponse.json({ error: "missing_id_or_user" }, { status: 400 });
+    return NextResponse.json({ error: "missing_scope" }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error) {
+    console.error("[orders:read]", error);
+    return NextResponse.json({ error: "order_read_failed" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  }
 }
 
-// PATCH /api/orders — Update order status (admin)
+// Administrative fulfilment updates. A paid state can only be produced by the
+// verified gateway callback, never by this general admin endpoint.
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user || user.role !== "super_admin") {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  const body = await req.json().catch(() => null);
-  if (!body?.id || !body?.status) {
-    return NextResponse.json({ error: "id_and_status_required" }, { status: 400 });
-  }
-
-  const validStatuses = ["pending", "paid", "processing", "shipped", "delivered", "cancelled", "refunded"];
-  if (!validStatuses.includes(body.status)) {
-    return NextResponse.json({ error: "invalid_status" }, { status: 400 });
+    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 
   try {
+    const body = updateOrderSchema.parse(await req.json());
+    const current = await prisma.order.findUnique({ where: { id: body.id }, select: { status: true } });
+    if (!current) {
+      return NextResponse.json({ error: "not_found" }, { status: 404, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+    const transitions: Record<string, string[]> = {
+      pending: ["cancelled"],
+      paid: ["processing", "refunded"],
+      processing: ["shipped", "refunded"],
+      shipped: ["delivered", "refunded"],
+      delivered: ["refunded"],
+      cancelled: [],
+      refunded: [],
+    };
+    if (!transitions[current.status]?.includes(body.status)) {
+      return NextResponse.json(
+        { error: "invalid_status_transition", from: current.status, to: body.status },
+        { status: 409, headers: cacheHeaders(PRIVATE_NO_STORE) }
+      );
+    }
     const order = await prisma.order.update({
       where: { id: body.id },
-      data: {
-        status: body.status,
-        adminNote: body.adminNote || undefined,
-        paidAt: body.status === "paid" ? new Date() : undefined,
-      },
+      data: { status: body.status, adminNote: body.adminNote },
       include: { items: true },
     });
-    return NextResponse.json({ ok: true, order });
+    return NextResponse.json({ ok: true, order: orderResponse(order, true) }, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "validation", issues: error.issues }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    }
+    console.error("[orders:update]", error);
+    return NextResponse.json({ error: "order_update_failed" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 

@@ -14,8 +14,11 @@ type Order = {
   id: string;
   orderNumber: string;
   status: string;
-  customerName: string;
-  customerPhone: string;
+  customer: {
+    name: string;
+    phone: string;
+    email?: string | null;
+  };
   total: number;
   createdAt: string;
   items: Array<{ title: string; quantity: number; price: number }>;
@@ -29,6 +32,16 @@ const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondar
   delivered: { label: "تحویل داده شده", variant: "default", icon: CheckCircle },
   cancelled: { label: "لغو شده", variant: "destructive", icon: XCircle },
   refunded: { label: "بازپرداخت شده", variant: "destructive", icon: XCircle },
+};
+
+const STATUS_TRANSITIONS: Record<string, string[]> = {
+  pending: ["cancelled"],
+  paid: ["processing", "refunded"],
+  processing: ["shipped", "refunded"],
+  shipped: ["delivered", "refunded"],
+  delivered: ["refunded"],
+  cancelled: [],
+  refunded: [],
 };
 
 export default function AdminOrdersPage() {
@@ -49,9 +62,10 @@ function OrdersContent() {
     setLoading(true);
     setError("");
     try {
-      // Load orders from site settings (legacy) or new Order model
-      // For now, we'll use a simple approach
-      setOrders([]);
+      const response = await fetch("/api/orders?scope=admin", { cache: "no-store" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.error || "دریافت سفارشات انجام نشد");
+      setOrders(Array.isArray(data) ? data : []);
     } catch (e: any) {
       setError(e?.message || "خطا");
     } finally {
@@ -130,7 +144,7 @@ function OrdersContent() {
                       <StatusIcon className="size-5 text-muted-foreground" />
                       <div>
                         <div className="text-sm font-bold">{order.orderNumber}</div>
-                        <div className="text-xs text-muted-foreground">{order.customerName} — {order.customerPhone}</div>
+                        <div className="text-xs text-muted-foreground">{order.customer.name} — {order.customer.phone}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -146,7 +160,13 @@ function OrdersContent() {
                       <SelectTrigger className="w-40 h-8"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {Object.entries(STATUS_MAP).map(([key, val]) => (
-                          <SelectItem key={key} value={key}>{val.label}</SelectItem>
+                          <SelectItem
+                            key={key}
+                            value={key}
+                            disabled={key !== order.status && !STATUS_TRANSITIONS[order.status]?.includes(key)}
+                          >
+                            {val.label}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

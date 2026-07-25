@@ -66,6 +66,7 @@ const limiters = {
   newsletter:     { redis: createRatelimit(3, "1 h"),   memMax: 3,   memWindowMs: 3_600_000 },
   search:         { redis: createRatelimit(30, "1 m"),  memMax: 30,  memWindowMs: 60_000 },
   profile:        { redis: createRatelimit(10, "1 m"),  memMax: 10,  memWindowMs: 60_000 },
+  orders:         { redis: createRatelimit(10, "10 m"), memMax: 10,  memWindowMs: 600_000 },
 };
 
 export type RateLimiterKey = keyof typeof limiters;

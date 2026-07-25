@@ -45,7 +45,7 @@ import {
   jalaliToGregorian,
 } from "@/lib/jalali"
 import { cn } from "@/lib/utils"
-import { useConsultation } from "@/providers/consultation.provider"
+import { useCart } from "@/providers/cart.provider"
 
 type Crumb = {
   label: string
@@ -638,7 +638,7 @@ type SiteHeaderProps = {
 }
 
 function CartButton() {
-  const { count, setOpen } = useConsultation()
+  const { count, setOpen } = useCart()
 
   return (
     <Tooltip>

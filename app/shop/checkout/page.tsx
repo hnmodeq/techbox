@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useCart } from "@/providers/cart.provider";
-import { useRouter } from "next/navigation";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,9 +14,13 @@ import { ShoppingCart, Truck, CreditCard, ArrowLeft, Trash2 } from "lucide-react
 import Image from "next/image";
 
 export default function CheckoutPage() {
-  const { items, count, remove, clear, setQty } = useCart();
-  const router = useRouter();
+  const { items, count, remove, setQty } = useCart();
   const [busy, setBusy] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState<{
+    orderId: string;
+    orderNumber: string;
+    accessToken: string;
+  } | null>(null);
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -28,13 +31,25 @@ export default function CheckoutPage() {
     note: "",
   });
 
-  const subtotal = items.reduce((sum, item) => {
-    const price = parseFloat(item.price.replace(/[^\d]/g, "")) || 0;
-    return sum + price * item.qty;
-  }, 0);
+  // Display estimate only. The API reloads every product and calculates the
+  // authoritative amount from database prices before creating the order.
+  const subtotal = items.reduce((sum, item) => sum + item.displayPrice * item.qty, 0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const startPayment = async (order: { orderId: string; orderNumber: string; accessToken: string }) => {
+    const payRes = await fetch("/api/pay/zarinpal/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId: order.orderId, accessToken: order.accessToken }),
+    });
+    const payData = await payRes.json().catch(() => ({}));
+    if (!payRes.ok || !payData.gatewayUrl) {
+      throw new Error(payData.message || "اتصال به درگاه پرداخت انجام نشد. دوباره تلاش کنید.");
+    }
+    window.location.assign(payData.gatewayUrl);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
     if (items.length === 0) {
       toast.error("سبد خرید خالی است");
@@ -47,19 +62,16 @@ export default function CheckoutPage() {
 
     setBusy(true);
     try {
-      // Create order
+      if (pendingPayment) {
+        await startPayment(pendingPayment);
+        return;
+      }
+
       const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map((item) => ({
-            slug: item.slug,
-            module: "shop",
-            title: item.title,
-            image: item.image,
-            price: parseFloat(item.price.replace(/[^\d]/g, "")) || 0,
-            quantity: item.qty,
-          })),
+          items: items.map((item) => ({ slug: item.slug, quantity: item.qty })),
           customer: {
             name: form.name.trim(),
             email: form.email.trim() || undefined,
@@ -72,35 +84,20 @@ export default function CheckoutPage() {
         }),
       });
 
-      const orderData = await orderRes.json();
+      const orderData = await orderRes.json().catch(() => ({}));
       if (!orderRes.ok) {
-        throw new Error(orderData.error || "خطا در ثبت سفارش");
+        throw new Error(orderData.message || "خطا در ثبت سفارش");
       }
 
-      // Try to initiate payment
-      try {
-        const payRes = await fetch("/api/pay/zarinpal/request", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: orderData.orderId }),
-        });
-
-        const payData = await payRes.json();
-        if (payRes.ok && payData.gatewayUrl) {
-          // Redirect to Zarinpal gateway
-          clear();
-          window.location.href = payData.gatewayUrl;
-          return;
-        }
-      } catch {
-        // Payment not available — order still created
-      }
-
-      // If payment not available, go to success page
-      clear();
-      router.push(`/order/success?id=${orderData.orderNumber}`);
-    } catch (err: any) {
-      toast.error(err.message || "خطا در ثبت سفارش");
+      const payment = {
+        orderId: orderData.orderId as string,
+        orderNumber: orderData.orderNumber as string,
+        accessToken: orderData.accessToken as string,
+      };
+      setPendingPayment(payment);
+      await startPayment(payment);
+    } catch (error: any) {
+      toast.error(error?.message || "خطا در ثبت سفارش و پرداخت");
     } finally {
       setBusy(false);
     }
@@ -191,7 +188,7 @@ export default function CheckoutPage() {
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-medium truncate">{item.title}</div>
-                      <div className="text-[10px] text-muted-foreground">{item.price} × {item.qty}</div>
+                      <div className="text-[10px] text-muted-foreground">{item.displayPrice.toLocaleString("fa-IR")} تومان × {item.qty.toLocaleString("fa-IR")}</div>
                     </div>
                     <div className="flex items-center gap-1">
                       <Button type="button" variant="ghost" size="icon-xs" onClick={() => setQty(item.slug, item.qty - 1)} disabled={item.qty <= 1}>-</Button>
@@ -216,13 +213,16 @@ export default function CheckoutPage() {
                 </div>
                 <Separator />
                 <div className="flex justify-between text-base">
-                  <span className="font-bold">قابل پرداخت</span>
+                  <span className="font-bold">برآورد قابل پرداخت</span>
                   <span className="font-black text-primary">{subtotal.toLocaleString("fa-IR")} تومان</span>
                 </div>
+                <p className="text-[10px] leading-5 text-muted-foreground">
+                  قیمت و موجودی نهایی پیش از انتقال به درگاه، مستقیماً از سرور بررسی می‌شود.
+                </p>
 
                 <Button type="submit" className="w-full gap-2" loading={busy} disabled={busy}>
                   <CreditCard className="size-4" />
-                  {busy ? "در حال ثبت..." : "ثبت سفارش و پرداخت"}
+                  {busy ? "در حال اتصال..." : pendingPayment ? "تلاش مجدد برای پرداخت" : "ثبت سفارش و پرداخت"}
                 </Button>
 
                 <ButtonLink href="/shop" variant="ghost" className="w-full gap-2" size="sm">
