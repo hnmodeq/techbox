@@ -9,7 +9,6 @@ export * from "./like-button";
 export * from "@/design";
 export * from "./module-badge";
 export * from "./media-selector-card";
-export * from "./theme-toggle-button";
 export * from "./author-link";
 export * from "./card-stats";
 export * from "./forum-badge";

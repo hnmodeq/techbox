@@ -15,6 +15,20 @@ const moduleTakes: Record<string, number> = {
   news: 15,
 };
 
+const layoutCardSelect = {
+  id: true,
+  slug: true,
+  module: true,
+  title: true,
+  excerpt: true,
+  image: true,
+  date: true,
+  likes: true,
+  views: true,
+  authorName: true,
+  author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true, verifiedType: true, verifiedLabel: true } },
+} as const;
+
 const cardSelect = {
   id: true,
   slug: true,
@@ -173,6 +187,65 @@ async function findPosts(module: string, take: number) {
   }
 
   return normalized;
+}
+
+async function getLayoutHomeDataUncached(): Promise<HomeData> {
+  const enabledModules = await getEnabledModules();
+  let news: any[] = [];
+  let ticker: any[] = [];
+  try {
+    if (enabledModules.includes("news" as any)) {
+      news = await prisma.post.findMany({
+        where: { module: "news", published: true, deletedAt: null, date: publicPostDateWhere() },
+        orderBy: { date: "desc" },
+        take: moduleTakes.news,
+        select: layoutCardSelect,
+      });
+    }
+    ticker = await prisma.post.findMany({
+      where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
+      orderBy: { date: "desc" },
+      take: 30,
+      select: layoutCardSelect,
+    });
+  } catch (error) {
+    console.error("[layout-data] Failed to load news/ticker data:", error);
+  }
+
+  const normalizedNews = news.map(normalizeCard);
+  if (news.length > 0) {
+    try {
+      const counts = await prisma.comment.groupBy({
+        by: ["postId"],
+        _count: { _all: true },
+        where: { postId: { in: news.map((post) => post.id) }, status: "approved" },
+      });
+      const countMap = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
+      normalizedNews.forEach((item, index) => { item.comments = countMap.get(news[index].id) || 0; });
+    } catch (error) {
+      console.error("[layout-data] Failed to count news comments:", error);
+    }
+  }
+
+  return {
+    modules: { news: normalizedNews },
+    ticker: ticker.map(normalizeCard),
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+const cachedLayoutHomeData = unstable_cache(getLayoutHomeDataUncached, ["layout-home-data-v1"], {
+  revalidate: 86400,
+  tags: ["home-data"],
+});
+
+export async function getLayoutHomeData(): Promise<HomeData> {
+  try {
+    return await cachedLayoutHomeData();
+  } catch (error) {
+    console.error("[layout-data] Falling back to empty layout data:", error);
+    return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
+  }
 }
 
 async function getHomeDataUncached(): Promise<HomeData> {

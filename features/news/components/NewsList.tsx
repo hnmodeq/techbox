@@ -7,7 +7,7 @@ import { formatRelativeDate } from "@/lib/date-format";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { MessageCircle } from "lucide-react";
 import {
   Pagination,

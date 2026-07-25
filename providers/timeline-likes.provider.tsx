@@ -22,12 +22,17 @@ const TimelineLikesContext = createContext<TimelineLikesContextValue>({
  * out its own "liked" state. Public like counts/comments come from the
  * bulk /api/timeline/events payload already.
  */
-export function TimelineLikesProvider({ children }: { children: ReactNode }) {
+export function TimelineLikesProvider({ children, enabled = true }: { children: ReactNode; enabled?: boolean }) {
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
-  const [status, setStatus] = useState<LikesStatus>("loading");
+  const [status, setStatus] = useState<LikesStatus>(enabled ? "loading" : "ready");
 
   useEffect(() => {
+    if (!enabled) {
+      setStatus("ready");
+      return;
+    }
     let mounted = true;
+    setStatus("loading");
     fetch("/api/timeline/liked-events", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
@@ -43,7 +48,7 @@ export function TimelineLikesProvider({ children }: { children: ReactNode }) {
         if (mounted) setStatus("error");
       });
     return () => { mounted = false; };
-  }, []);
+  }, [enabled]);
 
   const setLiked = useCallback((eventId: string, liked: boolean) => {
     setLikedIds((prev) => {

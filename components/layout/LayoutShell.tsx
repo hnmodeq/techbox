@@ -50,6 +50,8 @@ type LayoutShellProps = {
 export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutShellProps) {
   const pathname = usePathname()
   const isAdmin = pathname.startsWith("/admin")
+  const statsEnabled = /^\/(blog|news|media|review|download|shop|forum|search|author)(\/|$)/.test(pathname)
+  const timelineLikesEnabled = pathname === "/timeline" || pathname.startsWith("/timeline/")
 
   // Admin pages have their own layout — skip the main site chrome
   if (isAdmin) {
@@ -67,10 +69,10 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
       <AuthProvider>
         <CartProvider>
           <CompareProvider>
-            <StatsProvider>
+            <StatsProvider enabled={statsEnabled}>
             <HomeDataProvider initialData={homeData}>
               <ModuleConfigProvider serverConfig={serverModuleConfig}>
-                <TimelineLikesProvider>
+                <TimelineLikesProvider enabled={timelineLikesEnabled}>
                   <LayoutInner>{children}</LayoutInner>
                 </TimelineLikesProvider>
               </ModuleConfigProvider>

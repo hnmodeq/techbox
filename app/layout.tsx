@@ -11,7 +11,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { defaultSeo, siteUrl } from "@/lib/seo";
-import { getHomeData } from "@/lib/home-server";
+import { getLayoutHomeData } from "@/lib/home-server";
 import { getModuleConfig, type SiteLayoutConfig } from "@/lib/module-config";
 import { autoPublishScheduled } from "@/lib/auto-publish";
 import type { HomeData } from "@/features/home/lib/home-data";
@@ -76,7 +76,7 @@ export default async function RootLayout({
   let moduleConfig: SiteLayoutConfig | undefined;
   try {
     [homeData, moduleConfig] = await Promise.all([
-      getHomeData(),
+      getLayoutHomeData(),
       getModuleConfig(),
     ]);
   } catch {

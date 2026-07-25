@@ -6,7 +6,6 @@ import { formatRelativeTime } from "@/lib/date-format";
 import { LikeButton } from "@/components/ui/like-button";
 import CommentSection from "@/features/comment/components/CommentSection";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { AnimatePresence, motion } from "framer-motion";
 
 import { MessageCircle } from "lucide-react";
 
@@ -89,24 +88,21 @@ export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boole
         </div>
       </div>
 
-      {/* Waterfall Comments Dropdown */}
-      <AnimatePresence initial={false}>
-        {showComments && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <div className="w-full bg-[var(--card-background)] border-t border-border">
-              <div className="max-h-[300px] overflow-y-auto px-3 pb-3 overscroll-contain">
-                <CommentSection module="news" slug={news.slug} compact />
-              </div>
+      {/* CSS grid transition avoids loading the Motion runtime in the global layout. */}
+      <div
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+          showComments ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+        aria-hidden={!showComments}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="w-full border-t border-border bg-[var(--card-background)]">
+            <div className="max-h-[300px] overflow-y-auto px-3 pb-3 overscroll-contain">
+              {showComments && <CommentSection module="news" slug={news.slug} compact />}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -32,12 +32,17 @@ const StatsContext = createContext<{ stats: StatsMap; status: StatsStatus }>({
  * with a guessed timeout, which previously caused every card to fire its
  * own redundant request whenever the bulk fetch was a bit slow.
  */
-export function StatsProvider({ children }: { children: ReactNode }) {
+export function StatsProvider({ children, enabled = true }: { children: ReactNode; enabled?: boolean }) {
   const [stats, setStats] = useState<StatsMap>({});
-  const [status, setStatus] = useState<StatsStatus>("loading");
+  const [status, setStatus] = useState<StatsStatus>(enabled ? "loading" : "ready");
 
   useEffect(() => {
+    if (!enabled) {
+      setStatus("ready");
+      return;
+    }
     let mounted = true;
+    setStatus("loading");
 
     fetch("/api/stats", { cache: "no-store" })
       .then((r) => {
@@ -89,7 +94,7 @@ export function StatsProvider({ children }: { children: ReactNode }) {
       mounted = false;
       window.removeEventListener("tb_stats_update", handleUpdate);
     };
-  }, []);
+  }, [enabled]);
 
   return <StatsContext.Provider value={{ stats, status }}>{children}</StatsContext.Provider>;
 }
