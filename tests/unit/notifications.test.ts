@@ -80,9 +80,30 @@ describe("notifications ownership (TB-04)", () => {
     expect(where.OR ?? where.or).toBeUndefined();
   });
 
-  it("returns nothing for a user with no posts", async () => {
+  it("returns nothing for a user with no activity", async () => {
     const client = makeMockClient({ post: { findMany: vi.fn().mockResolvedValue([]) } });
     const items = await buildNotificationsForUser("nobody", client);
     expect(items).toEqual([]);
+  });
+
+  it("still returns verification notifications when the user has no posts", async () => {
+    const client = makeMockClient({
+      post: { findMany: vi.fn().mockResolvedValue([]) },
+      siteSetting: {
+        findMany: vi.fn().mockResolvedValue([
+          {
+            key: "verif_notif_alice_request-1",
+            value: JSON.stringify({
+              decision: "approved",
+              type: "user",
+              reviewedAt: "2026-07-25T10:00:00.000Z",
+            }),
+          },
+        ]),
+      },
+    });
+    const items = await buildNotificationsForUser("alice", client);
+    expect(items).toHaveLength(1);
+    expect(items[0].id).toBe("verif-request-1");
   });
 });

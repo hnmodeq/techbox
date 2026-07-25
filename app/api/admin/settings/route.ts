@@ -5,7 +5,6 @@ import { hasPermission } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
-import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
   "shop.banners": "[]",
@@ -68,7 +67,6 @@ export async function GET() {
   if (user instanceof NextResponse) return user;
 
   try {
-    await ensureSiteSettingsTable();
     const settings = await prisma.siteSetting.findMany();
     const map: Record<string, string> = { ...SETTINGS_DEFAULTS };
     for (const s of settings) map[s.key] = s.value;
@@ -99,7 +97,6 @@ export async function PATCH(req: NextRequest) {
     const required = [...new Set(Object.keys(updates).map((key) => settingPermission(key, "edit")))];
     const user = await requireAllPermissions(required);
     if (user instanceof NextResponse) return user;
-    await ensureSiteSettingsTable();
 
     // Validate known keys
     const validKeys = Object.keys(SETTINGS_DEFAULTS);

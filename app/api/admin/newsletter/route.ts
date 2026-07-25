@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission } from "@/lib/api-permissions";
-import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 import { publicPostDateWhere } from "@/lib/post-date";
 import { formatPostDateFa } from "@/lib/post-date";
 import {
@@ -15,7 +14,6 @@ const TEMPLATE_KEYS = ["newsletter.header_html", "newsletter.footer_html", "news
 
 async function getTemplate() {
   try {
-    await ensureSiteSettingsTable();
     const rows = await prisma.siteSetting.findMany({ where: { key: { in: TEMPLATE_KEYS } } });
     const map: Record<string, string> = {
       "newsletter.header_html": DEFAULT_NEWSLETTER_HEADER,
@@ -28,7 +26,8 @@ async function getTemplate() {
       footerHtml: map["newsletter.footer_html"],
       subject: map["newsletter.default_subject"],
     };
-  } catch {
+  } catch (error) {
+    console.error("[newsletter] Failed to load template; using defaults", error);
     return {
       headerHtml: DEFAULT_NEWSLETTER_HEADER,
       footerHtml: DEFAULT_NEWSLETTER_FOOTER,

@@ -129,6 +129,7 @@ settings, IP/network restrictions, and the provider's connection limit.
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm db:push` / `pnpm db:seed` | Schema sync / seed |
 | `pnpm storage:migrate-resumes` | Move legacy public Supabase résumés into the private bucket |
+| `pnpm storage:import-qnap -- --apply` | Import authorized official QNAP product images into `techbox/qnap` |
 | `pnpm test:e2e` | Playwright smoke tests |
 | `pnpm check:content` / `check:db` / `check:storage` / `check:all` | Content/DB/Supabase Storage integrity checks |
 
@@ -198,7 +199,7 @@ cluster (`TimelineEvent` + comments/likes).
 
 ### Rendering & performance notes
 - The homepage fetches its data **server-side** (`lib/home-server.ts`, cached
-  60s) and streams it into `HomeDataProvider` as initial state, so content is
+  for one day with immediate tag invalidation on content changes) and streams it into `HomeDataProvider` as initial state, so content is
   present on first paint — no loading flash. The client only refreshes silently.
 - Auth state is centralized in a typed `AuthProvider` (`useAuth()`), verified
   against `/api/auth/me` only when a local session exists.

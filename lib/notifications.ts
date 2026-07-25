@@ -49,8 +49,6 @@ export async function buildNotificationsForUser(
   const postIds = userPosts.map((p) => p.id);
   const userPostMap = new Map(userPosts.map((p) => [p.id, p]));
 
-  if (postIds.length === 0) return [];
-
   // Comments on the user's posts (excluding the user's own comments).
   const comments = await client.comment.findMany({
     where: {

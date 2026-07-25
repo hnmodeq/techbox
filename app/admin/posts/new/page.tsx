@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { canEdit as canEditModule } from "@/lib/auth";
 import { useAuth } from "@/providers/auth.provider";
 import { ModuleBadge } from "@/components/ui/module-badge";
-import { BlobUploadField } from "@/components/admin/BlobUploadField";
+import { StorageUploadField } from "@/components/admin/StorageUploadField";
 import { ShopSpecsField } from "@/components/admin/shop-specs-field";
 import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
 import { RevisionHistory } from "@/components/admin/revision-history";
@@ -535,7 +535,7 @@ function NewPostInner() {
                 />
               </div>
 
-              <BlobUploadField
+              <StorageUploadField
                 label="آپلود تصویر شاخص"
                 kind="image"
                 folder={moduleWatch === "review" ? "review-images" : moduleWatch === "news" ? "news-images" : "article-images"}
@@ -674,7 +674,7 @@ function NewPostInner() {
                           <FormItem><FormLabel>Size</FormLabel><FormControl><Input placeholder="50 MB" dir="ltr" {...field} /></FormControl></FormItem>
                         )} />
                       </div>
-                      <BlobUploadField
+                      <StorageUploadField
                         label="آپلود ویدیو"
                         kind="video"
                         folder="videos"
@@ -700,7 +700,7 @@ function NewPostInner() {
                         <FormField control={form.control as any} name="fileSize" render={({ field }) => (<FormItem><FormLabel>File Size</FormLabel><FormControl><Input dir="ltr" {...field} /></FormControl></FormItem>)} />
                         <FormField control={form.control as any} name="fileUrl" render={({ field }) => (<FormItem><FormLabel>File URL</FormLabel><FormControl><Input dir="ltr" {...field} /></FormControl></FormItem>)} />
                       </div>
-                      <BlobUploadField label="آپلود فایل" kind="download" folder="archive/uploads" onUploaded={(r) => { form.setValue("fileUrl", r.url); form.setValue("fileName", r.fileName); form.setValue("fileSize", formatBytes(r.size)); }} />
+                      <StorageUploadField label="آپلود فایل" kind="download" folder="archive/uploads" onUploaded={(r) => { form.setValue("fileUrl", r.url); form.setValue("fileName", r.fileName); form.setValue("fileSize", formatBytes(r.size)); }} />
                     </AccordionContent>
                   </Card>
                 </AccordionItem>
@@ -820,9 +820,9 @@ function NewPostInner() {
                       <PermissionGate permission="product:gallery:view">
                       <div className="space-y-3">
                         <p className="text-sm font-semibold">تصاویر محصول</p>
-                        <BlobUploadField label="آپلود تصویر اصلی" kind="image" folder="products" accept="image/*"
+                        <StorageUploadField label="آپلود تصویر اصلی" kind="image" folder="products" accept="image/*"
                           onUploaded={(r) => form.setValue("image", r.url)} />
-                        <BlobUploadField label="افزودن به گالری" kind="image" folder="products" accept="image/*"
+                        <StorageUploadField label="افزودن به گالری" kind="image" folder="products" accept="image/*"
                           onUploaded={(r) => form.setValue("gallery", [form.getValues("gallery")?.trim(), r.url].filter(Boolean).join("\n"))} />
                         <FormField control={form.control as any} name="gallery" render={({ field }) => (
                           <FormItem>

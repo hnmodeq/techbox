@@ -165,8 +165,9 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
 
 /**
  * Get the full module configuration map.
- * Cached for 30 seconds via Next.js unstable_cache.
- * OPTIMIZED: Single DB query for all 12 keys to avoid P2024 pool timeout (was 12 parallel findUnique)
+ * Cached for one day and invalidated immediately by the module administration
+ * routes through the `module-config` cache tag.
+ * OPTIMIZED: Single DB query for all keys to avoid connection-pool pressure.
  */
 async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const defaults = getDefaultModuleConfigMap();

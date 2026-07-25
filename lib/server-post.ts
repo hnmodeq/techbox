@@ -23,7 +23,9 @@ export async function getDbPost(module: ModuleSlug, slug: string) {
           productAdjustmentPercent: p.priceAdjustmentPercent ?? 0,
           rates,
         });
-      } catch {}
+      } catch (error) {
+        console.error(`[server-post] Price calculation failed for ${module}/${slug}:`, error);
+      }
     }
 
     return {
@@ -68,7 +70,8 @@ export async function getDbPost(module: ModuleSlug, slug: string) {
       downloadCount: p.downloadCount,
       solved: p.solved,
     };
-  } catch {
+  } catch (error) {
+    console.error(`[server-post] Failed to fetch ${module}/${slug}:`, error);
     return null;
   }
 }

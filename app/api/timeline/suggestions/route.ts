@@ -33,7 +33,9 @@ async function ensureSuggestionsEvent() {
 export async function GET() {
   try {
     await ensureSuggestionsEvent();
-  } catch {}
+  } catch (error) {
+    console.error("[timeline:suggestions] failed to ensure system event", error);
+  }
 
   const suggestions = await prisma.timelineComment.findMany({
     where: { eventId: SUGGESTIONS_EVENT_ID, status: "approved" },

@@ -113,7 +113,9 @@ export async function GET(req: NextRequest) {
       if (!postModule || postModule === "shop") {
         currencyRates = await getCurrencyRates();
       }
-    } catch {}
+    } catch (error) {
+      console.error("[posts:list] currency rates unavailable", error);
+    }
 
     const out = posts.map((p: any) => {
       let finalPriceAmount = p.priceAmount ?? null;
@@ -126,7 +128,9 @@ export async function GET(req: NextRequest) {
             sellerBenefitPercent: (p as any).sellerBenefitPercent ?? 35,
             rates: currencyRates,
           });
-        } catch {}
+        } catch (error) {
+          console.error("[posts:list] product price calculation failed", { postId: p.id, error });
+        }
       }
       return {
       id: p.id,
