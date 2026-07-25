@@ -457,60 +457,128 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
 
 /* ═══ Homepage Cinematic Gradient ═══ */
 
-/* Minimal Blue-to-Black Gradient */
+/* Gradient tokens — auto light/dark with light-dark() */
 :root {
+  /* Main gradient: soft warm to cool */
   --gradient-primary: linear-gradient(
-    180deg,
-    oklch(0.20 0.08 250) 0%,
-    oklch(0.12 0.06 250) 50%,
-    oklch(0.05 0.03 250) 100%
+    135deg,
+    oklch(0.85 0.04 60) 0%,
+    oklch(0.75 0.10 200) 50%,
+    oklch(0.70 0.15 280) 100%
   );
   
+  /* Radial glow for hero */
   --gradient-glow: radial-gradient(
-    ellipse 80% 50% at 50% 30%,
-    oklch(0.25 0.10 250 / 20%) 0%,
-    transparent 60%
+    ellipse 80% 60% at 50% 40%,
+    oklch(0.60 0.15 270 / 25%) 0%,
+    oklch(0.50 0.10 280 / 15%) 40%,
+    transparent 70%
+  );
+  
+  /* Accent orbs */
+  --gradient-orb-1: radial-gradient(circle, oklch(0.70 0.18 180) 0%, transparent 70%);
+  --gradient-orb-2: radial-gradient(circle, oklch(0.75 0.15 300) 0%, transparent 70%);
+  
+  /* Section background gradient */
+  --gradient-section: linear-gradient(
+    180deg,
+    oklch(0.98 0.01 60) 0%,
+    oklch(0.95 0.02 200) 50%,
+    oklch(0.92 0.02 280) 100%
   );
 }
 
 .dark {
+  /* Dark mode gradients — deeper, more dramatic */
   --gradient-primary: linear-gradient(
-    180deg,
-    oklch(0.15 0.08 250) 0%,
-    oklch(0.08 0.06 250) 50%,
-    oklch(0.02 0.02 250) 100%
+    135deg,
+    oklch(0.20 0.05 280) 0%,
+    oklch(0.15 0.08 260) 50%,
+    oklch(0.12 0.10 240) 100%
   );
   
   --gradient-glow: radial-gradient(
-    ellipse 80% 50% at 50% 30%,
-    oklch(0.20 0.10 250 / 25%) 0%,
-    transparent 60%
+    ellipse 80% 60% at 50% 40%,
+    oklch(0.35 0.15 270 / 30%) 0%,
+    oklch(0.25 0.10 280 / 20%) 40%,
+    transparent 70%
+  );
+  
+  --gradient-orb-1: radial-gradient(circle, oklch(0.40 0.12 200) 0%, transparent 70%);
+  --gradient-orb-2: radial-gradient(circle, oklch(0.35 0.15 300) 0%, transparent 70%);
+  
+  --gradient-section: linear-gradient(
+    180deg,
+    oklch(0.12 0.01 260) 0%,
+    oklch(0.10 0.02 240) 50%,
+    oklch(0.08 0.01 220) 100%
   );
 }
 
-/* Homepage Hero - Full viewport gradient */
+/* Cinematic homepage gradient hero */
 .homepage-hero {
   position: relative;
   min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-/* Grid lines overlay */
-.homepage-hero-grid {
+/* Base gradient background */
+.homepage-hero::before {
+  content: "";
   position: absolute;
   inset: 0;
-  background-image: 
-    linear-gradient(to right, oklch(1 0 0 / 3%) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(1 0 0 / 3%) 1px, transparent 1px);
-  background-size: 80px 80px;
-  pointer-events: none;
+  background: var(--gradient-primary);
+  z-index: 0;
 }
 
-/* Radial glow */
-.homepage-hero-glow {
+/* Radial glow overlay */
+.homepage-hero::after {
+  content: "";
   position: absolute;
   inset: 0;
   background: var(--gradient-glow);
+  z-index: 1;
   pointer-events: none;
+}
+
+/* Floating orbs */
+.homepage-hero-orb-1 {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: var(--gradient-orb-1);
+  top: -200px;
+  right: -100px;
+  z-index: 2;
+  animation: float-orb-1 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.homepage-hero-orb-2 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: var(--gradient-orb-2);
+  bottom: -150px;
+  left: -100px;
+  z-index: 2;
+  animation: float-orb-2 25s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes float-orb-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-30px, 20px) scale(1.05); }
+  66% { transform: translate(20px, -10px) scale(0.95); }
+}
+
+@keyframes float-orb-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -30px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
 }
 
 /* NOTE: Old homepage section classes removed - keeping only the cinematic gradient */
