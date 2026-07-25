@@ -36,7 +36,7 @@ export async function GET() {
   } catch {}
 
   const suggestions = await prisma.timelineComment.findMany({
-    where: { eventId: SUGGESTIONS_EVENT_ID },
+    where: { eventId: SUGGESTIONS_EVENT_ID, status: "approved" },
     orderBy: { createdAt: "desc" },
     take: 50,
   });

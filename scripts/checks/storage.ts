@@ -11,6 +11,14 @@ async function checkUrl(url: string) {
   }
 }
 
+function isRetiredVercelBlobUrl(url: string) {
+  try {
+    return new URL(url).hostname.endsWith("public.blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
   const issues: Issue[] = [];
   const targets: Array<{ scope: string; id: string; field: string; url: string }> = [];
@@ -33,22 +41,23 @@ async function main() {
     if (user.avatar && isHttpUrl(user.avatar)) targets.push({ scope: 'user', id: user.username, field: 'avatar', url: user.avatar });
   }
 
-  const limit = Number(process.env.BLOB_CHECK_LIMIT || 500);
-  console.log(`Checking ${Math.min(targets.length, limit)} of ${targets.length} remote URLs...`);
+  const limit = Number(process.env.STORAGE_CHECK_LIMIT || 500);
+  console.log(`Checking ${Math.min(targets.length, limit)} of ${targets.length} remote storage URLs...`);
   for (const target of targets.slice(0, limit)) {
     const result = await checkUrl(target.url);
     if (!result.ok) {
+      const retired = isRetiredVercelBlobUrl(target.url);
       issues.push({
-        level: 'error',
+        level: retired ? 'warning' : 'error',
         scope: target.scope,
         id: target.id,
-        message: `${target.field} URL failed (${result.status || result.error || 'unknown'})`,
+        message: `${target.field} URL failed (${result.status || result.error || 'unknown'})${retired ? ' — retired Vercel Blob reference' : ''}`,
         hint: target.url,
       });
     }
   }
 
-  const errorCount = printIssues('TechBox Blob/URL validation', issues);
+  const errorCount = printIssues('TechBox Supabase storage/URL validation', issues);
   await prisma.$disconnect();
   process.exit(errorCount > 0 ? 1 : 0);
 }

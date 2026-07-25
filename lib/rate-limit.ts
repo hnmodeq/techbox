@@ -8,6 +8,15 @@ const redis = process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_RE
     })
   : null;
 
+const rateLimitGlobal = globalThis as typeof globalThis & { __techboxRateLimitWarning?: boolean };
+if (!redis && process.env.NODE_ENV === "production" && !rateLimitGlobal.__techboxRateLimitWarning) {
+  rateLimitGlobal.__techboxRateLimitWarning = true;
+  console.error(
+    "[security:critical] Distributed rate limiting is disabled in production. " +
+    "Configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN."
+  );
+}
+
 const createRatelimit = (requests: number, window: `${number} ${'s' | 'm' | 'h' | 'd'}`) => {
   if (!redis) return null;
   return new Ratelimit({

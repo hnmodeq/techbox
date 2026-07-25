@@ -349,7 +349,7 @@ function NewPostInner() {
       priceAdjustmentPercent: (values as any).priceAdjustmentPercent ? Number((values as any).priceAdjustmentPercent) : 0,
       discountPercent: (values.discountPercent || "").trim() ? Number(values.discountPercent) : undefined,
       discountEndsAt: (values.discountEndsAt || "").trim() ? new Date(values.discountEndsAt!).toISOString() : undefined,
-      sellerBenefitPercent: (values as any).sellerBenefitPercent ? String((values as any).sellerBenefitPercent) : "35",
+      sellerBenefitPercent: (values as any).sellerBenefitPercent ? Number((values as any).sellerBenefitPercent) : 35,
       availability: (values.availability || "").trim() || undefined,
       warranty: (values.warranty || "").trim() || undefined,
       specs: parseSpecs(values.specs || ""),

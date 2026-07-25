@@ -58,6 +58,11 @@ export async function advancedSearch({
 
     const results = posts
       .map((p: any) => {
+        const publicPost = { ...p };
+        delete publicPost.sourcePriceAmount;
+        delete publicPost.sourceCurrency;
+        delete publicPost.priceAdjustmentPercent;
+        delete publicPost.sellerBenefitPercent;
         const title = normalizePersian(p.title || "");
         const excerpt = normalizePersian(p.excerpt || "");
         const content = normalizePersian(p.content || "");
@@ -100,7 +105,7 @@ export async function advancedSearch({
         score += Math.min((p.likes || 0) / 3, 12);
 
         return {
-          ...p,
+          ...publicPost,
           score,
           date: p.date.toISOString(),
           date_fa: formatPostDateFa(p.date),

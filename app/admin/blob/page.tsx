@@ -234,7 +234,7 @@ function BlobContent() {
         return body as BlobResponse;
       })
       .then((body) => { if (mounted) { setData(body); setInputPrefix(body.prefix || ""); } })
-      .catch((e) => { if (mounted) { setError(e?.message || "خطا در دریافت فایل‌های Blob"); setData(null); } })
+      .catch((e) => { if (mounted) { setError(e?.message || "خطا در دریافت فایل‌های Supabase"); setData(null); } })
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
   }, [prefix]);
@@ -286,7 +286,7 @@ function BlobContent() {
       <div>
         <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
           <Database className="size-5" />
-          فایل‌های Vercel Blob
+          فایل‌های Supabase Storage
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           نمای درختی فولدرها و فایل‌ها، اندازه، نوع، URL و ابزار کپی

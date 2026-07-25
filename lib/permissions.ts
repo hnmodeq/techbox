@@ -143,7 +143,7 @@ export const PERMISSION_BUNDLES: PermissionBundle[] = [
   { id: "redirects", name: "Redirects", nameFa: "Redirectها", description: "مدیریت ریدایرکت‌ها", category: "system", permissions: ["redirect:view", "redirect:edit"] },
   { id: "faq", name: "FAQ", nameFa: "FAQ", description: "مدیریت پرسش‌های متداول", category: "system", permissions: ["faq:view", "faq:edit"] },
   { id: "holidays", name: "Holidays", nameFa: "تعطیلات", description: "مدیریت تعطیلات", category: "system", permissions: ["holiday:view", "holiday:edit"] },
-  { id: "blob", name: "Blob Files", nameFa: "فایل‌های Blob", description: "مدیریت فایل‌ها", category: "system", permissions: ["blob:view", "blob:upload", "blob:delete"] },
+  { id: "blob", name: "Storage Files", nameFa: "فایل‌های Supabase", description: "مدیریت فایل‌ها", category: "system", permissions: ["blob:view", "blob:upload", "blob:delete"] },
   { id: "jobs", name: "Jobs", nameFa: "آگهی استخدام", description: "مدیریت آگهی‌های استخدام", category: "system", permissions: ["job:view", "job:edit", "job:applications"] },
   { id: "about", name: "About", nameFa: "درباره ما", description: "مدیریت صفحه درباره ما و اعضای تیم", category: "system", permissions: ["about:view", "about:edit"] },
   { id: "terms", name: "Terms", nameFa: "شرایط همکاری", description: "مدیریت متن شرایط همکاری", category: "system", permissions: ["terms:view", "terms:edit"] },

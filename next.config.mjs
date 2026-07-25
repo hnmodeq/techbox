@@ -6,9 +6,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.zarinpal.com" },
-      { protocol: "https", hostname: "gasy0aqpxehqiy8d.public.blob.vercel-storage.com" },
-      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
-      { protocol: "https", hostname: "nggwgcfkceuadvhxnczf.supabase.co" },
+      { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "github.com" },
       { protocol: "https", hostname: "*.githubusercontent.com" },
@@ -46,9 +44,9 @@ const nextConfig = {
           "style-src 'self' 'unsafe-inline'",
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
           "img-src 'self' data: blob: https:",
-          "media-src 'self' https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com https://*.public.blob.vercel-storage.com https://nggwgcfkceuadvhxnczf.supabase.co",
+          "media-src 'self' https://*.supabase.co",
           "font-src 'self' data:",
-          "connect-src 'self' https://gasy0aqpxehqiy8d.public.blob.vercel-storage.com https://*.public.blob.vercel-storage.com https://nggwgcfkceuadvhxnczf.supabase.co https://vitals.vercel-insights.com https://o*.ingest.sentry.io https://va.vercel-scripts.com",
+          "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://o*.ingest.sentry.io https://va.vercel-scripts.com",
           "frame-src 'self' https://www.openstreetmap.org",
           "form-action 'self'",
         ].join('; '),

@@ -1,127 +1,114 @@
 import { NextRequest, NextResponse } from "next/server";
-import { list } from "@vercel/blob";
 import { requirePermission } from "@/lib/api-permissions";
+import {
+  getSupabasePublicUrl,
+  getSupabaseStorageConfig,
+  listSupabaseObjects,
+  type SupabaseStorageObject,
+} from "@/lib/supabase-storage";
 
-const MAX_PAGES = 20;
-const PAGE_LIMIT = 1000;
-
-type BlobLike = {
-  pathname: string;
-  url: string;
-  downloadUrl?: string;
-  size: number;
-  uploadedAt: string | Date;
-  contentType?: string;
-};
+const MAX_FOLDERS = 200;
 
 function normalizePrefix(prefix: string | null) {
-  if (!prefix) return "";
-  return prefix.replace(/^\/+/, "").replace(/\.\./g, "");
+  return (prefix || "").replace(/^\/+|\/+$/g, "").replace(/\.\./g, "");
 }
 
-function inferContentType(pathname: string, explicit?: string) {
-  if (explicit) return explicit;
+function inferContentType(pathname: string, explicit?: unknown) {
+  if (typeof explicit === "string" && explicit) return explicit;
   const ext = pathname.split(".").pop()?.toLowerCase() || "";
   const map: Record<string, string> = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    webp: "image/webp",
-    gif: "image/gif",
-    svg: "image/svg+xml",
-    mp4: "video/mp4",
-    webm: "video/webm",
-    mov: "video/quicktime",
-    mp3: "audio/mpeg",
-    wav: "audio/wav",
-    pdf: "application/pdf",
-    zip: "application/zip",
-    rar: "application/vnd.rar",
-    "7z": "application/x-7z-compressed",
-    iso: "application/x-iso9660-image",
-    ts: "text/typescript",
-    js: "text/javascript",
-    json: "application/json",
-    txt: "text/plain",
+    jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp",
+    gif: "image/gif", svg: "image/svg+xml", mp4: "video/mp4", webm: "video/webm",
+    mov: "video/quicktime", mp3: "audio/mpeg", wav: "audio/wav", pdf: "application/pdf",
+    zip: "application/zip", rar: "application/vnd.rar", "7z": "application/x-7z-compressed",
+    iso: "application/x-iso9660-image", json: "application/json", txt: "text/plain",
   };
   return map[ext] || "application/octet-stream";
 }
 
-function collectFolders(blobs: BlobLike[], prefix: string) {
-  const folders = new Map<string, { name: string; prefix: string; count: number; size: number }>();
-  for (const blob of blobs) {
-    const rest = blob.pathname.slice(prefix.length);
-    const firstSlash = rest.indexOf("/");
-    if (firstSlash <= 0) continue;
-    const name = rest.slice(0, firstSlash);
-    const folderPrefix = `${prefix}${name}/`;
-    const existing = folders.get(folderPrefix) ?? { name, prefix: folderPrefix, count: 0, size: 0 };
-    existing.count += 1;
-    existing.size += blob.size || 0;
-    folders.set(folderPrefix, existing);
+function objectPath(prefix: string, name: string) {
+  return [prefix, name].filter(Boolean).join("/");
+}
+
+function isFolder(item: SupabaseStorageObject) {
+  return !item.id && !item.metadata;
+}
+
+async function walkFiles(bucket: string, rootPrefix: string) {
+  const queue = [rootPrefix];
+  const files: Array<{ item: SupabaseStorageObject; pathname: string }> = [];
+  let visited = 0;
+  while (queue.length > 0 && visited < MAX_FOLDERS) {
+    const prefix = queue.shift()!;
+    visited += 1;
+    const items = await listSupabaseObjects(bucket, prefix);
+    for (const item of items) {
+      const pathname = objectPath(prefix, item.name);
+      if (isFolder(item)) queue.push(pathname);
+      else files.push({ item, pathname });
+    }
   }
-  return [...folders.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return files;
+}
+
+function normalizeFile(bucket: string, item: SupabaseStorageObject, pathname: string) {
+  const metadata = item.metadata || {};
+  const url = getSupabasePublicUrl(bucket, pathname);
+  return {
+    pathname,
+    name: item.name,
+    url,
+    downloadUrl: url,
+    size: typeof metadata.size === "number" ? metadata.size : 0,
+    uploadedAt: item.updated_at || item.created_at || new Date(0).toISOString(),
+    contentType: inferContentType(pathname, metadata.mimetype),
+  };
 }
 
 export async function GET(req: NextRequest) {
   const user = await requirePermission("blob:view");
   if (user instanceof NextResponse) return user;
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return NextResponse.json(
-      {
-        error: "blob_not_configured",
-        message: "BLOB_READ_WRITE_TOKEN is not configured in this environment.",
-      },
-      { status: 503 }
-    );
-  }
-
-  const { searchParams } = new URL(req.url);
-  const prefix = normalizePrefix(searchParams.get("prefix"));
-
   try {
-    let cursor: string | undefined;
-    const blobs: BlobLike[] = [];
-    let hasMore = false;
-
-    for (let page = 0; page < MAX_PAGES; page += 1) {
-      const result = await list({ prefix, cursor, limit: PAGE_LIMIT });
-      blobs.push(...(result.blobs as BlobLike[]));
-      cursor = result.cursor;
-      hasMore = Boolean(cursor);
-      if (!cursor) break;
-    }
-
-    const allFiles = blobs
-      .map((blob) => ({
-        pathname: blob.pathname,
-        name: blob.pathname.split("/").pop() || blob.pathname,
-        url: blob.url,
-        downloadUrl: blob.downloadUrl || blob.url,
-        size: blob.size || 0,
-        uploadedAt: blob.uploadedAt,
-        contentType: inferContentType(blob.pathname, blob.contentType),
-      }))
+    const { publicBucket } = getSupabaseStorageConfig();
+    const prefix = normalizePrefix(new URL(req.url).searchParams.get("prefix"));
+    const direct = await listSupabaseObjects(publicBucket, prefix);
+    const directFiles = direct.filter((item) => !isFolder(item));
+    const directFolders = direct.filter(isFolder);
+    const walked = await walkFiles(publicBucket, prefix);
+    const allFiles = walked
+      .map(({ item, pathname }) => normalizeFile(publicBucket, item, pathname))
       .sort((a, b) => a.pathname.localeCompare(b.pathname));
-
-    const files = allFiles.filter((blob) => !blob.pathname.slice(prefix.length).includes("/"));
-
-    const folders = collectFolders(blobs, prefix);
-    const totalSize = blobs.reduce((sum, blob) => sum + (blob.size || 0), 0);
+    const files = directFiles.map((item) => normalizeFile(publicBucket, item, objectPath(prefix, item.name)));
+    const folders = directFolders.map((item) => {
+      const folderPrefix = objectPath(prefix, item.name);
+      const children = allFiles.filter((file) => file.pathname.startsWith(`${folderPrefix}/`));
+      return {
+        name: item.name,
+        prefix: `${folderPrefix}/`,
+        count: children.length,
+        size: children.reduce((sum, file) => sum + file.size, 0),
+      };
+    });
 
     return NextResponse.json({
-      prefix,
+      provider: "supabase",
+      bucket: publicBucket,
+      prefix: prefix ? `${prefix}/` : "",
       folders,
       files,
       allFiles,
-      totalFiles: blobs.length,
-      totalSize,
-      hasMore,
-      cursor: hasMore ? cursor : null,
+      totalFiles: allFiles.length,
+      totalSize: allFiles.reduce((sum, file) => sum + file.size, 0),
+      hasMore: false,
+      cursor: null,
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "blob_list_failed" }, { status: 500 });
+  } catch (error: any) {
+    console.error("[supabase-storage:list]", error);
+    return NextResponse.json(
+      { error: error?.message === "supabase_storage_not_configured" ? error.message : "storage_list_failed" },
+      { status: error?.message === "supabase_storage_not_configured" ? 503 : 500 }
+    );
   }
 }
 

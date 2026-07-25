@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 });
 
   const comments = await prisma.timelineComment.findMany({
-    where: { eventId },
+    where: { eventId, status: "approved" },
     orderBy: { createdAt: "desc" }
   });
   return NextResponse.json(comments);

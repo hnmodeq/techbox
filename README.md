@@ -5,7 +5,7 @@ infrastructure, networking, servers, storage, and security — magazine, news,
 video media, forum, downloads, tools, reviews, shop, and a tech timeline.
 
 Built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**,
-**Tailwind CSS v4**, **Prisma + PostgreSQL (Neon)**, **Vercel Blob**,
+**Tailwind CSS v4**, **Prisma + PostgreSQL (Neon)**, **Supabase Storage**,
 **Sentry**, and **Upstash Redis**.
 
 ---
@@ -70,7 +70,8 @@ All secrets live in `.env` (git-ignored). Required for a working app:
 | `DATABASE_URL` | Pooled PostgreSQL runtime URL (use Neon's `-pooler` host and the limits shown in `.env.example`) |
 | `DIRECT_URL` | Non-pooled PostgreSQL URL used only by Prisma migrations |
 | `NEXT_PUBLIC_SITE_URL` | Public site origin, e.g. `http://localhost:3000` |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for images / downloads |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase Storage server access (service key is never public) |
+| `SUPABASE_PUBLIC_BUCKET` / `SUPABASE_PRIVATE_BUCKET` | Public content and private résumé bucket names |
 | `ZARIN_MERCHANT_ID` | Zarinpal merchant ID required by the live shop checkout |
 
 Optional (features degrade gracefully when absent):
@@ -127,8 +128,9 @@ settings, IP/network restrictions, and the provider's connection limit.
 | `pnpm lint` | ESLint (next core-web-vitals) |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm db:push` / `pnpm db:seed` | Schema sync / seed |
+| `pnpm storage:migrate-resumes` | Move legacy public Supabase résumés into the private bucket |
 | `pnpm test:e2e` | Playwright smoke tests |
-| `pnpm check:content` / `check:db` / `check:blob` / `check:all` | Content/DB/Blob integrity checks |
+| `pnpm check:content` / `check:db` / `check:storage` / `check:all` | Content/DB/Supabase Storage integrity checks |
 
 ---
 

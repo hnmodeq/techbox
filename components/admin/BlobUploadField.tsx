@@ -27,7 +27,7 @@ function formatBytes(bytes: number) {
 }
 
 export function BlobUploadField({
-  label = "آپلود به Vercel Blob",
+  label = "آپلود به Supabase Storage",
   kind = "image",
   folder = "uploads/images",
   accept,

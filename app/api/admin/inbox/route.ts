@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
       take: 100,
       include: { replies: { orderBy: { createdAt: "asc" } } },
     });
-    return NextResponse.json(submissions, { headers: cacheHeaders(PRIVATE_NO_STORE) });
+    const safe = submissions.map(({ accessTokenHash: _accessTokenHash, ...submission }) => submission);
+    return NextResponse.json(safe, { headers: cacheHeaders(PRIVATE_NO_STORE) });
   } catch {
     return NextResponse.json({ error: "db_unavailable" }, { status: 503, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }

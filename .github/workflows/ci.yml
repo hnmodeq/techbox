@@ -131,7 +131,11 @@ jobs:
     if: ${{ needs.build.result == 'success' }}
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      BLOB_CHECK_LIMIT: 200
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_PUBLIC_BUCKET: ${{ vars.SUPABASE_PUBLIC_BUCKET }}
+      SUPABASE_PRIVATE_BUCKET: ${{ vars.SUPABASE_PRIVATE_BUCKET }}
+      STORAGE_CHECK_LIMIT: 200
 
     steps:
       - name: Checkout

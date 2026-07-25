@@ -103,7 +103,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     label: "ابزارها",
     items: [
       { title: "کتابخانه رسانه", href: "/admin/media", icon: ImageIcon },
-      { title: "فایل‌های Blob", href: "/admin/blob", icon: Database },
+      { title: "فایل‌های Supabase", href: "/admin/blob", icon: Database },
       { title: "آپلود فایل", href: "/admin/upload", icon: Upload },
       { title: "دیزاین سیستم", href: "/admin/design-system", icon: Palette, superAdminOnly: true },
     ],

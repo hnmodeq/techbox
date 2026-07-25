@@ -40,9 +40,6 @@ export type ContentItem = {
   sku?: string | null;
   priceLabel?: string | null;
   priceAmount?: number | null;
-  sourcePriceAmount?: number | null;
-  sourceCurrency?: string | null;
-  priceAdjustmentPercent?: number | null;
   discountPercent?: number | null;
   discountEndsAt?: string | null;
   availability?: string | null;

@@ -445,7 +445,9 @@ model JobApplication {
   name       String
   email      String
   phone      String
-  resumeUrl  String
+  /// Supabase object reference (`supabase://bucket/path`) for new private resumes.
+  /// Mapped to the legacy column name to avoid destructive data migration.
+  resumePath String   @map("resumeUrl")
   resumeName String
   message    String?  @db.Text
   status     String   @default("pending")
@@ -464,8 +466,9 @@ model ContactSubmission {
   email     String
   subject   String?
   message   String   @db.Text
-  status    String   @default("new") // new | read | resolved
-  createdAt DateTime @default(now())
+  status          String   @default("new") // new | read | waiting_user | closed
+  accessTokenHash String?  @unique // SHA-256 capability for guest ticket access
+  createdAt       DateTime @default(now())
 
   replies   TicketReply[]
 
