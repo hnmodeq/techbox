@@ -3,29 +3,14 @@
 3-chat box tabs need to get background to be removed
 4-magazine page need a re-design
 5-homepage need a design
-6-raid calulator needs a re-design
+
 7-media page needs final touchs
-8-files need to get optimize and get upload to supabase
+
 9-remove breadcrumb from magazine
 10-landing page needs to get remove
 11-mobile version need to get a re-design
 12-security check by the prompt that we have
 
-
-
-
-
-in raid calculator page:
-we have 3 section (1-select drives, 2-select raid type, 3-recomended products).
-1-add a button as "بهترین ذخیره‌ساز بر اساس نیاز شما" which is lock and not clickable.
-2-i want the second section have no default RAID (RAID 5 is the defaul, but let the user choose anything he wants without any default option)
-3-when the user enter to the page he gonna see only step 1 and a locked button below the step 1 (which is the best recomended products depends on your needs)
-4-when the user chose the RAID type the button gonna be unlock! when the user click on it the Step 3 (which is the recomended products) will be appears below step 2
-5-when the step 3 appears the step 1 and step 2 will be locked and not clickable.
-6-when the step 3 appears the "بهترین ذخیره ساز بر اساس نیاز شما" button well be change to "شروع دوباره"
-7-move the یادداشت ها section to step 2 (to be part of step 2)
-8-when step 3 appears the old "بازنشانی" button which is inside the step 1 can be invisible
-9-when the step 3 appears the page can get scroll automatically to go on the step 3 section
 
 
 
@@ -100,3 +85,27 @@ Please execute the following step-by-step resolution plan cleanly and rigorously
 1. Run `pnpm run typecheck` or `tsc --noEmit` to verify zero TypeScript errors.
 2. Run `pnpm run lint` to ensure no ESLint warnings or missing dependency arrays in hooks.
 3. Execute `pnpm run test` or `pnpm run test:smoke` to verify all end-to-end and unit tests pass cleanly.
+
+
+
+cd D:\Dev\techbox-blob\avatars
+
+npm install sharp
+
+node -e "
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
+
+const files = fs.readdirSync('.').filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+console.log('Found', files.length, 'images');
+
+Promise.all(files.map(f =>
+  sharp(f).webp({ quality: 80 }).toFile(path.parse(f).name + '.webp')
+    .then(() => console.log('✓', f))
+    .catch(e => console.error('✗', f, e.message))
+)).then(() => console.log('Done!'));
+"
+
+02634219054 poore
+
