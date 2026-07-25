@@ -25,6 +25,7 @@
     "db:fix-future-dates": "tsx prisma/fix-future-post-dates.ts",
     "storage:migrate-resumes": "tsx scripts/migrate-resumes-to-supabase-private.ts",
     "storage:import-qnap": "tsx scripts/import-qnap-product-images.ts",
+    "content:remove-retired": "tsx scripts/remove-retired-content.ts",
     "check:content": "tsx scripts/checks/content.ts",
     "check:storage": "tsx scripts/checks/storage.ts",
     "check:db": "tsx scripts/checks/db.ts",
