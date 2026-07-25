@@ -360,27 +360,18 @@ export default function RaidCalculator() {
           </div>
         </div>
 
-        {/* Recommend button / Restart button */}
-        {!locked && (
+        {/* Button after step 1 — only when step 2 is NOT visible */}
+        {!hasDrives && !locked && (
           <div className="flex justify-center">
-            <Button
-              onClick={handleRecommend}
-              disabled={!hasDrives || !hasRaid}
-              size="lg"
-              className="gap-2"
-            >
-              {(!hasDrives || !hasRaid) && <Lock className="size-4" />}
-              بهترین ذخیره‌ساز بر اساس نیاز شما
-            </Button>
-          </div>
-        )}
-
-        {locked && (
-          <div className="flex justify-center">
-            <Button onClick={handleRestart} variant="outline" size="lg" className="gap-2">
-              <RotateCcw className="size-4" />
-              شروع دوباره
-            </Button>
+            <Tooltip>
+              <TooltipTrigger render={
+                <Button disabled size="xl" className="gap-2">
+                  <Lock className="size-5" />
+                  بهترین ذخیره‌ساز بر اساس نیاز شما
+                </Button>
+              } />
+              <TooltipContent>برای مشاهده پیشنهاد محصول مراحل رو کامل کنید</TooltipContent>
+            </Tooltip>
           </div>
         )}
 
@@ -462,6 +453,27 @@ export default function RaidCalculator() {
           </div>
         )}
 
+        {/* Button after step 2 — when step 2 visible but step 3 not */}
+        {hasDrives && !locked && (
+          <div className="flex justify-center">
+            {canRecommend ? (
+              <Button onClick={handleRecommend} size="xl" className="gap-2">
+                بهترین ذخیره‌ساز بر اساس نیاز شما
+              </Button>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger render={
+                  <Button disabled size="xl" className="gap-2">
+                    <Lock className="size-5" />
+                    بهترین ذخیره‌ساز بر اساس نیاز شما
+                  </Button>
+                } />
+                <TooltipContent>برای مشاهده پیشنهاد محصول مراحل رو کامل کنید</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        )}
+
         {/* Step 3 — Recommended products */}
         {showResults && (
           <div ref={resultsRef} className="bg-card border rounded-xl p-5 sm:p-6">
@@ -470,6 +482,16 @@ export default function RaidCalculator() {
               <h2 className="text-[16px] sm:text-[18px] font-black">بهترین ذخیره‌ساز بر اساس نیاز شما</h2>
             </div>
             <RecommendedModels driveCount={drives.length} />
+          </div>
+        )}
+
+        {/* Restart button — after step 3 */}
+        {locked && (
+          <div className="flex justify-center">
+            <Button onClick={handleRestart} variant="outline" size="xl" className="gap-2">
+              <RotateCcw className="size-4" />
+              شروع دوباره
+            </Button>
           </div>
         )}
 
