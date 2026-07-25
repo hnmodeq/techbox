@@ -69,10 +69,12 @@ All secrets live in `.env` (git-ignored). Required for a working app:
 | `AUTH_SECRET` | JWT session signing secret (`openssl rand -base64 32`) |
 | `DATABASE_URL` | Pooled PostgreSQL runtime URL (use Neon's `-pooler` host and the limits shown in `.env.example`) |
 | `DIRECT_URL` | Non-pooled PostgreSQL URL used only by Prisma migrations |
-| `NEXT_PUBLIC_SITE_URL` | Public site origin, e.g. `http://localhost:3000` |
+| `NEXT_PUBLIC_SITE_URL` | Canonical public origin (`http://localhost:3000` in development; non-local HTTPS URL in production) |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase Storage server access (service key is never public) |
 | `SUPABASE_PUBLIC_BUCKET` / `SUPABASE_PRIVATE_BUCKET` | Public content and private résumé bucket names |
 | `ZARIN_MERCHANT_ID` | Zarinpal merchant ID required by the live shop checkout |
+
+> Production builds reject a missing, malformed, non-HTTPS, or localhost `NEXT_PUBLIC_SITE_URL` so canonical links and email URLs can never silently point to staging/local origins.
 
 Optional (features degrade gracefully when absent):
 

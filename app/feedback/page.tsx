@@ -1,10 +1,11 @@
-import { defaultSeo } from "@/lib/seo"
+import { pageMetadata } from "@/lib/seo"
 import { FeedbackForm } from "@/features/feedback/components/FeedbackForm"
 
-export const metadata = {
-  title: `بازخورد | ${defaultSeo.title}`,
-  description: "ارسال بازخورد و پیشنهادات به تکباکس",
-}
+export const metadata = pageMetadata({
+  title: "بازخورد و پیشنهادها | تکباکس",
+  description: "ارسال نظر، پیشنهاد و بازخورد درباره خدمات و محتوای تکباکس.",
+  path: "/feedback",
+})
 
 export default function FeedbackPage() {
   return (

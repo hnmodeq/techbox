@@ -10,11 +10,11 @@ export const metadata = modulePageMetadata(
 export default async function DownloadPage() {
   const dbItems = await getDbModulePosts("download", 60);
   return (
-    <div dir="rtl">
+    <main dir="rtl">
       <div className="mx-auto max-w-6xl px-4 pt-6">
         <PageBreadcrumb items={[{ label: "خانه", href: "/" }, { label: "دانلود" }]} />
       </div>
       <DownloadTable serverItems={dbItems.length > 0 ? dbItems : undefined} />
-    </div>
+    </main>
   );
 }

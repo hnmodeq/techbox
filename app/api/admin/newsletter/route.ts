@@ -9,6 +9,7 @@ import {
   DEFAULT_NEWSLETTER_SUBJECT,
 } from "@/lib/newsletter";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
+import { siteUrl } from "@/lib/seo";
 
 const TEMPLATE_KEYS = ["newsletter.header_html", "newsletter.footer_html", "newsletter.default_subject"];
 
@@ -40,7 +41,7 @@ export async function GET() {
   const admin = await requirePermission("newsletter:view");
   if (admin instanceof NextResponse) return admin;
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const base = siteUrl();
 
   try {
     const [news, subscriberCount, campaigns, template] = await Promise.all([

@@ -1,13 +1,12 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 import { publicPostDateWhere } from "@/lib/post-date";
+import { siteUrl } from "@/lib/seo";
+import { DEFAULT_MODULE_SLUGS, getEnabledModules } from "@/lib/module-config";
+import type { ModuleSlug } from "@/lib/content";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 86400;
-
-function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app").replace(/\/$/, "");
-}
 
 function entry(url: string, lastModified?: Date | string, priority = 0.7, changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly") {
   return {
@@ -25,7 +24,7 @@ const staticRoutes = [
   { path: "/media", priority: 0.85, changeFrequency: "daily" as const },
   { path: "/review", priority: 0.85, changeFrequency: "weekly" as const },
   { path: "/download", priority: 0.8, changeFrequency: "weekly" as const },
-  { path: "/shop", priority: 0.8, changeFrequency: "weekly" as const },
+  { path: "/landing/storage/shop", priority: 0.8, changeFrequency: "weekly" as const },
   { path: "/forum", priority: 0.8, changeFrequency: "daily" as const },
   { path: "/timeline", priority: 0.75, changeFrequency: "weekly" as const },
   { path: "/tools", priority: 0.7, changeFrequency: "monthly" as const },
@@ -39,17 +38,27 @@ const staticRoutes = [
   { path: "/work-with-us", priority: 0.45, changeFrequency: "monthly" as const },
 ];
 
+function moduleForStaticPath(path: string): ModuleSlug | null {
+  if (path === "/landing/storage/shop") return "shop";
+  const first = path.split("/").filter(Boolean)[0];
+  return DEFAULT_MODULE_SLUGS.includes(first as ModuleSlug) ? first as ModuleSlug : null;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl();
-  const routes: MetadataRoute.Sitemap = staticRoutes.map((route) =>
-    entry(`${base}${route.path}`, undefined, route.priority, route.changeFrequency)
-  );
+  const enabledModules = await getEnabledModules().catch(() => [...DEFAULT_MODULE_SLUGS]);
+  const routes: MetadataRoute.Sitemap = staticRoutes
+    .filter((route) => {
+      const module = moduleForStaticPath(route.path);
+      return !module || enabledModules.includes(module);
+    })
+    .map((route) => entry(`${base}${route.path}`, undefined, route.priority, route.changeFrequency));
 
   if (process.env.DATABASE_URL) {
     try {
       const [posts, timeline, categories] = await Promise.all([
         prisma.post.findMany({
-          where: { published: true, deletedAt: null, date: publicPostDateWhere() },
+          where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
           select: { module: true, slug: true, date: true },
           orderBy: { date: "desc" },
           take: 5000,
@@ -62,7 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }).catch(() => []),
         // Get unique categories for indexable category pages
         prisma.post.findMany({
-          where: { published: true, deletedAt: null, category: { not: null } },
+          where: { published: true, deletedAt: null, module: { in: enabledModules }, category: { not: null } },
           select: { module: true, category: true },
           distinct: ["module", "category"],
           take: 200,

@@ -1,17 +1,8 @@
 import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
+import { absoluteUrl, siteUrl } from "@/lib/seo";
 
 type AnyRecord = Record<string, any>;
-
-function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app").replace(/\/$/, "");
-}
-
-function absoluteUrl(url?: string | null) {
-  if (!url) return undefined;
-  if (/^https?:\/\//i.test(url)) return url;
-  return `${siteUrl()}${url.startsWith("/") ? url : `/${url}`}`;
-}
 
 function cleanObject<T extends AnyRecord>(obj: T): T {
   return Object.fromEntries(
@@ -160,6 +151,12 @@ export function ProductJsonLd({ item }: { item: any }) {
   const base = siteUrl();
   const url = `${base}/shop/${item.slug}`;
   const gallery = Array.isArray(item.gallery) ? item.gallery.map(absoluteUrl).filter(Boolean) : [];
+  const basePriceToman = typeof item.priceAmount === "number" ? item.priceAmount : 0;
+  const discount = typeof item.discountPercent === "number" ? item.discountPercent : 0;
+  const offerPriceRial = basePriceToman > 0
+    ? Math.round(basePriceToman * (discount > 0 ? 1 - discount / 100 : 1) * 10)
+    : undefined;
+  const unavailable = ["ناموجود", "اتمام موجودی"].includes(item.availability || "");
   return (
     <>
       <JsonLd
@@ -177,14 +174,17 @@ export function ProductJsonLd({ item }: { item: any }) {
           offers: cleanObject({
             "@type": "Offer",
             url,
-            availability: item.availability?.includes("موجود") ? "https://schema.org/InStock" : undefined,
-            priceCurrency: "IRR",
-            price: undefined,
-            description: item.priceLabel || "مشاوره خرید",
+            availability: unavailable ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+            priceCurrency: offerPriceRial ? "IRR" : undefined,
+            price: offerPriceRial,
+            priceValidUntil: item.discountEndsAt || undefined,
+            itemCondition: "https://schema.org/NewCondition",
+            seller: { "@type": "Organization", name: "TechBox", url: base },
+            description: item.priceLabel || undefined,
           }),
         })}
       />
-      <BreadcrumbJsonLd items={[{ name: "خانه", url: "/" }, { name: "فروشگاه", url: "/shop" }, { name: item.title, url: `/shop/${item.slug}` }]} />
+      <BreadcrumbJsonLd items={[{ name: "خانه", url: "/" }, { name: "فروشگاه", url: "/landing/storage/shop" }, { name: item.title, url: `/shop/${item.slug}` }]} />
     </>
   );
 }

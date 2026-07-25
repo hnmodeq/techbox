@@ -74,8 +74,11 @@ export function NewsSidebarCard({ news, isUnread }: { news: any; isUnread: boole
               <TooltipTrigger
                 render={
                   <button
+                    type="button"
                     onClick={() => setShowComments(!showComments)}
-                    className="flex items-center gap-1.5 text-[11px] font-bold text-white/90 hover:text-white transition-colors"
+                    aria-expanded={showComments}
+                    aria-label={showComments ? "بستن دیدگاه‌های خبر" : "نمایش دیدگاه‌های خبر"}
+                    className="flex min-h-11 items-center gap-1.5 text-[11px] font-bold text-white/90 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   />
                 }
               >

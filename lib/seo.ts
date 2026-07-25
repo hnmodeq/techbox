@@ -2,8 +2,32 @@ import type { Metadata } from "next";
 import type { ModuleSlug } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 
+let validatedSiteUrl: string | null = null;
+
+/** Canonical public origin. Production refuses missing/localhost values so a
+ * deployment can never silently publish staging or local canonical URLs. */
 export function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app").replace(/\/$/, "");
+  if (validatedSiteUrl) return validatedSiteUrl;
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!configured) {
+    if (process.env.NODE_ENV !== "production") return "http://localhost:3000";
+    throw new Error("NEXT_PUBLIC_SITE_URL is required in production and must be the canonical public origin.");
+  }
+  let parsed: URL;
+  try {
+    parsed = new URL(configured);
+  } catch {
+    throw new Error("NEXT_PUBLIC_SITE_URL must be a valid absolute http(s) URL without Markdown formatting.");
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    throw new Error("NEXT_PUBLIC_SITE_URL must use http or https.");
+  }
+  const isLocal = ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname);
+  if (process.env.NODE_ENV === "production" && (parsed.protocol !== "https:" || isLocal)) {
+    throw new Error("NEXT_PUBLIC_SITE_URL must be a non-local HTTPS origin in production.");
+  }
+  validatedSiteUrl = parsed.origin;
+  return validatedSiteUrl;
 }
 
 export function absoluteUrl(url?: string | null) {
@@ -20,7 +44,7 @@ function truncate(input: string | null | undefined, max = 155) {
 
 export const defaultSeo = {
   title: "تکباکس | رسانه تخصصی فناوری اطلاعات و زیرساخت",
-  description: "تکباکس، رسانه و پلتفرم تخصصی زیرساخت، شبکه، سرور، ذخیره‌سازی، امنیت، ویدیو، نقد و بررسی، دانلود و انجمن فناوری اطلاعات.",
+  description: "تکباکس، رسانه و پلتفرم تخصصی زیرساخت، شبکه، سرور، ذخیره‌سازی، امنیت، ویدیو، نقد و بررسی و انجمن فناوری اطلاعات.",
   image: "/logo.png",
 };
 
@@ -39,16 +63,26 @@ export function pageMetadata({
   type?: "website" | "article";
   noIndex?: boolean;
 }): Metadata {
-  const url = `${siteUrl()}${path.startsWith("/") ? path : `/${path}`}`;
+  const base = siteUrl();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${base}${normalizedPath}`;
   const desc = truncate(description || defaultSeo.description);
-  const img = absoluteUrl(image || defaultSeo.image);
+  const generatedImage = `/api/og?title=${encodeURIComponent(title)}`;
+  const imageValue = image || generatedImage;
+  const img = absoluteUrl(imageValue);
+  const generated = imageValue.startsWith("/api/og");
+  const openGraphImage = img
+    ? { url: img, alt: title, ...(generated ? { width: 1200, height: 630 } : {}) }
+    : undefined;
 
   return {
-    metadataBase: new URL(siteUrl()),
+    metadataBase: new URL(base),
     title,
     description: desc,
     alternates: { canonical: url },
-    robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
+    robots: noIndex
+      ? { index: false, follow: false, googleBot: { index: false, follow: false } }
+      : { index: true, follow: true },
     openGraph: {
       type,
       locale: "fa_IR",
@@ -56,7 +90,7 @@ export function pageMetadata({
       title,
       description: desc,
       url,
-      images: img ? [{ url: img, width: 1200, height: 630, alt: title }] : undefined,
+      images: openGraphImage ? [openGraphImage] : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -64,6 +98,14 @@ export function pageMetadata({
       description: desc,
       images: img ? [img] : undefined,
     },
+  };
+}
+
+export function privatePageMetadata(title: string, description?: string): Metadata {
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false, googleBot: { index: false, follow: false } },
   };
 }
 
@@ -89,8 +131,6 @@ export function detailMetadata(module: ModuleSlug, item: any | null, fallbackTit
 
   const title = item.seoTitle || `${item.title} | ${meta.titleFa} تکباکس`;
   const description = item.seoDescription || item.excerpt || item.content || `${meta.titleFa} تکباکس`;
-
-  // Use post image, or generate dynamic OG image as fallback
   const image = item.image || `/api/og?title=${encodeURIComponent(item.title)}&module=${module}${item.category ? `&category=${encodeURIComponent(item.category)}` : ""}`;
 
   return pageMetadata({

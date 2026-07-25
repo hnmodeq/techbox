@@ -5,6 +5,7 @@ import { getSessionUserPublic } from "@/lib/auth-server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { getSettings } from "@/lib/settings";
+import { siteUrl } from "@/lib/seo";
 
 const postSchema = z.object({
   postModule: z.string(),
@@ -129,7 +130,7 @@ export async function POST(req: NextRequest) {
       if (postAuthor?.email) {
         const { subject, html } = emailTemplates.newComment({
           postTitle: post.title,
-          postUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/${postModule}/${postSlug}`,
+          postUrl: `${siteUrl()}/${postModule}/${postSlug}`,
           commentAuthor: user.name || user.username,
           commentText: text,
         });

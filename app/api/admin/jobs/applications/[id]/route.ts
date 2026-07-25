@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission } from "@/lib/api-permissions";
 import { sendEmail, escapeHtml } from "@/lib/email";
+import { siteUrl } from "@/lib/seo";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
 export async function PATCH(
@@ -42,7 +43,7 @@ export async function PATCH(
             <p>وضعیت درخواست شما برای موقعیت شغلی <strong>${escapeHtml(application.job?.title || "")}</strong> به <strong>${escapeHtml(statusLabel)}</strong> تغییر کرد.</p>
             ${status === "contacted" ? "<p>به زودی با شما تماس خواهیم گرفت.</p>" : ""}
             ${status === "rejected" ? "<p>متأسفانه در این مرحله امکان همکاری وجود ندارد. از علاقه شما ممنونیم.</p>" : ""}
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://techbox.ir"}/work-with-us" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
+            <a href="${siteUrl()}/work-with-us" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
               مشاهده موقعیت‌های شغلی
             </a>
           </div>

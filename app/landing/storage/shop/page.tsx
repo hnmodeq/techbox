@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { getDbModulePosts } from "@/lib/server-posts";
 import ShopGrid from "@/features/shop/components/ShopGrid";
+import { pageMetadata, siteUrl } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/StructuredData";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "فروشگاه ذخیره‌ساز سازمانی | تکباکس",
-  description: "۱۴۴ مدل QNAP واقعی با قیمت دلاری و تبدیل لحظه‌ای به تومان – فیلتر Bay، CPU، RAM، 10GbE",
-};
+  description: "خرید آنلاین ذخیره‌سازهای QNAP و تجهیزات زیرساخت با مشخصات فنی، قیمت به‌روز و پرداخت امن.",
+  path: "/landing/storage/shop",
+});
 
 export default async function StorageShopPage() {
   const all = await getDbModulePosts("shop", 200);
@@ -20,6 +22,26 @@ export default async function StorageShopPage() {
 
   return (
     <main className="mx-auto max-w-[1920px] px-0 lg:px-4 py-4" dir="rtl">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "فروشگاه ذخیره‌ساز سازمانی تکباکس",
+          description: "فروشگاه آنلاین تجهیزات ذخیره‌سازی و زیرساخت",
+          url: `${siteUrl()}/landing/storage/shop`,
+          inLanguage: "fa-IR",
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: nas.length,
+            itemListElement: nas.slice(0, 24).map((product, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: `${siteUrl()}/shop/${product.slug}`,
+              name: product.title,
+            })),
+          },
+        }}
+      />
       <ShopGrid serverItems={nas.length > 0 ? nas : undefined} />
     </main>
   );

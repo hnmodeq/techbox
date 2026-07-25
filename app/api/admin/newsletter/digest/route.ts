@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/api-permissions";
 import { sendEmail } from "@/lib/email";
 import { renderNewsletterEmail, buildUnsubscribeUrl, type NewsletterItem } from "@/lib/newsletter";
 import { formatPostDateFa } from "@/lib/post-date";
+import { siteUrl } from "@/lib/seo";
 
 /**
  * POST /api/admin/newsletter/digest
@@ -62,7 +63,7 @@ export async function POST() {
       title: p.title,
       excerpt: p.excerpt || null,
       image: p.image || null,
-      url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app"}/${p.module}/${p.slug}`,
+      url: `${siteUrl()}/${p.module}/${p.slug}`,
       dateFa: formatPostDateFa(p.date),
     }));
 

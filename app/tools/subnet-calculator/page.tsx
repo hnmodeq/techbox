@@ -1,10 +1,11 @@
 import { SubnetCalculator } from "@/features/tools/components/subnet-calculator";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "محاسبه زیرشبکه | TechBox",
-  description: "محاسبه آدرس شبکه، ماسک، محدوده IP و تعداد میزبان قابل استفاده.",
-};
+export const metadata = pageMetadata({
+  title: "محاسبه زیرشبکه و CIDR | تکباکس",
+  description: "محاسبه آدرس شبکه، Subnet Mask، Broadcast، محدوده IP و تعداد میزبان قابل استفاده.",
+  path: "/tools/subnet-calculator",
+});
 
 export default function SubnetCalculatorPage() {
   return (

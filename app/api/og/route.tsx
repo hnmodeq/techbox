@@ -9,9 +9,9 @@ export const runtime = "edge";
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const title = searchParams.get("title") || "تکباکس";
-  const moduleKey = searchParams.get("module") || "";
-  const category = searchParams.get("category") || "";
+  const title = (searchParams.get("title") || "تکباکس").slice(0, 160);
+  const moduleKey = (searchParams.get("module") || "").slice(0, 30);
+  const category = (searchParams.get("category") || "").slice(0, 50);
 
   const moduleColors: Record<string, string> = {
     blog: "#fb923c",
@@ -176,6 +176,10 @@ export async function GET(req: NextRequest) {
     {
       width: 1200,
       height: 630,
+      headers: {
+        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        "X-Content-Type-Options": "nosniff",
+      },
     }
   );
 }

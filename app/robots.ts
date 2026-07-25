@@ -1,8 +1,5 @@
 import type { MetadataRoute } from "next";
-
-function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app").replace(/\/$/, "");
-}
+import { siteUrl } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   const base = siteUrl();
@@ -15,7 +12,10 @@ export default function robots(): MetadataRoute.Robots {
           "/admin/",
           "/api/",
           "/account",
+          "/auth/",
+          "/order/",
           "/shop/checkout",
+          "/compare",
         ],
       },
     ],

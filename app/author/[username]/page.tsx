@@ -11,6 +11,32 @@ import { getUserActivities, getProfileContentModulesForAuthor } from "@/lib/user
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
 import { FollowButton } from "@/components/profile/FollowButton";
 import { FollowStats } from "@/components/profile/FollowStats";
+import { pageMetadata } from "@/lib/seo";
+
+type AuthorParams = { params: Promise<{ username: string }> };
+
+export async function generateMetadata({ params }: AuthorParams) {
+  const { username } = await params;
+  const cleanUser = decodeURIComponent(username).toLowerCase();
+  const user = await prisma.user.findFirst({
+    where: { username: cleanUser },
+    select: { name: true, username: true, bio: true, job: true, avatar: true },
+  }).catch(() => null);
+  if (!user) {
+    return pageMetadata({
+      title: "کاربر یافت نشد | تکباکس",
+      description: "این نمایه کاربری در تکباکس وجود ندارد.",
+      path: `/author/${encodeURIComponent(cleanUser)}`,
+      noIndex: true,
+    });
+  }
+  return pageMetadata({
+    title: `${user.name} (@${user.username}) | تکباکس`,
+    description: user.bio || user.job || `نمایه و محتوای منتشرشده توسط ${user.name} در تکباکس`,
+    path: `/author/${encodeURIComponent(user.username)}`,
+    image: user.avatar,
+  });
+}
 
 export default async function AuthorProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;

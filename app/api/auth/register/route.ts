@@ -6,6 +6,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendEmail, emailTemplates } from "@/lib/email";
 
 import { getSetting } from "@/lib/settings";
+import { siteUrl } from "@/lib/seo";
 
 const registerSchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ حرف باشد"),
@@ -154,7 +155,7 @@ export async function POST(req: NextRequest) {
 
     // Require verification
     const { rawToken } = await createEmailVerification(user.id);
-    const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const base = siteUrl();
     const verifyLink = `${base}/auth/verify-email?token=${rawToken}&email=${encodeURIComponent(user.email)}`;
 
     const { subject, html } = emailTemplates.emailVerification(verifyLink);

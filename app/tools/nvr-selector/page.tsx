@@ -1,11 +1,12 @@
 import { NvrSelectorWizard } from "@/features/tools/components/nvr-selector-wizard";
 import { getDbModulePosts } from "@/lib/server-posts";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "انتخاب ذخیره‌ساز دوربین | TechBox",
-  description: "محاسبه فضای مورد نیاز و پهنای باند برای سیستم دوربین مداربسته.",
-};
+export const metadata = pageMetadata({
+  title: "انتخاب ذخیره‌ساز دوربین | تکباکس",
+  description: "محاسبه ظرفیت و انتخاب ذخیره‌ساز مناسب بر اساس تعداد دوربین، وضوح تصویر و مدت نگهداری.",
+  path: "/tools/nvr-selector",
+});
 
 export default async function NvrSelectorPage() {
   // Fetch NAS/server products that can be used as NVR

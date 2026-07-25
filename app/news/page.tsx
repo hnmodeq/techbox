@@ -10,11 +10,11 @@ export const metadata = modulePageMetadata(
 export default async function NewsPage() {
   const dbItems = await getDbModulePosts("news", 100);
   return (
-    <div dir="rtl">
+    <main dir="rtl">
       <div className="mx-auto max-w-6xl px-4 pt-6">
         <PageBreadcrumb items={[{ label: "خانه", href: "/" }, { label: "اخبار" }]} />
       </div>
       <NewsList serverItems={dbItems.length > 0 ? dbItems : undefined} />
-    </div>
+    </main>
   );
 }

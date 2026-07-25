@@ -10,11 +10,11 @@ export const metadata = modulePageMetadata(
 export default async function ReviewPage() {
   const dbItems = await getDbModulePosts("review", 60);
   return (
-    <div dir="rtl">
+    <main dir="rtl">
       <div className="mx-auto max-w-6xl px-4 pt-6">
         <PageBreadcrumb items={[{ label: "خانه", href: "/" }, { label: "نقد و بررسی" }]} />
       </div>
       <ReviewGrid serverItems={dbItems.length > 0 ? dbItems : undefined} />
-    </div>
+    </main>
   );
 }

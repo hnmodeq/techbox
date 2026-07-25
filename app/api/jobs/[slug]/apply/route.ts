@@ -11,6 +11,7 @@ import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 import { sendEmail, escapeHtml } from "@/lib/email";
+import { siteUrl } from "@/lib/seo";
 
 const applySchema = z.object({
   name: z.string().min(2, "نام باید حداقل ۲ کاراکتر باشد").max(100),
@@ -118,7 +119,7 @@ export async function POST(
           <p>ایمیل: ${escapeHtml(data.email)}</p>
           <p>تلفن: ${escapeHtml(data.phone)}</p>
           ${data.message ? `<p>پیام: ${escapeHtml(data.message)}</p>` : ""}
-          <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://techbox.ir"}/admin/jobs/applications" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
+          <a href="${siteUrl()}/admin/jobs/applications" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #111; color: white; text-decoration: none; border-radius: 6px;">
             مشاهده رزومه‌ها
           </a>
         </div>
