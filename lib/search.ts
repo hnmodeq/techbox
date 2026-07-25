@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
+import { stripInternalProductFields } from "@/lib/public-content";
 
 function normalizePersian(text: string): string {
   return text
@@ -58,11 +59,7 @@ export async function advancedSearch({
 
     const results = posts
       .map((p: any) => {
-        const publicPost = { ...p };
-        delete publicPost.sourcePriceAmount;
-        delete publicPost.sourceCurrency;
-        delete publicPost.priceAdjustmentPercent;
-        delete publicPost.sellerBenefitPercent;
+        const publicPost = stripInternalProductFields(p);
         const title = normalizePersian(p.title || "");
         const excerpt = normalizePersian(p.excerpt || "");
         const content = normalizePersian(p.content || "");

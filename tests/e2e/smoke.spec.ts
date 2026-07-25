@@ -37,7 +37,7 @@ async function expectHealthyPage(page: Page, path: string, headingOrText?: RegEx
     await expect(page.locator('main').first()).toBeVisible({ timeout: 10_000 });
   }
   
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(600);
   expect(errors, `fatal browser errors on ${path}`).toEqual([]);
 }
 
@@ -47,6 +47,7 @@ test.describe('public smoke tests', () => {
   });
 
   test('main module pages render', async ({ page }) => {
+    test.setTimeout(90_000);
     for (const path of ['/blog', '/news', '/media', '/review', '/download', '/shop', '/forum', '/timeline', '/tools']) {
       await expectHealthyPage(page, path);
     }

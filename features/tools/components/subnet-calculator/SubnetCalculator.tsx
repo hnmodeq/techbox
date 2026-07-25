@@ -6,48 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Network, RotateCcw } from "lucide-react";
+import { calculateSubnet, isValidIpv4 } from "@/lib/subnet";
 
-function ipToInt(ip: string) {
-  return ip.split(".").reduce((a, o) => (a << 8) + parseInt(o || "0"), 0) >>> 0;
-}
-function intToIp(n: number) {
-  return [24, 16, 8, 0].map((s) => (n >>> s) & 255).join(".");
-}
-function isValidIp(ip: string) {
-  const p = ip.split(".");
-  return p.length === 4 && p.every((o) => /^\d+$/.test(o) && +o >= 0 && +o <= 255);
-}
-
-const CIDR_PRESETS = [
-  { cidr: 24, label: "/24", mask: "255.255.255.0", hosts: "۲۵۴" },
-  { cidr: 25, label: "/25", mask: "255.255.255.128", hosts: "۱۲۶" },
-  { cidr: 26, label: "/26", mask: "255.255.255.192", hosts: "۶۲" },
-  { cidr: 27, label: "/27", mask: "255.255.255.224", hosts: "۳۰" },
-  { cidr: 28, label: "/28", mask: "255.255.255.240", hosts: "۱۴" },
-  { cidr: 29, label: "/29", mask: "255.255.255.248", hosts: "۶" },
-  { cidr: 30, label: "/30", mask: "255.255.255.252", hosts: "۲" },
-];
+const CIDR_PRESETS = [24, 25, 26, 27, 28, 29, 30, 31, 32].map((cidr) => ({ cidr, label: `/${cidr}` }));
 
 export default function SubnetCalculator() {
   const [ip, setIp] = useState("192.168.1.0");
   const [cidr, setCidr] = useState(24);
 
-  const valid = isValidIp(ip);
+  const valid = isValidIpv4(ip);
 
   const out = useMemo(() => {
     if (!valid) return null;
-    const mask = (~((1 << (32 - cidr)) - 1)) >>> 0;
-    const net = ipToInt(ip) & mask;
-    const broadcast = net | (~mask >>> 0);
-    const hosts = Math.max(0, (1 << (32 - cidr)) - 2);
-    return {
-      network: intToIp(net),
-      broadcast: intToIp(broadcast),
-      mask: intToIp(mask),
-      first: hosts > 0 ? intToIp(net + 1) : "—",
-      last: hosts > 0 ? intToIp(broadcast - 1) : "—",
-      hosts,
-    };
+    return calculateSubnet(ip, cidr);
   }, [ip, cidr, valid]);
 
   return (
@@ -66,8 +37,9 @@ export default function SubnetCalculator() {
       {/* Inputs */}
       <Card className="p-5 space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">آدرس IP</label>
+          <label htmlFor="subnet-ip" className="text-sm font-medium">آدرس IP</label>
           <Input
+            id="subnet-ip"
             value={ip}
             onChange={(e) => setIp(e.target.value)}
             className={`font-mono ${!valid ? "border-destructive" : ""}`}
@@ -81,21 +53,23 @@ export default function SubnetCalculator() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">پیشوند شبکه</label>
+            <label htmlFor="subnet-cidr" className="text-sm font-medium">پیشوند شبکه</label>
             <Badge variant="secondary" dir="ltr">/{cidr}</Badge>
           </div>
           <input
+            id="subnet-cidr"
+            aria-label="پیشوند CIDR"
             type="range"
-            min={8}
-            max={30}
+            min={0}
+            max={32}
             step={1}
             value={cidr}
             onChange={(e) => setCidr(parseInt(e.target.value))}
             className="w-full"
           />
           <div className="flex justify-between text-[10px] text-muted-foreground" dir="ltr">
-            <span>/8</span>
-            <span>/30</span>
+            <span>/0</span>
+            <span>/32</span>
           </div>
         </div>
 
@@ -140,8 +114,12 @@ export default function SubnetCalculator() {
             ))}
             <Separator />
             <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">تعداد کل آدرس‌ها</span>
+              <span className="font-bold">{out.totalAddresses.toLocaleString("fa-IR")}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">تعداد میزبان قابل استفاده</span>
-              <span className="font-bold text-primary">{out.hosts.toLocaleString("fa-IR")}</span>
+              <span className="font-bold text-primary">{out.usableHosts.toLocaleString("fa-IR")}</span>
             </div>
           </div>
         </Card>

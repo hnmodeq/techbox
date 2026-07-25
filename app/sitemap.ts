@@ -49,8 +49,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const enabledModules = await getEnabledModules().catch(() => [...DEFAULT_MODULE_SLUGS]);
   const routes: MetadataRoute.Sitemap = staticRoutes
     .filter((route) => {
-      const module = moduleForStaticPath(route.path);
-      return !module || enabledModules.includes(module);
+      const moduleSlug = moduleForStaticPath(route.path);
+      return !moduleSlug || enabledModules.includes(moduleSlug);
     })
     .map((route) => entry(`${base}${route.path}`, undefined, route.priority, route.changeFrequency));
 

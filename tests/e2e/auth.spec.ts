@@ -9,10 +9,11 @@ test.describe('Authentication Flows', () => {
   });
 
   test('Fails to login with invalid credentials', async ({ page }) => {
+    test.skip(!process.env.DATABASE_URL, 'DATABASE_URL is required for credential verification');
     await page.goto('/admin/login');
     await page.fill('input[placeholder="username"]', 'wronguser');
     await page.fill('input[placeholder="••••••••"]', 'wrongpass');
-    await page.click('button:has-text("ورود")');
-    await expect(page.locator('.text-\\[var\\(--danger\\)\\]')).toBeVisible();
+    await page.getByRole('button', { name: 'ورود', exact: true }).click();
+    await expect(page.getByText(/نام کاربری یا رمز عبور اشتباه است|خطا در ورود/)).toBeVisible();
   });
 });

@@ -14,6 +14,7 @@ import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { getEnabledModules } from "@/lib/module-config";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getCurrencyRates, calculateFinalTomanPrice, type CurrencyCode } from "@/lib/currency";
+import { stripInternalProductFields } from "@/lib/public-content";
 
 function normalizeSlug(value: string, fallback: string) {
   const base = (value || fallback)
@@ -132,7 +133,7 @@ export async function GET(req: NextRequest) {
           console.error("[posts:list] product price calculation failed", { postId: p.id, error });
         }
       }
-      return {
+      const item = {
       id: p.id,
       slug: p.slug,
       module: p.module,
@@ -195,6 +196,7 @@ export async function GET(req: NextRequest) {
         verifiedLabel: (p.author as any)?.verifiedLabel || null,
       },
     };
+      return includeAllPublishedStates ? item : stripInternalProductFields(item);
     });
 
     // Attach comment counts in bulk
