@@ -31,8 +31,9 @@ export async function GET(req: NextRequest) {
     const { results, count } = await advancedSearch({ q, moduleKey, take });
     logSearch({ query: normalizeQuery(q), results: count }); // fire-and-forget
     return NextResponse.json({ q, results, count }, { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "search_failed", q, results: [], count: 0 }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error) {
+    console.error("[search]", error);
+    return NextResponse.json({ error: "search_failed", q, results: [], count: 0 }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 

@@ -19,8 +19,8 @@ const updateSchema = z.object({
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const event = await prisma.timelineEvent.findUnique({
-      where: { id },
+    const event = await prisma.timelineEvent.findFirst({
+      where: { id, published: true },
     });
 
     if (!event) return NextResponse.json({ error: 'Not found' }, { status: 404 });

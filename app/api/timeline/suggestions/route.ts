@@ -77,11 +77,12 @@ export async function POST(req: NextRequest) {
       },
     });
     return NextResponse.json(suggestion, { status: 201 });
-  } catch (e: any) {
-    if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: "validation", issues: e.errors }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "validation", issues: error.errors }, { status: 400 });
     }
-    return NextResponse.json({ error: e?.message || "failed" }, { status: 400 });
+    console.error("[timeline:suggestions:create]", error);
+    return NextResponse.json({ error: "suggestion_create_failed" }, { status: 500 });
   }
 }
 

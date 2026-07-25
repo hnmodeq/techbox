@@ -51,10 +51,11 @@ export async function POST(req: NextRequest) {
     await setSessionCookie(fresh);
 
     return NextResponse.json({ ok: true, message: "رمز عبور با موفقیت تغییر کرد" });
-  } catch (e: any) {
-    if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: e.errors[0].message }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
     }
-    return NextResponse.json({ error: e?.message || "خطا در تغییر رمز عبور" }, { status: 400 });
+    console.error("[auth:change-password]", error);
+    return NextResponse.json({ error: "خطا در تغییر رمز عبور" }, { status: 500 });
   }
 }

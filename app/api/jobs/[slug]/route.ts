@@ -22,9 +22,9 @@ export async function GET(
     return NextResponse.json(job, {
       headers: cacheHeaders(PUBLIC_DETAIL_CACHE)
     });
-  } catch (error: any) {
-    console.error('Error fetching job:', error);
-    return NextResponse.json({ error: error.message || 'db_unavailable' }, { 
+  } catch (error) {
+    console.error('[jobs:detail]', error);
+    return NextResponse.json({ error: 'db_unavailable' }, {
       status: 503,
       headers: cacheHeaders(PRIVATE_NO_STORE)
     });

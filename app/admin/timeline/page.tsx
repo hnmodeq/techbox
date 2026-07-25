@@ -72,7 +72,7 @@ function TimelineContent({ isSuperAdmin }: { isSuperAdmin: boolean }) {
   async function fetchEvents() {
     setLoading(true);
     try {
-      const res = await fetch("/api/timeline/events", { cache: "no-store" });
+      const res = await fetch("/api/timeline/events?scope=admin", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         setEvents(Array.isArray(data) ? data : []);
@@ -138,7 +138,7 @@ function TimelineContent({ isSuperAdmin }: { isSuperAdmin: boolean }) {
       const url = editingEvent
         ? `/api/timeline/events/${editingEvent.id}`
         : "/api/timeline/events";
-      const method = editingEvent ? "PATCH" : "POST";
+      const method = editingEvent ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,

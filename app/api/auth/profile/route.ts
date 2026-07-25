@@ -119,7 +119,11 @@ export async function PUT(req: NextRequest) {
         emailVerified: !!updated.emailVerified,
       },
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "خطا در به‌روزرسانی پروفایل" }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "invalid_profile", issues: error.issues }, { status: 400 });
+    }
+    console.error("[auth:profile]", error);
+    return NextResponse.json({ error: "خطا در به‌روزرسانی پروفایل" }, { status: 500 });
   }
 }

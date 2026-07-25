@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getBySlug } from "@/lib/content";
 
 type Params = Promise<{ slug: string }>;
 
@@ -47,12 +46,6 @@ export async function GET(_req: NextRequest, { params }: { params: Params }) {
       return response;
     }
 
-    const fallback = getBySlug("download", slug) as any;
-    if (fallback?.fileUrl && isAllowedDownloadUrl(fallback.fileUrl)) {
-      const response = NextResponse.redirect(new URL(fallback.fileUrl), 302);
-      response.headers.set("Cache-Control", "no-store");
-      return response;
-    }
     return NextResponse.json(
       { error: "download_unavailable", message: "برای این آیتم فایل دانلودی ثبت نشده است." },
       { status: 404 }

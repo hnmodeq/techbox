@@ -11,9 +11,9 @@ export async function GET() {
     return NextResponse.json(jobs, {
       headers: cacheHeaders(PUBLIC_CONTENT_CACHE)
     });
-  } catch (error: any) {
-    console.error('Error fetching jobs:', error);
-    return NextResponse.json({ error: error.message || 'db_unavailable' }, { 
+  } catch (error) {
+    console.error('[jobs:list]', error);
+    return NextResponse.json({ error: 'db_unavailable' }, {
       status: 503,
       headers: cacheHeaders(PRIVATE_NO_STORE)
     });

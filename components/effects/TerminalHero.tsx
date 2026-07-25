@@ -90,7 +90,6 @@ function buildMixedSequence(
 }
 
 interface TerminalHeroProps {
-  lines?: string[];           // Legacy single list (backward compat)
   fullWidth?: boolean;
   echoLines?: string[];
   codeLines?: string[];
@@ -100,7 +99,6 @@ interface TerminalHeroProps {
 }
 
 export function TerminalHero({
-  lines: legacyLines,
   fullWidth,
   echoLines: propEcho,
   codeLines: propCode,
@@ -108,7 +106,6 @@ export function TerminalHero({
   codeEnabled = true,
   echoWeight = 70,
 }: TerminalHeroProps) {
-  // Use dual lists if provided, fall back to legacy single list, then defaults
   const echoLines = propEcho ?? FALLBACK_ECHO;
   const codeLines = propCode ?? FALLBACK_CODE;
 
@@ -228,11 +225,6 @@ export function TerminalHero({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [done]);
 
-  // Legacy single-list support
-  const displayLines = legacyLines && legacyLines.length > 0
-    ? (completedLines.length > 0 ? completedLines : legacyLines)
-    : completedLines;
-
   return (
     <div
       className={`w-full ${fullWidth ? "max-w-full" : "max-w-4xl"} mx-auto rounded-xl overflow-hidden border border-border shadow-2xl bg-[#0d1117] font-mono text-sm`}
@@ -249,7 +241,7 @@ export function TerminalHero({
         ref={scrollRef}
         className="p-4 h-[180px] sm:h-[220px] md:h-[250px] lg:h-[300px] overflow-y-auto space-y-1 text-left terminal-scroll"
       >
-        {displayLines.map((cmd, i) => (
+        {completedLines.map((cmd, i) => (
           <div key={`done-${i}`} className="flex flex-wrap items-center gap-1">
             <TerminalPrompt />
             <span className="text-[#e6edf3] break-all">{cmd}</span>

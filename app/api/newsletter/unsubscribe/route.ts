@@ -4,14 +4,9 @@ import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
-// Accept either a secure per-subscriber token (from the email link — preferred)
-// or an email address (legacy / footer form).
-const unsubscribeSchema = z
-  .object({
-    token: z.string().min(1).optional(),
-    email: z.string().email().optional(),
-  })
-  .refine((d) => d.token || d.email, { message: "token یا email الزامی است" });
+const unsubscribeSchema = z.object({
+  token: z.string().min(20).max(200),
+});
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -25,20 +20,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { token, email } = unsubscribeSchema.parse(body);
+    const { token } = unsubscribeSchema.parse(body);
 
-    if (token) {
-      // Token path (from the newsletter email link): set inactive by token.
-      await prisma.newsletterSubscriber.updateMany({
-        where: { unsubscribeToken: token },
-        data: { active: false, unsubscribedAt: new Date() },
-      });
-    } else if (email) {
-      await prisma.newsletterSubscriber.updateMany({
-        where: { email: email.toLowerCase().trim() },
-        data: { active: false, unsubscribedAt: new Date() },
-      });
-    }
+    await prisma.newsletterSubscriber.updateMany({
+      where: { unsubscribeToken: token },
+      data: { active: false, unsubscribedAt: new Date() },
+    });
 
     return NextResponse.json(
       { ok: true, message: "عضویت شما لغو شد." },

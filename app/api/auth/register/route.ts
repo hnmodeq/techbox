@@ -167,10 +167,11 @@ export async function POST(req: NextRequest) {
       email: user.email,
       message: "حساب شما ساخته شد. برای تکمیل ثبت‌نام، لینک تأیید را از ایمیل خود بررسی کنید.",
     }, { status: 201 });
-  } catch (e: any) {
-    if (e instanceof z.ZodError) {
-      return NextResponse.json({ error: e.errors[0].message }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
     }
-    return NextResponse.json({ error: e?.message || "خطا در ثبت‌نام" }, { status: 400 });
+    console.error("[auth:register]", error);
+    return NextResponse.json({ error: "خطا در ثبت‌نام" }, { status: 500 });
   }
 }

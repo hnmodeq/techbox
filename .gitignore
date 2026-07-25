@@ -9,6 +9,8 @@ coverage
 .env.*
 !.env.example
 *.tsbuildinfo
+*.log
+*.tmp
 next-env.d.ts
 .DS_Store
 .npm
@@ -32,3 +34,5 @@ playwright-report/
 test-results/
 uploads/
 test-check.*
+readme/data.md
+readme/tree.md

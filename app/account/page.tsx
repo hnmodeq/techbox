@@ -172,8 +172,7 @@ export default function AccountPage() {
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        toast.success(data.alreadyVerified ? "این ایمیل قبلاً تأیید شده است." : "لینک تأیید ارسال شد. لطفا صندوق پستی خود را بررسی کنید.");
-        if (data.alreadyVerified && !override) setVerifyEmail(null);
+        toast.success("اگر این ایمیل نیاز به تأیید داشته باشد، لینک ارسال می‌شود. لطفاً صندوق پستی خود را بررسی کنید.");
       } else {
         toast.error(data.message || "خطا در ارسال لینک تأیید");
       }

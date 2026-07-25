@@ -7,6 +7,10 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { siteUrl } from "@/lib/seo";
 
 const schema = z.object({ email: z.string().email() });
+const GENERIC_RESPONSE = {
+  ok: true,
+  message: "اگر حسابی با این ایمیل نیاز به تأیید داشته باشد، لینک ارسال شد.",
+};
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -27,14 +31,10 @@ export async function POST(req: NextRequest) {
       where: { email: email.toLowerCase() },
     });
 
-    // Always respond ok — never reveal whether an account exists.
-    if (!user) {
-      return NextResponse.json({ ok: true, message: "اگر ایمیل معتبر باشد، لینک تأیید ارسال شد." });
-    }
-
-    // Already verified — nothing to do. Still return ok.
-    if (user.emailVerified) {
-      return NextResponse.json({ ok: true, alreadyVerified: true, message: "این ایمیل قبلاً تأیید شده است." });
+    // Always return the same payload so callers cannot enumerate accounts or
+    // learn whether an address is already verified.
+    if (!user || user.emailVerified) {
+      return NextResponse.json(GENERIC_RESPONSE);
     }
 
     const { rawToken } = await createEmailVerification(user.id);
@@ -44,14 +44,12 @@ export async function POST(req: NextRequest) {
     const { subject, html } = emailTemplates.emailVerification(verifyLink);
     await sendEmail({ to: user.email, subject, html });
 
-    return NextResponse.json({
-      ok: true,
-      message: "لینک تأیید ایمیل ارسال شد.",
-    });
+    return NextResponse.json(GENERIC_RESPONSE);
   } catch (e: any) {
     if (e instanceof z.ZodError) {
       return NextResponse.json({ error: e.errors[0].message }, { status: 400 });
     }
-    return NextResponse.json({ error: "خطا در ارسال ایمیل" }, { status: 500 });
+    console.error("[auth:send-verification]", e);
+    return NextResponse.json(GENERIC_RESPONSE);
   }
 }

@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { moduleMeta, type ModuleSlug, getBySlug } from "@/lib/content";
+import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -233,7 +233,6 @@ function NewPostInner() {
         const res = await fetch(`/api/posts?module=${encodeURIComponent(moduleWatch)}&slug=${encodeURIComponent(editSlug)}`, { cache: "no-store" });
         if (res.ok) it = await res.json();
       } catch {}
-      if (!it) it = getBySlug(moduleWatch, editSlug);
       if (!mounted || !it) return;
       setEditPostId(it.id || null);
       form.reset({

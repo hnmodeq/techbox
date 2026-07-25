@@ -8,18 +8,6 @@ import {
 } from "@/lib/supabase-storage";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
-function legacySupabaseUrlIsAllowed(value: string) {
-  try {
-    const config = getSupabaseStorageConfig();
-    const url = new URL(value);
-    const expected = new URL(config.url);
-    return url.protocol === "https:" && url.hostname === expected.hostname &&
-      url.pathname.startsWith(`/storage/v1/object/public/${config.publicBucket}/`);
-  } catch {
-    return false;
-  }
-}
-
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -38,19 +26,14 @@ export async function GET(
 
   try {
     const privateRef = parsePrivateStorageRef(application.resumePath);
-    let upstream: Response;
-    if (privateRef) {
-      upstream = await fetchSupabaseObject(privateRef.bucket, privateRef.path);
-    } else if (legacySupabaseUrlIsAllowed(application.resumePath)) {
-      // Temporary compatibility for already-migrated public résumés. The
-      // migration utility moves these into the private bucket.
-      upstream = await fetch(application.resumePath, { cache: "no-store" });
-    } else {
+    const { privateBucket } = getSupabaseStorageConfig();
+    if (!privateRef || privateRef.bucket !== privateBucket) {
       return NextResponse.json(
         { error: "legacy_resume_unavailable" },
         { status: 410, headers: cacheHeaders(PRIVATE_NO_STORE) }
       );
     }
+    const upstream = await fetchSupabaseObject(privateRef.bucket, privateRef.path);
 
     if (!upstream.ok || !upstream.body) {
       return NextResponse.json({ error: "storage_error" }, { status: 502, headers: cacheHeaders(PRIVATE_NO_STORE) });

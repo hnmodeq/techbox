@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { getModuleItems } from "@/lib/content";
+import type { ContentItem } from "@/lib/content";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ import { ForumBadge } from "@/components/ui/forum-badge";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { useStats } from "@/providers/stats.provider";
 
-type ForumPost = ReturnType<typeof getModuleItems>[0] & {
+type ForumPost = ContentItem & {
   solved?: boolean;
   comments?: number;
   acceptedAnswer?: { text: string; authorName: string } | null;
@@ -57,11 +57,6 @@ function makeSlug(title: string): string {
 export default function ForumList({ serverItems }: { serverItems?: any[] }) {
   const { stats } = useStats();
   const router = useRouter();
-
-  const fallbackItems = getModuleItems("forum").map((t) => ({
-    ...t,
-    avatar: t.author?.avatar || "/assets/hooman.png",
-  })) as (ForumPost & { avatar: string })[];
 
   const [dbItems, setDbItems] = useState<(ForumPost & { avatar: string })[] | null>(
     serverItems && serverItems.length > 0

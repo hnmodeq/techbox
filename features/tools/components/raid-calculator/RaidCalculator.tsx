@@ -4,7 +4,6 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import { XIcon, HardDrive, Lock, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDbPosts } from "@/hooks/useDbPosts";
-import { getModuleItems } from "@/lib/content";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -50,9 +49,7 @@ function parseBay(specs: any): number | null {
 }
 
 function RecommendedModels({ driveCount }: { driveCount: number }) {
-  const fallback = getModuleItems("shop");
-  const { items: dbItems } = useDbPosts("shop", fallback, 120);
-  const items = dbItems.length > 0 ? dbItems : fallback;
+  const { items } = useDbPosts("shop", [], 120);
   const ranked = useMemo(() => {
     if (driveCount === 0) return [];
     const candidates = items.filter((p) => {

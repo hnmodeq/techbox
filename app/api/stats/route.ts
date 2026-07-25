@@ -16,17 +16,24 @@ interface PostStats {
 /** Cache for bulk stats (per module) — avoids loading all posts on every request. */
 const statsCache = new Map<string, { data: Record<string, PostStats>; ts: number }>();
 const CACHE_TTL_MS = 30_000; // 30 seconds
+const PUBLIC_POST_MODULES = new Set([
+  "blog", "news", "media", "forum", "download", "tools", "review", "shop",
+]);
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const moduleKey = searchParams.get("module");
   const slug = searchParams.get("slug");
 
+  if (moduleKey && !PUBLIC_POST_MODULES.has(moduleKey)) {
+    return NextResponse.json({ error: "invalid_module" }, { status: 400 });
+  }
+
   if (moduleKey && slug) {
     // Single-post stats — cheap, no caching needed
     try {
-      const post = await prisma.post.findUnique({
-        where: { module_slug: { module: moduleKey, slug } },
+      const post = await prisma.post.findFirst({
+        where: { module: moduleKey, slug, published: true, deletedAt: null },
         select: {
           id: true,
           views: true,
@@ -53,7 +60,7 @@ export async function GET(req: NextRequest) {
         });
       }
       const commentsCount = await prisma.comment.count({
-        where: { postId: post.id },
+        where: { postId: post.id, status: "approved" },
       });
       return NextResponse.json<PostStats>({
         views: post.views || 0,
@@ -81,7 +88,7 @@ export async function GET(req: NextRequest) {
       }
 
       const posts: { id: string; slug: string; views: number; likes: number; solved: boolean | null; rating: number | null; ratingCount: number; fileName: string | null; fileSize: string | null; downloadCount: number }[] = await prisma.post.findMany({
-        where: { module: moduleKey },
+        where: { module: moduleKey, published: true, deletedAt: null },
         select: {
           id: true,
           slug: true,
@@ -99,7 +106,7 @@ export async function GET(req: NextRequest) {
       const postIds = posts.map((p) => p.id);
       const commentCounts = postIds.length
         ? await prisma.comment
-            .groupBy({ by: ["postId"], _count: { _all: true }, where: { postId: { in: postIds } } })
+            .groupBy({ by: ["postId"], _count: { _all: true }, where: { postId: { in: postIds }, status: "approved" } })
             .catch(() => [] as { postId: string; _count: { _all: number } }[])
         : [];
 
@@ -132,7 +139,7 @@ export async function GET(req: NextRequest) {
   // No module specified — return summary counts only (not all posts)
   try {
     const [postCount, commentCount, userCount] = await Promise.all([
-      prisma.post.count({ where: { published: true } }),
+      prisma.post.count({ where: { published: true, deletedAt: null } }),
       prisma.comment.count({ where: { status: "approved" } }),
       prisma.user.count({ where: { status: "active" } }),
     ]);

@@ -74,11 +74,7 @@ export function AuthModal() {
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        toast.success(data.alreadyVerified ? "این ایمیل قبلاً تأیید شده است." : "لینک تأیید دوباره ارسال شد.");
-        if (data.alreadyVerified) {
-          setView("form");
-          setMode("login");
-        }
+        toast.success("اگر این ایمیل نیاز به تأیید داشته باشد، لینک دوباره ارسال می‌شود.");
       } else {
         toast.error(data.message || "خطا در ارسال لینک تأیید");
       }

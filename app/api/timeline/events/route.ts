@@ -6,19 +6,26 @@ import { z } from 'zod';
 const createSchema = z.object({
   title: z.string().min(1, 'عنوان الزامی است').max(200),
   description: z.string().min(1, 'توضیحات الزامی است').max(2000),
-  image: z.string().url().optional().or(z.literal('')),
+  image: z.string().url().optional().or(z.literal('')).nullable(),
   dateGr: z.string().min(1),
   dateFa: z.string().min(1),
   year: z.number().int(),
   yearFa: z.number().int(),
   importance: z.number().int().min(1).max(10).default(5),
   tags: z.array(z.string()).max(10).default([]),
+  published: z.boolean().default(true),
 });
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const adminScope = new URL(req.url).searchParams.get('scope') === 'admin';
+  if (adminScope) {
+    const user = await requirePermission("content:timeline:view");
+    if (user instanceof NextResponse) return user;
+  }
+
   try {
     const events = await prisma.timelineEvent.findMany({
-      where: { published: true },
+      where: adminScope ? undefined : { published: true },
       orderBy: {
         dateGr: 'asc',
       },
@@ -44,7 +51,10 @@ export async function GET() {
       return NextResponse.json(transformedEvents);
     }
   } catch (error) {
-    // Database table not created or unseeded locally
+    console.error('[timeline:events:list]', error);
+    if (adminScope) {
+      return NextResponse.json({ error: 'timeline_unavailable' }, { status: 503 });
+    }
   }
 
   return NextResponse.json([]);
@@ -56,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { title, description, image, dateGr, dateFa, year, yearFa, importance, tags } = createSchema.parse(body);
+    const { title, description, image, dateGr, dateFa, year, yearFa, importance, tags, published } = createSchema.parse(body);
 
     const event = await prisma.timelineEvent.create({
       data: {
@@ -69,7 +79,7 @@ export async function POST(req: NextRequest) {
         yearFa,
         importance,
         tags,
-        published: true,
+        published,
       },
     });
 

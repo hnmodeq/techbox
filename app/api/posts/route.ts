@@ -223,8 +223,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(slug ? (out[0] ?? null) : out, {
       headers: cacheHeaders(includeAllPublishedStates ? PRIVATE_NO_STORE : (slug ? PUBLIC_DETAIL_CACHE : PUBLIC_CONTENT_CACHE)),
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "db_unavailable" }, { status: 503, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error) {
+    console.error("[posts:list]", error);
+    return NextResponse.json({ error: "db_unavailable" }, { status: 503, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 
@@ -273,7 +274,14 @@ const createSchema = z.object({
 export async function POST(req: NextRequest) {
   const user = await getSessionUserPublic();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  const data = createSchema.parse(await req.json());
+  const parsed = createSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "validation", issues: parsed.error.issues },
+      { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) }
+    );
+  }
+  const data = parsed.data;
   const permissions = await getEffectivePermissions(user);
   const canManageModule = user.role === "super_admin" ||
     hasAnyPermission(permissions, modulePermissions(data.module, "create"));
@@ -351,8 +359,9 @@ export async function POST(req: NextRequest) {
     revalidatePath('/sitemap.xml');
     logAudit({ userId: user.id, userName: user.name, action: "post.create", target: `${data.module}/${data.slug}`, details: { title: data.title } });
     return NextResponse.json(post, { status: 201, headers: cacheHeaders(PRIVATE_NO_STORE) });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  } catch (error) {
+    console.error("[posts:create]", error);
+    return NextResponse.json({ error: "post_create_failed" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 const patchSchema = z.object({

@@ -1,6 +1,6 @@
 "use client";
 
-import { getModuleItems, type ContentItem } from "@/lib/content";
+import type { ContentItem } from "@/lib/content";
 import { useDbPosts } from "@/hooks/useDbPosts";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -139,9 +139,7 @@ function FilterSection({
 
 // ── Main ShopGrid ────────────────────────────────────────────────────────────
 export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
-  const fallbackItems = getModuleItems("shop");
-  const { items: dbItems } = useDbPosts("shop", fallbackItems, 200);
-  const items = dbItems.length > 0 ? dbItems : serverItems ?? fallbackItems;
+  const { items } = useDbPosts("shop", serverItems ?? [], 200);
   const banners = useShopBanners();
 
   const [sort, setSort] = useState<SortKey>("relevant");
