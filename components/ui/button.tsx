@@ -28,6 +28,7 @@ const buttonVariants = cva(
         xs: "h-5 gap-1 rounded-sm px-2 text-[0.625rem] has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 [&_svg:not([class*='size-'])]:size-2.5",
         sm: "h-6 gap-1 px-2 text-xs/relaxed has-data-[icon=inline-end]:pe-1.5 has-data-[icon=inline-start]:ps-1.5 [&_svg:not([class*='size-'])]:size-3",
         lg: "h-8 gap-1 px-2.5 text-xs/relaxed has-data-[icon=inline-end]:pe-2 has-data-[icon=inline-start]:ps-2 [&_svg:not([class*='size-'])]:size-4",
+        xl: "h-10 gap-2 px-4 text-sm/relaxed has-data-[icon=inline-end]:pe-3 has-data-[icon=inline-start]:ps-3 [&_svg:not([class*='size-'])]:size-5",
         icon: "size-7 [&_svg:not([class*='size-'])]:size-3.5",
         "icon-xs": "size-5 rounded-sm [&_svg:not([class*='size-'])]:size-2.5",
         "icon-sm": "size-6 [&_svg:not([class*='size-'])]:size-3",
@@ -55,6 +56,7 @@ export type ButtonSize =
   | "sm"
   | "md"
   | "lg"
+  | "xl"
   | "icon"
   | "iconSm"
   | "icon-sm"
@@ -95,6 +97,7 @@ function mapSize(size?: ButtonSize): VariantProps<typeof buttonVariants>["size"]
     case "xs":
     case "sm":
     case "lg":
+    case "xl":
     case "icon":
       return size;
     default:
