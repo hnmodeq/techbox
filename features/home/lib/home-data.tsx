@@ -69,12 +69,8 @@ export function HomeDataProvider({
     };
 
     if (initialData) {
-      // We already have server-rendered data → keep it fresh with a silent
-      // background refresh. No loading flip, so there is no flicker/jump.
-      fetch("/api/home")
-        .then((r) => (r.ok ? r.json() : null))
-        .then((body) => body && apply(body))
-        .catch(() => {});
+      // Server data is tag-invalidated when content changes; do not duplicate
+      // the root-layout request with another client fetch on every page load.
       return () => {
         mounted = false;
       };
