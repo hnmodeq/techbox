@@ -18,8 +18,6 @@
     "db:seed-roles": "tsx prisma/seed-roles.ts",
     "db:seed-tags": "tsx prisma/seed-tags.ts",
     "postinstall": "prisma generate",
-    "data": "node scripts/data.cjs",
-    "tree": "node scripts/tree.cjs",
     "prisma:generate": "prisma generate",
     "db:backfill-metadata": "tsx prisma/backfill-metadata.ts",
     "db:fix-future-dates": "tsx prisma/fix-future-post-dates.ts",

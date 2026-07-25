@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!eventId) return NextResponse.json({ error: "eventId required" }, { status: 400 });
 
   const comments = await prisma.timelineComment.findMany({
-    where: { eventId, status: "approved" },
+    where: { eventId, status: "approved", event: { published: true } },
     orderBy: { createdAt: "desc" }
   });
   return NextResponse.json(comments);
@@ -41,6 +41,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const { eventId, text } = schema.parse(await req.json());
+    const event = await prisma.timelineEvent.findFirst({
+      where: { id: eventId, published: true },
+      select: { id: true },
+    });
+    if (!event) {
+      return NextResponse.json({ error: "event_not_found" }, { status: 404 });
+    }
     const comment = await prisma.timelineComment.create({
       data: {
         eventId,
@@ -49,8 +56,12 @@ export async function POST(req: NextRequest) {
       }
     });
     return NextResponse.json(comment, { status: 201 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "failed to create comment" }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "invalid_comment", issues: error.issues }, { status: 400 });
+    }
+    console.error("[timeline:comments:create]", error);
+    return NextResponse.json({ error: "comment_create_failed" }, { status: 500 });
   }
 }
 

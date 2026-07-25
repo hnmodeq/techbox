@@ -19,8 +19,8 @@ type DbPost = ContentItem & {
   solved?: boolean | null;
 };
 
-export function useDbPosts(module: ModuleSlug, _fallback: ContentItem[] = [], take = 100) {
-  const [items, setItems] = useState<DbPost[]>([]);
+export function useDbPosts(module: ModuleSlug, fallback: ContentItem[] = [], take = 100) {
+  const [items, setItems] = useState<DbPost[]>(fallback);
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
   const [error, setError] = useState("");
@@ -38,8 +38,8 @@ export function useDbPosts(module: ModuleSlug, _fallback: ContentItem[] = [], ta
       })
       .catch(() => {
         if (!mounted) return;
-        // Keep the server-provided fallback (static seed data) instead of
-        // blanking the grid when the database is temporarily unavailable.
+        // Keep the server-rendered database snapshot instead of blanking the
+        // grid when the refresh request is temporarily unavailable.
         setFromDb(false);
         setError("db_unavailable");
       })
@@ -49,8 +49,8 @@ export function useDbPosts(module: ModuleSlug, _fallback: ContentItem[] = [], ta
   return { items, loading, fromDb, error };
 }
 
-export function useDbPost(module: ModuleSlug, slug: string, _fallback: ContentItem | null = null) {
-  const [item, setItem] = useState<DbPost | null>(null);
+export function useDbPost(module: ModuleSlug, slug: string, fallback: ContentItem | null = null) {
+  const [item, setItem] = useState<DbPost | null>(fallback);
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
   const [error, setError] = useState("");

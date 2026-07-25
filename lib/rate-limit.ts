@@ -64,6 +64,7 @@ const limiters = {
   register:       { redis: createRatelimit(3, "10 m"),  memMax: 3,   memWindowMs: 600_000 },
   comments:       { redis: createRatelimit(10, "1 m"),  memMax: 10,  memWindowMs: 60_000 },
   like:           { redis: createRatelimit(30, "1 m"),  memMax: 30,  memWindowMs: 60_000 },
+  follow:         { redis: createRatelimit(30, "1 m"),  memMax: 30,  memWindowMs: 60_000 },
   rating:         { redis: createRatelimit(20, "1 m"),  memMax: 20,  memWindowMs: 60_000 },
   upload:         { redis: createRatelimit(10, "1 m"),  memMax: 10,  memWindowMs: 60_000 },
   chat:           { redis: createRatelimit(15, "1 m"),  memMax: 15,  memWindowMs: 60_000 },

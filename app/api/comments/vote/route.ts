@@ -117,7 +117,11 @@ export async function POST(req: NextRequest) {
       likes: Math.max(0, c?.likes ?? 0),
       dislikes: Math.max(0, c?.dislikes ?? 0),
     });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "vote_failed" }, { status: 400 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "invalid_vote", issues: error.issues }, { status: 400 });
+    }
+    console.error("[comments:vote]", error);
+    return NextResponse.json({ error: "vote_failed" }, { status: 500 });
   }
 }

@@ -1,19 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getSessionUserPublic } from "@/lib/auth-server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const username = searchParams.get("username");
-  const viewerId = searchParams.get("viewerId");
+  const viewer = await getSessionUserPublic();
+  const viewerId = viewer?.id;
 
   if (!username) return NextResponse.json({ error: "username required" }, { status: 400 });
 
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findFirst({
+    where: { username, status: "active" },
+    select: { id: true },
+  });
   if (!user) return NextResponse.json({ users: [] });
 
   const followers = await prisma.follow.findMany({
-    where: { followingId: user.id },
-    include: { follower: true },
+    where: { followingId: user.id, follower: { status: "active" } },
+    select: {
+      follower: {
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          avatar: true,
+          verifiedType: true,
+          verifiedLabel: true,
+        },
+      },
+    },
     take: 50,
   });
 
@@ -35,9 +51,11 @@ export async function GET(req: NextRequest) {
       name: f.follower.name,
       username: f.follower.username,
       avatar: f.follower.avatar,
-      verifiedType: (f.follower as any).verifiedType ?? null,
-      verifiedLabel: (f.follower as any).verifiedLabel ?? null,
+      verifiedType: f.follower.verifiedType ?? null,
+      verifiedLabel: f.follower.verifiedLabel ?? null,
       isFollowedByViewer: viewerFollowingSet.has(f.follower.id),
     })),
   });
 }
+
+export const dynamic = "force-dynamic";

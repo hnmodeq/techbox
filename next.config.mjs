@@ -33,7 +33,7 @@ const nextConfig = {
         key: 'Strict-Transport-Security',
         value: 'max-age=63072000; includeSubDomains; preload',
       },
-      // Content-Security-Policy — enforced. Tune the blob/Sentry hosts to your real origins.
+      // Content-Security-Policy — enforced. Tune Supabase/Sentry hosts to real origins.
       {
         key: 'Content-Security-Policy',
         value: [
@@ -42,7 +42,7 @@ const nextConfig = {
           "frame-ancestors 'none'",
           "object-src 'none'",
           "style-src 'self' 'unsafe-inline'",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
+          `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"} https://va.vercel-scripts.com`,
           "img-src 'self' data: blob: https:",
           "media-src 'self' https://*.supabase.co",
           "font-src 'self' data:",

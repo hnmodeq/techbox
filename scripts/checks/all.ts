@@ -1,15 +1,19 @@
 import { spawnSync } from 'node:child_process';
 
-const checks: Array<[string, string[]]> = [
-  ['content', ['tsx', 'scripts/checks/content.ts']],
-  ['db', ['tsx', 'scripts/checks/db.ts']],
-  ['storage', ['tsx', 'scripts/checks/storage.ts']],
+const checks: Array<[string, string]> = [
+  ['content', 'scripts/checks/content.ts'],
+  ['db', 'scripts/checks/db.ts'],
+  ['storage', 'scripts/checks/storage.ts'],
 ];
 
+const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 let failed = false;
-for (const [name, args] of checks) {
+for (const [name, script] of checks) {
   console.log(`\nRunning check:${name}...`);
-  const result = spawnSync('npx', args, { stdio: 'inherit', shell: process.platform === 'win32' });
+  const result = spawnSync(pnpm, ['exec', 'tsx', script], {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  });
   if (result.status !== 0) failed = true;
 }
 

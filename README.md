@@ -1,241 +1,189 @@
 # TechBox (تکباکس)
 
-A Persian-language (RTL) multi-module tech content platform covering IT
-infrastructure, networking, servers, storage, and security — magazine, news,
-video media, forum, downloads, tools, reviews, shop, and a tech timeline.
+[![CI](https://github.com/hnmodeq/techbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hnmodeq/techbox/actions/workflows/ci.yml)
 
-Built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**,
-**Tailwind CSS v4**, **Prisma + PostgreSQL (Neon)**, **Supabase Storage**,
-**Sentry**, and **Upstash Redis**.
+TechBox is a Persian, right-to-left technology platform for infrastructure,
+networking, servers, storage, and security. It combines editorial content,
+news, video, reviews, a forum, technical calculators, a real shop and payment
+flow, jobs, support tickets, user accounts, and an RBAC-protected
+administration area.
 
----
+The application is built with **Next.js 16 App Router**, **React 19**,
+**TypeScript**, **Tailwind CSS v4**, **Prisma 6 + Neon PostgreSQL**,
+**Supabase Storage**, **Upstash Redis**, **Sentry**, and **Vercel**.
 
-## Current Status: shadcn/ui Migration Branch
+> The download module remains in the product code but is currently disabled in
+> production configuration. Retired download records and sample files must not
+> be reintroduced unless the module is deliberately relaunched.
 
-**Branch:** `feat/shadcn-migration`  
-**Latest commit:** `e6eb54b` (2026-07-12)  
-**Status:** Migration 95% complete, ready for debugging and final polish
+## Product and architecture
 
-### What's Done
-- ✅ Full shadcn/ui component library installed (37+ components)
-- ✅ New RTL sidebar layout with shadcn sidebar-16 pattern
-- ✅ All homepage rows redesigned with shadcn components
-- ✅ Tools calculators migrated (RAID, NVR, NAS, Subnet)
-- ✅ All forms migrated to RHF + Zod + shadcn
-- ✅ Module colors replaced with shadcn design tokens
-- ✅ News sidebar with floating button
-- ✅ Support and Feedback pages created
-- ✅ Chatbot with tabs (chatbot/support/messenger)
-- ✅ Alert component with close button
-- ✅ Profile dropdown fixed
-- ✅ Breadcrumbs only in navbar
-- ✅ Mobile RTL fixes
+- `app/` contains public pages, private account/admin segments, and route
+  handlers under `app/api/`.
+- `features/` contains domain-oriented UI and client logic.
+- `components/` contains shared layout, accessibility, SEO, and UI primitives.
+- `lib/` contains server policy, auth, storage, pricing, SEO, data, and domain
+  helpers.
+- `config/modules.config.ts` and `lib/module-config.ts` define module metadata
+  and runtime module visibility.
+- `prisma/schema.prisma` and `prisma/migrations/` are the database source of
+  truth. Production schema changes use migrations, not `prisma db push`.
+- A universal `Post` model powers the editorial, forum, download, review, and
+  shop modules. Timeline, orders, jobs, support, identity, and RBAC have
+  dedicated models.
 
-### Known Issues (Next Agent Should Debug)
-See **MIGRATION_STATUS.md** section "Issues for Next Agent" for detailed debugging instructions.
+The browser never supplies authoritative shop prices. Checkout reloads products
+and pricing inputs from PostgreSQL, and order/payment reads require account
+ownership, an administrative permission, or a hashed guest capability token.
+Browser identity comes from the HTTP-only `tb_session` cookie and
+`/api/auth/me`; local storage is not an identity authority.
 
----
+See [operations](docs/operations.md) and
+[security/privacy architecture](docs/security-and-privacy.md) for deployment
+and access-control details.
 
-## Quick start
+## Requirements
+
+- Node.js 20 or newer
+- pnpm 10.12.1 (declared by `packageManager`)
+- PostgreSQL/Neon for database-backed features
+- A Supabase project with:
+  - public bucket `techbox`
+  - private bucket `job-resumes`
+
+## Local setup
 
 ```bash
-# 1. Install dependencies (pnpm 10.12.1)
-pnpm install
-
-# 2. Configure environment
-cp .env.example .env        # then fill in real values (see below)
-
-# 3. Generate the Prisma client & sync the database schema
-pnpm prisma generate
-pnpm db:push                # or: pnpm prisma migrate deploy
-
-# 4. (optional) seed demo content
+corepack enable
+pnpm install --frozen-lockfile
+cp .env.example .env
+pnpm exec prisma generate
+pnpm db:migrate:deploy
+# Optional development/demo data:
 pnpm db:seed
-
-# 5. Run the dev server
+pnpm db:seed-roles
 pnpm dev
 ```
 
-The site is available at `http://localhost:3000` (RTL, Persian).
-
----
+The development server is available at `http://localhost:3000` by default.
+Use a disposable development database; do not point local seed or cleanup
+commands at production accidentally.
 
 ## Environment variables
 
-All secrets live in `.env` (git-ignored). Required for a working app:
+Use `.env.example` as the template. Never commit `.env` files or paste live
+secrets into issues, logs, prompts, or documentation.
+
+### Required for production
 
 | Variable | Purpose |
-|----------|---------|
-| `AUTH_SECRET` | JWT session signing secret (`openssl rand -base64 32`) |
-| `DATABASE_URL` | Pooled PostgreSQL runtime URL (use Neon's `-pooler` host and the limits shown in `.env.example`) |
-| `DIRECT_URL` | Non-pooled PostgreSQL URL used only by Prisma migrations |
-| `NEXT_PUBLIC_SITE_URL` | Canonical public origin (`http://localhost:3000` in development; non-local HTTPS URL in production) |
-| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Supabase Storage server access (service key is never public) |
-| `SUPABASE_PUBLIC_BUCKET` / `SUPABASE_PRIVATE_BUCKET` | Public content and private résumé bucket names |
-| `ZARIN_MERCHANT_ID` | Zarinpal merchant ID required by the live shop checkout |
+| --- | --- |
+| `AUTH_SECRET` | Session-signing secret, at least 32 characters. Generate independently per environment. |
+| `NEXT_PUBLIC_SITE_URL` | Exact canonical public HTTPS origin, with no Markdown or path. Production rejects missing, local, malformed, or HTTP values. |
+| `DATABASE_URL` | Neon pooled runtime URL. Keep `connection_limit=1` unless measured capacity supports more. |
+| `DIRECT_URL` | Neon direct/non-pooled URL for Prisma migrations. |
+| `SUPABASE_URL` | Supabase project origin. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only storage credential. **Never** use a `NEXT_PUBLIC_` prefix. |
+| `SUPABASE_PUBLIC_BUCKET` | Public content bucket; normally `techbox`. |
+| `SUPABASE_PRIVATE_BUCKET` | Private résumé bucket; normally `job-resumes`. |
+| `ZARIN_MERCHANT_ID` | Zarinpal merchant ID for live checkout. |
+| `CRON_SECRET` | Bearer secret for scheduled publishing. |
 
-> Production builds reject a missing, malformed, non-HTTPS, or localhost `NEXT_PUBLIC_SITE_URL` so canonical links and email URLs can never silently point to staging/local origins.
-
-Optional (features degrade gracefully when absent):
+### Recommended or feature-specific
 
 | Variable | Purpose |
-|----------|---------|
-| `RESEND_API_KEY` | Transactional email (welcome, password reset, contact) |
-| `CHAT_API_KEY` / `CHAT_BASE_URL` / `CHAT_MODEL` | TechBox AI chat assistant (OpenAI-compatible) |
-| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Rate limiting |
-| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_DSN` | Error monitoring |
-| `CONTACT_EMAIL` | Recipient for the contact form (default `info@techbox.ir`) |
-| `ZARINPAL_SANDBOX` | Set to `true` only while testing the payment sandbox |
+| --- | --- |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Distributed production rate limiting. Without them, only a per-process development fallback exists. |
+| `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `CONTACT_EMAIL` | Transactional email and operational recipients. |
+| `CHAT_API_KEY`, `CHAT_BASE_URL`, `CHAT_MODEL` | OpenAI-compatible assistant backend. The API key stays server-side. |
+| `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Browser/server error monitoring and source-map integration. |
+| `ZARINPAL_SANDBOX` | Set to `true` only in explicit non-production payment testing. |
+| `PRISMA_CONNECTION_LIMIT` | Runtime fallback when `DATABASE_URL` has no `connection_limit`; defaults to `1`. |
+| `QNAP_ASSET_IMPORT_AUTHORIZED` | One-time safety gate for the QNAP importer. It must remain `false` unless asset-use authorization has been confirmed. |
 
-> The chat route has a built-in demo fallback that is shown **only** when
-> `CHAT_API_KEY` is not configured — it never fabricates real content.
+Rotating `AUTH_SECRET` invalidates all existing sessions and signs users out.
 
-### PostgreSQL `57P01` / administrator command
+## Commands
 
-`57P01: terminating connection due to administrator command` is emitted by
-PostgreSQL when the server, compute endpoint, or an administrator terminates an
-existing session. It is not a Prisma schema or migration error. A short burst
-can be expected during a database restart, maintenance event, or failover;
-Prisma opens a fresh connection for later queries.
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the development server. |
+| `pnpm build` / `pnpm start` | Build and serve the production application. |
+| `pnpm lint` | Run ESLint. |
+| `pnpm typecheck` | Generate Next route types and run TypeScript without emitting files. |
+| `pnpm test` | Run the complete Vitest unit suite. |
+| `pnpm test:e2e` | Run the complete Playwright suite. |
+| `pnpm test:smoke` | Run only the public smoke specification. |
+| `pnpm db:migrate:deploy` | Apply committed Prisma migrations. This is the production schema command. |
+| `pnpm db:seed`, `pnpm db:seed-roles` | Seed development/application data and canonical RBAC roles. |
+| `pnpm check:content` | Validate content integrity. |
+| `pnpm check:db` | Validate database integrity. |
+| `pnpm check:storage` | Validate stored URLs and Supabase objects. |
+| `pnpm check:all` | Run all three integrity checks. |
+| `pnpm storage:migrate-resumes` | Migrate legacy résumé objects to private Supabase storage. |
+| `pnpm storage:import-qnap -- --apply` | Import authorized official QNAP assets; requires the explicit authorization gate. |
+| `pnpm content:remove-retired -- --apply` | Idempotently remove the approved retired records and their owned storage objects. |
 
-If it repeats continuously:
+Commands that accept `--apply` default to a non-destructive preview. Review the
+preview and the target environment before applying.
 
-1. Check the Neon project operations/status page and confirm that the compute
-   endpoint is active. If PostgreSQL is self-hosted, inspect its service and
-   server logs (`journalctl -u postgresql`, container logs, or the managed
-   provider's database logs) for restarts, OOM kills, deploys, and calls to
-   `pg_terminate_backend`.
-2. Confirm that `DATABASE_URL` uses Neon's pooled hostname (it contains
-   `-pooler`) and that `DIRECT_URL` uses the non-pooled hostname. Do not use the
-   direct URL for the serverless application runtime.
-3. Add the runtime query parameters shown in `.env.example`, especially
-   `connection_limit=1`. Prisma otherwise derives a pool size from the host CPU
-   count for every application instance, so one database restart can produce
-   many identical log lines and serverless scale-out can exhaust connections.
-4. Update the variables in every deployment environment, redeploy/restart the
-   application so old pools are discarded, then check `GET /api/healthz`.
-   A healthy connection returns HTTP 200 with `database: "healthy"`.
+## Storage and private data
 
-Do not hide the error by disabling Prisma error logs. If the health check stays
-unhealthy after the endpoint is active, verify the hostname, credentials, SSL
-settings, IP/network restrictions, and the provider's connection limit.
+- Public editorial/product objects use the public Supabase bucket.
+- Résumés use opaque `supabase://bucket/path` references in PostgreSQL and are
+  streamed only by the permission-protected admin endpoint.
+- Support and guest-order capabilities are returned once to the client and only
+  one-way hashes are stored.
+- Public content DTOs remove procurement costs, exchange adjustments, and
+  seller-margin inputs.
 
----
+## Database migrations
 
-## Scripts
+There are 16 committed migration directories: the `0_init` baseline plus
+migrations through `20260725000015_support_ticket_access`.
 
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` / `pnpm build` / `pnpm start` | Dev / production build / serve |
-| `pnpm lint` | ESLint (next core-web-vitals) |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm db:push` / `pnpm db:seed` | Schema sync / seed |
-| `pnpm storage:migrate-resumes` | Move legacy public Supabase résumés into the private bucket |
-| `pnpm storage:import-qnap -- --apply` | Import authorized official QNAP product images into `techbox/qnap` |
-| `pnpm test:e2e` | Complete Playwright suite (public smoke, auth UI, and checkout) |
-| `pnpm check:content` / `check:db` / `check:storage` / `check:all` | Content/DB/Supabase Storage integrity checks |
+```bash
+# Inspect first
+pnpm exec prisma migrate status
 
----
-
-## Architecture
-
-### Layout System (NEW - shadcn sidebar-16)
-
-The layout now uses shadcn's sidebar-16 pattern:
-
-```
-<SidebarProvider>
-  <SiteHeader />  ← Sticky header with toggle, breadcrumb, search, date/time, theme, notifications
-  <div className="flex" dir="rtl">
-    <TechboxAppSidebar />  ← Main sidebar (right side in RTL)
-    <SidebarInset>
-      <main>{children}</main>
-      <FooterSection />  ← 3-column: newsletter, links, social
-    </SidebarInset>
-    <TechboxNewsSidebar />  ← News sidebar (left side, controlled by floating button)
-  </div>
-  <LiveNewsButton />  ← Floating red button near news sidebar
-</SidebarProvider>
+# Apply pending committed migrations
+pnpm db:migrate:deploy
 ```
 
-**Key layout files:**
-- `components/layout/LayoutShell.tsx` - Main layout wrapper
-- `components/layout/techbox-app-sidebar.tsx` - Main sidebar container
-- `components/layout/techbox-nav-main.tsx` - Module navigation
-- `components/layout/techbox-nav-secondary.tsx` - Support/Feedback links
-- `components/layout/techbox-nav-user.tsx` - Profile dropdown
-- `components/layout/techbox-news-sidebar.tsx` - News sidebar
-- `components/layout/site-header.tsx` - Header with breadcrumb, search, etc.
-- `components/layout/live-news-button.tsx` - Floating news toggle
-- `components/layout/search-form.tsx` - Header search
+Never edit an already-applied migration and never use `prisma db push` against
+production. If Prisma reports a failed migration, inspect the database and the
+migration SQL before using `prisma migrate resolve`; resolution records state
+and does not execute missing SQL.
 
-### Component Structure
+## CI and deployment
 
-- **`app/`** — App Router segments (`blog`, `news`, `media`, `forum`,
-  `download`, `tools`, `review`, `shop`, `timeline`, `account`, `admin`, …)
-  plus `app/api/*` route handlers.
-- **`features/`** — vertical slices, one per domain
-  (`auth`, `blog`, `chat`, `comment`, `consultation`, `content`, `download`,
-  `forum`, `home`, `media`, `news`, `review`, `shop`, `timeline`, `tools`).
-  Each holds its `components/`, and some `actions/`, `hooks/`, `lib/`.
-- **`components/`** — shared UI:
-  - `layout/` (shell, sidebar, footer, header)
-  - `ui/` (shadcn primitives: accordion, alert, avatar, badge, breadcrumb, button, card, checkbox, collapsible, dialog, dropdown-menu, form, input, label, popover, radio-group, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, spinner, switch, table, tabs, textarea, tooltip)
-  - `ui/` (TechBox wrappers: like-button, module-badge, media-selector-card, theme-toggle-button, author-link, card-stats, forum-badge, live-view-counter)
-  - `effects/` (ChromaGrid, Dock, BorderGlow, …)
-  - `newsletter/`, `seo/`
-- **`config/`** — **single source of truth** for modules
-  (`modules.config.ts`), colors, and the sidebar.
-- **`lib/`** — server & client helpers (db, auth, content, search, seo,
-  recommendations, nas/nvr tools, rate-limit, email, …).
-- **`providers/`** — React context providers (Theme, Auth, Cart, Query,
-  Stats, TimelineLikes) composed once in `components/layout/LayoutShell.tsx`.
-- **`prisma/`** — `schema.prisma` (User, Post, Comment, Rating, Like,
-  TimelineEvent, NewsletterSubscriber, …) plus seed/backfill scripts.
+`.github/workflows/ci.yml` runs on every push and pull request to `main`:
 
-### Data model
-One universal **`Post`** type (keyed by `module` + `slug`) powers
-blog/news/media/review/download/shop/forum. Comments, ratings, likes, and
-revision history are separate tables. The tech **timeline** is its own
-cluster (`TimelineEvent` + comments/likes).
+1. Lint
+2. Typecheck
+3. Unit Tests
+4. Production Build
+5. Complete Playwright E2E Tests
+6. Optional DB/content/storage checks when repository secrets are configured
 
-### Rendering & performance notes
-- The homepage fetches its data **server-side** (`lib/home-server.ts`, cached
-  for one day with immediate tag invalidation on content changes) and streams it into `HomeDataProvider` as initial state, so content is
-  present on first paint — no loading flash. The client only refreshes silently.
-- Auth state is centralized in a typed `AuthProvider` (`useAuth()`), verified
-  against `/api/auth/me` only when a local session exists.
-- The service worker caches **only static assets** — it never caches HTML
-  navigations, so pages are never served stale.
-- Fonts: Kalameh (primary, self-hosted via `next/font`) without blocking
-  preloads; Vazirmatn is a slim fallback.
+The optional integrity job is informational so a transient external database
+or storage outage does not hide the status of the deterministic build/test
+jobs. Its logs still need review before release.
 
----
+Vercel deployment must use the same production environment contract described
+above. Apply pending migrations, confirm the canonical HTTPS origin, deploy,
+then verify `/api/healthz`, checkout/payment, private résumé access, and the
+latest CI/deployment status. See [docs/operations.md](docs/operations.md).
 
-## How to add a module
+## Security and contributions
 
-1. Add the module to `config/modules.config.ts` (`modules` tiles and/or
-   `moduleList` registry) — this is the **only** place to define its
-   `title` / `titleFa` / `color` / `href`. `lib/content.ts` derives its
-   `moduleMeta` from here automatically.
-2. Add a `Post` `module` value (e.g. `"blog"`) and create the route under
-   `app/<module>/` plus a feature slice in `features/<module>/`.
-3. Register nav/sidebar entries in `config/sidebar.config.ts`.
-4. Use `getModuleMeta(slug)` / `moduleMeta[slug]` everywhere you need
-   presentation metadata — never hard-code it.
-
----
-
-## CI / deployment
-
-`.github/workflows/ci.yml` runs the required **Lint**, **Typecheck**, **Unit Tests**,
-**Build**, and complete **Playwright E2E** jobs on every push/PR to `main`.
-An optional, non-blocking database/content/storage integrity job runs when
-`DATABASE_URL` is configured. Public builds remain database-outage-safe and do
-not require production credentials.
-
----
+Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md).
+Do not open a public issue containing credentials, personal data, or exploit
+details. Contribution and migration rules are in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-Proprietary — TechBox / هونامیک ارتباط رستاک.
+Copyright © TechBox / هونامیک ارتباط رستاک. All rights reserved. This is
+proprietary software; public source availability does not grant permission to
+copy, modify, redistribute, or deploy it. See [LICENSE](LICENSE).

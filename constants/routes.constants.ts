@@ -12,7 +12,7 @@ export const ROUTES = {
   ADMIN: "/admin",
   ADMIN_LOGIN: "/admin/login",
   ADMIN_POSTS: "/admin/posts",
-  ADMIN_ROLES: "/admin/roles",
+  ADMIN_ROLES: "/admin/roles-v2",
   CONTACT: "/contact",
   ABOUT: "/about",
   CONSULTATION: "/consultation",

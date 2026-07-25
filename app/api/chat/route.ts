@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { z } from "zod";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,7 +28,15 @@ const SERVER_MODEL = process.env.CHAT_MODEL || "gpt-4o-mini";
 const MAX_TEMPERATURE = 1.0;
 const MIN_TEMPERATURE = 0.0;
 
-type Msg = { role: "system" | "user" | "assistant"; content: string };
+const requestSchema = z.object({
+  messages: z.array(z.object({
+    role: z.enum(["user", "assistant"]),
+    content: z.string().max(MAX_CHARS_PER_MESSAGE),
+  })).max(MAX_MESSAGES).default([]),
+  temperature: z.number().finite().optional(),
+});
+
+type Msg = z.infer<typeof requestSchema>["messages"][number];
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
@@ -41,18 +50,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const raw = await req.json();
-    const { messages = [], temperature: clientTemp }: { messages: Msg[]; temperature?: number } = raw;
+    const { messages, temperature: clientTemp } = requestSchema.parse(await req.json());
 
-    // Strip any client-injected system messages — only server system prompt allowed
-    const filteredMessages = messages
-      .filter((m) => m.role !== "system")
-      .slice(0, MAX_MESSAGES); // Cap message count
-
-    // Truncate individual messages that are too long
-    const sanitizedMessages: Msg[] = filteredMessages.map((m) => ({
-      role: m.role,
-      content: String(m.content).slice(0, MAX_CHARS_PER_MESSAGE),
+    // The schema permits only user/assistant roles; the trusted system prompt
+    // is always supplied by the server.
+    const sanitizedMessages: Msg[] = messages.map((message) => ({
+      role: message.role,
+      content: message.content,
     }));
 
     // Reject if total content is absurdly large
@@ -97,14 +101,18 @@ export async function POST(req: NextRequest) {
     });
 
     if (!r.ok) {
-      const txt = await r.text();
-      return NextResponse.json({ error: `chat provider ${r.status}`, detail: txt.slice(0, 500) }, { status: 502 });
+      console.error("[chat] provider rejected request", { status: r.status });
+      return NextResponse.json({ error: "chat_provider_unavailable" }, { status: 502 });
     }
 
     const data = await r.json();
     const reply = data?.choices?.[0]?.message?.content || "پاسخی دریافت نشد.";
     return NextResponse.json({ reply, usage: data?.usage });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "chat_failed" }, { status: 500 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "invalid_request", issues: error.flatten() }, { status: 400 });
+    }
+    console.error("[chat] request failed", error);
+    return NextResponse.json({ error: "chat_failed" }, { status: 500 });
   }
 }

@@ -4,8 +4,8 @@ import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const schema = z.object({
-  module: z.string().min(1),
-  slug: z.string().min(1),
+  module: z.enum(["blog", "news", "media", "forum", "download", "tools", "review", "shop"]),
+  slug: z.string().min(1).max(200),
 });
 
 export async function POST(req: NextRequest) {
@@ -23,10 +23,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { module, slug } = schema.parse(body);
 
-    // Create the post row on the fly if it does not exist yet, so view
-    // counting works for every piece of content (not just seeded ones).
-    let post = await prisma.post.findUnique({
-      where: { module_slug: { module, slug } },
+    const post = await prisma.post.findFirst({
+      where: { module, slug, published: true, deletedAt: null },
     });
     if (!post) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });

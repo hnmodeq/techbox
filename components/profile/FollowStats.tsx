@@ -48,7 +48,7 @@ export function FollowStats({
 
   // Reconcile counts once on mount — deduped to avoid re-render loops
   useEffect(() => {
-    const qs = viewerId ? `?username=${username}&viewerId=${viewerId}` : `?username=${username}`;
+    const qs = `?username=${encodeURIComponent(username)}`;
     fetch(`/api/follow${qs}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -76,8 +76,9 @@ export function FollowStats({
 
       try {
         const endpoint = type === "followers" ? "followers" : "following";
-        // Pass viewerId so the API can return isFollowedByViewer in ONE query
-        const qs = viewerId ? `?username=${username}&viewerId=${viewerId}` : `?username=${username}`;
+        // The API derives the viewer from the signed session; browser IDs are
+        // never trusted as identity input.
+        const qs = `?username=${encodeURIComponent(username)}`;
         const res = await fetch(`/api/follow/${endpoint}${qs}`);
         if (res.ok) {
           const data = await res.json();
@@ -93,7 +94,7 @@ export function FollowStats({
         setLoadingUsers(false);
       }
     },
-    [username, viewerId]
+    [username]
   );
 
   const toggleFollow = useCallback(
