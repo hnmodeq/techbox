@@ -41,7 +41,13 @@ END $$;
 
 -- One-time compatibility roles preserve each legacy editor's module scope.
 -- Runtime authorization no longer reads User.modules after these assignments.
-INSERT INTO "Role" ("id", "name", "nameFa", "description", "permissions", "isSystem", "color") VALUES
+INSERT INTO "Role" (
+  "id", "name", "nameFa", "description", "permissions", "isSystem", "color", "createdAt", "updatedAt"
+)
+SELECT role_data.id, role_data.name, role_data.name_fa, role_data.description,
+       role_data.permissions, role_data.is_system, role_data.color,
+       CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+FROM (VALUES
 ('legacy-content-blog', 'legacy_content_blog', 'مدیریت مجله', 'Backfilled from legacy module access', '["content:blog:view","content:blog:create","content:blog:edit","content:blog:delete","content:blog:publish"]'::jsonb, true, '#3b82f6'),
 ('legacy-content-news', 'legacy_content_news', 'مدیریت اخبار', 'Backfilled from legacy module access', '["content:news:view","content:news:create","content:news:edit","content:news:delete","content:news:publish"]'::jsonb, true, '#3b82f6'),
 ('legacy-content-media', 'legacy_content_media', 'مدیریت رسانه', 'Backfilled from legacy module access', '["content:media:view","content:media:create","content:media:edit","content:media:delete","content:media:publish","blob:upload"]'::jsonb, true, '#3b82f6'),
@@ -52,6 +58,7 @@ INSERT INTO "Role" ("id", "name", "nameFa", "description", "permissions", "isSys
 ('legacy-content-timeline', 'legacy_content_timeline', 'مدیریت تایم‌لاین', 'Backfilled from legacy module access', '["content:timeline:view","content:timeline:create","content:timeline:edit","content:timeline:delete","content:timeline:publish","timeline:view"]'::jsonb, true, '#3b82f6'),
 ('legacy-product-shop', 'legacy_product_shop', 'مدیریت فروشگاه', 'Backfilled from legacy module access', '["product:list:view","product:create","product:delete","product:basic:view","product:basic:edit","product:seo:view","product:seo:edit","product:content:view","product:content:edit","product:media:view","product:media:edit","product:download:view","product:download:edit","product:review:view","product:review:edit","product:info:view","product:info:edit","product:price:view","product:price:edit","product:specs:view","product:specs:edit","product:gallery:view","product:gallery:edit","product:status:view","product:status:edit","product:series:view","product:series:edit","blob:upload"]'::jsonb, true, '#22c55e'),
 ('legacy-jobs', 'legacy_jobs', 'مدیریت استخدام', 'Backfilled from legacy module access', '["job:view","job:edit","job:applications"]'::jsonb, true, '#8b5cf6')
+) AS role_data(id, name, name_fa, description, permissions, is_system, color)
 ON CONFLICT ("name") DO NOTHING;
 
 INSERT INTO "UserRole" ("id", "userId", "roleId", "assignedBy")
