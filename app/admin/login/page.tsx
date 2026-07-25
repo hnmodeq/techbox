@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/providers/auth.provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
@@ -56,7 +56,7 @@ export default function AdminLogin() {
       <Toaster dir="rtl" />
       <Card className="w-full max-w-sm shadow-lg">
         <CardHeader>
-          <CardTitle className="text-lg">ورود به پنل تکباکس</CardTitle>
+          <h1 className="font-heading text-lg font-medium">ورود به پنل تکباکس</h1>
           <CardDescription>برای دسترسی به مدیریت وارد شوید</CardDescription>
         </CardHeader>
         <Form {...form}>
