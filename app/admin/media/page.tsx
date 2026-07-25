@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Copy, ExternalLink, ImageIcon, Film, FileText, Music, Archive, File, RefreshCw, Search, Grid3X3, List } from "lucide-react";
 
-type BlobFile = {
+type StorageFile = {
   pathname: string;
   name: string;
   url: string;
@@ -54,13 +54,13 @@ export default function AdminMediaPage() {
 }
 
 function MediaContent() {
-  const [files, setFiles] = useState<BlobFile[]>([]);
+  const [files, setFiles] = useState<StorageFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [selected, setSelected] = useState<BlobFile | null>(null);
+  const [selected, setSelected] = useState<StorageFile | null>(null);
   const [copied, setCopied] = useState("");
 
   const load = async () => {
@@ -68,7 +68,7 @@ function MediaContent() {
     setError("");
     try {
       // Fetch all files recursively
-      const res = await fetch("/api/admin/blob?prefix=", { cache: "no-store" });
+      const res = await fetch("/api/admin/storage?prefix=", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load");
       const data = await res.json();
       setFiles(data.allFiles || data.files || []);

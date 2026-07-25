@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
-export type BlobUploadResult = {
+export type StorageUploadResult = {
   ok: boolean;
   kind: string;
   fileName: string;
@@ -26,7 +26,7 @@ function formatBytes(bytes: number) {
   return `${value >= 10 || unit === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unit]}`;
 }
 
-export function BlobUploadField({
+export function StorageUploadField({
   label = "آپلود به Supabase Storage",
   kind = "image",
   folder = "uploads/images",
@@ -37,11 +37,11 @@ export function BlobUploadField({
   kind?: "image" | "avatar" | "video" | "download" | "file";
   folder?: string;
   accept?: string;
-  onUploaded?: (result: BlobUploadResult) => void;
+  onUploaded?: (result: StorageUploadResult) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<BlobUploadResult | null>(null);
+  const [result, setResult] = useState<StorageUploadResult | null>(null);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
 

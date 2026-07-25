@@ -27,3 +27,8 @@ txt2.txt
 techbox-prompt.md
 package-lock.json
 logo.glb
+# Local test/runtime artifacts
+playwright-report/
+test-results/
+uploads/
+test-check.*

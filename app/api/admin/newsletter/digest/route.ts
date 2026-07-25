@@ -79,7 +79,9 @@ export async function POST() {
         if (tpl.headerHtml) headerHtml = tpl.headerHtml;
         if (tpl.footerHtml) footerHtml = tpl.footerHtml;
       }
-    } catch {}
+    } catch (error) {
+      console.error("[newsletter:digest] template settings unavailable", error);
+    }
 
     // Send to active subscribers
     const subscribers = await prisma.newsletterSubscriber.findMany({

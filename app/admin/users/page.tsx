@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BlobUploadField } from "@/components/admin/BlobUploadField";
+import { StorageUploadField } from "@/components/admin/StorageUploadField";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { toast } from "sonner";
 import { Shield, Plus, X } from "lucide-react";
@@ -318,7 +318,7 @@ function UsersContent() {
                     </div>
                   </div>
 
-                  <BlobUploadField label="آپلود آواتار" kind="avatar" folder="avatars" accept="image/jpeg,image/png,image/webp" onUploaded={(r) => updateSelected({ avatar: r.url })} />
+                  <StorageUploadField label="آپلود آواتار" kind="avatar" folder="avatars" accept="image/jpeg,image/png,image/webp" onUploaded={(r) => updateSelected({ avatar: r.url })} />
 
                   {/* Role Assignment */}
                   <div>

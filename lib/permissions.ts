@@ -200,7 +200,7 @@ export const SIDEBAR_PERMISSIONS: SidebarPermissionItem[] = [
   { href: "/admin/hero-terminal", permission: "hero:view" },
 
   // Tools
-  { href: "/admin/blob", permission: "blob:view" },
+  { href: "/admin/storage", permission: "blob:view" },
   { href: "/admin/upload", permission: "blob:upload" },
   { href: "/admin/media", permission: "blob:view" },
   { href: "/admin/design-system", permission: "design:view" },

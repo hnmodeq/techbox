@@ -63,7 +63,9 @@ export async function getDbModulePosts(
         });
         counts.forEach((c: any) => commentMap.set(c.postId, c._count._all || 0));
       }
-    } catch {}
+    } catch (error) {
+      console.error(`[server-posts] Failed to count comments for ${module}:`, error);
+    }
 
     return posts.map((p: any) => {
       let finalPriceAmount = p.priceAmount ?? null;
@@ -147,7 +149,8 @@ export async function getAllDbModulePosts(takePerModule = 30) {
   for (const m of modules) {
     try {
       result[m] = await getDbModulePosts(m, takePerModule);
-    } catch {
+    } catch (error) {
+      console.error(`[server-posts] Failed to aggregate ${m}:`, error);
       result[m] = [];
     }
   }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requirePermission } from "@/lib/api-permissions";
-import { ensureSiteSettingsTable } from "@/lib/site-settings-table";
 import { z } from "zod";
 import { cacheHeaders, PRIVATE_NO_STORE } from "@/lib/cache-headers";
 
@@ -22,7 +21,6 @@ export async function PATCH(req: NextRequest) {
   if (user instanceof NextResponse) return user;
 
   try {
-    await ensureSiteSettingsTable();
     const body = schema.parse(await req.json());
 
     for (const [field, value] of Object.entries(body)) {
