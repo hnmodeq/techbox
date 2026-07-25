@@ -38,27 +38,6 @@ export default async function HomePage() {
   return (
     <HomeDataProvider initialData={data}>
       <main className="flex w-full max-w-full flex-col overflow-x-hidden">
-        {config.heroVisible === false && (
-          <h1 className="sr-only">تکباکس؛ رسانه، ابزار و فروشگاه تخصصی زیرساخت فناوری اطلاعات</h1>
-        )}
-        {config.heroVisible !== false && <HeroSection />}
-        <WhyTechBox />
-        {config.tools?.enabled !== false && <ToolsShowcase />}
-        {visibleRows.map((slug) => {
-          const Component = ROW_COMPONENTS[slug];
-          if (!Component) return null;
-          const row = config[slug];
-          return (
-            <Component
-              key={slug}
-              homeTitle={row?.homeTitle || undefined}
-              homeMoreLabel={row?.homeMoreLabel || undefined}
-              showHomeTitle={row?.showHomeTitle}
-              showHomeMoreLabel={row?.showHomeMoreLabel}
-            />
-          );
-        })}
-        <CtaSection />
       </main>
     </HomeDataProvider>
   );
