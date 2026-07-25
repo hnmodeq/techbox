@@ -132,7 +132,7 @@ settings, IP/network restrictions, and the provider's connection limit.
 | `pnpm db:push` / `pnpm db:seed` | Schema sync / seed |
 | `pnpm storage:migrate-resumes` | Move legacy public Supabase résumés into the private bucket |
 | `pnpm storage:import-qnap -- --apply` | Import authorized official QNAP product images into `techbox/qnap` |
-| `pnpm test:e2e` | Playwright smoke tests |
+| `pnpm test:e2e` | Complete Playwright suite (public smoke, auth UI, and checkout) |
 | `pnpm check:content` / `check:db` / `check:storage` / `check:all` | Content/DB/Supabase Storage integrity checks |
 
 ---
@@ -228,18 +228,11 @@ cluster (`TimelineEvent` + comments/likes).
 
 ## CI / deployment
 
-`.github/workflows/ci.yml` runs **three required checks** on every push/PR to
-`main`: **Lint**, **Typecheck**, and **Build**. An optional, non-blocking
-**DB/content check** job runs when `DATABASE_URL` is configured. The build is
-DB-outage-safe (all DB access is guarded) so it succeeds even without a live
-database.
-
-**Current branch CI status:**
-- ✅ Lint: passing (0 errors, 7 pre-existing warnings)
-- ✅ Typecheck: passing
-- ✅ Unit tests: passing (6/6)
-- ⚠️ Build: times out locally (300s limit), passes on CI with more memory
-- ️ E2E tests: may need adjustment due to layout changes
+`.github/workflows/ci.yml` runs the required **Lint**, **Typecheck**, **Unit Tests**,
+**Build**, and complete **Playwright E2E** jobs on every push/PR to `main`.
+An optional, non-blocking database/content/storage integrity job runs when
+`DATABASE_URL` is configured. Public builds remain database-outage-safe and do
+not require production credentials.
 
 ---
 

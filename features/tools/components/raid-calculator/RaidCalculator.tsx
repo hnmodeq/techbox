@@ -15,31 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
-
-export type RaidKey = "basic" | "jbod" | "raid0" | "raid1" | "raid5" | "raid6" | "raid10" | "shr1" | "shr2";
-export type Drive = { id: string; sizeTb: number; label: string; type: "HDD" | "SSD" };
-export type RaidResult = {
-  usableTb: number; protectionTb: number; unusedTb: number; rawTb: number;
-  activeRawTb: number; spareTb: number; valid: boolean; minDisks: number;
-  warnings: string[]; description: string; faultTolerance: string; efficiency: number;
-};
-
-type RaidOption = {
-  key: RaidKey; label: string; short: string; minDisks: number;
-  protected: boolean; description: string; faultTolerance: string;
-};
-
-export const RAID_OPTIONS: RaidOption[] = [
-  { key: "basic", label: "Basic", short: "Basic", minDisks: 1, protected: false, description: "هر دیسک مستقل – بیشترین ظرفیت، بدون تحمل خرابی.", faultTolerance: "ندارد" },
-  { key: "jbod", label: "JBOD", short: "JBOD", minDisks: 1, protected: false, description: "ترکیب ظرفیت دیسک‌ها در یک Volume پیوسته.", faultTolerance: "ندارد" },
-  { key: "raid0", label: "RAID 0", short: "RAID 0", minDisks: 2, protected: false, description: "Striping برای کارایی بالا، بدون تحمل خرابی.", faultTolerance: "ندارد" },
-  { key: "raid1", label: "RAID 1", short: "RAID 1", minDisks: 2, protected: true, description: "Mirror کامل – امنیت بالا، تحمل خرابی تا n-1 دیسک.", faultTolerance: "تحمل خرابی n-1 دیسک" },
-  { key: "raid5", label: "RAID 5", short: "RAID 5", minDisks: 3, protected: true, description: "یک دیسک Parity – تعادل ظرفیت و امنیت.", faultTolerance: "تحمل خرابی ۱ دیسک" },
-  { key: "raid6", label: "RAID 6", short: "RAID 6", minDisks: 4, protected: true, description: "دو Parity – مناسب آرایه‌های بزرگ و حساس.", faultTolerance: "تحمل خرابی ۲ دیسک" },
-  { key: "raid10", label: "RAID 10", short: "RAID 10", minDisks: 4, protected: true, description: "Mirror + Stripe – کارایی و امنیت.", faultTolerance: "حداقل ۱ دیسک" },
-  { key: "shr1", label: "SHR", short: "SHR", minDisks: 2, protected: true, description: "Synology Hybrid RAID – بهینه برای دیسک‌های نامساوی.", faultTolerance: "تحمل خرابی ۱ دیسک" },
-  { key: "shr2", label: "SHR-2", short: "SHR-2", minDisks: 4, protected: true, description: "SHR با تحمل ۲ دیسک – مناسب آرایه‌های بزرگ.", faultTolerance: "تحمل خرابی ۲ دیسک" },
-];
+import { calculateRaid, RAID_OPTIONS, type Drive, type RaidKey, type RaidResult } from "@/lib/raid";
 
 const HDD_SIZES = [
   { tb: 1, label: "۱ ترابایت" }, { tb: 2, label: "۲ ترابایت" }, { tb: 3, label: "۳ ترابایت" },
@@ -55,63 +31,7 @@ const SSD_SIZES = [
 ];
 
 function uid() { return `d-${Math.random().toString(36).slice(2, 10)}`; }
-function sum(v: number[]) { return v.reduce((a, b) => a + b, 0); }
 const nfFa0 = new Intl.NumberFormat("fa-IR", { maximumFractionDigits: 0 });
-
-function calculateShr(sizes: number[], parity: 1 | 2) {
-  const sorted = [...sizes].filter(Boolean).sort((a, b) => a - b);
-  const raw = sum(sorted);
-  let usable = 0, protection = 0, unused = 0, prev = 0;
-  for (const b of sorted) {
-    const slice = b - prev;
-    if (slice <= 0) continue;
-    const members = sorted.filter((s) => s >= b).length;
-    if (parity === 1) {
-      if (members >= 2) { usable += (members - 1) * slice; protection += slice; }
-      else unused += members * slice;
-    } else {
-      if (members >= 3) { usable += (members - 2) * slice; protection += 2 * slice; }
-      else unused += members * slice;
-    }
-    prev = b;
-  }
-  const gap = raw - usable - protection - unused;
-  if (Math.abs(gap) > 0.00001) unused += gap;
-  return { usable, protection, unused };
-}
-
-export function calculateRaid(raidKey: RaidKey, drives: Drive[], spareCount = 0): RaidResult {
-  const option = RAID_OPTIONS.find((o) => o.key === raidKey);
-  if (!option) return { usableTb: 0, protectionTb: 0, unusedTb: 0, rawTb: 0, activeRawTb: 0, spareTb: 0, valid: false, minDisks: 0, warnings: [], description: "", faultTolerance: "", efficiency: 0 };
-  const allSizes = drives.map((d) => Number(d.sizeTb)).filter((s) => s > 0);
-  const rawTb = sum(allSizes);
-  const sortedDesc = [...allSizes].sort((a, b) => b - a);
-  const spare = sortedDesc.slice(0, Math.min(spareCount, Math.max(0, sortedDesc.length - 1)));
-  const active = sortedDesc.slice(spare.length);
-  const activeRawTb = sum(active);
-  const spareTb = sum(spare);
-  const n = active.length;
-  const min = n ? Math.min(...active) : 0;
-  const warnings: string[] = [];
-  let usableTb = 0, protectionTb = 0, unusedTb = 0;
-
-  if (n < option.minDisks) warnings.push(`برای ${option.label} حداقل ${option.minDisks.toLocaleString("fa-IR")} دیسک لازم است.`);
-  if (raidKey === "raid10" && n % 2 !== 0) warnings.push("RAID 10 نیاز به تعداد دیسک زوج دارد.");
-
-  switch (raidKey) {
-    case "basic": case "jbod": usableTb = activeRawTb; break;
-    case "raid0": usableTb = n >= 2 ? min * n : 0; unusedTb = Math.max(0, activeRawTb - usableTb); break;
-    case "raid1": usableTb = n >= 2 ? min : 0; protectionTb = n >= 2 ? min * (n - 1) : 0; unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb); break;
-    case "raid5": usableTb = n >= 3 ? min * (n - 1) : 0; protectionTb = n >= 3 ? min : 0; unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb); break;
-    case "raid6": usableTb = n >= 4 ? min * (n - 2) : 0; protectionTb = n >= 4 ? min * 2 : 0; unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb); break;
-    case "raid10": usableTb = n >= 4 && n % 2 === 0 ? min * (n / 2) : 0; protectionTb = n >= 4 && n % 2 === 0 ? min * (n / 2) : 0; unusedTb = Math.max(0, activeRawTb - usableTb - protectionTb); break;
-    case "shr1": if (n >= 2) { const s = calculateShr(active, 1); usableTb = s.usable; protectionTb = s.protection; unusedTb = s.unused; } break;
-    case "shr2": if (n >= 4) { const s = calculateShr(active, 2); usableTb = s.usable; protectionTb = s.protection; unusedTb = s.unused; } break;
-  }
-  const valid = n >= option.minDisks && !(raidKey === "raid10" && n % 2 !== 0);
-  const efficiency = activeRawTb > 0 ? (usableTb / activeRawTb) * 100 : 0;
-  return { usableTb, protectionTb, unusedTb, rawTb, activeRawTb, spareTb, valid, minDisks: option.minDisks, warnings, description: option.description, faultTolerance: option.faultTolerance, efficiency };
-}
 
 const BINARY_FACTOR = 1000 ** 4 / 1024 ** 4;
 function toBinary(tb: number) { return tb * BINARY_FACTOR; }
@@ -120,11 +40,6 @@ function formatFaBinary(tb: number) {
   if (b <= 0) return "۰";
   if (b < 1) return `${(b * 1000).toLocaleString("fa-IR", { maximumFractionDigits: 0 })} گیگابایت`;
   return `${b.toLocaleString("fa-IR", { maximumFractionDigits: b >= 10 ? 1 : 2 })} ترابایت`;
-}
-function formatFaTb(tb: number) {
-  if (tb <= 0) return "۰";
-  if (tb < 1) return `${(tb * 1000).toLocaleString("fa-IR")} گیگابایت`;
-  return `${tb.toLocaleString("fa-IR", { maximumFractionDigits: 2 })} ترابایت`;
 }
 function parseBay(specs: any): number | null {
   if (!specs || typeof specs !== "object") return null;

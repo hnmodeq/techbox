@@ -21,8 +21,10 @@ export function RelatedPosts({
   limit?: number;
 }) {
   const [posts, setPosts] = useState<any[]>([]);
+  const tagsKey = tags.join("\u0000");
 
   useEffect(() => {
+    const tagSet = new Set(tagsKey ? tagsKey.split("\u0000") : []);
     fetch(`/api/posts?module=${module}&take=30`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
       .then((data) => {
@@ -32,7 +34,7 @@ export function RelatedPosts({
           .map((p: any) => ({
             ...p,
             score:
-              (tags.length > 0 && p.tags?.some((t: string) => tags.includes(t)) ? 3 : 0) +
+              (tagSet.size > 0 && p.tags?.some((tag: string) => tagSet.has(tag)) ? 3 : 0) +
               (category && p.category === category ? 1 : 0),
           }))
           .sort((a: any, b: any) => b.score - a.score || b.views - a.views)
@@ -40,7 +42,7 @@ export function RelatedPosts({
         setPosts(filtered);
       })
       .catch(() => {});
-  }, [module, slug, limit]);
+  }, [category, limit, module, slug, tagsKey]);
 
   if (posts.length === 0) return null;
 
