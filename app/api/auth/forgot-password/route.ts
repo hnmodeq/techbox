@@ -4,6 +4,7 @@ import { z } from "zod";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { hashTokenSha256 } from "@/lib/auth-server";
+import { siteUrl } from "@/lib/seo";
 
 const schema = z.object({
   email: z.string().email(),
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const resetLink = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
+    const resetLink = `${siteUrl()}/auth/reset-password?token=${rawToken}&email=${encodeURIComponent(email)}`;
 
     // Send reset email
     const { subject, html } = emailTemplates.passwordReset(resetLink);

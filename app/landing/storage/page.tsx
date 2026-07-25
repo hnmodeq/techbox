@@ -1,16 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
-import type { Metadata } from "next";
 import { getDbModulePosts } from "@/lib/server-posts";
+import { pageMetadata } from "@/lib/seo";
 
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HardDrive, Server, Cpu, Cloud, Building, Home, Briefcase, Camera } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "انتخاب ذخیره‌ساز سازمانی – تکباکس",
-  description: "راهنمای خرید NAS و ذخیره‌ساز سازمانی کیونپ، سینولوژی – بر اساس تعداد Bay، پردازنده، رم، شبکه 10GbE – با قیمت لحظه‌ای دلاری",
-};
+export const metadata = pageMetadata({
+  title: "راهنمای انتخاب ذخیره‌ساز سازمانی | تکباکس",
+  description: "راهنمای انتخاب NAS و ذخیره‌ساز سازمانی بر اساس ظرفیت، پردازنده، رم، تعداد Bay و شبکه.",
+  path: "/landing/storage",
+});
 
 const BRANDS = [
   { name: "QNAP", fa: "کیونپ", slug: "QNAP" },

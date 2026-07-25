@@ -4,6 +4,7 @@ import { createEmailVerification } from "@/lib/auth-server";
 import { z } from "zod";
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { siteUrl } from "@/lib/seo";
 
 const schema = z.object({ email: z.string().email() });
 
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { rawToken } = await createEmailVerification(user.id);
-    const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const base = siteUrl();
     const verifyLink = `${base}/auth/verify-email?token=${rawToken}&email=${encodeURIComponent(user.email)}`;
 
     const { subject, html } = emailTemplates.emailVerification(verifyLink);

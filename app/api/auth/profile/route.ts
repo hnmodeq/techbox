@@ -4,6 +4,7 @@ import { getSessionUserPublic, createEmailVerification, verifyPassword } from "@
 import { sendEmail, emailTemplates } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { z } from "zod";
+import { siteUrl } from "@/lib/seo";
 
 const profileSchema = z.object({
   name: z.string().min(2).optional(),
@@ -92,7 +93,7 @@ export async function PUT(req: NextRequest) {
     if (emailChanged) {
       try {
         const { rawToken } = await createEmailVerification(user.id);
-        const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+        const base = siteUrl();
         const verifyLink = `${base}/auth/verify-email?token=${rawToken}&email=${encodeURIComponent(newEmail!)}`;
         const { subject, html } = emailTemplates.emailVerification(verifyLink);
         await sendEmail({ to: newEmail!, subject, html });

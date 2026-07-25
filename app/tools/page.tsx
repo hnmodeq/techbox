@@ -1,16 +1,35 @@
 import { ToolsGrid } from "@/features/tools/components/ToolsGrid";
 import { ToolPageHeader } from "@/features/tools/components/ToolPageHeader";
-import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata, siteUrl } from "@/lib/seo";
+import { toolRoutes } from "@/config/modules.config";
+import { JsonLd } from "@/components/seo/StructuredData";
 
-export const metadata: Metadata = {
-  title: "ابزارها | TechBox",
-  description: "محاسبه فضای ذخیره‌ساز، انتخاب ذخیره‌ساز شبکه، انتخاب ذخیره‌ساز دوربین، محاسبه زیرشبکه",
-};
+export const metadata = pageMetadata({
+  title: "ابزارهای تخصصی فناوری اطلاعات | تکباکس",
+  description: "محاسبه RAID و زیرشبکه، انتخاب ذخیره‌ساز شبکه و انتخاب ذخیره‌ساز دوربین برای متخصصان فناوری اطلاعات.",
+  path: "/tools",
+});
 
 export default function ToolsPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "ابزارهای تخصصی فناوری اطلاعات تکباکس",
+          url: `${siteUrl()}/tools`,
+          inLanguage: "fa-IR",
+          hasPart: toolRoutes.map((tool) => ({
+            "@type": "SoftwareApplication",
+            name: tool.titleFa,
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Web",
+            url: `${siteUrl()}${tool.href}`,
+          })),
+        }}
+      />
       <ToolPageHeader
         title="ابزارهای TechBox"
         subtitle="محاسبه فضای ذخیره‌ساز، انتخاب ذخیره‌ساز شبکه و دوربین، محاسبه زیرشبکه"

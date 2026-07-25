@@ -1,4 +1,5 @@
 import { escapeHtml } from "./email";
+import { siteUrl } from "@/lib/seo";
 
 /** A single selected item to include in a newsletter. */
 export interface NewsletterItem {
@@ -126,6 +127,6 @@ export function renderNewsletterEmail(opts: RenderNewsletterOptions): string {
 
 /** Build the absolute unsubscribe URL for a given subscriber token. */
 export function buildUnsubscribeUrl(token: string): string {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const base = siteUrl();
   return `${base}/newsletter/unsubscribe?token=${encodeURIComponent(token)}`;
 }

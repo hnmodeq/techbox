@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     title: defaultSeo.title,
     description: defaultSeo.description,
     url: siteUrl(),
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "TechBox" }],
+    images: [{ url: `/api/og?title=${encodeURIComponent(defaultSeo.title)}`, width: 1200, height: 630, alt: "TechBox" }],
   },
   twitter: {
     card: "summary_large_image",
     title: defaultSeo.title,
     description: defaultSeo.description,
-    images: ["/logo.png"],
+    images: [`/api/og?title=${encodeURIComponent(defaultSeo.title)}`],
   },
   icons: {
     icon: "/logo.png",

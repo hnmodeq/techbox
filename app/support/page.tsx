@@ -1,10 +1,11 @@
-import { defaultSeo } from "@/lib/seo"
+import { pageMetadata } from "@/lib/seo"
 import { SupportForm } from "@/features/support/components/SupportForm"
 
-export const metadata = {
-  title: `پشتیبانی | ${defaultSeo.title}`,
-  description: "ارسال پیام به تیم پشتیبانی تکباکس",
-}
+export const metadata = pageMetadata({
+  title: "پشتیبانی | تکباکس",
+  description: "ثبت تیکت و ارتباط امن با تیم پشتیبانی تکباکس.",
+  path: "/support",
+})
 
 export default function SupportPage() {
   return (

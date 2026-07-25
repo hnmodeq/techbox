@@ -1,10 +1,11 @@
 import { RaidCalculator } from "@/features/tools/components/raid-calculator";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "محاسبه فضای ذخیره‌ساز | TechBox",
-  description: "محاسبه ظرفیت RAID 0/1/5/6/10 و SHR-1/SHR-2 با ظرفیت‌های ترکیبی.",
-};
+export const metadata = pageMetadata({
+  title: "محاسبه ظرفیت RAID و SHR | تکباکس",
+  description: "محاسبه ظرفیت قابل استفاده، فضای افزونگی و تحمل خرابی RAID 0، 1، 5، 6، 10 و SHR.",
+  path: "/tools/raid-calculator",
+});
 
 export default function RaidCalculatorPage() {
   return (

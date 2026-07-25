@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { TechboxAppSidebar } from "./techbox-app-sidebar"
 import { TechboxNewsSidebar } from "./techbox-news-sidebar"
 import { SiteHeader } from "./site-header"
+import { MobileBottomNav } from "./mobile-bottom-nav"
 import FooterSection from "@/components/layout/Footer"
 import { CartProvider } from "@/providers/cart.provider"
 import { CompareProvider } from "@/providers/compare.provider"
@@ -191,16 +192,18 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
                 <NewsTicker items={tickerItems} className="py-0" />
               </div>
             )}
-            <main
+            <div
               id="main-content"
-              className="flex min-h-[calc(100svh-var(--header-height))] flex-col"
+              tabIndex={-1}
+              className="flex min-h-[calc(100svh-var(--header-height))] flex-col focus:outline-none pb-[calc(4rem+env(safe-area-inset-bottom))] sm:pb-0"
             >
               <div className="w-full max-w-full flex-1">{children}</div>
               <FooterSection />
-            </main>
+            </div>
           </SidebarInset>
         </div>
       </SidebarProvider>
+      <MobileBottomNav />
 
       {/*
         News sidebar — fixed to the viewport, same as <Sidebar> in shadcn/ui.

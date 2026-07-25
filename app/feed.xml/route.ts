@@ -1,9 +1,7 @@
 import { prisma } from "@/lib/db";
-import { publicPostDateWhere, formatPostDateFa } from "@/lib/post-date";
-
-function siteUrl() {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://hnmodeq-techbox.vercel.app").replace(/\/$/, "");
-}
+import { publicPostDateWhere } from "@/lib/post-date";
+import { siteUrl } from "@/lib/seo";
+import { getEnabledModules } from "@/lib/module-config";
 
 function escapeXml(str: string): string {
   return str
@@ -19,12 +17,14 @@ export async function GET() {
 
   let posts: any[] = [];
   try {
+    const enabled = await getEnabledModules();
+    const feedModules = ["blog", "news", "review"].filter((module) => enabled.includes(module as any));
     posts = await prisma.post.findMany({
       where: {
         published: true,
         deletedAt: null,
         date: publicPostDateWhere(),
-        module: { in: ["blog", "news", "review"] },
+        module: { in: feedModules },
       },
       orderBy: { date: "desc" },
       take: 50,

@@ -6,8 +6,8 @@ export const metadata = modulePageMetadata("forum", "انجمن گفتگوی ف�
 export default async function ForumPage() {
   const dbItems = await getDbModulePosts("forum", 80);
   return (
-    <div dir="rtl">
+    <main dir="rtl">
       <ForumList serverItems={dbItems.length > 0 ? dbItems : undefined} />
-    </div>
+    </main>
   );
 }

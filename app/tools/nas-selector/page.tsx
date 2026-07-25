@@ -1,11 +1,12 @@
 import { NasSelectorWizard } from "@/features/tools/components/nas-selector-wizard";
 import { getDbModulePosts } from "@/lib/server-posts";
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "انتخاب ذخیره‌ساز شبکه | TechBox",
-  description: "با پاسخ به ۴ سؤال ساده، بهترین NAS را برای نیاز خود پیدا کنید.",
-};
+export const metadata = pageMetadata({
+  title: "انتخاب ذخیره‌ساز شبکه | تکباکس",
+  description: "با پاسخ به چند سؤال، ذخیره‌ساز شبکه مناسب ظرفیت، کاربران و بودجه خود را پیدا کنید.",
+  path: "/tools/nas-selector",
+});
 
 export default async function NasSelectorPage() {
   // Fetch real shop products
