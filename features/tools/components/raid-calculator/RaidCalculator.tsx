@@ -269,6 +269,7 @@ export default function RaidCalculator() {
   const hasRaid = raid !== null;
   const selectedOption = raid ? RAID_OPTIONS.find((o) => o.key === raid) : null;
   const locked = showResults;
+  const canRecommend = hasDrives && hasRaid;
 
   const handleRecommend = () => {
     if (!hasRaid || !hasDrives) return;
