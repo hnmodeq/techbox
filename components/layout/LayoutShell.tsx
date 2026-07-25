@@ -9,7 +9,7 @@ import { TechboxAppSidebar } from "./techbox-app-sidebar"
 import { TechboxNewsSidebar } from "./techbox-news-sidebar"
 import { SiteHeader } from "./site-header"
 import FooterSection from "@/components/layout/Footer"
-import { ConsultationProvider } from "@/providers/consultation.provider"
+import { CartProvider } from "@/providers/cart.provider"
 import { CompareProvider } from "@/providers/compare.provider"
 import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
@@ -65,7 +65,7 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
   return (
     <ThemeProvider>
       <AuthProvider>
-        <ConsultationProvider>
+        <CartProvider>
           <CompareProvider>
             <StatsProvider>
             <HomeDataProvider initialData={homeData}>
@@ -83,7 +83,7 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
             </HomeDataProvider>
             </StatsProvider>
           </CompareProvider>
-        </ConsultationProvider>
+        </CartProvider>
       </AuthProvider>
     </ThemeProvider>
   )

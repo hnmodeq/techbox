@@ -71,6 +71,7 @@ All secrets live in `.env` (git-ignored). Required for a working app:
 | `DIRECT_URL` | Non-pooled PostgreSQL URL used only by Prisma migrations |
 | `NEXT_PUBLIC_SITE_URL` | Public site origin, e.g. `http://localhost:3000` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token for images / downloads |
+| `ZARIN_MERCHANT_ID` | Zarinpal merchant ID required by the live shop checkout |
 
 Optional (features degrade gracefully when absent):
 
@@ -81,7 +82,7 @@ Optional (features degrade gracefully when absent):
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Rate limiting |
 | `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_DSN` | Error monitoring |
 | `CONTACT_EMAIL` | Recipient for the contact form (default `info@techbox.ir`) |
-| Zarinpal keys | Payments for the shop |
+| `ZARINPAL_SANDBOX` | Set to `true` only while testing the payment sandbox |
 
 > The chat route has a built-in demo fallback that is shown **only** when
 > `CHAT_API_KEY` is not configured — it never fabricates real content.

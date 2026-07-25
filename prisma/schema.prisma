@@ -658,10 +658,12 @@ model Order {
   total         Float
   currency      String   @default("IRR")
 
-  // Payment
-  paymentMethod String?  // zarinpal | manual
-  paymentId     String?  // Zarinpal authority/ref_id
-  paidAt        DateTime?
+  // Payment and private customer access
+  paymentMethod    String?  // zarinpal
+  paymentAuthority String?  @unique // Zarinpal authority issued before payment
+  paymentReference String?  // Zarinpal ref_id after successful verification
+  accessTokenHash  String?  @unique // SHA-256 of the guest/order capability token
+  paidAt           DateTime?
 
   // Notes
   adminNote     String?  @db.Text

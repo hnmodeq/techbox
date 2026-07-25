@@ -119,7 +119,8 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
   const specs = (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? (p.specs as Record<string, string>) : {};
 
   const priceAmount = p.priceAmount && p.priceAmount > 0 ? p.priceAmount : parsePriceLabel(p.priceLabel);
-  const discount = p.discountPercent ?? 0;
+  const discountState = useCountdown(p.discountEndsAt);
+  const discount = discountState?.expired ? 0 : (p.discountPercent ?? 0);
   const discountedPrice = discount > 0 ? Math.round(priceAmount * (1 - discount / 100)) : priceAmount;
 
   const validMajorSpecs = MAJOR_SPECS.map((def) => {
