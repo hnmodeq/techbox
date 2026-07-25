@@ -8,6 +8,28 @@ import {
 
 const QNAP_ORIGIN = "https://www.qnap.com";
 const REGION = "en-me";
+const OFFICIAL_OVERRIDES: Record<string, { pageUrl: string; imageUrl: string }> = {
+  "ej1600-v2": {
+    pageUrl: "https://store.qnap.com/ej1600-v2-us.html",
+    imageUrl: "https://dgi6y9510e51q.cloudfront.net/catalog/product/cache/768315cfcb45daeb341323f409d450a7/2/6/264_1479368296_EJ160020v2_Front_1.webp",
+  },
+  "es1640dc-v2": {
+    pageUrl: "https://www.qnap.com/en-me/product/es1640dc%20v2",
+    imageUrl: "https://www.qnap.com/i/_attach_file/product/photo/1000_625/263_1479365883_ES1640dc20v2_Front.png",
+  },
+  "es2486afdc": {
+    pageUrl: "https://www.qnap.com/en-us/product/es2486afdc",
+    imageUrl: "https://www.qnap.com/i/_attach_file/product/photo/1000_625/841_1779082841_ES2486AFdc_Right20angle20of20elevation.png",
+  },
+  "ts-262a": {
+    pageUrl: "https://www.qnap.com/en-us/product/ts-262a",
+    imageUrl: "https://www.qnap.com/i/_attach_file/product/photo/1000_625/810_1751880248_E794A2E59381E59C96_TS-262A_right.png",
+  },
+  "ts-462a": {
+    pageUrl: "https://www.qnap.com/en-us/product/ts-462a",
+    imageUrl: "https://www.qnap.com/i/_attach_file/product/photo/1000_625/809_1751880577_E794A2E59381E59C96_TS-462A_right.png",
+  },
+};
 const APPLY = process.argv.includes("--apply");
 const AUTHORIZED = process.env.QNAP_ASSET_IMPORT_AUTHORIZED === "true";
 const PAGE_CACHE = new Map<string, { pageUrl: string; imageUrl: string } | null>();
@@ -100,6 +122,11 @@ async function catalogSlugs() {
 async function resolveOfficialProduct(post: { slug: string; model: string | null; title: string }) {
   const catalog = await catalogSlugs();
   const sourceKeys = [post.model, post.slug, post.title].map(normalize).filter(Boolean);
+  for (const [productSlug, override] of Object.entries(OFFICIAL_OVERRIDES)) {
+    if (sourceKeys.some((key) => key === productSlug || key.startsWith(`${productSlug}-`))) {
+      return { productSlug, ...override };
+    }
+  }
   const catalogMatches = catalog
     .filter((candidate) => sourceKeys.some((key) => key === candidate || key.startsWith(`${candidate}-`)))
     .sort((a, b) => b.length - a.length);
@@ -116,6 +143,11 @@ async function resolveOfficialProduct(post: { slug: string; model: string | null
 }
 
 async function downloadAndConvert(imageUrl: string) {
+  const source = new URL(imageUrl);
+  const allowedHosts = new Set(["www.qnap.com", "dgi6y9510e51q.cloudfront.net"]);
+  if (source.protocol !== "https:" || !allowedHosts.has(source.hostname)) {
+    throw new Error(`unapproved QNAP image host: ${source.hostname}`);
+  }
   const response = await fetch(imageUrl, {
     headers: { "User-Agent": "TechBox-authorized-QNAP-asset-import/1.0" },
     cache: "no-store",
@@ -168,10 +200,19 @@ async function main() {
     console.log(`MAP ${product.slug} -> ${official.productSlug}`);
     if (!APPLY) continue;
 
+    const path = `qnap/${official.productSlug}.webp`;
+    const expectedUrl = getSupabasePublicUrl(config.publicBucket, path);
+    const existingGallery = Array.isArray(product.gallery)
+      ? product.gallery.filter((value): value is string => typeof value === "string")
+      : [];
+    if (product.image === expectedUrl && existingGallery.includes(expectedUrl)) {
+      console.log(`SKIP ${product.slug}: already imported`);
+      continue;
+    }
+
     let asset = uploaded.get(official.productSlug);
     if (!asset) {
       const output = await downloadAndConvert(official.imageUrl);
-      const path = `qnap/${official.productSlug}.webp`;
       const webp = output.buffer.slice(
         output.byteOffset,
         output.byteOffset + output.byteLength
@@ -191,9 +232,6 @@ async function main() {
       uploaded.set(official.productSlug, asset);
     }
 
-    const existingGallery = Array.isArray(product.gallery)
-      ? product.gallery.filter((value): value is string => typeof value === "string")
-      : [];
     const gallery = [
       asset.url,
       ...existingGallery.filter((url) => !url.includes("/qnap/") && !url.includes("blob.vercel-storage.com")),
