@@ -4,7 +4,48 @@
 
 ---
 
-## 1. Read this before migrating: your data is 15 MB
+## 0. RESOLVED (2026-07-26): it was network transfer, and it is fixed
+
+The owner reported **4.58 / 5 GB network transfer**. That is the meter, not
+storage (which is 15 MB, 2.8% — see §1).
+
+**Do not migrate.** Supabase Free caps egress at 5 GB too, so moving would
+have carried the identical problem to a new provider and cost a day.
+
+**Root cause: the homepage transferred 479 kB per render to display cards
+that needed 57 kB.** Two defects, both measured against the live database:
+
+1. **The news ticker used the full 35-column `cardSelect` for 30 rows** —
+   361 kB per render — while `NewsTicker.tsx` renders only module, slug,
+   title and a relative date. **82% of that payload was `specs`**: QNAP
+   product JSON blobs up to 40.5 kB each, on 16 of the 30 rows.
+2. **`cardSelect` fetched `specs`, `warranty` and `reviewedProductId`,
+   which `normalizeCard()` never emitted.** Fetched every render, dropped
+   on the floor.
+
+Fix: a dedicated 5-field `tickerSelect` + `normalizeTickerCard()`, and
+those three columns removed from `cardSelect`.
+
+| | before | after | saved |
+|---|---|---|---|
+| Homepage render | 479.3 kB | **56.9 kB** | **88%** |
+| Every other route (layout ticker) | 22.3 kB | **13.6 kB** | **39%** |
+
+Verified the ticker returns **byte-identical module/slug/title/date for all
+30 rows**. Nothing visible changed.
+
+At the previous rate 4.58 GB represented ~215,000 route renders; the same
+traffic now costs roughly an eighth of that. Seven regression tests in
+`tests/unit/egress.test.ts` fail if `specs` is ever re-added — verified by
+deliberately re-adding it and watching the suite go red.
+
+**Remaining action:** transfer resets at the start of your Neon billing
+period. If you are close to the cap before then, the site may briefly
+suspend; after the reset the new figures apply.
+
+---
+
+## 1. Storage is not the problem: your data is 15 MB
 
 This is the single most important number in this document.
 

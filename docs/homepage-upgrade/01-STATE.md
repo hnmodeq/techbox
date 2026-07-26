@@ -134,6 +134,30 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 18c) — Neon at 91% was egress; homepage payload cut 88%
+
+**The meter was network transfer (4.58/5 GB), not storage.** Owner asked how to migrate to Supabase. Measured first: the database holds **15 MB against a 0.5 GB cap (2.8%)**, so storage was never the constraint. Supabase Free caps egress at 5 GB as well, so migrating would have moved the identical problem to a new provider — recommended against it and fixed the cause instead.
+
+**Root cause: 479 kB transferred per homepage render to display cards needing 57 kB.** Two defects, both found by measuring bytes-per-query against live rows rather than reading the code:
+
+1. **The news ticker used the full 35-column `cardSelect` for 30 rows** — 361 kB per render. `NewsTicker.tsx` renders module, slug, title and a relative date. Nothing else. **82% of that payload was `specs`**: QNAP product JSON blobs, largest single row 40.5 kB, present on 16 of the 30 rows in the window.
+2. **`cardSelect` fetched `specs`, `warranty` and `reviewedProductId` that `normalizeCard()` never emits.** Pulled across the wire every render and discarded. `warranty` in §5 Top Picks comes from the nested `reviewedProduct` select, so removing it from `cardSelect` is safe — checked before touching it.
+
+Fix: a dedicated 5-field `tickerSelect` with its own `normalizeTickerCard()`, plus those three columns dropped from `cardSelect`. The separate normalizer is deliberate — feeding a trimmed row to `normalizeCard()` would spread `undefined` across ~30 keys, and the client-side merge in `home-data.tsx` distinguishes absent from empty, so that would have silently degraded richer server-rendered rows.
+
+| | before | after | saved |
+|---|---|---|---|
+| Homepage render | 479.3 kB | **56.9 kB** | **88%** |
+| Every other route (layout ticker) | 22.3 kB | **13.6 kB** | **39%** |
+
+**Verified the ticker returns byte-identical module/slug/title/date for all 30 rows** before and after. No visible change. `tsc` caught two genuine errors during the edit (`tags` required, `image` is `string | undefined` not `null`), which is exactly the value of `ContentItem` being a real type.
+
+New `tests/unit/egress.test.ts` — 7 tests parsing the select blocks out of `home-server.ts`. Confirmed the guard works by re-adding `specs: true` and watching it go red, then restoring. This class of regression is invisible in review and unattributable weeks later when a quota bar fills.
+
+`typecheck` ✅ · `lint` ✅ · `test` ✅ **142 passing** (was 135). New `pnpm db:size`. Full analysis in `docs/neon-to-supabase.md`.
+
+**Not verified:** the real-world egress drop — that needs a billing period on live traffic. The per-render numbers are measured; the monthly projection is arithmetic.
+
 ### 2026-07-26 (session 18b) — Doctor run on the owner's machine; my IPv6 theory was wrong
 
 **The real fault was the stale Prisma client, not the network.** Owner ran `pnpm db:doctor`. Every network layer passed: IPv4 187ms, SSLRequest 'S' 343ms, TLS 1.3 522ms, `select version()` 1519ms against PostgreSQL 17.10 with all 164 posts and 23 users. The only failure was `generated client is stale — missing: partner`, which is exactly the session-16 bug recurring. The P1001 storm was a *past* event in a log that also contained the stale-client error; the connection itself is healthy.

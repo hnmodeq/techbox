@@ -63,13 +63,26 @@ const layoutCardSelect = {
   author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true, verifiedType: true, verifiedLabel: true } },
 } as const;
 
+/**
+ * Fields a homepage card actually renders.
+ *
+ * Egress discipline: every column listed here is transferred from Neon on
+ * every uncached render, and the free plan meters that at 5 GB/month. Three
+ * columns were previously selected and then silently dropped by
+ * normalizeCard() — `specs`, `warranty` and `reviewedProductId`. `specs` is
+ * the expensive one: QNAP product rows carry JSON blobs up to 40 kB each,
+ * which made it 296 kB of the 361 kB the ticker query returned.
+ *
+ * Before adding a field, confirm normalizeCard() emits it and a component
+ * reads it. `content` stays because estimateReadingMinutes() needs it.
+ */
 const cardSelect = {
   id: true,
   slug: true,
   module: true,
   title: true,
   excerpt: true,
-  content: true,
+  content: true, // reading-time estimate
   image: true,
   videoUrl: true,
   videoDuration: true,
@@ -96,15 +109,55 @@ const cardSelect = {
   discountPercent: true,
   discountEndsAt: true,
   availability: true,
-  warranty: true,
-  specs: true,
-  reviewedProductId: true,
   authorName: true,
   author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true, verifiedType: true, verifiedLabel: true } },
 } as const;
 
+/**
+ * The news ticker renders module, slug, title and a relative date — nothing
+ * else. It previously reused the full cardSelect for 30 rows, transferring
+ * 361 kB per homepage render to display four fields, 82% of it `specs`
+ * blobs belonging to shop products the ticker does not even style
+ * differently. This select returns the same 30 rows in 4.6 kB.
+ */
+const tickerSelect = {
+  id: true,
+  slug: true,
+  module: true,
+  title: true,
+  date: true,
+} as const;
+
 function firstGalleryImage(value: unknown) {
   return Array.isArray(value) ? value.slice(0, 3) : [];
+}
+
+/**
+ * Shape a ticker row into the ContentItem fields NewsTicker reads.
+ *
+ * Deliberately not normalizeCard(): that would spread `undefined` across
+ * ~30 keys the trimmed select never fetched, and consumers distinguish
+ * "absent" from "empty". The defaults here match normalizeCard's so the
+ * client-side merge in home-data.tsx cannot regress a richer row.
+ */
+function normalizeTickerCard(p: any) {
+  return {
+    id: p.id,
+    slug: p.slug,
+    module: p.module,
+    title: p.title,
+    date: p.date.toISOString(),
+    date_fa: formatPostDateFa(p.date),
+    dateFa: formatPostDateFa(p.date),
+    excerpt: "",
+    image: undefined,
+    tags: [] as string[],
+    likes: 0,
+    views: 0,
+    comments: 0,
+    published: true,
+    author: { name: "", username: "", role: "", job: "", avatar: "", verifiedType: null, verifiedLabel: null },
+  };
 }
 
 function normalizeCard(p: any) {
@@ -245,7 +298,7 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
       where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
       orderBy: { date: "desc" },
       take: 30,
-      select: layoutCardSelect,
+      select: tickerSelect,
     });
   } catch (error) {
     logDbFailure("layout-data:news", error);
@@ -268,7 +321,7 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
 
   return {
     modules: { news: normalizedNews },
-    ticker: ticker.map(normalizeCard),
+    ticker: ticker.map(normalizeTickerCard),
     generatedAt: new Date().toISOString(),
   };
 }
@@ -329,7 +382,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
       where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
       orderBy: { date: "desc" },
       take: 30,
-      select: cardSelect,
+      select: tickerSelect,
     });
   } catch {
     tickerPosts = [];
@@ -440,7 +493,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
 
   return {
     modules: modules as HomeData["modules"],
-    ticker: tickerPosts.map(normalizeCard),
+    ticker: tickerPosts.map(normalizeTickerCard),
     generatedAt: new Date().toISOString(),
     insights,
     topPicks,
