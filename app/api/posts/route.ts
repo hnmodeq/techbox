@@ -27,6 +27,38 @@ function normalizeSlug(value: string, fallback: string) {
   return base || `topic-${Date.now().toString(36)}`;
 }
 
+/**
+ * A review may only exist for a product TechBox actually sells.
+ *
+ * Enforced HERE, on the server, not just in the admin form: decision D2
+ * makes this a system invariant, and client-side validation alone can be
+ * bypassed by any direct API call.
+ *
+ * Returns an error string when invalid, or null when the value is fine.
+ * Docs: docs/homepage-upgrade/03-DATA-CONTRACTS.md §5
+ */
+async function validateReviewedProduct(
+  moduleKey: string,
+  reviewedProductId: string | null | undefined,
+): Promise<string | null> {
+  if (moduleKey !== "review") return null;
+
+  if (!reviewedProductId) {
+    return "برای نقد و بررسی باید یک محصول از فروشگاه انتخاب شود.";
+  }
+
+  const product = await prisma.post.findUnique({
+    where: { id: reviewedProductId },
+    select: { id: true, module: true, published: true, deletedAt: true },
+  });
+
+  if (!product || product.deletedAt) return "محصول انتخاب‌شده یافت نشد.";
+  if (product.module !== "shop") return "فقط محصولات فروشگاه قابل نقد و بررسی هستند.";
+  if (!product.published) return "محصول انتخاب‌شده منتشر نشده است.";
+
+  return null;
+}
+
 async function uniquePostSlug(module: string, desired: string) {
   const base = normalizeSlug(desired, module);
   for (let index = 0; index < 20; index += 1) {
@@ -263,6 +295,8 @@ const createSchema = z.object({
   seriesOrder: z.number().int().min(1).optional(),
   rating: z.number().min(0).max(5).optional(),
   ratingCount: z.number().int().min(0).optional(),
+  /** Required for module="review": the shop post this review is about. */
+  reviewedProductId: z.string().max(64).nullish(),
   fileName: z.string().max(200).optional(),
   fileUrl: z.string().max(1000).optional(),
   fileSize: z.string().max(50).optional(),
@@ -288,6 +322,14 @@ export async function POST(req: NextRequest) {
 
   if (!canManageModule && data.module !== "forum") {
     return NextResponse.json({ error: "forbidden" }, { status: 403, headers: cacheHeaders(PRIVATE_NO_STORE) });
+  }
+
+  const reviewError = await validateReviewedProduct(data.module, data.reviewedProductId);
+  if (reviewError) {
+    return NextResponse.json(
+      { error: "review_product_required", message: reviewError },
+      { status: 422, headers: cacheHeaders(PRIVATE_NO_STORE) },
+    );
   }
 
   try {
@@ -331,6 +373,7 @@ export async function POST(req: NextRequest) {
       gallery: data.gallery || [],
       tags: data.tags,
       specs: data.specs || {},
+      reviewedProductId: data.reviewedProductId ?? undefined,
       priceAmount: data.priceAmount ?? undefined,
       sourcePriceAmount: (data as any).sourcePriceAmount ?? undefined,
       sourceCurrency: (data as any).sourceCurrency ?? undefined,
@@ -376,6 +419,7 @@ const patchSchema = z.object({
   solved: z.boolean().optional(),
   category: z.string().max(100).optional(),
   newSlug: z.string().min(1).max(200).optional(),
+  reviewedProductId: z.string().max(64).nullish(),
 });
 
 export async function PATCH(req: NextRequest) {
@@ -412,6 +456,19 @@ export async function PATCH(req: NextRequest) {
   }
   if (typeof body.solved === "boolean") data.solved = body.solved;
   if (typeof body.category === "string") data.category = body.category;
+
+  // Linking a review to its product. Validated server-side for the same
+  // reason as on create — see validateReviewedProduct.
+  if (body.reviewedProductId !== undefined) {
+    const err = await validateReviewedProduct(moduleKey, body.reviewedProductId ?? null);
+    if (err) {
+      return NextResponse.json(
+        { error: "review_product_required", message: err },
+        { status: 422, headers: cacheHeaders(PRIVATE_NO_STORE) },
+      );
+    }
+    data.reviewedProductId = body.reviewedProductId ?? null;
+  }
 
   // Handle slug change → auto-create redirect
   let newSlug = slug;
