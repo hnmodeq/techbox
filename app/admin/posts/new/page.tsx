@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { canEdit as canEditModule } from "@/lib/auth";
 import { useAuth } from "@/providers/auth.provider";
 import { ModuleBadge } from "@/components/ui/module-badge";
+import { ProductPicker, type PickedProduct } from "@/components/admin/product-picker";
 import { StorageUploadField } from "@/components/admin/StorageUploadField";
 import { ShopSpecsField } from "@/components/admin/shop-specs-field";
 import { ShopPricingFields } from "@/components/admin/shop-pricing-fields";
@@ -225,6 +226,11 @@ function NewPostInner() {
   });
 
   const moduleWatch = form.watch("module") as ModuleSlug;
+
+  // Reviews must point at a real shop product (decision D2). The API
+  // rejects a review without one, so this is required state, not a nicety.
+  const [reviewedProductId, setReviewedProductId] = useState<string | null>(null);
+  const [reviewedProduct, setReviewedProduct] = useState<PickedProduct | null>(null);
   const titleWatch = form.watch("title");
   const tagsWatch = form.watch("tags");
   const excerptWatch = form.watch("excerpt");
@@ -260,6 +266,8 @@ function NewPostInner() {
       } catch {}
       if (!mounted || !it) return;
       setEditPostId(it.id || null);
+      setReviewedProductId(it.reviewedProductId ?? null);
+      setReviewedProduct(it.reviewedProduct ?? null);
       form.reset({
         module: moduleWatch,
         title: it.title || "",
@@ -336,6 +344,11 @@ function NewPostInner() {
       setMsg("عنوان الزامی است");
       return;
     }
+    if (values.module === "review" && !reviewedProductId) {
+      setMsg("برای نقد و بررسی باید یک محصول از فروشگاه انتخاب کنید");
+      toast.error("محصول مرتبط انتخاب نشده است");
+      return;
+    }
     setSaving(true);
     setMsg("");
     setLastDraftKey("");
@@ -379,6 +392,8 @@ function NewPostInner() {
       specs: parseSpecs(values.specs || ""),
       series: (values.series || "").trim() || undefined,
       seriesOrder: (values.seriesOrder || "").trim() ? Number(values.seriesOrder) : undefined,
+      // Only meaningful for reviews; the API ignores it elsewhere.
+      reviewedProductId: values.module === "review" ? reviewedProductId : undefined,
     };
 
     try {
@@ -747,10 +762,25 @@ function NewPostInner() {
               {moduleWatch === "review" && (
                 <AccordionItem value="review">
                   <Card className="p-0">
-                    <AccordionTrigger className="p-4">امتیاز</AccordionTrigger>
-                    <AccordionContent className="p-4 pt-0 grid gap-3 md:grid-cols-2">
+                    <AccordionTrigger className="p-4">محصول مرتبط و امتیاز</AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0 grid gap-3">
+                      <div>
+                        <FormLabel className="mb-1.5 block">
+                          محصول مورد بررسی <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <ProductPicker
+                          value={reviewedProductId}
+                          product={reviewedProduct}
+                          onChange={(id, prod) => {
+                            setReviewedProductId(id);
+                            setReviewedProduct(prod);
+                          }}
+                        />
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
                       <FormField control={form.control as any} name="rating" render={({ field }) => (<FormItem><FormLabel>Rating</FormLabel><FormControl><Input type="number" min="0" max="5" step="0.1" {...field} /></FormControl></FormItem>)} />
                       <FormField control={form.control as any} name="ratingCount" render={({ field }) => (<FormItem><FormLabel>Rating Count</FormLabel><FormControl><Input type="number" min="0" {...field} /></FormControl></FormItem>)} />
+                      </div>
                     </AccordionContent>
                   </Card>
                 </AccordionItem>

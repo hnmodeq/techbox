@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { StorageUploadField } from "@/components/admin/StorageUploadField";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
@@ -400,13 +401,48 @@ function TimelineContent({ isSuperAdmin }: { isSuperAdmin: boolean }) {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs">تصویر (URL)</Label>
+              <Label className="text-xs">تصویر رویداد</Label>
+
+              {/* Upload writes to the same Supabase bucket the post editor
+                  uses, so timeline images are managed exactly like every
+                  other image on the site — nothing is hardcoded. */}
+              <StorageUploadField
+                label="آپلود تصویر"
+                kind="image"
+                folder="timeline-images"
+                accept="image/*"
+                onUploaded={(r) => setFormImage(r.url)}
+              />
+
               <Input
                 value={formImage}
                 onChange={(e) => setFormImage(e.target.value)}
-                placeholder="https://..."
+                placeholder="یا نشانی تصویر را مستقیم وارد کنید: https://..."
                 dir="ltr"
               />
+
+              {formImage.trim() ? (
+                <div className="flex items-center gap-3 rounded-md border border-border p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={formImage}
+                    alt="پیش‌نمایش تصویر رویداد"
+                    width={96}
+                    height={54}
+                    className="h-[54px] w-24 shrink-0 rounded object-cover"
+                  />
+                  <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground" dir="ltr">
+                    {formImage}
+                  </span>
+                  <Button type="button" variant="ghost" size="xs" onClick={() => setFormImage("")}>
+                    حذف
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-[11px] text-muted-foreground">
+                  بدون تصویر، کارت رویداد فقط متن نمایش می‌دهد.
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between rounded-lg border p-3">
