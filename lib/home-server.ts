@@ -124,7 +124,9 @@ function normalizeCard(p: any) {
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         username: p.author?.username || "",
-        role: p.author?.roleFa || p.author?.role || "عضو انجمن",
+        // Byline shows the author's real job title; roleFa (site role) is
+        // only a fallback when no job is set.
+        role: p.author?.job?.trim() || p.author?.roleFa?.trim() || "",
         job: p.author?.job || "",
         avatar: p.author?.avatar || "",
         verifiedType: (p.author as any)?.verifiedType || null,
