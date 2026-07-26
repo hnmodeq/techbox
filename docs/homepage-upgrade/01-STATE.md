@@ -134,6 +134,20 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 14) — HOTFIX: nested anchors in More to Explore
+
+Owner's browser console reported `<a> cannot be a descendant of <a>` followed by a hydration failure, both pointing at `MoreToExploreSection`.
+
+**Cause:** `HeroCard` wraps the whole card in a `<Link>`, and the `Byline` inside it renders its own `<Link>` to `/author/{username}`. Nested anchors are invalid HTML, so the browser silently restructures the DOM — which is also what produced the *second* error about the overlapping panel div. One root cause, two symptoms.
+
+**Fix:** added a `noLink` prop to `Byline` for callers that already wrap the card in a link, and passed it from `MoreToExploreSection`. TopPicks was checked and is fine — its Byline sits outside the card's links.
+
+**Verification:** rendered all 12 sections to HTML and walked the anchor stream counting depth — **0 nested anchors across 77 links**. A source-level grep had produced a false positive (it matched a TypeScript import), which is why the check was done on emitted HTML instead.
+
+Added an E2E regression test (`a a` selector) so this cannot silently return.
+
+**Note for future sections:** any card wrapped in a whole-card `<Link>` must not contain another link. This is the second time a browser-only defect slipped through — SSR-to-string catches invalid *nesting* only if you explicitly look for it, which the new test now does.
+
 ### 2026-07-26 (session 13) — Review workflow made whole + timeline images
 
 **E1 product picker — the workflow I had broken is now usable.**

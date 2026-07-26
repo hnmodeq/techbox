@@ -32,6 +32,14 @@ export type BylineProps = {
   size?: "sm" | "md";
   /** Hide the role line even when present. */
   hideRole?: boolean;
+  /**
+   * Suppress the author link.
+   *
+   * Set this when the Byline sits inside a larger <Link>. Nested anchors
+   * are invalid HTML and React reports them as a hydration error, so the
+   * name renders as plain text instead.
+   */
+  noLink?: boolean;
   onDark?: boolean;
   className?: string;
 };
@@ -44,6 +52,7 @@ export function Byline({
   datePrefix,
   size = "md",
   hideRole = false,
+  noLink = false,
   onDark = false,
   className,
 }: BylineProps) {
@@ -90,7 +99,7 @@ export function Byline({
       </span>
 
       <span className="flex min-w-0 flex-col">
-        {author.username ? (
+        {author.username && !noLink ? (
           <Link
             href={`/author/${author.username}`}
             className="transition-colors hover:text-[color:var(--hp-brand)]"
