@@ -3,6 +3,7 @@ import type { ModuleSlug, ContentItem } from "@/lib/content";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getCurrencyRates, calculateFinalTomanPrice, type CurrencyCode } from "@/lib/currency";
+import { pickListingSpecs } from "@/lib/listing-specs";
 
 export async function getDbModulePosts(
   module: ModuleSlug,
@@ -119,7 +120,10 @@ export async function getDbModulePosts(
         discountEndsAt: p.discountEndsAt ? p.discountEndsAt.toISOString() : null,
         availability: p.availability,
         warranty: p.warranty,
-        specs: (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? p.specs : {},
+        // Listings only need the ~21 keys ShopGrid filters on. Sending all
+        // 552 cost 978 kB per /shop load. Detail pages use getDbPost and
+        // still receive the complete spec set.
+        specs: pickListingSpecs(p.specs),
         rating: p.rating,
         ratingCount: p.ratingCount,
         readingTime: estimateReadingMinutes(p.title, p.excerpt, p.content),
