@@ -50,7 +50,33 @@ export async function GET(req: NextRequest) {
 
   try {
     const [posts, users, redirects] = await Promise.all([
-      prisma.post.findMany({ orderBy: [{ module: "asc" }, { date: "desc" }], include: { _count: { select: { comments: true } } } }),
+      // Explicit select, not `include`. This route audits every post in the
+      // database with no pagination, so an `include` (which selects all
+      // columns) transferred 1598 kB — 1228 kB of it the `specs` column,
+      // which nothing below reads. These are the 18 fields actually used.
+      prisma.post.findMany({
+        orderBy: [{ module: "asc" }, { date: "desc" }],
+        select: {
+          id: true,
+          module: true,
+          slug: true,
+          title: true,
+          excerpt: true,
+          content: true,
+          image: true,
+          gallery: true,
+          videoUrl: true,
+          fileName: true,
+          fileUrl: true,
+          fileSize: true,
+          likes: true,
+          views: true,
+          rating: true,
+          authorId: true,
+          authorName: true,
+          _count: { select: { comments: true } },
+        },
+      }),
       prisma.user.findMany({ orderBy: { username: "asc" }, select: { id: true, username: true, name: true, avatar: true, role: true } }),
       prisma.slugRedirect.findMany({ orderBy: { createdAt: "desc" } }),
     ]);

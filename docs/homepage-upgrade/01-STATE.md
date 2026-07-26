@@ -134,6 +134,34 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 18e) — Swept the remaining routes; two more `include` leaks
+
+Measured every route not yet checked, rather than assuming the job was done after `/shop`.
+
+**`/api/admin/content-health` was 1598 kB — larger than `/shop` ever was.** It audits *every* post with no pagination, using `include`, so it selected all columns. **1228 kB of that was `specs`**, which the handler never reads. Extracted the 18 fields it actually uses into an explicit select: **1598 kB → 249 kB (84% less)**, same 164 rows, all required fields verified present.
+
+**`/api/admin/users` pulled 23 bcrypt hashes across the wire.** `publicUser()` strips the password from the *response*, so this was never a disclosure bug — but `include` still moved every hash out of Neon first. Explicit select: **17.4 kB → 10.4 kB (40% less)**, and hashes now stay server-side. Audited the other 10 `user.findMany/findFirst` call sites; all already scoped correctly.
+
+**Corrected another of my own measurements.** I recorded `/api/settings` at 19.6 kB. Reading the handler showed it filters to `PUBLIC_KEYS = ["shop.banners"]` — real payload is **2 bytes**. My harness had queried the whole table instead of mirroring the route. Same mistake shape as the `/api/stats` guess in 18d: measuring the *table* rather than the *query*.
+
+**Verified clean, no action needed:** `sitemap.ts` (13.6 kB, capped 5000, scoped select) · `feed.xml` (21.7 kB, take 50, scoped) · `/api/timeline/events` (13.2 kB, filtered to published) · `/api/faq` (0.4 kB) · `/api/jobs` (1.2 kB) · `getAllDbModulePosts` (defined but never called anywhere).
+
+2 more guards in `tests/unit/egress.test.ts`, including one asserting the admin user list never selects `password`.
+
+`typecheck` ✅ · `lint` ✅ · `test` ✅ **156 passing** (was 154).
+
+**Cumulative egress reduction this session:**
+
+| Route | Before | After |
+|---|---|---|
+| `/shop` listing | 1218 kB | 259 kB |
+| `/api/admin/content-health` | 1598 kB | 249 kB |
+| Homepage | 479 kB | 57 kB |
+| `/api/admin/users` | 17.4 kB | 10.4 kB |
+| Every route (layout) | 22.3 kB | 13.6 kB (9.0 ticker off) |
+
+**Root cause across all of them was the same:** Prisma `include` selects every column, and `specs` is enormous. Any future `include` on `Post` should be treated as a defect.
+
 ### 2026-07-26 (session 18d) — /shop was 1.2 MB per load; ticker toggle added
 
 **`/shop` was the real egress hog, 21× the homepage.** After the ticker fix, measured every listing route. `getDbModulePosts` uses a Prisma `include`, which selects **every** column, so `/shop` (take: 100) transferred **1218 kB per page load — 978 kB of it `specs`**. QNAP rows average 123 spec entries; largest (`ts-433eu-us-qnap`) has 212. Across 106 products that is 13,051 spec rows.
