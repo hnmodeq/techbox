@@ -137,6 +137,18 @@ export async function GET(req: NextRequest) {
             authorName: true,
           },
         },
+        reviewedProduct: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            image: true,
+            brand: true,
+            model: true,
+            priceAmount: true,
+            availability: true,
+          },
+        },
       },
     });
 
@@ -212,6 +224,21 @@ export async function GET(req: NextRequest) {
       discountPercent: p.discountPercent ?? null,
       discountEndsAt: p.discountEndsAt ? p.discountEndsAt.toISOString() : null,
       availability: p.availability,
+      // Reviews are product-linked (decision D2). Both the id and a light
+      // summary go out so the editor can render the current selection
+      // without a second request.
+      reviewedProductId: p.reviewedProductId ?? null,
+      reviewedProduct: p.reviewedProduct
+        ? {
+            id: p.reviewedProduct.id,
+            slug: p.reviewedProduct.slug,
+            title: p.reviewedProduct.title,
+            image: p.reviewedProduct.image,
+            brand: p.reviewedProduct.brand,
+            model: p.reviewedProduct.model,
+            availability: p.reviewedProduct.availability,
+          }
+        : null,
       warranty: p.warranty,
       specs: (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? p.specs : {},
       acceptedAnswer: p.acceptedComment ? {

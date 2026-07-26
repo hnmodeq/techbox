@@ -18,7 +18,7 @@
 | **B** | DB audit, migrations 1+3, floating sidebar | ✅ Done (B6 deferred to CI — no browser in sandbox) |
 | **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ✅ Done |
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ✅ Done |
-| **E** | Review enforcement + Section 5 | 🔄 E2/E5/E6 ✅ · E1/E3 pending (admin UI) · E7 gated |
+| **E** | Review enforcement + Section 5 | ✅ (E3 unnecessary — 0 unlinked; E7 still gated) |
 | **F** | Sections 10, 11, 12 | ✅ Done |
 | **G** | Sections 0, 13, cleanup, E2E | ✅ mostly (G3 kept, G6 needs a browser) |
 
@@ -73,7 +73,7 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase E — Reviews
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| E1 | Admin product-picker | ⬜ | `app/admin/posts/...` | API accepts+validates `reviewedProductId`; the editor UI still needs the picker |
+| E1 | Admin product-picker | ✅ | `components/admin/product-picker.tsx`, `app/admin/posts/new/page.tsx`, `app/api/posts/route.ts` | Searchable catalogue picker; required for reviews; edit round-trip preserves the link |
 | E2 | API guard | ✅ | `app/api/posts/route.ts` | 422 on create AND patch. `validateReviewedProduct()`. **9 unit tests** |
 | E3 | Triage screen | ⬜ | `app/admin/reviews/link-products/` | Not needed yet — 0 unlinked reviews |
 | E4 | Run backfill | ✅ | (done in session 2 content pass) | 3 linked at score 100 |
@@ -133,6 +133,18 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 13) — Review workflow made whole + timeline images
+
+**E1 product picker — the workflow I had broken is now usable.**
+Since session 9 the API required `reviewedProductId` on reviews but the editor had no field for it, so *any* review save returned 422. Fixed end to end:
+- `components/admin/product-picker.tsx` — searchable picker over live shop posts. Loads the ~100-row catalogue once from the existing `/api/posts?module=shop` and filters in memory, so there is no request per keystroke. Results are exactly the rows the API will accept, so the picker cannot offer something that then fails validation.
+- Wired into the review accordion as a required field, with a client-side guard so the author sees a Persian message in the form instead of a raw 422.
+- **`/api/posts` GET now returns `reviewedProductId` plus a product summary.** It did not before, which meant opening a linked review in the editor and saving would have silently dropped the link — a data-loss bug that only appears on the second edit.
+- Verified the guard against the live DB: missing product, bogus id, and a blog-post target are all rejected; a real shop product is accepted; non-review modules unaffected.
+
+**Timeline images — admin-managed, nothing hardcoded.**
+All 20 events had `image = NULL`, so the rail was a wall of text. The admin screen only had a bare URL text box. Added the same `StorageUploadField` the post editor uses (Supabase, `timeline-images` folder) plus a live thumbnail preview and a clear button. Images are now uploaded and managed per event from the admin panel like every other image on the site. The section already degrades cleanly when an event has no image.
 
 ### 2026-07-26 (session 12) — Two bugs from owner review of the live site
 
