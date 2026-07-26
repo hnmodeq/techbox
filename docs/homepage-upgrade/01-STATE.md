@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅
-**Next action:** Phase D — §4 Finder, build the UPS calculator, §8 Tools, §7 Deals
+**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅ · D ✅
+**Next action:** Phase E — review enforcement (admin picker, API guard, triage) → §5 Top Picks
 
 ---
 
@@ -17,7 +17,7 @@
 | **A** | Foundations: tokens, formatters, icons, primitives | ✅ Done |
 | **B** | DB audit, migrations 1+3, floating sidebar | ✅ Done (B6 deferred to CI — no browser in sandbox) |
 | **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ✅ Done |
-| **D** | Sections 4, 7, 8 (+ build UPS calculator) | ⬜ Not started |
+| **D** | Sections 4, 7, 8 (+ build UPS calculator) | ✅ Done |
 | **E** | Review enforcement + Section 5 | ⬜ Not started |
 | **F** | Sections 10, 11, 12 | ⬜ Not started |
 | **G** | Sections 0, 13, cleanup, E2E, Lighthouse | ⬜ Not started |
@@ -64,11 +64,11 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase D — Finder, Tools, Deals
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| D1 | §4 Global Finder | ⬜ | `.../FinderSection.tsx` | `@supports` guard on gradient text |
-| D2 | Build UPS calculator tool | ⬜ | `app/tools/ups-calculator/`, `features/tools/...` | New route + logic + unit tests |
-| D3 | Register UPS in `toolRoutes` | ⬜ | `config/modules.config.ts`, `design/icons.tsx` | Add `ups` icon + `--ups` colour |
-| D4 | §8 Tools (SW 5-up) | ⬜ | `.../ToolsSection.tsx` | |
-| D5 | §7 Deals (TG) | ⬜ | `.../DealsSection.tsx` | Server-side pricing only |
+| D1 | §4 Global Finder | ✅ | `.../FinderSection.tsx` | TG measured CSS verified in output. Server Component — plain GET form, no JS |
+| D2 | Build UPS calculator | ✅ | `lib/ups.ts`, `features/tools/components/ups-calculator/`, `app/tools/ups-calculator/` | **24 unit tests** |
+| D3 | Register UPS | ✅ | `config/modules.config.ts`, `config/module-colors.ts` | `ups` icon already added in A3 |
+| D4 | §8 Tools (SW 5-up) | ✅ | `.../ToolsSection.tsx` | Maps `toolRoutes` — 5 tiles, no hardcoded list |
+| D5 | §7 Deals (TG) | ✅ | `.../DealsSection.tsx`, `.../CountdownBadge.tsx`, `getDeals` | Prices via currency pipeline; red only when discount is live |
 
 ### Phase E — Reviews
 | ID | Task | Status | Files touched | Notes |
@@ -131,6 +131,16 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 6) — Implementation agent · PHASE D COMPLETE
+- **D2 UPS calculator.** `lib/ups.ts` is pure and unit-tested (24 tests), mirroring `lib/raid.ts`. Models design headroom (80% ceiling), power factor, growth margin, N+1, battery blocks, runtime, BTU/hr and annual kWh. Every result carries the assumptions it was derived under — a sizing tool that hides its model invites over-trust. Results link into the real catalogue by VA range.
+- **D3** registered in `toolRoutes` + `module-colors`. Note: `ModuleColorApplier` is a no-op site-wide, so `--raid`/`--nas`/`--ups` are all undefined by design; no CSS needed.
+- **D1 Finder** is a Server Component — a plain GET form to the existing `/search` needs no JS. Verified TG's measured values survive into the output: radius 25px, pills at 200px with 2px white border, 40px submit, both decorative disks, gradient heading.
+- **D4 Tools** maps `toolRoutes`, so the new UPS tile appeared automatically. 5-up grid, no card chrome until hover (Spiceworks has none).
+- **D5 Deals** added `getDeals()`, which resolves every price through `calculateFinalPriceForPost` — all 106 shop rows store a USD source price, so reading `priceAmount` directly would show a stale figure. `CountdownBadge` is a tiny client island that renders nothing before hydration, avoiding a guaranteed timestamp mismatch.
+- **Bug caught while verifying:** Postgres orders NULLs FIRST on `DESC`, so a naive `discountPercent: "desc"` ranks the 97 non-discounted rows above the 9 real deals. `getDeals` is safe because `gt: 0` excludes nulls, and the backfill query sorts by date only — now documented in the code so nobody "simplifies" the filter away.
+- Markup audit on live data: 3 aria-labelledby ✓ · 0 physical CSS props ✓ · 0 right-arrows ✓ · 8 images / 8 aspect-ratio reservations ✓ · 0 eager (LCP stays with the Magazine lead) ✓ · 5 tool tiles ✓ · empty state renders **0 bytes** ✓.
+- `tsc --noEmit` ✅ · `lint` ✅ · `test` ✅ **111 passing** (was 87).
 
 ### 2026-07-26 (session 5) — Implementation agent · PHASE C COMPLETE
 - Built the first five sections + wired `app/page.tsx`, which had been rendering an empty `<main>`.

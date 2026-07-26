@@ -31,6 +31,10 @@ export type HomeData = {
   moreToExplore?: MoreToExplore;
   /** §12 — contributors with at least one published post. */
   authors?: AuthorCard[];
+  /** §4 — admin-configured finder chips (SiteSetting). */
+  finderChips?: Array<{ labelFa: string; href: string }>;
+  /** §8 — admin-configured tool order/allow-list (SiteSetting). */
+  toolsFeatured?: string[];
 };
 
 const emptyData: HomeData = { modules: {}, ticker: [] };
@@ -99,6 +103,8 @@ export function HomeDataProvider({
         familyComments: body.familyComments ?? prev.familyComments,
         moreToExplore: body.moreToExplore ?? prev.moreToExplore,
         authors: body.authors ?? prev.authors,
+        finderChips: body.finderChips ?? prev.finderChips,
+        toolsFeatured: body.toolsFeatured ?? prev.toolsFeatured,
       }));
     };
 

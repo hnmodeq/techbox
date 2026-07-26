@@ -44,6 +44,11 @@ export const moduleColors = {
     hover: "group-hover:text-[var(--nas)]",
     active: "text-[var(--nas)]",
   },
+  ups: {
+    base: "text-[var(--primary-text)]",
+    hover: "group-hover:text-[var(--ups)]",
+    active: "text-[var(--ups)]",
+  },
   nvr: {
     base: "text-[var(--primary-text)]",
     hover: "group-hover:text-[var(--nvr)]",
