@@ -3,7 +3,7 @@ import { unstable_cache } from "next/cache";
 import type { HomeData } from "@/features/home/lib/home-data";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
-import { getEnabledModules } from "@/lib/module-config";
+import { getEnabledModules, getModuleConfig } from "@/lib/module-config";
 import {
   getInsights,
   getDeals,
@@ -283,6 +283,14 @@ async function findPosts(module: string, take: number) {
 
 async function getLayoutHomeDataUncached(): Promise<HomeData> {
   const enabledModules = await getEnabledModules();
+  // Admin-controlled (SiteSetting `ticker.visible`). Defaults to true, so
+  // nothing changes until an admin turns it off.
+  let tickerVisible = true;
+  try {
+    tickerVisible = (await getModuleConfig()).tickerVisible !== false;
+  } catch {
+    // Config unreadable: keep the ticker rather than silently removing UI.
+  }
   let news: any[] = [];
   let ticker: any[] = [];
   try {
@@ -294,12 +302,17 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
         select: layoutCardSelect,
       });
     }
-    ticker = await prisma.post.findMany({
-      where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
-      orderBy: { date: "desc" },
-      take: 30,
-      select: tickerSelect,
-    });
+    // Skip the query entirely when the ticker is off. Hiding it in the
+    // client would still pay the transfer cost on every route, which is
+    // the whole point of the toggle.
+    if (tickerVisible) {
+      ticker = await prisma.post.findMany({
+        where: { published: true, deletedAt: null, module: { in: enabledModules }, date: publicPostDateWhere() },
+        orderBy: { date: "desc" },
+        take: 30,
+        select: tickerSelect,
+      });
+    }
   } catch (error) {
     logDbFailure("layout-data:news", error);
   }

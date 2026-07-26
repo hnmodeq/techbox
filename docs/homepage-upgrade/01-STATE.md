@@ -134,6 +134,33 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 18d) — /shop was 1.2 MB per load; ticker toggle added
+
+**`/shop` was the real egress hog, 21× the homepage.** After the ticker fix, measured every listing route. `getDbModulePosts` uses a Prisma `include`, which selects **every** column, so `/shop` (take: 100) transferred **1218 kB per page load — 978 kB of it `specs`**. QNAP rows average 123 spec entries; largest (`ts-433eu-us-qnap`) has 212. Across 106 products that is 13,051 spec rows.
+
+**ShopGrid reads exactly 21 of the 552 distinct keys** — bay / CPU family / max-memory / 10GbE / redundant-PSU / M.2 filters plus warranty. The other 531 were transferred on every listing load and never read.
+
+**Owner initially asked to delete the unused keys from the DB. Pushed back and they agreed to keep them.** Deleting would have destroyed **12,723 spec rows (97%)** across all 106 products — product *detail* pages render the full `SpecsTableCategorized`, so `ts-433eu-us-qnap` would have dropped from 212 spec rows to 5. The egress saving is identical either way because the fix is not *sending* them, not not *storing* them.
+
+`lib/listing-specs.ts` — `pickListingSpecs()` applied in `getDbModulePosts` only. `getDbPost` (detail) untouched.
+
+| | before | after |
+|---|---|---|
+| `/shop` listing | 1218 kB | **259 kB (79% less)** |
+| Product detail | full specs | **unchanged** |
+
+**Filter parity verified: bay number parsed identically on 100/100 products**, all 12 bay options (2,4,5,6,8,9,10,12,16,22,24,30) still discoverable.
+
+**Ticker toggle** (`ticker.visible`, defaults true) following the existing `heroVisible` pattern exactly: type → default → SiteSetting key → parse → persist → API `TOP_LEVEL_KEYS` → admin row in `/admin/modules`. **Turning it off skips the query**, not just the markup — hiding client-side would still pay the transfer on every route. Also added `revalidateTag("home-data")` to the modules API, without which the toggle would appear to do nothing for 24h (same class of bug as session 12).
+
+Verified the setting round-trips through the live DB and that an absent key defaults to ON, so existing behaviour is unchanged until an admin acts.
+
+**Checked and left alone:** `content` on listings — `ArticleModal` and `ForumCard` read it without refetching. `/api/stats` — I assumed it was heavy; measured it at **51 bytes** (3 COUNTs). Wrong guess, corrected by measuring.
+
+`typecheck` ✅ · `lint` ✅ · `test` ✅ **154 passing** (was 142; +12 in `listing-specs.test.ts`, incl. a guard that scrapes ShopGrid for spec keys and fails if the whitelist drifts).
+
+**Not verified:** real-world egress drop needs a billing period. Per-request figures are measured; monthly projection is arithmetic.
+
 ### 2026-07-26 (session 18c) — Neon at 91% was egress; homepage payload cut 88%
 
 **The meter was network transfer (4.58/5 GB), not storage.** Owner asked how to migrate to Supabase. Measured first: the database holds **15 MB against a 0.5 GB cap (2.8%)**, so storage was never the constraint. Supabase Free caps egress at 5 GB as well, so migrating would have moved the identical problem to a new provider — recommended against it and fixed the cause instead.

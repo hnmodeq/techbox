@@ -23,6 +23,7 @@ export async function GET() {
 
 const TOP_LEVEL_KEYS = new Set([
   "heroVisible",
+  "tickerVisible",
   "moduleColorsEnabled",
   "unifiedModuleColor",
   "moduleColors",
@@ -36,6 +37,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
     const heroVisible = body.heroVisible !== false;
+    const tickerVisible = body.tickerVisible !== false;
     const moduleColorsEnabled = body.moduleColorsEnabled !== false;
     const unifiedModuleColor = typeof body.unifiedModuleColor === "string" ? body.unifiedModuleColor : "var(--primary)";
     const moduleColors = (body.moduleColors && typeof body.moduleColors === "object") ? body.moduleColors : {};
@@ -50,6 +52,7 @@ export async function PATCH(req: NextRequest) {
     const config: SiteLayoutConfig = {
       ...moduleEntries,
       heroVisible,
+      tickerVisible,
       moduleColorsEnabled,
       unifiedModuleColor,
       moduleColors,
@@ -60,6 +63,9 @@ export async function PATCH(req: NextRequest) {
 
     // Revalidate cached data so changes take effect immediately
     revalidateTag("module-config", "max");
+    // The ticker query lives inside the layout-data cache, so toggling it
+    // must invalidate that too or the change is invisible for 24h.
+    revalidateTag("home-data", "max");
     revalidatePath("/");
     revalidatePath("/api/modules/enabled");
 

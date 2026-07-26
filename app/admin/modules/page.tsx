@@ -89,7 +89,7 @@ export default function AdminModulesPage() {
       const res = await fetch("/api/admin/modules", { cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "load_failed");
-      setConfig({ ...getDefaultSiteLayoutConfig(), ...data, heroVisible: data.heroVisible !== false });
+      setConfig({ ...getDefaultSiteLayoutConfig(), ...data, heroVisible: data.heroVisible !== false, tickerVisible: data.tickerVisible !== false });
     } catch (e: any) {
       setMessage(e?.message || "خطا در دریافت تنظیمات ماژول");
     } finally {
@@ -122,6 +122,7 @@ export default function AdminModulesPage() {
 
       const payload = {
         heroVisible: config.heroVisible,
+        tickerVisible: config.tickerVisible,
         moduleColorsEnabled: config.moduleColorsEnabled,
         unifiedModuleColor: config.unifiedModuleColor,
         moduleColors: config.moduleColors,
@@ -203,6 +204,10 @@ export default function AdminModulesPage() {
           <Card className="p-4">
             <div className="text-sm text-muted-foreground">هیرو</div>
             <div className="text-2xl font-bold">{config.heroVisible !== false ? "فعال" : "غیرفعال"}</div>
+          </Card>
+          <Card className="p-4">
+            <div className="text-sm text-muted-foreground">تیکبار</div>
+            <div className="text-2xl font-bold">{config.tickerVisible !== false ? "فعال" : "غیرفعال"}</div>
           </Card>
         </div>
 
@@ -298,6 +303,32 @@ export default function AdminModulesPage() {
                 <Switch
                   checked={config.heroVisible}
                   onCheckedChange={(checked) => setConfig((prev) => ({ ...prev, heroVisible: checked }))}
+                />
+              </div>
+
+              {/* Ticker row — turning this off also skips its query, so it
+                  removes ~4.6 kB of database transfer from every page load,
+                  not just the visual strip. */}
+              <div
+                className={`flex items-center justify-between gap-4 rounded-lg border p-3 transition-colors ${
+                  config.tickerVisible ? "bg-card border-border" : "bg-muted/20 border-border/50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[var(--admin)]/10 text-xs font-bold text-[var(--admin)]">
+                    📰
+                  </span>
+                  <span className="text-sm font-semibold">تیکبار خبری</span>
+                  <span className="text-xs text-muted-foreground">نوار متحرک آخرین مطالب در همه صفحات</span>
+                  {config.tickerVisible ? (
+                    <Badge variant="default" className="text-[10px]">فعال</Badge>
+                  ) : (
+                    <Badge variant="secondary" className="text-[10px]">غیرفعال</Badge>
+                  )}
+                </div>
+                <Switch
+                  checked={config.tickerVisible}
+                  onCheckedChange={(checked) => setConfig((prev) => ({ ...prev, tickerVisible: checked }))}
                 />
               </div>
 
