@@ -3,17 +3,17 @@ export async function register() {
     // Prefer IPv4 when resolving hostnames in development.
     //
     // Neon publishes both A and AAAA records. Node 17+ defaults to
-    // `verbatim` result order, which hands addresses to the connector in
-    // whatever order the resolver returned them — frequently IPv6 first.
-    // On a machine with an IPv6 address but no working IPv6 route (very
-    // common on Windows behind consumer routers, corporate VPNs, and
-    // split-tunnel setups) every connection attempt burns the full
-    // connect_timeout on an unreachable address before IPv4 is tried.
+    // `verbatim` result order, so when getaddrinfo does return AAAA on a
+    // machine with no working IPv6 route, connection attempts can stall
+    // on an unreachable address before IPv4 is tried, and Prisma reports
+    // that as P1001 on a perfectly healthy database.
     //
-    // Prisma reports that as P1001 "Can't reach database server", which
-    // reads as an outage even though the database is perfectly healthy
-    // and IPv4 would have connected in ~30ms. It also explains requests
-    // that hang for 15-30s and then fail.
+    // Scope note, because this was initially overstated: it only helps
+    // when the OS resolver actually hands back IPv6 addresses. Windows
+    // applies AI_ADDRCONFIG and omits AAAA entirely when the machine has
+    // no global IPv6 source address — in that case nothing ever attempts
+    // IPv6 and this setting is a harmless no-op. `pnpm db:doctor`
+    // distinguishes the two cases explicitly.
     //
     // Development only: Vercel's IPv6 path works, and production should
     // keep Node's standard resolution behaviour. Set DNS_RESULT_ORDER to
