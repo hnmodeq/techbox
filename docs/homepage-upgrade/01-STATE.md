@@ -134,6 +134,21 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 17) — Timeline images sourced and uploaded (option B)
+
+**Found a mismatch worth recording.** `timeline-images/` already held 17 images — but downloading and *looking* at them showed they belong to the **world-history timeline deleted in session 2** (chariot relief, Roman aqueduct, Edison bulb, Mars rover). None matched the 20 IT events. Attaching them would have been exactly the fake data the owner forbids: a Roman aqueduct captioned "TCP/IP standardisation" is worse than no image. Raised it and the owner chose option B — source real ones.
+
+**What was done:**
+- Resolved 15/20 events by direct Commons filename lookup, then *searched* Commons for the 5 that failed rather than guessing more filenames.
+- Downloaded all 20 and **rendered a contact sheet to inspect them**. That caught two weak picks: the 1991 image was a generic beige CRT (swapped for the actual CERN NeXT cube — the literal first web server) and 2020 was a cluttered 1990s desk (swapped for a clean modern remote-work photo).
+- **Rejected the only GFDL-licensed image** (2024) and replaced it with a CC BY-SA datacenter photo. Final licence spread: Public domain, CC0/CC BY 2.0–4.0, CC BY-SA 2.0–4.0, Apache 2.0. No GFDL, no unclear terms.
+- Converted to WebP (q82, max 1200px) — **20 files, 1.1 MB total**.
+- Uploaded to `timeline-images/` in the existing public bucket via the same code path the admin uploader uses, and linked each event.
+- **Attribution is stored on the event's `tags`** (`عکس: {artist} · {licence}`), so the credit travels with the database row instead of living in a script.
+- Verified: **20/20 images return HTTP 200** from Supabase, every event linked.
+
+Script kept at `scripts/content/upload-timeline-images.ts` (dry-run by default) so the process is repeatable and auditable.
+
 ### 2026-07-26 (session 16) — Stale Prisma client, and stopping it recurring
 
 Owner's terminal filled with `Cannot read properties of undefined (reading 'findMany')` from `getPartners`, repeating on every render.
