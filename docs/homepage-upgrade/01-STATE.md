@@ -134,6 +134,31 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 18) — Owner's local dev: P1001, diagnosed and instrumented
+
+**The database was never down.** Owner's terminal filled with `P1001 Can't reach database server at ep-twilight-hall-atc6iest-pooler.c-9...:5432`. Connecting from this sandbox with the owner's exact `.env` succeeded in ~550ms — `PostgreSQL 17.10`, 164 posts, 23 users. So the fault is the network path from the owner's Windows machine, not Neon and not application code. Nothing was "fixed" in the query layer because nothing there was broken.
+
+**Most likely cause, now mitigated.** Neon publishes both A and AAAA records for that host. Node 17+ resolves `verbatim`, handing addresses to the connector in resolver order — often IPv6 first. On a machine with an IPv6 address but no working IPv6 *route* (ordinary on Windows behind consumer routers, corporate VPNs, split-tunnel clients), every attempt burns the full `connect_timeout=30` on an unreachable address before IPv4 is tried. That presents as P1001 on a perfectly healthy database, and also explains the `GET /api/auth/me 200 in 16.6s` in the same log — a 16.6s response is a stalled connect, not slow SQL. Reproduced the shape here: IPv4 connects in 27ms, IPv6 returns `ENETUNREACH`.
+
+`instrumentation.ts` now calls `dns.setDefaultResultOrder("ipv4first")` in development only. Production keeps `verbatim` (Vercel's IPv6 path is fine). Override either way with `DNS_RESULT_ORDER`.
+
+**New: `pnpm db:doctor`** (`scripts/checks/db-connect.ts`). P1001 is one message for at least six unrelated faults, and guessing between them costs more than the bug. The doctor walks the connection one layer at a time and names the layer that broke:
+1. env files actually loaded, `DATABASE_URL` parsed, password redacted before printing, pooler-host sanity check
+2. A and AAAA resolution
+3. TCP to 5432 **per address family** — this is the check that isolates the IPv6 trap
+4. a hand-rolled Postgres `SSLRequest` (the 8-byte `80877103` packet) then a real TLS handshake — separates "port open but a TLS-inspecting proxy is mangling the protocol" from a clean path
+5. a live Prisma `select version()`, a **stale-client model probe**, and row counts
+
+Each failure carries a specific remedy, not a generic one. Verified against three scenarios: healthy (all pass), bad host (fails at DNS), and a host that accepts TCP but isn't Postgres (`example.com:5432` — passes TCP, fails at SSLRequest with the interception hint).
+
+**Log flood fixed.** `lib/db-error.ts` classifies connectivity failures (`P1000/P1001/P1002/P1008/P1017/P2024`) and the stale-client `TypeError`, then rate-limits logging to one report per scope per 30s. Measured: 50 identical P1001s now emit **2 lines instead of 50 stack traces**; distinct scopes still each report once; recovery is announced with the suppressed count. **Application errors are deliberately not collapsed** — `P2002`, `P2025` and ordinary bugs keep their full error object and stack, because that is the trace you actually need. Wired into `home-server` (7 sites), `auth-server` (2), `settings` (2). Control flow is unchanged; every caller still degrades exactly as before.
+
+The stale-client detector is named explicitly because that failure has hit this repo three times (`User.createdAt`, `Post.reviewedProductId`, `Partner`) and it reports as `Cannot read properties of undefined (reading 'findMany')` with no mention of Prisma at all.
+
+`typecheck` ✅ · `lint` ✅ · `test` ✅ **135 passing** (was 120; +15 in `tests/unit/db-error.test.ts`).
+
+**Not verified:** whether the owner's machine is specifically the IPv6 case. `pnpm db:doctor` on their box settles it in one command. If step 3 shows IPv4 failing too, it's a firewall blocking outbound 5432 and the fix is different.
+
 ### 2026-07-26 (session 17) — Timeline images sourced and uploaded (option B)
 
 **Found a mismatch worth recording.** `timeline-images/` already held 17 images — but downloading and *looking* at them showed they belong to the **world-history timeline deleted in session 2** (chariot relief, Roman aqueduct, Edison bulb, Mars rover). None matched the 20 IT events. Attaching them would have been exactly the fake data the owner forbids: a Roman aqueduct captioned "TCP/IP standardisation" is worse than no image. Raised it and the owner chose option B — source real ones.
