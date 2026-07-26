@@ -6,13 +6,14 @@ import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getEnabledModules } from "@/lib/module-config";
 import {
   getInsights,
+  getDeals,
   getTopPicks,
   getTimeline,
   getFamilyComments,
   getMoreToExplore,
   getAuthors,
 } from "@/lib/home-sections";
-import { getSetting } from "@/lib/settings";
+import { getSettings } from "@/lib/settings";
 
 const moduleTakes: Record<string, number> = {
   blog: 5,   // §1 lead + 4-item list (Spiceworks Articles)
@@ -318,6 +319,15 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     console.error("[home-data] topPicks failed:", e);
   }
 
+  // §7 Deals replaces the raw shop slice: prices must be resolved through
+  // the currency pipeline, which the generic findPosts() does not do.
+  try {
+    const deals = await getDeals(normalizeCard, cardSelect, moduleTakes.shop ?? 8);
+    if (deals.length) modules.shop = deals;
+  } catch (e) {
+    console.error("[home-data] deals failed:", e);
+  }
+
   let timeline: any[] = [];
   try {
     timeline = await getTimeline();
@@ -325,9 +335,36 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     console.error("[home-data] timeline failed:", e);
   }
 
+  // Homepage SiteSetting keys, read as one batch.
+  let homeSettings: Record<string, string> = {};
+  try {
+    homeSettings = await getSettings([
+      "home.familyComments.blocklist",
+      "home.finder.chips",
+      "home.tools.featured",
+    ]);
+  } catch (e) {
+    console.error("[home-data] settings failed:", e);
+  }
+
+  const parseJsonArray = (raw: string | undefined): any[] => {
+    if (!raw) return [];
+    try {
+      const v = JSON.parse(raw);
+      return Array.isArray(v) ? v : [];
+    } catch {
+      return []; // malformed setting must not hide a section
+    }
+  };
+
+  const finderChips = parseJsonArray(homeSettings["home.finder.chips"])
+    .filter((c) => c && typeof c.labelFa === "string" && typeof c.href === "string");
+  const toolsFeatured = parseJsonArray(homeSettings["home.tools.featured"])
+    .filter((x) => typeof x === "string");
+
   let familyComments: any[] = [];
   try {
-    const raw = await getSetting("home.familyComments.blocklist");
+    const raw = homeSettings["home.familyComments.blocklist"];
     let blocklist: string[] = [];
     if (raw) {
       try {
@@ -366,6 +403,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     familyComments,
     moreToExplore,
     authors,
+    finderChips,
+    toolsFeatured,
   };
 }
 

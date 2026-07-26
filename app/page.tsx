@@ -26,19 +26,33 @@ import { VideoSection } from "@/features/home/components/sections/VideoSection";
 import { InsightsSection } from "@/features/home/components/sections/InsightsSection";
 import { TimelineSection } from "@/features/home/components/sections/TimelineSection";
 import { CommunitySection } from "@/features/home/components/sections/CommunitySection";
+import { FinderSection } from "@/features/home/components/sections/FinderSection";
+import { DealsSection } from "@/features/home/components/sections/DealsSection";
+import { ToolsSection } from "@/features/home/components/sections/ToolsSection";
 
 /**
  * Which module slug gates each section, so the admin panel keeps control.
  * Sections not tied to a module (Insights) are always eligible and rely on
  * their own empty-state guard.
  */
-type SectionKey = "magazine" | "video" | "insights" | "timeline" | "community";
+type SectionKey =
+  | "magazine"
+  | "video"
+  | "insights"
+  | "finder"
+  | "timeline"
+  | "deals"
+  | "tools"
+  | "community";
 
 const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   magazine: "blog",
   video: "media",
   insights: null, // news-backed, but has no dedicated home row in the config
+  finder: null,   // search, not a content module
   timeline: "timeline",
+  deals: "shop",
+  tools: "tools",
   community: "forum",
 };
 
@@ -47,7 +61,10 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   magazine: 1,
   video: 2,
   insights: 3,
+  finder: 4,
   timeline: 6,
+  deals: 7,
+  tools: 8,
   community: 9,
 };
 
@@ -91,8 +108,20 @@ export default async function HomePage() {
       node: <InsightsSection insights={data.insights ?? []} />,
     },
     {
+      key: "finder",
+      node: <FinderSection chips={data.finderChips} />,
+    },
+    {
       key: "timeline",
       node: <TimelineSection events={data.timeline ?? []} {...textFor("timeline")} />,
+    },
+    {
+      key: "deals",
+      node: <DealsSection products={data.modules.shop ?? []} {...textFor("deals")} />,
+    },
+    {
+      key: "tools",
+      node: <ToolsSection featured={data.toolsFeatured} {...textFor("tools")} />,
     },
     {
       key: "community",

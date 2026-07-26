@@ -221,6 +221,17 @@ export const toolRoutes = [
     icon: "tools" as const,
     color: "var(--subnet)",
   },
+  {
+    slug: "ups-calculator",
+    key: "ups-calculator",
+    titleFa: "محاسبه توان UPS",
+    title: "UPS Calculator",
+    href: "/tools/ups-calculator",
+    descriptionFa: "ظرفیت UPS، بلوک باتری و زمان پشتیبانی رک",
+    icon: "ups" as const,
+    color: "var(--ups)",
+    new: true,
+  },
 ] as const;
 
 export type ToolSlug = typeof toolRoutes[number]["slug"];

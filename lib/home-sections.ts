@@ -197,6 +197,85 @@ export async function getTopPicks(
 }
 
 // ═════════════════════════════════════════════════════════════════════
+// §7 Deals
+// ═════════════════════════════════════════════════════════════════════
+
+/**
+ * Shop products for the deals rail.
+ *
+ * Prefers genuinely discounted, in-stock items. If there are fewer than
+ * `take` of those, it backfills with the newest products so the rail is
+ * never half-empty — still 100% real rows, just not all on offer.
+ *
+ * Every price is resolved through calculateFinalPriceForPost, because all
+ * shop rows store a source price in USD and the displayed Toman figure is
+ * derived from live rates. Reading `priceAmount` directly would show a
+ * stale number.
+ */
+export async function getDeals(
+  normalize: (p: any) => ContentItem,
+  cardSelect: any,
+  take = 8,
+): Promise<ContentItem[]> {
+  const priceSelect = {
+    ...cardSelect,
+    sourcePriceAmount: true,
+    sourceCurrency: true,
+    priceAdjustmentPercent: true,
+    sellerBenefitPercent: true,
+  };
+
+  const discounted = await prisma.post.findMany({
+    where: {
+      module: "shop",
+      ...PUBLISHED,
+      date: publicPostDateWhere(),
+      discountPercent: { gt: 0 },
+      // Never advertise a deal on something that cannot be bought.
+      availability: "موجود",
+    },
+    // Postgres orders NULLs FIRST on DESC, so `discountPercent: "desc"`
+    // alone would rank the 97 non-discounted rows above the 9 real deals.
+    // The `gt: 0` filter above excludes nulls here, and the backfill query
+    // below sorts by date only — so no NULL ever wins a discount sort.
+    orderBy: [{ discountPercent: "desc" }, { date: "desc" }],
+    take,
+    select: priceSelect,
+  });
+
+  let rows: any[] = discounted;
+
+  if (rows.length < take) {
+    const fill = await prisma.post.findMany({
+      where: {
+        module: "shop",
+        ...PUBLISHED,
+        date: publicPostDateWhere(),
+        availability: "موجود",
+        id: { notIn: rows.map((r) => r.id) },
+      },
+      orderBy: { date: "desc" },
+      take: take - rows.length,
+      select: priceSelect,
+    });
+    rows = [...rows, ...fill];
+  }
+
+  const out: ContentItem[] = [];
+  for (const r of rows) {
+    const item = normalize(r);
+    try {
+      const final = await calculateFinalPriceForPost(r);
+      if (typeof final === "number" && final > 0) item.priceAmount = final;
+    } catch {
+      // Keep the stored amount rather than dropping the card.
+    }
+    out.push(item);
+  }
+  return out;
+}
+
+// ═════════════════════════════════════════════════════════════════════
 // §6 Timeline
 // ═════════════════════════════════════════════════════════════════════
 
