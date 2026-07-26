@@ -736,3 +736,24 @@ model TeamMember {
 
   @@index([sectionId, order])
 }
+
+/// Companies TechBox works with — shown on the homepage and fully
+/// admin-managed. Deliberately its own model rather than reusing Post:
+/// a partner has no body, no author and no comments, so squeezing it into
+/// the universal Post shape would leave most columns meaningless.
+model Partner {
+  id        String   @id @default(cuid())
+  name      String
+  /// Logo URL (Supabase storage or external).
+  logo      String?
+  /// Optional outbound link to the partner's site.
+  url       String?
+  /// Short Persian descriptor, e.g. "شریک ذخیره‌سازی".
+  tagline   String?
+  order     Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
+}

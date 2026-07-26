@@ -24,6 +24,8 @@ import { gregorianToJalali } from "@/lib/jalali";
 import { getCurrencyRates, calculateFinalTomanPrice, type CurrencyRates } from "@/lib/currency";
 import type { ContentItem } from "@/lib/content";
 import type {
+  FamilyProfile,
+  PartnerCard,
   TopPickCard,
   TimelineCard,
   FamilyComment,
@@ -371,8 +373,14 @@ const MODULE_LABEL: Record<string, string> = {
   download: "از مرکز دانلود",
 };
 
-/** Long enough to be a real opinion, short enough to fit the card. */
-const MIN_LEN = 80;
+/**
+ * Long enough to be a real opinion, short enough to fit the card.
+ *
+ * 80 was too strict: only 19 of 148 approved comments cleared it, from
+ * just 8 distinct authors. A 40-character Persian sentence is still a
+ * genuine remark rather than an emoji, and 145 comments clear that.
+ */
+const MIN_LEN = 40;
 const MAX_LEN = 400;
 
 export async function getFamilyComments(blocklist: string[] = []): Promise<FamilyComment[]> {
@@ -385,7 +393,7 @@ export async function getFamilyComments(blocklist: string[] = []): Promise<Famil
       post: PUBLISHED,
     },
     orderBy: { likes: "desc" }, // quality bias before sampling
-    take: 60,
+    take: 120,
     select: {
       id: true,
       text: true,
@@ -445,9 +453,11 @@ export async function getFamilyComments(blocklist: string[] = []): Promise<Famil
 
   if (eligible.length < 3) return []; // one lonely testimonial looks broken
 
-  // Rotate hourly through the eligible pool.
+  // Rotate hourly through the eligible pool. Six fills two rows of three
+  // on desktop; fewer looks thin against the width of the section.
+  const want = Math.min(6, eligible.length);
   const start = seededIndex(eligible.length, 11);
-  return [0, 1, 2].map((i) => eligible[(start + i) % eligible.length]);
+  return Array.from({ length: want }, (_, i) => eligible[(start + i) % eligible.length]);
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -548,4 +558,72 @@ export async function getAuthors(): Promise<AuthorCard[]> {
     verifiedLabel: u.verifiedLabel ?? null,
     postCount: u._count.posts,
   }));
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// §13 Family Profiles — community members, not staff
+// ═════════════════════════════════════════════════════════════════════
+
+/**
+ * A random sample of ordinary registered members.
+ *
+ * Staff are deliberately excluded: they already have their own section
+ * (§12 Authors), and the point here is to show the community rather than
+ * the masthead a second time. Only members who have actually done
+ * something — posted or commented — are eligible, so the row cannot fill
+ * up with empty signups.
+ */
+export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
+  const STAFF = ["super_admin", "admin", "editor"];
+
+  const rows = await prisma.user.findMany({
+    where: {
+      status: "active",
+      role: { notIn: STAFF },
+      OR: [{ posts: { some: PUBLISHED } }, { comments: { some: { status: "approved", deletedAt: null } } }],
+    },
+    select: {
+      name: true,
+      username: true,
+      job: true,
+      avatar: true,
+      createdAt: true,
+      verifiedType: true,
+      _count: { select: { posts: true, comments: true } },
+    },
+    take: 40,
+  });
+
+  if (rows.length < 4) return []; // a row of two looks like a mistake
+
+  const mapped: FamilyProfile[] = rows.map((u) => ({
+    name: u.name,
+    username: u.username,
+    job: u.job?.trim() || "",
+    avatar: u.avatar ?? null,
+    memberSince: u.createdAt ? faYear(gregorianToJalali(u.createdAt).year) : "",
+    verifiedType: u.verifiedType ?? null,
+    postCount: u._count.posts,
+    commentCount: u._count.comments,
+  }));
+
+  // Hourly rotation, distinct salt so this does not move in lockstep with
+  // the other sampled sections.
+  const want = Math.min(8, mapped.length);
+  const start = seededIndex(mapped.length, 23);
+  return Array.from({ length: want }, (_, i) => mapped[(start + i) % mapped.length]);
+}
+
+// ═════════════════════════════════════════════════════════════════════
+// §14 Partners
+// ═════════════════════════════════════════════════════════════════════
+
+export async function getPartners(): Promise<PartnerCard[]> {
+  const rows = await prisma.partner.findMany({
+    where: { published: true },
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    take: 12,
+    select: { id: true, name: true, logo: true, url: true, tagline: true },
+  });
+  return rows;
 }

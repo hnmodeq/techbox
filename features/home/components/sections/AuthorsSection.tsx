@@ -98,9 +98,14 @@ export function AuthorsSection({
 
         {/* ── Half B: contributors ──────────────────────────────── */}
         <div className="bg-[color:var(--hp-inset)] px-6 pb-4 md:px-12">
-          <p className="p-8 text-base font-semibold leading-6 text-[color:var(--hp-ink)] md:text-3xl md:leading-8">
-            {title} این‌ها هستند
-          </p>
+          <div className="p-8 pb-4">
+            <p className="text-base font-semibold leading-6 text-[color:var(--hp-ink)] md:text-3xl md:leading-8">
+              {title} این‌ها هستند
+            </p>
+            <p className="mt-2 max-w-2xl text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
+              تیمی که محتوای تکباکس را می‌نویسد، تست می‌کند و منتشر می‌کند.
+            </p>
+          </div>
 
           <ScrollRail label={title} gap={20} railClassName="pb-2">
             {authors.map((a) => (

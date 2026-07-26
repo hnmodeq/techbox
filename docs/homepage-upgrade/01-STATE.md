@@ -134,6 +134,20 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 15) — Nine design fixes from owner review
+
+1. **Community featured card** dropped its stock image. Forum posts carry a generic thumbnail that says nothing about the thread — Spiceworks' own community rows have no imagery at all.
+2. **Top Picks cards were far too tall**, only one visible. Hero 450×253 → 16/9, title 20px/3-line → 17px/2-line, padding 5→4, verdict list trimmed (availability already shows in the footer). Now 78% width mobile, 2-up tablet, 3-up desktop.
+3. **Tool icons rewritten to `currentColor`.** They carried four fixed brand colours from the reversed D1 palette, which looked foreign against the achromatic theme. Now four opacity steps of `currentColor`, so they inherit the section's text colour and follow both themes. **Rendered and inspected**: NAS and UPS had collapsed into solid blobs because their inner detail was the same colour as the chassis — separation had come from hue, not tone. Redrawn outline-first so shape survives a monochrome palette.
+4. **Family comments 3 → 6.** The 80-char floor left only 19 of 148 comments from 8 authors. Lowered to 40 (145 comments, 12 authors) — a 40-char Persian sentence is a real remark, not an emoji.
+5. **More to Explore**: the hero panel's `-mt-6` leaked outward and overlapped the row beneath; added matching bottom space. Also **news and videos no longer show a byline** — they are desk output, so `AUTHORED_MODULES` limits bylines to blog/review/forum and unauthored cards show the date instead.
+6. **New §13 Family Profiles** — random sample of non-staff members who have actually posted or commented. Staff excluded because they already appear in §12.
+7. **New §14 Partners** + `Partner` model + migration + full admin CRUD at `/admin/partners`. Greyscale logos that colour on hover. Currently 0 partners, so the section hides itself.
+8. **Every section now has a description.** Five were missing one (Insights, Family Comments, More to Explore, Finder, Authors). Verified: **13/13 sections** carry a title + supporting line.
+9. **Card treatment**: deal cards gained the brand kicker that makes TG's grid scannable, plus bordered chrome; magazine and community rows gained the Spiceworks hover-inset.
+
+Verified on rendered HTML against live data: 13 sections all with descriptions, 0 images in the community featured card, 0 bylines on news, 8 brand kickers on deals, 46 `currentColor` fills and **0 hardcoded hex** in the icons, 0 nested anchors.
+
 ### 2026-07-26 (session 14) — HOTFIX: nested anchors in More to Explore
 
 Owner's browser console reported `<a> cannot be a descendant of <a>` followed by a hydration failure, both pointing at `MoreToExploreSection`.

@@ -67,7 +67,7 @@ export function TopPicksSection({
         {picks.map((pick, i) => (
           <li
             key={`${pick.module}-${pick.slug}`}
-            className="w-[71%] shrink-0 md:w-auto"
+            className="w-[78%] shrink-0 sm:w-[46%] md:w-auto"
           >
             <PickCard pick={pick} rank={i + 1} />
           </li>
@@ -88,7 +88,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
       <Link href={`/${pick.module}/${pick.slug}`} className="group block focus-visible:outline-none">
         <div
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
-          style={{ aspectRatio: "450/253" }}
+          style={{ aspectRatio: "16/9" }}
         >
           {pick.image && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -106,8 +106,8 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="line-clamp-3 text-[20px] font-bold leading-[28px] text-[color:var(--hp-ink)]">
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="line-clamp-2 text-[17px] font-bold leading-[26px] text-[color:var(--hp-ink)]">
           <Link
             href={`/${pick.module}/${pick.slug}`}
             className="transition-colors hover:text-[color:var(--hp-brand)] focus-visible:outline-none"
@@ -117,13 +117,13 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
         </h3>
 
         {pick.excerpt && (
-          <p className="mt-2 line-clamp-2 text-[14px] leading-[22px] text-[color:var(--hp-ink-3)]">
+          <p className="mt-1.5 line-clamp-2 text-[13px] leading-[21px] text-[color:var(--hp-ink-3)]">
             {pick.excerpt}
           </p>
         )}
 
         {/* Verdict — our equivalent of TG's "Short List Includes". */}
-        <div className="mt-4">
+        <div className="mt-3">
           <Eyebrow className="mb-1.5">امتیاز تکباکس</Eyebrow>
 
           {/* Rating is hidden entirely when null — never defaults to a
@@ -155,7 +155,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
             </div>
           )}
 
-          <ul className="mt-2.5 space-y-1 text-[13px] leading-[22px] text-[color:var(--hp-ink-2)]">
+          <ul className="mt-2 space-y-0.5 text-[12px] leading-[20px] text-[color:var(--hp-ink-2)]">
             {p.model && (
               <li className="flex gap-1.5">
                 <span aria-hidden="true" className="text-[color:var(--hp-brand)]">•</span>
@@ -168,17 +168,11 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
                 <span>گارانتی: {p.warranty}</span>
               </li>
             )}
-            {p.availability && (
-              <li className="flex gap-1.5">
-                <span aria-hidden="true" className="text-[color:var(--hp-brand)]">•</span>
-                <span>وضعیت: {p.availability}</span>
-              </li>
-            )}
           </ul>
         </div>
 
         {/* TG pins the byline to the bottom of the card. */}
-        <div className="mt-auto pt-4">
+        <div className="mt-auto pt-3">
           <Byline
             author={{
               name: pick.author?.name ?? "تحریریه",

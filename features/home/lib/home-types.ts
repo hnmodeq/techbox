@@ -79,3 +79,26 @@ export type MoreToExplore = {
   hero: ContentItem | null;
   cards: ContentItem[];
 };
+
+/** §13 Family Profiles — a randomly sampled community member (not staff). */
+export type FamilyProfile = {
+  name: string;
+  username: string;
+  /** Their real job title, e.g. "مهندس ذخیره‌سازی". */
+  job: string;
+  avatar: string | null;
+  /** Persian year they joined. */
+  memberSince: string;
+  verifiedType: string | null;
+  postCount: number;
+  commentCount: number;
+};
+
+/** §14 Partners — a company TechBox works with. */
+export type PartnerCard = {
+  id: string;
+  name: string;
+  logo: string | null;
+  url: string | null;
+  tagline: string | null;
+};

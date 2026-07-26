@@ -46,6 +46,7 @@ export function InsightsSection({
             <SectionHeader
               headingId={HEADING_ID}
               title={title}
+              description="مهم‌ترین خبرهای هفته، انتخاب‌شده بر اساس بیشترین بازخورد خوانندگان."
               className="mb-0 flex-1"
             />
           </div>

@@ -27,6 +27,10 @@ export type MoreToExploreSectionProps = {
 
 const HEADING_ID = "hp-mte-heading";
 
+/** Modules where a named author is meaningful. News and videos are desk
+ *  output and carry no byline. */
+const AUTHORED_MODULES = new Set(["blog", "review", "forum"]);
+
 const MODULE_LABEL: Record<string, string> = {
   blog: "مجله",
   news: "اخبار",
@@ -49,12 +53,17 @@ export function MoreToExploreSection({
 
   return (
     <InsetBand labelledBy={HEADING_ID} tone="tint">
-      <h2
-        id={HEADING_ID}
-        className="mb-6 text-[28px] font-bold leading-[40px] text-[color:var(--hp-ink)]"
-      >
-        {title}
-      </h2>
+      <div className="mb-6">
+        <h2
+          id={HEADING_ID}
+          className="text-[28px] font-bold leading-[40px] text-[color:var(--hp-ink)]"
+        >
+          {title}
+        </h2>
+        <p className="mt-2 max-w-3xl text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
+          مطالبی از آرشیو که شاید از دست داده باشید — از قدیمی‌ترین‌های هر بخش.
+        </p>
+      </div>
 
       <HeroCard item={hero} />
 
@@ -71,7 +80,9 @@ export function MoreToExploreSection({
 
 function HeroCard({ item }: { item: ContentItem }) {
   return (
-    <article className="hp-card group">
+    // The content panel is pulled up over the image with a negative
+    // margin; without matching space below, it overlapped the row beneath.
+    <article className="hp-card group pb-2">
       <Link href={`/${item.module}/${item.slug}`} className="block focus-visible:outline-none">
         <div
           className="relative w-full overflow-hidden rounded-[var(--hp-r-md)] bg-[color:var(--hp-brand-tint)]"
@@ -103,6 +114,10 @@ function HeroCard({ item }: { item: ContentItem }) {
             </p>
           )}
 
+          {/* News and videos are unbylined by editorial policy — they are
+              desk output, not authored pieces. Only show a byline for
+              modules where authorship is meaningful. */}
+          {AUTHORED_MODULES.has(item.module) && (
           <div className="mt-4">
             <Byline
               author={{
@@ -116,6 +131,13 @@ function HeroCard({ item }: { item: ContentItem }) {
               noLink
             />
           </div>
+          )}
+
+          {!AUTHORED_MODULES.has(item.module) && (
+            <p className="mt-4 text-[12px] leading-[18px] text-[color:var(--hp-on-brand-mut)]">
+              {item.date_fa}
+            </p>
+          )}
         </div>
       </Link>
     </article>
