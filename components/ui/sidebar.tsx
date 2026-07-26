@@ -153,6 +153,7 @@ function Sidebar({
   side = "left",
   variant = "sidebar",
   collapsible = "offcanvas",
+  overlay = false,
   className,
   children,
   dir,
@@ -161,8 +162,29 @@ function Sidebar({
   side?: "left" | "right"
   variant?: "sidebar" | "floating" | "inset"
   collapsible?: "offcanvas" | "icon" | "none"
+  /**
+   * Float the sidebar above the page instead of reserving layout width.
+   *
+   * Default `false` keeps the original push behaviour, so existing
+   * consumers (admin) are untouched. When `true` the layout gap collapses
+   * to zero, SidebarInset spans the full viewport, and a dismiss scrim is
+   * rendered behind the panel — matching how the news sidebar already
+   * behaves in LayoutShell.
+   */
+  overlay?: boolean
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const { isMobile, state, openMobile, setOpenMobile, setOpen } = useSidebar()
+
+  // Escape closes an overlay sidebar. Bound only while open + overlaying so
+  // Escape keeps working normally for modals and menus elsewhere.
+  React.useEffect(() => {
+    if (!overlay || state !== "expanded" || isMobile) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [overlay, state, isMobile, setOpen])
 
   if (collapsible === "none") {
     return (
@@ -214,23 +236,42 @@ function Sidebar({
       data-side={side}
       data-slot="sidebar"
     >
-      {/* This is what handles the sidebar gap on desktop */}
+      {/* Reserves the layout width on desktop. In overlay mode it reserves
+          nothing, so content spans the full viewport. */}
       <div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
-          "group-data-[collapsible=offcanvas]:w-0",
-          "group-data-[side=right]:rotate-180",
-          variant === "floating" || variant === "inset"
-            ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
+          "relative bg-transparent transition-[width] duration-200 ease-linear",
+          overlay
+            ? "w-0"
+            : [
+                "w-(--sidebar-width)",
+                "group-data-[collapsible=offcanvas]:w-0",
+                "group-data-[side=right]:rotate-180",
+                variant === "floating" || variant === "inset"
+                  ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
+                  : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
+              ]
         )}
       />
+
+      {/* Dismiss scrim — overlay mode only, and only while open. Sits below
+          the panel (zIndex.sidebar) and above page content. */}
+      {overlay && state === "expanded" && (
+        <button
+          type="button"
+          aria-label="بستن منو"
+          data-slot="sidebar-scrim"
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-40 hidden cursor-default bg-black/20 md:block dark:bg-black/50"
+        />
+      )}
       <div
         data-slot="sidebar-container"
         data-side={side}
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
+          overlay ? "z-50" : "z-10",
+          "fixed inset-y-0 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"

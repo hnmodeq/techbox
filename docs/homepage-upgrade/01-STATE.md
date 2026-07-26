@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ complete · B partially done (B1–B4 ✅)
-**Next action:** B5 (floating sidebar PR) → then Phase C (first sections)
+**Current phase:** A ✅ · B ✅ except B6 (needs a browser) and B7
+**Next action:** B7 (extend lib/home-server.ts) → then Phase C (first sections)
 
 ---
 
@@ -47,8 +47,8 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 | B3 | Migration 3 — `User.createdAt` | ✅ | same migration | Backfilled from earliest post |
 | B4 | Review auto-match | ✅ | `scripts/content/homepage-content-pass.ts` | Superseded by content pass — 3 linked at score 100 |
 | B4b | **Content pass** (owner-authorised) | ✅ | `scripts/content/homepage-content-pass.ts` | Reviews/bios/discounts/comments/timeline made real |
-| B5 | **Floating sidebar** | ⬜ | `LayoutShell.tsx`, `techbox-app-sidebar.tsx` | 🚦 **GATE: separate PR, owner review** |
-| B6 | 8-route regression pass @1280/1440 | ⬜ | — | After B5 |
+| B5 | **Floating sidebar** | ✅ | `components/ui/sidebar.tsx`, `techbox-app-sidebar.tsx`, `LayoutShell.tsx` | Additive `overlay` prop — admin sidebar untouched (defaults false) |
+| B6 | 8-route regression pass @1280/1440 | ⏸️ | — | **Cannot run locally** — Playwright needs libnspr4.so, unavailable in sandbox. Must run in CI or by owner |
 | B7 | Extend `lib/home-server.ts` data layer | ⬜ | `lib/home-server.ts` | Bump cache key to `home-data-v6`, revalidate 3600 |
 
 ### Phase C — First sections
