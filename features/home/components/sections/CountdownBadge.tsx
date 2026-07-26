@@ -22,9 +22,16 @@ export function CountdownBadge({ endsAt }: { endsAt: string | null }) {
   React.useEffect(() => {
     if (!endsAt) return;
 
-    const tick = () => setLabel(faCountdown(endsAt));
-    tick();
+    const tick = () => {
+      const next = faCountdown(endsAt);
+      // Skip the state write when the rendered string is unchanged, and
+      // stop the timer once the deal expires — eight of these on the
+      // deals grid should not keep re-rendering forever.
+      setLabel((prev) => (prev === next ? prev : next));
+      if (next === null) window.clearInterval(id);
+    };
 
+    tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [endsAt]);

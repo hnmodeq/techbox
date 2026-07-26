@@ -56,20 +56,45 @@ export function ScrollRail({
     // In RTL, scrollLeft runs 0 → negative. abs() normalises both directions.
     const pos = Math.abs(el.scrollLeft);
     const max = el.scrollWidth - el.clientWidth;
-    setOverflows(max > 4);
-    setAtStart(pos <= 4);
-    setAtEnd(pos >= max - 4);
+
+    // Only ever call setState when a value actually CHANGES.
+    //
+    // These three setters run from a ResizeObserver. Showing/hiding the
+    // arrows changes layout, which re-fires the observer — so setting
+    // state unconditionally creates an observer -> render -> observer
+    // feedback loop that never settles and pins the main thread.
+    const nextOverflows = max > 4;
+    const nextAtStart = pos <= 4;
+    const nextAtEnd = pos >= max - 4;
+
+    setOverflows((v) => (v === nextOverflows ? v : nextOverflows));
+    setAtStart((v) => (v === nextAtStart ? v : nextAtStart));
+    setAtEnd((v) => (v === nextAtEnd ? v : nextAtEnd));
   }, []);
 
   React.useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
     sync();
     el.addEventListener("scroll", sync, { passive: true });
-    const ro = new ResizeObserver(sync);
+
+    // Coalesce observer bursts into one measurement per frame. Without
+    // this, a single layout pass can deliver several callbacks and each
+    // one schedules another render.
+    let frame = 0;
+    const ro = new ResizeObserver(() => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        sync();
+      });
+    });
     ro.observe(el);
+
     return () => {
       el.removeEventListener("scroll", sync);
+      if (frame) cancelAnimationFrame(frame);
       ro.disconnect();
     };
   }, [sync]);

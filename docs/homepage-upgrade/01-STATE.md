@@ -132,6 +132,22 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 8) — HOTFIX 2: infinite render loop in ScrollRail
+Session 7's pool fix was real but was **not** the cause of the endless refresh. Owner reported `/` still blank and reloading.
+
+**Root cause: a ResizeObserver → setState → layout → ResizeObserver feedback loop in `ScrollRail`.**
+`sync()` called `setOverflows/setAtStart/setAtEnd` unconditionally. Mounting or unmounting the 56px arrows changes layout, which re-fires the observer, which sets state again — a loop that never settles, pinning the main thread and starving the render. Three rails on the page (video, timeline, deals) each ran their own.
+
+Fixes:
+- `sync()` now writes state **only when a value actually changes** (functional updater comparing against previous).
+- The `ResizeObserver` callback is **coalesced to one measurement per animation frame**, so a single layout pass can't schedule several renders.
+- `CountdownBadge` got the same treatment: skips the write when the formatted string is unchanged, and **clears its own interval** once the deal expires. Eight of these on the deals grid were re-rendering every second forever.
+- Caught and fixed an operator-precedence bug in my own first attempt (`v === max > 4` parses as `(v === max) > 4`).
+
+Simulated the loop: 50 identical observer callbacks now produce **1** state write and settle.
+
+⚠️ **Sandbox limitation confirmed:** `pnpm dev` cannot compile pages here — `/blog`, which contains none of this project's code, also hangs on "Compiling". So runtime behaviour of the homepage **cannot be verified in this environment at all**; only static analysis, unit tests and SSR-to-string checks are possible. Browser verification must happen on the owner's machine.
+
 ### 2026-07-26 (session 7) — HOTFIX: P2024 pool exhaustion on the homepage
 Owner reported `/` rendering empty and reloading endlessly, with repeated
 `Timed out fetching a new connection from the connection pool (limit: 1)`.
