@@ -59,7 +59,7 @@ export function FinderSection({
       className="w-full px-4 py-6 sm:px-6 lg:px-8"
     >
       <div className="mx-auto w-full max-w-[1280px]">
-        <div className="relative overflow-hidden rounded-[var(--hp-r-finder)] bg-[color:var(--hp-brand)] px-6 pb-12 pt-8 md:px-[45px] md:pb-[70px] md:pt-5 dark:border dark:border-white/[0.08]">
+        <div className="relative overflow-hidden rounded-[var(--hp-r-finder)] bg-[color:var(--hp-brand-ink)] px-6 pb-12 pt-8 md:px-[45px] md:pb-[70px] md:pt-5 dark:border dark:border-white/[0.08]">
           {/* Decorative disks — TG places two, 230px and 130px, bleeding
               off opposite corners. Mirrored for RTL. */}
           <span
@@ -75,7 +75,7 @@ export function FinderSection({
             className="pointer-events-none absolute top-4 start-4 h-[88px] w-[88px] opacity-[0.12]"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#fff"
+            stroke="currentColor"
             strokeWidth="1.5"
           >
             <circle cx="11" cy="11" r="7" />
@@ -103,7 +103,7 @@ export function FinderSection({
               </label>
               <svg
                 aria-hidden="true"
-                className="ms-2 h-5 w-5 shrink-0 text-[#64748b]"
+                className="ms-2 h-5 w-5 shrink-0 text-slate-500"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -118,12 +118,12 @@ export function FinderSection({
                 type="search"
                 required
                 placeholder="مثلاً: ذخیره‌ساز مناسب بکاپ ۳۰ کاربر"
-                className="min-w-0 flex-1 bg-transparent p-1.5 text-lg text-slate-700 placeholder:text-[#64748b] focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent p-1.5 text-lg text-slate-700 placeholder:text-slate-500 focus:outline-none"
               />
               <button
                 type="submit"
                 aria-label="جست‌وجو"
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[color:var(--hp-accent)] text-lg text-white transition-opacity hover:opacity-90"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[color:var(--hp-accent)] text-lg text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90"
               >
                 <span aria-hidden="true">←</span>
               </button>

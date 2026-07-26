@@ -55,7 +55,7 @@ export function TimelineSection({
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
@@ -115,7 +115,7 @@ function TimelineItem({ event, flip }: { event: TimelineCard; flip: boolean }) {
       <div
         className={`hp-card rounded-[var(--hp-r-md)] border bg-white/[0.06] p-4 backdrop-blur-sm transition-colors dark:bg-white/[0.04] ${
           highlight
-            ? "border-[color:var(--hp-accent)] shadow-[0_0_24px_rgba(232,93,4,0.18)]"
+            ? "border-white/45 shadow-[0_0_24px_oklch(1_0_0/0.12)]"
             : "border-white/[0.12] hover:border-white/25"
         }`}
       >
@@ -165,7 +165,7 @@ function YearMarker({ year, highlight }: { year: number; highlight: boolean }) {
       <span
         className={`grid h-9 min-w-9 place-items-center rounded-full px-2 text-[12px] font-bold ${
           highlight
-            ? "bg-[color:var(--hp-accent)] text-white"
+            ? "bg-white text-[color:var(--hp-brand-ink)]"
             : "bg-white/15 text-[color:var(--hp-on-brand)]"
         }`}
       >

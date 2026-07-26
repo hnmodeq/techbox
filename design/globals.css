@@ -569,86 +569,88 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
    Nothing above this block is renamed or overridden — 500+ files depend
    on the existing shadcn tokens, so these live alongside them.
 
-   Palette (decision D1): blue = structure · orange = action/commerce ·
-   red = urgency only. The three never trade jobs.
+   Palette: the site's own shadcn tokens (decision D1 reversed 2026-07-26
+   at the owner's request — no separate homepage palette).
 
    Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §1
    ════════════════════════════════════════════════════════════════════════ */
 
+/*
+   These are ALIASES over the existing shadcn tokens above — not a second
+   palette. The homepage inherits whatever theme the rest of the site
+   uses, so retheming the site retints the homepage automatically and
+   there is no separate colour set to keep in sync.
+
+   The site palette is intentionally achromatic. Hierarchy therefore comes
+   from weight, size and placement rather than hue — which is also how
+   Tom's Guide's own near-monochrome layout works. The one exception is
+   --hp-deal: a discount badge has to read as urgent, so it borrows the
+   existing --destructive.
+*/
+
 :root {
-  /* Brand */
-  --hp-brand:        #0F4C81;
-  --hp-brand-hover:  #14639F;
-  --hp-brand-ink:    #072944;
-  --hp-brand-tint:   #E8F0F7;
-  --hp-on-brand:     #FFFFFF;
-  --hp-on-brand-mut: rgba(255, 255, 255, 0.60);
-  --hp-accent:       #E85D04;
-  --hp-accent-hover: #FF7A29;
+  /* Structure — text, links, section titles, filled panels */
+  --hp-brand:        var(--primary);
+  --hp-brand-hover:  var(--foreground);
+  --hp-brand-ink:    var(--primary);
+  --hp-brand-tint:   var(--muted);
+  --hp-on-brand:     var(--primary-foreground);
+  --hp-on-brand-mut: color-mix(in oklch, var(--primary-foreground) 62%, transparent);
+
+  /* Action. Achromatic, so a CTA reads through fill + weight, not hue. */
+  --hp-accent:    var(--primary);
+  --hp-on-accent: var(--primary-foreground);
 
   /* Surfaces */
-  --hp-bg:         #F8FAFC;
-  --hp-surface:    #FFFFFF;
-  --hp-surface-2:  #FFFFFF;
-  --hp-inset:      #E8F0F7;
-  --hp-border:     #E2E8F0;
-  --hp-border-mut: #EEF2F6;
+  --hp-bg:         var(--background);
+  --hp-surface:    var(--card);
+  --hp-surface-2:  var(--muted);
+  --hp-inset:      var(--muted);
+  --hp-border:     var(--border);
+  --hp-border-mut: var(--border);
 
   /* Text */
-  --hp-ink:   #011535;
-  --hp-ink-2: #1E293B;
-  --hp-ink-3: #64748B;
+  --hp-ink:   var(--foreground);
+  --hp-ink-2: var(--foreground);
+  --hp-ink-3: var(--muted-foreground);
 
-  /* Semantic */
-  --hp-deal:   #DC2626;
-  --hp-solved: #059669;
-  --hp-live:   #E11D48;
+  /* Semantic — the only chromatic tokens, reused from the site set */
+  --hp-deal:   var(--destructive);
+  --hp-solved: var(--success);
+  --hp-live:   var(--destructive);
 
   /* Elevation */
-  --hp-shadow-card:  0 1px 3px rgba(1, 21, 53, 0.06);
-  --hp-shadow-hover: 0 8px 24px rgba(1, 21, 53, 0.10);
+  --hp-shadow-card:  0 1px 3px oklch(0 0 0 / 0.06);
+  --hp-shadow-hover: 0 8px 24px oklch(0 0 0 / 0.10);
 
-  /* Geometry — Tom's Guide brand constants, measured from source */
-  --hp-r-lg:     24px;
-  --hp-r-md:     16px;
-  --hp-r-sm:     8px;
-  --hp-r-finder: 25px;
+  /* Geometry — derived from the site --radius so the homepage matches the
+     rest of the UI rather than hardcoding its own scale. */
+  --hp-r-sm:     calc(var(--radius) * 0.8);
+  --hp-r-md:     calc(var(--radius) * 1.6);
+  --hp-r-lg:     calc(var(--radius) * 2.4);
+  --hp-r-finder: calc(var(--radius) * 2.4);
   --hp-r-pill:   200px;
 
-  /* Carousel arrow — TG uses this exact chip in both themes */
-  --hp-arrow-bg: #1B1B1BD9;
+  /* Carousel arrow chip */
+  --hp-arrow-bg: color-mix(in oklch, var(--foreground) 88%, transparent);
 }
 
 .dark {
-  /* Brand lifts for contrast; ink deepens into the page */
-  --hp-brand:        #4A9EDE;
-  --hp-brand-hover:  #6BB4EC;
-  --hp-brand-ink:    #0B1826;
-  --hp-brand-tint:   #16273A;
-  --hp-on-brand:     #071019;
-  --hp-on-brand-mut: rgba(255, 255, 255, 0.55);
-  --hp-accent:       #FF7A29;
-  --hp-accent-hover: #FF9250;
+  /* shadcn flips --primary to near-white in dark mode. That is correct for
+     text but would make a filled panel blinding, so panels switch to a
+     raised dark surface while text keeps --primary. */
+  --hp-brand-ink:    var(--secondary);
+  --hp-on-brand:     var(--foreground);
+  --hp-on-brand-mut: color-mix(in oklch, var(--foreground) 62%, transparent);
 
-  --hp-bg:         #0B1017;
-  --hp-surface:    #131C27;
-  --hp-surface-2:  #18242F;
-  --hp-inset:      #101A25;
-  --hp-border:     #24313F;
-  --hp-border-mut: #1B2631;
+  --hp-accent:    var(--primary);
+  --hp-on-accent: var(--primary-foreground);
 
-  --hp-ink:   #F1F5F9;
-  --hp-ink-2: #DCE3EB;
-  --hp-ink-3: #93A3B5;
+  --hp-shadow-card:  0 1px 3px oklch(0 0 0 / 0.55);
+  --hp-shadow-hover: 0 8px 28px oklch(0 0 0 / 0.65);
 
-  --hp-deal:   #F87171;
-  --hp-solved: #34D399;
-  --hp-live:   #FB7185;
-
-  --hp-shadow-card:  0 1px 3px rgba(0, 0, 0, 0.55);
-  --hp-shadow-hover: 0 8px 28px rgba(0, 0, 0, 0.65);
+  --hp-arrow-bg: color-mix(in oklch, var(--background) 85%, transparent);
 }
-
 @theme inline {
   --color-hp-brand:        var(--hp-brand);
   --color-hp-brand-hover:  var(--hp-brand-hover);
@@ -657,7 +659,7 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   --color-hp-on-brand:     var(--hp-on-brand);
   --color-hp-on-brand-mut: var(--hp-on-brand-mut);
   --color-hp-accent:       var(--hp-accent);
-  --color-hp-accent-hover: var(--hp-accent-hover);
+  --color-hp-on-accent:    var(--hp-on-accent);
 
   --color-hp-bg:         var(--hp-bg);
   --color-hp-surface:    var(--hp-surface);
@@ -718,7 +720,7 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
 
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .hp-gradient-text {
-    background: linear-gradient(180deg, #fff, #fff, var(--hp-on-brand-mut));
+    background: linear-gradient(180deg, var(--hp-on-brand), var(--hp-on-brand), var(--hp-on-brand-mut));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -726,7 +728,7 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   }
 
   .dark .hp-gradient-text {
-    background: linear-gradient(180deg, #f1f5f9, #f1f5f9, #93a3b5);
+    background: linear-gradient(180deg, var(--hp-on-brand), var(--hp-on-brand), var(--hp-on-brand-mut));
     -webkit-background-clip: text;
     background-clip: text;
   }
