@@ -537,7 +537,11 @@ export async function getAuthors(): Promise<AuthorCard[]> {
   return rows.map((u) => ({
     name: u.name,
     username: u.username,
-    role: u.roleFa || u.job || u.role || "",
+    // The card is a professional profile, so show the person's real job
+    // title ("مهندس ذخیره‌سازی"), not their site permission level
+    // ("ادمین محتوا"). roleFa is a site role and only stands in when no
+    // job title has been filled out.
+    role: u.job?.trim() || u.roleFa?.trim() || "",
     bio: u.bio || "",
     avatar: u.avatar ?? null,
     verifiedType: u.verifiedType ?? null,

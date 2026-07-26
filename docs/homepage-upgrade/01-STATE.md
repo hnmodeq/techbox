@@ -102,7 +102,9 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 ## Blockers
 
-*None.* — P2024 pool exhaustion on `/` fixed 2026-07-26 (session 7).
+*None.*
+
+**Fixed 2026-07-26 (session 12):** admin settings API never invalidated any cache — a module toggle appeared to do nothing for up to 24h. — P2024 pool exhaustion on `/` fixed 2026-07-26 (session 7).
 
 > Format when adding: `**[TASK-ID]** — what is blocked, why, what would unblock it, who owns it.`
 
@@ -131,6 +133,18 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 12) — Two bugs from owner review of the live site
+
+**1. Author cards showed the site ROLE, not the person's job title.**
+`getAuthors` and `normalizeCard` both preferred `roleFa` (a permission level — "ادمین محتوا", "کاربر عضو") over `job` (the real title — "مهندس ذخیره‌سازی"). Every one of the 10 users already had a proper `job` filled in, so the wrong field was simply winning the fallback chain. Reversed the precedence in both places: `job` first, `roleFa` only when no job is set. An author card is a professional profile, not a permissions display.
+
+**2. `/review` rendered empty despite 3 published, product-linked reviews.**
+Traced it: the page server-renders correctly (24 QNAP mentions in the HTML), but `ReviewGrid` then refetches through `useDbPosts` → `/api/posts?module=review`, which returned `[]` and **overwrote** the good server data. That endpoint filters on `getEnabledModules()`, which is `unstable_cache`d for **24 hours** under the `module-config` tag.
+
+**The real defect is bigger than the symptom:** `app/api/admin/settings/route.ts` writes to `SiteSetting` and never calls `revalidateTag` at all. So *any* module enable/disable, hero setting, or currency-rate change made through the admin panel silently did nothing for up to a day — the write succeeded while every reader kept serving the stale cache. My session-9 script that enabled the review module hit exactly this.
+
+Fixed by invalidating from the settings route: `modules.*`/`hero.*`/`home.*` → `module-config` + `home-data` + `/`; `currency.*` → `currency-rates` + `home-data` + `/` + `/shop`. Used the two-arg `revalidateTag(tag, "max")` form this codebase already uses; Next 16 requires it.
 
 ### 2026-07-26 (session 11) — PHASE G
 - **G4 dead code deleted.** 13 files (`HeroSection`, `CtaSection`, `WhyTechBox`, `ToolsShowcase`, all six `*Row` components, `DownloadRow`, `HomeRowConfig`, `HomeRowSkeletons`). Checked first that every remaining reference was *internal to the dead cluster* — `HomeRowConfig` showed 7 "external" refs but all 7 were other dead rows importing it. Safe as a unit; typecheck clean after.

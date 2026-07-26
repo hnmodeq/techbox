@@ -4,6 +4,7 @@ import { requireAllPermissions, requireStaff } from "@/lib/api-permissions";
 import { hasPermission } from "@/lib/permissions";
 import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
+import { revalidateTag, revalidatePath } from "next/cache";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
@@ -136,7 +137,25 @@ export async function PATCH(req: NextRequest) {
       });
     }
 
-    logAudit({ userId: user.id, userName: user.name, action: "settings.update", details: { keys: Object.keys(updates) } });
+    // Settings feed unstable_cache layers that hold for up to 24h. Without
+    // this, toggling a module or editing the homepage banner appeared to do
+    // nothing until the window expired — the write succeeded but every
+    // reader kept serving the stale cached value.
+    const touched = Object.keys(updates);
+    if (touched.some((k) => k.startsWith("modules.") || k.startsWith("hero.") || k.startsWith("home."))) {
+      revalidateTag("module-config", "max");
+      revalidateTag("home-data", "max");
+      revalidatePath("/");
+    }
+    if (touched.some((k) => k.startsWith("currency."))) {
+      // Prices are derived from these rates on the server.
+      revalidateTag("currency-rates", "max");
+      revalidateTag("home-data", "max");
+      revalidatePath("/");
+      revalidatePath("/shop");
+    }
+
+    logAudit({ userId: user.id, userName: user.name, action: "settings.update", details: { keys: touched } });
 
     return NextResponse.json({ ok: true });
   } catch (e: any) {
