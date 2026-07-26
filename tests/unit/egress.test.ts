@@ -109,3 +109,31 @@ describe("ticker rows are normalized by their own function", () => {
     }
   });
 });
+
+/**
+ * Unbounded admin routes.
+ *
+ * These query every row in a table with no pagination, so a Prisma
+ * `include` (which selects all columns) scales with the whole database.
+ * /api/admin/content-health transferred 1598 kB for 164 posts, 1228 kB of
+ * it the `specs` column that nothing in the handler reads.
+ */
+describe("unbounded admin routes use explicit selects", () => {
+  const read = (p: string) =>
+    fs.readFileSync(path.resolve(__dirname, "../..", p), "utf8");
+
+  it("content-health does not use a bare include", () => {
+    const src = read("app/api/admin/content-health/route.ts");
+    expect(src).toMatch(/prisma\.post\.findMany\(\{[\s\S]{0,200}select:/);
+    expect(src).not.toMatch(/prisma\.post\.findMany\(\{\s*orderBy:[^}]*\}\s*,\s*include:/);
+  });
+
+  it("the admin user list never pulls password hashes", () => {
+    // publicUser() strips the password from the response, but `include`
+    // still moves every bcrypt hash out of the database first.
+    const src = read("app/api/admin/users/route.ts");
+    const listQuery = src.slice(src.indexOf("const users = await prisma.user.findMany"));
+    expect(listQuery).toMatch(/select:/);
+    expect(listQuery.slice(0, 800)).not.toMatch(/password:\s*true/);
+  });
+});
