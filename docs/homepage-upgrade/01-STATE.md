@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** B (data groundwork) — B1–B4 done
-**Next action:** Phase A · Task A1 (tokens), then B5 (floating sidebar)
+**Current phase:** A ✅ complete · B partially done (B1–B4 ✅)
+**Next action:** B5 (floating sidebar PR) → then Phase C (first sections)
 
 ---
 
@@ -14,7 +14,7 @@
 
 | Phase | Description | Status |
 |---|---|---|
-| **A** | Foundations: tokens, formatters, icons, primitives | ⬜ Not started |
+| **A** | Foundations: tokens, formatters, icons, primitives | ✅ Done |
 | **B** | DB audit, migrations 1+3, floating sidebar | 🔄 In progress (B1–B4 ✅, B5–B7 pending) |
 | **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ⬜ Not started |
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ⬜ Not started |
@@ -33,11 +33,11 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase A — Foundations
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| A1 | Add `--hp-*` tokens (light + dark) | ⬜ | `design/globals.css` | |
-| A2 | Add `faPrice()` + `<Num>` component | ⬜ | `lib/format-price.ts`, `components/ui/num.tsx` | Reuse existing `toFa`; do NOT duplicate date helpers |
-| A3 | Author 5 tool SVG icons | ⬜ | `design/icons/tools/*` | incl. new `ups` icon |
-| A4 | Shared primitives | ⬜ | `features/home/components/primitives/*` | SectionHeader, Eyebrow, Byline, InsetBand, ScrollRail, CardShell |
-| A5 | Verify Kalameh available weights | ⬜ | — | If no true 900, fall back to 800 globally in spec |
+| A1 | Add `--hp-*` tokens (light + dark) | ✅ | `design/globals.css` (+222 lines, appended) | Also added `.hp-eyebrow`, `.hp-gradient-text` (@supports-guarded), `.hp-rail`, `.hp-live-dot`, `.hp-numeric`, dark image knock-down |
+| A2 | Add `faPrice()` + `<Num>` | ✅ | `lib/format-price.ts`, `components/ui/num.tsx` | Reuses existing `toFa`. 29 unit tests. Also `faDiscountedPrice`, `faCountdown`, `faRating`, `isDiscountLive` |
+| A3 | Author 5 tool SVG icons | ✅ | `design/icons/tools.tsx` | raid/nas/nvr/subnet/**ups**. Visually verified in both themes |
+| A4 | Shared primitives | ✅ | `features/home/components/primitives/*` | SectionHeader, Eyebrow, Byline, InsetBand+SectionShell, ScrollRail, CardShell+CardMedia |
+| A5 | Verify Kalameh available weights | ✅ | — | **All 9 weights ship incl. true 900** (`lib/fonts.ts`). No synthesis risk; spec's 800 stands |
 
 ### Phase B — Data & layout groundwork
 | ID | Task | Status | Files touched | Notes |
@@ -131,6 +131,14 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 3) — Implementation agent · PHASE A COMPLETE
+- **A1 tokens**: appended a 222-line `--hp-*` block to `design/globals.css`. Nothing existing renamed. Full `:root` + `.dark` pairs, `@theme inline` mappings so `bg-hp-surface` / `text-hp-ink` / `rounded-hp-md` compile.
+- **A2 formatters**: created `lib/format-price.ts`. Confirmed `toFa` already emits Persian digits AND U+066C separators, so no digit mapping was reimplemented. Long-form prices only (D9). Added `faDiscountedPrice`, `faPercent`, `faCount`, `faRating`, `faCountdown`, `isDiscountLive`. `<Num latin>` guards model numbers with `lang="en"`. **29 unit tests, all passing.**
+- **A3 icons**: `design/icons/tools.tsx` — 5 flat duotone SVGs, mid-tone fills only so one asset works in both themes. **Rendered to PNG and visually inspected**; fixed two defects found that way: NVR arcs read as a smiley face (redrawn as a wall-mount camera with signal waves) and Subnet leaf nodes overlapped (respaced to 3 clean columns). Registered `ups: BatteryCharging` in `design/icons.tsx` and exported from `design/index.ts`.
+- **A4 primitives**: 6 components. Only `ScrollRail` is `"use client"`. It handles the RTL `scrollLeft`-is-negative quirk via `scrollBy` with a sign flip, and uses TG's exact 56px `#1B1B1BD9` arrow chip.
+- **A5**: Kalameh ships **all 9 weights including a true 900** — no synthesis risk, spec unchanged.
+- `pnpm typecheck` ✅ · `pnpm lint` ✅ · `pnpm test` ✅ **87 tests passing**.
 
 ### 2026-07-26 (session 2) — Implementation agent
 - Environment: pnpm 10.12.1, deps installed, Prisma client generated, prod DB connected.
