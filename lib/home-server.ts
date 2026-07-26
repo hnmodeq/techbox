@@ -17,6 +17,31 @@ import {
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
 
+/**
+ * Run one homepage section, degrading to a fallback instead of taking the
+ * page down.
+ *
+ * Logs the FIRST failure per section and then stays quiet. These run on
+ * every uncached render, so an unconditional console.error turns one
+ * broken section into hundreds of identical stack traces and hides
+ * whatever else is wrong.
+ */
+const loggedSectionFailures = new Set<string>();
+
+async function section<T>(name: string, fallback: T, run: () => Promise<T>): Promise<T> {
+  try {
+    const value = await run();
+    loggedSectionFailures.delete(name); // recovered — allow logging again
+    return value;
+  } catch (e) {
+    if (!loggedSectionFailures.has(name)) {
+      loggedSectionFailures.add(name);
+      console.error(`[home-data] ${name} failed (further identical errors suppressed):`, e);
+    }
+    return fallback;
+  }
+}
+
 const moduleTakes: Record<string, number> = {
   blog: 5,   // §1 lead + 4-item list (Spiceworks Articles)
   media: 10, // §2 video rail
@@ -323,35 +348,19 @@ export async function getHomeDataUncached(): Promise<HomeData> {
 
   const sidebarNewsSlugs = (modules.news ?? []).slice(0, 5).map((n: any) => n.slug);
 
-  let insights: any[] = [];
-  try {
-    insights = await getInsights(sidebarNewsSlugs, normalizeCard, cardSelect);
-  } catch (e) {
-    console.error("[home-data] insights failed:", e);
-  }
+  const insights = await section("insights", [] as any[], () =>
+    getInsights(sidebarNewsSlugs, normalizeCard, cardSelect));
 
-  let topPicks: any[] = [];
-  try {
-    topPicks = await getTopPicks(normalizeCard, cardSelect);
-  } catch (e) {
-    console.error("[home-data] topPicks failed:", e);
-  }
+  const topPicks = await section("topPicks", [] as any[], () =>
+    getTopPicks(normalizeCard, cardSelect));
 
   // §7 Deals replaces the raw shop slice: prices must be resolved through
   // the currency pipeline, which the generic findPosts() does not do.
-  try {
-    const deals = await getDeals(normalizeCard, cardSelect, moduleTakes.shop ?? 8);
-    if (deals.length) modules.shop = deals;
-  } catch (e) {
-    console.error("[home-data] deals failed:", e);
-  }
+  const deals = await section("deals", [] as any[], () =>
+    getDeals(normalizeCard, cardSelect, moduleTakes.shop ?? 8));
+  if (deals.length) modules.shop = deals;
 
-  let timeline: any[] = [];
-  try {
-    timeline = await getTimeline();
-  } catch (e) {
-    console.error("[home-data] timeline failed:", e);
-  }
+  const timeline = await section("timeline", [] as any[], () => getTimeline());
 
   // Homepage SiteSetting keys, read as one batch.
   let homeSettings: Record<string, string> = {};
@@ -423,33 +432,14 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     console.error("[home-data] familyComments failed:", e);
   }
 
-  let moreToExplore: any = { hero: null, cards: [] };
-  try {
-    moreToExplore = await getMoreToExplore(normalizeCard, cardSelect);
-  } catch (e) {
-    console.error("[home-data] moreToExplore failed:", e);
-  }
+  const moreToExplore = await section("moreToExplore", { hero: null, cards: [] } as any, () =>
+    getMoreToExplore(normalizeCard, cardSelect));
 
-  let authors: any[] = [];
-  try {
-    authors = await getAuthors();
-  } catch (e) {
-    console.error("[home-data] authors failed:", e);
-  }
+  const authors = await section("authors", [] as any[], () => getAuthors());
 
-  let familyProfiles: any[] = [];
-  try {
-    familyProfiles = await getFamilyProfiles();
-  } catch (e) {
-    console.error("[home-data] familyProfiles failed:", e);
-  }
+  const familyProfiles = await section("familyProfiles", [] as any[], () => getFamilyProfiles());
 
-  let partners: any[] = [];
-  try {
-    partners = await getPartners();
-  } catch (e) {
-    console.error("[home-data] partners failed:", e);
-  }
+  const partners = await section("partners", [] as any[], () => getPartners());
 
   return {
     modules: modules as HomeData["modules"],

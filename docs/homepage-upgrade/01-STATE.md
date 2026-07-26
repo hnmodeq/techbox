@@ -134,6 +134,19 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 16) — Stale Prisma client, and stopping it recurring
+
+Owner's terminal filled with `Cannot read properties of undefined (reading 'findMany')` from `getPartners`, repeating on every render.
+
+**Diagnosis:** the DB was fine — `Partner` table present, migration recorded, 0 rows. The *generated client* on the owner's machine predated the migration. This is the **third** time a schema change has left a stale client (User.createdAt, then reviewedProductId, now Partner), so the fix targets the pattern, not just this instance:
+
+1. **`pnpm dev` now runs `prisma generate` first.** It is idempotent and takes ~400ms, so pulling a schema change can no longer leave a stale client behind. This is the actual root cause and it is now impossible to hit by forgetting a command.
+2. **`getPartners` detects a missing model** and returns `[]` with a single actionable warning naming the command to run, instead of throwing.
+3. **The admin route returns a clear 503** with a Persian message rather than a raw TypeError.
+4. **Consolidated 8 duplicated try/catch blocks into a `section()` helper** that logs the first failure per section and suppresses repeats until it recovers. The old code logged unconditionally on every uncached render — one broken section produced hundreds of identical stack traces and buried everything else. That is why the terminal was unreadable.
+
+Verified after the refactor: insights 2, topPicks 3, deals 8, timeline 20, familyComments 6, moreToExplore 4, authors 10, familyProfiles 8, partners 0 (correct — none added yet).
+
 ### 2026-07-26 (session 15) — Nine design fixes from owner review
 
 1. **Community featured card** dropped its stock image. Forum posts carry a generic thumbnail that says nothing about the thread — Spiceworks' own community rows have no imagery at all.
