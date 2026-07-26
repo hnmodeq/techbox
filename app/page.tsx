@@ -33,6 +33,7 @@ import { TopPicksSection } from "@/features/home/components/sections/TopPicksSec
 import { FamilyCommentsSection } from "@/features/home/components/sections/FamilyCommentsSection";
 import { MoreToExploreSection } from "@/features/home/components/sections/MoreToExploreSection";
 import { AuthorsSection } from "@/features/home/components/sections/AuthorsSection";
+import { AnnouncementBar } from "@/features/home/components/sections/AnnouncementBar";
 
 /**
  * Which module slug gates each section, so the admin panel keeps control.
@@ -168,6 +169,10 @@ export default async function HomePage() {
   return (
     <HomeDataProvider initialData={data}>
       <div className="flex w-full max-w-full flex-col overflow-x-hidden bg-[color:var(--hp-bg)]">
+        {/* §0 sits above the ordered sections and is not part of the
+            module-config ordering — it is chrome, not content. */}
+        <AnnouncementBar announcement={data.announcement} />
+
         {/* Screen readers need one h1; the visual hierarchy starts at h2. */}
         <h1 className="sr-only">تکباکس — پاتوق بچه‌های فناوری اطلاعات</h1>
         {visible.map((s) => (
