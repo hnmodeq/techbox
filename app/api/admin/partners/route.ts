@@ -22,6 +22,23 @@ const partnerSchema = z.object({
   published: z.boolean().optional(),
 });
 
+/**
+ * The generated Prisma client will not have `partner` until
+ * `pnpm prisma:generate` has run against the migrated schema. Return a
+ * clear 503 rather than a raw "Cannot read properties of undefined".
+ */
+function partnerModel() {
+  return (prisma as unknown as { partner?: any }).partner ?? null;
+}
+
+const NEEDS_GENERATE = NextResponse.json(
+  {
+    error: "prisma_client_stale",
+    message: "کلاینت Prisma به‌روز نیست. دستور pnpm prisma:generate را اجرا کنید.",
+  },
+  { status: 503 },
+);
+
 function bust() {
   revalidateTag("home-data", "max");
   revalidatePath("/");
@@ -30,8 +47,9 @@ function bust() {
 export async function GET() {
   const user = await requireStaff();
   if (user instanceof NextResponse) return user;
+  if (!partnerModel()) return NEEDS_GENERATE;
 
-  const partners = await prisma.partner.findMany({
+  const partners = await partnerModel().findMany({
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
   });
   return NextResponse.json(partners);
@@ -40,13 +58,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await requireStaff();
   if (user instanceof NextResponse) return user;
+  if (!partnerModel()) return NEEDS_GENERATE;
 
   const parsed = partnerSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json({ error: "validation", issues: parsed.error.issues }, { status: 400 });
   }
 
-  const created = await prisma.partner.create({
+  const created = await partnerModel().create({
     data: {
       name: parsed.data.name.trim(),
       logo: parsed.data.logo?.trim() || null,
@@ -65,6 +84,7 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const user = await requireStaff();
   if (user instanceof NextResponse) return user;
+  if (!partnerModel()) return NEEDS_GENERATE;
 
   const body = await req.json().catch(() => null);
   if (!body?.id || typeof body.id !== "string") {
@@ -83,7 +103,7 @@ export async function PATCH(req: NextRequest) {
   if (parsed.data.order !== undefined) data.order = parsed.data.order;
   if (parsed.data.published !== undefined) data.published = parsed.data.published;
 
-  const updated = await prisma.partner.update({ where: { id: body.id }, data });
+  const updated = await partnerModel().update({ where: { id: body.id }, data });
 
   bust();
   logAudit({ userId: user.id, userName: user.name, action: "partner.update", target: body.id, details: { keys: Object.keys(data) } });
@@ -93,11 +113,12 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const user = await requireStaff();
   if (user instanceof NextResponse) return user;
+  if (!partnerModel()) return NEEDS_GENERATE;
 
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id_required" }, { status: 400 });
 
-  await prisma.partner.delete({ where: { id } });
+  await partnerModel().delete({ where: { id } });
 
   bust();
   logAudit({ userId: user.id, userName: user.name, action: "partner.delete", target: id });

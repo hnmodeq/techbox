@@ -35,6 +35,9 @@ import type {
 
 const PUBLISHED = { published: true, deletedAt: null } as const;
 
+/** Warn once per process, not once per render — see getPartners(). */
+let warnedMissingPartnerModel = false;
+
 /**
  * Price a shop row from rates that were fetched ONCE by the caller.
  *
@@ -619,11 +622,26 @@ export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
 // ═════════════════════════════════════════════════════════════════════
 
 export async function getPartners(): Promise<PartnerCard[]> {
-  const rows = await prisma.partner.findMany({
+  // `prisma.partner` is undefined when the generated client predates the
+  // Partner migration — i.e. someone pulled the code but has not run
+  // `pnpm prisma:generate`. Detect that explicitly instead of letting a
+  // "Cannot read properties of undefined" fire on every render.
+  const model = (prisma as unknown as { partner?: { findMany: Function } }).partner;
+  if (!model?.findMany) {
+    if (!warnedMissingPartnerModel) {
+      warnedMissingPartnerModel = true;
+      console.warn(
+        "[home-data] Prisma client has no `partner` model — run `pnpm prisma:generate`. " +
+          "Skipping the partners section until then.",
+      );
+    }
+    return [];
+  }
+
+  return (await model.findMany({
     where: { published: true },
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     take: 12,
     select: { id: true, name: true, logo: true, url: true, tagline: true },
-  });
-  return rows;
+  })) as PartnerCard[];
 }
