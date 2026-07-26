@@ -107,6 +107,21 @@ test.describe('homepage', () => {
     });
   }
 
+  test('no nested anchors — invalid HTML that breaks hydration', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    // React reports this as "<a> cannot be a descendant of <a>" and then
+    // fails hydration, because the browser silently restructures the DOM
+    // around the invalid nesting. Easy to introduce by putting a Byline or
+    // any inner link inside a card that is itself wrapped in a Link.
+    const nested = await page.evaluate(() =>
+      [...document.querySelectorAll('a a')].map(
+        (a) => `${(a as HTMLAnchorElement).getAttribute('href')} inside ${(a.closest('a[href]:not(:scope)') as HTMLAnchorElement)?.getAttribute('href') ?? '?'}`,
+      ),
+    );
+    expect(nested, `nested anchors:\n${nested.join('\n')}`).toEqual([]);
+  });
+
   test('page direction is RTL and language is Persian', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');

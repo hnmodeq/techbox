@@ -113,6 +113,7 @@ function HeroCard({ item }: { item: ContentItem }) {
               }}
               date={item.date_fa}
               onDark
+              noLink
             />
           </div>
         </div>
