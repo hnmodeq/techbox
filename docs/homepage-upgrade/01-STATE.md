@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ · B ✅ (except B6 — needs a browser)
-**Next action:** Phase C — build sections §1 Magazine, §2 Video, §3 Insights, §6 Timeline, §9 Community, then wire app/page.tsx
+**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅
+**Next action:** Phase D — §4 Finder, build the UPS calculator, §8 Tools, §7 Deals
 
 ---
 
@@ -16,7 +16,7 @@
 |---|---|---|
 | **A** | Foundations: tokens, formatters, icons, primitives | ✅ Done |
 | **B** | DB audit, migrations 1+3, floating sidebar | ✅ Done (B6 deferred to CI — no browser in sandbox) |
-| **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ⬜ Not started |
+| **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ✅ Done |
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ⬜ Not started |
 | **E** | Review enforcement + Section 5 | ⬜ Not started |
 | **F** | Sections 10, 11, 12 | ⬜ Not started |
@@ -54,12 +54,12 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase C — First sections
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| C1 | §1 Magazine (SW Articles) | ⬜ | `features/home/components/sections/MagazineSection.tsx` | |
-| C2 | §2 Video Hub (TG Quick takes) | ⬜ | `.../VideoSection.tsx` | |
-| C3 | §3 Insights + Newsletter | ⬜ | `.../InsightsSection.tsx` | Engagement-ranked |
-| C4 | §6 Timeline | ⬜ | `.../TimelineSection.tsx` | |
-| C5 | §9 Community (SW) | ⬜ | `.../CommunitySection.tsx` | |
-| C6 | Wire `app/page.tsx` | ⬜ | `app/page.tsx` | Respect module config order/visibility |
+| C1 | §1 Magazine (SW Articles) | ✅ | `.../sections/MagazineSection.tsx` | 578×325 lead + 4× 143×95 rows. Holds the single eager LCP image |
+| C2 | §2 Video Hub (TG Quick takes) | ✅ | `.../VideoSection.tsx` | 9:16 rail, duration pill hidden when null. Links to existing HLS route |
+| C3 | §3 Insights + Newsletter | ✅ | `.../InsightsSection.tsx`, `.../NewsletterCard.tsx` | Engagement-ranked; newsletter posts to existing API and echoes its Persian message |
+| C4 | §6 Timeline | ✅ | `.../TimelineSection.tsx` | Dark full-bleed zigzag rail, RTL oldest-first |
+| C5 | §9 Community (SW) | ✅ | `.../CommunitySection.tsx` | Best-answer showcase, falls back to most-discussed when nothing solved |
+| C6 | Wire `app/page.tsx` | ✅ | `app/page.tsx` | Honours enabled/showOnHome/homeOrder + title & label overrides |
 
 ### Phase D — Finder, Tools, Deals
 | ID | Task | Status | Files touched | Notes |
@@ -131,6 +131,18 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 5) — Implementation agent · PHASE C COMPLETE
+- Built the first five sections + wired `app/page.tsx`, which had been rendering an empty `<main>`.
+- **Verification approach:** Playwright cannot launch in this sandbox and `pnpm build` times out, so I rendered the sections to static HTML with `renderToStaticMarkup` against **live DB rows** and audited the markup programmatically. That is what caught the defects below.
+- **Audit results:** heading order h2→h3 with no skips ✓ · all 5 `aria-labelledby` targets resolve ✓ · 14 images, **14 aspect-ratio reservations** (CLS) ✓ · 0 missing alt ✓ · 0 right-arrows ✓ · 17 `--hp-*` tokens in use ✓.
+- **Empty-state proof: passing `[]` to all five sections renders exactly 0 bytes.** Rule 1 verified mechanically, not by eye.
+- **Three defects found and fixed by the audit:**
+  1. Two images were `loading="eager"` — the Insights hero was competing with the Magazine lead for LCP priority. Now exactly one eager image on the page.
+  2. Video play button used `left-1/2` (physical property). Switched to `inset-0 m-auto`.
+  3. The `✓` solved badge sat inside the `<h3>` with no separator, so screen readers read "حل شدهبرای شبکه…". Split into an `aria-hidden` glyph plus an `sr-only` label.
+- `app/page.tsx` keeps full admin control: `enabled`, `showOnHome`, `homeOrder`, and the per-module title/more-label overrides all still apply. Added the required `sr-only` `<h1>`.
+- `tsc --noEmit` ✅ · `lint` ✅ · `test` ✅ 87 passing. No build run (times out — owner instruction).
 
 ### 2026-07-26 (session 4) — Implementation agent · B5 + B7
 - **B5 floating sidebar.** Added an **additive `overlay` prop** to the shared `Sidebar` primitive (defaults `false`), so the admin sidebar — the only other consumer — is untouched. When on: `sidebar-gap` collapses to `w-0`, panel goes `z-50`, dismiss scrim `z-40` (matching `design/z-index.ts`), click-scrim and Escape both close. Escape is bound only while open+overlaying so it doesn't swallow Escape for modals. Sidebar now starts **closed on `/` only**.
