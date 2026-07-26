@@ -9,11 +9,23 @@ import { TechboxNavSecondary } from "./techbox-nav-secondary"
 import { TechboxNavUser } from "./techbox-nav-user"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
+/**
+ * Main site sidebar.
+ *
+ * Renders in `overlay` mode: it floats above the page rather than
+ * consuming ~14rem of layout width, mirroring how the news sidebar in
+ * LayoutShell already behaves. Before this change the homepage had only
+ * ~1010px of usable canvas at a 1280px viewport, which cramped the
+ * full-width Finder and the 3-up Top Picks grid.
+ *
+ * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §1.5 (decision D3)
+ */
 export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       side="right"
       dir="rtl"
+      overlay
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
       {...props}
     >

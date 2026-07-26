@@ -93,6 +93,8 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
 }
 
 function LayoutInner({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isHome = pathname === "/"
   const { user } = useAuth()
   const userId = user?.id ?? ""
   const [newsOpen, setNewsOpen] = React.useState(false)
@@ -173,7 +175,16 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="[--header-height:calc(var(--spacing)*14)]">
-      <SidebarProvider className="min-h-svh w-full flex-col" defaultOpen={true}>
+      {/*
+        The main sidebar floats (overlay) rather than reserving layout
+        width — see docs/homepage-upgrade §1.5 (decision D3).
+
+        It starts CLOSED on the homepage only: `/` is a destination page
+        whose sections are designed against the full 1280px container, so
+        the chrome gets out of the way. Every other route keeps the
+        previous default-open behaviour.
+      */}
+      <SidebarProvider className="min-h-svh w-full flex-col" defaultOpen={!isHome}>
         <SiteHeader
           hasUnreadNews={hasUnreadNews}
           newsOpen={newsOpen}
