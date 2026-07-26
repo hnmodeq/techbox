@@ -16,6 +16,7 @@ import {
   getPartners,
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
+import { logDbFailure, noteDbSuccess, isDbUnreachable } from "@/lib/db-error";
 
 /**
  * Run one homepage section, degrading to a fallback instead of taking the
@@ -26,18 +27,14 @@ import { getSettings } from "@/lib/settings";
  * broken section into hundreds of identical stack traces and hides
  * whatever else is wrong.
  */
-const loggedSectionFailures = new Set<string>();
-
 async function section<T>(name: string, fallback: T, run: () => Promise<T>): Promise<T> {
+  const scope = `home-data:${name}`;
   try {
     const value = await run();
-    loggedSectionFailures.delete(name); // recovered — allow logging again
+    noteDbSuccess(scope); // recovered — report the next failure immediately
     return value;
   } catch (e) {
-    if (!loggedSectionFailures.has(name)) {
-      loggedSectionFailures.add(name);
-      console.error(`[home-data] ${name} failed (further identical errors suppressed):`, e);
-    }
+    logDbFailure(scope, e);
     return fallback;
   }
 }
@@ -251,7 +248,7 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
       select: layoutCardSelect,
     });
   } catch (error) {
-    console.error("[layout-data] Failed to load news/ticker data:", error);
+    logDbFailure("layout-data:news", error);
   }
 
   const normalizedNews = news.map(normalizeCard);
@@ -265,7 +262,7 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
       const countMap = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
       normalizedNews.forEach((item, index) => { item.comments = countMap.get(news[index].id) || 0; });
     } catch (error) {
-      console.error("[layout-data] Failed to count news comments:", error);
+      logDbFailure("layout-data:comment-counts", error);
     }
   }
 
@@ -285,7 +282,7 @@ export async function getLayoutHomeData(): Promise<HomeData> {
   try {
     return await cachedLayoutHomeData();
   } catch (error) {
-    console.error("[layout-data] Falling back to empty layout data:", error);
+    logDbFailure("layout-data", error);
     return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
   }
 }
@@ -310,7 +307,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     } catch (e) {
       moduleFailures++;
       modules[module] = [];
-      console.error(`[home-data] module "${module}" failed:`, e);
+      logDbFailure(`home-data:module:${module}`, e);
     }
   }
 
@@ -372,7 +369,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
       "home.announcement",
     ]);
   } catch (e) {
-    console.error("[home-data] settings failed:", e);
+    logDbFailure("home-data:settings", e);
   }
 
   const parseJsonArray = (raw: string | undefined): any[] => {
@@ -429,7 +426,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     }
     familyComments = await getFamilyComments(blocklist);
   } catch (e) {
-    console.error("[home-data] familyComments failed:", e);
+    logDbFailure("home-data:familyComments", e);
   }
 
   const moreToExplore = await section("moreToExplore", { hero: null, cards: [] } as any, () =>
@@ -475,7 +472,9 @@ export async function getHomeData(): Promise<HomeData> {
     // result is NOT cached (the throw above prevents that), so the next
     // request retries. Logged loudly because a silently blank homepage is
     // very hard to diagnose from the outside.
-    console.error("[home-data] unavailable, serving empty homepage:", e);
+    if (logDbFailure("home-data", e) && isDbUnreachable(e)) {
+      console.error("[home-data] serving an empty homepage until the database responds");
+    }
     return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
   }
 }

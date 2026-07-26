@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { logDbFailure } from "./db-error";
 
 const DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve",
@@ -30,7 +31,7 @@ export async function getSetting(key: string): Promise<string> {
     const row = await prisma.siteSetting.findUnique({ where: { key } });
     return row?.value ?? DEFAULTS[key] ?? "";
   } catch (error) {
-    console.error(`[settings] Failed to read ${key}; using default`, error);
+    logDbFailure(`settings:${key}`, error);
     return DEFAULTS[key] ?? "";
   }
 }
@@ -50,7 +51,7 @@ export async function getSettings(keys: string[]): Promise<Record<string, string
     }
     return map;
   } catch (error) {
-    console.error("[settings] Failed to read settings; using defaults", { keys, error });
+    logDbFailure("settings", error);
     const map: Record<string, string> = {};
     for (const key of keys) {
       map[key] = DEFAULTS[key] ?? "";

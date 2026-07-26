@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { prisma } from "./db";
 import bcrypt from "bcryptjs";
+import { logDbFailure } from "@/lib/db-error";
 
 function getAuthSecret(): Uint8Array {
   const envSecret = process.env.AUTH_SECRET;
@@ -106,7 +107,7 @@ export async function getSessionUser(){
 
     return user;
   } catch (err) {
-    console.error("[auth-server] Failed to fetch session user:", err);
+    logDbFailure("auth-server", err);
   }
   
   return null;
@@ -164,7 +165,7 @@ export async function getSessionUserPublic(){
     if (isSessionRevoked(payload, user.sessionsInvalidatedAt)) return null;
     return user;
   } catch (err) {
-    console.error("[auth-server] Failed to fetch session user:", err);
+    logDbFailure("auth-server", err);
   }
 
   return null;
