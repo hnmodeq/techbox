@@ -23,3 +23,151 @@ shop product slugs tab design and merge specs with comments
 5-homepage need a design
 
 11-mobile version need to get a re-design
+
+
+
+
+--------------------------------------------------------------------
+
+i want to design my homepage inner content.
+
+TechBox and SpiceWorks have similar contents and we can get inspiration from SpiceWorks design for our homepage.
+
+for example in SpiceWorks homepage we have:
+
+1-topbar
+
+2-announcement bar
+
+3-articles
+
+4-community
+
+5-research
+
+6-tools
+
+7-CTA
+
+8-footer
+
+in Toms Guide homepage we have:
+
+1-reviews
+
+2-videos
+
+3-find deals fast
+
+4-latest insights
+
+5-streaming
+
+6-puzzle of the day (as a hubby)
+
+7-top picks products
+
+8-computing & AI reviews
+
+9-fitness & home reviews
+
+10-best deals (again)
+
+11-more to explore
+
+12-coupons
+
+13-introducting the Tom's Guide website
+
+14-tom's guide team
+
+15-footer
+
+and in TechBox we have these modules/sections:
+
+1-top bar
+
+2-tick bar
+
+3-main sidebar
+
+4-news sidebar
+
+5-magazine
+
+6-videos
+
+7-tools
+
+8-forum
+
+9-shop
+
+10-timeline (as a hubby)
+
+11-newsletter
+
+12-footer
+
+i want to make my homepage by using these two websites which have similar contents/modules/features
+
+also i saw a simple explanation about SpiceWorks in GitHub which was so clean and clear and also it is almost same with the TechBox goal, the explanation was:
+
+SpiceWorks is an online community and marketplace where IT professionals can find advice, manage their networks, and discover and purchase IT products and services.
+
+now i want to hear your opinion, about the TechBox and of course designing TechBox homepage.
+
+
+can we please use:
+
+spiceworks article as techbox magazine
+
+no hero yet
+
+annoucement from spiceworks
+
+videohub from toms guide
+
+shop from toms guide
+
+tools from spiceworks
+
+community from spiceworks
+
+timeline is a unique hobby
+
+also i like the latest insight (maybe we can redirect 2 of our news as latest insights and the newsletter can be here as tom's guide did)
+
+i like the "Find your next TV" in tom's guide, it's a search bar for TV but we can use it as a global search in different categories (categories gonna be as "easy to use Smart TV's / Best for watching sports / Build-in ATSC 3.0)
+
+i like the our top picks (tom's guide) as top 3 reviews on products (the review section is disable from admin panel but we can make it enable > limit reviews only for products (the author have to select a product from our real shop and write a review) > so the product reviews gonna be visible here as "Our top picks"
+
+i like the "more to explore" from tom's guide a mix of "a random news from news archive - a random oldest video from /media - an oldest article from /magazine)
+
+and i like the last part in tom's guide which is a explanation about the toms, we can have it and put an explanation similar to:
+
+
+
+ SpiceWorks is an online community and marketplace where IT professionals can find advice, manage their networks, and discover and purchase IT products and services.
+
+
+
+also after this we gonna have "her's who make tom's guide" section and gonna show our authors.
+
+
+
+i want to add something extra which gonna be: "Some of TechBox Family Comments" which gonna pick random comments from all of modules and show them here, the design of this card can be as the "See what our community has to say" section in spiceworks.
+
+
+
+IMPORTANT: we need you to design new cards similar or "EXACTLY" like spiceworks / tom's guide cards.
+
+
+
+IMPORTANT: we don't use any fake data, all of our cards and data needs to be alive and live in database (which we have many contents right now)
+
+
+
+please update our plan by what i said.
+
+and stand by for next step.
