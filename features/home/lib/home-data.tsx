@@ -8,6 +8,8 @@ import type {
   FamilyComment,
   AuthorCard,
   MoreToExplore,
+  FamilyProfile,
+  PartnerCard,
 } from "./home-types";
 
 export type HomeData = {
@@ -35,6 +37,10 @@ export type HomeData = {
   finderChips?: Array<{ labelFa: string; href: string }>;
   /** §8 — admin-configured tool order/allow-list (SiteSetting). */
   toolsFeatured?: string[];
+  /** §13 — sampled community members (staff excluded). */
+  familyProfiles?: FamilyProfile[];
+  /** §14 — companies we work with. */
+  partners?: PartnerCard[];
   /** §0 — campaign banner; null when disabled or outside its window. */
   announcement?: {
     enabled: boolean;
@@ -118,6 +124,8 @@ export function HomeDataProvider({
         finderChips: body.finderChips ?? prev.finderChips,
         toolsFeatured: body.toolsFeatured ?? prev.toolsFeatured,
         announcement: body.announcement ?? prev.announcement,
+        familyProfiles: body.familyProfiles ?? prev.familyProfiles,
+        partners: body.partners ?? prev.partners,
       }));
     };
 

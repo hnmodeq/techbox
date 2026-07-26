@@ -85,10 +85,13 @@ export function FinderSection({
           <div className="relative mx-auto max-w-3xl">
             <h2
               id={HEADING_ID}
-              className="hp-gradient-text mb-[30px] text-center text-2xl font-medium tracking-[0.4px] md:mb-6 md:text-3xl"
+              className="hp-gradient-text mb-2 text-center text-2xl font-medium tracking-[0.4px] md:text-3xl"
             >
               {title}
             </h2>
+            <p className="mb-[26px] text-center text-[15px] leading-[26px] text-[color:var(--hp-on-brand-mut)]">
+              در مقالات، ویدیوها، ابزارها و کل کاتالوگ فروشگاه جست‌وجو کنید.
+            </p>
 
             {/* GET so the query lands in the URL and the existing /search
                 page (and SearchLog) handle it — no client JS required. */}

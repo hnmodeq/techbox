@@ -123,7 +123,7 @@ function ListRow({ item }: { item: ContentItem }) {
   return (
     <Link
       href={`/${item.module}/${item.slug}`}
-      className="hp-card group flex gap-4 border-b border-[color:var(--hp-border)] py-5 transition-colors last:border-b-0 hover:bg-[color:var(--hp-bg)] focus-visible:outline-none"
+      className="hp-card group flex gap-4 border-b border-[color:var(--hp-border)] py-5 ps-0 transition-[background-color,padding] duration-200 last:border-b-0 hover:bg-[color:var(--hp-bg)] hover:ps-2 focus-visible:outline-none"
     >
       <div
         className="relative w-[110px] shrink-0 overflow-hidden rounded-[6px] bg-[color:var(--hp-brand-tint)] sm:w-[143px]"

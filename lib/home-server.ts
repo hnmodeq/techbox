@@ -12,6 +12,8 @@ import {
   getFamilyComments,
   getMoreToExplore,
   getAuthors,
+  getFamilyProfiles,
+  getPartners,
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
 
@@ -435,6 +437,20 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     console.error("[home-data] authors failed:", e);
   }
 
+  let familyProfiles: any[] = [];
+  try {
+    familyProfiles = await getFamilyProfiles();
+  } catch (e) {
+    console.error("[home-data] familyProfiles failed:", e);
+  }
+
+  let partners: any[] = [];
+  try {
+    partners = await getPartners();
+  } catch (e) {
+    console.error("[home-data] partners failed:", e);
+  }
+
   return {
     modules: modules as HomeData["modules"],
     ticker: tickerPosts.map(normalizeCard),
@@ -448,6 +464,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     finderChips,
     toolsFeatured,
     announcement,
+    familyProfiles,
+    partners,
   };
 }
 

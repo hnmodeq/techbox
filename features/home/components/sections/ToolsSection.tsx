@@ -95,10 +95,12 @@ function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
         </span>
       )}
 
+      {/* The icon draws in currentColor, so it inherits this colour and
+          follows the theme instead of carrying its own palette. */}
       <ToolIcon
         slug={tool.slug}
         size={72}
-        className="transition-transform duration-200 group-hover:scale-[1.06] motion-reduce:transform-none"
+        className="text-[color:var(--hp-ink-3)] transition-[transform,color] duration-200 group-hover:scale-[1.06] group-hover:text-[color:var(--hp-brand)] motion-reduce:transform-none"
       />
 
       {/*

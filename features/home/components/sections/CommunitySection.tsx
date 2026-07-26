@@ -93,29 +93,8 @@ function FeaturedTopic({ topic }: { topic: WithAccepted }) {
   const answer = topic.acceptedAnswer;
 
   return (
-    <article className="hp-card group">
-      {topic.image && (
-        <Link
-          href={`/${topic.module}/${topic.slug}`}
-          className="block overflow-hidden rounded-[var(--hp-r-md)] focus-visible:outline-none"
-        >
-          <div
-            className="relative w-full bg-[color:var(--hp-brand-tint)]"
-            style={{ aspectRatio: "16/9" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={topic.image}
-              alt={topic.title}
-              sizes="(min-width: 1024px) 620px, 100vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
-            />
-          </div>
-        </Link>
-      )}
-
-      <div className="pt-4">
+    <article className="hp-card group rounded-[var(--hp-r-md)] border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] p-5">
+      <div>
         {topic.category && <Eyebrow className="mb-2">{topic.category}</Eyebrow>}
 
         <h3 className="text-[20px] font-bold leading-[30px] text-[color:var(--hp-ink)]">
@@ -164,7 +143,7 @@ function TopicRow({ topic }: { topic: WithAccepted }) {
   return (
     <Link
       href={`/${topic.module}/${topic.slug}`}
-      className="hp-card group flex items-start justify-between gap-4 border-b border-[color:var(--hp-border)] py-3.5 transition-colors last:border-b-0 hover:bg-[color:var(--hp-bg)] focus-visible:outline-none"
+      className="hp-card group flex items-start justify-between gap-4 border-b border-[color:var(--hp-border)] py-3.5 ps-0 transition-[background-color,padding] duration-200 last:border-b-0 hover:bg-[color:var(--hp-bg)] hover:ps-2 focus-visible:outline-none"
     >
       <div className="min-w-0">
         {topic.category && (

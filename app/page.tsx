@@ -34,6 +34,8 @@ import { FamilyCommentsSection } from "@/features/home/components/sections/Famil
 import { MoreToExploreSection } from "@/features/home/components/sections/MoreToExploreSection";
 import { AuthorsSection } from "@/features/home/components/sections/AuthorsSection";
 import { AnnouncementBar } from "@/features/home/components/sections/AnnouncementBar";
+import { FamilyProfilesSection } from "@/features/home/components/sections/FamilyProfilesSection";
+import { PartnersSection } from "@/features/home/components/sections/PartnersSection";
 
 /**
  * Which module slug gates each section, so the admin panel keeps control.
@@ -52,7 +54,9 @@ type SectionKey =
   | "community"
   | "familyComments"
   | "moreToExplore"
-  | "authors";
+  | "authors"
+  | "familyProfiles"
+  | "partners";
 
 const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   magazine: "blog",
@@ -67,6 +71,8 @@ const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   familyComments: null, // sampled across every module
   moreToExplore: null,  // mixed-module rediscovery
   authors: null,        // people, not a content module
+  familyProfiles: null, // community members
+  partners: null,       // companies, admin-managed
 };
 
 /** Fallback ordering when a module has no explicit homeOrder. */
@@ -83,6 +89,8 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   familyComments: 10,
   moreToExplore: 11,
   authors: 12,
+  familyProfiles: 13,
+  partners: 14,
 };
 
 export default async function HomePage() {
@@ -159,6 +167,14 @@ export default async function HomePage() {
     {
       key: "authors",
       node: <AuthorsSection authors={data.authors ?? []} />,
+    },
+    {
+      key: "familyProfiles",
+      node: <FamilyProfilesSection profiles={data.familyProfiles ?? []} />,
+    },
+    {
+      key: "partners",
+      node: <PartnersSection partners={data.partners ?? []} />,
     },
   ];
 
