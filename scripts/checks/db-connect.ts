@@ -288,14 +288,34 @@ async function main() {
 
   if (v4.length === 0 && v6.length === 0) return report();
 
-  // 3 ─ TCP, per address family
+  // 2b ─ what the connector is ACTUALLY handed
   //
-  // This is the split that matters most. Node 18+ resolves with
-  // verbatim ordering, so if the host publishes AAAA records and the
-  // machine has an IPv6 address but no working IPv6 route, every
-  // connection attempt burns the full timeout on an unreachable
-  // address before anything else is tried. That surfaces as P1001 on a
-  // database that is perfectly healthy.
+  // Step 2 used resolve4/resolve6, which query the DNS server directly and
+  // therefore always see every published record. No connector works that
+  // way. Prisma, pg, and Node itself all go through getaddrinfo, which
+  // applies AI_ADDRCONFIG and omits AAAA entirely when the machine has no
+  // global IPv6 source address.
+  //
+  // Conflating the two produced a wrong diagnosis once already, so the
+  // distinction is now measured rather than assumed: only addresses that
+  // appear here can possibly participate in a connection attempt.
+  let lookupAddrs: { address: string; family: number }[] = [];
+  try {
+    lookupAddrs = await dns.lookup(parsed.host, { all: true });
+    const v4Count = lookupAddrs.filter((a) => a.family === 4).length;
+    const v6Count = lookupAddrs.filter((a) => a.family === 6).length;
+    pass(
+      "getaddrinfo",
+      `${v4Count} IPv4, ${v6Count} IPv6 offered to the connector` +
+        (v6.length > 0 && v6Count === 0 ? " (AAAA published but filtered out locally)" : "")
+    );
+  } catch (e: any) {
+    fail("getaddrinfo", e.code || String(e), "The OS resolver cannot resolve this host even though DNS can.");
+  }
+
+  const connectorGetsV6 = lookupAddrs.some((a) => a.family === 6);
+
+  // 3 ─ TCP, per address family
   step(3, "TCP reachability (port " + parsed.port + ")");
   let anyTcp = false;
   if (v4.length) {
@@ -318,11 +338,22 @@ async function main() {
     if (r.ok) {
       anyTcp = true;
       pass("IPv6", `connected in ${r.ms}ms`);
+    } else if (!connectorGetsV6 || r.error === "ENOENT" || r.error === "EAI_AGAIN") {
+      // ENOENT from a family:6 probe means getaddrinfo has no AAAA to give
+      // for this host on this machine. Nothing will ever attempt IPv6, so
+      // this is a non-finding — not a latent hazard, and not something a
+      // resolution-order setting can influence.
+      console.log(
+        `  \u00b7 IPv6  not offered by the OS resolver (${r.error}) \u2014 harmless; nothing attempts IPv6`
+      );
     } else {
+      // ENETUNREACH / EHOSTUNREACH / timeout are different: the address IS
+      // handed to the connector and then stalls, burning connect_timeout
+      // before IPv4 is tried. That genuinely surfaces as P1001.
       warn(
         "IPv6",
         `${r.error} after ${r.ms}ms`,
-        "IPv6 is advertised but unreachable from this machine. Node tries addresses in resolver order, so this can stall or fail connections even though IPv4 works. Workaround: set NODE_OPTIONS=--dns-result-order=ipv4first (already wired into `pnpm dev`), or disable the IPv6 stack on the adapter."
+        "IPv6 addresses are offered to the connector but unreachable, so connection attempts can stall on them before falling back to IPv4. `pnpm dev` already sets ipv4first; if this persists, disable IPv6 on the network adapter."
       );
     }
   }
@@ -369,19 +400,27 @@ async function main() {
     pass("select version()", `${Date.now() - started}ms`);
     console.log(`  \u00b7 ${String(rows[0]?.v || "").split(",")[0]}`);
 
-    // A generated client that predates the last migration is its own
-    // recurring failure mode here, and it reports as "Cannot read
-    // properties of undefined" rather than anything about Prisma.
-    const expectedModels = ["post", "user", "siteSetting", "partner", "timelineEvent"];
-    const missing = expectedModels.filter((m) => !(m in (client as any)) || !(client as any)[m]?.findMany);
-    if (missing.length) {
+    // A generated client that predates the last schema change is its own
+    // recurring failure mode here, and it surfaces as "Cannot read
+    // properties of undefined (reading 'findMany')" — a TypeError that
+    // never mentions Prisma at all. It has cost this repo three separate
+    // debugging sessions.
+    //
+    // Read the model list out of schema.prisma rather than hardcoding it,
+    // so this keeps working for models that do not exist yet.
+    const missing = staleModels(client);
+    if (missing === null) {
+      warn("generated client", "could not read prisma/schema.prisma to verify");
+    } else if (missing.length) {
       fail(
         "generated client is stale",
         `missing: ${missing.join(", ")}`,
-        "Run `pnpm prisma generate`. `pnpm dev` does this automatically now; a stale client usually means dev was started some other way."
+        "Run `pnpm prisma generate`, then restart the dev server.\n" +
+          "     If that fails on Windows with EPERM/EBUSY, a running `next dev` is holding\n" +
+          "     the query-engine DLL open — stop every Node process first (taskkill /F /IM node.exe)."
       );
     } else {
-      pass("generated client", `${expectedModels.length} models present`);
+      pass("generated client", "in sync with schema.prisma");
     }
 
     const [posts, users] = await Promise.all([client.post.count(), client.user.count()]);
@@ -394,6 +433,29 @@ async function main() {
   }
 
   report();
+}
+
+/**
+ * Model names declared in schema.prisma that the generated client does not
+ * expose. Returns null if the schema cannot be read.
+ *
+ * Parsing the schema instead of hardcoding a list means a model added
+ * tomorrow is covered without anyone remembering to update this file —
+ * which is precisely the maintenance step that fails in practice.
+ */
+function staleModels(client: unknown): string[] | null {
+  const schemaPath = path.resolve(process.cwd(), "prisma/schema.prisma");
+  if (!fs.existsSync(schemaPath)) return null;
+  const schema = fs.readFileSync(schemaPath, "utf8");
+
+  const declared = [...schema.matchAll(/^\s*model\s+([A-Za-z0-9_]+)\s*\{/gm)].map((m) => m[1]);
+  if (declared.length === 0) return null;
+
+  const bag = client as Record<string, { findMany?: unknown } | undefined>;
+  return declared
+    .map((name) => ({ name, key: name.charAt(0).toLowerCase() + name.slice(1) }))
+    .filter(({ key }) => typeof bag[key]?.findMany !== "function")
+    .map(({ name }) => name);
 }
 
 function prismaHint(code?: string): string {

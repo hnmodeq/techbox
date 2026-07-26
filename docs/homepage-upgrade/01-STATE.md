@@ -134,6 +134,24 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-26 (session 18b) — Doctor run on the owner's machine; my IPv6 theory was wrong
+
+**The real fault was the stale Prisma client, not the network.** Owner ran `pnpm db:doctor`. Every network layer passed: IPv4 187ms, SSLRequest 'S' 343ms, TLS 1.3 522ms, `select version()` 1519ms against PostgreSQL 17.10 with all 164 posts and 23 users. The only failure was `generated client is stale — missing: partner`, which is exactly the session-16 bug recurring. The P1001 storm was a *past* event in a log that also contained the stale-client error; the connection itself is healthy.
+
+**Correcting session 18's diagnosis.** I attributed P1001 to IPv6 misordering. On the owner's machine that is wrong, and the doctor's own output is what disproved it. Step 3 reported `IPv6 ENOENT` — but step 3 used `dns.resolve6()`, which queries the DNS server directly and always sees published AAAA records. No connector resolves that way. Prisma, `pg` and Node all use `getaddrinfo`, which applies `AI_ADDRCONFIG` and omits AAAA entirely when the machine has no global IPv6 source address.
+
+So `ENOENT` there means the OS resolver never offers IPv6 for that host at all — nothing can attempt it, and `ipv4first` is a **no-op** on that box. That is categorically different from this sandbox's `ENETUNREACH`, where AAAA *is* handed over and then stalls. Reporting both as the same warning turned a non-finding into a false lead.
+
+Fixed by measuring the distinction instead of inferring it: the doctor now runs `dns.lookup(host, {all:true})` as step 2b and prints what the connector is actually handed. `ENOENT`/no-IPv6-offered downgrades to a plain informational line ("harmless; nothing attempts IPv6"); only `ENETUNREACH`/timeout — where addresses are offered and stall — still warns. The `ipv4first` default in `instrumentation.ts` is kept (it is correct and harmless for the ENETUNREACH case) but its comment no longer overstates its reach.
+
+**Hardened the check that actually mattered.** The stale-client probe tested 5 hardcoded model names. A model added later would not be covered — the same maintenance step that fails in practice, and the reason this bug has now recurred three times. It now parses `model X {` out of `prisma/schema.prisma` and verifies every one against the generated client: **38 models instead of 5**. Verified it reports clean against a good client and correctly returns `['Partner']` when that model is masked.
+
+Added the Windows-specific remedy the owner will likely need: `prisma generate` fails with `EPERM`/`EBUSY` when a running `next dev` holds the query-engine DLL open, so the hint now says to stop all Node processes first.
+
+`typecheck` ✅ · `lint` ✅ · `test` ✅ 135 passing.
+
+**Owner's fix:** stop all Node processes, `pnpm prisma generate`, restart `pnpm dev`. Re-run `pnpm db:doctor` to confirm step 5 is clean.
+
 ### 2026-07-26 (session 18) — Owner's local dev: P1001, diagnosed and instrumented
 
 **The database was never down.** Owner's terminal filled with `P1001 Can't reach database server at ep-twilight-hall-atc6iest-pooler.c-9...:5432`. Connecting from this sandbox with the owner's exact `.env` succeeded in ~550ms — `PostgreSQL 17.10`, 164 posts, 23 users. So the fault is the network path from the owner's Windows machine, not Neon and not application code. Nothing was "fixed" in the query layer because nothing there was broken.
