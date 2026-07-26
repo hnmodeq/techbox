@@ -29,7 +29,17 @@
 
 ---
 
-## D1 · Colour identity → **blue + orange + red**
+## D1 · Colour identity → ~~blue + orange + red~~ → **REVERSED: the site's own tokens**
+
+> **Superseded 2026-07-26.** The owner reviewed the rendered result and rejected the palette: *"i don't like colors, let just use my own tokens."*
+>
+> `--hp-*` is now a thin **alias layer over the existing shadcn tokens** rather than a second palette. `--hp-brand → var(--primary)`, `--hp-ink → var(--foreground)`, `--hp-surface → var(--card)`, and so on. Retheming the site now retints the homepage automatically, and there is no parallel colour set to keep in sync.
+>
+> Consequences: the palette is achromatic, so hierarchy comes from weight, size and placement rather than hue — which is how Tom's Guide's own near-monochrome layout works anyway. `--hp-deal` is the single chromatic exception, aliased to `--destructive`, because a discount badge has to read as urgent. Radii now derive from the site `--radius` instead of hardcoded pixels.
+>
+> The original reasoning is kept below for the record.
+
+### Original decision (superseded)
 
 **Decision:** `#0F4C81` blue (structure) + `#E85D04` orange (action/commerce) + `#DC2626` red (urgency only).
 

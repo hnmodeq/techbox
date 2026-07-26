@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅ · D ✅ · E mostly ✅
-**Next action:** Phase F — §10 Family Comments, §11 More to Explore, §12 Authors
+**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅ · D ✅ · E mostly ✅ · F ✅
+**Next action:** Phase G — §0 Announcement, §13 Footer, delete dead row components, E2E. Then fix the owner's local env.
 
 ---
 
@@ -19,7 +19,7 @@
 | **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ✅ Done |
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ✅ Done |
 | **E** | Review enforcement + Section 5 | 🔄 E2/E5/E6 ✅ · E1/E3 pending (admin UI) · E7 gated |
-| **F** | Sections 10, 11, 12 | ⬜ Not started |
+| **F** | Sections 10, 11, 12 | ✅ Done |
 | **G** | Sections 0, 13, cleanup, E2E, Lighthouse | ⬜ Not started |
 
 **Legend:** ⬜ not started · 🔄 in progress · ⏸️ blocked (see Blockers) · ✅ done · ❌ failed/reverted
@@ -84,9 +84,9 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase F — Community & about
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| F1 | §10 Family Comments | ⬜ | `.../FamilyCommentsSection.tsx` | Needs `User.createdAt` (B3) |
-| F2 | §11 More to Explore | ⬜ | `.../MoreToExploreSection.tsx` | Hourly-seeded random |
-| F3 | §12 About + Authors | ⬜ | `.../AuthorsSection.tsx` | |
+| F1 | §10 Family Comments | ✅ | `.../FamilyCommentsSection.tsx` | Chrome-less SW testimonial, upright not italic, origin chip |
+| F2 | §11 More to Explore | ✅ | `.../MoreToExploreSection.tsx` | TG landscape hero w/ overlapping panel + 4-up row |
+| F3 | §12 About + Authors | ✅ | `.../AuthorsSection.tsx` | Manifesto panel + contributor carousel, 116→160px avatars |
 
 ### Phase G — Finish
 | ID | Task | Status | Files touched | Notes |
@@ -131,6 +131,16 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 10) — PHASE F + D1 REVERSED
+**Owner rejected the custom palette** after seeing it live: *"i don't like colors, let just use my own tokens."*
+
+- **`--hp-*` rewritten as an alias layer** over the existing shadcn tokens. `--hp-brand → var(--primary)`, `--hp-ink → var(--foreground)`, `--hp-surface → var(--card)`, radii derived from `--radius`. No second palette to maintain; retheming the site now retints the homepage for free. `05-DECISIONS.md` D1 marked superseded with the original reasoning kept.
+- **Caught what the swap would have broken.** Under shadcn, `--primary` is near-black in light mode but near-**white** in dark. Eight places hardcoded `text-white` on an accent fill — invisible text in light mode after the swap. Introduced `--hp-on-accent`/`--hp-on-brand` pairs and repointed every filled panel from `--hp-brand` to `--hp-brand-ink` (which resolves to a dark surface in dark mode, since a near-white filled panel would be blinding).
+- Swept every hardcoded colour out of the homepage components: stale navy `rgba(1,21,53,…)` scrims → `black/85`, `#0F4C81` play glyph → `currentColor`, `#fff` grid texture → `currentColor`, `#64748B` placeholders → `slate-500`. **Zero hex/rgba left** in sections or primitives.
+- Contrast checked in both themes: body 16.3/12.6, on-panel 12.6/9.6, accent-on-fill 12.6/11.0 — all pass. Muted text is 3.23 in light, but that is the pre-existing site `--muted-foreground`, not a regression from this change.
+- **F1/F2/F3 built** and verified against live data: 3 family comments (3 distinct authors), MTE hero + 4 cards spanning media/blog/forum/shop, 10 authors all with bios. 19 images, all dimensioned, 0 eager, 0 physical CSS props, 0 right-arrows, empty state 0 bytes.
+- **11 of 14 sections now live.** 120 tests passing.
 
 ### 2026-07-26 (session 9) — PHASE E (mostly) · verified against the live deployment
 **First actual sighting of the rendered homepage** — owner pointed me at https://hnmodeq-techbox.vercel.app/. Fetched it and confirmed all 8 shipped sections render server-side with real data: 32 Persian prices, 16 discount badges, 5 tool tiles, 23 images. The ScrollRail loop fix is live and the page is stable.

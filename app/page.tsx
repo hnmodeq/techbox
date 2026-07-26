@@ -30,6 +30,9 @@ import { FinderSection } from "@/features/home/components/sections/FinderSection
 import { DealsSection } from "@/features/home/components/sections/DealsSection";
 import { ToolsSection } from "@/features/home/components/sections/ToolsSection";
 import { TopPicksSection } from "@/features/home/components/sections/TopPicksSection";
+import { FamilyCommentsSection } from "@/features/home/components/sections/FamilyCommentsSection";
+import { MoreToExploreSection } from "@/features/home/components/sections/MoreToExploreSection";
+import { AuthorsSection } from "@/features/home/components/sections/AuthorsSection";
 
 /**
  * Which module slug gates each section, so the admin panel keeps control.
@@ -45,7 +48,10 @@ type SectionKey =
   | "timeline"
   | "deals"
   | "tools"
-  | "community";
+  | "community"
+  | "familyComments"
+  | "moreToExplore"
+  | "authors";
 
 const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   magazine: "blog",
@@ -57,6 +63,9 @@ const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   deals: "shop",
   tools: "tools",
   community: "forum",
+  familyComments: null, // sampled across every module
+  moreToExplore: null,  // mixed-module rediscovery
+  authors: null,        // people, not a content module
 };
 
 /** Fallback ordering when a module has no explicit homeOrder. */
@@ -70,6 +79,9 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   deals: 7,
   tools: 8,
   community: 9,
+  familyComments: 10,
+  moreToExplore: 11,
+  authors: 12,
 };
 
 export default async function HomePage() {
@@ -134,6 +146,18 @@ export default async function HomePage() {
     {
       key: "community",
       node: <CommunitySection topics={data.modules.forum ?? []} {...textFor("community")} />,
+    },
+    {
+      key: "familyComments",
+      node: <FamilyCommentsSection comments={data.familyComments ?? []} />,
+    },
+    {
+      key: "moreToExplore",
+      node: <MoreToExploreSection data={data.moreToExplore} />,
+    },
+    {
+      key: "authors",
+      node: <AuthorsSection authors={data.authors ?? []} />,
     },
   ];
 

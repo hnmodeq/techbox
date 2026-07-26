@@ -52,7 +52,7 @@ export function NewsletterCard() {
   }
 
   return (
-    <aside className="rounded-[var(--hp-r-lg)] bg-[color:var(--hp-brand)] p-7 text-[color:var(--hp-on-brand)] lg:sticky lg:top-24 dark:border dark:border-white/[0.08]">
+    <aside className="rounded-[var(--hp-r-lg)] bg-[color:var(--hp-brand-ink)] p-7 text-[color:var(--hp-on-brand)] lg:sticky lg:top-24 dark:border dark:border-white/[0.08]">
       <h3 className="text-[22px] font-semibold leading-[30px]">
         خبرنامه تکباکس
       </h3>
@@ -85,13 +85,13 @@ export function NewsletterCard() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="h-9 min-w-0 flex-1 bg-transparent px-2 text-[15px] text-slate-800 placeholder:text-[#64748B] focus:outline-none"
+              className="h-9 min-w-0 flex-1 bg-transparent px-2 text-[15px] text-slate-800 placeholder:text-slate-500 focus:outline-none"
             />
             <button
               type="submit"
               disabled={status === "loading"}
               aria-label="عضویت در خبرنامه"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[color:var(--hp-accent)] text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[color:var(--hp-accent)] text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {status === "loading" ? (
                 <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none" />

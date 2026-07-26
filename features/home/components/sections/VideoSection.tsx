@@ -86,12 +86,12 @@ function VideoCard({ item }: { item: ContentItem }) {
       {/* Scrim so the title stays legible over any poster frame. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-[rgba(1,21,53,0.88)] via-[rgba(1,21,53,0.15)] to-transparent"
+        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent"
       />
 
       {/* Duration pill — hidden when the DB has no duration, never faked. */}
       {item.videoDuration && (
-        <span className="absolute top-2 end-2 rounded-[4px] bg-[rgba(1,21,53,0.75)] px-1.5 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
+        <span className="absolute top-2 end-2 rounded-[4px] bg-black/70 px-1.5 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm">
           <Num tabular>{item.videoDuration}</Num>
         </span>
       )}
@@ -99,10 +99,10 @@ function VideoCard({ item }: { item: ContentItem }) {
       {/* Play affordance appears on hover/focus. */}
       <span
         aria-hidden="true"
-        className="absolute inset-0 m-auto flex h-11 w-11 items-center justify-center rounded-full bg-white/90 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+        className="absolute inset-0 m-auto flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-[color:var(--hp-brand-ink)] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
       >
         <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
-          <path d="M15 7.27a2 2 0 0 1 0 3.46L3 17.66A2 2 0 0 1 0 15.93V2.07A2 2 0 0 1 3 .34l12 6.93Z" fill="#0F4C81" />
+          <path d="M15 7.27a2 2 0 0 1 0 3.46L3 17.66A2 2 0 0 1 0 15.93V2.07A2 2 0 0 1 3 .34l12 6.93Z" fill="currentColor" />
         </svg>
       </span>
 

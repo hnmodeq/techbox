@@ -90,7 +90,7 @@ function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
       className="hp-card group relative flex h-full flex-col items-center rounded-[var(--hp-r-md)] bg-transparent px-4 py-8 text-center transition-[background-color,box-shadow] duration-200 hover:bg-[color:var(--hp-surface)] hover:shadow-[var(--hp-shadow-card)] focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none dark:hover:bg-[color:var(--hp-surface-2)]"
     >
       {badge && (
-        <span className="absolute top-2 end-2 rounded-[4px] bg-[color:var(--hp-accent)] px-1.5 py-0.5 text-[11px] font-bold text-white">
+        <span className="absolute top-2 end-2 rounded-[4px] bg-[color:var(--hp-accent)] px-1.5 py-0.5 text-[11px] font-bold text-[color:var(--hp-on-accent)]">
           {badge}
         </span>
       )}

@@ -100,7 +100,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
             />
           )}
-          <span className="absolute top-2 start-2 rounded-[4px] bg-[color:var(--hp-brand)] px-2 py-0.5 text-[12px] font-bold text-white">
+          <span className="absolute top-2 start-2 rounded-[4px] bg-[color:var(--hp-brand)] px-2 py-0.5 text-[12px] font-bold text-[color:var(--hp-on-brand)]">
             <Num>{rank}</Num>
           </span>
         </div>
@@ -214,7 +214,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
 
         <Link
           href={`/shop/${p.slug}`}
-          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-4 py-2 text-[13px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
+          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-4 py-2 text-[13px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
         >
           خرید از فروشگاه <span aria-hidden="true">←</span>
         </Link>

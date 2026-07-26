@@ -57,7 +57,7 @@ export function InsetBand({
   const toneCls =
     tone === "brand"
       ? // Brand-filled panels need a hairline in dark mode or the edge vanishes
-        "bg-[color:var(--hp-brand)] text-[color:var(--hp-on-brand)] dark:border dark:border-white/[0.08]"
+        "bg-[color:var(--hp-brand-ink)] text-[color:var(--hp-on-brand)] dark:border dark:border-white/[0.08]"
       : tone === "ink"
         ? "bg-[color:var(--hp-brand-ink)] text-[color:var(--hp-on-brand)]"
         : "bg-[color:var(--hp-inset)]";
