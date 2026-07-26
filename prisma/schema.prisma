@@ -31,6 +31,7 @@ model User {
   password String
   emailVerified         DateTime?
   sessionsInvalidatedAt DateTime?
+  createdAt             DateTime  @default(now())
 
   /// Verification badge type: "content" | "org" | "user" | null (none)
   verifiedType  String?
@@ -55,6 +56,7 @@ model User {
 
   @@index([role, status], name: "user_role_status_idx")
   @@index([status], name: "user_status_idx")
+  @@index([createdAt], name: "user_created_idx")
 }
 
 /// IP bans — prevents registration and login from banned IPs.
@@ -135,6 +137,12 @@ model Post {
   deletedAt     DateTime?
   deletedBy     String?
 
+  /// Product reviews: a review post MUST point at a real shop product.
+  /// Nullable during backfill; promoted to required once every row is linked.
+  reviewedProductId String?
+  reviewedProduct   Post?  @relation("ProductReviews", fields: [reviewedProductId], references: [id], onDelete: SetNull)
+  productReviews    Post[] @relation("ProductReviews")
+
   author   User?     @relation(fields: [authorId], references: [id])
   comments Comment[]
   ratings  Rating[]
@@ -151,6 +159,7 @@ model Post {
   @@index([module, published, likes], name: "post_module_published_likes_idx")
   @@index([module, published, rating], name: "post_module_published_rating_idx")
   @@index([date], name: "post_date_idx")
+  @@index([reviewedProductId], name: "post_reviewed_product_idx")
 }
 
 
