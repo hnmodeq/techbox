@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ · B ✅ except B6 (needs a browser) and B7
-**Next action:** B7 (extend lib/home-server.ts) → then Phase C (first sections)
+**Current phase:** A ✅ · B ✅ (except B6 — needs a browser)
+**Next action:** Phase C — build sections §1 Magazine, §2 Video, §3 Insights, §6 Timeline, §9 Community, then wire app/page.tsx
 
 ---
 
@@ -15,7 +15,7 @@
 | Phase | Description | Status |
 |---|---|---|
 | **A** | Foundations: tokens, formatters, icons, primitives | ✅ Done |
-| **B** | DB audit, migrations 1+3, floating sidebar | 🔄 In progress (B1–B4 ✅, B5–B7 pending) |
+| **B** | DB audit, migrations 1+3, floating sidebar | ✅ Done (B6 deferred to CI — no browser in sandbox) |
 | **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ⬜ Not started |
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ⬜ Not started |
 | **E** | Review enforcement + Section 5 | ⬜ Not started |
@@ -49,7 +49,7 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 | B4b | **Content pass** (owner-authorised) | ✅ | `scripts/content/homepage-content-pass.ts` | Reviews/bios/discounts/comments/timeline made real |
 | B5 | **Floating sidebar** | ✅ | `components/ui/sidebar.tsx`, `techbox-app-sidebar.tsx`, `LayoutShell.tsx` | Additive `overlay` prop — admin sidebar untouched (defaults false) |
 | B6 | 8-route regression pass @1280/1440 | ⏸️ | — | **Cannot run locally** — Playwright needs libnspr4.so, unavailable in sandbox. Must run in CI or by owner |
-| B7 | Extend `lib/home-server.ts` data layer | ⬜ | `lib/home-server.ts` | Bump cache key to `home-data-v6`, revalidate 3600 |
+| B7 | Extend data layer | ✅ | `lib/home-sections.ts` (new), `lib/home-server.ts`, `features/home/lib/home-types.ts` (new), `home-data.tsx` | Cache `home-data-v6`, revalidate 3600. All 6 slices verified against live DB |
 
 ### Phase C — First sections
 | ID | Task | Status | Files touched | Notes |
@@ -131,6 +131,16 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 4) — Implementation agent · B5 + B7
+- **B5 floating sidebar.** Added an **additive `overlay` prop** to the shared `Sidebar` primitive (defaults `false`), so the admin sidebar — the only other consumer — is untouched. When on: `sidebar-gap` collapses to `w-0`, panel goes `z-50`, dismiss scrim `z-40` (matching `design/z-index.ts`), click-scrim and Escape both close. Escape is bound only while open+overlaying so it doesn't swallow Escape for modals. Sidebar now starts **closed on `/` only**.
+- **B7 data layer.** New `lib/home-sections.ts` with all six section queries + `seededIndex()`. New `features/home/lib/home-types.ts`. `HomeData` extended and the client merge in `home-data.tsx` updated to preserve the new slices. Cache key → `home-data-v6`, revalidate 24h → 1h. All new blocks are **sequential and individually try/caught** — one failing section hides itself, it can't take down the page.
+- **Verified every slice against the live DB.** insights 2 (0 overlap with sidebar ✓), topPicks 3 (all موجود, real prices), timeline 20, familyComments 3 (3 unique authors), moreToExplore hero+4, authors 10 (10 with bios).
+- **Two bugs caught by running it**, not by typecheck:
+  1. `toFa()` applies Intl thousands grouping, so "عضو از ۱۴۰۵" rendered as **"۱٬۴۰۵"**. Added a `faYear()` helper that maps digits without grouping.
+  2. Timeline `take: 12` truncated the 20-event history **at 1999**, silently dropping AWS, Docker, Kubernetes and everything modern. Raised to 24.
+- ⚠️ **Harness limit discovered:** `unstable_cache` throws `Invariant: incrementalCache missing` outside a Next request context, so `getHomeData()` cannot be called from a plain `tsx` script. Exported `getHomeDataUncached` for test harnesses; verification scripts call the section functions directly.
+- `tsc --noEmit` ✅ · `lint` ✅ · `test` ✅ 87 passing. **`pnpm build` deliberately not run — it times out in this sandbox (owner instruction).**
 
 ### 2026-07-26 (session 3) — Implementation agent · PHASE A COMPLETE
 - **A1 tokens**: appended a 222-line `--hp-*` block to `design/globals.css`. Nothing existing renamed. Full `:root` + `.dark` pairs, `@theme inline` mappings so `bg-hp-surface` / `text-hp-ink` / `rounded-hp-md` compile.
