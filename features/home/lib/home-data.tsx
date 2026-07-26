@@ -2,11 +2,35 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ContentItem, ModuleSlug } from "@/lib/content";
+import type {
+  TopPickCard,
+  TimelineCard,
+  FamilyComment,
+  AuthorCard,
+  MoreToExplore,
+} from "./home-types";
 
 export type HomeData = {
   modules: Partial<Record<ModuleSlug, ContentItem[]>>;
   ticker: ContentItem[];
   generatedAt?: string;
+
+  // ── Homepage upgrade sections ──
+  // All optional: the layout fetch (getLayoutHomeData) only populates
+  // `modules.news` + `ticker`, so these are absent there by design. Every
+  // consumer must treat an empty slice as "hide the section".
+  /** §3 — 2 news posts ranked by engagement, deduped against the sidebar. */
+  insights?: ContentItem[];
+  /** §5 — up to 3 reviews joined to their shop product. */
+  topPicks?: TopPickCard[];
+  /** §6 — up to 12 IT milestones. */
+  timeline?: TimelineCard[];
+  /** §10 — 3 sampled comments from across all modules. */
+  familyComments?: FamilyComment[];
+  /** §11 — random hero + oldest-per-module cards. */
+  moreToExplore?: MoreToExplore;
+  /** §12 — contributors with at least one published post. */
+  authors?: AuthorCard[];
 };
 
 const emptyData: HomeData = { modules: {}, ticker: [] };
@@ -62,9 +86,19 @@ export function HomeDataProvider({
       };
 
       setData((prev) => ({
+        ...prev,
         modules: mergeModules(body.modules || {}, prev.modules as Record<string, any[]>),
         ticker: body.ticker || prev.ticker,
         generatedAt: body.generatedAt,
+        // Upgrade slices: keep the server-rendered value unless the API
+        // actually supplies a replacement. Spreading `prev` above is not
+        // enough — an explicit undefined in the body would clobber it.
+        insights: body.insights ?? prev.insights,
+        topPicks: body.topPicks ?? prev.topPicks,
+        timeline: body.timeline ?? prev.timeline,
+        familyComments: body.familyComments ?? prev.familyComments,
+        moreToExplore: body.moreToExplore ?? prev.moreToExplore,
+        authors: body.authors ?? prev.authors,
       }));
     };
 

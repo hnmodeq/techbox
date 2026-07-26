@@ -4,13 +4,22 @@ import type { HomeData } from "@/features/home/lib/home-data";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getEnabledModules } from "@/lib/module-config";
+import {
+  getInsights,
+  getTopPicks,
+  getTimeline,
+  getFamilyComments,
+  getMoreToExplore,
+  getAuthors,
+} from "@/lib/home-sections";
+import { getSetting } from "@/lib/settings";
 
 const moduleTakes: Record<string, number> = {
-  blog: 5,
-  media: 7,
-  shop: 5,
-  forum: 6,
-  review: 5,
+  blog: 5,   // §1 lead + 4-item list (Spiceworks Articles)
+  media: 10, // §2 video rail
+  shop: 8,   // §7 deals grid (4-up x 2 rows)
+  forum: 6,  // §9 featured + 5-row list
+  review: 3, // §5 top picks
   download: 8,
   news: 15,
 };
@@ -62,6 +71,9 @@ const cardSelect = {
   discountPercent: true,
   discountEndsAt: true,
   availability: true,
+  warranty: true,
+  specs: true,
+  reviewedProductId: true,
   authorName: true,
   author: { select: { name: true, username: true, role: true, roleFa: true, job: true, avatar: true, verifiedType: true, verifiedLabel: true } },
 } as const;
@@ -248,7 +260,9 @@ export async function getLayoutHomeData(): Promise<HomeData> {
   }
 }
 
-async function getHomeDataUncached(): Promise<HomeData> {
+/** Exported for scripts/tests: unstable_cache needs a Next request context,
+ *  so verification harnesses call this directly. */
+export async function getHomeDataUncached(): Promise<HomeData> {
   // Get enabled modules from DB config
   const enabledModules = await getEnabledModules();
 
@@ -280,17 +294,86 @@ async function getHomeDataUncached(): Promise<HomeData> {
     tickerPosts = [];
   }
 
+  // ── Homepage upgrade sections ───────────────────────────────────────
+  // Sequential for the same reason as the module loop above: parallelising
+  // these would put ~12 more concurrent queries on the Neon pool and
+  // reproduce the P2024 exhaustion this file was already fixed for.
+  //
+  // Every block is individually try/caught. One failing section must
+  // degrade to "section hidden", never take down the whole homepage.
+
+  const sidebarNewsSlugs = (modules.news ?? []).slice(0, 5).map((n: any) => n.slug);
+
+  let insights: any[] = [];
+  try {
+    insights = await getInsights(sidebarNewsSlugs, normalizeCard, cardSelect);
+  } catch (e) {
+    console.error("[home-data] insights failed:", e);
+  }
+
+  let topPicks: any[] = [];
+  try {
+    topPicks = await getTopPicks(normalizeCard, cardSelect);
+  } catch (e) {
+    console.error("[home-data] topPicks failed:", e);
+  }
+
+  let timeline: any[] = [];
+  try {
+    timeline = await getTimeline();
+  } catch (e) {
+    console.error("[home-data] timeline failed:", e);
+  }
+
+  let familyComments: any[] = [];
+  try {
+    const raw = await getSetting("home.familyComments.blocklist");
+    let blocklist: string[] = [];
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) blocklist = parsed.filter((x) => typeof x === "string");
+      } catch {
+        // Malformed setting: ignore the blocklist rather than hide the section.
+      }
+    }
+    familyComments = await getFamilyComments(blocklist);
+  } catch (e) {
+    console.error("[home-data] familyComments failed:", e);
+  }
+
+  let moreToExplore: any = { hero: null, cards: [] };
+  try {
+    moreToExplore = await getMoreToExplore(normalizeCard, cardSelect);
+  } catch (e) {
+    console.error("[home-data] moreToExplore failed:", e);
+  }
+
+  let authors: any[] = [];
+  try {
+    authors = await getAuthors();
+  } catch (e) {
+    console.error("[home-data] authors failed:", e);
+  }
+
   return {
     modules: modules as HomeData["modules"],
     ticker: tickerPosts.map(normalizeCard),
     generatedAt: new Date().toISOString(),
+    insights,
+    topPicks,
+    timeline,
+    familyComments,
+    moreToExplore,
+    authors,
   };
 }
 
-// Cached for 1 day so the layout can SSR real homepage data on every request
-// without hitting the database on each navigation (kills the loading flash).
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v5"], {
-  revalidate: 86400,
+// Cache key bumped v5 -> v6: the payload shape changed.
+// Window shortened 24h -> 1h so the hourly-seeded random slots in §10 and
+// §11 actually rotate; seededIndex() is keyed to the same hour boundary.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v6"], {
+  revalidate: 3600,
   tags: ["home-data"],
 });
 
