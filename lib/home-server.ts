@@ -356,6 +356,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
       "home.familyComments.blocklist",
       "home.finder.chips",
       "home.tools.featured",
+      "home.announcement",
     ]);
   } catch (e) {
     console.error("[home-data] settings failed:", e);
@@ -375,6 +376,31 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     .filter((c) => c && typeof c.labelFa === "string" && typeof c.href === "string");
   const toolsFeatured = parseJsonArray(homeSettings["home.tools.featured"])
     .filter((x) => typeof x === "string");
+
+  // §0 Announcement. Absent or malformed setting = disabled, which is the
+  // intended default (D7): the bar exists for campaigns, not permanently.
+  let announcement: any = null;
+  try {
+    const raw = homeSettings["home.announcement"];
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object" && parsed.enabled === true) {
+        announcement = {
+          enabled: true,
+          version: Number(parsed.version) || 1,
+          textFa: String(parsed.textFa ?? ""),
+          boldLeadFa: parsed.boldLeadFa ? String(parsed.boldLeadFa) : undefined,
+          ctaLabelFa: parsed.ctaLabelFa ? String(parsed.ctaLabelFa) : undefined,
+          href: parsed.href ? String(parsed.href) : undefined,
+          startsAt: parsed.startsAt ?? null,
+          endsAt: parsed.endsAt ?? null,
+          tone: ["brand", "accent", "deal"].includes(parsed.tone) ? parsed.tone : "brand",
+        };
+      }
+    }
+  } catch {
+    announcement = null;
+  }
 
   let familyComments: any[] = [];
   try {
@@ -419,6 +445,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     authors,
     finderChips,
     toolsFeatured,
+    announcement,
   };
 }
 

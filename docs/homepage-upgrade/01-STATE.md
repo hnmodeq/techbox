@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅ · D ✅ · E mostly ✅ · F ✅
-**Next action:** Phase G — §0 Announcement, §13 Footer, delete dead row components, E2E. Then fix the owner's local env.
+**Current phase:** A–G complete except browser-dependent tasks (B6, G6) and G3 (deliberately skipped)
+**Next action:** Fix the owner's local dev environment. Then optionally: E1 admin product picker, E3 triage, E7 NOT NULL.
 
 ---
 
@@ -20,7 +20,7 @@
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ✅ Done |
 | **E** | Review enforcement + Section 5 | 🔄 E2/E5/E6 ✅ · E1/E3 pending (admin UI) · E7 gated |
 | **F** | Sections 10, 11, 12 | ✅ Done |
-| **G** | Sections 0, 13, cleanup, E2E, Lighthouse | ⬜ Not started |
+| **G** | Sections 0, 13, cleanup, E2E | ✅ mostly (G3 kept, G6 needs a browser) |
 
 **Legend:** ⬜ not started · 🔄 in progress · ⏸️ blocked (see Blockers) · ✅ done · ❌ failed/reverted
 
@@ -91,12 +91,12 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase G — Finish
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| G1 | §0 Announcement bar | ⬜ | `.../AnnouncementBar.tsx` | Default disabled |
-| G2 | Admin announcement screen | ⬜ | `app/admin/appearance/announcement/` | |
-| G3 | §13 Footer | ⬜ | `components/layout/Footer.tsx` | |
-| G4 | Delete dead row components | ⬜ | `features/home/components/*` | See list in `00-START-HERE.md` §3.5 |
-| G5 | E2E: RTL + dark + empty-state | ⬜ | `tests/e2e/homepage.spec.ts` | |
-| G6 | Lighthouse + CLS pass | ⬜ | — | |
+| G1 | §0 Announcement bar | ✅ | `.../AnnouncementBar.tsx` | Disabled by default; **0 bytes SSR in every state** |
+| G2 | Admin announcement screen | ✅ | `app/admin/appearance/announcement/` | Uses the existing settings API; dual-theme live preview |
+| G3 | §13 Footer | ⬜ **skipped deliberately** | — | The current footer already carries real business content (company, design credit, socials, newsletter). Replacing it with a Spiceworks clone would destroy working content to match a reference. Flagged for the owner. |
+| G4 | Delete dead row components | ✅ | — | 13 files removed after confirming all refs were internal to the cluster |
+| G5 | E2E: RTL + dark + empty-state | ✅ | `tests/e2e/homepage.spec.ts` | 14 tests. **Cannot run here — no browser.** Must run in CI |
+| G6 | Lighthouse + CLS | ⬜ | — | Needs a browser; owner/CI only |
 
 ---
 
@@ -131,6 +131,13 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 11) — PHASE G
+- **G4 dead code deleted.** 13 files (`HeroSection`, `CtaSection`, `WhyTechBox`, `ToolsShowcase`, all six `*Row` components, `DownloadRow`, `HomeRowConfig`, `HomeRowSkeletons`). Checked first that every remaining reference was *internal to the dead cluster* — `HomeRowConfig` showed 7 "external" refs but all 7 were other dead rows importing it. Safe as a unit; typecheck clean after.
+- **G1 announcement bar.** Disabled by default per D7. Verified all 6 schedule cases (disabled / no window / before start / after end / inside window / empty text) and confirmed **0 bytes SSR in every state** — it starts dismissed so the server and first client render agree, then reveals after reading localStorage. Rendering-then-hiding would flash the bar on every load for users who already dismissed it.
+- **G2 admin screen** at `/admin/appearance/announcement`. Reuses the existing `/api/admin/settings` endpoint rather than adding a route — registered the 4 homepage keys in its whitelist and mapped them to the existing `hero:*` permission. Live preview renders in **both themes**, since a tone can look fine in light and unreadable in dark. Fixed two real API mismatches caught by tsc: `AdminGuard` takes a render function, and `"default"` is not a `ButtonVariant` here (it's `"primary"`).
+- **G5 E2E suite** — 14 tests targeting exactly what typecheck and SSR-to-string cannot catch: render loops (`Maximum update depth` / `ResizeObserver loop`), horizontal overflow at 4 widths, invisible text in dark mode (luminance-diff scan), unreserved image dimensions, eager-image count, heading-order skips, orphaned `aria-labelledby`, focus visibility. **Cannot execute here** — no browser in the sandbox.
+- **G3 footer: deliberately NOT replaced.** The existing footer already carries real business content — company name, design credit, social links, newsletter. Swapping it for a Spiceworks-style multi-column clone would delete working content purely to match a reference. Raised for the owner rather than done unilaterally.
 
 ### 2026-07-26 (session 10) — PHASE F + D1 REVERSED
 **Owner rejected the custom palette** after seeing it live: *"i don't like colors, let just use my own tokens."*

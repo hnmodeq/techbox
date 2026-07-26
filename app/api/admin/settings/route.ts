@@ -25,6 +25,12 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "modules.custom_colors": "{}",
   "modules.titles": "{}",
   "hero.visible": "true",
+  // Homepage upgrade (docs/homepage-upgrade). All optional; absent or
+  // malformed values degrade to "feature off" rather than breaking a section.
+  "home.announcement": '{"enabled":false,"version":1,"textFa":"","tone":"brand"}',
+  "home.finder.chips": "[]",
+  "home.tools.featured": "[]",
+  "home.familyComments.blocklist": "[]",
   "auth.require_email_verification": "false",
   "email.provider": "resend",
   "email.nodemailer_host": "smtp.gmail.com",
@@ -59,6 +65,7 @@ function settingPermission(key: string, access: "view" | "edit") {
   if (key.startsWith("terms.")) return `terms:${access}`;
   if (key.startsWith("modules.")) return `module:${access}`;
   if (key.startsWith("hero.")) return `hero:${access}`;
+  if (key.startsWith("home.")) return `hero:${access}`;
   return `settings:*:${access}`;
 }
 

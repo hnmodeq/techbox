@@ -35,6 +35,18 @@ export type HomeData = {
   finderChips?: Array<{ labelFa: string; href: string }>;
   /** §8 — admin-configured tool order/allow-list (SiteSetting). */
   toolsFeatured?: string[];
+  /** §0 — campaign banner; null when disabled or outside its window. */
+  announcement?: {
+    enabled: boolean;
+    version: number;
+    textFa: string;
+    boldLeadFa?: string;
+    ctaLabelFa?: string;
+    href?: string;
+    startsAt?: string | null;
+    endsAt?: string | null;
+    tone?: "brand" | "accent" | "deal";
+  } | null;
 };
 
 const emptyData: HomeData = { modules: {}, ticker: [] };
@@ -105,6 +117,7 @@ export function HomeDataProvider({
         authors: body.authors ?? prev.authors,
         finderChips: body.finderChips ?? prev.finderChips,
         toolsFeatured: body.toolsFeatured ?? prev.toolsFeatured,
+        announcement: body.announcement ?? prev.announcement,
       }));
     };
 
