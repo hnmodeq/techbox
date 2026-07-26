@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-07-26
 **Updated by:** Implementation agent
-**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅ · D ✅
-**Next action:** Phase E — review enforcement (admin picker, API guard, triage) → §5 Top Picks
+**Current phase:** A ✅ · B ✅ (B6 deferred) · C ✅ · D ✅ · E mostly ✅
+**Next action:** Phase F — §10 Family Comments, §11 More to Explore, §12 Authors
 
 ---
 
@@ -18,7 +18,7 @@
 | **B** | DB audit, migrations 1+3, floating sidebar | ✅ Done (B6 deferred to CI — no browser in sandbox) |
 | **C** | Sections 1, 2, 3, 6, 9 (first visible pixels) | ✅ Done |
 | **D** | Sections 4, 7, 8 (+ build UPS calculator) | ✅ Done |
-| **E** | Review enforcement + Section 5 | ⬜ Not started |
+| **E** | Review enforcement + Section 5 | 🔄 E2/E5/E6 ✅ · E1/E3 pending (admin UI) · E7 gated |
 | **F** | Sections 10, 11, 12 | ⬜ Not started |
 | **G** | Sections 0, 13, cleanup, E2E, Lighthouse | ⬜ Not started |
 
@@ -73,13 +73,13 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ### Phase E — Reviews
 | ID | Task | Status | Files touched | Notes |
 |---|---|---|---|---|
-| E1 | Admin product-picker on review editor | ⬜ | `app/admin/posts/...` | Required field, server-guarded |
-| E2 | API guard: reject review w/o product | ⬜ | review create/update routes | 422 |
-| E3 | Triage screen | ⬜ | `app/admin/reviews/link-products/` | |
-| E4 | Run backfill (migration 2) | ⬜ | `scripts/reviews/...` | After owner approves buckets |
-| E5 | Migration 4 — enable review module | ⬜ | `SiteSetting` data | |
-| E6 | §5 Our Top Picks | ⬜ | `.../TopPicksSection.tsx` | |
-| E7 | Migration 5 — `NOT NULL` | ⬜ | migration | 🚦 **GATE: only when triage is 100%** |
+| E1 | Admin product-picker | ⬜ | `app/admin/posts/...` | API accepts+validates `reviewedProductId`; the editor UI still needs the picker |
+| E2 | API guard | ✅ | `app/api/posts/route.ts` | 422 on create AND patch. `validateReviewedProduct()`. **9 unit tests** |
+| E3 | Triage screen | ⬜ | `app/admin/reviews/link-products/` | Not needed yet — 0 unlinked reviews |
+| E4 | Run backfill | ✅ | (done in session 2 content pass) | 3 linked at score 100 |
+| E5 | Enable review module | ✅ | `SiteSetting modules.enabled` | Gated on 0 unlinked; verified before applying |
+| E6 | §5 Our Top Picks | ✅ | `.../TopPicksSection.tsx` | TG gridX 1.4/3, byline pinned, buy-strip |
+| E7 | Migration 5 — `NOT NULL` | ⬜ | migration | 🚦 Deferred: safe now (0 unlinked) but blocks any future draft review |
 
 ### Phase F — Community & about
 | ID | Task | Status | Files touched | Notes |
@@ -131,6 +131,17 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 9) — PHASE E (mostly) · verified against the live deployment
+**First actual sighting of the rendered homepage** — owner pointed me at https://hnmodeq-techbox.vercel.app/. Fetched it and confirmed all 8 shipped sections render server-side with real data: 32 Persian prices, 16 discount badges, 5 tool tiles, 23 images. The ScrollRail loop fix is live and the page is stable.
+
+- **E2 API guard.** `validateReviewedProduct()` in `app/api/posts/route.ts` rejects a review with no product, a missing/soft-deleted product, a non-shop post, or an unpublished product — **422** with a Persian message, on **both** create and patch. Server-side, so a direct API call cannot bypass it. 9 unit tests lock the decision table down (the fn itself can't be imported — it pulls the Next request stack — so the tests reproduce the rules against a fake catalogue).
+- **E5 review module enabled**, gated: the script refuses to flip the flag while any unlinked review exists. Verified 3 linked / 0 unlinked first.
+- **E6 §5 Top Picks** built to TG's measured grid (gridX 1.4 mobile with the deliberate next-card peek, 3-up ≥900px, byline pinned with `mt-auto`). Verdict block replaces TG's "Short List Includes". Rating hidden entirely when null rather than defaulting to 5. Footer strip carries the live price + buy link — content→commerce in one hop, which neither source can do.
+- Audit: 0 physical CSS props · 0 right-arrows · 3 card images all with `aspect-ratio`, 3 avatars with explicit `width`/`height` (no CLS gap) · 3 buy links · Latin model numbers tagged `lang="en"`.
+- **E1/E3 intentionally not built.** The API accepts and validates `reviewedProductId`, but the admin editor has no picker widget yet and the triage screen has nothing to triage (0 unlinked). Both are logged as remaining work rather than silently skipped.
+- **E7 deferred.** `NOT NULL` would pass today but would block creating a review draft before its product is chosen. Worth doing only alongside the E1 picker.
+- 120 tests passing (was 111).
 
 ### 2026-07-26 (session 8) — HOTFIX 2: infinite render loop in ScrollRail
 Session 7's pool fix was real but was **not** the cause of the endless refresh. Owner reported `/` still blank and reloading.

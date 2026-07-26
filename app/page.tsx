@@ -29,6 +29,7 @@ import { CommunitySection } from "@/features/home/components/sections/CommunityS
 import { FinderSection } from "@/features/home/components/sections/FinderSection";
 import { DealsSection } from "@/features/home/components/sections/DealsSection";
 import { ToolsSection } from "@/features/home/components/sections/ToolsSection";
+import { TopPicksSection } from "@/features/home/components/sections/TopPicksSection";
 
 /**
  * Which module slug gates each section, so the admin panel keeps control.
@@ -40,6 +41,7 @@ type SectionKey =
   | "video"
   | "insights"
   | "finder"
+  | "topPicks"
   | "timeline"
   | "deals"
   | "tools"
@@ -50,6 +52,7 @@ const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   video: "media",
   insights: null, // news-backed, but has no dedicated home row in the config
   finder: null,   // search, not a content module
+  topPicks: "review",
   timeline: "timeline",
   deals: "shop",
   tools: "tools",
@@ -62,6 +65,7 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   video: 2,
   insights: 3,
   finder: 4,
+  topPicks: 5,
   timeline: 6,
   deals: 7,
   tools: 8,
@@ -110,6 +114,10 @@ export default async function HomePage() {
     {
       key: "finder",
       node: <FinderSection chips={data.finderChips} />,
+    },
+    {
+      key: "topPicks",
+      node: <TopPicksSection picks={data.topPicks ?? []} {...textFor("topPicks")} />,
     },
     {
       key: "timeline",
