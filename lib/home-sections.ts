@@ -21,7 +21,7 @@
 import { prisma } from "@/lib/db";
 import { publicPostDateWhere } from "@/lib/post-date";
 import { gregorianToJalali } from "@/lib/jalali";
-import { calculateFinalPriceForPost } from "@/lib/currency";
+import { getCurrencyRates, calculateFinalTomanPrice, type CurrencyRates } from "@/lib/currency";
 import type { ContentItem } from "@/lib/content";
 import type {
   TopPickCard,
@@ -32,6 +32,37 @@ import type {
 } from "@/features/home/lib/home-types";
 
 const PUBLISHED = { published: true, deletedAt: null } as const;
+
+/**
+ * Price a shop row from rates that were fetched ONCE by the caller.
+ *
+ * `calculateFinalPriceForPost` looks the rates up itself, which means a
+ * DB round-trip per product. With `connection_limit=1` (the Neon default
+ * in lib/db.ts) eight of those in a loop serialise behind one connection
+ * and blow the 15s pool timeout. Rates are identical for every row in a
+ * render, so they are read once and passed in.
+ */
+function priceFromRates(
+  row: {
+    sourcePriceAmount?: number | null;
+    sourceCurrency?: string | null;
+    priceAdjustmentPercent?: number | null;
+    sellerBenefitPercent?: number | null;
+    priceAmount?: number | null;
+  },
+  rates: CurrencyRates,
+): number {
+  if (!row.sourcePriceAmount || row.sourcePriceAmount <= 0) {
+    return row.priceAmount ? Math.round(row.priceAmount) : 0;
+  }
+  return calculateFinalTomanPrice({
+    sourcePrice: row.sourcePriceAmount,
+    sourceCurrency: row.sourceCurrency,
+    productAdjustmentPercent: row.priceAdjustmentPercent,
+    sellerBenefitPercent: row.sellerBenefitPercent ?? 35,
+    rates,
+  });
+}
 
 /** Persian digits with NO thousands separator — for years. */
 function faYear(n: number): string {
@@ -162,20 +193,26 @@ export async function getTopPicks(
     },
   });
 
+  if (!rows.length) return [];
+
+  // One rates read for the whole section, not one per product.
+  let rates: CurrencyRates | null = null;
+  try {
+    rates = await getCurrencyRates();
+  } catch {
+    // Fall back to stored prices rather than dropping every card.
+  }
+
   const out: TopPickCard[] = [];
   for (const r of rows as any[]) {
     const p = r.reviewedProduct;
     if (!p) continue;
 
-    // Price is resolved server-side through the existing currency pipeline.
-    // The client never computes a price — that is an existing invariant.
-    let finalPrice: number | null = p.priceAmount ?? null;
-    try {
-      const calc = await calculateFinalPriceForPost(p);
-      if (typeof calc === "number" && Number.isFinite(calc)) finalPrice = calc;
-    } catch {
-      // Fall back to the stored amount rather than dropping the card.
-    }
+    // Price resolves server-side. The client never computes a price —
+    // that is an existing security invariant of this codebase.
+    const finalPrice: number | null = rates
+      ? priceFromRates(p, rates)
+      : (p.priceAmount ?? null);
 
     out.push({
       ...normalize(r),
@@ -207,7 +244,7 @@ export async function getTopPicks(
  * `take` of those, it backfills with the newest products so the rail is
  * never half-empty — still 100% real rows, just not all on offer.
  *
- * Every price is resolved through calculateFinalPriceForPost, because all
+ * Prices are resolved from ONE rates read (see priceFromRates), because all
  * shop rows store a source price in USD and the displayed Toman figure is
  * derived from live rates. Reading `priceAmount` directly would show a
  * stale number.
@@ -261,18 +298,24 @@ export async function getDeals(
     rows = [...rows, ...fill];
   }
 
-  const out: ContentItem[] = [];
-  for (const r of rows) {
-    const item = normalize(r);
-    try {
-      const final = await calculateFinalPriceForPost(r);
-      if (typeof final === "number" && final > 0) item.priceAmount = final;
-    } catch {
-      // Keep the stored amount rather than dropping the card.
-    }
-    out.push(item);
+  if (!rows.length) return [];
+
+  // One rates read for the whole rail, not one per product.
+  let rates: CurrencyRates | null = null;
+  try {
+    rates = await getCurrencyRates();
+  } catch {
+    // Keep stored amounts rather than dropping the rail.
   }
-  return out;
+
+  return rows.map((r) => {
+    const item = normalize(r);
+    if (rates) {
+      const final = priceFromRates(r, rates);
+      if (final > 0) item.priceAmount = final;
+    }
+    return item;
+  });
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -431,26 +474,34 @@ export async function getMoreToExplore(
     if (row) hero = normalize(row);
   }
 
-  // Cards: the OLDEST item per module — genuine rediscovery, not a
-  // second helping of what is already above the fold.
-  const oldest = async (module: string, extra: any = {}): Promise<any | null> =>
-    prisma.post.findFirst({
-      where: { module, ...PUBLISHED, date: publicPostDateWhere(), ...extra },
-      orderBy: { date: "asc" },
-      select: cardSelect,
-    }) as Promise<any | null>;
+  // Cards: the OLDEST item per module — genuine rediscovery, not a second
+  // helping of what is already above the fold.
+  //
+  // This used to be four sequential findFirst calls. With
+  // connection_limit=1 every extra round-trip serialises behind the last,
+  // so they are collapsed into ONE query that fetches the oldest handful
+  // across all four modules and picks the first per module in memory.
+  const MODULES = ["media", "blog", "forum", "shop"] as const;
+  const pool = (await prisma.post.findMany({
+    where: {
+      ...PUBLISHED,
+      date: publicPostDateWhere(),
+      OR: [
+        { module: "media", videoUrl: { not: null } },
+        { module: "blog" },
+        { module: "forum" },
+        { module: "shop" },
+      ],
+    },
+    orderBy: { date: "asc" },
+    take: 40, // enough to guarantee coverage of all four modules
+    select: cardSelect,
+  })) as any[];
 
   const cards: ContentItem[] = [];
-  const heroSlug = hero?.slug;
-
-  for (const [module, extra] of [
-    ["media", { videoUrl: { not: null } }],
-    ["blog", {}],
-    ["forum", {}],
-    ["shop", {}],
-  ] as Array<[string, any]>) {
-    const row = await oldest(module, extra);
-    if (row && row.slug !== heroSlug) cards.push(normalize(row));
+  for (const m of MODULES) {
+    const row = pool.find((r) => r.module === m && r.slug !== hero?.slug);
+    if (row) cards.push(normalize(row));
   }
 
   return { hero, cards: cards.slice(0, 4) };

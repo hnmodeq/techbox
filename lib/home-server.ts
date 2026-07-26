@@ -274,12 +274,26 @@ export async function getHomeDataUncached(): Promise<HomeData> {
 
   // Sequential to avoid P2024 pool exhaustion – was Promise.all of 7 modules each doing 2-3 queries = up to 21 concurrent
   const modules: Record<string, any> = {};
+  let moduleFailures = 0;
   for (const [module, take] of Object.entries(activeModuleTakes)) {
     try {
       modules[module] = await findPosts(module, take as number);
-    } catch {
+    } catch (e) {
+      moduleFailures++;
       modules[module] = [];
+      console.error(`[home-data] module "${module}" failed:`, e);
     }
+  }
+
+  // If EVERY module query failed, the database is unreachable or the pool
+  // is exhausted — this is not a genuinely empty site. Throwing here is
+  // deliberate: unstable_cache does not store a rejected promise, so the
+  // next request retries instead of serving a blank homepage for the full
+  // revalidate window. Caching a transient failure is how a one-off pool
+  // timeout turns into an hour of empty page.
+  const moduleCount = Object.keys(activeModuleTakes).length;
+  if (moduleCount > 0 && moduleFailures === moduleCount) {
+    throw new Error("home-data: all module queries failed — refusing to cache an empty homepage");
   }
 
   // Ticker: only include posts from enabled modules
@@ -419,9 +433,12 @@ const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v6"], {
 export async function getHomeData(): Promise<HomeData> {
   try {
     return await cachedHomeData();
-  } catch {
-    // Database unavailable → fall back to empty; the client provider simply
-    // shows no rows instead of crashing the whole page.
+  } catch (e) {
+    // Database unreachable → render an empty page rather than a 500. This
+    // result is NOT cached (the throw above prevents that), so the next
+    // request retries. Logged loudly because a silently blank homepage is
+    // very hard to diagnose from the outside.
+    console.error("[home-data] unavailable, serving empty homepage:", e);
     return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
   }
 }

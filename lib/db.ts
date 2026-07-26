@@ -21,12 +21,23 @@ function getPrismaClient(): PrismaClientInstance {
   // One Prisma connection per serverless instance is the safe Neon default.
   // Concurrency comes from independent Vercel instances and Neon's pooler, not
   // from opening ten PostgreSQL sessions inside every function instance.
+  //
+  // Local dev is the opposite situation: a single long-lived Node process
+  // serves every request, Turbopack re-renders on each save, and React
+  // Strict Mode double-invokes. With connection_limit=1 a page that issues
+  // a few dozen sequential queries can queue past pool_timeout and fail
+  // with P2024 even though the database is perfectly healthy. So dev gets
+  // a small pool; production keeps the serverless-safe default of 1.
+  const isDev = process.env.NODE_ENV !== "production";
   let dbUrl = process.env.DATABASE_URL || "";
   if (dbUrl && !dbUrl.includes("connection_limit=")) {
-    const configured = Number(process.env.PRISMA_CONNECTION_LIMIT || "1");
-    const connectionLimit = Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : 1;
+    const fallback = isDev ? 5 : 1;
+    const configured = Number(process.env.PRISMA_CONNECTION_LIMIT || String(fallback));
+    const connectionLimit =
+      Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : fallback;
+    const poolTimeout = isDev ? 30 : 15;
     const sep = dbUrl.includes("?") ? "&" : "?";
-    dbUrl = `${dbUrl}${sep}connection_limit=${connectionLimit}&pool_timeout=15`;
+    dbUrl = `${dbUrl}${sep}connection_limit=${connectionLimit}&pool_timeout=${poolTimeout}`;
   }
 
   const client = new PrismaClient({

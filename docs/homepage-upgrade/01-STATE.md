@@ -102,7 +102,7 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 ## Blockers
 
-*None.*
+*None.* — P2024 pool exhaustion on `/` fixed 2026-07-26 (session 7).
 
 > Format when adding: `**[TASK-ID]** — what is blocked, why, what would unblock it, who owns it.`
 
@@ -131,6 +131,21 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-26 (session 7) — HOTFIX: P2024 pool exhaustion on the homepage
+Owner reported `/` rendering empty and reloading endlessly, with repeated
+`Timed out fetching a new connection from the connection pool (limit: 1)`.
+
+**Three compounding causes, all now fixed:**
+1. **Rates lookup inside a loop (my bug).** `getDeals` and `getTopPicks` called `calculateFinalPriceForPost` per product, and that helper fetches currency rates itself — 8 products meant 8 extra round-trips. Rates are identical for every row in a render, so they are now read **once** via `getCurrencyRates()` and passed to a new pure `priceFromRates()`. Removed ~11 queries.
+2. **`getMoreToExplore` made 6 sequential queries** (count + findFirst + 4× oldest-per-module). The four are collapsed into **one** `findMany` with an `OR` across modules, picking the first per module in memory. 6 → 3.
+3. **`connection_limit=1` is wrong for local dev.** It is correct for serverless (many isolated instances), but dev is one long-lived process with Turbopack re-renders and Strict Mode double-invocation. `lib/db.ts` now uses **5 connections / 30s timeout in dev**, unchanged 1/15s in production. Override with `PRISMA_CONNECTION_LIMIT`.
+
+**Why the page stayed empty rather than recovering:** the module loop swallowed every error into `[]`, so a total DB failure produced a *successful* empty result — which `unstable_cache` then stored for the full hour. Now, if **every** module query fails, `getHomeDataUncached` throws. A rejected promise is never cached, so the next request retries. `getHomeData` still degrades to an empty page instead of a 500, but now logs loudly.
+
+Net: ~30 queries per uncached render → ~16.
+
+**Verified after fix:** getDeals 8 products with correct prices · getTopPicks 3 · getMoreToExplore hero + 4 cards across all modules. tsc/lint/test clean, 111 passing.
 
 ### 2026-07-26 (session 6) — Implementation agent · PHASE D COMPLETE
 - **D2 UPS calculator.** `lib/ups.ts` is pure and unit-tested (24 tests), mirroring `lib/raid.ts`. Models design headroom (80% ceiling), power factor, growth margin, N+1, battery blocks, runtime, BTU/hr and annual kWh. Every result carries the assumptions it was derived under — a sizing tool that hides its model invites over-trust. Results link into the real catalogue by VA range.
