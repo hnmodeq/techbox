@@ -123,6 +123,33 @@ function recordFailure() {
 }
 
 /**
+ * A dead pooled handle fails instantly and deterministically: Neon has
+ * closed the socket, Prisma hands it out anyway, the query dies. Retrying
+ * once forces the pool to dial a fresh connection, which then succeeds.
+ *
+ * This is the difference between "the compute went to sleep, wake it" and
+ * "the network is down". Without it the first request after every idle
+ * period burns three failures and opens the breaker for something that
+ * would have worked on the second attempt.
+ *
+ * One retry only, and only for connectivity errors — anything more turns
+ * a genuine outage back into the retry storm the breaker exists to stop.
+ */
+const RETRY_DELAY_MS = Number(process.env.DB_RETRY_DELAY_MS ?? 150);
+
+async function runWithRetry<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (error) {
+    if (!isDbUnreachable(error)) throw error;
+    if (RETRY_DELAY_MS > 0) {
+      await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+    }
+    return run();
+  }
+}
+
+/**
  * Run a read through the breaker.
  *
  * Only *connectivity* failures count toward opening it. A P2002 or a bad
@@ -146,7 +173,7 @@ export async function withCircuit<T>(run: () => Promise<T>): Promise<T> {
   }
 
   try {
-    const value = await run();
+    const value = await runWithRetry(run);
     recordSuccess();
     return value;
   } catch (error) {
