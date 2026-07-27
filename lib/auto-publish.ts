@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { circuitState } from "@/lib/db-circuit";
+import { circuitState, retryOnStaleConnection } from "@/lib/db-circuit";
 
 /**
  * Auto-publish scheduled posts whose date has passed.
@@ -23,7 +23,15 @@ export async function autoPublishScheduled(): Promise<void> {
   lastCheck = now;
 
   try {
-    const result = await prisma.post.updateMany({
+    // Retried like every read: the first query after Neon's compute
+    // suspends hits a dead pooled handle and fails instantly, and this
+    // runs on every layout render, so it was a reliable source of
+    // connectivity errors on an otherwise healthy database.
+    //
+    // Safe to retry despite being a write: the where clause is
+    // status="scheduled", which the update itself clears, so a duplicate
+    // execution matches zero rows. Idempotent by construction.
+    const result = await retryOnStaleConnection(() => prisma.post.updateMany({
       where: {
         status: "scheduled",
         date: { lte: new Date() },
@@ -32,7 +40,7 @@ export async function autoPublishScheduled(): Promise<void> {
         status: "published",
         published: true,
       },
-    });
+    }));
 
     if (result.count > 0) {
       console.log(`[auto-publish] Published ${result.count} scheduled post(s)`);
