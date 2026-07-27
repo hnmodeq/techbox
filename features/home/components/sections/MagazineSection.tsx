@@ -178,7 +178,12 @@ function ListRow({ item }: { item: ContentItem }) {
         )}
       </div>
 
-      <div className="flex min-w-0 flex-col justify-center">
+      {/* items-start, not the default stretch. A flex column stretches its
+          children across the cross axis, which overrides the chip's
+          inline-block and renders it as a full-width bar instead of a pill
+          hugging its label. The lead panel is unaffected because its parent
+          is a plain block. */}
+      <div className="flex min-w-0 flex-col items-start justify-center">
         {item.category && <CategoryChip label={item.category} />}
         <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
           {item.title}
