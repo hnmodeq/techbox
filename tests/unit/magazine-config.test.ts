@@ -86,6 +86,25 @@ describe("MagazineSection visual contract", () => {
     expect(src).not.toMatch(/border-b border-\[color:var\(--hp-border\)\]/);
   });
 
+  it("puts the separator on the <li>, not on the <a> inside it", () => {
+    // Regression guard. The border first shipped on the row's <a>, which is
+    // always the only child of its <li>, so `last:border-b-0` (compiled to
+    // `&:last-child`) matched EVERY row and removed EVERY separator. The
+    // earlier version of the test above passed throughout, because it only
+    // checked that the token was referenced somewhere in the file.
+    // NB: the JSX has a comment between `<li` and `className`, so this
+    // cannot use a [^>]* character class.
+    const liTag = src.match(/<li\b[\s\S]*?className="([^"]*)"/);
+    expect(liTag, "the list <li> should carry a className").not.toBeNull();
+    expect(liTag![1]).toMatch(/border-b/);
+    expect(liTag![1]).toMatch(/last:border-b-0/);
+
+    // And the row anchor must not carry a bottom border at all.
+    const rowClass = src.match(/className="hp-card group flex gap-4([^"]*)"/);
+    expect(rowClass, "ListRow anchor className not found").not.toBeNull();
+    expect(rowClass![1]).not.toMatch(/border-b/);
+  });
+
   it("hovers the lead by colour, not by transform", () => {
     expect(src).not.toMatch(/group-hover:scale/);
     expect(src).toMatch(/group-hover:text-\[color:var\(--hp-accent-on-ink\)\]/);
