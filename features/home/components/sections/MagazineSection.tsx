@@ -76,7 +76,7 @@ export function MagazineSection({
           // item, so it stretches to the row height set by the taller lead
           // card; that leftover space is what gets distributed. With equal
           // content the rule is inert, which is the correct no-op.
-          <ul className="flex flex-col justify-around">
+          <ul className="flex flex-col justify-between">
             {list.map((item) => (
               <li
                 key={`${item.module}-${item.slug}`}
@@ -193,7 +193,7 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
     <Link
       href={`/${item.module}/${item.slug}`}
       className={cn(
-        "hp-card group flex gap-4 py-5 focus-visible:outline-none",
+        "hp-card group flex focus-visible:outline-none",
         // Trim the outer edges so the rail starts and ends flush with the
         // lead card. Interior rows keep full padding, so the rhythm between
         // rows is unchanged — only the first top and last bottom go.
