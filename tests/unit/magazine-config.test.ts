@@ -86,42 +86,41 @@ describe("MagazineSection visual contract", () => {
     expect(src).not.toMatch(/border-b border-\[color:var\(--hp-border\)\]/);
   });
 
-  it("draws the separator inset, not edge-to-edge", () => {
-    // A border-bottom always spans the full element width, so the rule is
-    // an ::after with a logical inset. If this reverts to border-b the line
-    // silently goes full-bleed again.
-    expect(src).toMatch(/after:absolute/);
-    expect(src).toMatch(/after:end-\d+/);
-    expect(src).toMatch(/after:bg-\[color:var\(--hp-rule\)\]/);
+  it("draws separators as real flex items, not a pinned pseudo-element", () => {
+    // The rule used to be an ::after at bottom-0 on each row. Under
+    // justify-between the rows stay content-height and all the slack lands
+    // in the gaps, so a bottom-pinned line hugs the row above instead of
+    // sitting between two — and CSS cannot centre it in a gap the flex
+    // algorithm only sizes at layout time. As sibling <li> elements the
+    // dividers are distributed by the same algorithm as the rows.
+    expect(src).toMatch(/role="separator"/);
+    expect(src).toMatch(/bg-\[color:var\(--hp-rule\)\]/);
+    expect(src).not.toMatch(/after:absolute/);
+    expect(src).not.toMatch(/last:after:hidden/);
   });
 
-  it("trims only the outer edges of the list", () => {
-    // First row loses its top padding and the last its bottom, so the rail
-    // sits flush with the lead card. Interior spacing is untouched.
-    expect(src).toMatch(/group-first\/row:pt-0/);
-    expect(src).toMatch(/group-last\/row:pb-0/);
-    expect(src).toMatch(/group\/row/);
+  it("renders separators only between rows", () => {
+    // index > 0 — never before the first row or after the last, or the rail
+    // stops sitting flush with the lead card.
+    expect(src).toMatch(/\{index > 0 && \(/);
+  });
+
+  it("keeps separators out of the accessibility tree", () => {
+    // They are <li> children of a <ul>, so without this they would be
+    // announced as empty list items between every article.
+    const sepBlock = src.slice(src.indexOf('role="separator"') - 200, src.indexOf('role="separator"') + 60);
+    expect(sepBlock).toMatch(/aria-hidden="true"/);
+  });
+
+  it("insets the separator from the trailing edge", () => {
+    // Logical me-*, not mr-*, so the shortening happens on the correct side
+    // under RTL.
+    expect(src).toMatch(/me-\d+/);
   });
 
   it("aligns row text to the top, not the vertical centre", () => {
     expect(src).toMatch(/flex-col items-start justify-start/);
     expect(src).not.toMatch(/flex-col items-start justify-center/);
-  });
-
-  it("puts the separator on the <li>, not on the <a> inside it", () => {
-    // Regression guard. The rule first shipped on the row's <a>, which is
-    // always the only child of its <li>, so `last:` (compiled to
-    // `&:last-child`) matched EVERY row and removed EVERY separator. It now
-    // lives on the <li>, where :last-child means what it reads as.
-    const liBlock = src.slice(src.indexOf("<li"), src.indexOf("<ListRow"));
-    expect(liBlock).toMatch(/after:absolute/);
-    expect(liBlock).toMatch(/last:after:hidden/);
-
-    // And the row anchor must not draw a separator itself.
-    const anchorStart = src.indexOf('"hp-card group flex gap-4');
-    const rowClass = src.slice(anchorStart, src.indexOf("<div", anchorStart));
-    expect(rowClass).not.toMatch(/border-b/);
-    expect(rowClass).not.toMatch(/after:absolute/);
   });
 
   it("hovers the lead by colour, not by transform", () => {
