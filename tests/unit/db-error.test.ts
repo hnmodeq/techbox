@@ -101,10 +101,17 @@ describe("describeDbError", () => {
 });
 
 describe("logDbFailure", () => {
+  // Connectivity failures log at WARN, not error. Every caller catches and
+  // degrades, and Next's dev overlay promotes console.error into a blocking
+  // red modal — so error severity on a handled fallback buries the screen
+  // in popups for something working as designed. `errorSpy` below asserts
+  // that genuine bugs still use error.
   let spy: ReturnType<typeof vi.spyOn>;
+  let errorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     vi.spyOn(console, "log").mockImplementation(() => {});
   });
   afterEach(() => {
@@ -150,9 +157,18 @@ describe("logDbFailure", () => {
     const scope = `test-bug-${Math.random()}`;
     const bug = new Error('column "nope" does not exist');
     logDbFailure(scope, bug);
-    expect(spy).toHaveBeenCalledTimes(1);
-    // The error itself is passed through so the stack survives.
-    expect(spy.mock.calls[0]).toContain(bug);
+    // Application bugs keep console.error AND the full error object, so the
+    // stack survives and the dev overlay still surfaces them.
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    expect(errorSpy.mock.calls[0]).toContain(bug);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("uses warn (not error) for connectivity, so the dev overlay stays quiet", () => {
+    const scope = `test-severity-${Math.random()}`;
+    logDbFailure(scope, p1001());
+    expect(spy).toHaveBeenCalled();       // console.warn
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it("reports the next failure immediately after a recovery", () => {

@@ -108,7 +108,11 @@ function recordFailure() {
   if (circuit.failures >= THRESHOLD && circuit.state !== "open") {
     circuit.state = "open";
     circuit.openedAt = now();
-    console.error(
+    // warn, not error: opening the circuit is the mitigation working, not
+    // a fault. Callers degrade to empty sections and the page still
+    // serves. Next's dev overlay turns console.error into a blocking
+    // modal, which would make load-shedding look like a crash.
+    console.warn(
       `[db-circuit] ${circuit.failures} consecutive connectivity failures — ` +
         `pausing database reads for ${COOLDOWN_MS}ms to let the pool recover`,
     );
