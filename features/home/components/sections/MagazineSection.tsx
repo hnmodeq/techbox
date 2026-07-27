@@ -73,7 +73,14 @@ export function MagazineSection({
         {list.length > 0 && (
           <ul className="flex flex-col">
             {list.map((item) => (
-              <li key={`${item.module}-${item.slug}`}>
+              <li
+                key={`${item.module}-${item.slug}`}
+                // The rule belongs on the <li>, not on the <a> inside it.
+                // `last:` compiles to `&:last-child`, and the <a> is always
+                // the only child of its <li>, so it matched on every row and
+                // silently removed every separator.
+                className="border-b border-[color:var(--hp-rule)] last:border-b-0"
+              >
                 <ListRow item={item} showTags={showTags} />
               </li>
             ))}
@@ -171,7 +178,7 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
   return (
     <Link
       href={`/${item.module}/${item.slug}`}
-      className="hp-card group flex gap-4 border-b border-[color:var(--hp-rule)] py-5 last:border-b-0 focus-visible:outline-none"
+      className="hp-card group flex gap-4 py-5 focus-visible:outline-none"
     >
       <div
         className="relative w-[110px] shrink-0 overflow-hidden bg-[color:var(--hp-brand-tint)] sm:w-[143px]"
