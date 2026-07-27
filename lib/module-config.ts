@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
+import { withCircuit } from "@/lib/db-circuit";
 
 /**
  * Module Configuration System
@@ -206,10 +207,12 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
       KEY_MODULE_COLORS,
       KEY_MODULE_TITLES,
     ];
-    const rows = await prisma.siteSetting.findMany({
-      where: { key: { in: allKeys } },
-      select: { key: true, value: true },
-    });
+    const rows = await withCircuit(() =>
+      prisma.siteSetting.findMany({
+        where: { key: { in: allKeys } },
+        select: { key: true, value: true },
+      }),
+    );
     settingsMap = new Map(rows.map((r) => [r.key, r.value]));
   } catch {
     // DB unavailable – use defaults

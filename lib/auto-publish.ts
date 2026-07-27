@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { circuitState } from "@/lib/db-circuit";
 
 /**
  * Auto-publish scheduled posts whose date has passed.
@@ -12,6 +13,13 @@ const COOLDOWN_MS = 60 * 1000; // 1 minute
 export async function autoPublishScheduled(): Promise<void> {
   const now = Date.now();
   if (now - lastCheck < COOLDOWN_MS) return; // Skip if checked recently
+
+  // Never open a connection while the database is already struggling. This
+  // is a best-effort background write on every layout render; making it
+  // compete with user-facing reads for one of five pool slots is how a
+  // transient blip becomes a queue.
+  if (circuitState() === "open") return;
+
   lastCheck = now;
 
   try {

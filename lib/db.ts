@@ -35,7 +35,13 @@ function getPrismaClient(): PrismaClientInstance {
     const configured = Number(process.env.PRISMA_CONNECTION_LIMIT || String(fallback));
     const connectionLimit =
       Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : fallback;
-    const poolTimeout = isDev ? 30 : 15;
+    // 30s was far too patient. When Neon's free-tier compute suspends and
+    // closes pooled connections, every queued query sat for the full window
+    // before failing, so a two-second blip presented as a multi-minute hang
+    // and requests piled up behind it. 10s is still generous for a cold
+    // start (measured wake ~0.5-2s) while failing fast enough that the
+    // circuit breaker in lib/db-circuit.ts can trip and shed load.
+    const poolTimeout = Number(process.env.PRISMA_POOL_TIMEOUT || (isDev ? 10 : 15));
     const sep = dbUrl.includes("?") ? "&" : "?";
     dbUrl = `${dbUrl}${sep}connection_limit=${connectionLimit}&pool_timeout=${poolTimeout}`;
   }
