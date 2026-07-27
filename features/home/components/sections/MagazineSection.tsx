@@ -18,7 +18,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
-import { SectionShell, SectionHeader, Eyebrow } from "../primitives";
+import { SectionShell, SectionHeader } from "../primitives";
 
 export type MagazineSectionProps = {
   posts: ContentItem[];
@@ -52,6 +52,7 @@ export function MagazineSection({
           description="اخبار، تحلیل و منابع فناوری اطلاعات برای آماده ماندن در برابر هر چالشی."
           href={showMore ? "/blog" : undefined}
           linkLabel={moreLabel}
+          rule
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
@@ -72,13 +73,41 @@ export function MagazineSection({
   );
 }
 
-/** Spiceworks lead: 578×325 image, category kicker, headline, excerpt, date. */
+/**
+ * Spiceworks renders the category as a small filled chip, not the bare
+ * tracked kicker the other sections use. Kept local to this file rather
+ * than pushed into the shared `Eyebrow` primitive, because changing that
+ * would restyle every section that already ships.
+ *
+ * `onBrand` is the reversed variant used inside the lead's colour panel.
+ */
+function CategoryChip({ label, onBrand = false }: { label: string; onBrand?: boolean }) {
+  return (
+    <span
+      className={
+        onBrand
+          ? "mb-3 inline-block rounded-[3px] bg-[color:var(--hp-on-brand)] px-2 py-[3px] text-[12px] font-semibold leading-[16px] text-[color:var(--hp-brand-ink)]"
+          : "mb-2 inline-block rounded-[3px] bg-[color:var(--hp-brand-tint)] px-2 py-[3px] text-[11px] font-semibold leading-[16px] text-[color:var(--hp-ink-2)]"
+      }
+    >
+      {label}
+    </span>
+  );
+}
+
+/**
+ * Spiceworks lead: 578×325 image sitting directly on top of a solid brand
+ * panel that holds the kicker, headline, excerpt and date in reversed
+ * text. The panel is the signature of this block — the image and the
+ * colour field read as one object, so the image corners are squared off
+ * where the two meet rather than rounded independently.
+ */
 function LeadArticle({ item }: { item: ContentItem }) {
   return (
     <article className="hp-card group">
       <Link href={`/${item.module}/${item.slug}`} className="block focus-visible:outline-none">
         <div
-          className="relative w-full overflow-hidden rounded-[var(--hp-r-sm)] bg-[color:var(--hp-brand-tint)]"
+          className="relative w-full overflow-hidden rounded-t-[var(--hp-r-sm)] bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "578/325" }}
         >
           {item.image && (
@@ -96,20 +125,28 @@ function LeadArticle({ item }: { item: ContentItem }) {
           )}
         </div>
 
-        <div className="pt-4">
-          {item.category && <Eyebrow className="mb-2">{item.category}</Eyebrow>}
+        {/* Reversed panel.
+            Uses --hp-brand-ink, NOT --hp-brand. shadcn flips --primary to
+            near-white in dark mode, which is right for text but would make
+            this filled panel white-on-white — measured at 1.21:1, i.e.
+            invisible. --hp-brand-ink is the token that stays a dark surface
+            in both themes (17.2:1 light, 13.0:1 dark).
+            No hover colour shift on the headline: there is no contrast
+            headroom left on a saturated ground. */}
+        <div className="rounded-b-[var(--hp-r-sm)] bg-[color:var(--hp-brand-ink)] px-6 pb-6 pt-5">
+          {item.category && <CategoryChip label={item.category} onBrand />}
 
-          <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
+          <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-on-brand)]">
             {item.title}
           </h3>
 
           {item.excerpt && (
-            <p className="mt-2 line-clamp-3 text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
+            <p className="mt-2 line-clamp-3 text-[15px] leading-[28px] text-[color:var(--hp-on-brand-mut)]">
               {item.excerpt}
             </p>
           )}
 
-          <p className="mt-3 text-[13px] leading-[20px] text-[color:var(--hp-ink-3)]">
+          <p className="mt-3 text-[13px] leading-[20px] text-[color:var(--hp-on-brand-mut)]">
             {item.date_fa}
           </p>
         </div>
@@ -142,9 +179,7 @@ function ListRow({ item }: { item: ContentItem }) {
       </div>
 
       <div className="flex min-w-0 flex-col justify-center">
-        {item.category && (
-          <Eyebrow className="mb-1 !text-[11px] !tracking-[1px]">{item.category}</Eyebrow>
-        )}
+        {item.category && <CategoryChip label={item.category} />}
         <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
           {item.title}
         </h3>

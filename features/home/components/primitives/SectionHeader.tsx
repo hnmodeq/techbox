@@ -32,6 +32,12 @@ export type SectionHeaderProps = {
   headingId: string;
   /** Render on a dark band (Timeline, About) — flips text to on-brand colours. */
   onDark?: boolean;
+  /**
+   * Spiceworks runs a hairline rule from the title across to the see-all
+   * link. Opt-in (default off) so the 13 sections already shipped keep
+   * their current header exactly as-is.
+   */
+  rule?: boolean;
   className?: string;
 };
 
@@ -42,6 +48,7 @@ export function SectionHeader({
   linkLabel = "مشاهده همه",
   headingId,
   onDark = false,
+  rule = false,
   className,
 }: SectionHeaderProps) {
   return (
@@ -56,6 +63,21 @@ export function SectionHeader({
         >
           {title}
         </h2>
+
+        {/* The rule fills the gap between title and link. aria-hidden and
+            not focusable: it is pure decoration, and a <hr> here would be
+            announced as a thematic break between two parts of one heading. */}
+        {rule && (
+          <span
+            aria-hidden="true"
+            className={cn(
+              "hidden h-px min-w-8 flex-1 self-center sm:block",
+              onDark
+                ? "bg-[color:var(--hp-on-brand-mut)]"
+                : "bg-[color:var(--hp-brand)]",
+            )}
+          />
+        )}
 
         {href && (
           <Link
