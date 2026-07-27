@@ -137,7 +137,7 @@ function recordFailure() {
  */
 const RETRY_DELAY_MS = Number(process.env.DB_RETRY_DELAY_MS ?? 150);
 
-async function runWithRetry<T>(run: () => Promise<T>): Promise<T> {
+export async function retryOnStaleConnection<T>(run: () => Promise<T>): Promise<T> {
   try {
     return await run();
   } catch (error) {
@@ -173,7 +173,7 @@ export async function withCircuit<T>(run: () => Promise<T>): Promise<T> {
   }
 
   try {
-    const value = await runWithRetry(run);
+    const value = await retryOnStaleConnection(run);
     recordSuccess();
     return value;
   } catch (error) {

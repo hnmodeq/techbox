@@ -13,10 +13,34 @@ import { PrismaClient } from "@prisma/client";
 // when a query is attempted, not when the module is imported.
 type PrismaClientInstance = InstanceType<typeof PrismaClient>;
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientInstance };
+/**
+ * Bump when the PrismaClient CONSTRUCTOR options below change.
+ *
+ * The client is cached on globalThis so HMR reuses one pool instead of
+ * leaking a connection per edit. But the cache was keyed on nothing, so a
+ * client built with old options survived every hot reload: changing `log`
+ * or the pool settings appeared to do nothing until the dev server was
+ * fully restarted, which is a genuinely confusing way to lose an hour.
+ *
+ * Versioning the key means a config change discards the stale client and
+ * builds a fresh one on the next request.
+ */
+const CLIENT_CONFIG_VERSION = 2;
+
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClientInstance;
+  prismaConfigVersion?: number;
+};
 
 function getPrismaClient(): PrismaClientInstance {
-  if (globalForPrisma.prisma) return globalForPrisma.prisma;
+  if (globalForPrisma.prisma && globalForPrisma.prismaConfigVersion === CLIENT_CONFIG_VERSION) {
+    return globalForPrisma.prisma;
+  }
+  if (globalForPrisma.prisma) {
+    // Stale config. Drop the old pool rather than leaking it.
+    void globalForPrisma.prisma.$disconnect().catch(() => {});
+    globalForPrisma.prisma = undefined;
+  }
 
   // One Prisma connection per serverless instance is the safe Neon default.
   // Concurrency comes from independent Vercel instances and Neon's pooler, not
@@ -63,7 +87,10 @@ function getPrismaClient(): PrismaClientInstance {
     log: process.env.PRISMA_VERBOSE === "1" ? ["query", "warn", "error"] : ["warn"],
     datasources: { db: { url: dbUrl } },
   });
-  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;
+  if (process.env.NODE_ENV !== "production") {
+    globalForPrisma.prisma = client;
+    globalForPrisma.prismaConfigVersion = CLIENT_CONFIG_VERSION;
+  }
   return client;
 }
 

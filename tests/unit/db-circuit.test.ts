@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 import {
   withCircuit,
   isCircuitOpenError,
@@ -185,5 +187,41 @@ describe("circuit breaker", () => {
     expect(isCircuitOpenError(err)).toBe(true);
     // Distinguishable from a genuine failure, so logs are not duplicated.
     expect(isCircuitOpenError(connErr())).toBe(false);
+  });
+});
+
+/**
+ * Guards for the two bugs that kept `prisma:error` on screen after the
+ * logging fix had already landed.
+ */
+describe("client construction and background writes", () => {
+  const read = (p: string) =>
+    fs.readFileSync(path.resolve(__dirname, "../..", p), "utf8");
+
+  it("keys the cached Prisma client on a config version", () => {
+    // The client is cached on globalThis so HMR reuses one pool. Without a
+    // version in the key, a client built with old constructor options
+    // survives every hot reload — so changing `log` or the pool settings
+    // appears to do nothing until a full dev-server restart.
+    const src = read("lib/db.ts");
+    expect(src).toMatch(/CLIENT_CONFIG_VERSION/);
+    expect(src).toMatch(/prismaConfigVersion === CLIENT_CONFIG_VERSION/);
+  });
+
+  it("does not let Prisma print raw connectivity errors", () => {
+    // Prisma's own logger emits the multi-paragraph "Invalid invocation"
+    // blocks before our code sees the exception, so logDbFailure() cannot
+    // rate-limit them. Verified empirically: log:["warn"] emits 0 bytes.
+    const src = read("lib/db.ts");
+    expect(src).not.toMatch(/log:\s*\["warn",\s*"error"\]/);
+    expect(src).toMatch(/PRISMA_VERBOSE/);
+  });
+
+  it("retries the auto-publish write like every read", () => {
+    // It runs on every layout render and was the one query still hitting a
+    // stale pooled handle without a retry. Safe because its where clause
+    // (status="scheduled") is cleared by the update itself.
+    const src = read("lib/auto-publish.ts");
+    expect(src).toMatch(/retryOnStaleConnection\(\(\) => prisma\.post\.updateMany/);
   });
 });
