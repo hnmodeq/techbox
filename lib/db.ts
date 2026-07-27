@@ -46,8 +46,21 @@ function getPrismaClient(): PrismaClientInstance {
     dbUrl = `${dbUrl}${sep}connection_limit=${connectionLimit}&pool_timeout=${poolTimeout}`;
   }
 
+  // Prisma's own logger is the source of the multi-paragraph
+  // "Invalid `prisma.x.findMany()` invocation ... Can't reach database
+  // server" blocks, complete with Turbopack-mangled chunk paths. Those are
+  // emitted BEFORE our code ever sees the error, so the rate-limiting in
+  // lib/db-error.ts cannot suppress them, and they drown the one-line
+  // summary that actually says what to do.
+  //
+  // Errors are still surfaced — every caller receives the exception and
+  // logs it through logDbFailure(), which prints a single readable line
+  // plus a remedy. Silencing the raw channel removes duplication, not
+  // information. "warn" is kept because Prisma uses it for genuinely
+  // novel things (pool saturation hints, deprecations) that we do not
+  // otherwise report.
   const client = new PrismaClient({
-    log: ["warn", "error"],
+    log: process.env.PRISMA_VERBOSE === "1" ? ["query", "warn", "error"] : ["warn"],
     datasources: { db: { url: dbUrl } },
   });
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;

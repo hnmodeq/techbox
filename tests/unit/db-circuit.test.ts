@@ -62,8 +62,11 @@ describe("circuit breaker", () => {
         }
       }
     }
-    expect(hits).toBe(3);   // only the failures that opened it
-    expect(shed).toBe(87);  // the rest never touched the pool
+    // 3 logical failures open the breaker; each attempts twice because a
+    // connectivity error gets one retry (a stale handle usually recovers
+    // there). 6 pool touches instead of 90 is still the point.
+    expect(hits).toBe(6);
+    expect(shed).toBe(87);  // the rest never touched the pool at all
   });
 
   it("does NOT open for application errors", async () => {
@@ -124,6 +127,41 @@ describe("circuit breaker", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("retries once, so a stale pooled handle self-heals", async () => {
+    // Neon closes pooled sockets when its free-tier compute suspends.
+    // Prisma hands the dead handle out anyway and the query fails
+    // instantly; a second attempt dials a fresh connection and works.
+    // Without this, the first request after every idle period burned
+    // three failures and opened the breaker for a transient condition.
+    let attempts = 0;
+    const value = await withCircuit(async () => {
+      attempts++;
+      if (attempts === 1) throw connErr();
+      return "recovered";
+    });
+    expect(value).toBe("recovered");
+    expect(attempts).toBe(2);
+    expect(circuitState()).toBe("closed");
+  });
+
+  it("does not retry application errors", async () => {
+    // A constraint violation will fail identically on a second attempt.
+    // Retrying doubles the write load for no possible benefit.
+    let attempts = 0;
+    await expect(
+      withCircuit(async () => { attempts++; throw appErr(); }),
+    ).rejects.toThrow();
+    expect(attempts).toBe(1);
+  });
+
+  it("still opens when the retry also fails", async () => {
+    // The retry must not become a way to avoid ever tripping the breaker.
+    for (let i = 0; i < 3; i++) {
+      await expect(withCircuit(async () => { throw connErr(); })).rejects.toThrow();
+    }
+    expect(circuitState()).toBe("open");
   });
 
   it("opening the circuit warns rather than errors", async () => {
