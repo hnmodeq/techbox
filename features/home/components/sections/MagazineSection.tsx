@@ -72,7 +72,11 @@ export function MagazineSection({
       <div className="grid gap-8 lg:grid-cols-[minmax(0,578fr)_minmax(0,420fr)] lg:gap-10">
         <LeadArticle item={lead} showTags={showTags} />
         {list.length > 0 && (
-          <ul className="flex flex-col">
+          // justify-around on the main (vertical) axis. The <ul> is a grid
+          // item, so it stretches to the row height set by the taller lead
+          // card; that leftover space is what gets distributed. With equal
+          // content the rule is inert, which is the correct no-op.
+          <ul className="flex flex-col justify-around">
             {list.map((item) => (
               <li
                 key={`${item.module}-${item.slug}`}
