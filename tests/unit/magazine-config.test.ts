@@ -82,27 +82,46 @@ describe("MagazineSection visual contract", () => {
   it("separates list rows with the dedicated rule token", () => {
     // --hp-border is ~1.26:1 against the page: correct for a card edge,
     // invisible as a standalone divider. --hp-rule exists for this.
-    expect(src).toMatch(/border-\[color:var\(--hp-rule\)\]/);
+    expect(src).toMatch(/--hp-rule/);
     expect(src).not.toMatch(/border-b border-\[color:var\(--hp-border\)\]/);
   });
 
-  it("puts the separator on the <li>, not on the <a> inside it", () => {
-    // Regression guard. The border first shipped on the row's <a>, which is
-    // always the only child of its <li>, so `last:border-b-0` (compiled to
-    // `&:last-child`) matched EVERY row and removed EVERY separator. The
-    // earlier version of the test above passed throughout, because it only
-    // checked that the token was referenced somewhere in the file.
-    // NB: the JSX has a comment between `<li` and `className`, so this
-    // cannot use a [^>]* character class.
-    const liTag = src.match(/<li\b[\s\S]*?className="([^"]*)"/);
-    expect(liTag, "the list <li> should carry a className").not.toBeNull();
-    expect(liTag![1]).toMatch(/border-b/);
-    expect(liTag![1]).toMatch(/last:border-b-0/);
+  it("draws the separator inset, not edge-to-edge", () => {
+    // A border-bottom always spans the full element width, so the rule is
+    // an ::after with a logical inset. If this reverts to border-b the line
+    // silently goes full-bleed again.
+    expect(src).toMatch(/after:absolute/);
+    expect(src).toMatch(/after:end-\d+/);
+    expect(src).toMatch(/after:bg-\[color:var\(--hp-rule\)\]/);
+  });
 
-    // And the row anchor must not carry a bottom border at all.
-    const rowClass = src.match(/className="hp-card group flex gap-4([^"]*)"/);
-    expect(rowClass, "ListRow anchor className not found").not.toBeNull();
-    expect(rowClass![1]).not.toMatch(/border-b/);
+  it("trims only the outer edges of the list", () => {
+    // First row loses its top padding and the last its bottom, so the rail
+    // sits flush with the lead card. Interior spacing is untouched.
+    expect(src).toMatch(/group-first\/row:pt-0/);
+    expect(src).toMatch(/group-last\/row:pb-0/);
+    expect(src).toMatch(/group\/row/);
+  });
+
+  it("aligns row text to the top, not the vertical centre", () => {
+    expect(src).toMatch(/flex-col items-start justify-start/);
+    expect(src).not.toMatch(/flex-col items-start justify-center/);
+  });
+
+  it("puts the separator on the <li>, not on the <a> inside it", () => {
+    // Regression guard. The rule first shipped on the row's <a>, which is
+    // always the only child of its <li>, so `last:` (compiled to
+    // `&:last-child`) matched EVERY row and removed EVERY separator. It now
+    // lives on the <li>, where :last-child means what it reads as.
+    const liBlock = src.slice(src.indexOf("<li"), src.indexOf("<ListRow"));
+    expect(liBlock).toMatch(/after:absolute/);
+    expect(liBlock).toMatch(/last:after:hidden/);
+
+    // And the row anchor must not draw a separator itself.
+    const anchorStart = src.indexOf('"hp-card group flex gap-4');
+    const rowClass = src.slice(anchorStart, src.indexOf("<div", anchorStart));
+    expect(rowClass).not.toMatch(/border-b/);
+    expect(rowClass).not.toMatch(/after:absolute/);
   });
 
   it("hovers the lead by colour, not by transform", () => {
