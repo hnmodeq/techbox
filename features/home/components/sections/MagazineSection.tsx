@@ -26,9 +26,18 @@ export type MagazineSectionProps = {
   moreLabel?: string;
   showTitle?: boolean;
   showMore?: boolean;
+  /** One-line copy under the title. Admin-editable; empty falls back to the
+   *  default below so the section never renders a bare heading. */
+  description?: string;
+  /** Category chips on cards. Admin-editable, defaults on. */
+  showTags?: boolean;
 };
 
 const HEADING_ID = "hp-magazine-heading";
+
+/** Used when an admin has not written their own description. */
+const DEFAULT_DESCRIPTION =
+  "اخبار، تحلیل و منابع فناوری اطلاعات برای آماده ماندن در برابر هر چالشی.";
 
 export function MagazineSection({
   posts,
@@ -36,6 +45,8 @@ export function MagazineSection({
   moreLabel = "مشاهده همه مقالات",
   showTitle = true,
   showMore = true,
+  description,
+  showTags = true,
 }: MagazineSectionProps) {
   // Rule 1: no data → no section. Guard is the first statement.
   if (!posts?.length) return null;
@@ -49,7 +60,7 @@ export function MagazineSection({
         <SectionHeader
           headingId={HEADING_ID}
           title={title}
-          description="اخبار، تحلیل و منابع فناوری اطلاعات برای آماده ماندن در برابر هر چالشی."
+          description={description?.trim() || DEFAULT_DESCRIPTION}
           href={showMore ? "/blog" : undefined}
           linkLabel={moreLabel}
           rule
@@ -58,12 +69,12 @@ export function MagazineSection({
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,578fr)_minmax(0,420fr)] lg:gap-10">
-        <LeadArticle item={lead} />
+        <LeadArticle item={lead} showTags={showTags} />
         {list.length > 0 && (
           <ul className="flex flex-col">
             {list.map((item) => (
               <li key={`${item.module}-${item.slug}`}>
-                <ListRow item={item} />
+                <ListRow item={item} showTags={showTags} />
               </li>
             ))}
           </ul>
@@ -86,8 +97,8 @@ function CategoryChip({ label, onBrand = false }: { label: string; onBrand?: boo
     <span
       className={
         onBrand
-          ? "mb-3 inline-block rounded-[3px] bg-[color:var(--hp-on-brand)] px-2 py-[3px] text-[12px] font-semibold leading-[16px] text-[color:var(--hp-brand-ink)]"
-          : "mb-2 inline-block rounded-[3px] bg-[color:var(--hp-brand-tint)] px-2 py-[3px] text-[11px] font-semibold leading-[16px] text-[color:var(--hp-ink-2)]"
+          ? "mb-3 inline-block bg-[color:var(--hp-on-brand)] px-2 py-[3px] text-[12px] font-semibold leading-[16px] text-[color:var(--hp-brand-ink)]"
+          : "mb-2 inline-block bg-[color:var(--hp-brand-tint)] px-2 py-[3px] text-[11px] font-semibold leading-[16px] text-[color:var(--hp-ink-2)]"
       }
     >
       {label}
@@ -102,12 +113,12 @@ function CategoryChip({ label, onBrand = false }: { label: string; onBrand?: boo
  * colour field read as one object, so the image corners are squared off
  * where the two meet rather than rounded independently.
  */
-function LeadArticle({ item }: { item: ContentItem }) {
+function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean }) {
   return (
     <article className="hp-card group">
       <Link href={`/${item.module}/${item.slug}`} className="block focus-visible:outline-none">
         <div
-          className="relative w-full overflow-hidden rounded-t-[var(--hp-r-sm)] bg-[color:var(--hp-brand-tint)]"
+          className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "578/325" }}
         >
           {item.image && (
@@ -120,7 +131,7 @@ function LeadArticle({ item }: { item: ContentItem }) {
               sizes="(min-width: 1024px) 578px, 100vw"
               loading="eager"
               fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           )}
         </div>
@@ -133,10 +144,10 @@ function LeadArticle({ item }: { item: ContentItem }) {
             in both themes (17.2:1 light, 13.0:1 dark).
             No hover colour shift on the headline: there is no contrast
             headroom left on a saturated ground. */}
-        <div className="rounded-b-[var(--hp-r-sm)] bg-[color:var(--hp-brand-ink)] px-6 pb-6 pt-5">
-          {item.category && <CategoryChip label={item.category} onBrand />}
+        <div className="bg-[color:var(--hp-brand-ink)] px-6 pb-6 pt-5">
+          {showTags && item.category && <CategoryChip label={item.category} onBrand />}
 
-          <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-on-brand)]">
+          <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-on-brand)] transition-colors duration-200 group-hover:text-[color:var(--hp-accent-on-ink)]">
             {item.title}
           </h3>
 
@@ -156,14 +167,14 @@ function LeadArticle({ item }: { item: ContentItem }) {
 }
 
 /** Spiceworks list row: 143×95 thumb + three text lines. No avatar. */
-function ListRow({ item }: { item: ContentItem }) {
+function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
   return (
     <Link
       href={`/${item.module}/${item.slug}`}
-      className="hp-card group flex gap-4 border-b border-[color:var(--hp-border)] py-5 ps-0 transition-[background-color,padding] duration-200 last:border-b-0 hover:bg-[color:var(--hp-bg)] hover:ps-2 focus-visible:outline-none"
+      className="hp-card group flex gap-4 border-b border-[color:var(--hp-rule)] py-5 last:border-b-0 focus-visible:outline-none"
     >
       <div
-        className="relative w-[110px] shrink-0 overflow-hidden rounded-[6px] bg-[color:var(--hp-brand-tint)] sm:w-[143px]"
+        className="relative w-[110px] shrink-0 overflow-hidden bg-[color:var(--hp-brand-tint)] sm:w-[143px]"
         style={{ aspectRatio: "143/95" }}
       >
         {item.image && (
@@ -184,7 +195,7 @@ function ListRow({ item }: { item: ContentItem }) {
           hugging its label. The lead panel is unaffected because its parent
           is a plain block. */}
       <div className="flex min-w-0 flex-col items-start justify-center">
-        {item.category && <CategoryChip label={item.category} />}
+        {showTags && item.category && <CategoryChip label={item.category} />}
         <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
           {item.title}
         </h3>

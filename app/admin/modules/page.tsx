@@ -105,7 +105,8 @@ export default function AdminModulesPage() {
     setSaving(true);
     setMessage("");
     try {
-      // Build complete payload — every module must have ALL 7 required fields
+      // Build complete payload — every module must send ALL fields; the
+      // API persists module objects wholesale, so an omitted key is a lost setting.
       const moduleData: Record<string, any> = {};
       for (const slug of ALL_MODULES) {
         const m = config[slug] || {};
@@ -114,6 +115,8 @@ export default function AdminModulesPage() {
           showOnHome: m.showOnHome ?? true,
           homeOrder: m.homeOrder ?? 99,
           homeTitle: m.homeTitle ?? "",
+          homeDescription: m.homeDescription ?? "",
+          showHomeTags: m.showHomeTags ?? true,
           homeMoreLabel: m.homeMoreLabel ?? "",
           showHomeTitle: m.showHomeTitle ?? true,
           showHomeMoreLabel: m.showHomeMoreLabel ?? true,
@@ -449,6 +452,36 @@ export default function AdminModulesPage() {
                           value={cfg?.homeTitle || ""}
                           onChange={(e) => updateModule(slug, { homeTitle: e.target.value })}
                           placeholder={DEFAULT_HOME_TITLES[slug] || "عنوان ردیف..."}
+                        />
+                      </div>
+
+                      {/* Description sits with the title because that is
+                          where an editor looks for it — they are one block
+                          of copy on the page. */}
+                      <div className="space-y-2">
+                        <Label className="text-xs">
+                          توضیح زیر عنوان
+                          <span className="text-muted-foreground mr-1">
+                            (خالی = متن پیش‌فرض بخش)
+                          </span>
+                        </Label>
+                        <Input
+                          value={cfg?.homeDescription || ""}
+                          onChange={(e) => updateModule(slug, { homeDescription: e.target.value })}
+                          placeholder="یک جمله توضیح درباره این بخش..."
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
+                        <div>
+                          <Label className="text-xs">نمایش برچسب موضوع</Label>
+                          <p className="text-[11px] text-muted-foreground">
+                            چیپ دسته‌بندی روی کارت‌های این ردیف
+                          </p>
+                        </div>
+                        <Switch
+                          checked={cfg?.showHomeTags ?? true}
+                          onCheckedChange={(checked) => updateModule(slug, { showHomeTags: checked })}
                         />
                       </div>
                       <div className="space-y-2">

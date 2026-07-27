@@ -116,6 +116,8 @@ export default async function HomePage() {
       moreLabel: cfg?.homeMoreLabel?.trim() || undefined,
       showTitle: cfg?.showHomeTitle ?? true,
       showMore: cfg?.showHomeMoreLabel ?? true,
+      description: cfg?.homeDescription?.trim() || undefined,
+      showTags: cfg?.showHomeTags ?? true,
     };
   };
 
