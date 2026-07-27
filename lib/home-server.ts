@@ -17,6 +17,7 @@ import {
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
 import { logDbFailure, noteDbSuccess, isDbUnreachable } from "@/lib/db-error";
+import { withCircuit, isCircuitOpenError } from "@/lib/db-circuit";
 
 /**
  * Run one homepage section, degrading to a fallback instead of taking the
@@ -30,11 +31,13 @@ import { logDbFailure, noteDbSuccess, isDbUnreachable } from "@/lib/db-error";
 async function section<T>(name: string, fallback: T, run: () => Promise<T>): Promise<T> {
   const scope = `home-data:${name}`;
   try {
-    const value = await run();
+    const value = await withCircuit(run);
     noteDbSuccess(scope); // recovered — report the next failure immediately
     return value;
   } catch (e) {
-    logDbFailure(scope, e);
+    // The breaker already logged why it opened. Repeating it once per
+    // section per render is the log flood this was built to prevent.
+    if (!isCircuitOpenError(e)) logDbFailure(scope, e);
     return fallback;
   }
 }
@@ -314,7 +317,7 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
       });
     }
   } catch (error) {
-    logDbFailure("layout-data:news", error);
+    if (!isCircuitOpenError(error)) logDbFailure("layout-data:news", error);
   }
 
   const normalizedNews = news.map(normalizeCard);
@@ -348,7 +351,7 @@ export async function getLayoutHomeData(): Promise<HomeData> {
   try {
     return await cachedLayoutHomeData();
   } catch (error) {
-    logDbFailure("layout-data", error);
+    if (!isCircuitOpenError(error)) logDbFailure("layout-data", error);
     return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
   }
 }
@@ -369,11 +372,11 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   let moduleFailures = 0;
   for (const [module, take] of Object.entries(activeModuleTakes)) {
     try {
-      modules[module] = await findPosts(module, take as number);
+      modules[module] = await withCircuit(() => findPosts(module, take as number));
     } catch (e) {
       moduleFailures++;
       modules[module] = [];
-      logDbFailure(`home-data:module:${module}`, e);
+      if (!isCircuitOpenError(e)) logDbFailure(`home-data:module:${module}`, e);
     }
   }
 
@@ -538,7 +541,7 @@ export async function getHomeData(): Promise<HomeData> {
     // result is NOT cached (the throw above prevents that), so the next
     // request retries. Logged loudly because a silently blank homepage is
     // very hard to diagnose from the outside.
-    if (logDbFailure("home-data", e) && isDbUnreachable(e)) {
+    if (!isCircuitOpenError(e) && logDbFailure("home-data", e) && isDbUnreachable(e)) {
       console.error("[home-data] serving an empty homepage until the database responds");
     }
     return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };

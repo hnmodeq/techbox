@@ -1,5 +1,6 @@
 import { prisma } from "./db";
 import { logDbFailure } from "./db-error";
+import { withCircuit, isCircuitOpenError } from "./db-circuit";
 
 const DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve",
@@ -28,10 +29,10 @@ const DEFAULTS: Record<string, string> = {
  */
 export async function getSetting(key: string): Promise<string> {
   try {
-    const row = await prisma.siteSetting.findUnique({ where: { key } });
+    const row = await withCircuit(() => prisma.siteSetting.findUnique({ where: { key } }));
     return row?.value ?? DEFAULTS[key] ?? "";
   } catch (error) {
-    logDbFailure(`settings:${key}`, error);
+    if (!isCircuitOpenError(error)) logDbFailure(`settings:${key}`, error);
     return DEFAULTS[key] ?? "";
   }
 }
@@ -41,7 +42,7 @@ export async function getSetting(key: string): Promise<string> {
  */
 export async function getSettings(keys: string[]): Promise<Record<string, string>> {
   try {
-    const rows = await prisma.siteSetting.findMany({ where: { key: { in: keys } } });
+    const rows = await withCircuit(() => prisma.siteSetting.findMany({ where: { key: { in: keys } } }));
     const map: Record<string, string> = {};
     for (const key of keys) {
       map[key] = DEFAULTS[key] ?? "";
@@ -51,7 +52,7 @@ export async function getSettings(keys: string[]): Promise<Record<string, string
     }
     return map;
   } catch (error) {
-    logDbFailure("settings", error);
+    if (!isCircuitOpenError(error)) logDbFailure("settings", error);
     const map: Record<string, string> = {};
     for (const key of keys) {
       map[key] = DEFAULTS[key] ?? "";
