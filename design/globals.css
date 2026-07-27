@@ -608,6 +608,13 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   --hp-inset:      var(--muted);
   --hp-border:     var(--border);
   --hp-border-mut: var(--border);
+  /* List separators. --border sits at ~1.26:1 against the page, which is
+     correct for a card edge but disappears as a standalone rule between
+     rows. Mixed toward the foreground so the divider actually reads. */
+  --hp-rule: color-mix(in oklch, var(--foreground) 22%, var(--background));
+  /* Hover colour for text sitting ON a filled dark panel, where --hp-brand
+     has no contrast headroom. */
+  --hp-accent-on-ink: color-mix(in oklch, var(--primary-foreground) 72%, var(--primary));
 
   /* Text */
   --hp-ink:   var(--foreground);
@@ -641,6 +648,8 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
      raised dark surface while text keeps --primary. */
   --hp-brand-ink:    var(--secondary);
   --hp-on-brand:     var(--foreground);
+  --hp-rule: color-mix(in oklch, var(--foreground) 26%, var(--background));
+  --hp-accent-on-ink: color-mix(in oklch, var(--foreground) 62%, var(--secondary));
   --hp-on-brand-mut: color-mix(in oklch, var(--foreground) 62%, transparent);
 
   --hp-accent:    var(--primary);
@@ -656,6 +665,8 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   --color-hp-brand-hover:  var(--hp-brand-hover);
   --color-hp-brand-ink:    var(--hp-brand-ink);
   --color-hp-brand-tint:   var(--hp-brand-tint);
+  --color-hp-rule:         var(--hp-rule);
+  --color-hp-accent-on-ink: var(--hp-accent-on-ink);
   --color-hp-on-brand:     var(--hp-on-brand);
   --color-hp-on-brand-mut: var(--hp-on-brand-mut);
   --color-hp-accent:       var(--hp-accent);

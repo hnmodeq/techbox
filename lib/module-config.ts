@@ -29,6 +29,11 @@ export type ModuleConfig = {
   showHomeTitle: boolean;
   /** Whether "more" button is visible */
   showHomeMoreLabel: boolean;
+  /** One-line description under the section title. Empty = use the
+   *  component's own default copy. */
+  homeDescription: string;
+  /** Whether category tags/chips render on this row's cards. */
+  showHomeTags: boolean;
 };
 
 export type ModuleConfigMap = Record<ModuleSlug, ModuleConfig>;
@@ -120,6 +125,9 @@ export function getDefaultModuleConfig(slug: ModuleSlug): ModuleConfig {
     homeMoreLabel: DEFAULT_HOME_MORE_LABELS[slug] ?? "",
     showHomeTitle: true,
     showHomeMoreLabel: true,
+    homeDescription: "",
+    // Tags default ON so existing rows are unchanged until an admin opts out.
+    showHomeTags: true,
   };
 }
 
@@ -150,6 +158,8 @@ const KEY_HOME_TITLES = "modules.home_titles";
 const KEY_HOME_MORE_LABELS = "modules.home_more_labels";
 const KEY_HOME_SHOW_TITLE = "modules.home_show_title";
 const KEY_HOME_SHOW_MORE_LABEL = "modules.home_show_more_label";
+const KEY_HOME_DESCRIPTIONS = "modules.home_descriptions";
+const KEY_HOME_SHOW_TAGS = "modules.home_show_tags";
 const KEY_HERO_VISIBLE = "hero.visible";
 const KEY_TICKER_VISIBLE = "ticker.visible";
 const KEY_MODULE_COLORS_ENABLED = "modules.colors_enabled";
@@ -188,6 +198,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
       KEY_HOME_MORE_LABELS,
       KEY_HOME_SHOW_TITLE,
       KEY_HOME_SHOW_MORE_LABEL,
+      KEY_HOME_DESCRIPTIONS,
+      KEY_HOME_SHOW_TAGS,
       KEY_HERO_VISIBLE,
       KEY_MODULE_COLORS_ENABLED,
       KEY_UNIFIED_MODULE_COLOR,
@@ -212,6 +224,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const homeMoreRaw = getRaw(KEY_HOME_MORE_LABELS);
   const homeShowTitleRaw = getRaw(KEY_HOME_SHOW_TITLE);
   const homeShowMoreLabelRaw = getRaw(KEY_HOME_SHOW_MORE_LABEL);
+  const homeDescriptionsRaw = getRaw(KEY_HOME_DESCRIPTIONS);
+  const homeShowTagsRaw = getRaw(KEY_HOME_SHOW_TAGS);
   const heroVisibleRaw = getRaw(KEY_HERO_VISIBLE);
   const tickerVisibleRaw = getRaw(KEY_TICKER_VISIBLE);
   const colorsEnabledRaw = getRaw(KEY_MODULE_COLORS_ENABLED);
@@ -226,6 +240,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const homeMoreMap = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(homeMoreRaw, {});
   const homeShowTitleMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(homeShowTitleRaw, {});
   const homeShowMoreLabelMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(homeShowMoreLabelRaw, {});
+  const homeDescriptionsMap = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(homeDescriptionsRaw, {});
+  const homeShowTagsMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(homeShowTagsRaw, {});
 
   for (const slug of DEFAULT_MODULE_SLUGS) {
     const cfg = defaults[slug];
@@ -236,6 +252,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
     if (homeMoreMap[slug] !== undefined) cfg.homeMoreLabel = homeMoreMap[slug]!;
     if (homeShowTitleMap[slug] !== undefined) cfg.showHomeTitle = homeShowTitleMap[slug]!;
     if (homeShowMoreLabelMap[slug] !== undefined) cfg.showHomeMoreLabel = homeShowMoreLabelMap[slug]!;
+    if (homeDescriptionsMap[slug] !== undefined) cfg.homeDescription = homeDescriptionsMap[slug]!;
+    if (homeShowTagsMap[slug] !== undefined) cfg.showHomeTags = homeShowTagsMap[slug]!;
   }
 
   // Hero visibility (default: true)
@@ -316,6 +334,8 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
   const homeMoreMap: Record<string, string> = {};
   const homeShowTitleMap: Record<string, boolean> = {};
   const homeShowMoreLabelMap: Record<string, boolean> = {};
+  const homeDescriptionsMap: Record<string, string> = {};
+  const homeShowTagsMap: Record<string, boolean> = {};
 
   for (const slug of DEFAULT_MODULE_SLUGS) {
     const cfg = config[slug];
@@ -327,6 +347,8 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
     homeMoreMap[slug] = cfg.homeMoreLabel;
     homeShowTitleMap[slug] = cfg.showHomeTitle;
     homeShowMoreLabelMap[slug] = cfg.showHomeMoreLabel;
+    homeDescriptionsMap[slug] = cfg.homeDescription ?? "";
+    homeShowTagsMap[slug] = cfg.showHomeTags ?? true;
   }
 
   const updates: Array<{ key: string; value: string }> = [
@@ -337,6 +359,8 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
     { key: KEY_HOME_MORE_LABELS, value: JSON.stringify(homeMoreMap) },
     { key: KEY_HOME_SHOW_TITLE, value: JSON.stringify(homeShowTitleMap) },
     { key: KEY_HOME_SHOW_MORE_LABEL, value: JSON.stringify(homeShowMoreLabelMap) },
+    { key: KEY_HOME_DESCRIPTIONS, value: JSON.stringify(homeDescriptionsMap) },
+    { key: KEY_HOME_SHOW_TAGS, value: JSON.stringify(homeShowTagsMap) },
     { key: KEY_HERO_VISIBLE, value: String(config.heroVisible ?? true) },
     { key: KEY_TICKER_VISIBLE, value: String(config.tickerVisible ?? true) },
     { key: KEY_MODULE_COLORS_ENABLED, value: String(config.moduleColorsEnabled ?? true) },
