@@ -72,31 +72,39 @@ export function MagazineSection({
       <div className="grid gap-8 lg:grid-cols-[minmax(0,578fr)_minmax(0,420fr)] lg:gap-10">
         <LeadArticle item={lead} showTags={showTags} />
         {list.length > 0 && (
-          // justify-around on the main (vertical) axis. The <ul> is a grid
+          // justify-between on the main (vertical) axis. The <ul> is a grid
           // item, so it stretches to the row height set by the taller lead
-          // card; that leftover space is what gets distributed. With equal
-          // content the rule is inert, which is the correct no-op.
+          // card, and that slack is distributed into the gaps between rows —
+          // no space before the first or after the last, so the rail stays
+          // flush with the lead card.
           <ul className="flex flex-col justify-between">
-            {list.map((item) => (
-              <li
-                key={`${item.module}-${item.slug}`}
-                // The rule lives on the <li>, not the <a> inside it: `last:`
-                // compiles to `&:last-child`, and the <a> is always its <li>'s
-                // only child, so it matched every row and removed every
-                // separator.
-                //
-                // It is a pseudo-element rather than border-b because a border
-                // always spans the full element width. Insetting `end-12`
-                // shortens the line. start-/end- stay correct under RTL.
-                className={cn(
-                  "group/row relative",
-                  "after:absolute after:bottom-0 after:start-0 after:end-12",
-                  "after:h-px after:bg-[color:var(--hp-rule)] after:content-['']",
-                  "last:after:hidden",
+            {list.map((item, index) => (
+              <React.Fragment key={`${item.module}-${item.slug}`}>
+                {/* Separators are real flex items, not an ::after pinned to
+                    each row's bottom edge.
+                    
+                    With justify-between the rows stay content-height and all
+                    the slack is pushed into the gaps between them. A rule at
+                    `bottom-0` therefore hugs the row above it and reads as
+                    attached to that row rather than sitting between two —
+                    and CSS cannot centre it in a gap whose height the flex
+                    algorithm only computes at layout time.
+                    
+                    As a sibling <li> the divider is spaced by the same
+                    algorithm as the rows, so it lands in the middle of the
+                    gap by construction. aria-hidden + role=separator keeps
+                    it out of the list semantics. */}
+                {index > 0 && (
+                  <li
+                    aria-hidden="true"
+                    role="separator"
+                    className="h-px shrink-0 self-stretch bg-[color:var(--hp-rule)] me-12"
+                  />
                 )}
-              >
-                <ListRow item={item} showTags={showTags} />
-              </li>
+                <li className="group/row">
+                  <ListRow item={item} showTags={showTags} />
+                </li>
+              </React.Fragment>
             ))}
           </ul>
         )}
