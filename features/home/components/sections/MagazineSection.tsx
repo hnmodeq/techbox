@@ -18,6 +18,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
+import { cn } from "@/lib/utils";
 import { SectionShell, SectionHeader } from "../primitives";
 
 export type MagazineSectionProps = {
@@ -75,11 +76,20 @@ export function MagazineSection({
             {list.map((item) => (
               <li
                 key={`${item.module}-${item.slug}`}
-                // The rule belongs on the <li>, not on the <a> inside it.
-                // `last:` compiles to `&:last-child`, and the <a> is always
-                // the only child of its <li>, so it matched on every row and
-                // silently removed every separator.
-                className="border-b border-[color:var(--hp-rule)] last:border-b-0"
+                // The rule lives on the <li>, not the <a> inside it: `last:`
+                // compiles to `&:last-child`, and the <a> is always its <li>'s
+                // only child, so it matched every row and removed every
+                // separator.
+                //
+                // It is a pseudo-element rather than border-b because a border
+                // always spans the full element width. Insetting `end-12`
+                // shortens the line. start-/end- stay correct under RTL.
+                className={cn(
+                  "group/row relative",
+                  "after:absolute after:bottom-0 after:start-0 after:end-12",
+                  "after:h-px after:bg-[color:var(--hp-rule)] after:content-['']",
+                  "last:after:hidden",
+                )}
               >
                 <ListRow item={item} showTags={showTags} />
               </li>
@@ -178,7 +188,13 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
   return (
     <Link
       href={`/${item.module}/${item.slug}`}
-      className="hp-card group flex gap-4 py-5 focus-visible:outline-none"
+      className={cn(
+        "hp-card group flex gap-4 py-5 focus-visible:outline-none",
+        // Trim the outer edges so the rail starts and ends flush with the
+        // lead card. Interior rows keep full padding, so the rhythm between
+        // rows is unchanged — only the first top and last bottom go.
+        "group-first/row:pt-0 group-last/row:pb-0",
+      )}
     >
       <div
         className="relative w-[110px] shrink-0 overflow-hidden bg-[color:var(--hp-brand-tint)] sm:w-[143px]"
@@ -201,7 +217,7 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
           inline-block and renders it as a full-width bar instead of a pill
           hugging its label. The lead panel is unaffected because its parent
           is a plain block. */}
-      <div className="flex min-w-0 flex-col items-start justify-center">
+      <div className="flex min-w-0 flex-col items-start justify-start">
         {showTags && item.category && <CategoryChip label={item.category} />}
         <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
           {item.title}
