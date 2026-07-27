@@ -69,7 +69,7 @@ export function MagazineSection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,578fr)_minmax(0,420fr)] lg:gap-10">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,878fr)_minmax(0,618fr)] lg:gap-10">
         <LeadArticle item={lead} showTags={showTags} />
         {list.length > 0 && (
           // justify-between on the main (vertical) axis. The <ul> is a grid
@@ -148,7 +148,7 @@ function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean 
       <Link href={`/${item.module}/${item.slug}`} className="block focus-visible:outline-none">
         <div
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
-          style={{ aspectRatio: "578/325" }}
+          style={{ aspectRatio: "1.65/1" }}
         >
           {item.image && (
             // The homepage LCP element — eager, high priority. Everything
@@ -173,7 +173,7 @@ function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean 
             in both themes (17.2:1 light, 13.0:1 dark).
             No hover colour shift on the headline: there is no contrast
             headroom left on a saturated ground. */}
-        <div className="bg-[color:var(--hp-brand-ink)] px-6 pb-6 pt-5">
+        <div className="bg-[color:var(--hp-brand-ink)] px-10 pb-6 pt-20">
           {showTags && item.category && <CategoryChip label={item.category} onBrand />}
 
           <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-on-brand)] transition-colors duration-200 group-hover:text-[color:var(--hp-accent-on-ink)]">
@@ -181,7 +181,7 @@ function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean 
           </h3>
 
           {item.excerpt && (
-            <p className="mt-2 line-clamp-3 text-[15px] leading-[28px] text-[color:var(--hp-on-brand-mut)]">
+            <p className="line-clamp-3 text-[15px] leading-[28px] text-[color:var(--hp-on-brand-mut)]">
               {item.excerpt}
             </p>
           )}
@@ -202,15 +202,12 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
       href={`/${item.module}/${item.slug}`}
       className={cn(
         "hp-card group flex focus-visible:outline-none",
-        // Trim the outer edges so the rail starts and ends flush with the
-        // lead card. Interior rows keep full padding, so the rhythm between
-        // rows is unchanged — only the first top and last bottom go.
         "group-first/row:pt-0 group-last/row:pb-0",
       )}
     >
       <div
-        className="relative w-[110px] shrink-0 overflow-hidden bg-[color:var(--hp-brand-tint)] sm:w-[143px]"
-        style={{ aspectRatio: "143/95" }}
+        className="relative w-[180px] shrink-0 overflow-hidden bg-[color:var(--hp-brand-tint)] sm:w-[150px]"
+        style={{ aspectRatio: "1.3/1" }}
       >
         {item.image && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -231,10 +228,10 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
           is a plain block. */}
       <div className="flex min-w-0 flex-col items-start justify-start">
         {showTags && item.category && <CategoryChip label={item.category} />}
-        <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
+        <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)] pr-5">
           {item.title}
         </h3>
-        <p className="mt-1 text-[12px] leading-[18px] text-[color:var(--hp-ink-3)]">
+        <p className="mt-1 text-[12px] leading-[18px] text-[color:var(--hp-ink-3)] pr-5">
           {item.date_fa}
         </p>
       </div>

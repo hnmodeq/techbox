@@ -57,7 +57,7 @@ export function SectionHeader({
         <h2
           id={headingId}
           className={cn(
-            "text-[28px] font-bold leading-[40px] tracking-tight",
+            "text-2xl font-bold leading-[40px] tracking-tight",
             onDark ? "text-[color:var(--hp-on-brand)]" : "text-[color:var(--hp-ink)]",
           )}
         >
