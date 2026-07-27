@@ -115,9 +115,16 @@ export function logDbFailure(scope: string, error: unknown): boolean {
     // Infrastructure problem: the one-line summary plus the fix is the
     // whole useful payload. The stack trace points at whichever query
     // happened to run first, which is never the cause.
-    console.error(`[${scope}] ${summary}${repeat}`);
+    //
+    // console.warn, not console.error. Every caller of this function
+    // CATCHES and degrades — the section hides, the page still returns
+    // 200. Next's dev overlay promotes console.error into a blocking red
+    // "Console Error" modal, so using error severity for a handled
+    // fallback buries the screen in popups for something that is working
+    // as designed. Reserve error for bugs that need fixing.
+    console.warn(`[${scope}] ${summary}${repeat}`);
     const hint = remedyFor(error);
-    if (hint) console.error(`[${scope}] → ${hint}`);
+    if (hint) console.warn(`[${scope}] → ${hint}`);
     return true;
   }
 

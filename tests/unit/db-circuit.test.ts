@@ -31,6 +31,7 @@ function appErr(code = "P2002") {
 describe("circuit breaker", () => {
   beforeEach(() => {
     resetCircuit();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.spyOn(console, "log").mockImplementation(() => {});
   });
@@ -123,6 +124,19 @@ describe("circuit breaker", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("opening the circuit warns rather than errors", async () => {
+    // Opening is the mitigation working, not a fault. console.error would
+    // become a blocking red modal in Next's dev overlay and make correct
+    // load-shedding look like a crash.
+    const warn = vi.spyOn(console, "warn");
+    const error = vi.spyOn(console, "error");
+    for (let i = 0; i < 3; i++) {
+      await expect(withCircuit(async () => { throw connErr(); })).rejects.toThrow();
+    }
+    expect(warn).toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
   });
 
   it("marks its own error so callers can stay quiet", async () => {

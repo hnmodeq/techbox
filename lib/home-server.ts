@@ -388,7 +388,18 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   // timeout turns into an hour of empty page.
   const moduleCount = Object.keys(activeModuleTakes).length;
   if (moduleCount > 0 && moduleFailures === moduleCount) {
-    throw new Error("home-data: all module queries failed — refusing to cache an empty homepage");
+    // Deliberate: unstable_cache does not store a rejected promise, so
+    // throwing here means the next request retries instead of serving a
+    // blank homepage for the full revalidate window.
+    //
+    // Tagged with the circuit code because the caller catches this and
+    // degrades. Without the tag it is reported a second time as a fresh
+    // failure, which is how one blip produced four separate red overlays.
+    const err = new Error(
+      "home-data: all module queries failed — refusing to cache an empty homepage",
+    ) as Error & { code?: string };
+    err.code = "DB_CIRCUIT_OPEN";
+    throw err;
   }
 
   // Ticker: only include posts from enabled modules
@@ -541,8 +552,9 @@ export async function getHomeData(): Promise<HomeData> {
     // result is NOT cached (the throw above prevents that), so the next
     // request retries. Logged loudly because a silently blank homepage is
     // very hard to diagnose from the outside.
+    // warn, not error: this path is the graceful fallback, not a crash.
     if (!isCircuitOpenError(e) && logDbFailure("home-data", e) && isDbUnreachable(e)) {
-      console.error("[home-data] serving an empty homepage until the database responds");
+      console.warn("[home-data] serving an empty homepage until the database responds");
     }
     return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
   }
