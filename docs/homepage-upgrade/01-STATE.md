@@ -134,6 +134,10 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-28 — Stable local dev compiler fallback
+
+Changed the default `pnpm dev` script from Next 16's default Turbopack server to Webpack (`next dev --webpack`), retaining the former behavior as `pnpm dev:turbo`. This is a development-only fallback for browser-specific HMR/font delivery loops; production build behavior is unchanged. `pnpm typecheck`, `pnpm lint`, and `pnpm test` remain green (201 tests).
+
 ### 2026-07-28 — Portrait lead reel and comment-card interaction refinement
 
 - Changed the newest Video lead from a landscape card to a centred `9:16` portrait reel; all homepage video cards now use the reel ratio.
