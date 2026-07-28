@@ -2,6 +2,21 @@
 
 import * as React from "react";
 
+function clearLocalServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+
+  // Do not wait for window.load. A stale worker can keep a localhost page in
+  // a navigation loop, preventing load from ever firing and making a
+  // load-event cleanup unreachable.
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => registration.unregister());
+  }).catch(() => {});
+
+  if ("caches" in window) {
+    caches.keys().then((keys) => keys.forEach((key) => caches.delete(key))).catch(() => {});
+  }
+}
+
 export function RuntimeEffects() {
   React.useEffect(() => {
     try {
@@ -30,19 +45,14 @@ export function RuntimeEffects() {
       const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
       const isSecureProduction = window.location.protocol === "https:" && !isLocalhost;
 
-      window.addEventListener("load", () => {
-        if (isSecureProduction) {
-          navigator.serviceWorker.register("/sw.js").catch(() => {});
-          return;
-        }
+      if (!isSecureProduction) {
+        clearLocalServiceWorker();
+        return;
+      }
 
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          registrations.forEach((registration) => registration.unregister());
-        });
-        if ("caches" in window) {
-          caches.keys().then((keys) => keys.forEach((key) => caches.delete(key)));
-        }
-      });
+      const register = () => navigator.serviceWorker.register("/sw.js").catch(() => {});
+      if (document.readyState === "complete") register();
+      else window.addEventListener("load", register, { once: true });
     } catch {}
   }, []);
 
@@ -53,12 +63,12 @@ export function RuntimeEffects() {
     // and throws an unhandled DOMException. This is expected behavior,
     // not a bug, so we prevent it from polluting the console.
     const onUnhandled = (e: PromiseRejectionEvent) => {
-      if (e.reason instanceof DOMException && e.reason.name === 'AbortError') {
+      if (e.reason instanceof DOMException && e.reason.name === "AbortError") {
         e.preventDefault();
       }
     };
-    window.addEventListener('unhandledrejection', onUnhandled);
-    return () => window.removeEventListener('unhandledrejection', onUnhandled);
+    window.addEventListener("unhandledrejection", onUnhandled);
+    return () => window.removeEventListener("unhandledrejection", onUnhandled);
   }, []);
 
   return null;
