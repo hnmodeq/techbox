@@ -134,6 +134,14 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-28 — Immediate stale-service-worker cleanup
+
+The browser repeatedly requested `/` after `next dev` reported healthy `200` responses, proving a client navigation loop. The localhost cleanup had been deferred to the `load` event, but a stale worker loop can prevent `load` forever.
+
+- Added an immediate, head-level localhost service-worker/cache purge before React hydration.
+- Changed `RuntimeEffects` and `public/register-sw.js` to unregister workers and clear Cache Storage immediately on localhost rather than waiting for `load`.
+- `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass (201 tests).
+
 ### 2026-07-28 — Stable local dev compiler fallback
 
 Changed the default `pnpm dev` script from Next 16's default Turbopack server to Webpack (`next dev --webpack`), retaining the former behavior as `pnpm dev:turbo`. This is a development-only fallback for browser-specific HMR/font delivery loops; production build behavior is unchanged. `pnpm typecheck`, `pnpm lint`, and `pnpm test` remain green (201 tests).

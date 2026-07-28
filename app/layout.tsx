@@ -28,6 +28,24 @@ h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
 button, .btn { font-family: inherit; transition: all 0.2s ease; }
 `;
 
+// Runs before hydration. This is intentionally duplicated in RuntimeEffects:
+// an old localhost service worker can keep reloading a page before React has a
+// chance to mount, so dev cleanup cannot rely only on useEffect or `load`.
+const localServiceWorkerCleanup = `
+(() => {
+  try {
+    const local = ["localhost", "127.0.0.1", "::1"].includes(location.hostname);
+    if (!local || !("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.getRegistrations()
+      .then((registrations) => registrations.forEach((registration) => registration.unregister()))
+      .catch(() => {});
+    if ("caches" in window) {
+      caches.keys().then((keys) => keys.forEach((key) => caches.delete(key))).catch(() => {});
+    }
+  } catch (_) {}
+})();
+`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
@@ -94,6 +112,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: localServiceWorkerCleanup }} />
         <style dangerouslySetInnerHTML={{ __html: criticalStyles }} suppressHydrationWarning />
         <WebSiteJsonLd />
         <OrganizationJsonLd />
