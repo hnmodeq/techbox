@@ -94,6 +94,28 @@ export function seededIndex(total: number, salt = 0): number {
   return Math.abs(((hour + salt) * 2654435761) % total);
 }
 
+/**
+ * `count` DISTINCT indices from `total`, with the same hourly stability as
+ * seededIndex.
+ *
+ * Calling seededIndex twice with different salts is not enough: nothing
+ * stops the two results colliding, which would render the same comment
+ * twice. This walks forward from each pick to the next free slot instead.
+ */
+export function seededIndices(total: number, count: number, salt = 0): number[] {
+  if (total <= 0 || count <= 0) return [];
+  const wanted = Math.min(count, total);
+  const picked: number[] = [];
+  for (let i = 0; i < wanted; i += 1) {
+    let candidate = seededIndex(total, salt + i * 101);
+    // Linear probe to the next unused index. Terminates because
+    // `wanted <= total`.
+    while (picked.includes(candidate)) candidate = (candidate + 1) % total;
+    picked.push(candidate);
+  }
+  return picked;
+}
+
 // ═════════════════════════════════════════════════════════════════════
 // §3 Latest Insights — the week's most-commented news
 // ═════════════════════════════════════════════════════════════════════
@@ -191,17 +213,21 @@ export async function getLatestInsights(
 }
 
 /**
- * One real, rotating approved comment on the newest published video. The
- * video card itself is supplied by the normal media module query; this only
- * adds the small companion quote and its comment anchor.
+ * Real, rotating approved comments on the newest published video. The video
+ * card itself is supplied by the normal media module query; this only adds
+ * the small companion quotes and their comment anchors.
+ *
+ * Returns FEWER than `take` when the video has fewer approved comments, and
+ * an empty array when it has none — the section renders only what exists
+ * rather than padding with placeholders.
  */
-export async function getLatestVideoHighlightComment(): Promise<VideoHighlightComment | null> {
+export async function getLatestVideoHighlightComments(take = 2): Promise<VideoHighlightComment[]> {
   const latest = await prisma.post.findFirst({
     where: { module: "media", ...PUBLISHED, date: publicPostDateWhere(), videoUrl: { not: null } },
     orderBy: [{ date: "desc" }, { id: "desc" }],
     select: { id: true, slug: true },
   });
-  if (!latest) return null;
+  if (!latest) return [];
 
   const rows = await prisma.comment.findMany({
     where: {
@@ -227,12 +253,12 @@ export async function getLatestVideoHighlightComment(): Promise<VideoHighlightCo
     .filter((row) => !row.author || row.author.status === "active")
     .map(mapHighlightComment)
     .filter((comment): comment is HighlightComment => Boolean(comment));
-  if (candidates.length === 0) return null;
+  if (candidates.length === 0) return [];
 
-  return {
-    ...candidates[seededIndex(candidates.length, 37)],
+  return seededIndices(candidates.length, take, 37).map((index) => ({
+    ...candidates[index],
     videoSlug: latest.slug,
-  };
+  }));
 }
 
 // ═════════════════════════════════════════════════════════════════════

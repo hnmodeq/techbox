@@ -27,8 +27,8 @@ export type HomeData = {
   latestInsights?: LatestInsights;
   /** Legacy shape retained for older API consumers. */
   insights?: ContentItem[];
-  /** §2 — one sampled approved comment on the newest video. */
-  videoHighlightComment?: VideoHighlightComment | null;
+  /** §2 — sampled approved comments on the newest video. */
+  videoHighlightComments?: VideoHighlightComment[];
   /** §5 — up to 3 reviews joined to their shop product. */
   topPicks?: TopPickCard[];
   /** §6 — up to 12 IT milestones. */
@@ -123,7 +123,7 @@ export function HomeDataProvider({
         // enough — an explicit undefined in the body would clobber it.
         insights: body.insights ?? prev.insights,
         latestInsights: body.latestInsights ?? prev.latestInsights,
-        videoHighlightComment: body.videoHighlightComment ?? prev.videoHighlightComment,
+        videoHighlightComments: body.videoHighlightComments ?? prev.videoHighlightComments,
         topPicks: body.topPicks ?? prev.topPicks,
         timeline: body.timeline ?? prev.timeline,
         familyComments: body.familyComments ?? prev.familyComments,

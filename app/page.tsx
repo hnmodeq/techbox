@@ -146,7 +146,7 @@ export default async function HomePage() {
       node: (
         <VideoSection
           videos={data.modules.media ?? []}
-          highlightComment={data.videoHighlightComment}
+          highlightComments={data.videoHighlightComments}
           {...textFor("video")}
         />
       ),
