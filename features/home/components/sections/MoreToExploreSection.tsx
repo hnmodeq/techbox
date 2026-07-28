@@ -85,13 +85,12 @@ function HeroCard({ item }: { item: ContentItem }) {
           className="relative w-full overflow-hidden rounded-[var(--hp-r-md)] bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "1200/500" }}
         >
-          {item.image && (            <RemoteImage
-              src={item.image}
-              alt={item.title}
-              sizes="(min-width: 1280px) 1216px, 100vw"
-              className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
-            />
-          )}
+          <RemoteImage
+            src={item.image}
+            alt={item.title}
+            sizes="(min-width: 1280px) 1216px, 100vw"
+            className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
+          />
         </div>
 
         {/* TG floats the content panel up over the image edge. */}
@@ -146,13 +145,12 @@ function SmallCard({ item }: { item: ContentItem }) {
           className="relative w-full overflow-hidden rounded-[var(--hp-r-sm)] bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "450/253" }}
         >
-          {item.image && (            <RemoteImage
-              src={item.image}
-              alt={item.title}
-              sizes="(min-width: 900px) 290px, 50vw"
-              className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
-            />
-          )}
+          <RemoteImage
+            src={item.image}
+            alt={item.title}
+            sizes="(min-width: 900px) 290px, 50vw"
+            className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+          />
         </div>
 
         <div className="pt-3">

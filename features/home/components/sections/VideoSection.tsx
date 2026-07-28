@@ -151,12 +151,15 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
         className="group relative block h-full w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <div className="relative h-full w-full overflow-hidden bg-background max-lg:aspect-9/16 lg:min-h-[520px]">
-          {item.image && (            <RemoteImage
-              src={item.image}
-              alt={item.title}
-              sizes="(min-width: 1024px) 390px, 100vw"
-            />
-          )}
+          {/* Above the fold whenever Video is ordered near the top, and the
+              browser reports this poster as the LCP element there. Marked
+              priority so it is not lazy-loaded on the critical path. */}
+          <RemoteImage
+            src={item.image}
+            alt={item.title}
+            sizes="(min-width: 1024px) 390px, 100vw"
+            priority
+          />
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
           <PlayAffordance />
           <div className="absolute inset-x-5 bottom-5 text-white">
@@ -187,12 +190,11 @@ function QuickTakeCard({ item, onOpen }: { item: ContentItem; onOpen: () => void
       className="hp-card group relative w-[172px] overflow-hidden bg-background text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:w-[200px]"
       style={{ aspectRatio: "9/16" }}
     >
-      {item.image && (        <RemoteImage
-          src={item.image}
-          alt={item.title}
-          sizes="200px"
-        />
-      )}
+      <RemoteImage
+        src={item.image}
+        alt={item.title}
+        sizes="200px"
+      />
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
 
       {item.videoDuration && (

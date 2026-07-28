@@ -72,13 +72,12 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
     <article className="group">
       <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <div className="relative overflow-hidden bg-background" style={{ aspectRatio: "16/9" }}>
-          {story.image && (            <RemoteImage
-              src={story.image}
-              alt={story.title}
-              sizes="(min-width: 1024px) 760px, 100vw"
-              className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
-            />
-          )}
+          <RemoteImage
+            src={story.image}
+            alt={story.title}
+            sizes="(min-width: 1024px) 760px, 100vw"
+            className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
+          />
         </div>
       </Link>
 
