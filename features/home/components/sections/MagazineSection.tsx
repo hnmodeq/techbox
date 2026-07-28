@@ -271,8 +271,9 @@ function LeadArticle({
           style={{ aspectRatio: "1.65/1" }}
         >
           {item.image && (
-            // The homepage LCP element — eager, high priority. Everything
-            // else on the page is lazy.
+            // Eager: the lead is the LCP element whenever Magazine is
+            // ordered first. Section order is admin-controlled, so the
+            // Video lead is marked the same way.
             <RemoteImage
               src={item.image}
               alt={item.title}
@@ -328,12 +329,11 @@ function ListRow({
           className="relative w-[180px] overflow-hidden bg-muted sm:w-[150px]"
           style={{ aspectRatio: "1.3/1" }}
         >
-          {item.image && (            <RemoteImage
-              src={item.image}
-              alt={item.title}
-              sizes="143px"
-            />
-          )}
+          <RemoteImage
+            src={item.image}
+            alt={item.title}
+            sizes="143px"
+          />
         </div>
       </button>
 

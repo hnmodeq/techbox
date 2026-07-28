@@ -89,13 +89,12 @@ function DealCard({ item }: { item: ContentItem }) {
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "450/253" }}
         >
-          {item.image && (            <RemoteImage
-              src={item.image}
-              alt={item.title}
-              sizes="(min-width: 900px) 300px, 50vw"
-              className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
-            />
-          )}
+          <RemoteImage
+            src={item.image}
+            alt={item.title}
+            sizes="(min-width: 900px) 300px, 50vw"
+            className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+          />
           {discounted && (
             <span className="absolute top-2 start-2 rounded-[4px] bg-[color:var(--hp-deal)] px-1.5 py-0.5 text-[12px] font-bold text-white">
               {discounted.badge}

@@ -98,13 +98,12 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "16/9" }}
         >
-          {pick.image && (            <RemoteImage
-              src={pick.image}
-              alt={pick.title}
-              sizes="(min-width: 900px) 420px, 71vw"
-              className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
-            />
-          )}
+          <RemoteImage
+            src={pick.image}
+            alt={pick.title}
+            sizes="(min-width: 900px) 420px, 71vw"
+            className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+          />
           <span className="absolute top-2 start-2 rounded-[4px] bg-[color:var(--hp-brand)] px-2 py-0.5 text-[12px] font-bold text-[color:var(--hp-on-brand)]">
             <Num>{rank}</Num>
           </span>
