@@ -3,6 +3,16 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Pin Turbopack's project root.
+  //
+  // With no explicit root Turbopack infers one by walking up for a lockfile.
+  // A stray package-lock.json or pnpm-workspace.yaml above this directory
+  // moves the inferred root, which changes where the dev cache lives and can
+  // leave two different builds' chunks addressable at once — the state that
+  // produces a dev reload loop.
+  turbopack: {
+    root: import.meta.dirname,
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.zarinpal.com" },

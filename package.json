@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "prisma generate && next dev",
+    "dev:clean": "node scripts/clean-dev-cache.mjs && prisma generate && next dev",
+    "clean": "node scripts/clean-dev-cache.mjs",
     "build": "next build",
     "build:webpack": "next build --webpack",
     "start": "next start",
