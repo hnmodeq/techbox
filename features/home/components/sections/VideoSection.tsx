@@ -217,8 +217,12 @@ function PlayAffordance() {
 
 /** One-card version of the supplied three-column Spiceworks testimonial. */
 function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment; onOpen: () => void }) {
+  // `block` is load-bearing. This span is not always a flex item — when the
+  // author has a username it is wrapped in a <Link>, and that Link becomes
+  // the flex item instead. A default-inline span ignores width/height, so
+  // the avatar rendered at the image's natural size and blew the card open.
   const avatar = (
-    <span className="size-8 shrink-0 overflow-hidden rounded-[var(--hp-r-sm)] bg-muted">
+    <span className="block size-8 shrink-0 overflow-hidden rounded-[var(--hp-r-sm)] bg-muted">
       {comment.author.avatar ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={comment.author.avatar} alt={comment.author.name} width={32} height={32} loading="lazy" className="h-full w-full object-cover" />
@@ -247,7 +251,7 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
           <Link
             href={`/author/${comment.author.username}`}
             aria-label={`مشاهدهٔ پروفایل ${comment.author.name}`}
-            className="shrink-0 rounded-[var(--hp-r-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="block shrink-0 rounded-[var(--hp-r-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {avatar}
           </Link>
