@@ -3,13 +3,14 @@
 /**
  * §2 · Video Hub
  *
- * One latest landscape video anchors the left at desktop. The current quick
+ * One latest portrait reel anchors the left at desktop. The current quick
  * takes remain compact portrait cards in the right-bottom rail, while one
  * real approved comment on that newest video uses the supplied Spiceworks
  * testimonial anatomy in the right-top slot. Every click opens the existing
  * VideoModal rather than navigating away from the homepage.
  */
 import * as React from "react";
+import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
 import type { VideoHighlightComment } from "@/features/home/lib/home-types";
 import { VideoModal, useVideoModal } from "@/components/content/VideoCard";
@@ -71,7 +72,7 @@ export function VideoSection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,.85fr)_minmax(0,1.35fr)] lg:gap-8">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,.7fr)] lg:gap-8">
         {/* First in RTL is right: comment on top, compact video rail below. */}
         <div className="flex min-w-0 flex-col gap-5">
           {videoComment ? (
@@ -115,33 +116,35 @@ export function VideoSection({
 
 function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="group relative block w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <div className="relative w-full overflow-hidden bg-background" style={{ aspectRatio: "16/9" }}>
-        {item.image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={item.image}
-            alt={item.title}
-            sizes="(min-width: 1024px) 760px, 100vw"
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        )}
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
-        <PlayAffordance />
-        <div className="absolute inset-x-5 bottom-5 text-white">
-          <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/75">
-            <time dateTime={item.date}>{item.date_fa}</time>
-            {item.videoDuration && <span dir="ltr">{item.videoDuration}</span>}
+    <div className="mx-auto w-full max-w-[390px]">
+      <button
+        type="button"
+        onClick={onOpen}
+        className="group relative block w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <div className="relative w-full overflow-hidden bg-background" style={{ aspectRatio: "9/16" }}>
+          {item.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.image}
+              alt={item.title}
+              sizes="(min-width: 1024px) 390px, 100vw"
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+          <PlayAffordance />
+          <div className="absolute inset-x-5 bottom-5 text-white">
+            <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/75">
+              <time dateTime={item.date}>{item.date_fa}</time>
+              {item.videoDuration && <span dir="ltr">{item.videoDuration}</span>}
+            </div>
+            <h3 className="text-[22px] font-bold leading-[32px] transition-colors group-hover:text-[color:var(--video-accent)]">{item.title}</h3>
           </div>
-          <h3 className="text-[22px] font-bold leading-[32px] transition-colors group-hover:text-[color:var(--video-accent)] md:text-[26px] md:leading-[36px]">{item.title}</h3>
         </div>
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }
 
@@ -194,7 +197,7 @@ function PlayAffordance() {
   return (
     <span
       aria-hidden="true"
-      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm"
     >
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
         <path d="M15 7.27a2 2 0 0 1 0 3.46L3 17.66A2 2 0 0 1 0 15.93V2.07A2 2 0 0 1 3 .34l12 6.93Z" fill="currentColor" />
@@ -205,31 +208,47 @@ function PlayAffordance() {
 
 /** One-card version of the supplied three-column Spiceworks testimonial. */
 function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment; onOpen: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="group flex min-h-[210px] w-full flex-col border border-border bg-background p-6 text-start transition-colors hover:border-[color:var(--video-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      <span aria-hidden="true" className="text-4xl font-black leading-none text-[color:var(--video-accent)]">“</span>
-      <p className="mt-2 line-clamp-4 text-[15px] leading-[27px] text-foreground">{comment.text}</p>
-      <span className="mt-auto flex items-center gap-3 pt-6">
-        <span className="size-11 shrink-0 overflow-hidden rounded-full bg-muted">
-          {comment.author.avatar ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={comment.author.avatar} alt="" width={44} height={44} loading="lazy" className="h-full w-full object-cover" />
-          ) : (
-            <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-sm font-bold text-muted-foreground">
-              {comment.author.name.trim()[0] ?? "؟"}
-            </span>
-          )}
+  const avatar = (
+    <span className="size-11 shrink-0 overflow-hidden rounded-full bg-muted">
+      {comment.author.avatar ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={comment.author.avatar} alt={comment.author.name} width={44} height={44} loading="lazy" className="h-full w-full object-cover" />
+      ) : (
+        <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-sm font-bold text-muted-foreground">
+          {comment.author.name.trim()[0] ?? "؟"}
         </span>
-        <span className="min-w-0">
+      )}
+    </span>
+  );
+
+  return (
+    <article className="flex min-h-[210px] w-full flex-col rounded-[var(--hp-r-md)] border border-border bg-background p-6 shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]">
+      {/* Most of the card opens the existing modal at this real comment. */}
+      <button
+        type="button"
+        onClick={onOpen}
+        className="group min-w-0 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <span aria-hidden="true" className="text-4xl font-black leading-none text-[color:var(--video-accent)]">“</span>
+        <p className="mt-2 line-clamp-4 text-[15px] leading-[27px] text-foreground">{comment.text}</p>
+      </button>
+
+      <div className="mt-auto flex items-center gap-3 pt-6">
+        {comment.author.username ? (
+          <Link
+            href={`/author/${comment.author.username}`}
+            aria-label={`مشاهدهٔ پروفایل ${comment.author.name}`}
+            className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {avatar}
+          </Link>
+        ) : avatar}
+        <button type="button" onClick={onOpen} className="min-w-0 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <span className="block truncate text-[14px] font-bold text-[color:var(--video-accent)]">{comment.author.name}</span>
           <time dateTime={comment.date} className="mt-0.5 block text-[12px] text-muted-foreground">{comment.dateFa}</time>
-        </span>
-      </span>
-    </button>
+        </button>
+      </div>
+    </article>
   );
 }
 
