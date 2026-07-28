@@ -25,149 +25,207 @@ shop product slugs tab design and merge specs with comments
 11-mobile version need to get a re-design
 
 
+--------------------------------------------
+-------------------------------------------
 
+I'm working on magazine section in homepage.  
+  
+  
+  
+1-i want to make sure this section is using shadcn standard color tokens  
+  
+  
+  
+2-i want you to remove the background color of content tags  
+  
+  
+  
+3-also tags needs a pr-5 i think to be same as the title  
+  
+  
+  
+4-tags should be clickable and when we click on it we needs to see all contents with this tag  
+  
+  
+  
+5-i want hovering effect for titles and tags, on hovering on title and tags they get an underline text effect  
+  
+  
+  
+6-i want tool tip on:  
+  
+-dates: تاریخ انتشار  
+  
+make sure you use shadcn components (we already have the tooltip component)  
+  
+  
+  
+7-make sure the big article is our latest article and small articles is random articles on every refresh  
+  
+  
+  
+8-please add reading time (which already implemented) on the big article and small articles either.  
+  
+  
+  
+9-make sure everything is real and get read from db, dates/tags/contents
 
---------------------------------------------------------------------
 
-i want to design my homepage inner content.
 
-TechBox and SpiceWorks have similar contents and we can get inspiration from SpiceWorks design for our homepage.
+-----------------------------------------------------------
 
-for example in SpiceWorks homepage we have:
 
-1-topbar
+1- i want all sections headers have same design as our magazine section header which including a title > line > more button.
 
-2-announcement bar
 
-3-articles
 
-4-community
+2-in admin panel we have a setting for modules > colors which is for make our module color system on/off or customize colors.
 
-5-research
+-customizing colors here is not easy you have to copy/paste color oklch code. i want all of these modules have a color modal which gonna let me to select colors visually from color pallet.
 
-6-tools
+also make sure when i enable this system modules colors is work. they should work like when it is disable all modules/secitons/components gonna follow default shadcn tokens but when it's enable some of elements colors gonna get replace by these colors which mostly is including titles/hovering effects etc.
 
-7-CTA
 
-8-footer
 
-in Toms Guide homepage we have:
+3-since the homepage sections are new and we have a header for all of sections please make sure when the module colors is enable the section headers gonna follow it. for example make the line and more button to follow the module color, also hovering on tags, also the solid background behind texts on the big article. in the section header the section title should not follow module colors and always gonna stay on default colors.
 
-1-reviews
 
-2-videos
 
-3-find deals fast
+4-in the next section let's have a ghost color on the whole section background
 
-4-latest insights
+-make the corner radius 0
 
-5-streaming
+-remove the background and border from previous/next buttons and make it bigger
 
-6-puzzle of the day (as a hubby)
+-we already talked about the section header
 
-7-top picks products
+-add shadcn tooltip on duration as: زمان ویدیو
 
-8-computing & AI reviews
+-we have 2 hovering effect on these cards, a scale and a play icon. let only have the play icon on hovering
 
-9-fitness & home reviews
+-let when we click on videos the video modal gets open (we already have it)
 
-10-best deals (again)
+-let cards titles show the module color on hover
 
-11-more to explore
+-please show the date of publish somewhere
 
-12-coupons
+-let's have a system like magazine section, in magazine section we have a big article which is our latest and 4 small articles which is random.
 
-13-introducting the Tom's Guide website
+in video section please use the current section is the small videos and add a big video as the latest video. 
 
-14-tom's guide team
+and sorting them is gonna be like the big video on the left, small videos on the right bottom, and on the right top which gonna be an empty space we gonna add a card as a random comment on the latest video! which when you click on it you gonna redirect to the video modal and that scroll to that comment.
 
-15-footer
+you can use spicework comment card design as the design for the comment cards, I'm gonna upload an image of it.
 
-and in TechBox we have these modules/sections:
 
-1-top bar
 
-2-tick bar
+5-let's go for next section which gonna be latest section.
 
-3-main sidebar
+in this section we gonna have a comment card. but with different design.
 
-4-news sidebar
 
-5-magazine
 
-6-videos
+the comment card for this section is simple (please check the next image)
 
-7-tools
 
-8-forum
 
-9-shop
+sorting cards on this section gonna be like this:
 
-10-timeline (as a hubby)
+on the right our latest news which gonna be our the most important news in the week. and how it got selected is base on comments number.
 
-11-newsletter
+-on the left top we gonna have our comments cards and on the left bottom we gonna have our newsletter register card.
 
-12-footer
 
-i want to make my homepage by using these two websites which have similar contents/modules/features
 
-also i saw a simple explanation about SpiceWorks in GitHub which was so clean and clear and also it is almost same with the TechBox goal, the explanation was:
 
-SpiceWorks is an online community and marketplace where IT professionals can find advice, manage their networks, and discover and purchase IT products and services.
 
-now i want to hear your opinion, about the TechBox and of course designing TechBox homepage.
+-please remove background from this section and apply a background behind the whole section (full width of the webpage no the full with of the section)
 
 
-can we please use:
 
-spiceworks article as techbox magazine
+and push all changes, your last changes and these ones.
 
-no hero yet
 
-annoucement from spiceworks
 
-videohub from toms guide
 
-shop from toms guide
 
-tools from spiceworks
 
-community from spiceworks
 
-timeline is a unique hobby
 
-also i like the latest insight (maybe we can redirect 2 of our news as latest insights and the newsletter can be here as tom's guide did)
 
-i like the "Find your next TV" in tom's guide, it's a search bar for TV but we can use it as a global search in different categories (categories gonna be as "easy to use Smart TV's / Best for watching sports / Build-in ATSC 3.0)
 
-i like the our top picks (tom's guide) as top 3 reviews on products (the review section is disable from admin panel but we can make it enable > limit reviews only for products (the author have to select a product from our real shop and write a review) > so the product reviews gonna be visible here as "Our top picks"
 
-i like the "more to explore" from tom's guide a mix of "a random news from news archive - a random oldest video from /media - an oldest article from /magazine)
 
-and i like the last part in tom's guide which is a explanation about the toms, we can have it and put an explanation similar to:
 
 
 
- SpiceWorks is an online community and marketplace where IT professionals can find advice, manage their networks, and discover and purchase IT products and services.
 
 
 
-also after this we gonna have "her's who make tom's guide" section and gonna show our authors.
 
 
 
-i want to add something extra which gonna be: "Some of TechBox Family Comments" which gonna pick random comments from all of modules and show them here, the design of this card can be as the "See what our community has to say" section in spiceworks.
+please help me to:
 
 
 
-IMPORTANT: we need you to design new cards similar or "EXACTLY" like spiceworks / tom's guide cards.
+1-create a new neon free project
 
+2-connect it to my project in vercel
 
+3-connect it to my local .env
 
-IMPORTANT: we don't use any fake data, all of our cards and data needs to be alive and live in database (which we have many contents right now)
+4-connect it to vercel Environments
 
+5-transfer my data from the old project to the new one
 
+6-edit my homepage to be less dynamic (revalidated hourly)
 
-please update our plan by what i said.
+7-let the view counters get update hourly too
 
-and stand by for next step.
+
+
+techbox_season_two_POSTGRES_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+techbox_season_two_POSTGRES_PRISMA_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&connect_timeout=15&sslmode=require
+
+techbox_season_two_POSTGRES_URL_NON_POOLING=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+
+DATABASE_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+DIRECT_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+
+
+
+
+
+
+NEW_DIRECT_URL="postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+OLD_DIRECT_URL="postgresql://neondb_owner:npg_q1DvoGA4rlYb@ep-twilight-hall-atc6iest.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require&connect_timeout=30"
+
+
+pg_dump "$OLD_DIRECT_URL" \ \
+  --schema=public \
+  --format=custom \
+  --no-owner \
+  --no-privileges \
+  --file=techbox-public.dump
+
+pg_restore \
+  --dbname="$NEW_DIRECT_URL" \  
+  --schema=public \
+  --no-owner \
+  --no-privileges \
+  --clean \
+  --if-exists \
+  techbox-public.dump
+
+
+psql "$NEW_DIRECT_URL" -c 'select count(*) from public."Post";'
+psql "$NEW_DIRECT_URL" -c "select pg_size_pretty(pg_database_size(current_database()));"
+
+
+DATABASE_URL="postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+DIRECT_URL="postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
+PRISMA_CONNECTION_LIMIT="1"
