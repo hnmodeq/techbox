@@ -73,17 +73,24 @@ describe("page.tsx passes them to the section", () => {
 describe("MagazineSection visual contract", () => {
   const src = read("features/home/components/sections/MagazineSection.tsx");
 
-  it("has no rounded corners", () => {
-    // Spiceworks squares every corner in this block. A stray radius on one
-    // element reads as a mistake rather than a style.
-    expect(src).not.toMatch(/rounded-(t-|b-|s-|e-)?\[/);
+  it("rounds and elevates the lead card, and nothing else", () => {
+    // The lead now matches the Video section's comment card: one radius
+    // token plus the shared card shadow. The compact list rows stay square,
+    // so the Spiceworks density is preserved where it matters.
+    expect(src).toMatch(/rounded-\[var\(--hp-r-md\)\]/);
+    expect(src).toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
+    expect(src).toMatch(/hover:shadow-\[var\(--hp-shadow-hover\)\]/);
+    // Radius belongs to the lead <article> only.
+    expect([...src.matchAll(/rounded-\[var\(--hp-r-md\)\]/g)].length).toBe(1);
   });
 
   it("uses the shadcn border token for list separators", () => {
-    // Magazine is deliberately on the site’s regular shadcn palette, not
-    // the homepage-specific colour aliases.
+    // Magazine text and rules stay on the regular shadcn palette. The only
+    // homepage-specific aliases permitted are the lead card's radius and
+    // shadow, which deliberately match the Video comment card.
     expect(src).toMatch(/bg-border/);
-    expect(src).not.toMatch(/--hp-/);
+    const hpTokens = new Set([...src.matchAll(/--hp-[a-z-]+/g)].map((m) => m[0]));
+    expect([...hpTokens].sort()).toEqual(["--hp-r-md", "--hp-shadow-card", "--hp-shadow-hover"]);
   });
 
   it("draws separators as real flex items, not a pinned pseudo-element", () => {
@@ -132,15 +139,36 @@ describe("MagazineSection visual contract", () => {
     const tags = [...src.matchAll(/<ArticleTags tags=\{item\.tags\}/g)];
     expect(tags.length).toBe(2); // lead + list row
     expect([...src.matchAll(/showTags && <ArticleTags tags=\{item\.tags\}/g)].length).toBe(2);
-    expect(src).toMatch(/href=\{`\/blog\/tag\/\$\{encodeURIComponent\(tag\)\}`\}/);
+    expect(src).toMatch(/href=\{`\/blog\/tag\/\$\{encodeURIComponent\(primaryTag\)\}`\}/);
     expect(src).toMatch(/className="ps-5"/);
     expect(src).not.toMatch(/CategoryChip/);
   });
 
   it("uses the existing shadcn tooltip and the server-derived reading time", () => {
     expect(src).toMatch(/TooltipTrigger/);
-    expect(src).toMatch(/تاریخ انتشار/);
-    expect(src).toMatch(/item\.readingTimeLabel/);
+    // Publish dates go through the shared RelativeDate component, which
+    // renders the relative ladder and puts the real Jalali date in its
+    // tooltip behind this label.
+    expect(src).toMatch(/<RelativeDate date=\{item\.date\} label="تاریخ انتشار"/);
+    // Reading time is still server-derived, but the badge shows the bare
+    // duration and "زمان مطالعه" moved into the tooltip.
+    expect(src).toMatch(/formatReadingTimeShort\(item\.readingTime\)/);
+    expect(src).toMatch(/<TooltipContent>زمان مطالعه<\/TooltipContent>/);
+    expect(src).not.toMatch(/دقیقه مطالعه/);
+  });
+
+  it("shows only the primary tag", () => {
+    // A row of chips competes with the headline; the rail is dense by design.
+    expect(src).toMatch(/const primaryTag =/);
+    expect(src).not.toMatch(/uniqueTags\.map/);
+  });
+
+  it("opens the ArticleModal in place instead of navigating away", () => {
+    expect(src).toMatch(/import \{ ArticleModal \}/);
+    expect(src).toMatch(/<ArticleModal/);
+    // Both the lead and every list row are buttons wired to the modal.
+    expect([...src.matchAll(/onOpen=\{\(\) => setActiveIndex\(/g)].length).toBe(2);
+    expect(src).toMatch(/^"use client";/);
   });
 
   it("falls back to default copy when the admin description is blank", () => {

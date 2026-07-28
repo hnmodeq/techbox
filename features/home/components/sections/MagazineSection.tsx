@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * §1 · Magazine — Spiceworks "Articles" layout
  *
@@ -12,14 +14,18 @@
  *
  * RTL: lead sits on the RIGHT, list on the LEFT.
  *
- * Server Component.
+ * Client Component — every card opens the existing ArticleModal in place
+ * rather than navigating away, matching the Video section's behaviour.
  * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §1
  */
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
 import { cn } from "@/lib/utils";
+import { formatReadingTimeShort } from "@/lib/reading-time";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { RelativeDate } from "@/components/ui/relative-date";
+import { ArticleModal } from "@/features/blog/components/ArticleModal";
 import { SectionShell, SectionHeader } from "../primitives";
 
 export type MagazineSectionProps = {
@@ -58,7 +64,21 @@ export function MagazineSection({
   showTags = true,
   accentColor,
 }: MagazineSectionProps) {
-  // Rule 1: no data → no section. Guard is the first statement.
+  // Modal index into `posts`, so prev/next walk the same five articles the
+  // section is showing. Hooks must run before the empty guard.
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const items = posts ?? [];
+  const close = React.useCallback(() => setActiveIndex(null), []);
+  const prev = React.useCallback(
+    () => setActiveIndex((i) => (i === null ? null : i > 0 ? i - 1 : items.length - 1)),
+    [items.length],
+  );
+  const next = React.useCallback(
+    () => setActiveIndex((i) => (i === null ? null : i < items.length - 1 ? i + 1 : 0)),
+    [items.length],
+  );
+
+  // Rule 1: no data → no section. Guard is the first statement after hooks.
   if (!posts?.length) return null;
 
   // `getMagazinePosts()` guarantees this order: the latest published
@@ -86,7 +106,7 @@ export function MagazineSection({
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,878fr)_minmax(0,618fr)] lg:gap-10">
-        <LeadArticle item={lead} showTags={showTags} />
+        <LeadArticle item={lead} showTags={showTags} onOpen={() => setActiveIndex(0)} />
         {list.length > 0 && (
           // justify-between on the main (vertical) axis. The <ul> is a grid
           // item, so it stretches to the row height set by the taller lead
@@ -118,13 +138,22 @@ export function MagazineSection({
                   />
                 )}
                 <li>
-                  <ListRow item={item} showTags={showTags} />
+                  <ListRow item={item} showTags={showTags} onOpen={() => setActiveIndex(index + 1)} />
                 </li>
               </React.Fragment>
             ))}
           </ul>
         )}
       </div>
+
+      {activeIndex !== null && items[activeIndex] && (
+        <ArticleModal
+          item={items[activeIndex]}
+          onClose={close}
+          onPrev={prev}
+          onNext={next}
+        />
+      )}
     </SectionShell>
   );
 }
@@ -143,8 +172,10 @@ function ArticleTags({
   onPrimary?: boolean;
   className?: string;
 }) {
-  const uniqueTags = [...new Set(tags.filter((tag) => typeof tag === "string" && tag.trim()))];
-  if (uniqueTags.length === 0) return null;
+  // Only the primary tag. The rail is dense by design and a row of chips
+  // competes with the headline for the eye.
+  const primaryTag = [...new Set(tags.filter((tag) => typeof tag === "string" && tag.trim()))][0];
+  if (!primaryTag) return null;
 
   return (
     <div
@@ -154,18 +185,15 @@ function ArticleTags({
         className,
       )}
     >
-      {uniqueTags.map((tag) => (
-        <Link
-          key={tag}
-          href={`/blog/tag/${encodeURIComponent(tag)}`}
-          className={cn(
-            "decoration-1 underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            onPrimary ? "hover:text-[color:var(--magazine-on-accent)]" : "hover:text-[color:var(--magazine-accent)]",
-          )}
-        >
-          {tag}
-        </Link>
-      ))}
+      <Link
+        href={`/blog/tag/${encodeURIComponent(primaryTag)}`}
+        className={cn(
+          "decoration-1 underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          onPrimary ? "hover:text-[color:var(--magazine-on-accent)]" : "hover:text-[color:var(--magazine-accent)]",
+        )}
+      >
+        {primaryTag}
+      </Link>
     </div>
   );
 }
@@ -181,6 +209,10 @@ function PublicationMeta({
   onPrimary?: boolean;
   className?: string;
 }) {
+  // The badge shows the bare duration; "زمان مطالعه" lives in the tooltip.
+  const readingTime =
+    item.readingTime != null ? formatReadingTimeShort(item.readingTime) : null;
+
   return (
     <div
       className={cn(
@@ -189,17 +221,17 @@ function PublicationMeta({
         className,
       )}
     >
-      <Tooltip>
-        <TooltipTrigger render={<time dateTime={item.date} className="cursor-default" />}>
-          {item.date_fa}
-        </TooltipTrigger>
-        <TooltipContent>تاریخ انتشار</TooltipContent>
-      </Tooltip>
+      <RelativeDate date={item.date} label="تاریخ انتشار" />
 
-      {item.readingTimeLabel && (
+      {readingTime && (
         <>
           <span aria-hidden="true">•</span>
-          <span>{item.readingTimeLabel}</span>
+          <Tooltip>
+            <TooltipTrigger render={<span className="cursor-default" />}>
+              {readingTime}
+            </TooltipTrigger>
+            <TooltipContent>زمان مطالعه</TooltipContent>
+          </Tooltip>
         </>
       )}
     </div>
@@ -213,14 +245,25 @@ function PublicationMeta({
  * object, so the image corners are squared off where the two meet rather
  * than rounded independently.
  */
-function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean }) {
-  const href = `/${item.module}/${item.slug}`;
-
+function LeadArticle({
+  item,
+  showTags,
+  onOpen,
+}: {
+  item: ContentItem;
+  showTags: boolean;
+  onOpen: () => void;
+}) {
   return (
-    <article className="hp-card">
-      <Link
-        href={href}
-        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    // Rounded and elevated to match the Video section's comment card.
+    // overflow-hidden clips the image to the same radius, so the photo and
+    // the colour panel still read as one object.
+    <article className="hp-card overflow-hidden rounded-[var(--hp-r-md)] shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`باز کردن مقالهٔ ${item.title}`}
+        className="group block w-full text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <div
           className="relative w-full overflow-hidden bg-muted"
@@ -240,40 +283,47 @@ function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean 
             />
           )}
         </div>
-      </Link>
 
-      <div className="bg-[color:var(--magazine-accent)] px-10 pb-6 pt-10 text-[color:var(--magazine-on-accent)]">
-        {showTags && <ArticleTags tags={item.tags} onPrimary />}
+        <div className="bg-[color:var(--magazine-accent)] px-10 pb-6 pt-10 text-[color:var(--magazine-on-accent)]">
+          {showTags && <ArticleTags tags={item.tags} onPrimary />}
 
-        <h3 className="text-[28px] font-bold leading-[38px]">
-          <Link
-            href={href}
-            className="decoration-1 underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
+          <h3 className="text-[28px] font-bold leading-[38px] decoration-1 underline-offset-4 group-hover:underline">
             {item.title}
-          </Link>
-        </h3>
+          </h3>
 
-        {item.excerpt && (
-          <p className="line-clamp-3 text-[15px] leading-[28px] text-[color:var(--magazine-on-accent)]">
-            {item.excerpt}
-          </p>
-        )}
+          {item.excerpt && (
+            <p className="line-clamp-3 text-[15px] leading-[28px] text-[color:var(--magazine-on-accent)]">
+              {item.excerpt}
+            </p>
+          )}
+        </div>
+      </button>
 
-        <PublicationMeta item={item} onPrimary className="mt-3" />
+      {/* Outside the button: the meta row owns interactive tooltips and the
+          tag links, which cannot be nested inside another button. */}
+      <div className="bg-[color:var(--magazine-accent)] px-10 pb-10 text-[color:var(--magazine-on-accent)]">
+        <PublicationMeta item={item} onPrimary />
       </div>
     </article>
   );
 }
 
 /** Spiceworks list row: 143×95 thumb + tags, title and metadata. */
-function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
-  const href = `/${item.module}/${item.slug}`;
-
+function ListRow({
+  item,
+  showTags,
+  onOpen,
+}: {
+  item: ContentItem;
+  showTags: boolean;
+  onOpen: () => void;
+}) {
   return (
-    <article className="hp-card flex">
-      <Link
-        href={href}
+    <article className="hp-card group flex">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`باز کردن مقالهٔ ${item.title}`}
         className="block shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <div
@@ -291,18 +341,19 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
             />
           )}
         </div>
-      </Link>
+      </button>
 
       <div className="flex min-w-0 flex-col items-start justify-start">
         {/* Match the title's existing logical inset in RTL. */}
         {showTags && <ArticleTags tags={item.tags} className="ps-5" />}
-        <h3 className="line-clamp-2 ps-5 text-[16px] font-bold leading-[24px] text-foreground">
-          <Link
-            href={href}
-            className="decoration-1 underline-offset-4 transition-colors hover:text-[color:var(--magazine-accent)] hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        <h3 className="ps-5 text-[16px] font-bold leading-[24px] text-foreground">
+          <button
+            type="button"
+            onClick={onOpen}
+            className="line-clamp-2 text-start decoration-1 underline-offset-4 transition-colors hover:text-[color:var(--magazine-accent)] hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {item.title}
-          </Link>
+          </button>
         </h3>
         <PublicationMeta item={item} className="mt-1 ps-5" />
       </div>
