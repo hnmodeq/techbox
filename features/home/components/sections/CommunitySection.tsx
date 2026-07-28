@@ -37,6 +37,7 @@ export type CommunitySectionProps = {
   moreLabel?: string;
   showTitle?: boolean;
   showMore?: boolean;
+  accentColor?: string;
 };
 
 const HEADING_ID = "hp-community-heading";
@@ -48,6 +49,7 @@ export function CommunitySection({
   moreLabel = "ورود به انجمن",
   showTitle = true,
   showMore = true,
+  accentColor,
 }: CommunitySectionProps) {
   if (!topics || topics.length < MIN_TOPICS) return null;
 
@@ -69,6 +71,7 @@ export function CommunitySection({
           description="به هزاران متخصص IT بپیوندید: بپرسید، پیشنهاد بدهید و تجربه‌تان را به اشتراک بگذارید."
           href={showMore ? "/forum" : undefined}
           linkLabel={moreLabel}
+          accentColor={accentColor}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}

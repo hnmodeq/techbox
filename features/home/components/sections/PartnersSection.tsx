@@ -34,6 +34,8 @@ export function PartnersSection({
         headingId={HEADING_ID}
         title={title}
         description="برندها و شرکت‌هایی که تکباکس با آن‌ها همکاری می‌کند."
+        href="/about"
+        linkLabel="درباره تکباکس"
       />
 
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">

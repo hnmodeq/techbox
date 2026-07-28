@@ -3,10 +3,10 @@
 > **This file is the single source of truth for "what is done" and "what is next".**
 > Update it before you stop working, every time. An agent resuming after you reads this first.
 
-**Last updated:** 2026-07-26
-**Updated by:** Implementation agent
-**Current phase:** A–G complete except browser-dependent tasks (B6, G6) and G3 (deliberately skipped)
-**Next action:** Fix the owner's local dev environment. Then optionally: E1 admin product picker, E3 triage, E7 NOT NULL.
+**Last updated:** 2026-07-28
+**Updated by:** Implementation agent + Arena agent
+**Current phase:** A–G complete except browser-dependent tasks (B6, G6) and G3 (deliberately skipped); Magazine, shared headers, module colours, Video and Latest refinements applied
+**Next action:** Visually check the Magazine/Video/Latest refinements and module-colour toggle in the owner's local/CI browser environment. Then optionally: E1 admin product picker, E3 triage, E7 NOT NULL.
 
 ---
 
@@ -133,6 +133,27 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 ## Session log
 
 Append one entry per working session. Newest at top.
+
+### 2026-07-28 — Shared headers, module colour restoration, Video and Latest redesign
+
+Completed the owner-requested follow-on homepage work using the supplied Spiceworks and Tom's Guide references:
+
+- The shared `SectionHeader` now uses the Magazine title → rule → action rhythm by default. It keeps titles on standard shadcn foreground tokens while its rule and “more” action receive the active module accent. Timeline, Family Comments, More to Explore, Profiles and Partners now use the same browse-header treatment where a safe destination exists.
+- Restored the dormant module-colour system. The admin Colours tab now opens a visual palette/native colour-picker dialog per module (hex values only), validates input server-side, and explains that disabled mode returns all consumers to default shadcn tokens. `ModuleColorApplier` now applies/removes runtime variables; the client config fetch no longer discarded the saved colour state.
+- Module accents now affect the requested homepage locations: header rules/actions, Magazine tag hover and lead-panel background, Video title hover, and Latest-news interactions. The disabled path uses `var(--primary)` / standard shadcn styling.
+- Rebuilt Video as a ghost full-width section with square cards, a latest landscape video at desktop-left, current quick takes at desktop-right-bottom, larger borderless rail controls, date metadata, an exact `زمان ویدیو` tooltip, no card scaling, and the existing `VideoModal` on every video click. The right-top slot contains **one** real approved comment on the latest video, modelled after the supplied Spiceworks testimonial. Clicking it opens the modal and scrolls to the real comment anchor.
+- Rebuilt Latest as a full-width muted wash with the current week's most-commented published news story at desktop-right, real compact comment rows at left-top, and the newsletter at left-bottom. A quiet-week fallback uses the newest published news row; there is never fabricated content.
+- Added coverage for module-colour validation and the Video/Latest data/layout contracts. `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass (**201 tests**). Production builds remain blocked by the sandbox's prior Turbopack termination / Webpack heap limit, so normal local/CI browser validation is still required.
+
+### 2026-07-28 — Magazine homepage refinements
+
+Applied the owner-requested Magazine changes without introducing placeholder data or client-side content loading:
+
+- Replaced homepage-specific colour aliases in `MagazineSection` with standard shadcn semantic tokens (`primary`, `primary-foreground`, `foreground`, `muted`, `muted-foreground`, `border`, `ring`).
+- Replaced filled category chips with unfilled, database-backed article tags. Tags use the existing `/blog/tag/[tag]` listing (including a correction to its PostgreSQL JSON-array tag filter), are logically inset with the list title (`ps-5`, the RTL-safe equivalent of `pr-5`), and title/tag hover states underline text.
+- Added the existing shadcn tooltip to every publication date (`تاریخ انتشار`) and rendered the existing server-derived reading-time label on the lead and compact articles.
+- Added an uncached `getMagazinePosts()` selection: the lead is the newest eligible blog row; up to four distinct compact rows are sampled from real database IDs on every full homepage refresh. `app/page.tsx` is intentionally `force-dynamic` for that refresh contract; all other homepage slices retain their existing cache windows.
+- Added/updated unit-level contract tests. `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass (195 tests). Production builds cannot complete in this sandbox: Turbopack was terminated by the runner, and Webpack exhausted the ~944 MB Node heap. This needs normal local/CI build and browser visual verification.
 
 ### 2026-07-26 (session 18e) — Swept the remaining routes; two more `include` leaks
 

@@ -7,9 +7,10 @@
  * back empty renders `null` and disappears entirely rather than showing a
  * skeleton or dummy card.
  *
- * All data arrives from a single cached `getHomeData()` call; no section
- * fetches on its own, and nothing fetches on the client during first
- * paint.
+ * All sections except Magazine arrive from a single cached `getHomeData()`
+ * call. Magazine intentionally makes one server-side refresh-time selection:
+ * its lead is always the newest article and its four compact cards are real
+ * random articles. Nothing fetches on the client during first paint.
  *
  * Section order and visibility remain admin-controlled through
  * `getModuleConfig()` — `enabled`, `showOnHome`, `homeOrder`, plus the
@@ -18,8 +19,9 @@
  * Docs: docs/homepage-upgrade/
  */
 import { HomeDataProvider } from "@/features/home/lib/home-data";
-import { getHomeData } from "@/lib/home-server";
+import { getHomeData, getMagazinePosts } from "@/lib/home-server";
 import { getModuleConfig, type ModuleSlug } from "@/lib/module-config";
+import { resolveModuleColor } from "@/config/module-colors";
 
 import { MagazineSection } from "@/features/home/components/sections/MagazineSection";
 import { VideoSection } from "@/features/home/components/sections/VideoSection";
@@ -93,8 +95,16 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   partners: 14,
 };
 
+// Magazine's four compact cards deliberately change on each full refresh.
+// This opts the route out of Next's Full Route Cache while the other homepage
+// slices retain their own `unstable_cache` windows in lib/home-server.ts.
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [config, data] = await Promise.all([getModuleConfig(), getHomeData()]);
+  const magazinePosts = config.blog?.enabled && config.blog?.showOnHome
+    ? await getMagazinePosts()
+    : [];
 
   const isVisible = (key: SectionKey) => {
     const slug = SECTION_MODULE[key];
@@ -118,21 +128,39 @@ export default async function HomePage() {
       showMore: cfg?.showHomeMoreLabel ?? true,
       description: cfg?.homeDescription?.trim() || undefined,
       showTags: cfg?.showHomeTags ?? true,
+      // Disabled means ordinary shadcn tokens. Sections only receive a
+      // custom value when the administrator has turned module colours on.
+      accentColor: slug && config.moduleColorsEnabled !== false
+        ? resolveModuleColor(slug, config.moduleColors[slug])
+        : undefined,
     };
   };
 
   const sections: Array<{ key: SectionKey; node: React.ReactNode }> = [
     {
       key: "magazine",
-      node: <MagazineSection posts={data.modules.blog ?? []} {...textFor("magazine")} />,
+      node: <MagazineSection posts={magazinePosts} {...textFor("magazine")} />,
     },
     {
       key: "video",
-      node: <VideoSection videos={data.modules.media ?? []} {...textFor("video")} />,
+      node: (
+        <VideoSection
+          videos={data.modules.media ?? []}
+          highlightComment={data.videoHighlightComment}
+          {...textFor("video")}
+        />
+      ),
     },
     {
       key: "insights",
-      node: <InsightsSection insights={data.insights ?? []} />,
+      node: (
+        <InsightsSection
+          data={data.latestInsights}
+          accentColor={config.moduleColorsEnabled !== false
+            ? resolveModuleColor("news", config.moduleColors.news)
+            : undefined}
+        />
+      ),
     },
     {
       key: "finder",

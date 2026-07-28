@@ -8,6 +8,7 @@ import {
   type SiteLayoutConfig,
 } from "@/lib/module-config";
 import { z } from "zod";
+import { COLORABLE_MODULE_SLUGS, isModuleColor } from "@/config/module-colors";
 
 export async function GET() {
   const user = await requirePermission("module:view");
@@ -39,8 +40,16 @@ export async function PATCH(req: NextRequest) {
     const heroVisible = body.heroVisible !== false;
     const tickerVisible = body.tickerVisible !== false;
     const moduleColorsEnabled = body.moduleColorsEnabled !== false;
-    const unifiedModuleColor = typeof body.unifiedModuleColor === "string" ? body.unifiedModuleColor : "var(--primary)";
-    const moduleColors = (body.moduleColors && typeof body.moduleColors === "object") ? body.moduleColors : {};
+    const unifiedModuleColor = "var(--primary)"; // retained for older settings payloads; disabled mode is now pure shadcn.
+    const incomingColors: Record<string, unknown> = (body.moduleColors && typeof body.moduleColors === "object")
+      ? body.moduleColors as Record<string, unknown>
+      : {};
+    const moduleColors = Object.fromEntries(
+      COLORABLE_MODULE_SLUGS.flatMap((slug) => {
+        const color = incomingColors[slug];
+        return isModuleColor(color) ? [[slug, color.trim()]] : [];
+      }),
+    );
 
     // No strict validation — frontend now always sends complete objects
     const moduleEntries: Record<string, any> = {};

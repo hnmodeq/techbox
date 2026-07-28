@@ -62,6 +62,31 @@ export type FamilyComment = {
   };
 };
 
+/** A real approved comment surfaced beside the video or weekly news item. */
+export type HighlightComment = {
+  id: string;
+  text: string;
+  date: string;
+  dateFa: string;
+  author: {
+    name: string;
+    username: string | null;
+    avatar: string | null;
+    verifiedType: string | null;
+  };
+};
+
+/** §2 — a random approved comment on the newest published video. */
+export type VideoHighlightComment = HighlightComment & {
+  videoSlug: string;
+};
+
+/** §3 — the most-commented news story of the current week and its comments. */
+export type LatestInsights = {
+  story: ContentItem | null;
+  comments: HighlightComment[];
+};
+
 /** §12 Authors — a contributor card. */
 export type AuthorCard = {
   name: string;

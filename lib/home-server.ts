@@ -1,11 +1,14 @@
+import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import type { HomeData } from "@/features/home/lib/home-data";
+import type { ContentItem } from "@/lib/content";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getEnabledModules, getModuleConfig } from "@/lib/module-config";
 import {
-  getInsights,
+  getLatestInsights,
+  getLatestVideoHighlightComment,
   getDeals,
   getTopPicks,
   getTimeline,
@@ -284,6 +287,81 @@ async function findPosts(module: string, take: number) {
   return normalized;
 }
 
+/**
+ * Return a new random sample without touching the input array.
+ *
+ * `crypto.randomInt()` is deliberate: unlike Math.random(), this selection
+ * only exists in the server-rendered RSC payload, so it cannot cause a
+ * client hydration mismatch. It also lets the four compact magazine cards
+ * genuinely change on each full homepage refresh.
+ */
+function randomSample<T>(items: readonly T[], take: number): T[] {
+  const sampled = [...items];
+  const count = Math.min(Math.max(take, 0), sampled.length);
+
+  for (let index = 0; index < count; index++) {
+    const swapIndex = index + randomInt(sampled.length - index);
+    [sampled[index], sampled[swapIndex]] = [sampled[swapIndex], sampled[index]];
+  }
+
+  return sampled.slice(0, count);
+}
+
+/**
+ * Homepage Magazine data is intentionally not part of the hour-long home
+ * cache. The lead is always the newest published blog article; its compact
+ * neighbours are a distinct, cryptographically sampled set of real blog
+ * rows on each full page refresh.
+ *
+ * Candidate lookup selects IDs only, then hydrates only the four selected
+ * cards. That avoids transferring every article body merely to randomise a
+ * small rail; `content` is transferred only for rendered cards because the
+ * reading-time formatter needs it.
+ */
+export async function getMagazinePosts(): Promise<ContentItem[]> {
+  return section<ContentItem[]>("magazine", [], async (): Promise<ContentItem[]> => {
+    const where = {
+      module: "blog",
+      published: true,
+      deletedAt: null,
+      date: publicPostDateWhere(),
+    };
+
+    const latest = await prisma.post.findFirst({
+      where,
+      orderBy: [{ date: "desc" }, { id: "desc" }],
+      select: cardSelect,
+    });
+    if (!latest) return [];
+
+    const candidateIds = await prisma.post.findMany({
+      where: { ...where, id: { not: latest.id } },
+      select: { id: true },
+    });
+    const selectedIds = randomSample(candidateIds.map((post) => post.id), 4);
+
+    if (selectedIds.length === 0) return [normalizeCard(latest) as ContentItem];
+
+    const selected = await prisma.post.findMany({
+      where: { id: { in: selectedIds } },
+      select: cardSelect,
+    });
+    const selectedById = new Map<string, ContentItem>(
+      selected.map((post) => [post.id, normalizeCard(post) as ContentItem]),
+    );
+
+    // findMany does not preserve `in` ordering. Restore the random ID order
+    // so the compact rail does not quietly become deterministic by primary
+    // key, and keep the newest article in the lead position.
+    const compactPosts: ContentItem[] = [];
+    for (const id of selectedIds) {
+      const post = selectedById.get(id);
+      if (post) compactPosts.push(post);
+    }
+    return [normalizeCard(latest) as ContentItem, ...compactPosts];
+  });
+}
+
 async function getLayoutHomeDataUncached(): Promise<HomeData> {
   const enabledModules = await getEnabledModules();
   // Admin-controlled (SiteSetting `ticker.visible`). Defaults to true, so
@@ -423,10 +501,11 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   // Every block is individually try/caught. One failing section must
   // degrade to "section hidden", never take down the whole homepage.
 
-  const sidebarNewsSlugs = (modules.news ?? []).slice(0, 5).map((n: any) => n.slug);
+  const latestInsights = await section("latestInsights", { story: null, comments: [] } as any, () =>
+    getLatestInsights(normalizeCard, cardSelect));
 
-  const insights = await section("insights", [] as any[], () =>
-    getInsights(sidebarNewsSlugs, normalizeCard, cardSelect));
+  const videoHighlightComment = await section("videoHighlightComment", null as any, () =>
+    getLatestVideoHighlightComment());
 
   const topPicks = await section("topPicks", [] as any[], () =>
     getTopPicks(normalizeCard, cardSelect));
@@ -522,7 +601,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     modules: modules as HomeData["modules"],
     ticker: tickerPosts.map(normalizeTickerCard),
     generatedAt: new Date().toISOString(),
-    insights,
+    latestInsights,
+    videoHighlightComment,
     topPicks,
     timeline,
     familyComments,
@@ -536,10 +616,10 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// Cache key bumped v5 -> v6: the payload shape changed.
-// Window shortened 24h -> 1h so the hourly-seeded random slots in §10 and
-// §11 actually rotate; seededIndex() is keyed to the same hour boundary.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v6"], {
+// Cache key bumped v6 -> v7: Latest Insights is now the weekly
+// most-commented news story with real comment cards, plus a video comment.
+// Window shortened 24h -> 1h so hourly-seeded comment slots rotate.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v7"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

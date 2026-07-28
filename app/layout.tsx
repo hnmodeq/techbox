@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { RuntimeEffects } from "@/components/layout/RuntimeEffects";
-import { ModuleColorApplier } from "@/components/layout/ModuleColorApplier";
 import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/SiteJsonLd";
 
 // Critical inline styles (inlined for performance)
@@ -104,7 +103,6 @@ export default async function RootLayout({
           رد شدن به محتوای اصلی
         </a>
         <RuntimeEffects />
-        <ModuleColorApplier />
         <TooltipProvider>
           <ScrollRestoration />
           <LayoutShell homeData={homeData} serverModuleConfig={moduleConfig}>{children}</LayoutShell>

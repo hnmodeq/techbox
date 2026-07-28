@@ -79,11 +79,11 @@ describe("MagazineSection visual contract", () => {
     expect(src).not.toMatch(/rounded-(t-|b-|s-|e-)?\[/);
   });
 
-  it("separates list rows with the dedicated rule token", () => {
-    // --hp-border is ~1.26:1 against the page: correct for a card edge,
-    // invisible as a standalone divider. --hp-rule exists for this.
-    expect(src).toMatch(/--hp-rule/);
-    expect(src).not.toMatch(/border-b border-\[color:var\(--hp-border\)\]/);
+  it("uses the shadcn border token for list separators", () => {
+    // Magazine is deliberately on the site’s regular shadcn palette, not
+    // the homepage-specific colour aliases.
+    expect(src).toMatch(/bg-border/);
+    expect(src).not.toMatch(/--hp-/);
   });
 
   it("draws separators as real flex items, not a pinned pseudo-element", () => {
@@ -94,7 +94,7 @@ describe("MagazineSection visual contract", () => {
     // algorithm only sizes at layout time. As sibling <li> elements the
     // dividers are distributed by the same algorithm as the rows.
     expect(src).toMatch(/role="separator"/);
-    expect(src).toMatch(/bg-\[color:var\(--hp-rule\)\]/);
+    expect(src).toMatch(/bg-border/);
     expect(src).not.toMatch(/after:absolute/);
     expect(src).not.toMatch(/last:after:hidden/);
   });
@@ -123,15 +123,24 @@ describe("MagazineSection visual contract", () => {
     expect(src).not.toMatch(/flex-col items-start justify-center/);
   });
 
-  it("hovers the lead by colour, not by transform", () => {
+  it("uses an underline interaction for article titles, not a transform", () => {
     expect(src).not.toMatch(/group-hover:scale/);
-    expect(src).toMatch(/group-hover:text-\[color:var\(--hp-accent-on-ink\)\]/);
+    expect([...src.matchAll(/hover:underline/g)].length).toBeGreaterThanOrEqual(3);
   });
 
-  it("gates both chips behind showTags", () => {
-    const chips = [...src.matchAll(/<CategoryChip/g)];
-    expect(chips.length).toBe(2); // lead + list row
-    expect([...src.matchAll(/showTags && item\.category && <CategoryChip/g)].length).toBe(2);
+  it("renders database tags as clickable, unfilled links behind showTags", () => {
+    const tags = [...src.matchAll(/<ArticleTags tags=\{item\.tags\}/g)];
+    expect(tags.length).toBe(2); // lead + list row
+    expect([...src.matchAll(/showTags && <ArticleTags tags=\{item\.tags\}/g)].length).toBe(2);
+    expect(src).toMatch(/href=\{`\/blog\/tag\/\$\{encodeURIComponent\(tag\)\}`\}/);
+    expect(src).toMatch(/className="ps-5"/);
+    expect(src).not.toMatch(/CategoryChip/);
+  });
+
+  it("uses the existing shadcn tooltip and the server-derived reading time", () => {
+    expect(src).toMatch(/TooltipTrigger/);
+    expect(src).toMatch(/تاریخ انتشار/);
+    expect(src).toMatch(/item\.readingTimeLabel/);
   });
 
   it("falls back to default copy when the admin description is blank", () => {

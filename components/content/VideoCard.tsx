@@ -146,12 +146,15 @@ export function VideoModal({
   onPrev,
   onNext,
   slideDirection,
+  scrollToCommentId,
 }: {
   video: VideoItem;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
   slideDirection: "left" | "right";
+  /** Home-video comment cards open the existing modal at this real comment. */
+  scrollToCommentId?: string | null;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
@@ -177,6 +180,29 @@ export function VideoModal({
       vid.removeEventListener("canplay", onCanPlay);
     };
   }, [video.slug]);
+
+  useEffect(() => {
+    if (!scrollToCommentId) return;
+    let attempts = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    // Comments load asynchronously inside the modal. Retry briefly until the
+    // real anchor is in the DOM, then scroll its own overflow container.
+    const reveal = () => {
+      const target = document.getElementById(`comment-${scrollToCommentId}`);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.classList.add("ring-2", "ring-primary/50");
+        timer = setTimeout(() => target.classList.remove("ring-2", "ring-primary/50"), 2200);
+        return;
+      }
+      attempts += 1;
+      if (attempts < 10) timer = setTimeout(reveal, 250);
+    };
+
+    timer = setTimeout(reveal, 100);
+    return () => { if (timer) clearTimeout(timer); };
+  }, [scrollToCommentId, video.slug]);
 
   return (
     <div

@@ -10,6 +10,8 @@ import type {
   MoreToExplore,
   FamilyProfile,
   PartnerCard,
+  VideoHighlightComment,
+  LatestInsights,
 } from "./home-types";
 
 export type HomeData = {
@@ -21,8 +23,12 @@ export type HomeData = {
   // All optional: the layout fetch (getLayoutHomeData) only populates
   // `modules.news` + `ticker`, so these are absent there by design. Every
   // consumer must treat an empty slice as "hide the section".
-  /** §3 — 2 news posts ranked by engagement, deduped against the sidebar. */
+  /** §3 — weekly most-commented news story plus real approved comments. */
+  latestInsights?: LatestInsights;
+  /** Legacy shape retained for older API consumers. */
   insights?: ContentItem[];
+  /** §2 — one sampled approved comment on the newest video. */
+  videoHighlightComment?: VideoHighlightComment | null;
   /** §5 — up to 3 reviews joined to their shop product. */
   topPicks?: TopPickCard[];
   /** §6 — up to 12 IT milestones. */
@@ -116,6 +122,8 @@ export function HomeDataProvider({
         // actually supplies a replacement. Spreading `prev` above is not
         // enough — an explicit undefined in the body would clobber it.
         insights: body.insights ?? prev.insights,
+        latestInsights: body.latestInsights ?? prev.latestInsights,
+        videoHighlightComment: body.videoHighlightComment ?? prev.videoHighlightComment,
         topPicks: body.topPicks ?? prev.topPicks,
         timeline: body.timeline ?? prev.timeline,
         familyComments: body.familyComments ?? prev.familyComments,

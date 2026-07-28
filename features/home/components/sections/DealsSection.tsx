@@ -32,6 +32,7 @@ export type DealsSectionProps = {
   moreLabel?: string;
   showTitle?: boolean;
   showMore?: boolean;
+  accentColor?: string;
 };
 
 const HEADING_ID = "hp-deals-heading";
@@ -43,6 +44,7 @@ export function DealsSection({
   moreLabel = "مشاهده همه محصولات",
   showTitle = true,
   showMore = true,
+  accentColor,
 }: DealsSectionProps) {
   if (!products || products.length < MIN_PRODUCTS) return null;
 
@@ -55,6 +57,7 @@ export function DealsSection({
           description="تخفیف‌های امروز را از دست ندهید. بهترین کاهش قیمت‌ها روی سخت‌افزار سازمانی."
           href={showMore ? "/shop" : undefined}
           linkLabel={moreLabel}
+          accentColor={accentColor}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}

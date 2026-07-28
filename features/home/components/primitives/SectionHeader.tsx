@@ -1,16 +1,10 @@
 /**
- * SectionHeader — the title block above every homepage section.
+ * Shared homepage header.
  *
- * Matches the Spiceworks / Tom's Guide widget-header pattern:
- *   [ h2 title ]                          [ see-all link ]
- *   [ optional one-line description                      ]
- *
- * In RTL the title sits on the RIGHT and the see-all link on the LEFT,
- * which is the mirror of both sources.
- *
- * Server Component — no interactivity.
- *
- * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §1 (typography), §2
+ * Every content section uses the same Magazine-style rhythm: section title,
+ * hairline rule, then a "see all" action. The title always stays on the
+ * ordinary shadcn foreground token; when module colours are enabled only the
+ * decorative rule and action receive that module's accent.
  */
 import * as React from "react";
 import Link from "next/link";
@@ -21,24 +15,23 @@ export type SectionHeaderProps = {
   title: string;
   /** One-line description under the title. Optional. */
   description?: string;
-  /** "see all" destination. Omit to hide the link entirely. */
+  /** "See all" destination. Omit to hide the action. */
   href?: string;
   /** Link label. Arrow is appended automatically. */
   linkLabel?: string;
-  /**
-   * id for the <h2>, so the parent <section> can point at it with
-   * aria-labelledby. Required for the a11y contract.
-   */
+  /** id for the <h2>, so the parent section can point at it. */
   headingId: string;
-  /** Render on a dark band (Timeline, About) — flips text to on-brand colours. */
+  /** Render on a dark band (Timeline, About). */
   onDark?: boolean;
-  /**
-   * Spiceworks runs a hairline rule from the title across to the see-all
-   * link. Opt-in (default off) so the 13 sections already shipped keep
-   * their current header exactly as-is.
-   */
+  /** The active module colour; omit for the standard shadcn primary. */
+  accentColor?: string;
+  /** The Magazine line-and-action treatment. Defaults to on for all sections. */
   rule?: boolean;
   className?: string;
+};
+
+type HeaderStyle = React.CSSProperties & {
+  "--section-header-accent"?: string;
 };
 
 export function SectionHeader({
@@ -48,34 +41,32 @@ export function SectionHeader({
   linkLabel = "مشاهده همه",
   headingId,
   onDark = false,
-  rule = false,
+  accentColor,
+  rule = true,
   className,
 }: SectionHeaderProps) {
+  const style: HeaderStyle = {
+    "--section-header-accent": accentColor || (onDark ? "var(--primary-foreground)" : "var(--primary)"),
+  };
+
   return (
-    <div className={cn("mb-6", className)}>
+    <div className={cn("mb-6", className)} style={style}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+        {/* The title intentionally never receives a module colour. */}
         <h2
           id={headingId}
           className={cn(
             "text-2xl font-bold leading-[40px] tracking-tight",
-            onDark ? "text-[color:var(--hp-on-brand)]" : "text-[color:var(--hp-ink)]",
+            onDark ? "text-primary-foreground" : "text-foreground",
           )}
         >
           {title}
         </h2>
 
-        {/* The rule fills the gap between title and link. aria-hidden and
-            not focusable: it is pure decoration, and a <hr> here would be
-            announced as a thematic break between two parts of one heading. */}
         {rule && (
           <span
             aria-hidden="true"
-            className={cn(
-              "hidden h-px min-w-8 flex-1 self-center sm:block",
-              onDark
-                ? "bg-[color:var(--hp-on-brand-mut)]"
-                : "bg-[color:var(--hp-brand)]",
-            )}
+            className="hidden h-px min-w-8 flex-1 self-center bg-[color:var(--section-header-accent)] sm:block"
           />
         )}
 
@@ -83,10 +74,8 @@ export function SectionHeader({
           <Link
             href={href}
             className={cn(
-              "shrink-0 text-[13px] font-bold transition-colors",
-              onDark
-                ? "text-[color:var(--hp-on-brand-mut)] hover:text-[color:var(--hp-on-brand)]"
-                : "text-[color:var(--hp-brand)] hover:text-[color:var(--hp-brand-hover)]",
+              "shrink-0 text-[13px] font-bold text-[color:var(--section-header-accent)] underline-offset-4 transition-opacity hover:underline hover:opacity-80 focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              onDark && "focus-visible:ring-primary-foreground",
             )}
           >
             {/* RTL: "forward" is a LEFT arrow */}
@@ -99,7 +88,7 @@ export function SectionHeader({
         <p
           className={cn(
             "mt-2 max-w-3xl text-[15px] leading-[28px]",
-            onDark ? "text-[color:var(--hp-on-brand-mut)]" : "text-[color:var(--hp-ink-3)]",
+            onDark ? "text-primary-foreground/70" : "text-muted-foreground",
           )}
         >
           {description}

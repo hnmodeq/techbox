@@ -18,7 +18,7 @@ import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
 import type { MoreToExplore } from "@/features/home/lib/home-types";
-import { InsetBand, Eyebrow, Byline } from "../primitives";
+import { InsetBand, Eyebrow, Byline, SectionHeader } from "../primitives";
 
 export type MoreToExploreSectionProps = {
   data?: MoreToExplore;
@@ -53,17 +53,13 @@ export function MoreToExploreSection({
 
   return (
     <InsetBand labelledBy={HEADING_ID} tone="tint">
-      <div className="mb-6">
-        <h2
-          id={HEADING_ID}
-          className="text-[28px] font-bold leading-[40px] text-[color:var(--hp-ink)]"
-        >
-          {title}
-        </h2>
-        <p className="mt-2 max-w-3xl text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
-          مطالبی از آرشیو که شاید از دست داده باشید — از قدیمی‌ترین‌های هر بخش.
-        </p>
-      </div>
+      <SectionHeader
+        headingId={HEADING_ID}
+        title={title}
+        description="مطالبی از آرشیو که شاید از دست داده باشید — از قدیمی‌ترین‌های هر بخش."
+        href="/search"
+        linkLabel="کاوش همه"
+      />
 
       <HeroCard item={hero} />
 

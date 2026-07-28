@@ -33,6 +33,7 @@ export type TopPicksSectionProps = {
   moreLabel?: string;
   showTitle?: boolean;
   showMore?: boolean;
+  accentColor?: string;
 };
 
 const HEADING_ID = "hp-toppicks-heading";
@@ -43,6 +44,7 @@ export function TopPicksSection({
   moreLabel = "همه بررسی‌ها",
   showTitle = true,
   showMore = true,
+  accentColor,
 }: TopPicksSectionProps) {
   if (!picks?.length) return null;
 
@@ -55,6 +57,7 @@ export function TopPicksSection({
           description="کارشناسان ما هر سال ده‌ها محصول را تست می‌کنند. این‌ها قهرمانان فعلی دسته‌بندی خود هستند."
           href={showMore ? "/review" : undefined}
           linkLabel={moreLabel}
+          accentColor={accentColor}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}

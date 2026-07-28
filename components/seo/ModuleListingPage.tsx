@@ -43,8 +43,10 @@ export async function ModuleListingPage({ module, type, value }: Props) {
     if (type === "category") {
       where.category = value;
     } else {
-      // Tag is stored as JSON array, use array_contains
-      where.tags = { array_contains: value };
+      // Tags are stored as a JSON array. PostgreSQL JSONB containment needs
+      // the searched value wrapped as an array too: ["storage"], not the
+      // scalar "storage". This is the destination used by Magazine tags.
+      where.tags = { array_contains: [value] };
     }
 
     posts = await prisma.post.findMany({
