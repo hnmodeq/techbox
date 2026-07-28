@@ -108,6 +108,24 @@ function getPrismaClient(): PrismaClientInstance {
   // information. "warn" is kept because Prisma uses it for genuinely
   // novel things (pool saturation hints, deprecations) that we do not
   // otherwise report.
+  // Say which database this process actually connects to.
+  //
+  // "did I really switch providers?" is otherwise unanswerable from the
+  // logs: the URL lives only in .env, Prisma never echoes it, and a stale
+  // .env or a leftover .env.local silently wins. Host and database only —
+  // never the credentials.
+  if (isDev && dbUrl) {
+    try {
+      const parsed = new URL(dbUrl);
+      console.log(
+        `[db] ${parsed.hostname}${parsed.pathname} ` +
+          `(pool ${new URLSearchParams(parsed.search).get("connection_limit") ?? "?"})`,
+      );
+    } catch {
+      console.warn("[db] DATABASE_URL is not a parseable URL");
+    }
+  }
+
   const client = new PrismaClient({
     log: process.env.PRISMA_VERBOSE === "1" ? ["query", "warn", "error"] : ["warn"],
     datasources: { db: { url: dbUrl } },

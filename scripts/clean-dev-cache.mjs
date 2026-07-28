@@ -31,6 +31,26 @@ for (const target of targets) {
   }
 }
 
+// Which env files exist, and therefore which DATABASE_URL actually wins.
+//
+// Next loads .env.local AFTER .env in development, so a leftover
+// .env.local silently overrides a freshly-updated .env — the usual reason
+// a project appears to still be pointed at an old database after a
+// provider switch.
+import { existsSync } from "node:fs";
+
+const envFiles = [".env", ".env.local", ".env.development", ".env.development.local"]
+  .filter((file) => existsSync(path.join(root, file)));
+
+if (envFiles.length > 1) {
+  console.log(
+    `\nNOTE: ${envFiles.length} env files present: ${envFiles.join(", ")}\n` +
+    "Later files override earlier ones in development. If you just switched\n" +
+    "databases, make sure the OLD url is not still sitting in a later file.\n" +
+    "`pnpm db:doctor` prints the host actually being used.",
+  );
+}
+
 console.log(
   "\nDev caches cleared. The browser also caches the old build:\n" +
   "  DevTools -> Application -> Storage -> Clear site data,\n" +
