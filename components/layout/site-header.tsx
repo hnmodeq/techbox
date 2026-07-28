@@ -535,9 +535,19 @@ function NotificationsButton() {
     }
   }, [])
 
+  // Load on FIRST OPEN, not on mount.
+  //
+  // /api/notifications runs four unindexed-by-default queries and measured
+  // 3-9s on this dataset. Firing it during hydration of every page put that
+  // on the critical path — and, sharing the dev connection pool with the
+  // page's own render, it was a main contributor to the P2024 pool timeouts.
+  // Nothing here is visible until the popover opens.
+  const hasLoaded = React.useRef(false)
   React.useEffect(() => {
-    loadNotifications()
-  }, [loadNotifications])
+    if (!open || hasLoaded.current) return
+    hasLoaded.current = true
+    void loadNotifications()
+  }, [open, loadNotifications])
 
   React.useEffect(() => {
     const openNotifications = () => setOpen(true)
