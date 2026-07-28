@@ -2,6 +2,26 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Keep Tailwind's class scanner out of server-only code.
+ *
+ * The scanner is deliberately naive: it treats any `word:word` token it
+ * finds in a scanned file as a possible arbitrary-property utility. Route
+ * handlers are full of log tags like console.error("[zarinpal:request]")
+ * and permission strings like "user-roles:assign", so Tailwind emitted
+ * real CSS rules for them:
+ *
+ *     .\[zarinpal\:request\] { zarinpal: request; }
+ *
+ * Every one is invalid CSS that no element uses, and each produced a
+ * "Unknown property" console error on every page load. None of these
+ * directories can contain a className, so none needs scanning.
+ */
+@source not "../app/api";
+@source not "../lib";
+@source not "../scripts";
+@source not "../prisma";
+@source not "../tests";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
