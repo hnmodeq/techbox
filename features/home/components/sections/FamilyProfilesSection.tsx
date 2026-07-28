@@ -36,6 +36,8 @@ export function FamilyProfilesSection({
         headingId={HEADING_ID}
         title={title}
         description="اعضایی که هر روز در انجمن، نظرات و محتوای تکباکس مشارکت می‌کنند."
+        href="/forum"
+        linkLabel="انجمن تکباکس"
       />
 
       <ScrollRail label={title} gap={16}>

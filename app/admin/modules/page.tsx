@@ -19,24 +19,14 @@ import {
   type ModuleConfigMap,
 } from "@/lib/module-config";
 import { moduleMeta } from "@/lib/content";
+import { ModuleColorDialog } from "@/components/admin/module-color-dialog";
+import { MODULE_COLOR_DEFAULTS, resolveModuleColor } from "@/config/module-colors";
 
 const ALL_MODULES: ModuleSlug[] = [
   "blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline",
 ];
 
 type TabId = "modules" | "homepage" | "titles" | "colors" | "names";
-
-const DEFAULT_MODULE_COLORS: Record<string, string> = {
-  blog: "light-dark(oklch(0.7 0.17 52), #fb923c)",
-  news: "light-dark(oklch(0.64 0.22 25), #fb7185)",
-  media: "light-dark(oklch(0.82 0.15 85), #fcd34d)",
-  shop: "light-dark(oklch(0.8 0.19 125), #a3e635)",
-  forum: "light-dark(oklch(0.78 0.16 5), #fda4af)",
-  review: "light-dark(oklch(0.7 0.17 240), #38bdf8)",
-  download: "light-dark(oklch(0.72 0.2 350), #f472b6)",
-  timeline: "light-dark(oklch(0.72 0.16 210), #06b6d4)",
-  tools: "light-dark(oklch(0.82 0.12 200), #67e8f9)",
-};
 
 export default function AdminModulesPage() {
   const [config, setConfig] = useState<SiteLayoutConfig>(getDefaultSiteLayoutConfig());
@@ -45,6 +35,7 @@ export default function AdminModulesPage() {
 
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<TabId>("modules");
+  const [colorDialogSlug, setColorDialogSlug] = useState<ModuleSlug | null>(null);
   // ─── Module names (source of truth) ───
   const [moduleNames, setModuleNames] = useState<Record<string, string>>({});
   const [nameDefaults, setNameDefaults] = useState<Record<string, string>>({});
@@ -524,7 +515,7 @@ export default function AdminModulesPage() {
             <CardHeader className="p-0">
               <CardTitle>رنگ‌های ماژول‌ها</CardTitle>
               <CardDescription>
-                کنترل رنگ اختصاصی هر ماژول. وقتی سیستم رنگ فعال باشد هر ماژول رنگ جداگانه دارد؛ وقتی غیرفعال باشد همه از یک رنگ واحد استفاده می‌کنند.
+                هنگام فعال بودن، رنگ هر ماژول را با یک پالت بصری انتخاب کنید. هنگام غیرفعال بودن، همه‌چیز از توکن‌های پیش‌فرض شادسی‌ان استفاده می‌کند.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 pt-4 space-y-4">
@@ -534,8 +525,8 @@ export default function AdminModulesPage() {
                   <div className="text-sm font-semibold">سیستم رنگ ماژول‌ها</div>
                   <div className="text-xs text-muted-foreground">
                     {config.moduleColorsEnabled !== false
-                      ? "هر ماژول رنگ اختصاصی خود را دارد"
-                      : "همه ماژول‌ها از یک رنگ واحد استفاده می‌کنند"}
+                      ? "رنگ انتخاب‌شده برای هر ماژول در عناصر مرتبط آن استفاده می‌شود"
+                      : "غیرفعال: همه ماژول‌ها و بخش‌ها از توکن‌های استاندارد شادسی‌ان استفاده می‌کنند"}
                   </div>
                 </div>
                 <Switch
@@ -545,70 +536,61 @@ export default function AdminModulesPage() {
               </div>
 
               {config.moduleColorsEnabled !== false ? (
-                /* Per-module color pickers */
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold">رنگ هر ماژول</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {ALL_MODULES.map((slug) => {
                       const meta = moduleMeta[slug];
-                      const currentColor = config.moduleColors?.[slug] || "";
-                      const defaultColor = DEFAULT_MODULE_COLORS[slug] || "var(--primary)";
+                      const savedColor = config.moduleColors?.[slug];
+                      const visibleColor = resolveModuleColor(slug, savedColor);
                       return (
                         <div key={slug} className="flex items-center gap-3 rounded-lg border p-3">
-                          <div
-                            className="h-8 w-8 shrink-0 rounded-md border"
-                            style={{ backgroundColor: `var(--${slug})` }}
+                          <span
+                            aria-hidden="true"
+                            className="size-9 shrink-0 rounded-full border-2 border-background shadow-sm"
+                            style={{ backgroundColor: visibleColor }}
                           />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-xs font-semibold flex items-center gap-2">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 text-xs font-semibold">
                               <ModuleBadge module={slug}>{meta?.titleFa || slug}</ModuleBadge>
+                              {savedColor && <span className="text-[10px] text-muted-foreground">شخصی‌سازی‌شده</span>}
                             </div>
-                            <input
-                              type="text"
-                              value={currentColor}
-                              onChange={(e) => {
-                                const newColors = { ...(config.moduleColors || {}) };
-                                if (e.target.value) {
-                                  newColors[slug] = e.target.value;
-                                } else {
-                                  delete newColors[slug];
-                                }
-                                setConfig((prev) => ({ ...prev, moduleColors: newColors }));
-                              }}
-                              placeholder={defaultColor}
-                              className="mt-1 w-full rounded border border-border bg-background px-2 py-1 text-xs font-mono text-muted-foreground"
-                            />
+                            <p className="mt-1 truncate font-mono text-[10px] text-muted-foreground" dir="ltr">{visibleColor}</p>
                           </div>
+                          <Button type="button" variant="outline" size="sm" onClick={() => setColorDialogSlug(slug)}>
+                            انتخاب رنگ
+                          </Button>
                         </div>
                       );
                     })}
                   </div>
-                  <p className="text-[10px] text-muted-foreground">
-                    مقدار CSS وارد کنید (مثلاً #ff6600 یا oklch(0.7 0.17 52)). خالی بگذارید تا رنگ پیش‌فرض استفاده شود.
-                  </p>
+
+                  {colorDialogSlug && (
+                    <ModuleColorDialog
+                      open
+                      onOpenChange={(open) => { if (!open) setColorDialogSlug(null); }}
+                      moduleName={moduleMeta[colorDialogSlug]?.titleFa || colorDialogSlug}
+                      value={resolveModuleColor(colorDialogSlug, config.moduleColors?.[colorDialogSlug])}
+                      defaultValue={MODULE_COLOR_DEFAULTS[colorDialogSlug]}
+                      onChange={(color) => {
+                        setConfig((prev) => ({
+                          ...prev,
+                          moduleColors: { ...(prev.moduleColors || {}), [colorDialogSlug]: color },
+                        }));
+                      }}
+                      onReset={() => {
+                        setConfig((prev) => {
+                          const moduleColors = { ...(prev.moduleColors || {}) };
+                          delete moduleColors[colorDialogSlug];
+                          return { ...prev, moduleColors };
+                        });
+                      }}
+                    />
+                  )}
                 </div>
               ) : (
-                /* Unified color picker */
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">رنگ واحد همه ماژول‌ها</Label>
-                  <div className="flex items-center gap-3 rounded-lg border p-3">
-                    <div
-                      className="h-8 w-8 shrink-0 rounded-md border"
-                      style={{ backgroundColor: config.unifiedModuleColor || "var(--primary)" }}
-                    />
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        value={config.unifiedModuleColor || ""}
-                        onChange={(e) => setConfig((prev) => ({ ...prev, unifiedModuleColor: e.target.value }))}
-                        placeholder="var(--primary)"
-                        className="w-full rounded border border-border bg-background px-2 py-1 text-xs font-mono text-muted-foreground"
-                      />
-                      <p className="text-[10px] text-muted-foreground mt-1">
-                        همه ماژول‌ها از این رنگ استفاده خواهند کرد. مقدار CSS وارد کنید.
-                      </p>
-                    </div>
-                  </div>
+                <div className="rounded-lg border border-dashed p-4 text-sm leading-6 text-muted-foreground">
+                  رنگ‌های ماژول غیرفعال‌اند. عنوان‌ها، دکمه‌ها، بخش‌ها و کارت‌ها از رنگ‌های پیش‌فرض شادسی‌ان استفاده می‌کنند.
                 </div>
               )}
 
@@ -618,14 +600,17 @@ export default function AdminModulesPage() {
                 <div className="flex flex-wrap gap-2">
                   {ALL_MODULES.slice(0, 6).map((slug) => {
                     const meta = moduleMeta[slug];
+                    const color = config.moduleColorsEnabled !== false
+                      ? resolveModuleColor(slug, config.moduleColors?.[slug])
+                      : "var(--primary)";
                     return (
                       <span
                         key={slug}
                         className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold"
                         style={{
-                          backgroundColor: `color-mix(in oklch, var(--${slug}) 18%, transparent)`,
-                          color: `var(--${slug})`,
-                          border: `1px solid color-mix(in oklch, var(--${slug}) 35%, transparent)`,
+                          backgroundColor: `color-mix(in oklch, ${color} 18%, transparent)`,
+                          color,
+                          border: `1px solid color-mix(in oklch, ${color} 35%, transparent)`,
                         }}
                       >
                         {meta?.titleFa || slug}

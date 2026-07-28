@@ -21,7 +21,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { FamilyComment } from "@/features/home/lib/home-types";
-import { SectionShell } from "../primitives";
+import { SectionShell, SectionHeader } from "../primitives";
 
 export type FamilyCommentsSectionProps = {
   comments: FamilyComment[];
@@ -40,19 +40,13 @@ export function FamilyCommentsSection({
 
   return (
     <SectionShell labelledBy={HEADING_ID} className="bg-[color:var(--hp-bg)]">
-      {/* Spiceworks uses an h3 here, not an h2 — it reads as a coda to the
-          community section above rather than a peer heading. */}
-      <div className="mb-10 text-center">
-        <h2
-          id={HEADING_ID}
-          className="text-[24px] font-bold leading-[32px] text-[color:var(--hp-ink)]"
-        >
-          {title}
-        </h2>
-        <p className="mx-auto mt-2 max-w-2xl text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
-          آنچه اعضای تکباکس دربارهٔ محتوا، محصولات و تجربهٔ کارشان نوشته‌اند.
-        </p>
-      </div>
+      <SectionHeader
+        headingId={HEADING_ID}
+        title={title}
+        description="آنچه اعضای تکباکس دربارهٔ محتوا، محصولات و تجربهٔ کارشان نوشته‌اند."
+        href="/forum"
+        linkLabel="انجمن تکباکس"
+      />
 
       <ul className="hp-rail gap-6 lg:grid lg:grid-cols-3 lg:gap-10 lg:overflow-visible">
         {comments.map((c) => (

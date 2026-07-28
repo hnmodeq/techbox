@@ -92,9 +92,9 @@ export function ModuleConfigProvider({
           enabled: enabledSet,
           homeConfig,
           heroVisible,
-          moduleColorsEnabled: false,
-          unifiedModuleColor: "var(--primary)",
-          moduleColors: {},
+          moduleColorsEnabled: data.moduleColorsEnabled !== false,
+          unifiedModuleColor: data.unifiedModuleColor || "var(--primary)",
+          moduleColors: data.moduleColors || {},
           titles,
           loading: false,
         });

@@ -26,6 +26,7 @@ export type ToolsSectionProps = {
   moreLabel?: string;
   showTitle?: boolean;
   showMore?: boolean;
+  accentColor?: string;
 };
 
 const HEADING_ID = "hp-tools-heading";
@@ -36,6 +37,7 @@ export function ToolsSection({
   moreLabel = "مشاهده همه ابزارها",
   showTitle = true,
   showMore = true,
+  accentColor,
 }: ToolsSectionProps) {
   const all = [...toolRoutes];
 
@@ -62,6 +64,7 @@ export function ToolsSection({
             description="ابزارهای آنلاین و آسان IT. محاسبه ظرفیت، انتخاب سخت‌افزار و زیرشبکه — بدون نصب."
             href={showMore ? "/tools" : undefined}
             linkLabel={moreLabel}
+            accentColor={accentColor}
           />
         )}
         {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}

@@ -306,7 +306,7 @@ export default function CommentSection({ module, slug, initialComments, compact 
       !(isTopicAuthor && (c as any).authorId === user?.id);
 
     return (
-      <div key={c.id} className={depth ? "py-3" : ""} style={{ marginTop: depth ? 0 : 12 }}>
+      <div id={`comment-${c.id}`} key={c.id} className={depth ? "scroll-mt-4 py-3" : "scroll-mt-4"} style={{ marginTop: depth ? 0 : 12 }}>
         <div className={depth ? "ps-3 pe-4" : "pe-0"} style={{ marginRight: depth ? 16 : 0 }}>
           <div className={`bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative ${isAccepted ? "border-[color-mix(in_oklch,var(--success)_45%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--success)_30%,transparent)]" : "border-[var(--border-color)]"}`}>
             {isDeleting && (

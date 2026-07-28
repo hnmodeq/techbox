@@ -19,7 +19,7 @@
  * Docs: docs/homepage-upgrade/03-DATA-CONTRACTS.md
  */
 import { prisma } from "@/lib/db";
-import { publicPostDateWhere } from "@/lib/post-date";
+import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { gregorianToJalali } from "@/lib/jalali";
 import { getCurrencyRates, calculateFinalTomanPrice, type CurrencyRates } from "@/lib/currency";
 import type { ContentItem } from "@/lib/content";
@@ -31,6 +31,9 @@ import type {
   FamilyComment,
   AuthorCard,
   MoreToExplore,
+  HighlightComment,
+  LatestInsights,
+  VideoHighlightComment,
 } from "@/features/home/lib/home-types";
 
 const PUBLISHED = { published: true, deletedAt: null } as const;
@@ -92,64 +95,144 @@ export function seededIndex(total: number, salt = 0): number {
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// §3 Latest Insights — engagement-ranked news
+// §3 Latest Insights — the week's most-commented news
 // ═════════════════════════════════════════════════════════════════════
 
+function mapHighlightComment(row: any): HighlightComment | null {
+  const name = row.author?.name || row.authorName || "";
+  if (!name) return null;
+  return {
+    id: row.id,
+    text: row.text,
+    date: row.createdAt.toISOString(),
+    dateFa: formatPostDateFa(row.createdAt),
+    author: {
+      name,
+      username: row.author?.username ?? null,
+      avatar: row.author?.avatar ?? null,
+      verifiedType: row.author?.verifiedType ?? null,
+    },
+  };
+}
+
 /**
- * The floating news sidebar already shows the most RECENT news. If this
- * section also sorted by recency the same headline would appear twice,
- * a couple of hundred pixels apart. So it ranks the last 180 days by
- * engagement and excludes whatever the sidebar is currently showing.
- *
- * @param excludeSlugs slugs already visible in the news sidebar
+ * The right-hand lead of the Latest section is the published news item with
+ * the most approved comments in the current seven-day window. Ties favour
+ * the newer post. When a quiet week has no news, the newest published item
+ * is a real-content fallback rather than an invented empty card.
  */
-export async function getInsights(
-  excludeSlugs: string[],
+export async function getLatestInsights(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
-): Promise<ContentItem[]> {
-  const WINDOW_DAYS = 180;
+): Promise<LatestInsights> {
+  const weekAgo = new Date(Date.now() - 7 * 864e5);
+  const weekly = await prisma.post.findMany({
+    where: {
+      module: "news",
+      ...PUBLISHED,
+      date: { gte: weekAgo, ...publicPostDateWhere() },
+    },
+    orderBy: { date: "desc" },
+    take: 30,
+    select: cardSelect,
+  });
 
-  const fetchPool = async (days: number) =>
-    prisma.post.findMany({
-      where: {
-        module: "news",
-        ...PUBLISHED,
-        date: { gte: new Date(Date.now() - days * 864e5), ...publicPostDateWhere() },
-      },
-      orderBy: [{ views: "desc" }, { likes: "desc" }, { date: "desc" }],
-      take: 12,
+  let pool: any[] = weekly as any[];
+  if (pool.length === 0) {
+    pool = await prisma.post.findMany({
+      where: { module: "news", ...PUBLISHED, date: publicPostDateWhere() },
+      orderBy: { date: "desc" },
+      take: 1,
       select: cardSelect,
     });
+  }
+  if (pool.length === 0) return { story: null, comments: [] };
 
-  let pool = await fetchPool(WINDOW_DAYS);
-  // A quiet 6 months shouldn't hide the section — widen before giving up.
-  if (pool.length === 0) pool = await fetchPool(365);
-  if (pool.length === 0) return [];
-
-  // Comment counts in one grouped query, not one per post.
   const counts = await prisma.comment.groupBy({
     by: ["postId"],
     _count: { _all: true },
-    where: { postId: { in: pool.map((p: any) => p.id) }, status: "approved" },
+    where: { postId: { in: pool.map((post: any) => post.id) }, status: "approved", deletedAt: null },
   });
-  const commentMap = new Map(counts.map((c) => [c.postId, c._count._all || 0]));
+  const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
+  const featured = [...pool].sort((a: any, b: any) => {
+    const countDifference = (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0);
+    if (countDifference !== 0) return countDifference;
+    return b.date.getTime() - a.date.getTime();
+  })[0];
 
-  const score = (p: any) =>
-    (p.views || 0) + (p.likes || 0) * 8 + (commentMap.get(p.id) || 0) * 15;
-
-  const excluded = new Set(excludeSlugs);
-  const ranked = [...pool].sort((a: any, b: any) => score(b) - score(a));
-
-  let picked = ranked.filter((p: any) => !excluded.has(p.slug)).slice(0, 2);
-  // If dedupe starved us, a repeated headline still beats an empty band.
-  if (picked.length < 2) picked = ranked.slice(0, 2);
-
-  return picked.map((p: any) => {
-    const item = normalize(p);
-    item.comments = commentMap.get(p.id) || 0;
-    return item;
+  const rows = await prisma.comment.findMany({
+    where: {
+      postId: featured.id,
+      parentId: null,
+      status: "approved",
+      deletedAt: null,
+    },
+    orderBy: [{ likes: "desc" }, { createdAt: "desc" }],
+    take: 3,
+    select: {
+      id: true,
+      text: true,
+      authorName: true,
+      createdAt: true,
+      author: {
+        select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
+      },
+    },
   });
+
+  const comments = rows
+    .filter((row) => !row.author || row.author.status === "active")
+    .map(mapHighlightComment)
+    .filter((comment): comment is HighlightComment => Boolean(comment));
+
+  const story = normalize(featured);
+  story.comments = countByPost.get(featured.id) || 0;
+  return { story, comments };
+}
+
+/**
+ * One real, rotating approved comment on the newest published video. The
+ * video card itself is supplied by the normal media module query; this only
+ * adds the small companion quote and its comment anchor.
+ */
+export async function getLatestVideoHighlightComment(): Promise<VideoHighlightComment | null> {
+  const latest = await prisma.post.findFirst({
+    where: { module: "media", ...PUBLISHED, date: publicPostDateWhere(), videoUrl: { not: null } },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    select: { id: true, slug: true },
+  });
+  if (!latest) return null;
+
+  const rows = await prisma.comment.findMany({
+    where: {
+      postId: latest.id,
+      parentId: null,
+      status: "approved",
+      deletedAt: null,
+    },
+    orderBy: [{ likes: "desc" }, { createdAt: "desc" }],
+    take: 30,
+    select: {
+      id: true,
+      text: true,
+      authorName: true,
+      createdAt: true,
+      author: {
+        select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
+      },
+    },
+  });
+
+  const candidates = rows
+    .filter((row) => !row.author || row.author.status === "active")
+    .map(mapHighlightComment)
+    .filter((comment): comment is HighlightComment => Boolean(comment));
+  if (candidates.length === 0) return null;
+
+  return {
+    ...candidates[seededIndex(candidates.length, 37)],
+    videoSlug: latest.slug,
+  };
 }
 
 // ═════════════════════════════════════════════════════════════════════

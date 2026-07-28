@@ -33,6 +33,8 @@ export type ScrollRailProps = {
   gap?: number;
   /** Hide arrows entirely (short rails). */
   hideArrows?: boolean;
+  /** Larger, borderless controls for the Video quick-takes rail. */
+  bareArrows?: boolean;
   className?: string;
   railClassName?: string;
 };
@@ -42,6 +44,7 @@ export function ScrollRail({
   label,
   gap = 20,
   hideArrows = false,
+  bareArrows = false,
   className,
   railClassName,
 }: ScrollRailProps) {
@@ -127,8 +130,8 @@ export function ScrollRail({
 
       {showArrows && (
         <>
-          <RailArrow dir="prev" disabled={atStart} onClick={() => nudge("prev")} />
-          <RailArrow dir="next" disabled={atEnd} onClick={() => nudge("next")} />
+          <RailArrow dir="prev" disabled={atStart} bare={bareArrows} onClick={() => nudge("prev")} />
+          <RailArrow dir="next" disabled={atEnd} bare={bareArrows} onClick={() => nudge("next")} />
         </>
       )}
     </div>
@@ -138,10 +141,12 @@ export function ScrollRail({
 function RailArrow({
   dir,
   disabled,
+  bare = false,
   onClick,
 }: {
   dir: "prev" | "next";
   disabled: boolean;
+  bare?: boolean;
   onClick: () => void;
 }) {
   // RTL: "prev" (back toward the first item) sits on the RIGHT.
@@ -154,9 +159,9 @@ function RailArrow({
       aria-label={dir === "prev" ? "موارد قبلی" : "موارد بعدی"}
       className={cn(
         "absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full",
-        "h-14 w-14 border transition-opacity duration-200 md:flex", // 56px — TG exact
-        "border-[color:var(--hp-brand)] bg-[var(--hp-arrow-bg)] text-white",
-        "hover:opacity-100 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none",
+        bare ? "h-16 w-16 text-foreground transition-colors duration-200 md:flex" : "h-14 w-14 border transition-opacity duration-200 md:flex", // 56px — TG exact
+        bare ? "hover:text-primary" : "border-[color:var(--hp-brand)] bg-[var(--hp-arrow-bg)] text-white hover:opacity-100",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         disabled ? "pointer-events-none opacity-0" : "opacity-90",
         sideCls,
       )}

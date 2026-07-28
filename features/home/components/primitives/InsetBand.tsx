@@ -21,18 +21,20 @@ export type SectionShellProps = {
   labelledBy: string;
   className?: string;
   id?: string;
+  style?: React.CSSProperties;
 };
 
 /**
  * Plain section wrapper: standard vertical rhythm + 1280 container.
  * Use when the section sits directly on the page background.
  */
-export function SectionShell({ children, labelledBy, className, id }: SectionShellProps) {
+export function SectionShell({ children, labelledBy, className, id, style }: SectionShellProps) {
   return (
     <section
       id={id}
       aria-labelledby={labelledBy}
       className={cn("w-full px-4 py-12 sm:px-6 lg:px-8 lg:py-16", className)}
+      style={style}
     >
       <div className="mx-auto w-full max-w-[1280px]">{children}</div>
     </section>
@@ -53,6 +55,7 @@ export function InsetBand({
   fullBleed = false,
   className,
   id,
+  style,
 }: InsetBandProps) {
   const toneCls =
     tone === "brand"
@@ -69,6 +72,7 @@ export function InsetBand({
       className={cn(
         fullBleed ? "w-full" : "w-full px-4 py-6 sm:px-6 lg:px-8",
       )}
+      style={style}
     >
       <div
         className={cn(

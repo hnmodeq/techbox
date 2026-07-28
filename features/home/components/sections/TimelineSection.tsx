@@ -16,9 +16,8 @@
  * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §6
  */
 import * as React from "react";
-import Link from "next/link";
 import type { TimelineCard } from "@/features/home/lib/home-types";
-import { ScrollRail } from "../primitives";
+import { ScrollRail, SectionHeader } from "../primitives";
 import { Num } from "@/components/ui/num";
 
 export type TimelineSectionProps = {
@@ -27,6 +26,7 @@ export type TimelineSectionProps = {
   moreLabel?: string;
   showTitle?: boolean;
   showMore?: boolean;
+  accentColor?: string;
 };
 
 const HEADING_ID = "hp-timeline-heading";
@@ -41,6 +41,7 @@ export function TimelineSection({
   moreLabel = "ورود به گاه‌شمار کامل",
   showTitle = true,
   showMore = true,
+  accentColor,
 }: TimelineSectionProps) {
   if (!events || events.length < MIN_EVENTS) return null;
 
@@ -62,17 +63,16 @@ export function TimelineSection({
 
       <div className="relative mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {showTitle && (
-          <div className="mb-8">
-            <h2
-              id={HEADING_ID}
-              className="text-[28px] font-bold leading-[40px] text-[color:var(--hp-on-brand)]"
-            >
-              {title}
-            </h2>
-            <p className="mt-2 max-w-3xl text-[15px] leading-[28px] text-[color:var(--hp-on-brand-mut)]">
-              از ترانزیستور تا دیتاسنترهای هوش مصنوعی — نقاط عطفی که زیرساخت امروز را ساختند.
-            </p>
-          </div>
+          <SectionHeader
+            headingId={HEADING_ID}
+            title={title}
+            description="از ترانزیستور تا دیتاسنترهای هوش مصنوعی — نقاط عطفی که زیرساخت امروز را ساختند."
+            href={showMore ? "/timeline" : undefined}
+            linkLabel={moreLabel}
+            onDark
+            accentColor={accentColor}
+            className="mb-8"
+          />
         )}
         {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
@@ -89,16 +89,6 @@ export function TimelineSection({
           </ScrollRail>
         </div>
 
-        {showMore && (
-          <div className="mt-8 flex justify-center">
-            <Link
-              href="/timeline"
-              className="rounded-full border border-white/40 px-6 py-2.5 text-[14px] font-bold text-[color:var(--hp-on-brand)] transition-colors hover:border-white hover:bg-white/10"
-            >
-              {moreLabel} <span aria-hidden="true">←</span>
-            </Link>
-          </div>
-        )}
       </div>
     </section>
   );

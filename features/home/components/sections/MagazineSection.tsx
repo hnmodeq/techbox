@@ -5,7 +5,7 @@
  * compact rows. Measured from their markup:
  *   lead image  578 × 325
  *   list thumb  143 × 95
- *   list row    [category] / [headline] / [date]  — no avatar, no excerpt
+ *   list row    [tags] / [headline] / [metadata]  — no avatar, no excerpt
  *
  * That density is the signature, so the rows deliberately carry less than
  * a normal card would.
@@ -19,6 +19,7 @@ import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { SectionShell, SectionHeader } from "../primitives";
 
 export type MagazineSectionProps = {
@@ -30,8 +31,15 @@ export type MagazineSectionProps = {
   /** One-line copy under the title. Admin-editable; empty falls back to the
    *  default below so the section never renders a bare heading. */
   description?: string;
-  /** Category chips on cards. Admin-editable, defaults on. */
+  /** Article tags. Admin-editable, defaults on. */
   showTags?: boolean;
+  /** Set only while the optional module-colour system is enabled. */
+  accentColor?: string;
+};
+
+type MagazineStyle = React.CSSProperties & {
+  "--magazine-accent"?: string;
+  "--magazine-on-accent"?: string;
 };
 
 const HEADING_ID = "hp-magazine-heading";
@@ -48,15 +56,23 @@ export function MagazineSection({
   showMore = true,
   description,
   showTags = true,
+  accentColor,
 }: MagazineSectionProps) {
   // Rule 1: no data → no section. Guard is the first statement.
   if (!posts?.length) return null;
 
+  // `getMagazinePosts()` guarantees this order: the latest published
+  // article is the lead and the following items are distinct random
+  // published articles from the same real DB collection.
   const [lead, ...rest] = posts;
   const list = rest.slice(0, 4);
+  const style: MagazineStyle = {
+    "--magazine-accent": accentColor || "var(--primary)",
+    "--magazine-on-accent": accentColor ? "#fff" : "var(--primary-foreground)",
+  };
 
   return (
-    <SectionShell labelledBy={HEADING_ID}>
+    <SectionShell labelledBy={HEADING_ID} style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -64,7 +80,7 @@ export function MagazineSection({
           description={description?.trim() || DEFAULT_DESCRIPTION}
           href={showMore ? "/blog" : undefined}
           linkLabel={moreLabel}
-          rule
+          accentColor={accentColor}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
@@ -82,14 +98,14 @@ export function MagazineSection({
               <React.Fragment key={`${item.module}-${item.slug}`}>
                 {/* Separators are real flex items, not an ::after pinned to
                     each row's bottom edge.
-                    
+
                     With justify-between the rows stay content-height and all
                     the slack is pushed into the gaps between them. A rule at
                     `bottom-0` therefore hugs the row above it and reads as
                     attached to that row rather than sitting between two —
                     and CSS cannot centre it in a gap whose height the flex
                     algorithm only computes at layout time.
-                    
+
                     As a sibling <li> the divider is spaced by the same
                     algorithm as the rows, so it lands in the middle of the
                     gap by construction. aria-hidden + role=separator keeps
@@ -98,10 +114,10 @@ export function MagazineSection({
                   <li
                     aria-hidden="true"
                     role="separator"
-                    className="h-px shrink-0 self-stretch bg-[color:var(--hp-rule)] me-12"
+                    className="me-12 h-px shrink-0 self-stretch bg-border"
                   />
                 )}
-                <li className="group/row">
+                <li>
                   <ListRow item={item} showTags={showTags} />
                 </li>
               </React.Fragment>
@@ -114,40 +130,100 @@ export function MagazineSection({
 }
 
 /**
- * Spiceworks renders the category as a small filled chip, not the bare
- * tracked kicker the other sections use. Kept local to this file rather
- * than pushed into the shared `Eyebrow` primitive, because changing that
- * would restyle every section that already ships.
- *
- * `onBrand` is the reversed variant used inside the lead's colour panel.
+ * Real article tags, not a locally invented category label. Each tag routes
+ * to the existing database-backed blog tag listing. Deliberately no chip
+ * fill: tags are text links, using only standard shadcn semantic tokens.
  */
-function CategoryChip({ label, onBrand = false }: { label: string; onBrand?: boolean }) {
+function ArticleTags({
+  tags,
+  onPrimary = false,
+  className,
+}: {
+  tags: string[];
+  onPrimary?: boolean;
+  className?: string;
+}) {
+  const uniqueTags = [...new Set(tags.filter((tag) => typeof tag === "string" && tag.trim()))];
+  if (uniqueTags.length === 0) return null;
+
   return (
-    <span
-      className={
-        onBrand
-          ? "mb-3 inline-block bg-[color:var(--hp-on-brand)] px-2 py-[3px] text-[12px] font-semibold leading-[16px] text-[color:var(--hp-brand-ink)]"
-          : "mb-2 inline-block bg-[color:var(--hp-brand-tint)] px-2 py-[3px] text-[11px] font-semibold leading-[16px] text-[color:var(--hp-ink-2)]"
-      }
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-semibold leading-[16px]",
+        onPrimary ? "mb-3 text-[color:var(--magazine-on-accent)]" : "mb-2 text-muted-foreground",
+        className,
+      )}
     >
-      {label}
-    </span>
+      {uniqueTags.map((tag) => (
+        <Link
+          key={tag}
+          href={`/blog/tag/${encodeURIComponent(tag)}`}
+          className={cn(
+            "decoration-1 underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            onPrimary ? "hover:text-[color:var(--magazine-on-accent)]" : "hover:text-[color:var(--magazine-accent)]",
+          )}
+        >
+          {tag}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/** Date has the requested shadcn tooltip; reading time is precomputed from
+ * the actual article title/excerpt/body in `lib/home-server.ts`. */
+function PublicationMeta({
+  item,
+  onPrimary = false,
+  className,
+}: {
+  item: ContentItem;
+  onPrimary?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] leading-[18px]",
+        onPrimary ? "text-[color:var(--magazine-on-accent)]" : "text-muted-foreground",
+        className,
+      )}
+    >
+      <Tooltip>
+        <TooltipTrigger render={<time dateTime={item.date} className="cursor-default" />}>
+          {item.date_fa}
+        </TooltipTrigger>
+        <TooltipContent>تاریخ انتشار</TooltipContent>
+      </Tooltip>
+
+      {item.readingTimeLabel && (
+        <>
+          <span aria-hidden="true">•</span>
+          <span>{item.readingTimeLabel}</span>
+        </>
+      )}
+    </div>
   );
 }
 
 /**
- * Spiceworks lead: 578×325 image sitting directly on top of a solid brand
- * panel that holds the kicker, headline, excerpt and date in reversed
- * text. The panel is the signature of this block — the image and the
- * colour field read as one object, so the image corners are squared off
- * where the two meet rather than rounded independently.
+ * Spiceworks lead: 578×325 image sitting directly on top of a solid primary
+ * panel that holds the tags, headline, excerpt and metadata. The panel is
+ * the signature of this block — the image and the colour field read as one
+ * object, so the image corners are squared off where the two meet rather
+ * than rounded independently.
  */
 function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean }) {
+  const href = `/${item.module}/${item.slug}`;
+
   return (
-    <article className="hp-card group">
-      <Link href={`/${item.module}/${item.slug}`} className="block focus-visible:outline-none">
+    <article className="hp-card">
+      <Link
+        href={href}
+        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
         <div
-          className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
+          className="relative w-full overflow-hidden bg-muted"
           style={{ aspectRatio: "1.65/1" }}
         >
           {item.image && (
@@ -164,78 +240,73 @@ function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean 
             />
           )}
         </div>
-
-        {/* Reversed panel.
-            Uses --hp-brand-ink, NOT --hp-brand. shadcn flips --primary to
-            near-white in dark mode, which is right for text but would make
-            this filled panel white-on-white — measured at 1.21:1, i.e.
-            invisible. --hp-brand-ink is the token that stays a dark surface
-            in both themes (17.2:1 light, 13.0:1 dark).
-            No hover colour shift on the headline: there is no contrast
-            headroom left on a saturated ground. */}
-        <div className="bg-[color:var(--hp-brand-ink)] px-10 pb-6 pt-10">
-          {showTags && item.category && <CategoryChip label={item.category} onBrand />}
-
-          <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-on-brand)] transition-colors duration-200 group-hover:text-[color:var(--hp-accent-on-ink)]">
-            {item.title}
-          </h3>
-
-          {item.excerpt && (
-            <p className="line-clamp-3 text-[15px] leading-[28px] text-[color:var(--hp-on-brand-mut)]">
-              {item.excerpt}
-            </p>
-          )}
-
-          <p className="mt-3 text-[13px] leading-[20px] text-[color:var(--hp-on-brand-mut)]">
-            {item.date_fa}
-          </p>
-        </div>
       </Link>
+
+      <div className="bg-[color:var(--magazine-accent)] px-10 pb-6 pt-10 text-[color:var(--magazine-on-accent)]">
+        {showTags && <ArticleTags tags={item.tags} onPrimary />}
+
+        <h3 className="text-[28px] font-bold leading-[38px]">
+          <Link
+            href={href}
+            className="decoration-1 underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {item.title}
+          </Link>
+        </h3>
+
+        {item.excerpt && (
+          <p className="line-clamp-3 text-[15px] leading-[28px] text-[color:var(--magazine-on-accent)]">
+            {item.excerpt}
+          </p>
+        )}
+
+        <PublicationMeta item={item} onPrimary className="mt-3" />
+      </div>
     </article>
   );
 }
 
-/** Spiceworks list row: 143×95 thumb + three text lines. No avatar. */
+/** Spiceworks list row: 143×95 thumb + tags, title and metadata. */
 function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
-  return (
-    <Link
-      href={`/${item.module}/${item.slug}`}
-      className={cn(
-        "hp-card group flex focus-visible:outline-none",
-        "group-first/row:pt-0 group-last/row:pb-0",
-      )}
-    >
-      <div
-        className="relative w-[180px] shrink-0 overflow-hidden bg-[color:var(--hp-brand-tint)] sm:w-[150px]"
-        style={{ aspectRatio: "1.3/1" }}
-      >
-        {item.image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={item.image}
-            alt={item.title}
-            sizes="143px"
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        )}
-      </div>
+  const href = `/${item.module}/${item.slug}`;
 
-      {/* items-start, not the default stretch. A flex column stretches its
-          children across the cross axis, which overrides the chip's
-          inline-block and renders it as a full-width bar instead of a pill
-          hugging its label. The lead panel is unaffected because its parent
-          is a plain block. */}
+  return (
+    <article className="hp-card flex">
+      <Link
+        href={href}
+        className="block shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <div
+          className="relative w-[180px] overflow-hidden bg-muted sm:w-[150px]"
+          style={{ aspectRatio: "1.3/1" }}
+        >
+          {item.image && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.image}
+              alt={item.title}
+              sizes="143px"
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+        </div>
+      </Link>
+
       <div className="flex min-w-0 flex-col items-start justify-start">
-        {showTags && item.category && <CategoryChip label={item.category} />}
-        <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)] pr-5">
-          {item.title}
+        {/* Match the title's existing logical inset in RTL. */}
+        {showTags && <ArticleTags tags={item.tags} className="ps-5" />}
+        <h3 className="line-clamp-2 ps-5 text-[16px] font-bold leading-[24px] text-foreground">
+          <Link
+            href={href}
+            className="decoration-1 underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {item.title}
+          </Link>
         </h3>
-        <p className="mt-1 text-[12px] leading-[18px] text-[color:var(--hp-ink-3)] pr-5">
-          {item.date_fa}
-        </p>
+        <PublicationMeta item={item} className="mt-1 ps-5" />
       </div>
-    </Link>
+    </article>
   );
 }
 
