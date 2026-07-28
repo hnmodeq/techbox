@@ -19,8 +19,19 @@ const nextConfig = {
     qualities: [75, 95, 100],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
   },
-  // Security headers + better caching for static assets
+  // Security headers + better caching for static assets.
+  //
+  // IMPORTANT: these are PRODUCTION-ONLY. In `next dev` they actively break
+  // the dev server:
+  //   * `immutable, max-age=31536000` on /fonts, /images, /assets overrides
+  //     the `no-store` Next normally sends in dev, so the browser serves
+  //     stale assets and Fast Refresh falls back to full page reloads.
+  //   * a strict CSP has to be kept permanently in sync with whatever the
+  //     dev overlay / HMR client happens to need this release.
+  // Test CSP against `next build && next start`, not `next dev`.
   async headers() {
+    if (process.env.NODE_ENV !== 'production') return [];
+
     const securityHeaders = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },
       { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -42,7 +53,7 @@ const nextConfig = {
           "frame-ancestors 'none'",
           "object-src 'none'",
           "style-src 'self' 'unsafe-inline'",
-          `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"} https://va.vercel-scripts.com`,
+          "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
           "img-src 'self' data: blob: https:",
           "media-src 'self' https://*.supabase.co",
           "font-src 'self' data:",
