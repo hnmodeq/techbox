@@ -38,6 +38,8 @@ export type TopPicksSectionProps = {
 
 const HEADING_ID = "hp-toppicks-heading";
 
+type TopPicksStyle = React.CSSProperties & { "--top-picks-accent"?: string };
+
 export function TopPicksSection({
   picks,
   title = "انتخاب‌های برتر ما",
@@ -48,8 +50,10 @@ export function TopPicksSection({
 }: TopPicksSectionProps) {
   if (!picks?.length) return null;
 
+  const style: TopPicksStyle = { "--top-picks-accent": accentColor || "var(--primary)" };
+
   return (
-    <SectionShell labelledBy={HEADING_ID}>
+    <SectionShell labelledBy={HEADING_ID} style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -113,7 +117,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
         <h3 className="line-clamp-2 text-[17px] font-bold leading-[26px] text-[color:var(--hp-ink)]">
           <Link
             href={`/${pick.module}/${pick.slug}`}
-            className="transition-colors hover:text-[color:var(--hp-brand)] focus-visible:outline-none"
+            className="transition-colors hover:text-[color:var(--top-picks-accent)] focus-visible:outline-none"
           >
             {pick.title}
           </Link>

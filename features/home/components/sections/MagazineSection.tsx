@@ -299,7 +299,7 @@ function ListRow({ item, showTags }: { item: ContentItem; showTags: boolean }) {
         <h3 className="line-clamp-2 ps-5 text-[16px] font-bold leading-[24px] text-foreground">
           <Link
             href={href}
-            className="decoration-1 underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="decoration-1 underline-offset-4 transition-colors hover:text-[color:var(--magazine-accent)] hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {item.title}
           </Link>

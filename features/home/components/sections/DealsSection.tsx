@@ -36,6 +36,8 @@ export type DealsSectionProps = {
 };
 
 const HEADING_ID = "hp-deals-heading";
+
+type DealsStyle = React.CSSProperties & { "--deals-accent"?: string };
 const MIN_PRODUCTS = 4;
 
 export function DealsSection({
@@ -48,8 +50,10 @@ export function DealsSection({
 }: DealsSectionProps) {
   if (!products || products.length < MIN_PRODUCTS) return null;
 
+  const style: DealsStyle = { "--deals-accent": accentColor || "var(--primary)" };
+
   return (
-    <InsetBand labelledBy={HEADING_ID} tone="tint">
+    <InsetBand labelledBy={HEADING_ID} tone="tint" style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -78,7 +82,7 @@ function DealCard({ item }: { item: ContentItem }) {
   const discounted = live ? faDiscountedPrice(item.priceAmount, item.discountPercent) : null;
 
   return (
-    <article className="hp-card group h-full overflow-hidden rounded-[var(--hp-r-md)] border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[color:var(--hp-brand)]/40 hover:shadow-[var(--hp-shadow-hover)] motion-reduce:transform-none">
+    <article className="hp-card group h-full overflow-hidden rounded-[var(--hp-r-md)] border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[color:var(--deals-accent)]/40 hover:shadow-[var(--hp-shadow-hover)] motion-reduce:transform-none">
       <Link href={`/${item.module}/${item.slug}`} className="flex h-full flex-col focus-visible:outline-none">
         <div
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
@@ -106,7 +110,7 @@ function DealCard({ item }: { item: ContentItem }) {
               what makes the grid scannable at a glance. */}
           {item.brand && <Eyebrow className="mb-1 !text-[11px] !tracking-[1px]">{item.brand}</Eyebrow>}
 
-          <h3 className="line-clamp-3 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
+          <h3 className="line-clamp-3 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--deals-accent)]">
             <Num latin>{item.title}</Num>
           </h3>
 
