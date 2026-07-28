@@ -173,7 +173,7 @@ function LeadArticle({ item, showTags }: { item: ContentItem; showTags: boolean 
             in both themes (17.2:1 light, 13.0:1 dark).
             No hover colour shift on the headline: there is no contrast
             headroom left on a saturated ground. */}
-        <div className="bg-[color:var(--hp-brand-ink)] px-10 pb-6 pt-20">
+        <div className="bg-[color:var(--hp-brand-ink)] px-10 pb-6 pt-10">
           {showTags && item.category && <CategoryChip label={item.category} onBrand />}
 
           <h3 className="text-[28px] font-bold leading-[38px] text-[color:var(--hp-on-brand)] transition-colors duration-200 group-hover:text-[color:var(--hp-accent-on-ink)]">
