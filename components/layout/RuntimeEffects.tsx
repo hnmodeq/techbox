@@ -2,21 +2,6 @@
 
 import * as React from "react";
 
-function clearLocalServiceWorker() {
-  if (!("serviceWorker" in navigator)) return;
-
-  // Do not wait for window.load. A stale worker can keep a localhost page in
-  // a navigation loop, preventing load from ever firing and making a
-  // load-event cleanup unreachable.
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    registrations.forEach((registration) => registration.unregister());
-  }).catch(() => {});
-
-  if ("caches" in window) {
-    caches.keys().then((keys) => keys.forEach((key) => caches.delete(key))).catch(() => {});
-  }
-}
-
 export function RuntimeEffects() {
   React.useEffect(() => {
     try {
@@ -42,13 +27,12 @@ export function RuntimeEffects() {
     try {
       if (!("serviceWorker" in navigator)) return;
 
+      // Localhost cleanup already ran pre-hydration via the inline script in
+      // app/layout.tsx. Only registration is left to do here, and only on a
+      // secure production origin.
       const isLocalhost = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
       const isSecureProduction = window.location.protocol === "https:" && !isLocalhost;
-
-      if (!isSecureProduction) {
-        clearLocalServiceWorker();
-        return;
-      }
+      if (!isSecureProduction) return;
 
       const register = () => navigator.serviceWorker.register("/sw.js").catch(() => {});
       if (document.readyState === "complete") register();
