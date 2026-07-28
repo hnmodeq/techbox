@@ -39,7 +39,7 @@ export function FamilyCommentsSection({
   if (!comments || comments.length < MIN_COMMENTS) return null;
 
   return (
-    <SectionShell labelledBy={HEADING_ID} className="bg-[color:var(--hp-bg)]">
+    <SectionShell labelledBy={HEADING_ID}>
       <SectionHeader
         headingId={HEADING_ID}
         title={title}

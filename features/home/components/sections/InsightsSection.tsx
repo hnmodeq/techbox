@@ -13,6 +13,7 @@ import type { LatestInsights, HighlightComment } from "@/features/home/lib/home-
 import { SectionShell, SectionHeader } from "../primitives";
 import { NewsletterCard } from "./NewsletterCard";
 import { Num } from "@/components/ui/num";
+import { RemoteImage } from "@/components/ui/remote-image";
 
 export type InsightsSectionProps = {
   data?: LatestInsights;
@@ -35,7 +36,7 @@ export function InsightsSection({
   const style: InsightsStyle = { "--insights-accent": accentColor || "var(--primary)" };
 
   return (
-    <SectionShell labelledBy={HEADING_ID} className="bg-muted/50" style={style}>
+    <SectionShell labelledBy={HEADING_ID} style={style}>
       <SectionHeader
         headingId={HEADING_ID}
         title={title}
@@ -71,14 +72,11 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
     <article className="group">
       <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
         <div className="relative overflow-hidden bg-background" style={{ aspectRatio: "16/9" }}>
-          {story.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+          {story.image && (            <RemoteImage
               src={story.image}
               alt={story.title}
               sizes="(min-width: 1024px) 760px, 100vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
+              className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
             />
           )}
         </div>

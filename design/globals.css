@@ -660,6 +660,14 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
 
   /* Carousel arrow chip */
   --hp-arrow-bg: color-mix(in oklch, var(--foreground) 88%, transparent);
+
+  /* Alternating full-bleed section bands.
+     Applied by app/page.tsx from the RENDERED order, so the stripe stays
+     correct no matter how an admin reorders or hides sections. Kept
+     deliberately close together — this is a subtle separation, not a
+     colour scheme. */
+  --hp-band-a: var(--background);
+  --hp-band-b: color-mix(in oklch, var(--foreground) 3.5%, var(--background));
 }
 
 .dark {
@@ -679,6 +687,11 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   --hp-shadow-hover: 0 8px 28px oklch(0 0 0 / 0.65);
 
   --hp-arrow-bg: color-mix(in oklch, var(--background) 85%, transparent);
+
+  /* On a dark page the alternate band lifts instead of darkening: going
+     further down from an already-dark background reads as a hole. */
+  --hp-band-a: var(--background);
+  --hp-band-b: color-mix(in oklch, var(--foreground) 6%, var(--background));
 }
 @theme inline {
   --color-hp-brand:        var(--hp-brand);
@@ -692,6 +705,8 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   --color-hp-accent:       var(--hp-accent);
   --color-hp-on-accent:    var(--hp-on-accent);
 
+  --color-hp-band-a:     var(--hp-band-a);
+  --color-hp-band-b:     var(--hp-band-b);
   --color-hp-bg:         var(--hp-bg);
   --color-hp-surface:    var(--hp-surface);
   --color-hp-surface-2:  var(--hp-surface-2);

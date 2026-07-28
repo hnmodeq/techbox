@@ -20,7 +20,8 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
-import { InsetBand, SectionHeader } from "../primitives";
+import { RemoteImage } from "@/components/ui/remote-image";
+import { SectionShell, SectionHeader } from "../primitives";
 import { faPrice, faDiscountedPrice, isDiscountLive } from "@/lib/format-price";
 import { Num } from "@/components/ui/num";
 import { Eyebrow } from "../primitives";
@@ -53,7 +54,7 @@ export function DealsSection({
   const style: DealsStyle = { "--deals-accent": accentColor || "var(--primary)" };
 
   return (
-    <InsetBand labelledBy={HEADING_ID} tone="tint" style={style}>
+    <SectionShell labelledBy={HEADING_ID} style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -73,7 +74,7 @@ export function DealsSection({
           </li>
         ))}
       </ul>
-    </InsetBand>
+    </SectionShell>
   );
 }
 
@@ -88,14 +89,11 @@ function DealCard({ item }: { item: ContentItem }) {
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "450/253" }}
         >
-          {item.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+          {item.image && (            <RemoteImage
               src={item.image}
               alt={item.title}
               sizes="(min-width: 900px) 300px, 50vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+              className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
             />
           )}
           {discounted && (
