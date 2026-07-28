@@ -12,6 +12,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
+import { RemoteImage } from "@/components/ui/remote-image";
 import type { VideoHighlightComment } from "@/features/home/lib/home-types";
 import { VideoModal, useVideoModal } from "@/components/content/VideoCard";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -51,8 +52,14 @@ export function VideoSection({
   if (items.length < MIN_VIDEOS) return null;
 
   const [latest, ...quickTakes] = items;
-  // Only show quotes that belong to the video actually on screen.
-  const comments = (highlightComments ?? []).filter((c) => c.videoSlug === latest.slug).slice(0, 2);
+
+  // Quotes are sampled from ALL videos, so each card must open the video it
+  // actually belongs to. Comments whose video is not in this section's slice
+  // are dropped rather than opening the wrong one.
+  const comments = (highlightComments ?? [])
+    .map((comment) => ({ comment, index: items.findIndex((v) => v.slug === comment.videoSlug) }))
+    .filter((entry) => entry.index >= 0)
+    .slice(0, 4);
   const style: VideoStyle = { "--video-accent": accentColor || "var(--primary)" };
 
   const openVideo = (index: number, commentId?: string) => {
@@ -61,7 +68,7 @@ export function VideoSection({
   };
 
   return (
-    <SectionShell labelledBy={HEADING_ID} className="bg-muted/35" style={style}>
+    <SectionShell labelledBy={HEADING_ID} style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -74,6 +81,8 @@ export function VideoSection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
+      {/* items-stretch (grid default) + h-full on the video makes the poster
+          span the full row height, so the section has no dead band under it. */}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,.7fr)] lg:gap-8">
         {/* First in RTL is right: comments on top, compact video rail below.
             justify-between distributes the slack between the two blocks so
@@ -82,11 +91,11 @@ export function VideoSection({
         <div className="flex min-w-0 flex-col justify-between gap-5">
           {comments.length > 0 && (
             <div className="grid gap-4 sm:grid-cols-2">
-              {comments.map((comment) => (
+              {comments.map(({ comment, index }) => (
                 <VideoCommentCard
                   key={comment.id}
                   comment={comment}
-                  onOpen={() => openVideo(0, comment.id)}
+                  onOpen={() => openVideo(index, comment.id)}
                 />
               ))}
             </div>
@@ -132,21 +141,20 @@ export function VideoSection({
 
 function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => void }) {
   return (
-    <div className="mx-auto w-full max-w-[390px]">
+    // h-full so the poster matches the section height instead of leaving a
+    // gap. The 9/16 ratio stays as a MIN on small screens, where the column
+    // stacks and there is no sibling to match.
+    <div className="mx-auto h-full w-full max-w-[390px] lg:max-w-none">
       <button
         type="button"
         onClick={onOpen}
-        className="group relative block w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="group relative block h-full w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <div className="relative w-full overflow-hidden bg-background" style={{ aspectRatio: "9/16" }}>
-          {item.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+        <div className="relative h-full w-full overflow-hidden bg-background max-lg:aspect-9/16 lg:min-h-[520px]">
+          {item.image && (            <RemoteImage
               src={item.image}
               alt={item.title}
               sizes="(min-width: 1024px) 390px, 100vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover"
             />
           )}
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
@@ -179,14 +187,10 @@ function QuickTakeCard({ item, onOpen }: { item: ContentItem; onOpen: () => void
       className="hp-card group relative w-[172px] overflow-hidden bg-background text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:w-[200px]"
       style={{ aspectRatio: "9/16" }}
     >
-      {item.image && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+      {item.image && (        <RemoteImage
           src={item.image}
           alt={item.title}
           sizes="200px"
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover"
         />
       )}
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
@@ -234,12 +238,12 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
   // the flex item instead. A default-inline span ignores width/height, so
   // the avatar rendered at the image's natural size and blew the card open.
   const avatar = (
-    <span className="block size-8 shrink-0 overflow-hidden rounded-[var(--hp-r-sm)] bg-muted">
+    <span className="block size-11 shrink-0 overflow-hidden rounded-[var(--hp-r-sm)] bg-muted">
       {comment.author.avatar ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={comment.author.avatar} alt={comment.author.name} width={32} height={32} loading="lazy" className="h-full w-full object-cover" />
+        <img src={comment.author.avatar} alt={comment.author.name} width={44} height={44} loading="lazy" className="h-full w-full object-cover" />
       ) : (
-        <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-sm font-bold text-muted-foreground">
+        <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-base font-bold text-muted-foreground">
           {comment.author.name.trim()[0] ?? "؟"}
         </span>
       )}
@@ -266,16 +270,23 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
 
       <div className="mt-auto flex shrink-0 items-center gap-3 pt-4">
         {comment.author.username ? (
-          <Link
-            href={`/author/${comment.author.username}`}
-            aria-label={`مشاهدهٔ پروفایل ${comment.author.name}`}
-            className="block shrink-0 rounded-[var(--hp-r-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {avatar}
-          </Link>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Link
+                  href={`/author/${comment.author.username}`}
+                  aria-label={`بازدید از حساب کاربری ${comment.author.name}`}
+                  className="block shrink-0 rounded-[var(--hp-r-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+              }
+            >
+              {avatar}
+            </TooltipTrigger>
+            <TooltipContent>{`بازدید از حساب کاربری ${comment.author.name}`}</TooltipContent>
+          </Tooltip>
         ) : avatar}
         <button type="button" onClick={onOpen} className="min-w-0 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <span className="block truncate text-[14px] font-bold text-[color:var(--video-accent)]">{comment.author.name}</span>
+          <span className="block truncate text-[15px] font-bold text-[color:var(--video-accent)]">{comment.author.name}</span>
           <RelativeDate date={comment.date} className="mt-0.5 block text-[12px] text-muted-foreground" />
         </button>
       </div>

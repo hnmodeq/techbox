@@ -28,9 +28,19 @@ describe("homepage Video and Latest contracts", () => {
     expect(video).not.toMatch(/hideArrows=\{quickTakes\.length < 4\}/);
   });
 
-  it("keeps the comment avatar small and softly rounded", () => {
-    expect(video).toMatch(/block size-8 shrink-0 overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
-    expect(video).not.toMatch(/size-11 shrink-0 overflow-hidden rounded-full/);
+  it("keeps the comment avatar softly rounded, and big enough to identify", () => {
+    // 32px was too small to tell who was speaking; 44px on the small radius
+    // token. Still not a circle.
+    expect(video).toMatch(/block size-11 shrink-0 overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
+    // Scoped to the avatar: PlayAffordance is legitimately a circle.
+    const avatarBlock = video.slice(video.indexOf("const avatar = ("), video.indexOf("<article"));
+    expect(avatarBlock).not.toMatch(/rounded-full/);
+  });
+
+  it("labels the avatar link with the commenter's real name", () => {
+    // Name is interpolated, never hardcoded.
+    expect(video).toMatch(/بازدید از حساب کاربری \$\{comment\.author\.name\}/);
+    expect(video).not.toMatch(/بازدید از حساب کاربری پارسا/);
   });
 
   it("blockifies the avatar and its optional link wrapper", () => {
@@ -39,24 +49,34 @@ describe("homepage Video and Latest contracts", () => {
     // item instead. A default-inline span ignores width/height, so the
     // avatar rendered at the image's natural size and blew the card open.
     const block = video.slice(video.indexOf("const avatar = ("), video.indexOf("<article"));
-    expect(block).toMatch(/className="block size-8/);
+    expect(block).toMatch(/className="block size-11/);
     expect(video).toMatch(/className="block shrink-0 rounded-\[var\(--hp-r-sm\)\]/);
   });
 
-  it("shows two real, distinct comment cards beside the latest video", () => {
+  it("shows four real, distinct comment cards drawn from across all videos", () => {
     expect(video).toMatch(/highlightComments\?: VideoHighlightComment\[\]/);
     expect(video).toMatch(/<VideoCommentCard\s/);
     expect(video).toMatch(/scrollToCommentId=\{commentToReveal\}/);
     expect(data).toMatch(/export async function getLatestVideoHighlightComments/);
-    expect(data).toMatch(/videoSlug: latest\.slug/);
+    expect(data).toMatch(/videoSlug: row\.post\.slug/);
+    // Not scoped to the newest video any more.
+    expect(data).not.toMatch(/videoSlug: latest\.slug/);
     // Two salted picks could collide and render the same comment twice;
     // seededIndices probes to the next free slot instead.
     expect(data).toMatch(/export function seededIndices/);
     expect(data).toMatch(/while \(picked\.includes\(candidate\)\)/);
     // Quotes must belong to the video actually on screen, and never pad
     // beyond what the database returned.
-    expect(video).toMatch(/\.filter\(\(c\) => c\.videoSlug === latest\.slug\)\.slice\(0, 2\)/);
+    // Quotes come from ANY published video, so each card resolves the index
+    // of its own video and opens that one — never the newest by default.
+    expect(video).toMatch(/items\.findIndex\(\(v\) => v\.slug === comment\.videoSlug\)/);
+    expect(video).toMatch(/\.slice\(0, 4\)/);
+    expect(video).toMatch(/openVideo\(index, comment\.id\)/);
     expect(video).toMatch(/comments\.length > 0 &&/);
+    // 2 x 2 grid.
+    expect(video).toMatch(/grid gap-4 sm:grid-cols-2/);
+    // One quote per person, so four cards are four different voices.
+    expect(data).toMatch(/seenAuthors\.has\(key\)/);
   });
 
   it("renders the comment cards as squares", () => {
@@ -83,9 +103,13 @@ describe("homepage Video and Latest contracts", () => {
     expect(insights).toMatch(/#comment-\$\{comment\.id\}/);
   });
 
-  it("uses a full-width ghost page wash rather than an inset card for Latest", () => {
-    expect(insights).toMatch(/SectionShell labelledBy=\{HEADING_ID\} className="bg-muted\/50"/);
+  it("lets the page own the section background, not the section", () => {
+    // Backgrounds now alternate per RENDERED index in app/page.tsx, so a
+    // section painting its own wash would break the stripe wherever an
+    // admin reorders or hides something.
     expect(insights).not.toMatch(/InsetBand/);
+    expect(insights).not.toMatch(/className="bg-muted\/50"/);
+    expect(video).not.toMatch(/className="bg-muted\/35"/);
   });
 });
 
