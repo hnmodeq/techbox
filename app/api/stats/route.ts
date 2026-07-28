@@ -15,7 +15,14 @@ interface PostStats {
 
 /** Cache for bulk stats (per module) — avoids loading all posts on every request. */
 const statsCache = new Map<string, { data: Record<string, PostStats>; ts: number }>();
-const CACHE_TTL_MS = 30_000; // 30 seconds
+const CACHE_TTL_MS = 3_600_000; // 1 hour
+const STATS_CACHE_CONTROL = "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400";
+
+function statsJson(body: unknown, init?: ResponseInit) {
+  const response = NextResponse.json(body, init);
+  response.headers.set("Cache-Control", STATS_CACHE_CONTROL);
+  return response;
+}
 const PUBLIC_POST_MODULES = new Set([
   "blog", "news", "media", "forum", "download", "tools", "review", "shop",
 ]);
@@ -47,7 +54,7 @@ export async function GET(req: NextRequest) {
         },
       });
       if (!post) {
-        return NextResponse.json<PostStats>({
+        return statsJson({
           views: 0,
           likes: 0,
           comments: 0,
@@ -62,7 +69,7 @@ export async function GET(req: NextRequest) {
       const commentsCount = await prisma.comment.count({
         where: { postId: post.id, status: "approved" },
       });
-      return NextResponse.json<PostStats>({
+      return statsJson({
         views: post.views || 0,
         likes: post.likes || 0,
         comments: commentsCount || 0,
@@ -84,7 +91,7 @@ export async function GET(req: NextRequest) {
     try {
       const cached = statsCache.get(moduleKey);
       if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
-        return NextResponse.json(cached.data);
+        return statsJson(cached.data);
       }
 
       const posts: { id: string; slug: string; views: number; likes: number; solved: boolean | null; rating: number | null; ratingCount: number; fileName: string | null; fileSize: string | null; downloadCount: number }[] = await prisma.post.findMany({
@@ -130,7 +137,7 @@ export async function GET(req: NextRequest) {
       }
 
       statsCache.set(moduleKey, { data: stats, ts: Date.now() });
-      return NextResponse.json(stats);
+      return statsJson(stats);
     } catch {
       return NextResponse.json({ error: "db_unavailable" }, { status: 503 });
     }
@@ -143,7 +150,7 @@ export async function GET(req: NextRequest) {
       prisma.comment.count({ where: { status: "approved" } }),
       prisma.user.count({ where: { status: "active" } }),
     ]);
-    return NextResponse.json({ postCount, commentCount, userCount });
+    return statsJson({ postCount, commentCount, userCount });
   } catch {
     return NextResponse.json({ error: "db_unavailable" }, { status: 503 });
   }
