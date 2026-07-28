@@ -25,7 +25,7 @@ type PrismaClientInstance = InstanceType<typeof PrismaClient>;
  * Versioning the key means a config change discards the stale client and
  * builds a fresh one on the next request.
  */
-const CLIENT_CONFIG_VERSION = 2;
+const CLIENT_CONFIG_VERSION = 3;
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClientInstance;
@@ -54,6 +54,31 @@ function getPrismaClient(): PrismaClientInstance {
   // a small pool; production keeps the serverless-safe default of 1.
   const isDev = process.env.NODE_ENV !== "production";
   let dbUrl = process.env.DATABASE_URL || "";
+
+  // In DEVELOPMENT, override any connection_limit already in the URL.
+  //
+  // .env.example tells you to put `connection_limit=1` in DATABASE_URL,
+  // which is right for serverless production — but the guard below used to
+  // be "only add settings if the URL has none", so a correctly-configured
+  // .env meant local dev ran on a pool of ONE. One `next dev` process then
+  // served the homepage (~9 sequential section queries) plus
+  // /api/notifications, /api/auth/me, /api/modules/enabled and
+  // /api/news/read-state concurrently through a single connection. Everything
+  // after the first query queued until pool_timeout and failed P2024, which
+  // tripped the circuit breaker and blanked sections — while the database
+  // itself was perfectly healthy.
+  //
+  // Production still honours whatever the URL says: one connection per
+  // serverless instance remains the correct Neon default there.
+  if (dbUrl && isDev) {
+    dbUrl = dbUrl
+      .replace(/([?&])connection_limit=\d+/g, "$1")
+      .replace(/([?&])pool_timeout=\d+/g, "$1")
+      .replace(/[?&]+$/, "")
+      .replace(/\?&+/, "?")
+      .replace(/&&+/g, "&");
+  }
+
   if (dbUrl && !dbUrl.includes("connection_limit=")) {
     const fallback = isDev ? 5 : 1;
     const configured = Number(process.env.PRISMA_CONNECTION_LIMIT || String(fallback));
