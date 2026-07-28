@@ -8,7 +8,7 @@ import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getEnabledModules, getModuleConfig } from "@/lib/module-config";
 import {
   getLatestInsights,
-  getLatestVideoHighlightComment,
+  getLatestVideoHighlightComments,
   getDeals,
   getTopPicks,
   getTimeline,
@@ -522,8 +522,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   const latestInsights = await section("latestInsights", { story: null, comments: [] } as any, () =>
     getLatestInsights(normalizeCard, cardSelect));
 
-  const videoHighlightComment = await section("videoHighlightComment", null as any, () =>
-    getLatestVideoHighlightComment());
+  const videoHighlightComments = await section("videoHighlightComments", [] as any[], () =>
+    getLatestVideoHighlightComments(2));
 
   const topPicks = await section("topPicks", [] as any[], () =>
     getTopPicks(normalizeCard, cardSelect));
@@ -620,7 +620,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     ticker: tickerPosts.map(normalizeTickerCard),
     generatedAt: new Date().toISOString(),
     latestInsights,
-    videoHighlightComment,
+    videoHighlightComments,
     topPicks,
     timeline,
     familyComments,

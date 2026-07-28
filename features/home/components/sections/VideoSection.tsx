@@ -20,7 +20,7 @@ import { SectionShell, SectionHeader, ScrollRail } from "../primitives";
 
 export type VideoSectionProps = {
   videos: ContentItem[];
-  highlightComment?: VideoHighlightComment | null;
+  highlightComments?: VideoHighlightComment[];
   title?: string;
   moreLabel?: string;
   showTitle?: boolean;
@@ -37,7 +37,7 @@ type VideoStyle = React.CSSProperties & {
 
 export function VideoSection({
   videos,
-  highlightComment,
+  highlightComments,
   title = "ویدیوهای تکباکس",
   moreLabel = "همه ویدیوها",
   showTitle = true,
@@ -51,7 +51,8 @@ export function VideoSection({
   if (items.length < MIN_VIDEOS) return null;
 
   const [latest, ...quickTakes] = items;
-  const videoComment = highlightComment?.videoSlug === latest.slug ? highlightComment : null;
+  // Only show quotes that belong to the video actually on screen.
+  const comments = (highlightComments ?? []).filter((c) => c.videoSlug === latest.slug).slice(0, 2);
   const style: VideoStyle = { "--video-accent": accentColor || "var(--primary)" };
 
   const openVideo = (index: number, commentId?: string) => {
@@ -74,11 +75,22 @@ export function VideoSection({
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,.7fr)] lg:gap-8">
-        {/* First in RTL is right: comment on top, compact video rail below. */}
-        <div className="flex min-w-0 flex-col gap-5">
-          {videoComment ? (
-            <VideoCommentCard comment={videoComment} onOpen={() => openVideo(0, videoComment.id)} />
-          ) : null}
+        {/* First in RTL is right: comments on top, compact video rail below.
+            justify-between distributes the slack between the two blocks so
+            this column ends level with the tall portrait video beside it,
+            instead of leaving a gap under the rail. */}
+        <div className="flex min-w-0 flex-col justify-between gap-5">
+          {comments.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {comments.map((comment) => (
+                <VideoCommentCard
+                  key={comment.id}
+                  comment={comment}
+                  onOpen={() => openVideo(0, comment.id)}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Slider: the quick takes are the only way to reach these videos,
               so the arrows stay available on touch too and appear as soon as
@@ -235,18 +247,24 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
   );
 
   return (
-    <article className="flex min-h-[210px] w-full flex-col rounded-[var(--hp-r-md)] border border-border bg-background p-6 shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]">
+    // Square by request. min-h-0 lets the quote block actually shrink inside
+    // the fixed ratio, and line-clamp keeps a long comment from demanding
+    // more height than the square allows.
+    <article
+      className="flex w-full flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-border bg-background p-5 shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]"
+      style={{ aspectRatio: "1/1" }}
+    >
       {/* Most of the card opens the existing modal at this real comment. */}
       <button
         type="button"
         onClick={onOpen}
-        className="group min-w-0 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="group min-h-0 min-w-0 flex-1 overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <span aria-hidden="true" className="text-4xl font-black leading-none text-[color:var(--video-accent)]">“</span>
-        <p className="mt-2 line-clamp-4 text-[15px] leading-[27px] text-foreground">{comment.text}</p>
+        <span aria-hidden="true" className="text-3xl font-black leading-none text-[color:var(--video-accent)]">“</span>
+        <p className="mt-1 line-clamp-4 text-[14px] leading-[24px] text-foreground">{comment.text}</p>
       </button>
 
-      <div className="mt-auto flex items-center gap-3 pt-6">
+      <div className="mt-auto flex shrink-0 items-center gap-3 pt-4">
         {comment.author.username ? (
           <Link
             href={`/author/${comment.author.username}`}

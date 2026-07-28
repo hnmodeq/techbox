@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { seededIndices } from "@/lib/home-sections";
 
 const read = (file: string) => fs.readFileSync(path.resolve(__dirname, "../..", file), "utf8");
 
@@ -42,12 +43,35 @@ describe("homepage Video and Latest contracts", () => {
     expect(video).toMatch(/className="block shrink-0 rounded-\[var\(--hp-r-sm\)\]/);
   });
 
-  it("uses exactly one real Spiceworks-style comment slot beside the latest video", () => {
-    expect(video).toMatch(/highlightComment\?: VideoHighlightComment/);
-    expect(video).toMatch(/<VideoCommentCard comment=\{videoComment\}/);
+  it("shows two real, distinct comment cards beside the latest video", () => {
+    expect(video).toMatch(/highlightComments\?: VideoHighlightComment\[\]/);
+    expect(video).toMatch(/<VideoCommentCard\s/);
     expect(video).toMatch(/scrollToCommentId=\{commentToReveal\}/);
-    expect(data).toMatch(/export async function getLatestVideoHighlightComment/);
+    expect(data).toMatch(/export async function getLatestVideoHighlightComments/);
     expect(data).toMatch(/videoSlug: latest\.slug/);
+    // Two salted picks could collide and render the same comment twice;
+    // seededIndices probes to the next free slot instead.
+    expect(data).toMatch(/export function seededIndices/);
+    expect(data).toMatch(/while \(picked\.includes\(candidate\)\)/);
+    // Quotes must belong to the video actually on screen, and never pad
+    // beyond what the database returned.
+    expect(video).toMatch(/\.filter\(\(c\) => c\.videoSlug === latest\.slug\)\.slice\(0, 2\)/);
+    expect(video).toMatch(/comments\.length > 0 &&/);
+  });
+
+  it("renders the comment cards as squares", () => {
+    const card = video.slice(video.indexOf("function VideoCommentCard"));
+    expect(card).toMatch(/aspectRatio: "1\/1"/);
+    // A fixed ratio only holds if the quote block can shrink inside it.
+    expect(card).toMatch(/min-h-0 min-w-0 flex-1 overflow-hidden/);
+    expect(card).toMatch(/line-clamp-4/);
+    expect(card).not.toMatch(/min-h-\[210px\]/);
+  });
+
+  it("closes the gap under the quick-takes rail", () => {
+    // justify-between spreads the slack between the comments and the rail
+    // so the column finishes level with the tall portrait video.
+    expect(video).toMatch(/flex min-w-0 flex-col justify-between gap-5/);
   });
 
   it("selects the weekly news lead by approved-comment count and keeps comments real", () => {
@@ -62,5 +86,30 @@ describe("homepage Video and Latest contracts", () => {
   it("uses a full-width ghost page wash rather than an inset card for Latest", () => {
     expect(insights).toMatch(/SectionShell labelledBy=\{HEADING_ID\} className="bg-muted\/50"/);
     expect(insights).not.toMatch(/InsetBand/);
+  });
+});
+
+describe("seededIndices picks distinct slots", () => {
+  it("never repeats an index, at any pool size", () => {
+    // Two independently salted seededIndex calls can collide, which would
+    // render the same comment in both cards.
+    for (let total = 1; total <= 40; total += 1) {
+      for (let count = 1; count <= 5; count += 1) {
+        const got = seededIndices(total, count);
+        expect(new Set(got).size).toBe(got.length);
+        expect(got.length).toBe(Math.min(count, total));
+        for (const index of got) {
+          expect(index).toBeGreaterThanOrEqual(0);
+          expect(index).toBeLessThan(total);
+        }
+      }
+    }
+  });
+
+  it("degrades rather than throwing on empty input", () => {
+    expect(seededIndices(0, 2)).toEqual([]);
+    expect(seededIndices(5, 0)).toEqual([]);
+    // One comment must yield one card, not a duplicate pair.
+    expect(seededIndices(1, 2)).toHaveLength(1);
   });
 });
