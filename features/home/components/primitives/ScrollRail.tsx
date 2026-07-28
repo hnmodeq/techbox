@@ -156,8 +156,19 @@ function RailArrow({
   onMobile?: boolean;
   onClick: () => void;
 }) {
-  // RTL: "prev" (back toward the first item) sits on the RIGHT.
-  const sideCls = dir === "prev" ? "end-0 sm:-end-4" : "start-0 sm:-start-4";
+  // RTL: "prev" (back toward the first item) sits on the RIGHT, and in a
+  // right-to-left container the logical START edge *is* the right edge.
+  // These were inverted, which put the disabled prev arrow over the
+  // left-hand cut-off card and the live next arrow past the right edge
+  // where the rail had already run out — so the slider read as having no
+  // working controls at all.
+  //
+  // Bare arrows also sit just INSIDE the rail. The bordered variant hangs
+  // 16px outside, which is fine for a full-width rail but clips when the
+  // rail is a narrow grid column, as it is beside the video comment card.
+  const sideCls = bare
+    ? (dir === "prev" ? "start-1" : "end-1")
+    : (dir === "prev" ? "start-0 sm:-start-4" : "end-0 sm:-end-4");
   return (
     <button
       type="button"
@@ -167,10 +178,15 @@ function RailArrow({
       className={cn(
         "absolute top-1/2 z-10 -translate-y-1/2 items-center justify-center rounded-full",
         onMobile ? "flex" : "hidden md:flex",
-        bare ? "size-11 text-foreground transition-colors duration-200 md:size-16" : "h-14 w-14 border transition-opacity duration-200", // 56px — TG exact
-        bare ? "hover:text-primary" : "border-[color:var(--hp-brand)] bg-[var(--hp-arrow-bg)] text-white hover:opacity-100",
+        bare ? "size-11 transition-colors duration-200" : "h-14 w-14 border transition-opacity duration-200", // 56px — TG exact
+        bare
+          ? "bg-background/90 text-foreground shadow-[var(--hp-shadow-card)] backdrop-blur-sm hover:text-primary"
+          : "border-[color:var(--hp-brand)] bg-[var(--hp-arrow-bg)] text-white hover:opacity-100",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-        disabled ? "pointer-events-none opacity-0" : "opacity-90",
+        // Dim rather than vanish. An arrow that disappears at each end makes
+        // the rail look like it has no controls in exactly the state every
+        // visitor sees first (scrolled to the start).
+        disabled ? "pointer-events-none opacity-25" : "opacity-90",
         sideCls,
       )}
     >
