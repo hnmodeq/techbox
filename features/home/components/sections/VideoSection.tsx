@@ -258,7 +258,7 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
     // more height than the square allows.
     <article
       className="flex w-full flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-border bg-background p-5 shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]"
-      style={{ aspectRatio: "1/1" }}
+      style={{ aspectRatio: "2/1" }}
     >
       {/* Most of the card opens the existing modal at this real comment. */}
       <button
