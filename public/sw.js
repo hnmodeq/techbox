@@ -35,13 +35,15 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   if (IS_LOCAL_DEV) {
+    // A previous production worker may still control localhost after a
+    // deployment/test. Clear it, but NEVER navigate every client here:
+    // `client.navigate(client.url)` turns activation into a dev/HMR reload
+    // loop and can interrupt hashed Next font requests mid-download.
     event.waitUntil(
       caches
         .keys()
         .then((cacheNames) => Promise.all(cacheNames.map((name) => caches.delete(name))))
         .then(() => self.registration.unregister())
-        .then(() => self.clients.matchAll({ type: "window", includeUncontrolled: true }))
-        .then((clients) => clients.forEach((client) => client.navigate(client.url)))
     );
     return;
   }

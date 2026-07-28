@@ -46,7 +46,9 @@ const nextConfig = {
           "img-src 'self' data: blob: https:",
           "media-src 'self' https://*.supabase.co",
           "font-src 'self' data:",
-          "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://o*.ingest.sentry.io https://va.vercel-scripts.com",
+          // CSP wildcards must occupy the entire left-most label. `o*.…`
+          // is invalid in Firefox and makes the browser discard this policy.
+          "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://*.ingest.sentry.io https://va.vercel-scripts.com",
           "frame-src 'self' https://www.openstreetmap.org",
           "form-action 'self'",
         ].join('; '),
