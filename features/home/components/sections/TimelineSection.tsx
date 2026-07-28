@@ -19,6 +19,7 @@ import * as React from "react";
 import type { TimelineCard } from "@/features/home/lib/home-types";
 import { ScrollRail, SectionHeader } from "../primitives";
 import { Num } from "@/components/ui/num";
+import { RemoteImage } from "@/components/ui/remote-image";
 
 export type TimelineSectionProps = {
   events: TimelineCard[];
@@ -114,14 +115,7 @@ function TimelineItem({ event, flip }: { event: TimelineCard; flip: boolean }) {
             className="relative mb-3 w-full overflow-hidden rounded-[var(--hp-r-sm)] bg-white/10"
             style={{ aspectRatio: "16/9" }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={event.image}
-              alt={event.title}
-              sizes="260px"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+            <RemoteImage src={event.image} alt={event.title} sizes="260px" />
           </div>
         )}
 
