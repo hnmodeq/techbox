@@ -28,8 +28,18 @@ describe("homepage Video and Latest contracts", () => {
   });
 
   it("keeps the comment avatar small and softly rounded", () => {
-    expect(video).toMatch(/size-8 shrink-0 overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
+    expect(video).toMatch(/block size-8 shrink-0 overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
     expect(video).not.toMatch(/size-11 shrink-0 overflow-hidden rounded-full/);
+  });
+
+  it("blockifies the avatar and its optional link wrapper", () => {
+    // The avatar span is NOT always a flex item: when the author has a
+    // username it is wrapped in a <Link>, and the Link becomes the flex
+    // item instead. A default-inline span ignores width/height, so the
+    // avatar rendered at the image's natural size and blew the card open.
+    const block = video.slice(video.indexOf("const avatar = ("), video.indexOf("<article"));
+    expect(block).toMatch(/className="block size-8/);
+    expect(video).toMatch(/className="block shrink-0 rounded-\[var\(--hp-r-sm\)\]/);
   });
 
   it("uses exactly one real Spiceworks-style comment slot beside the latest video", () => {
