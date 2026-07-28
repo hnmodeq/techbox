@@ -15,6 +15,7 @@ import type { ContentItem } from "@/lib/content";
 import type { VideoHighlightComment } from "@/features/home/lib/home-types";
 import { VideoModal, useVideoModal } from "@/components/content/VideoCard";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { RelativeDate } from "@/components/ui/relative-date";
 import { SectionShell, SectionHeader, ScrollRail } from "../primitives";
 
 export type VideoSectionProps = {
@@ -79,11 +80,14 @@ export function VideoSection({
             <VideoCommentCard comment={videoComment} onOpen={() => openVideo(0, videoComment.id)} />
           ) : null}
 
+          {/* Slider: the quick takes are the only way to reach these videos,
+              so the arrows stay available on touch too and appear as soon as
+              the rail overflows rather than only past four items. */}
           <ScrollRail
             label="ویدیوهای کوتاه"
             gap={12}
-            hideArrows={quickTakes.length < 4}
             bareArrows
+            arrowsOnMobile
             railClassName="pb-1"
           >
             {quickTakes.map((video, index) => (
@@ -137,8 +141,15 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
           <PlayAffordance />
           <div className="absolute inset-x-5 bottom-5 text-white">
             <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/75">
-              <time dateTime={item.date}>{item.date_fa}</time>
-              {item.videoDuration && <span dir="ltr">{item.videoDuration}</span>}
+              <RelativeDate date={item.date} />
+              {item.videoDuration && (
+                <Tooltip>
+                  <TooltipTrigger render={<span dir="ltr" className="cursor-default" />}>
+                    {item.videoDuration}
+                  </TooltipTrigger>
+                  <TooltipContent>مدت زمان ویدیو</TooltipContent>
+                </Tooltip>
+              )}
             </div>
             <h3 className="text-[22px] font-bold leading-[32px] transition-colors group-hover:text-[color:var(--video-accent)]">{item.title}</h3>
           </div>
@@ -175,16 +186,14 @@ function QuickTakeCard({ item, onOpen }: { item: ContentItem; onOpen: () => void
           >
             {item.videoDuration}
           </TooltipTrigger>
-          <TooltipContent>زمان ویدیو</TooltipContent>
+          <TooltipContent>مدت زمان ویدیو</TooltipContent>
         </Tooltip>
       )}
 
       <PlayAffordance />
 
       <div className="absolute inset-x-3 bottom-3">
-        <time dateTime={item.date} className="mb-1 block text-[11px] leading-4 text-white/70">
-          {item.date_fa}
-        </time>
+        <RelativeDate date={item.date} className="mb-1 block text-[11px] leading-4 text-white/70" />
         <h3 className="line-clamp-2 text-[14px] font-bold leading-[20px] text-white transition-colors group-hover:text-[color:var(--video-accent)]">
           {item.title}
         </h3>
@@ -209,10 +218,10 @@ function PlayAffordance() {
 /** One-card version of the supplied three-column Spiceworks testimonial. */
 function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment; onOpen: () => void }) {
   const avatar = (
-    <span className="size-11 shrink-0 overflow-hidden rounded-full bg-muted">
+    <span className="size-8 shrink-0 overflow-hidden rounded-[var(--hp-r-sm)] bg-muted">
       {comment.author.avatar ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={comment.author.avatar} alt={comment.author.name} width={44} height={44} loading="lazy" className="h-full w-full object-cover" />
+        <img src={comment.author.avatar} alt={comment.author.name} width={32} height={32} loading="lazy" className="h-full w-full object-cover" />
       ) : (
         <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-sm font-bold text-muted-foreground">
           {comment.author.name.trim()[0] ?? "؟"}
@@ -238,14 +247,14 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
           <Link
             href={`/author/${comment.author.username}`}
             aria-label={`مشاهدهٔ پروفایل ${comment.author.name}`}
-            className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="shrink-0 rounded-[var(--hp-r-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {avatar}
           </Link>
         ) : avatar}
         <button type="button" onClick={onOpen} className="min-w-0 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <span className="block truncate text-[14px] font-bold text-[color:var(--video-accent)]">{comment.author.name}</span>
-          <time dateTime={comment.date} className="mt-0.5 block text-[12px] text-muted-foreground">{comment.dateFa}</time>
+          <RelativeDate date={comment.date} className="mt-0.5 block text-[12px] text-muted-foreground" />
         </button>
       </div>
     </article>
