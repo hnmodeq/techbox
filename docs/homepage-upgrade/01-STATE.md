@@ -134,6 +134,12 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-28 — Expanded module palette and module-colour title hovers
+
+- Expanded each module’s visual admin colour dialog from ten suggested swatches to a 120-swatch hue/lightness spectrum, while retaining the native colour picker for any RGB colour.
+- Applied each active homepage module accent to its content-title hover states: Magazine compact articles, Community featured/topic rows, Deals, Tools (icon + title), Top Picks, Video and Latest. Each section falls back to the standard shadcn primary when the colour system is disabled.
+- `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass (201 tests).
+
 ### 2026-07-28 — Local development service-worker reload-loop fix
 
 A localhost dev report showed repeated refreshes, failed hashed Kalameh font requests, and a malformed Sentry CSP host. The font failures are a symptom of interrupted/reloaded dev pages, not missing font files: all nine local source fonts are present.

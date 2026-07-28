@@ -31,6 +31,8 @@ export type ToolsSectionProps = {
 
 const HEADING_ID = "hp-tools-heading";
 
+type ToolsStyle = React.CSSProperties & { "--tools-accent"?: string };
+
 export function ToolsSection({
   featured,
   title = "ابزارها و اپلیکیشن‌ها",
@@ -51,10 +53,13 @@ export function ToolsSection({
 
   if (!tools.length) return null;
 
+  const style: ToolsStyle = { "--tools-accent": accentColor || "var(--primary)" };
+
   return (
     <section
       aria-labelledby={HEADING_ID}
       className="w-full bg-[color:var(--hp-bg)] px-4 py-12 sm:px-6 lg:px-8 lg:py-16"
+      style={style}
     >
       <div className="mx-auto w-full max-w-[1280px]">
         {showTitle && (
@@ -103,7 +108,7 @@ function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
       <ToolIcon
         slug={tool.slug}
         size={72}
-        className="text-[color:var(--hp-ink-3)] transition-[transform,color] duration-200 group-hover:scale-[1.06] group-hover:text-[color:var(--hp-brand)] motion-reduce:transform-none"
+        className="text-[color:var(--hp-ink-3)] transition-[transform,color] duration-200 group-hover:scale-[1.06] group-hover:text-[color:var(--tools-accent)] motion-reduce:transform-none"
       />
 
       {/*
@@ -112,7 +117,7 @@ function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
         balance` + min-height reproduces that without hardcoding a break.
       */}
       <h3
-        className="mt-4 text-[18px] font-bold leading-[28px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]"
+        className="mt-4 text-[18px] font-bold leading-[28px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--tools-accent)]"
         style={{ textWrap: "balance", minHeight: "56px" }}
       >
         {tool.titleFa}

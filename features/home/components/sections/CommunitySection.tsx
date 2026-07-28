@@ -41,6 +41,8 @@ export type CommunitySectionProps = {
 };
 
 const HEADING_ID = "hp-community-heading";
+
+type CommunityStyle = React.CSSProperties & { "--community-accent"?: string };
 const MIN_TOPICS = 3;
 
 export function CommunitySection({
@@ -62,8 +64,10 @@ export function CommunitySection({
 
   const rows = list.filter((t) => t.slug !== featured.slug).slice(0, 5);
 
+  const style: CommunityStyle = { "--community-accent": accentColor || "var(--primary)" };
+
   return (
-    <SectionShell labelledBy={HEADING_ID}>
+    <SectionShell labelledBy={HEADING_ID} style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -103,7 +107,7 @@ function FeaturedTopic({ topic }: { topic: WithAccepted }) {
         <h3 className="text-[20px] font-bold leading-[30px] text-[color:var(--hp-ink)]">
           <Link
             href={`/${topic.module}/${topic.slug}`}
-            className="transition-colors hover:text-[color:var(--hp-brand)] focus-visible:outline-none"
+            className="transition-colors hover:text-[color:var(--community-accent)] focus-visible:outline-none"
           >
             {topic.title}
           </Link>
@@ -132,7 +136,7 @@ function FeaturedTopic({ topic }: { topic: WithAccepted }) {
 
         <Link
           href="/forum"
-          className="mt-4 inline-block text-[13px] font-bold text-[color:var(--hp-brand)] hover:underline"
+          className="mt-4 inline-block text-[13px] font-bold text-[color:var(--community-accent)] hover:underline"
         >
           کاوش در انجمن <span aria-hidden="true">←</span>
         </Link>
@@ -153,7 +157,7 @@ function TopicRow({ topic }: { topic: WithAccepted }) {
           <Eyebrow className="!text-[11px] !tracking-[1px]">{topic.category}</Eyebrow>
         )}
 
-        <h3 className="mt-0.5 flex items-start gap-1.5 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
+        <h3 className="mt-0.5 flex items-start gap-1.5 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--community-accent)]">
           {topic.solved && (
             <span
               className="mt-0.5 shrink-0 text-[11px] text-[color:var(--hp-solved)]"
