@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && next dev --webpack",
+    "dev": "prisma generate && next dev",
     "build": "next build",
     "build:webpack": "next build --webpack",
     "start": "next start",
@@ -36,7 +36,7 @@
     "playwright:install": "playwright install chromium",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev:turbo": "prisma generate && next dev"
+    "dev:webpack": "prisma generate && next dev --webpack"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
