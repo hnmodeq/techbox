@@ -1,231 +1,34 @@
-1-the searchbar needs to be more visible and some final touchs
+1-magazine page need a re-design (time.com)
+2-homepage need a design
+3-mobile version need to get a re-design
 
-2-the sub footer needs less height
-
-3-chat box tabs need to get background to be removed
-
+4-the searchbar needs to be more visible and some final touchs
+5-the sub footer needs less height
+6-chat box tabs need to get background to be removed
 7-media page needs final touchs
-
-9-remove breadcrumb from magazine
-
-10-landing page needs to get remove
-
-11-price should be big not as a tag in work-with-us slugs
-
-12-RAID Calculator product recommendation showing products with a delay
-
-shop product slugs tab design and merge specs with comments
-
-------------
-
-4-magazine page need a re-design (time.com)
-
-5-homepage need a design
-
-11-mobile version need to get a re-design
-
+8-remove breadcrumb from magazine
+9-landing page needs to get remove
+10-price should be big not as a tag in work-with-us slugs
+11-RAID Calculator product recommendation showing products with a delay
+12-shop product slugs tab design and merge specs with comments
 
 --------------------------------------------
--------------------------------------------
 
-I'm working on magazine section in homepage.  
-  
-  
-  
-1-i want to make sure this section is using shadcn standard color tokens  
-  
-  
-  
-2-i want you to remove the background color of content tags  
-  
-  
-  
-3-also tags needs a pr-5 i think to be same as the title  
-  
-  
-  
-4-tags should be clickable and when we click on it we needs to see all contents with this tag  
-  
-  
-  
-5-i want hovering effect for titles and tags, on hovering on title and tags they get an underline text effect  
-  
-  
-  
-6-i want tool tip on:  
-  
--dates: تاریخ انتشار  
-  
-make sure you use shadcn components (we already have the tooltip component)  
-  
-  
-  
-7-make sure the big article is our latest article and small articles is random articles on every refresh  
-  
-  
-  
-8-please add reading time (which already implemented) on the big article and small articles either.  
-  
-  
-  
-9-make sure everything is real and get read from db, dates/tags/contents
-
-
-
------------------------------------------------------------
-
-
-1- i want all sections headers have same design as our magazine section header which including a title > line > more button.
-
-
-
-2-in admin panel we have a setting for modules > colors which is for make our module color system on/off or customize colors.
-
--customizing colors here is not easy you have to copy/paste color oklch code. i want all of these modules have a color modal which gonna let me to select colors visually from color pallet.
-
-also make sure when i enable this system modules colors is work. they should work like when it is disable all modules/secitons/components gonna follow default shadcn tokens but when it's enable some of elements colors gonna get replace by these colors which mostly is including titles/hovering effects etc.
-
-
-
-3-since the homepage sections are new and we have a header for all of sections please make sure when the module colors is enable the section headers gonna follow it. for example make the line and more button to follow the module color, also hovering on tags, also the solid background behind texts on the big article. in the section header the section title should not follow module colors and always gonna stay on default colors.
-
-
-
-4-in the next section let's have a ghost color on the whole section background
-
--make the corner radius 0
-
--remove the background and border from previous/next buttons and make it bigger
-
--we already talked about the section header
-
--add shadcn tooltip on duration as: زمان ویدیو
-
--we have 2 hovering effect on these cards, a scale and a play icon. let only have the play icon on hovering
-
--let when we click on videos the video modal gets open (we already have it)
-
--let cards titles show the module color on hover
-
--please show the date of publish somewhere
-
--let's have a system like magazine section, in magazine section we have a big article which is our latest and 4 small articles which is random.
-
-in video section please use the current section is the small videos and add a big video as the latest video. 
-
-and sorting them is gonna be like the big video on the left, small videos on the right bottom, and on the right top which gonna be an empty space we gonna add a card as a random comment on the latest video! which when you click on it you gonna redirect to the video modal and that scroll to that comment.
-
-you can use spicework comment card design as the design for the comment cards, I'm gonna upload an image of it.
-
-
-
-5-let's go for next section which gonna be latest section.
-
-in this section we gonna have a comment card. but with different design.
-
-
-
-the comment card for this section is simple (please check the next image)
-
-
-
-sorting cards on this section gonna be like this:
-
-on the right our latest news which gonna be our the most important news in the week. and how it got selected is base on comments number.
-
--on the left top we gonna have our comments cards and on the left bottom we gonna have our newsletter register card.
-
-
-
-
-
--please remove background from this section and apply a background behind the whole section (full width of the webpage no the full with of the section)
-
-
-
-and push all changes, your last changes and these ones.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-please help me to:
-
-
-
-1-create a new neon free project
-
-2-connect it to my project in vercel
-
-3-connect it to my local .env
-
-4-connect it to vercel Environments
-
-5-transfer my data from the old project to the new one
-
-6-edit my homepage to be less dynamic (revalidated hourly)
-
-7-let the view counters get update hourly too
-
-
-
-techbox_season_two_POSTGRES_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-
-techbox_season_two_POSTGRES_PRISMA_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&connect_timeout=15&sslmode=require
-
-techbox_season_two_POSTGRES_URL_NON_POOLING=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-
-
-DATABASE_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-DIRECT_URL=postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-
-
-
-
-
-
-
-NEW_DIRECT_URL="postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
-OLD_DIRECT_URL="postgresql://neondb_owner:npg_q1DvoGA4rlYb@ep-twilight-hall-atc6iest.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require&connect_timeout=30"
-
-
-pg_dump "$OLD_DIRECT_URL" \ \
-  --schema=public \
-  --format=custom \
-  --no-owner \
-  --no-privileges \
-  --file=techbox-public.dump
-
-pg_restore \
-  --dbname="$NEW_DIRECT_URL" \  
-  --schema=public \
-  --no-owner \
-  --no-privileges \
-  --clean \
-  --if-exists \
-  techbox-public.dump
-
-
-psql "$NEW_DIRECT_URL" -c 'select count(*) from public."Post";'
-psql "$NEW_DIRECT_URL" -c "select pg_size_pretty(pg_database_size(current_database()));"
-
-
-DATABASE_URL="postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
-DIRECT_URL="postgresql://neondb_owner:npg_bfIDGMj0qyH3@ep-withered-cell-awxzos6k.c-12.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require"
-PRISMA_CONNECTION_LIMIT="1"
+let's go for next changes:
+
+in homepage video section:
+1-user avatar is too big!
+2-corenr radius for user avatar
+3-use our default date system for showing the publish date, we already implement it. (we are using لحظاتی پیش / and after that we gonna have for example 1 دقیقه پیش for under 1 hour, and 1 ساعت پیش for under 24 hours and 1 روز پیش for under 1 week and 4 هفته پیش for under 1 month and 12 ماه پیش for under 1 year and rest of it gonna be 1 سال پیش to the end.) we already have this system, please put a name on this so i can mention it easier without a full explaination.
+4-add a tooltip for date which gonna show the real date not relative dates. for example 1 تیر
+5-add tooltip for the video duration as: مدت زمان ویدیو
+6-let the small videos be like a slider (previous/next button)
+
+in homepage magazine section:
+1-tooltip for reading time: زمان مطالعه
+2-remove the "مطالعه" from the reading time badge
+3-show only the first content tag not all of them.
+4-we have an article modal. let the modal get open when someone open on article cards
+5-use our default date system for showing the publish date, we already implement it. (we are using لحظاتی پیش / and after that we gonna have for example 1 دقیقه پیش for under 1 hour, and 1 ساعت پیش for under 24 hours and 1 روز پیش for under 1 week and 4 هفته پیش for under 1 month and 12 ماه پیش for under 1 year and rest of it gonna be 1 سال پیش to the end.) we already have this system, please put a name on this so i can mention it easier without a full explaination.
+6-let's have same corner radius on the big article and a shadow (just like the comment card in video section)
+7-add a tooltip for date which gonna show the real date not relative dates. for example 1 تیر
