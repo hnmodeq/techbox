@@ -41,7 +41,7 @@ export function ForumCommentCount({ slug, initial }: { slug: string; initial: nu
   useEffect(() => {
     let mounted = true;
     if (status === "loading" || shared) return () => { mounted = false; };
-    fetch(`/api/stats?module=forum&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+    fetch(`/api/stats?module=forum&slug=${encodeURIComponent(slug)}`)
       .then((r) => r.json())
       .then((s) => { if (mounted && typeof s.comments === "number") setCount(s.comments); })
       .catch(() => {});

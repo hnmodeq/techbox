@@ -46,7 +46,7 @@ export function CardStats({
   useEffect(() => {
     let mounted = true;
     if (status === "loading" || shared) return () => { mounted = false; };
-    fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`, { cache: "no-store" })
+    fetch(`/api/stats?module=${encodeURIComponent(module)}&slug=${encodeURIComponent(slug)}`)
       .then(r => r.json())
       .then(s => {
         if (!mounted || !s) return;

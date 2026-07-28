@@ -318,7 +318,7 @@ function randomSample<T>(items: readonly T[], take: number): T[] {
  * small rail; `content` is transferred only for rendered cards because the
  * reading-time formatter needs it.
  */
-export async function getMagazinePosts(): Promise<ContentItem[]> {
+async function getMagazinePostsUncached(): Promise<ContentItem[]> {
   return section<ContentItem[]>("magazine", [], async (): Promise<ContentItem[]> => {
     const where = {
       module: "blog",
@@ -360,6 +360,24 @@ export async function getMagazinePosts(): Promise<ContentItem[]> {
     }
     return [normalizeCard(latest) as ContentItem, ...compactPosts];
   });
+}
+
+// Keep the homepage compatible with the Full Route Cache. The magazine rail
+// still rotates, but only once per hour instead of forcing a database-backed
+// render on every page refresh. That matters on free Neon because transfer and
+// compute are monthly quotas, not unlimited development resources.
+const cachedMagazinePosts = unstable_cache(getMagazinePostsUncached, ["home-magazine-v1"], {
+  revalidate: 3600,
+  tags: ["home-data"],
+});
+
+export async function getMagazinePosts(): Promise<ContentItem[]> {
+  try {
+    return await cachedMagazinePosts();
+  } catch (error) {
+    if (!isCircuitOpenError(error)) logDbFailure("home-data:magazine", error);
+    return [];
+  }
 }
 
 async function getLayoutHomeDataUncached(): Promise<HomeData> {

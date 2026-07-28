@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 type StatEntry = {
   views: number;
@@ -22,9 +23,10 @@ const StatsContext = createContext<{ stats: StatsMap; status: StatsStatus }>({
 });
 
 /**
- * Fetches stats for ALL posts in a single request (using the existing bulk
- * mode of /api/stats) instead of every card/badge on the page firing its
- * own request. This turns e.g. 20 separate DB round-trips into 1.
+ * Fetches stats for the current content module in a single request instead of
+ * every card/badge on the page firing its own request. This turns e.g. 20
+ * separate DB round-trips into 1, and /api/stats now caches that response for
+ * an hour.
  *
  * Consumers (useStatEntry) get both the data AND a `status` flag so they
  * can tell the difference between "still loading" and "loaded, but this
@@ -33,18 +35,20 @@ const StatsContext = createContext<{ stats: StatsMap; status: StatsStatus }>({
  * own redundant request whenever the bulk fetch was a bit slow.
  */
 export function StatsProvider({ children, enabled = true }: { children: ReactNode; enabled?: boolean }) {
+  const pathname = usePathname();
+  const moduleKey = pathname.match(/^\/(blog|news|media|review|download|shop|forum|tools)(?:\/|$)/)?.[1] ?? null;
   const [stats, setStats] = useState<StatsMap>({});
-  const [status, setStatus] = useState<StatsStatus>(enabled ? "loading" : "ready");
+  const [status, setStatus] = useState<StatsStatus>(enabled && moduleKey ? "loading" : "ready");
 
   useEffect(() => {
-    if (!enabled) {
+    if (!enabled || !moduleKey) {
       setStatus("ready");
       return;
     }
     let mounted = true;
     setStatus("loading");
 
-    fetch("/api/stats", { cache: "no-store" })
+    fetch(`/api/stats?module=${encodeURIComponent(moduleKey)}`)
       .then((r) => {
         // A 503 ("db_unavailable") is an expected, non-fatal case: the client
         // simply keeps the server-rendered initial values instead of inventing
@@ -94,7 +98,7 @@ export function StatsProvider({ children, enabled = true }: { children: ReactNod
       mounted = false;
       window.removeEventListener("tb_stats_update", handleUpdate);
     };
-  }, [enabled]);
+  }, [enabled, moduleKey]);
 
   return <StatsContext.Provider value={{ stats, status }}>{children}</StatsContext.Provider>;
 }

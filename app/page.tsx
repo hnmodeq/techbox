@@ -95,10 +95,10 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   partners: 14,
 };
 
-// Magazine's four compact cards deliberately change on each full refresh.
-// This opts the route out of Next's Full Route Cache while the other homepage
-// slices retain their own `unstable_cache` windows in lib/home-server.ts.
-export const dynamic = "force-dynamic";
+// Keep the public homepage in Next's route cache and refresh it hourly.
+// The magazine rail is cached separately in lib/home-server.ts, so it still
+// rotates without making every visitor hit the database.
+export const revalidate = 3600;
 
 export default async function HomePage() {
   const [config, data] = await Promise.all([getModuleConfig(), getHomeData()]);
