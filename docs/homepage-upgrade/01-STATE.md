@@ -134,6 +134,14 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-28 — Local development service-worker reload-loop fix
+
+A localhost dev report showed repeated refreshes, failed hashed Kalameh font requests, and a malformed Sentry CSP host. The font failures are a symptom of interrupted/reloaded dev pages, not missing font files: all nine local source fonts are present.
+
+- Removed `client.navigate(client.url)` from the localhost branch of `public/sw.js`. A stale production service worker now clears its cache and unregisters without forcing every controlled browser client to reload during activation.
+- Fixed the invalid CSP host source `https://o*.ingest.sentry.io` to the valid wildcard `https://*.ingest.sentry.io`.
+- `pnpm typecheck`, `pnpm lint`, and `pnpm test` remain green (201 tests). The affected local browser must stop the dev server, remove `.next`, then reload once after clearing any old service-worker/site data.
+
 ### 2026-07-28 — Shared headers, module colour restoration, Video and Latest redesign
 
 Completed the owner-requested follow-on homepage work using the supplied Spiceworks and Tom's Guide references:
