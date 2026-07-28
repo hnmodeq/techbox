@@ -99,6 +99,76 @@ export function formatRelativeDate(date: Date | string | undefined | null): stri
 }
 
 /**
+ * ─── "تاریخ نسبی" / RelativeDate ──────────────────────────────────────
+ *
+ * THE canonical relative-date ladder for TechBox. When you want "the
+ * normal date display", this is it — render `<RelativeDate />` from
+ * `@/components/ui/relative-date`, which wraps this function and adds the
+ * absolute-date tooltip.
+ *
+ * Unlike `formatRelativeDate`, this NEVER falls back to an absolute date;
+ * the ladder continues all the way up. The absolute date is what the
+ * tooltip is for.
+ *
+ *   < 1 minute   → "لحظاتی پیش"
+ *   < 1 hour     → "۵ دقیقه پیش"
+ *   < 24 hours   → "۳ ساعت پیش"
+ *   < 1 week     → "۲ روز پیش"
+ *   < 1 month    → "۴ هفته پیش"
+ *   < 1 year     → "۱۲ ماه پیش"
+ *   otherwise    → "۱ سال پیش"
+ *
+ * A month is 30 days and a year is 365 days here. Calendar-exact month
+ * arithmetic would make "۱۲ ماه پیش" and "۱ سال پیش" disagree at the
+ * boundary, and the whole point of this scale is a single smooth ladder.
+ */
+export function formatRelativeFa(date: Date | string | undefined | null): string {
+  if (!date) return "";
+  const value = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(value.getTime())) return "";
+
+  const diffSeconds = Math.floor((Date.now() - value.getTime()) / 1000);
+
+  // Future dates (scheduled posts that slipped through) read as brand new
+  // rather than as a negative duration.
+  if (diffSeconds < 60) return "لحظاتی پیش";
+
+  const minutes = Math.floor(diffSeconds / 60);
+  if (minutes < 60) return `${toFa(minutes)} دقیقه پیش`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${toFa(hours)} ساعت پیش`;
+
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${toFa(days)} روز پیش`;
+
+  if (days < 30) return `${toFa(Math.floor(days / 7))} هفته پیش`;
+
+  if (days < 365) return `${toFa(Math.floor(days / 30))} ماه پیش`;
+
+  return `${toFa(Math.floor(days / 365))} سال پیش`;
+}
+
+/**
+ * The absolute Jalali date behind a relative label — "۱ تیر", or
+ * "۱ تیر ۱۴۰۴" when it is not the current Jalali year.
+ *
+ * This is what `<RelativeDate />` shows in its tooltip.
+ */
+export function formatAbsoluteFa(date: Date | string | undefined | null): string {
+  if (!date) return "";
+  const value = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(value.getTime())) return "";
+
+  const jalali = toJalali(value);
+  const monthName = getPersianMonthName(jalali.month);
+  const currentYear = toJalali(getTehranToday()).year;
+
+  if (jalali.year === currentYear) return `${toFa(jalali.day)} ${monthName}`;
+  return `${toFa(jalali.day)} ${monthName} ${toFa(jalali.year)}`;
+}
+
+/**
  * Format a date relative to now with minute/second precision for very recent items.
  * Falls through to formatRelativeDate for items older than 24 hours.
  *
