@@ -35,6 +35,10 @@ export type ScrollRailProps = {
   hideArrows?: boolean;
   /** Larger, borderless controls for the Video quick-takes rail. */
   bareArrows?: boolean;
+  /** Keep the arrows visible below the md breakpoint. Rails that are the
+   *  primary way to reach their items (the video quick-takes slider) need
+   *  them on touch too, where there is no hover affordance. */
+  arrowsOnMobile?: boolean;
   className?: string;
   railClassName?: string;
 };
@@ -45,6 +49,7 @@ export function ScrollRail({
   gap = 20,
   hideArrows = false,
   bareArrows = false,
+  arrowsOnMobile = false,
   className,
   railClassName,
 }: ScrollRailProps) {
@@ -130,8 +135,8 @@ export function ScrollRail({
 
       {showArrows && (
         <>
-          <RailArrow dir="prev" disabled={atStart} bare={bareArrows} onClick={() => nudge("prev")} />
-          <RailArrow dir="next" disabled={atEnd} bare={bareArrows} onClick={() => nudge("next")} />
+          <RailArrow dir="prev" disabled={atStart} bare={bareArrows} onMobile={arrowsOnMobile} onClick={() => nudge("prev")} />
+          <RailArrow dir="next" disabled={atEnd} bare={bareArrows} onMobile={arrowsOnMobile} onClick={() => nudge("next")} />
         </>
       )}
     </div>
@@ -142,11 +147,13 @@ function RailArrow({
   dir,
   disabled,
   bare = false,
+  onMobile = false,
   onClick,
 }: {
   dir: "prev" | "next";
   disabled: boolean;
   bare?: boolean;
+  onMobile?: boolean;
   onClick: () => void;
 }) {
   // RTL: "prev" (back toward the first item) sits on the RIGHT.
@@ -158,8 +165,9 @@ function RailArrow({
       disabled={disabled}
       aria-label={dir === "prev" ? "موارد قبلی" : "موارد بعدی"}
       className={cn(
-        "absolute top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full",
-        bare ? "h-16 w-16 text-foreground transition-colors duration-200 md:flex" : "h-14 w-14 border transition-opacity duration-200 md:flex", // 56px — TG exact
+        "absolute top-1/2 z-10 -translate-y-1/2 items-center justify-center rounded-full",
+        onMobile ? "flex" : "hidden md:flex",
+        bare ? "size-11 text-foreground transition-colors duration-200 md:size-16" : "h-14 w-14 border transition-opacity duration-200", // 56px — TG exact
         bare ? "hover:text-primary" : "border-[color:var(--hp-brand)] bg-[var(--hp-arrow-bg)] text-white hover:opacity-100",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         disabled ? "pointer-events-none opacity-0" : "opacity-90",
