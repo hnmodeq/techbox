@@ -17,6 +17,11 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.zarinpal.com" },
       { protocol: "https", hostname: "*.supabase.co" },
+      // Vercel Blob. Assets uploaded before the Supabase migration still
+      // live here and are referenced by rows in the database — avatars and
+      // news images both. next/image THROWS on an unconfigured host rather
+      // than falling back, so a single un-migrated row takes out the page.
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "github.com" },
       { protocol: "https", hostname: "*.githubusercontent.com" },
