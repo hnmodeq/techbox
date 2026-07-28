@@ -221,8 +221,22 @@ export default async function HomePage() {
 
         {/* Screen readers need one h1; the visual hierarchy starts at h2. */}
         <h1 className="sr-only">تکباکس — پاتوق بچه‌های فناوری اطلاعات</h1>
-        {visible.map((s) => (
-          <div key={s.key}>{s.node}</div>
+        {/* Alternating full-bleed bands.
+            The stripe is computed from the RENDERED index, not from a colour
+            baked into each section, so hiding or reordering any section in
+            the admin panel keeps the light/dark/light rhythm intact. Each
+            wrapper is full-width; the sections themselves still centre their
+            own 1280 container. */}
+        {visible.map((s, index) => (
+          <div
+            key={s.key}
+            className="w-full"
+            style={{
+              background: index % 2 === 0 ? "var(--hp-band-a)" : "var(--hp-band-b)",
+            }}
+          >
+            {s.node}
+          </div>
         ))}
       </div>
     </HomeDataProvider>

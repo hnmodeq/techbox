@@ -17,8 +17,9 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
+import { RemoteImage } from "@/components/ui/remote-image";
 import type { MoreToExplore } from "@/features/home/lib/home-types";
-import { InsetBand, Eyebrow, Byline, SectionHeader } from "../primitives";
+import { SectionShell, Eyebrow, Byline, SectionHeader } from "../primitives";
 
 export type MoreToExploreSectionProps = {
   data?: MoreToExplore;
@@ -52,7 +53,7 @@ export function MoreToExploreSection({
   if (!hero || cards.length < 2) return null;
 
   return (
-    <InsetBand labelledBy={HEADING_ID} tone="tint">
+    <SectionShell labelledBy={HEADING_ID}>
       <SectionHeader
         headingId={HEADING_ID}
         title={title}
@@ -70,7 +71,7 @@ export function MoreToExploreSection({
           </li>
         ))}
       </ul>
-    </InsetBand>
+    </SectionShell>
   );
 }
 
@@ -84,14 +85,11 @@ function HeroCard({ item }: { item: ContentItem }) {
           className="relative w-full overflow-hidden rounded-[var(--hp-r-md)] bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "1200/500" }}
         >
-          {item.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+          {item.image && (            <RemoteImage
               src={item.image}
               alt={item.title}
               sizes="(min-width: 1280px) 1216px, 100vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
+              className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
             />
           )}
         </div>
@@ -148,14 +146,11 @@ function SmallCard({ item }: { item: ContentItem }) {
           className="relative w-full overflow-hidden rounded-[var(--hp-r-sm)] bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "450/253" }}
         >
-          {item.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+          {item.image && (            <RemoteImage
               src={item.image}
               alt={item.title}
               sizes="(min-width: 900px) 290px, 50vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+              className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
             />
           )}
         </div>
