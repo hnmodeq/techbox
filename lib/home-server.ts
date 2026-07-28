@@ -523,7 +523,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     getLatestInsights(normalizeCard, cardSelect));
 
   const videoHighlightComments = await section("videoHighlightComments", [] as any[], () =>
-    getLatestVideoHighlightComments(2));
+    getLatestVideoHighlightComments(4));
 
   const topPicks = await section("topPicks", [] as any[], () =>
     getTopPicks(normalizeCard, cardSelect));

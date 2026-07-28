@@ -55,7 +55,14 @@ export function RelativeDate({ date, className, label }: RelativeDateProps) {
         render={
           <time
             dateTime={iso}
-            className={cn("cursor-default", className)}
+            // `w-fit` matters: the tooltip is positioned against the
+            // trigger's box, and a full-width block box centres the tooltip
+            // on the CONTAINER rather than on the date text — which reads as
+            // the tooltip being randomly offset. Shrinking the box to the
+            // text puts the tooltip directly above the words. Callers may
+            // still pass `block`/`inline-block` for layout; w-fit keeps the
+            // width honest either way.
+            className={cn("w-fit cursor-default", className)}
             suppressHydrationWarning
           />
         }

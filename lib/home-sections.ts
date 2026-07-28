@@ -213,31 +213,31 @@ export async function getLatestInsights(
 }
 
 /**
- * Real, rotating approved comments on the newest published video. The video
- * card itself is supplied by the normal media module query; this only adds
- * the small companion quotes and their comment anchors.
+ * Real, rotating approved comments drawn from across ALL published videos,
+ * not just the newest one. Each carries the slug of the video it belongs to
+ * so the card can open that video's modal at that comment.
  *
- * Returns FEWER than `take` when the video has fewer approved comments, and
- * an empty array when it has none — the section renders only what exists
+ * Returns FEWER than `take` when there are not enough approved comments, and
+ * an empty array when there are none — the section renders only what exists
  * rather than padding with placeholders.
  */
-export async function getLatestVideoHighlightComments(take = 2): Promise<VideoHighlightComment[]> {
-  const latest = await prisma.post.findFirst({
-    where: { module: "media", ...PUBLISHED, date: publicPostDateWhere(), videoUrl: { not: null } },
-    orderBy: [{ date: "desc" }, { id: "desc" }],
-    select: { id: true, slug: true },
-  });
-  if (!latest) return [];
-
+export async function getLatestVideoHighlightComments(take = 4): Promise<VideoHighlightComment[]> {
   const rows = await prisma.comment.findMany({
     where: {
-      postId: latest.id,
       parentId: null,
       status: "approved",
       deletedAt: null,
+      text: { not: "" },
+      post: {
+        module: "media",
+        ...PUBLISHED,
+        date: publicPostDateWhere(),
+        videoUrl: { not: null },
+      },
     },
+    // Quality bias before sampling, exactly as getFamilyComments does.
     orderBy: [{ likes: "desc" }, { createdAt: "desc" }],
-    take: 30,
+    take: 120,
     select: {
       id: true,
       text: true,
@@ -246,19 +246,29 @@ export async function getLatestVideoHighlightComments(take = 2): Promise<VideoHi
       author: {
         select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
       },
+      post: { select: { slug: true } },
     },
   });
 
-  const candidates = rows
-    .filter((row) => !row.author || row.author.status === "active")
-    .map(mapHighlightComment)
-    .filter((comment): comment is HighlightComment => Boolean(comment));
+  const seenAuthors = new Set<string>();
+  const candidates: VideoHighlightComment[] = [];
+
+  for (const row of rows) {
+    if (row.author && row.author.status !== "active") continue;
+    const mapped = mapHighlightComment(row);
+    if (!mapped || !row.post?.slug) continue;
+
+    // One quote per person, so four cards means four different voices.
+    const key = mapped.author.username || mapped.author.name;
+    if (seenAuthors.has(key)) continue;
+    seenAuthors.add(key);
+
+    candidates.push({ ...mapped, videoSlug: row.post.slug });
+  }
+
   if (candidates.length === 0) return [];
 
-  return seededIndices(candidates.length, take, 37).map((index) => ({
-    ...candidates[index],
-    videoSlug: latest.slug,
-  }));
+  return seededIndices(candidates.length, take, 37).map((index) => candidates[index]);
 }
 
 // ═════════════════════════════════════════════════════════════════════
