@@ -22,6 +22,7 @@ import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
 import { cn } from "@/lib/utils";
+import { RemoteImage } from "@/components/ui/remote-image";
 import { formatReadingTimeShort } from "@/lib/reading-time";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { RelativeDate } from "@/components/ui/relative-date";
@@ -272,14 +273,11 @@ function LeadArticle({
           {item.image && (
             // The homepage LCP element — eager, high priority. Everything
             // else on the page is lazy.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <RemoteImage
               src={item.image}
               alt={item.title}
               sizes="(min-width: 1024px) 578px, 100vw"
-              loading="eager"
-              fetchPriority="high"
-              className="absolute inset-0 h-full w-full object-cover"
+              priority
             />
           )}
         </div>
@@ -330,14 +328,10 @@ function ListRow({
           className="relative w-[180px] overflow-hidden bg-muted sm:w-[150px]"
           style={{ aspectRatio: "1.3/1" }}
         >
-          {item.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+          {item.image && (            <RemoteImage
               src={item.image}
               alt={item.title}
               sizes="143px"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover"
             />
           )}
         </div>

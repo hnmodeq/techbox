@@ -12,6 +12,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { RemoteImage } from "@/components/ui/remote-image";
 
 export type CardShellProps = {
   children: React.ReactNode;
@@ -87,18 +88,15 @@ export function CardMedia({
       className={cn("hp-media relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]", className)}
       style={{ aspectRatio: ratio }}
     >
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt={alt}
-          sizes={sizes}
-          loading={priority ? "eager" : "lazy"}
-          fetchPriority={priority ? "high" : undefined}
-          decoding={priority ? "sync" : "async"}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
-        />
-      ) : null}
+      <RemoteImage
+        src={src}
+        alt={alt}
+        // Falls back to the slot's own width rather than Next's 100vw
+        // default, which would fetch a desktop-width file for a thumbnail.
+        sizes={sizes ?? "(min-width: 1024px) 450px, 100vw"}
+        priority={priority}
+        className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
+      />
       {children}
     </div>
   );

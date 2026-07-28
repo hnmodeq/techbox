@@ -26,6 +26,7 @@ import type { TopPickCard } from "@/features/home/lib/home-types";
 import { SectionShell, SectionHeader, Byline, Eyebrow } from "../primitives";
 import { faPrice, faRating, faCount, faDiscountedPrice, isDiscountLive } from "@/lib/format-price";
 import { Num } from "@/components/ui/num";
+import { RemoteImage } from "@/components/ui/remote-image";
 
 export type TopPicksSectionProps = {
   picks: TopPickCard[];
@@ -97,14 +98,11 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
           className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
           style={{ aspectRatio: "16/9" }}
         >
-          {pick.image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+          {pick.image && (            <RemoteImage
               src={pick.image}
               alt={pick.title}
               sizes="(min-width: 900px) 420px, 71vw"
-              loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+              className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
             />
           )}
           <span className="absolute top-2 start-2 rounded-[4px] bg-[color:var(--hp-brand)] px-2 py-0.5 text-[12px] font-bold text-[color:var(--hp-on-brand)]">
