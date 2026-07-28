@@ -39,8 +39,16 @@ describe("homepage magazine data contract", () => {
     expect(randomSample).not.toMatch(/Math\.random\(/);
   });
 
-  it("keeps the random selection server-rendered on each full refresh", () => {
-    expect(page).toMatch(/export const dynamic = "force-dynamic"/);
+  it("keeps the random selection server-rendered, refreshed hourly", () => {
+    // Was `dynamic = "force-dynamic"`, which re-queried on every single
+    // visit. On a free Neon tier transfer and compute are monthly quotas,
+    // so the rail now rotates once an hour via the route cache and the
+    // matching unstable_cache window on getMagazinePosts. Still server
+    // rendered, still real rows — just not per-request.
+    expect(page).toMatch(/export const revalidate = 3600/);
+    expect(page).not.toMatch(/force-dynamic/);
+    expect(homeServer).toMatch(/cachedMagazinePosts = unstable_cache/);
+    expect(homeServer).toMatch(/revalidate: 3600/);
     expect(page).toMatch(/await getMagazinePosts\(\)/);
     expect(page).toMatch(/<MagazineSection posts=\{magazinePosts\}/);
   });

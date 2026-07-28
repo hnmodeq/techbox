@@ -28,6 +28,15 @@ export function formatReadingTime(minutes: number) {
   return `${value.toLocaleString("fa-IR")} دقیقه مطالعه`;
 }
 
+/**
+ * Badge form: just the duration, no "مطالعه" suffix. Used where a
+ * "زمان مطالعه" tooltip already supplies that context.
+ */
+export function formatReadingTimeShort(minutes: number) {
+  const value = Number.isFinite(minutes) && minutes > 0 ? Math.ceil(minutes) : 1;
+  return `${value.toLocaleString("fa-IR")} دقیقه`;
+}
+
 export function getReadingTimeLabel(...parts: Array<string | null | undefined>) {
   return formatReadingTime(estimateReadingMinutes(...parts));
 }
