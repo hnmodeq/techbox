@@ -134,6 +134,13 @@ Full task definitions with acceptance criteria are in `04-PHASES.md`. This table
 
 Append one entry per working session. Newest at top.
 
+### 2026-07-28 — Portrait lead reel and comment-card interaction refinement
+
+- Changed the newest Video lead from a landscape card to a centred `9:16` portrait reel; all homepage video cards now use the reel ratio.
+- Made play affordances persist on both lead and compact reels instead of appearing only on hover.
+- Added the requested radius and elevation to the single Spiceworks-inspired video comment card. Its text/card action opens the existing video modal at the real comment; its commenter avatar now links to that member’s public profile when one exists.
+- `pnpm typecheck`, `pnpm lint`, and `pnpm test` pass (201 tests).
+
 ### 2026-07-28 — Expanded module palette and module-colour title hovers
 
 - Expanded each module’s visual admin colour dialog from ten suggested swatches to a 120-swatch hue/lightness spectrum, while retaining the native colour picker for any RGB colour.
