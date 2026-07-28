@@ -14,7 +14,6 @@ const STATIC_ASSETS = [
   "/logo.png",
   "/favicon.ico",
   "/placeholder-blur.svg",
-  "/register-sw.js",
 ];
 
 const IS_LOCAL_DEV = ["localhost", "127.0.0.1", "::1"].includes(self.location.hostname);

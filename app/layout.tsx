@@ -28,9 +28,16 @@ h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
 button, .btn { font-family: inherit; transition: all 0.2s ease; }
 `;
 
-// Runs before hydration. This is intentionally duplicated in RuntimeEffects:
-// an old localhost service worker can keep reloading a page before React has a
-// chance to mount, so dev cleanup cannot rely only on useEffect or `load`.
+// Localhost service-worker safety net.
+//
+// The app itself only registers /sw.js on secure production origins, so a
+// worker should never exist on localhost. But a worker installed by an
+// earlier build (or by visiting the deployed site on the same browser
+// profile) outlives the code that registered it and keeps serving cached
+// HTML/RSC. This runs before hydration so a controlling worker cannot
+// prevent its own removal by looping the page before React mounts.
+//
+// This is a self-deleting escape hatch, not load-bearing behaviour.
 const localServiceWorkerCleanup = `
 (() => {
   try {
