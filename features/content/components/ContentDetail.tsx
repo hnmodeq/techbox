@@ -113,9 +113,21 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
           {item.title}
         </h1>
 
-        {/* Article body */}
+        {/* Article body.
+            News is short-form: the excerpt IS the story, and the homepage
+            card shows it in full. Rendering `content` here would make the
+            "نمای تمام‌صفحه" view show different — and much longer — text
+            than the card the reader just came from. Older news rows still
+            carry a long `content`; it is deliberately left in the database
+            rather than deleted, in case the model changes back. */}
         <div className="mt-6">
-          <MarkdownContent content={item.content || item.excerpt} />
+          <MarkdownContent
+            content={
+              (item.module === "news"
+                ? item.excerpt || item.content
+                : item.content || item.excerpt) ?? ""
+            }
+          />
         </div>
 
         {/* Tags */}

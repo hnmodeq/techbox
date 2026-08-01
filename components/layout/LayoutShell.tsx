@@ -175,6 +175,18 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
     if (!newsOpen) setOpenedUnreadNewsSlugs([])
   }, [newsOpen])
 
+  // Let anything on the page open the news sidebar.
+  //
+  // `newsOpen` is local state here, so the homepage's
+  // "اخبار ۲۴ ساعت گذشته" button had no way to reach it. A CustomEvent
+  // costs nothing — no network, no query — and the sidebar's data is
+  // already loaded by this layout, so opening it fetches nothing.
+  React.useEffect(() => {
+    const open = () => setNewsOpen(true)
+    window.addEventListener("tb_open_news_sidebar", open)
+    return () => window.removeEventListener("tb_open_news_sidebar", open)
+  }, [])
+
   return (
     <div className="[--header-height:calc(var(--spacing)*14)]">
       {/*
