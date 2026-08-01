@@ -87,6 +87,13 @@ export async function createCommentAction(prevState: any, formData: FormData) {
     });
 
     revalidatePath(`/${module}/${slug}`);
+    // The homepage discussion sampler only surfaces approved comments. Make a
+    // newly-public comment eligible immediately instead of leaving an old
+    // cached sample visible for the full home-data window.
+    if (status === "approved") {
+      revalidatePath("/");
+      revalidateTag("home-data", "max");
+    }
     return {
       ok: true,
       pending: status === "pending",

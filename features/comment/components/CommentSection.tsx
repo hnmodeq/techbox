@@ -31,13 +31,15 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-export default function CommentSection({ module, slug, initialComments, compact, fillHeight, variant = "default" }: {
+export default function CommentSection({ module, slug, initialComments, compact, fillHeight, variant = "default", scrollToCommentId }: {
   module: string;
   slug: string;
   initialComments?: number;
   compact?: boolean;
   /** A compact, divider-led list for the homepage news discussion panel. */
   variant?: "default" | "trending";
+  /** Reveal and spotlight this comment after the live thread has loaded. */
+  scrollToCommentId?: string | null;
   /**
    * Let the thread grow to fill the parent instead of a fixed cap.
    *
@@ -79,6 +81,19 @@ export default function CommentSection({ module, slug, initialComments, compact,
   useEffect(() => {
     load();
   }, [load]);
+
+  // A homepage discussion preview opens the modal at the row the reader
+  // selected. Wait until the real live thread is in the DOM, then let
+  // scrollIntoView locate the nearest scrollable ancestor (the modal body on
+  // desktop or its full-screen sheet on mobile).
+  useEffect(() => {
+    if (!scrollToCommentId || loading) return;
+    const frame = window.requestAnimationFrame(() => {
+      const target = document.getElementById(`comment-${scrollToCommentId}`);
+      target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [scrollToCommentId, loading, comments]);
 
   // ─── Forum topic meta (for accept-best-answer) ───────────────
   const [topicMeta, setTopicMeta] = useState<{ id: string; authorId: string | null; acceptedCommentId: string | null } | null>(null);
@@ -321,6 +336,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
 
   const renderNode = (c: CommentNode, depth = 0) => {
     const deleted = isSoftDeleted(c);
+    const isHighlighted = scrollToCommentId === c.id;
     const isOwner = user && (c as any).authorId === user.id;
     const hasBeenEdited = !!(c as any).editedAt;
     const isEditing = editingId === (c as any).id;
@@ -336,7 +352,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
     return (
       <div id={`comment-${c.id}`} key={c.id} className={depth ? "scroll-mt-4 py-3" : "scroll-mt-4"} style={{ marginTop: depth ? 0 : 12 }}>
         <div className={depth ? "ps-3 pe-4" : "pe-0"} style={{ marginRight: depth ? 16 : 0 }}>
-          <div className={`bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative ${isAccepted ? "border-[color-mix(in_oklch,var(--success)_45%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--success)_30%,transparent)]" : "border-[var(--border-color)]"}`}>
+          <div className={`bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-4 relative ${isAccepted ? "border-[color-mix(in_oklch,var(--success)_45%,transparent)] ring-1 ring-[color-mix(in_oklch,var(--success)_30%,transparent)]" : "border-[var(--border-color)]"} ${isHighlighted ? "ring-2 ring-primary/45 bg-primary/5" : ""}`}>
             {isDeleting && (
               <div className="absolute inset-0 bg-[var(--card-background)]/60 rounded-[var(--corner-radius)] flex items-center justify-center z-10">
                 <Spinner className="h-5 w-5" />

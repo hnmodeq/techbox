@@ -98,30 +98,27 @@ describe("homepage Video and Latest contracts", () => {
     expect(video).toMatch(/flex min-w-0 flex-col justify-between gap-5/);
   });
 
-  it("leads with the recent news that has the most comments", () => {
-    // The section carries a comment rail, an inline reply box and a count,
-    // so it surfaces the story people are actually discussing: the one with
-    // the most approved comments in the window, breaking ties toward the
-    // newest (the pool is date-desc and the sort is stable).
+  it("builds a diverse, comment-led rotation from recent News", () => {
+    // Recent News has priority, then the latest-ten fallback fills any empty
+    // slots. One sampled top-level comment per post makes every carousel
+    // change represent a different discussion.
     expect(data).toMatch(/export async function getLatestInsights/);
-    expect(data).toMatch(/const featured = \[\.\.\.pool\]\.sort/);
-    expect(data).toMatch(/countByPost\.get\(b\.id\)/);
-    expect(data).not.toMatch(/MIN_COMMENTS_FOR_FEATURE/);
-    // Comments stay real and approved-only.
+    expect(data).toMatch(/export function selectNewsDiscussionComments/);
+    expect(data).toMatch(/take: 10,/);
+    expect(data).toMatch(/parentId: null/);
     expect(data).toMatch(/status: "approved"/);
-    // The section no longer renders a server-side comment rail; the live
-    // CommentSection owns the thread. Selection is still asserted above.
+    expect(data).toMatch(/const featured = \[\.\.\.storyPool\]\.sort/);
+    expect(data).not.toMatch(/MIN_COMMENTS_FOR_FEATURE/);
   });
 
-  it("keeps the news section navigation-free", () => {
-    // Cards must not link away: users read the story and its comments in
-    // place. The only exits are explicit — full-screen view and share.
-    expect(insights).not.toMatch(/#comment-\$\{comment\.id\}/);
+  it("keeps the news card in place and opens the selected discussion in a modal", () => {
+    // The lead remains an in-place preview; a comment explicitly opens the
+    // dedicated NewsModal, where the full live thread is loaded.
     expect(insights).toMatch(/نمای تمام‌صفحه/);
     expect(insights).toMatch(/<ShareButton url=\{fullScreenHref\}/);
-    // Comments render in place, with a composer, like the news sidebar.
-    expect(insights).toMatch(/<CommentSection/);
-    expect(insights).toMatch(/fillHeight/);
+    expect(insights).toMatch(/<NewsModal/);
+    expect(insights).toMatch(/onOpenComment/);
+    expect(insights).not.toMatch(/<CommentSection/);
   });
 
   it("lets the page own the section background, not the section", () => {

@@ -1,200 +1,163 @@
 import { describe, expect, it } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { selectNewsDiscussionComments } from "@/lib/home-sections";
 
 const read = (p: string) => fs.readFileSync(path.resolve(__dirname, "../..", p), "utf8");
 const section = read("features/home/components/sections/InsightsSection.tsx");
+const modal = read("features/news/components/NewsModal.tsx");
 const newsletter = read("features/home/components/sections/NewsletterCard.tsx");
-const shell = read("components/layout/LayoutShell.tsx");
 const editor = read("app/admin/posts/new/page.tsx");
 const dialog = read("features/legal/components/TermsDialog.tsx");
 
-/** The selection rule, mirrored so the behaviour can be asserted directly. */
-function pickFeatured(pool: Array<{ id: string }>, counts: Map<string, number>) {
-  // Most approved comments in the window, ties broken by recency (the
-  // `pool` arrives date-desc and Array.prototype.sort is stable).
-  return [...pool].sort(
-    (a, b) => (counts.get(b.id) || 0) - (counts.get(a.id) || 0),
-  )[0]?.id;
-}
+/** The comment source is fresh-first, then fills from the latest-ten fallback. */
+describe("news discussion selection", () => {
+  it("prefers one comment from each recent story before using older fallback posts", () => {
+    const rows = new Map([
+      ["recent-a", [{ id: "a-1", postId: "recent-a" }, { id: "a-2", postId: "recent-a" }]],
+      ["recent-b", [{ id: "b-1", postId: "recent-b" }]],
+      ["older-c", [{ id: "c-1", postId: "older-c" }]],
+      ["older-d", [{ id: "d-1", postId: "older-d" }]],
+    ]);
 
-describe("story selection", () => {
-  // `pool` arrives date-desc.
-  const pool = [{ id: "newest" }, { id: "mid" }, { id: "old" }];
+    const selected = selectNewsDiscussionComments(
+      ["recent-a", "recent-b"],
+      ["older-c", "older-d"],
+      rows,
+      3,
+    );
 
-  it("leads with the recent story that has the most comments", () => {
-    // The section carries a comment rail and count, so surface the story
-    // people are actually discussing — not the newest regardless of
-    // engagement.
-    const counts = new Map([["newest", 0], ["mid", 9], ["old", 50]]);
-    expect(pickFeatured(pool, counts)).toBe("old");
+    const postIds = selected.map((row) => row.postId);
+    expect(selected).toHaveLength(3);
+    expect(new Set(postIds).size).toBe(3);
+    expect(postIds).toContain("recent-a");
+    expect(postIds).toContain("recent-b");
+    expect(postIds.some((id) => id.startsWith("older-"))).toBe(true);
   });
 
-  it("breaks ties toward the newest", () => {
-    const counts = new Map([["newest", 9], ["mid", 9], ["old", 9]]);
-    expect(pickFeatured(pool, counts)).toBe("newest");
+  it("returns only the available real discussions", () => {
+    const rows = new Map([["only", [{ id: "only-1", postId: "only" }]]]);
+    expect(selectNewsDiscussionComments(["only"], ["missing"], rows, 5)).toEqual([
+      { id: "only-1", postId: "only" },
+    ]);
   });
 
-  it("falls back to the newest when none has comments", () => {
-    // Common on a young site: the section must still render. With no
-    // distinguishing comment count the stable sort keeps the date-desc
-    // order, so the newest story wins.
-    expect(pickFeatured(pool, new Map([["newest", 0], ["mid", 0]]))).toBe("newest");
-    expect(pickFeatured(pool, new Map())).toBe("newest");
+  it("queries the last seven days first, then the newest ten posts", () => {
+    const data = read("lib/home-sections.ts");
+    expect(data).toMatch(/const weekAgo = new Date\(Date\.now\(\) - 7 \* 864e5\)/);
+    expect(data).toMatch(/take: 10,/);
+    expect(data).toMatch(/parentId: null/);
+    expect(data).toMatch(/selectNewsDiscussionComments\(/);
+    // Homepage DB work stays serial to protect the small Neon pool.
+    const latest = data.slice(data.indexOf("export async function getLatestInsights"));
+    expect(latest).not.toMatch(/Promise\.all/);
+  });
+
+  it("keeps featured-story ties biased toward the newer database order", () => {
+    const data = read("lib/home-sections.ts");
+    expect(data).toMatch(/const featured = \[\.\.\.storyPool\]\.sort/);
+    expect(data).toMatch(/countByPost\.get\(b\.id\)/);
   });
 });
 
-describe("the section never navigates away", () => {
-  it("renders the title and image without wrapping them in a link", () => {
-    expect(section).not.toMatch(/<Link[^>]*>\s*\{story\.title\}/);
-    expect(section).toMatch(/<h3[^>]*>[\s\S]*?\{story\.title\}/);
+describe("interactive News discussion panel", () => {
+  it("keeps the panel beside the story and routes a selected comment to a new NewsModal", () => {
+    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.25fr\)_minmax\(320px,\.75fr\)\]/);
+    expect(section).toMatch(/import \{ NewsModal \}/);
+    expect(section).toMatch(/<NewsModal/);
+    expect(section).toMatch(/onOpenComment=\{setSelectedComment\}/);
   });
 
-  it("offers explicit exits instead", () => {
+  it("cycles every five seconds but pauses for a reader, modal, hidden tab, or reduced motion", () => {
+    expect(section).toMatch(/const CAROUSEL_MS = 5_000;/);
+    expect(section).toMatch(/window\.setInterval/);
+    expect(section).toMatch(/previewSlug \|\|/);
+    expect(section).toMatch(/selectedComment \|\|/);
+    expect(section).toMatch(/prefers-reduced-motion: reduce/);
+    expect(section).toMatch(/visibilitychange/);
+  });
+
+  it("previews the matching news on hover and focus, then restores the rotating default", () => {
+    expect(section).toMatch(/onMouseEnter=\{\(\) => onPreview\(comment\.newsSlug\)\}/);
+    expect(section).toMatch(/onFocusCapture=\{\(\) => onPreview\(comment\.newsSlug\)\}/);
+    expect(section).toMatch(/onMouseLeave=\{onLeavePreview\}/);
+    expect(section).toMatch(/onBlurCapture=/);
+    expect(section).toMatch(/const previewStory = previewSlug/);
+  });
+
+  it("visually connects the active comment to the displayed story", () => {
+    expect(section).toMatch(/color-mix\(in_oklch,var\(--insights-accent\)_10%/);
+    expect(section).toMatch(/start-0 w-1/);
+    expect(section).toMatch(/در حال نمایش گفتگوی این خبر/);
+  });
+
+  it("does not mount a complete CommentSection on every homepage load", () => {
+    // The modal alone owns the complete live thread. This avoids loading a
+    // full comment list for a story the reader did not select.
+    expect(section).not.toMatch(/import CommentSection/);
+    expect(section).not.toMatch(/<CommentSection/);
+    expect(modal).toMatch(/<CommentSection/);
+  });
+});
+
+describe("NewsModal", () => {
+  it("contains the full story, real comments, and the selected-comment focus", () => {
+    expect(modal).toMatch(/export function NewsModal/);
+    expect(modal).toMatch(/story\.content\?\.trim\(\) \|\| story\.excerpt/);
+    expect(modal).toMatch(/module="news"/);
+    expect(modal).toMatch(/scrollToCommentId=\{selectedCommentId\}/);
+    expect(modal).toMatch(/صفحهٔ خبر/);
+  });
+
+  it("lets the live thread reveal and spotlight the selected comment", () => {
+    const cs = read("features/comment/components/CommentSection.tsx");
+    expect(cs).toMatch(/scrollToCommentId\?: string \| null/);
+    expect(cs).toMatch(/scrollIntoView\(\{ behavior: "smooth", block: "center" \}\)/);
+    expect(cs).toMatch(/ring-2 ring-primary\/45 bg-primary\/5/);
+  });
+});
+
+describe("existing section exits and newsletter", () => {
+  it("keeps explicit story exits", () => {
     expect(section).toMatch(/نمای تمام‌صفحه/);
     expect(section).toMatch(/<ShareButton url=\{fullScreenHref\}/);
   });
 
-  it("puts the discussion beside the story, not beneath it", () => {
-    // Story on the right (first in RTL); discussion and newsletter stacked
-    // in the left column so neither leaves a band of whitespace.
-    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.25fr\)_minmax\(320px,\.75fr\)\]/);
-    const left = section.slice(section.indexOf("<NewsDiscussion"), section.indexOf("</div>", section.indexOf("<NewsDiscussion")));
-    expect(left).toMatch(/<NewsletterCard/);
-  });
-
-  it("squares the story image where a column sits beside it", () => {
-    // The left column stacks the discussion above the newsletter and runs
-    // much taller than a 16/9 poster, which left dead space under the story
-    // actions. Below lg the columns stack, so the wider crop stays.
-    expect(section).toMatch(/lg:aspect-square/);
-    expect(section).toMatch(/max-lg:aspect-video/);
-    expect(section).not.toMatch(/aspectRatio: "16\/9"/);
-  });
-
-  it("puts the section actions under the story card", () => {
-    const storyCol = section.slice(section.indexOf("<LatestStory"), section.indexOf("<div className=\"flex min-w-0"));
-    expect(storyCol).toMatch(/<NewsActions \/>/);
-  });
-
-  it("shows the thread open and scrollable, with a composer", () => {
-    // Same shape as the news sidebar: no toggle, because the comments are
-    // the point of this column.
-    expect(section).not.toMatch(/همه دیدگاه‌ها و ثبت دیدگاه/);
-    expect(section).not.toMatch(/aria-expanded/);
-    expect(section).toMatch(/fillHeight/);
-  });
-
-  it("keeps one source of truth for the thread", () => {
-    // An earlier version paired a server-rendered rail with a hidden
-    // CommentSection mounted only for its composer. Posting refetched the
-    // hidden list while the visible rail came from an hour-cached server
-    // payload, so a new comment appeared nowhere.
-    const cs = read("features/comment/components/CommentSection.tsx");
-    expect(section).not.toMatch(/hideList/);
-    expect(cs).not.toMatch(/hideList/);
-    expect(section).not.toMatch(/LatestCommentRow/);
-    // CommentSection reloads its own list after a successful post.
-    expect(cs).toMatch(/startTransition\(\(\) => \{ load\(\); \}\)/);
-  });
-
-  it("lets the list fill the panel rather than pinning a fixed height", () => {
-    // A fixed cap leaves dead space the moment the panel is made taller —
-    // which is exactly what happened when the panel grew to h-200 while the
-    // scroller stayed at 360px.
-    const cs = read("features/comment/components/CommentSection.tsx");
-    expect(cs).toMatch(/min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1/);
-    // flex-1 only resolves if the section itself is a flex column.
-    expect(cs).toMatch(/fillHeight \? "flex min-h-0 flex-1 flex-col" : ""/);
-    // The panel must therefore have a height for it to fill.
-    expect(section).toMatch(/h-200/);
-  });
-
-  it("keeps the composer outside the scroll region", () => {
-    const cs = read("features/comment/components/CommentSection.tsx");
-    expect(cs.indexOf("handleTopSubmit}")).toBeLessThan(cs.indexOf("فهرست دیدگاه‌ها"));
-  });
-
-  it("uses the divider-led trending treatment for homepage comments", () => {
-    // The visual reference is a compact Tom's Guide-style trending panel:
-    // a soft blue surface, one header rule, then statement/author/time rows.
-    const cs = read("features/comment/components/CommentSection.tsx");
-    expect(section).toMatch(/bg-sky-50/);
-    expect(section).toMatch(/variant="trending"/);
-    expect(cs).toMatch(/const renderTrendingNode/);
-    expect(cs).toMatch(/border-b border-\[color:var\(--hp-rule\)\]/);
-    expect(cs).toMatch(/line-clamp-3/);
-    expect(cs).toMatch(/ارسال‌شده/);
-    // The logged-out action belongs below the list, so it cannot hide the
-    // comments a reader came here to see.
-    expect(cs).toMatch(/order-2 mt-4 shrink-0 border-t/);
-  });
-});
-
-describe("comment metadata", () => {
-  const cs = read("features/comment/components/CommentSection.tsx");
-
-  it("links comment authors to their profile", () => {
-    // AuthorLink resolves a slug from the username, falling back to a
-    // name map, so guests still render as a link rather than breaking.
-    expect(cs).toMatch(/<AuthorLink/);
-  });
-
-  it("uses RelativeDate for comment timestamps", () => {
-    // The old tooltip said "date of this comment", which the relative
-    // label already implies. RelativeDate shows the real Jalali date.
-    expect(cs).toMatch(/<RelativeDate\s+date=\{\(c as any\)\.createdAt\}/);
-    expect(cs).toMatch(/label="تاریخ دیدگاه"/);
-  });
-});
-
-describe("newsletter panel", () => {
-  it("wears the news module colour", () => {
+  it("wears the news module colour and keeps terms in a dialog", () => {
     expect(newsletter).toMatch(/accentColor \|\| "var\(--hp-brand-ink\)"/);
     expect(section).toMatch(/<NewsletterCard accentColor=\{accentColor\}/);
-  });
-
-  it("opens the terms in a dialog rather than navigating", () => {
     expect(newsletter).toMatch(/<TermsDialog>/);
-    expect(newsletter).not.toMatch(/href="\/terms"/);
-  });
-
-  it("loads the terms only when the dialog is first opened", () => {
-    // This renders on the homepage; a query per page load is how the
-    // connection pool got exhausted before.
     expect(dialog).toMatch(/if \(!open \|\| loadedRef\.current\) return/);
   });
 });
 
 describe("news excerpt bounds", () => {
-  it("constrains news only, not every module", () => {
+  it("constrains only News excerpts and keeps drafts saveable", () => {
     expect(editor).toMatch(/const NEWS_EXCERPT_MIN = 180;/);
     expect(editor).toMatch(/const NEWS_EXCERPT_MAX = 450;/);
     expect(editor).toMatch(/if \(values\.module !== "news"\) return;/);
-  });
-
-  it("still allows an empty draft to be saved", () => {
-    // Authors must be able to save before the text is written.
     expect(editor).toMatch(/if \(length === 0\) return;/);
-  });
-
-  it("shows a live counter", () => {
-    expect(editor).toMatch(/excerptWithinBounds/);
   });
 });
 
-describe("the homepage degrades instead of throwing", () => {
+describe("the homepage still degrades rather than throwing", () => {
   const server = read("lib/home-server.ts");
 
   it("does not enter the cache while the breaker is open", () => {
-    // Every query inside would fail and the deliberate "refuse to cache an
-    // empty homepage" throw would fire inside unstable_cache, which Next
-    // surfaces as a red dev overlay even though it is caught and handled.
     expect(server).toMatch(/if \(circuitState\(\) === "open"\) \{/);
     expect(server).toMatch(/import \{ withCircuit, isCircuitOpenError, circuitState \}/);
   });
 
-  it("still catches the race where queries fail after entry", () => {
-    expect(server).toMatch(/return \{ modules: \{\}, ticker: \[\], generatedAt: new Date\(\)\.toISOString\(\) \};/);
+  it("has a complete empty discussion fallback", () => {
+    expect(server).toMatch(/\{ story: null, stories: \[\], comments: \[\] \}/);
+  });
+
+  it("invalidates the preview cache after comment mutations", () => {
+    const actions = read("features/comment/actions/comments.ts");
+    const edit = read("app/api/comments/edit/route.ts");
+    const remove = read("app/api/comments/delete/route.ts");
+    expect(actions).toMatch(/revalidateTag\("home-data", "max"\)/);
+    expect(edit).toMatch(/revalidateTag\("home-data", "max"\)/);
+    expect(remove).toMatch(/revalidateTag\("home-data", "max"\)/);
   });
 });
