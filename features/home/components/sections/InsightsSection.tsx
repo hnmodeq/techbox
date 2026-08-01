@@ -44,9 +44,6 @@ export function InsightsSection({
 }: InsightsSectionProps) {
   const story = data?.story ?? null;
 
-  // Hooks must run before the empty guard.
-  const [showComments, setShowComments] = React.useState(false);
-
   if (!story) return null;
 
   const style: InsightsStyle = { "--insights-accent": accentColor || "var(--primary)" };
@@ -62,34 +59,20 @@ export function InsightsSection({
         accentColor={accentColor}
       />
 
-      <NewsActions />
-
-      {/* Three tracks at xl: story · discussion · newsletter.
-          Stacking the comments under the story left the newsletter column
-          almost entirely empty, so the section read as a tall column of
-          whitespace. Side by side, the discussion fills that space and the
-          reader can see the story and the reaction to it at once.
-
-          At lg the newsletter drops below and story/comments stay paired;
-          below lg everything stacks. */}
-      <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)_minmax(300px,.7fr)]">
-        {/* In RTL, the first grid column is the right-hand lead. */}
+      {/* Two tracks: the story on the right (first in RTL), the discussion
+          and newsletter stacked on the left. The story column carries its
+          own actions underneath, so the eye finishes the article and then
+          meets the ways out. */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,.75fr)] lg:gap-10">
         <div className="min-w-0">
           <LatestStory story={story} />
+          <NewsActions />
         </div>
 
-        <div className="min-w-0">
-          <CommentDisclosure
-            story={story}
-            comments={comments}
-            open={showComments}
-            onToggle={() => setShowComments((v) => !v)}
-          />
-        </div>
-
-        <aside className="min-w-0 lg:col-span-2 xl:col-span-1">
+        <div className="flex min-w-0 flex-col gap-6">
+          <NewsDiscussion story={story} comments={comments} />
           <NewsletterCard accentColor={accentColor} />
-        </aside>
+        </div>
       </div>
     </SectionShell>
   );
@@ -108,7 +91,7 @@ function NewsActions() {
   };
 
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-3">
+    <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-5">
       <button
         type="button"
         onClick={openSidebar}
@@ -198,84 +181,69 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
 }
 
 /**
- * Comment rail + reply box, expanding in place.
+ * Reader discussion: server-rendered comments, plus a box to add one.
  *
- * Mirrors `components/layout/news-sidebar-card.tsx`: a count button toggles
- * a CSS-grid height transition, and `CommentSection` mounts only once open.
- * That laziness matters — CommentSection fetches on mount, and this sits on
- * the homepage, which has a history of connection-pool exhaustion.
+ * Always open, matching the news sidebar: the comments ARE the point of
+ * this column, so hiding them behind a toggle would be busywork.
+ *
+ * The rail shows the ten approved comments that already arrived with the
+ * page — no request, instant paint, and they carry avatars and profile
+ * links the generic list does not.
+ *
+ * `CommentSection` sits underneath for its composer, with `hideList` so it
+ * does not repeat the same thread directly below the rail. It still fetches
+ * on mount, which is one query on the homepage; that is accepted so posting
+ * works without an extra click, and it is the first thing to make lazy if
+ * this page needs to shed load again.
  */
-function CommentDisclosure({
+function NewsDiscussion({
   story,
   comments,
-  open,
-  onToggle,
 }: {
   story: NonNullable<LatestInsights["story"]>;
   comments: HighlightComment[];
-  open: boolean;
-  onToggle: () => void;
 }) {
   return (
-    <div className="flex h-full flex-col">
-      <h4 className="mb-3 text-[13px] font-bold text-muted-foreground">
+    <section className="flex min-h-0 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
+      <h4 className="mb-3 flex items-center gap-2 text-[13px] font-bold text-foreground">
+        <MessageCircle className="size-4 text-[color:var(--insights-accent)]" aria-hidden="true" />
         گفتگوی خوانندگان
+        {(story.comments ?? 0) > 0 && (
+          <span className="font-normal text-muted-foreground">
+            (<Num>{story.comments}</Num>)
+          </span>
+        )}
       </h4>
+
       {comments.length > 0 ? (
-        <section
-          aria-label="دیدگاه‌های خبر منتخب"
+        <div
+          aria-label="دیدگاه‌های این خبر"
           tabIndex={0}
-          className="max-h-[420px] flex-1 overflow-y-auto overscroll-contain focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="max-h-[360px] min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           style={{ scrollbarWidth: "thin" }}
         >
           {comments.map((comment) => (
             <LatestCommentRow key={comment.id} comment={comment} />
           ))}
-        </section>
+        </div>
       ) : (
-        // The story can fall below the comment threshold, so this column
-        // must say something rather than sitting empty next to the card.
-        <p className="flex-1 text-[13px] leading-[22px] text-muted-foreground">
+        // The featured story can fall below the comment threshold, so this
+        // column must say something rather than sitting empty.
+        <p className="text-[13px] leading-[22px] text-muted-foreground">
           هنوز دیدگاهی برای این خبر ثبت نشده. اولین نفر باشید.
         </p>
       )}
 
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        className="mt-3 inline-flex min-h-11 items-center gap-2 text-[13px] font-bold text-[color:var(--insights-accent)] transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <MessageCircle className="size-4" aria-hidden="true" />
-        {open
-          ? "بستن دیدگاه‌ها"
-          : comments.length > 0
-            ? "همه دیدگاه‌ها و ثبت دیدگاه"
-            : "ثبت دیدگاه"}
-      </button>
-
-      {/* Grid-rows transition instead of Motion: this section is in the
-          homepage bundle and does not need an animation runtime. */}
-      <div
-        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
-        aria-hidden={!open}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <div className="max-h-[460px] overflow-y-auto overscroll-contain pt-2" style={{ scrollbarWidth: "thin" }}>
-            {open && (
-              <CommentSection
-                module={story.module}
-                slug={story.slug}
-                initialComments={story.comments ?? 0}
-                compact
-              />
-            )}
-          </div>
-        </div>
+      <div className="mt-4 border-t border-border pt-4">
+        <CommentSection
+          module={story.module}
+          slug={story.slug}
+          initialComments={story.comments ?? 0}
+          compact
+          hideList
+        />
       </div>
-    </div>
+    </section>
   );
 }
 

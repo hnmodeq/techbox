@@ -118,9 +118,9 @@ describe("homepage Video and Latest contracts", () => {
     expect(insights).not.toMatch(/#comment-\$\{comment\.id\}/);
     expect(insights).toMatch(/نمای تمام‌صفحه/);
     expect(insights).toMatch(/<ShareButton url=\{fullScreenHref\}/);
-    // Comments expand in place, mounting CommentSection only once open.
-    expect(insights).toMatch(/\{open && \(\s*<CommentSection/);
-    expect(insights).toMatch(/aria-expanded=\{open\}/);
+    // Comments render in place, with a composer, like the news sidebar.
+    expect(insights).toMatch(/<CommentSection/);
+    expect(insights).toMatch(/hideList/);
   });
 
   it("lets the page own the section background, not the section", () => {
