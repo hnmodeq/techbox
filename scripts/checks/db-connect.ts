@@ -427,9 +427,19 @@ async function main() {
     pass("row counts", `posts ${posts} \u00b7 users ${users}`);
     await client.$disconnect();
   } catch (e: any) {
-    const code = e?.code ? ` [${e.code}]` : "";
-    const first = String(e?.message || e).split("\n").find((l: string) => l.trim()) || String(e);
-    fail("Prisma", `${first.trim()}${code}`, prismaHint(e?.code));
+    // Prisma prefixes several connection failures with a generic
+    // "Invalid prisma.$queryRaw... invocation" line. That was all the
+    // doctor printed, hiding the actionable P1001/P1000 sentence that comes
+    // later in the same message. Select a safe, useful line instead.
+    const message = String(e?.message || e);
+    const inferredCode = inferPrismaCode(e?.code, message);
+    const lines = message.split("\n").map((line) => line.trim()).filter(Boolean);
+    const useful = lines.find((line) =>
+      /Can't reach database server|Authentication failed|timed out|closed the connection|connection pool|database .* does not exist/i.test(line)
+    );
+    const detail = useful || lines.find((line) => !/^Invalid `?prisma\./i.test(line)) || message;
+    const code = inferredCode ? ` [${inferredCode}]` : "";
+    fail("Prisma", `${redact(detail)}${code}`, prismaHint(inferredCode));
   }
 
   report();
@@ -456,6 +466,17 @@ function staleModels(client: unknown): string[] | null {
     .map((name) => ({ name, key: name.charAt(0).toLowerCase() + name.slice(1) }))
     .filter(({ key }) => typeof bag[key]?.findMany !== "function")
     .map(({ name }) => name);
+}
+
+/** Infer the Prisma connectivity code from engines that omit `error.code`. */
+function inferPrismaCode(code: unknown, message: string): string | undefined {
+  if (typeof code === "string") return code;
+  if (/Can't reach database server/i.test(message)) return "P1001";
+  if (/Authentication failed/i.test(message)) return "P1000";
+  if (/Timed out fetching a new connection|connection pool/i.test(message)) return "P2024";
+  if (/Server has closed the connection/i.test(message)) return "P1017";
+  if (/database .* does not exist/i.test(message)) return "P1003";
+  return undefined;
 }
 
 function prismaHint(code?: string): string {
