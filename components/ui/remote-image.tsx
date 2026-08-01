@@ -61,6 +61,28 @@ export type RemoteImageProps = {
   className?: string;
 };
 
+/**
+ * Skip Next's server-side image optimizer and let the BROWSER fetch the
+ * original.
+ *
+ * The optimizer runs in Node, on the server, using the OS DNS resolver.
+ * Where an ISP poisons DNS for a blocked domain — Iranian networks resolve
+ * to 10.10.34.34/35/36, the national filter page — Node receives a private
+ * IP and Next refuses it with:
+ *
+ *     upstream image ... resolved to private ip ["10.10.34.35"]
+ *
+ * The browser is unaffected because Firefox and Chrome use DNS-over-HTTPS,
+ * so the same URL loads fine client-side. Converting these images from
+ * plain <img> to next/image therefore moved a working browser fetch onto a
+ * broken server path, and every card image 502'd.
+ *
+ * `NEXT_PUBLIC_UNOPTIMIZED_IMAGES=1` restores the browser fetch. Set it in
+ * .env for local development behind such a network. Production on Vercel
+ * resolves normally and should leave it unset so optimization stays on.
+ */
+const UNOPTIMIZED = process.env.NEXT_PUBLIC_UNOPTIMIZED_IMAGES === "1";
+
 export function RemoteImage({
   src,
   alt,
@@ -101,6 +123,7 @@ export function RemoteImage({
       sizes={sizes}
       priority={priority}
       loading={priority ? undefined : "lazy"}
+      unoptimized={UNOPTIMIZED}
       className={cn("object-cover", className)}
     />
   );
