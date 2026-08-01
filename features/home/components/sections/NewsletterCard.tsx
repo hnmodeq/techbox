@@ -14,11 +14,11 @@
  * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §3
  */
 import * as React from "react";
-import Link from "next/link";
+import { TermsDialog } from "@/features/legal/components/TermsDialog";
 
 type Status = "idle" | "loading" | "ok" | "error";
 
-export function NewsletterCard() {
+export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
   const [email, setEmail] = React.useState("");
   const [status, setStatus] = React.useState<Status>("idle");
   const [message, setMessage] = React.useState("");
@@ -52,7 +52,13 @@ export function NewsletterCard() {
   }
 
   return (
-    <aside className="rounded-[var(--hp-r-lg)] bg-[color:var(--hp-brand-ink)] p-7 text-[color:var(--hp-on-brand)] lg:sticky lg:top-24 dark:border dark:border-white/[0.08]">
+    // Wears the news module's colour so the panel reads as part of this
+    // section rather than a generic site-wide block. Falls back to the
+    // standard brand panel when module colours are switched off.
+    <aside
+      className="rounded-[var(--hp-r-lg)] p-7 text-[color:var(--hp-on-brand)] lg:sticky lg:top-24 dark:border dark:border-white/[0.08]"
+      style={{ background: accentColor || "var(--hp-brand-ink)" }}
+    >
       <h3 className="text-[22px] font-semibold leading-[30px]">
         خبرنامه تکباکس
       </h3>
@@ -109,11 +115,18 @@ export function NewsletterCard() {
         </form>
       )}
 
+      {/* A dialog, not a link: sending someone to another page mid-signup
+          abandons a half-filled form. */}
       <p className="mt-4 text-[11px] leading-[18px] text-[color:var(--hp-on-brand-mut)]">
         با عضویت،{" "}
-        <Link href="/terms" className="underline hover:text-[color:var(--hp-on-brand)]">
-          قوانین و حریم خصوصی
-        </Link>{" "}
+        <TermsDialog>
+          <button
+            type="button"
+            className="underline underline-offset-2 hover:text-[color:var(--hp-on-brand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            قوانین و حریم خصوصی
+          </button>
+        </TermsDialog>{" "}
         تکباکس را می‌پذیرید. هر زمان می‌توانید لغو عضویت کنید.
       </p>
     </aside>
