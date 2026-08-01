@@ -409,7 +409,6 @@ export default function CommentSection({ module, slug, initialComments, compact,
                         which the relative label already implies. */}
                     <RelativeDate
                       date={(c as any).createdAt}
-                      label="تاریخ دیدگاه"
                       className="text-[11px] paragraph-color shrink-0"
                     />
                   </div>
@@ -637,10 +636,8 @@ export default function CommentSection({ module, slug, initialComments, compact,
               />
               <div className="flex shrink-0 items-center gap-1.5 text-[11px] text-muted-foreground">
                 <span aria-hidden="true">•</span>
-                <span>ارسال‌شده</span>
                 <RelativeDate
                   date={(c as any).createdAt}
-                  label="تاریخ دیدگاه"
                   className="text-[11px] text-muted-foreground"
                 />
               </div>

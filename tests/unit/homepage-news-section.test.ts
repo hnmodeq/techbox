@@ -74,8 +74,8 @@ describe("news discussion selection", () => {
 });
 
 describe("interactive News discussion panel", () => {
-  it("keeps the panel beside the story and routes a selected comment to a new NewsModal", () => {
-    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.15fr\)_minmax\(360px,\.85fr\)\]/);
+  it("uses the requested section title and routes a selected comment to a new NewsModal", () => {
+    expect(section).toMatch(/title = "بحث برانگیزترین خبرها"/);
     expect(section).toMatch(/import \{ NewsModal \}/);
     expect(section).toMatch(/<NewsModal/);
     expect(section).toMatch(/onOpenComment=\{setSelectedComment\}/);
@@ -110,13 +110,15 @@ describe("interactive News discussion panel", () => {
     expect(section).toMatch(/const previewStory = previewSlug/);
   });
 
-  it("visually connects the active comment to the displayed story without an overlay label", () => {
-    expect(section).toMatch(/color-mix\(in_oklch,var\(--insights-accent\)_16%/);
-    // The marker sits inside a padded active row rather than colliding with
-    // avatars/text on the RTL-leading edge.
+  it("visually connects the active comment without painting it red", () => {
+    // The marker sits inside a padded row rather than colliding with
+    // avatars/text on the RTL-leading edge. A ring, not a tinted fill,
+    // marks the active relationship to the News card.
     expect(section).toMatch(/start-2 w-1/);
     expect(section).toMatch(/className="block w-full ps-5/);
+    expect(section).toMatch(/ring-1 ring-\[color:color-mix/);
     expect(section).toMatch(/دربارهٔ: \{parentStory\.title\}/);
+    expect(section).not.toMatch(/bg-\[color:color-mix\(in_oklch,var\(--insights-accent\)_16%/);
     expect(section).not.toMatch(/در حال نمایش گفتگوی این خبر/);
   });
 
@@ -124,11 +126,22 @@ describe("interactive News discussion panel", () => {
     expect(section).toMatch(/lg:aspect-square/);
     expect(section).toMatch(/lg:h-\[48%\]/);
     expect(section).toMatch(/lg:h-full/);
-    // Archive/sidebar actions now live inside the card rather than adding a
-    // third strip beneath it and breaking column alignment.
-    expect(section).toMatch(/<NewsActions \/>/);
+    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.05fr\)_minmax\(360px,\.95fr\)\]/);
+    // Header actions avoid adding a third strip beneath the card.
+    expect(section).toMatch(/actions=\{<NewsActions header \/>\}/);
+    expect(section).not.toMatch(/<NewsActions \/>/);
     expect(section).not.toMatch(/h-200/);
     expect(section).not.toMatch(/bg-sky-50/);
+  });
+
+  it("keeps comment rows flat, separated, and free of redundant copy", () => {
+    expect(section).toMatch(/role="separator"/);
+    expect(section).toMatch(/index < comments\.length - 1/);
+    expect(section).not.toMatch(/border-b border-\[color:var\(--hp-rule\)\]/);
+    expect(section).not.toMatch(/ارسال‌شده/);
+    expect(section).not.toMatch(/تاریخ دیدگاه/);
+    // The panel keeps an aria-label, but has no visible heading/counter.
+    expect(section).not.toMatch(/<h4/);
   });
 
   it("does not mount a complete CommentSection on every homepage load", () => {

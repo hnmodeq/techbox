@@ -56,13 +56,13 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
     // section rather than a generic site-wide block. Falls back to the
     // standard brand panel when module colours are switched off.
     <aside
-      className="shrink-0 rounded-[var(--hp-r-md)] p-7 text-[color:var(--hp-on-brand)] dark:border dark:border-white/[0.08]"
+      className="shrink-0 rounded-[var(--hp-r-md)] p-5 text-[color:var(--hp-on-brand)] dark:border dark:border-white/[0.08]"
       style={{ background: accentColor || "var(--hp-brand-ink)" }}
     >
-      <h3 className="text-[22px] font-semibold leading-[30px]">
+      <h3 className="text-[20px] font-semibold leading-[28px]">
         خبرنامه تکباکس
       </h3>
-      <p className="mt-2 text-[14px] leading-[24px] text-[color:var(--hp-on-brand-mut)]">
+      <p className="mt-1.5 text-[13px] leading-[22px] text-[color:var(--hp-on-brand-mut)]">
         هر هفته یک ایمیل: مهم‌ترین اخبار زیرساخت، تحلیل‌ها و تخفیف‌های فروشگاه.
       </p>
 
@@ -78,7 +78,7 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
           <p className="text-[14px] leading-[24px]">{message}</p>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="mt-5">
+        <form onSubmit={onSubmit} className="mt-4">
           <label htmlFor="hp-newsletter-email" className="sr-only">
             نشانی ایمیل
           </label>
@@ -117,7 +117,7 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
 
       {/* A dialog, not a link: sending someone to another page mid-signup
           abandons a half-filled form. */}
-      <p className="mt-4 text-[11px] leading-[18px] text-[color:var(--hp-on-brand-mut)]">
+      <p className="mt-3 text-[11px] leading-[17px] text-[color:var(--hp-on-brand-mut)]">
         با عضویت،{" "}
         <TermsDialog>
           <button
