@@ -33,7 +33,7 @@ export type InsightsSectionProps = {
 };
 
 const HEADING_ID = "hp-insights-heading";
-const CAROUSEL_MS = 5_000;
+const CAROUSEL_MS = 15_000;
 
 type InsightsStyle = React.CSSProperties & { "--insights-accent"?: string };
 
@@ -193,7 +193,7 @@ function NewsActions({ header = false }: { header?: boolean }) {
 
       <Link
         href="/news"
-        className="inline-flex min-h-10 items-center gap-2 rounded-[var(--hp-r-sm)] border border-border px-3 text-[12px] font-bold text-muted-foreground transition-colors hover:border-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex min-h-10 items-center gap-2 rounded-[var(--hp-r-sm)] px-3 text-[12px] font-bold text-muted-foreground transition-colors hover:text-[color:var(--insights-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         بایگانی خبرهای قدیمی‌تر
       </Link>
@@ -317,11 +317,7 @@ function NewsDiscussion({
             return (
               <React.Fragment key={comment.id}>
               <article
-                className={`relative rounded-[var(--hp-r-sm)] px-3 py-4 transition-[box-shadow,color] ${
-                  isActive
-                    ? "ring-1 ring-[color:color-mix(in_oklch,var(--insights-accent)_45%,transparent)]"
-                    : ""
-                }`}
+                className="relative rounded-[var(--hp-r-sm)] px-3 py-4 transition-colors"
                 onMouseEnter={() => onPreview(comment.newsSlug)}
                 onFocusCapture={() => onPreview(comment.newsSlug)}
               >
