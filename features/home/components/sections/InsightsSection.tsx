@@ -214,8 +214,11 @@ function NewsDiscussion({
   story: NonNullable<LatestInsights["story"]>;
 }) {
   return (
-    <section className="flex min-h-0 h-200 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
-      <h4 className="mb-1 flex items-center gap-2 text-[13px] font-bold text-foreground">
+    // Fixed height so the column reads as a panel rather than growing with
+    // the thread. The list inside flexes into whatever is left, so this one
+    // number is the only thing to change when resizing it.
+    <section className="flex h-200 min-h-0 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
+      <h4 className="mb-1 flex shrink-0 items-center gap-2 text-[13px] font-bold text-foreground">
         <MessageCircle className="size-4 text-[color:var(--insights-accent)]" aria-hidden="true" />
         گفتگوی خوانندگان
         {(story.comments ?? 0) > 0 && (
@@ -226,13 +229,15 @@ function NewsDiscussion({
       </h4>
 
       {/* The composer renders above the list and stays outside the scroll
-          region, so it is reachable however long the thread grows. */}
+          region, so it is reachable however long the thread grows.
+          `fillHeight` lets the list take the remaining space instead of a
+          fixed cap, which would leave a gap whenever the panel is taller. */}
       <CommentSection
         module={story.module}
         slug={story.slug}
         initialComments={story.comments ?? 0}
         compact
-        listMaxHeight="360px"
+        fillHeight
       />
     </section>
   );
