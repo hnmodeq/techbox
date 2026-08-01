@@ -82,7 +82,7 @@ describe("interactive News discussion panel", () => {
   });
 
   it("cycles every five seconds but pauses for a reader, modal, hidden tab, or reduced motion", () => {
-    expect(section).toMatch(/const CAROUSEL_MS = 5_000;/);
+    expect(section).toMatch(/const CAROUSEL_MS = 15_000;/);
     expect(section).toMatch(/window\.setInterval/);
     expect(section).toMatch(/previewSlug \|\|/);
     expect(section).toMatch(/selectedComment \|\|/);
@@ -97,8 +97,8 @@ describe("interactive News discussion panel", () => {
     expect(section).toMatch(/showCarouselProgress=\{showsCarouselProgress\}/);
     expect(section).toMatch(/hp-news-carousel-progress/);
     expect(section).toMatch(/hp-news-card-swap/);
-    expect(css).toMatch(/animation: hp-news-card-swap 700ms/);
-    expect(css).toMatch(/animation: hp-news-carousel-progress 5s linear/);
+    expect(css).toMatch(/animation: hp-news-card-swap 1100ms/);
+    expect(css).toMatch(/animation: hp-news-carousel-progress 15s linear/);
     expect(css).toMatch(/transform-origin: right center/);
   });
 
@@ -116,7 +116,7 @@ describe("interactive News discussion panel", () => {
     // marks the active relationship to the News card.
     expect(section).toMatch(/start-2 w-1/);
     expect(section).toMatch(/className="block w-full ps-5/);
-    expect(section).toMatch(/ring-1 ring-\[color:color-mix/);
+    expect(section).not.toMatch(/ring-1 ring-\[color:color-mix/);
     expect(section).toMatch(/دربارهٔ: \{parentStory\.title\}/);
     expect(section).not.toMatch(/bg-\[color:color-mix\(in_oklch,var\(--insights-accent\)_16%/);
     expect(section).not.toMatch(/در حال نمایش گفتگوی این خبر/);
