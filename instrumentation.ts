@@ -1,3 +1,10 @@
+import * as Sentry from "@sentry/nextjs";
+
+// Required by Next 15+ / Sentry 10 to report nested React Server Component
+// render errors. Keeping it in instrumentation.ts lets Next invoke it in the
+// same runtime where `register()` loads the matching Sentry configuration.
+export const onRequestError = Sentry.captureRequestError;
+
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     // Prefer IPv4 when resolving hostnames in development.

@@ -3,8 +3,8 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && next dev",
-    "dev:clean": "node scripts/clean-dev-cache.mjs && prisma generate && next dev",
+    "dev": "prisma generate && next dev --webpack",
+    "dev:clean": "node scripts/clean-dev-cache.mjs && prisma generate && next dev --webpack",
     "clean": "node scripts/clean-dev-cache.mjs",
     "build": "next build",
     "build:webpack": "next build --webpack",
@@ -38,7 +38,9 @@
     "playwright:install": "playwright install chromium",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev:webpack": "prisma generate && next dev --webpack"
+    "dev:webpack": "prisma generate && next dev --webpack",
+    "dev:turbo": "prisma generate && next dev",
+    "dev:turbo:clean": "node scripts/clean-dev-cache.mjs && prisma generate && next dev"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

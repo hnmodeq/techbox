@@ -13,6 +13,7 @@ import { ScrollRestoration } from "@/components/ScrollRestoration";
 import { defaultSeo, siteUrl } from "@/lib/seo";
 import { getLayoutHomeData } from "@/lib/home-server";
 import { getModuleConfig, type SiteLayoutConfig } from "@/lib/module-config";
+import { COLORABLE_MODULE_SLUGS, resolveModuleColor } from "@/config/module-colors";
 import { autoPublishScheduled } from "@/lib/auto-publish";
 import type { HomeData } from "@/features/home/lib/home-data";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,24 @@ html, body { font-family: var(--font-kalameh), Vazirmatn, system-ui, Tahoma, san
 h1, .hero-title { font-size: var(--hero-font-size); font-weight: 800; }
 button, .btn { font-family: inherit; transition: all 0.2s ease; }
 `;
+
+type ModuleColorStyle = React.CSSProperties & Record<`--${string}`, string>;
+
+/**
+ * Paint module colours in the server HTML, before any client component
+ * hydrates. The database remains the source of truth; this simply makes the
+ * already-fetched config available to CSS at first paint rather than waiting
+ * for ModuleColorApplier's client effect.
+ */
+function moduleColorStyle(config: SiteLayoutConfig | undefined): ModuleColorStyle | undefined {
+  if (!config || config.moduleColorsEnabled === false) return undefined;
+
+  const style: ModuleColorStyle = {};
+  for (const slug of COLORABLE_MODULE_SLUGS) {
+    style[`--module-${slug}-color`] = resolveModuleColor(slug, config.moduleColors[slug]);
+  }
+  return style;
+}
 
 // Localhost service-worker safety net.
 //
@@ -110,11 +129,15 @@ export default async function RootLayout({
 
   // Fire-and-forget: auto-publish any overdue scheduled posts (60s cooldown built in)
   autoPublishScheduled().catch(() => {});
+  const colorsEnabled = moduleConfig?.moduleColorsEnabled !== false;
+
   return (
     <html
       lang="fa"
       dir="rtl"
       data-main-sidebar-open="true"
+      data-module-colors={colorsEnabled ? "enabled" : "disabled"}
+      style={moduleColorStyle(moduleConfig)}
       className={cn(kalameh.variable, kalameh.className, "font-sans", "main-sidebar-booting", "news-sidebar-booting")}
       suppressHydrationWarning
     >

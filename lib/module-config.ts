@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
-import { withCircuit } from "@/lib/db-circuit";
+import { withCircuit, isCircuitOpenError } from "@/lib/db-circuit";
+import { logDbFailure } from "@/lib/db-error";
 
 /**
  * Module Configuration System
@@ -182,41 +183,40 @@ function parseJsonSafe<T>(value: string | null, fallback: T): T {
 /**
  * Get the full module configuration map.
  * Cached for one day and invalidated immediately by the module administration
- * routes through the `module-config` cache tag.
+ * routes through the `module-config` cache tag. A database failure is allowed
+ * to reject here: rejected unstable_cache entries are not stored, so a short
+ * outage cannot turn into a day of default (blue) module colours.
  * OPTIMIZED: Single DB query for all keys to avoid connection-pool pressure.
  */
 async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const defaults = getDefaultModuleConfigMap();
 
-  // Single query instead of 12 parallel – prevents connection pool exhaustion
-  let settingsMap = new Map<string, string>();
-  try {
-    const allKeys = [
-      KEY_ENABLED,
-      KEY_HOME_VISIBILITY,
-      KEY_HOME_ORDER,
-      KEY_HOME_TITLES,
-      KEY_HOME_MORE_LABELS,
-      KEY_HOME_SHOW_TITLE,
-      KEY_HOME_SHOW_MORE_LABEL,
-      KEY_HOME_DESCRIPTIONS,
-      KEY_HOME_SHOW_TAGS,
-      KEY_HERO_VISIBLE,
-      KEY_MODULE_COLORS_ENABLED,
-      KEY_UNIFIED_MODULE_COLOR,
-      KEY_MODULE_COLORS,
-      KEY_MODULE_TITLES,
-    ];
-    const rows = await withCircuit(() =>
-      prisma.siteSetting.findMany({
-        where: { key: { in: allKeys } },
-        select: { key: true, value: true },
-      }),
-    );
-    settingsMap = new Map(rows.map((r) => [r.key, r.value]));
-  } catch {
-    // DB unavailable – use defaults
-  }
+  // One query instead of 12 parallel queries prevents connection-pool
+  // exhaustion. Do not catch it here: a fallback returned from inside
+  // unstable_cache would be considered a successful result and cached.
+  const allKeys = [
+    KEY_ENABLED,
+    KEY_HOME_VISIBILITY,
+    KEY_HOME_ORDER,
+    KEY_HOME_TITLES,
+    KEY_HOME_MORE_LABELS,
+    KEY_HOME_SHOW_TITLE,
+    KEY_HOME_SHOW_MORE_LABEL,
+    KEY_HOME_DESCRIPTIONS,
+    KEY_HOME_SHOW_TAGS,
+    KEY_HERO_VISIBLE,
+    KEY_MODULE_COLORS_ENABLED,
+    KEY_UNIFIED_MODULE_COLOR,
+    KEY_MODULE_COLORS,
+    KEY_MODULE_TITLES,
+  ];
+  const rows = await withCircuit(() =>
+    prisma.siteSetting.findMany({
+      where: { key: { in: allKeys } },
+      select: { key: true, value: true },
+    }),
+  );
+  const settingsMap = new Map(rows.map((r) => [r.key, r.value]));
 
   const getRaw = (k: string) => settingsMap.get(k) ?? null;
 
@@ -281,11 +281,25 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   return { ...defaults, heroVisible, tickerVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, titles };
 }
 
-export const getModuleConfig = unstable_cache(
+const cachedModuleConfig = unstable_cache(
   getModuleConfigUncached,
   ["module-config-v1"],
-  { revalidate: 86400, tags: ["module-config"] }
+  { revalidate: 86400, tags: ["module-config"] },
 );
+
+/**
+ * Public, failure-tolerant config read. The visible application can keep
+ * rendering with built-in defaults while a failed DB read is deliberately
+ * kept OUTSIDE `cachedModuleConfig`, allowing the next request to retry.
+ */
+export async function getModuleConfig(): Promise<SiteLayoutConfig> {
+  try {
+    return await cachedModuleConfig();
+  } catch (error) {
+    if (!isCircuitOpenError(error)) logDbFailure("module-config", error);
+    return getDefaultSiteLayoutConfig();
+  }
+}
 
 /**
  * Get only the list of enabled module slugs (most common query).
