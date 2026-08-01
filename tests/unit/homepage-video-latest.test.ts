@@ -98,13 +98,29 @@ describe("homepage Video and Latest contracts", () => {
     expect(video).toMatch(/flex min-w-0 flex-col justify-between gap-5/);
   });
 
-  it("selects the weekly news lead by approved-comment count and keeps comments real", () => {
+  it("features the NEWEST news that has a real discussion", () => {
+    // Was "most-commented this week", which pinned the section to whatever
+    // went viral days ago — wrong for a block titled "آخرین خبر امروز".
+    // Now: newest story clearing MIN_COMMENTS_FOR_FEATURE, else newest.
     expect(data).toMatch(/export async function getLatestInsights/);
-    expect(data).toMatch(/const weekAgo = new Date\(Date\.now\(\) - 7 \* 864e5\)/);
-    expect(data).toMatch(/status: "approved", deletedAt: null/);
-    expect(data).toMatch(/countDifference/);
+    expect(data).toMatch(/const MIN_COMMENTS_FOR_FEATURE = 4;/);
+    expect(data).toMatch(/>= MIN_COMMENTS_FOR_FEATURE/);
+    expect(data).toMatch(/const featured = qualifying\[0\] \?\? pool\[0\]/);
+    expect(data).not.toMatch(/countDifference/);
+    // Comments stay real and approved-only.
+    expect(data).toMatch(/status: "approved"/);
     expect(insights).toMatch(/data\?\.comments/);
-    expect(insights).toMatch(/#comment-\$\{comment\.id\}/);
+  });
+
+  it("keeps the news section navigation-free", () => {
+    // Cards must not link away: users read the story and its comments in
+    // place. The only exits are explicit — full-screen view and share.
+    expect(insights).not.toMatch(/#comment-\$\{comment\.id\}/);
+    expect(insights).toMatch(/نمای تمام‌صفحه/);
+    expect(insights).toMatch(/<ShareButton url=\{fullScreenHref\}/);
+    // Comments expand in place, mounting CommentSection only once open.
+    expect(insights).toMatch(/\{open && \(\s*<CommentSection/);
+    expect(insights).toMatch(/aria-expanded=\{open\}/);
   });
 
   it("lets the page own the section background, not the section", () => {
