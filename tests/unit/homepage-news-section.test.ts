@@ -114,6 +114,21 @@ describe("the section never navigates away", () => {
     const cs = read("features/comment/components/CommentSection.tsx");
     expect(cs.indexOf("handleTopSubmit}")).toBeLessThan(cs.indexOf("فهرست دیدگاه‌ها"));
   });
+
+  it("uses the divider-led trending treatment for homepage comments", () => {
+    // The visual reference is a compact Tom's Guide-style trending panel:
+    // a soft blue surface, one header rule, then statement/author/time rows.
+    const cs = read("features/comment/components/CommentSection.tsx");
+    expect(section).toMatch(/bg-sky-50/);
+    expect(section).toMatch(/variant="trending"/);
+    expect(cs).toMatch(/const renderTrendingNode/);
+    expect(cs).toMatch(/border-b border-\[color:var\(--hp-rule\)\]/);
+    expect(cs).toMatch(/line-clamp-3/);
+    expect(cs).toMatch(/ارسال‌شده/);
+    // The logged-out action belongs below the list, so it cannot hide the
+    // comments a reader came here to see.
+    expect(cs).toMatch(/order-2 mt-4 shrink-0 border-t/);
+  });
 });
 
 describe("comment metadata", () => {

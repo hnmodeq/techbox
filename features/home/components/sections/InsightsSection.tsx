@@ -210,15 +210,15 @@ function NewsDiscussion({
   story: NonNullable<LatestInsights["story"]>;
 }) {
   return (
-    // Fixed height so the column reads as a panel rather than growing with
-    // the thread. The list inside flexes into whatever is left, so this one
-    // number is the only thing to change when resizing it.
-    <section className="flex h-200 min-h-0 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
-      <h4 className="mb-1 flex shrink-0 items-center gap-2 text-[13px] font-bold text-foreground">
+    // A divider-led "trending" panel rather than stacked comment cards.
+    // Its fixed column height keeps the newsletter aligned below it; the
+    // live comment list inside takes the remaining space and scrolls.
+    <section className="flex h-200 min-h-0 flex-col overflow-hidden rounded-[var(--hp-r-md)] bg-sky-50 p-7 dark:bg-sky-950/30">
+      <h4 className="flex shrink-0 items-center gap-2 border-b border-slate-400/80 pb-4 text-[13px] font-extrabold tracking-[0.04em] text-foreground dark:border-slate-500/70">
         <MessageCircle className="size-4 text-[color:var(--insights-accent)]" aria-hidden="true" />
-        گفتگوی خوانندگان
+        گفتگوهای داغ
         {(story.comments ?? 0) > 0 && (
-          <span className="font-normal text-muted-foreground">
+          <span className="font-semibold text-muted-foreground">
             (<Num>{story.comments}</Num>)
           </span>
         )}
@@ -234,6 +234,7 @@ function NewsDiscussion({
         initialComments={story.comments ?? 0}
         compact
         fillHeight
+        variant="trending"
       />
     </section>
   );

@@ -31,11 +31,13 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-export default function CommentSection({ module, slug, initialComments, compact, fillHeight }: {
+export default function CommentSection({ module, slug, initialComments, compact, fillHeight, variant = "default" }: {
   module: string;
   slug: string;
   initialComments?: number;
   compact?: boolean;
+  /** A compact, divider-led list for the homepage news discussion panel. */
+  variant?: "default" | "trending";
   /**
    * Let the thread grow to fill the parent instead of a fixed cap.
    *
@@ -46,6 +48,11 @@ export default function CommentSection({ module, slug, initialComments, compact,
    */
   fillHeight?: boolean;
 }) {
+  // The trending treatment is intentionally opt-in: compact comments also
+  // appear in the news drawer, video modal and media reels, where their
+  // existing card treatment remains the right fit.
+  const isTrending = compact && variant === "trending";
+
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
@@ -565,6 +572,114 @@ export default function CommentSection({ module, slug, initialComments, compact,
     );
   };
 
+  /**
+   * Homepage news uses a Tom's Guide-style "trending" rhythm: a short
+   * comment statement first, then the speaker and time on a single metadata
+   * row. This deliberately is not a second data source — the same live
+   * CommentSection still owns posting, replies, edits and votes.
+   */
+  const renderTrendingNode = (c: CommentNode, depth = 0): React.ReactNode => {
+    const deleted = isSoftDeleted(c);
+    const isOwner = user && (c as any).authorId === user.id;
+    const isEditing = editingId === (c as any).id;
+    const isReplying = replyOpen === (c as any).id;
+    const rawText = String((c as any).text || "");
+    const ratingSectionAt = rawText.indexOf("نقاط");
+    const preview = (ratingSectionAt > 0 ? rawText.slice(0, ratingSectionAt) : rawText).trim();
+
+    // Keep the full editing/reply form available without duplicating its
+    // stateful controls. It temporarily uses the standard treatment only
+    // while the reader is actively changing that one comment.
+    if (isEditing || isReplying) return renderNode(c, depth);
+
+    return (
+      <article
+        id={`comment-${c.id}`}
+        key={c.id}
+        className={`scroll-mt-4 border-b border-[color:var(--hp-rule)] py-5 last:border-b-0 ${
+          depth ? "me-4 border-r border-r-[color:var(--hp-rule)] pe-4" : ""
+        }`}
+      >
+        {deleted ? (
+          <div className="flex items-center gap-2 py-1 text-sm italic text-muted-foreground">
+            <Icon name="trash" size={16} className="shrink-0 opacity-50" />
+            این دیدگاه حذف شده است
+          </div>
+        ) : (
+          <>
+            <p className="whitespace-pre-wrap text-[14px] font-bold leading-6 text-foreground line-clamp-3">
+              {preview || "دیدگاه بدون متن"}
+            </p>
+
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <AuthorLink
+                name={(c as any).authorName || "کاربر"}
+                username={(c as any).author?.username}
+                avatar={(c as any).author?.avatar || ""}
+                verifiedType={(c as any).author?.verifiedType}
+                verifiedLabel={(c as any).author?.verifiedLabel}
+              />
+              <div className="flex shrink-0 items-center gap-1.5 text-[11px] text-muted-foreground">
+                <span aria-hidden="true">•</span>
+                <span>ارسال‌شده</span>
+                <RelativeDate
+                  date={(c as any).createdAt}
+                  label="تاریخ دیدگاه"
+                  className="text-[11px] text-muted-foreground"
+                />
+              </div>
+            </div>
+
+            <div className="mt-3 flex items-center gap-3 text-[11px]">
+              <CommentVote
+                id={c.id}
+                initialLikes={(c as any).likes ?? 0}
+                initialDislikes={(c as any).dislikes ?? 0}
+              />
+              <Button
+                onClick={() => handleReplyClick(c.id)}
+                variant="link"
+                size="xs"
+                className="h-auto p-0 text-[11px] text-muted-foreground hover:text-foreground"
+                type="button"
+              >
+                پاسخ
+              </Button>
+              {isOwner && (
+                <>
+                  <Button
+                    onClick={() => handleEditClick((c as any).id, (c as any).text)}
+                    variant="link"
+                    size="xs"
+                    className="h-auto p-0 text-[11px] text-muted-foreground hover:text-foreground"
+                    type="button"
+                  >
+                    ویرایش
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete((c as any).id)}
+                    variant="link"
+                    size="xs"
+                    className="h-auto p-0 text-[11px] text-[var(--danger)] hover:text-[var(--danger)]"
+                    type="button"
+                  >
+                    حذف
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
+        )}
+
+        {c.replies && c.replies.length > 0 && (
+          <div className="mt-1">
+            {c.replies.map((reply: CommentNode) => renderTrendingNode(reply, depth + 1))}
+          </div>
+        )}
+      </article>
+    );
+  };
+
   const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
 
   const sortedComments = React.useMemo(() => {
@@ -599,7 +714,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
             // it the section is block-level, the list's flex-1 has nothing
             // to resolve against, and the scroller keeps its own height
             // while the panel stretches — leaving dead space underneath.
-            `mt-2 pt-2 ${fillHeight ? "flex min-h-0 flex-1 flex-col" : ""}`
+            `${isTrending ? "mt-0" : "mt-2 pt-2"} ${fillHeight ? "flex min-h-0 flex-1 flex-col" : ""}`
           : "mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10"
       }
     >
@@ -638,11 +753,17 @@ export default function CommentSection({ module, slug, initialComments, compact,
       {authLoading ? (
         <CommentFormSkeleton />
       ) : user ? (
-        <form onSubmit={handleTopSubmit} className={compact ? "space-y-3 mb-4" : "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8"}>
+        <form onSubmit={handleTopSubmit} className={
+          compact
+            ? isTrending
+              ? "order-2 mt-4 shrink-0 space-y-3 border-t border-[color:var(--hp-rule)] pt-4"
+              : "space-y-3 mb-4"
+            : "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-5 space-y-4 mb-8"
+        }>
           <input type="hidden" name="module" value={module} />
           <input type="hidden" name="slug" value={slug} />
           <input type="hidden" name="parentId" value="" />
-          <div className={`flex items-center gap-3 ${compact ? "pb-2" : "border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3"}`}>
+          <div className={`flex items-center gap-3 ${compact ? (isTrending ? "hidden" : "pb-2") : "border-b-[length:var(--border-size)] border-[var(--border-color)] pb-3"}`}>
             {user.avatar && user.avatar !== "/assets/hooman.png" ? (
               <Image src={user.avatar} width={36} height={36} alt={user.name || "کاربر"} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" />
             ) : (
@@ -770,7 +891,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
           <Textarea
             name="text"
             placeholder={compact ? "دیدگاه شما..." : "دیدگاه خود را درباره این مطلب بنویسید..."}
-            className={compact ? "min-h-[40px] h-[40px] w-full text-sm text-[var(--paragraph-color)] resize-none overflow-hidden" : "min-h-[100px] w-full text-sm text-[var(--paragraph-color)]"}
+            className={compact ? (isTrending ? "min-h-[42px] h-[42px] w-full rounded-[var(--hp-r-sm)] border border-border bg-[color:var(--hp-surface)] px-3 text-sm text-[var(--paragraph-color)] resize-none overflow-hidden" : "min-h-[40px] h-[40px] w-full text-sm text-[var(--paragraph-color)] resize-none overflow-hidden") : "min-h-[100px] w-full text-sm text-[var(--paragraph-color)]"}
             onInput={(e) => {
               if (compact) {
                 const target = e.target as HTMLTextAreaElement;
@@ -789,7 +910,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
           </div>
         </form>
       ) : (
-        <div className={compact ? "text-center py-2 mb-4" : "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed"}>
+        <div className={compact ? (isTrending ? "order-2 mt-4 shrink-0 border-t border-[color:var(--hp-rule)] pt-4 text-center" : "text-center py-2 mb-4") : "bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] p-6 text-center space-y-3 mb-8 bg-[var(--card-background)]/40 border-dashed"}>
           {!compact && (
             <>
               <h4 className="text-[length:var(--h3-font-size)] text-[var(--h3-font-color)] font-semibold text-[var(--primary-text)]">برای ثبت دیدگاه وارد شوید</h4>
@@ -799,13 +920,15 @@ export default function CommentSection({ module, slug, initialComments, compact,
             </>
           )}
           <div className={compact ? "" : "pt-2"}>
-            <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} size="sm">ورود یا ثبت‌نام</Button>
+            <Button type="button" onClick={() => window.dispatchEvent(new CustomEvent("tb_open_auth"))} size="sm">
+              {isTrending ? "برای شرکت در گفتگو وارد شوید" : "ورود یا ثبت‌نام"}
+            </Button>
           </div>
         </div>
       )}
 
       <div
-        className={`space-y-1 min-h-[60px] ${
+        className={`${isTrending ? "order-1 space-y-0" : "space-y-1"} min-h-[60px] ${
           fillHeight ? "min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1" : ""
         }`}
         style={fillHeight ? { scrollbarWidth: "thin" } : undefined}
@@ -825,7 +948,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
         ) : comments.length === 0 ? (
           <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (
-          sortedComments.map(c => renderNode(c, 0))
+          sortedComments.map(c => isTrending ? renderTrendingNode(c, 0) : renderNode(c, 0))
         )}
       </div>
     </section>
