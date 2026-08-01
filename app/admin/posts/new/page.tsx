@@ -110,12 +110,27 @@ const categoryHints: Record<ModuleSlug, string[]> = {
   timeline: ["تاریخچه", "رویداد", "معماری", "سخت‌افزار", "نرم‌افزار"],
 };
 
+/**
+ * News excerpt bounds, in characters.
+ *
+ * Measured against the homepage card: the lead column is ~738px at lg, the
+ * excerpt renders at 15px/28px, and Persian averages ~8px per character
+ * including spaces — roughly 92 characters per line. Two lines is the
+ * minimum that fills the slot; five lines is the maximum it can show.
+ *
+ * Re-measure if the section's column widths or type scale change.
+ */
+const NEWS_EXCERPT_MIN = 180;
+const NEWS_EXCERPT_MAX = 450;
+
 const postSchema = z.object({
   module: z.string().min(1),
   category: z.string().max(100).optional(),
   title: z.string().min(3, "عنوان حداقل ۳ کاراکتر").max(300),
   slug: z.string().max(120).optional(),
   excerpt: z.string().max(500).optional(),
+  // News excerpts are length-constrained further down via superRefine —
+  // see NEWS_EXCERPT_MIN / NEWS_EXCERPT_MAX.
   tags: z.string().max(500).optional(),
   image: z.string().max(1000).optional(),
   content: z.string().max(20000).optional(),
@@ -150,6 +165,30 @@ const postSchema = z.object({
   status: z.enum(["published", "scheduled", "review", "draft", "archived"]).default("published"),
   published: z.boolean().default(true),
   scheduledAt: z.string().max(30).optional(),
+}).superRefine((values, ctx) => {
+  // News is short-form: the excerpt IS the story, shown in full on the
+  // homepage card. Too short and the card looks broken; too long and it
+  // overruns the five-line slot and unbalances the section.
+  //
+  // Scoped to news on purpose — other modules render the excerpt as a
+  // teaser in differently-sized cards, so a global rule would be wrong.
+  if (values.module !== "news") return;
+  const length = (values.excerpt ?? "").trim().length;
+  if (length === 0) return; // drafts may be saved before the text is written
+  if (length < NEWS_EXCERPT_MIN) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["excerpt"],
+      message: `متن خبر باید حداقل ${NEWS_EXCERPT_MIN} کاراکتر باشد (حدود دو خط).`,
+    });
+  }
+  if (length > NEWS_EXCERPT_MAX) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["excerpt"],
+      message: `متن خبر حداکثر ${NEWS_EXCERPT_MAX} کاراکتر است (حدود پنج خط).`,
+    });
+  }
 });
 
 type PostValues = z.infer<typeof postSchema>;
@@ -234,6 +273,9 @@ function NewPostInner() {
   const titleWatch = form.watch("title");
   const tagsWatch = form.watch("tags");
   const excerptWatch = form.watch("excerpt");
+  const excerptLength = (excerptWatch || "").trim().length;
+  const excerptWithinBounds =
+    excerptLength >= NEWS_EXCERPT_MIN && excerptLength <= NEWS_EXCERPT_MAX;
   const contentWatch = form.watch("content");
   const imageWatch = form.watch("image");
   const statusWatch = form.watch("status");
@@ -534,10 +576,33 @@ function NewPostInner() {
                 name="excerpt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>خلاصه</FormLabel>
+                    <FormLabel>
+                      {moduleWatch === "news" ? "متن خبر" : "خلاصه"}
+                    </FormLabel>
                     <FormControl>
-                      <Textarea placeholder="خلاصه کوتاه برای کارت‌ها، فیدها و سئو…" className="min-h-[80px]" {...field} />
+                      <Textarea
+                        placeholder={
+                          moduleWatch === "news"
+                            ? "متن کامل خبر — روی کارت صفحهٔ اصلی همین متن نمایش داده می‌شود…"
+                            : "خلاصه کوتاه برای کارت‌ها، فیدها و سئو…"
+                        }
+                        className="min-h-[80px]"
+                        {...field}
+                      />
                     </FormControl>
+                    {moduleWatch === "news" && (
+                      <p
+                        className={
+                          excerptLength > 0 && !excerptWithinBounds
+                            ? "text-[11px] font-bold text-destructive"
+                            : "text-[11px] text-muted-foreground"
+                        }
+                      >
+                        {excerptLength.toLocaleString("fa-IR")} از{" "}
+                        {NEWS_EXCERPT_MAX.toLocaleString("fa-IR")} کاراکتر — حداقل{" "}
+                        {NEWS_EXCERPT_MIN.toLocaleString("fa-IR")} (دو تا پنج خط روی کارت)
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}

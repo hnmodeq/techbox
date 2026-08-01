@@ -32,6 +32,43 @@ Existing helpers to reuse — do not reinvent:
 
 ---
 
+## 1b. Decisions (settled with the owner)
+
+| # | Decision |
+|---|---|
+| Story selection | Newest news item with **at least 4 approved comments**; fall back to newest overall. Threshold is a named constant so it can be tuned. |
+| Comments | **Expand in place**, reusing the news-sidebar mechanism (count button → CSS-grid expand → scrollable `CommentSection compact`). **Not** a modal. |
+| Card click | Cards never navigate. Subtle lift/scale on hover — signals "opens here", not "goes somewhere". |
+| Slug pages | **Kept** for SEO and sharing, reached only by explicit action. |
+| News content model | **Short-form.** The `excerpt` IS the story. `content` is not rendered for news. |
+| Full-screen action | "نمای تمام‌صفحه" → `/news/{slug}`. A focused, shareable view of the same text. |
+| Share | Existing `ShareButton` with `url={/news/{slug}}`. Copies to clipboard, toasts. No new component. |
+
+### The short-form decision has a consequence
+
+Measured from the production dump:
+
+| Field | Length | Rendered by |
+|---|---|---|
+| `excerpt` | 435 chars (both news rows) | The card |
+| `content` | 1,425 and 3,907 chars | `/news/[slug]` via `DbContentDetail` |
+
+`content` is 3.3×–9× longer than `excerpt`. Under the short-form model that
+long body **stops being displayed anywhere for the news module**.
+
+The owner chose this deliberately. But it means:
+
+- Existing news `content` becomes dead data. Do **not** delete it — it is
+  the only copy, and the decision may be revisited.
+- `/news/[slug]` currently renders `content` through `DbContentDetail`. For
+  news it should render the same excerpt text the card shows, otherwise the
+  "full screen" view contradicts the card. **Check this before shipping.**
+- The excerpt cap (§6) is now the *entire* length budget for a news item,
+  not a summary limit. 450 characters is a real editorial constraint —
+  confirm with whoever writes the news before enforcing it.
+
+---
+
 ## 2. Corrections to the brief — read before starting
 
 ### 2.1 News DO have slugs
@@ -56,31 +93,19 @@ Confirmed: `techbox-news-sidebar.tsx` filters on
 `now - date <= TWENTY_FOUR_HOURS`. The button label
 "اخبار ۲۴ ساعت گذشته" will be accurate. No query change needed.
 
-### 2.3 "Latest news" conflicts with the comment rail — decision required
+### 2.3 "Latest news" vs the comment rail — RESOLVED
 
-`getLatestInsights()` currently picks the **most-commented** story of the
-past week, falling back to the newest.
+`getLatestInsights()` picks the most-commented story of the past week. At
+~4 posts/hour a strictly-newest rule would almost always surface a story
+with zero comments, leaving the rail and the new comment box empty.
 
-Switching to strictly-newest, at ~4 posts/hour, means the featured story
-will almost always have **zero comments**. The comment rail, the new
-"all comments" link and the new comment box would then be empty in the
-common case — immediately after being built.
+**Settled:** newest story with **≥4 approved comments**, falling back to
+newest overall. Put the threshold in a named constant
+(`MIN_COMMENTS_FOR_FEATURE = 4`) — on a young site the fallback will fire
+often and the number will need tuning.
 
-Two options; **the owner has not yet chosen**:
-
-- **A — strictly newest.** Matches "آخرین خبر امروز" literally. Comment rail
-  usually empty. Consider hiding the rail when `comments.length === 0` so the
-  layout does not collapse.
-- **B — newest among today's stories that have ≥1 approved comment, else
-  newest overall.** Title stays honest, section stays populated.
-
-**Recommendation: B.** Implement A only if the owner confirms they want a
-usually-empty discussion area.
-
-Whichever is chosen, also update the section `description`, which currently
-claims selection is by comment count.
-
----
+Update the section `description`, which still claims selection is purely by
+comment count.
 
 ## 3. Newsletter panel
 
@@ -286,8 +311,11 @@ accept that, or filter the archive — but do not let the label overpromise.
 
 | # | Decision | Status |
 |---|---|---|
-| 1 | Story selection: **A** strictly-newest, or **B** newest-with-comments | **Owner input needed** (§2.3) |
-| 2 | Comment box collapsed-until-clicked | Recommended; assumed yes unless told otherwise (§5.6) |
-| 3 | Excerpt `min 180 / max 450`, news module only | Proposed from measurement (§6) |
-| 4 | Fix the sidebar card's missing link | Suggested, not requested (§7) |
-| 5 | `/news` archive is not 24h-filtered | Flagged (§9) |
+| 1 | Story selection | **Settled** — newest with ≥4 comments (§1b, §2.3) |
+| 2 | Comments expand in place, not a modal | **Settled** (§1b) |
+| 3 | Cards never navigate | **Settled** (§1b) |
+| 4 | News are short-form; `content` unused | **Settled** — see the consequence note in §1b |
+| 5 | Excerpt `min 180 / max 450`, news module only | Proposed from measurement (§6). Confirm 450 chars is workable as a *whole news item*, not a summary. |
+| 6 | `/news/[slug]` still renders long `content` | **Needs a fix** — contradicts short-form (§1b) |
+| 7 | Fix the sidebar card's missing link | Suggested, not requested (§7) |
+| 8 | `/news` archive is not 24h-filtered | Flagged (§9) |
