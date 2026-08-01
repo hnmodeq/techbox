@@ -116,7 +116,17 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
     // The card does not navigate. `group` drives a lift on hover so it reads
     // as an object you can act on, without implying it is a link.
     <article className="group">
-      <div className="relative overflow-hidden bg-background" style={{ aspectRatio: "16/9" }}>
+      {/* Square at lg and up.
+          The left column carries the discussion panel stacked above the
+          newsletter, which together run far taller than a 16/9 poster — so
+          the story column ran out of content and left a band of empty space
+          under its actions. A 1:1 image absorbs most of that height.
+
+          Below lg the columns stack and there is nothing to match, so the
+          wider 16/9 crop reads better on a phone. */}
+      <div
+        className="relative overflow-hidden bg-background max-lg:aspect-video lg:aspect-square"
+      >
         <RemoteImage
           src={story.image}
           alt={story.title}

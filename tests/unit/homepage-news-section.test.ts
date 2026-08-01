@@ -58,6 +58,15 @@ describe("the section never navigates away", () => {
     expect(left).toMatch(/<NewsletterCard/);
   });
 
+  it("squares the story image where a column sits beside it", () => {
+    // The left column stacks the discussion above the newsletter and runs
+    // much taller than a 16/9 poster, which left dead space under the story
+    // actions. Below lg the columns stack, so the wider crop stays.
+    expect(section).toMatch(/lg:aspect-square/);
+    expect(section).toMatch(/max-lg:aspect-video/);
+    expect(section).not.toMatch(/aspectRatio: "16\/9"/);
+  });
+
   it("puts the section actions under the story card", () => {
     const storyCol = section.slice(section.indexOf("<LatestStory"), section.indexOf("<div className=\"flex min-w-0"));
     expect(storyCol).toMatch(/<NewsActions \/>/);
