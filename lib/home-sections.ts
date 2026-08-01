@@ -145,23 +145,40 @@ function mapHighlightComment(row: any): HighlightComment | null {
  * most one row, so the panel represents several conversations rather than a
  * single busy article repeated five times.
  */
-export function selectNewsDiscussionComments<T extends { postId: string }>(
+export function selectNewsDiscussionComments<T extends { postId: string; authorKey?: string }>(
   recentPostIds: readonly string[],
   fallbackPostIds: readonly string[],
   rowsByPost: ReadonlyMap<string, readonly T[]>,
-  take = 5,
+  take = 4,
 ): T[] {
   const picked: T[] = [];
+  const seenAuthors = new Set<string>();
+
+  const pickUnusedAuthor = (rows: readonly T[], salt: number): T | null => {
+    if (rows.length === 0) return null;
+    const start = seededIndex(rows.length, salt);
+    for (let offset = 0; offset < rows.length; offset += 1) {
+      const row = rows[(start + offset) % rows.length];
+      const authorKey = row.authorKey?.trim();
+      if (!authorKey || !seenAuthors.has(authorKey)) return row;
+    }
+    return null;
+  };
+
   const appendPostIds = (postIds: readonly string[], salt: number) => {
     const available = postIds.filter((postId) => (rowsByPost.get(postId)?.length ?? 0) > 0);
-    const slots = seededIndices(available.length, Math.max(0, take - picked.length), salt);
+    // Walk the entire shuffled priority group. A first-choice row may belong
+    // to an already displayed author, so stopping after `take` candidate
+    // posts could leave empty slots even when another unique voice exists.
+    const slots = seededIndices(available.length, available.length, salt);
     for (const index of slots) {
+      if (picked.length >= take) return;
       const postId = available[index];
-      const rows = rowsByPost.get(postId) ?? [];
-      if (rows.length === 0) continue;
-      // The parent-post choice and its comment choice both rotate hourly, but
-      // only on the server inside the cached payload — never during hydration.
-      picked.push(rows[seededIndex(rows.length, salt + index * 17)]);
+      const row = pickUnusedAuthor(rowsByPost.get(postId) ?? [], salt + index * 17);
+      if (!row) continue;
+      const authorKey = row.authorKey?.trim();
+      if (authorKey) seenAuthors.add(authorKey);
+      picked.push(row);
     }
   };
 
@@ -224,6 +241,7 @@ export async function getLatestInsights(
       postId: true,
       text: true,
       authorName: true,
+      authorId: true,
       createdAt: true,
       author: {
         select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
@@ -233,13 +251,18 @@ export async function getLatestInsights(
   const commentRows = rawCommentRows as any[];
 
   const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
-  const rowsByPost = new Map<string, typeof commentRows>();
+  const rowsByPost = new Map<string, Array<(typeof commentRows)[number] & { authorKey: string }>>();
   for (const row of commentRows) {
     // Suspended accounts do not get a highlighted promotional slot. Guests
     // are still valid because they carry authorName and have no User record.
     if (row.author && row.author.status !== "active") continue;
     const rows = rowsByPost.get(row.postId) ?? [];
-    rows.push(row);
+    rows.push({
+      ...row,
+      // One person should not dominate the four-slot discovery panel, even
+      // when they commented on several different News posts.
+      authorKey: row.authorId || row.author?.username || row.author?.name || row.authorName,
+    });
     rowsByPost.set(row.postId, rows);
   }
 
@@ -255,7 +278,7 @@ export async function getLatestInsights(
     recentPostIds,
     fallbackPostIds,
     rowsByPost,
-    5,
+    4,
   );
 
   const postById = new Map(latestPosts.map((post) => [post.id, post]));

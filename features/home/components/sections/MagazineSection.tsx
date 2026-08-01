@@ -24,7 +24,7 @@ import type { ContentItem } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { formatReadingTimeShort } from "@/lib/reading-time";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipColorScope, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { RelativeDate } from "@/components/ui/relative-date";
 import { ArticleModal } from "@/features/blog/components/ArticleModal";
 import { SectionShell, SectionHeader } from "../primitives";
@@ -93,7 +93,8 @@ export function MagazineSection({
   };
 
   return (
-    <SectionShell labelledBy={HEADING_ID} style={style}>
+    <TooltipColorScope color={accentColor}>
+      <SectionShell labelledBy={HEADING_ID} style={style}>
       {showTitle && (
         <SectionHeader
           headingId={HEADING_ID}
@@ -155,7 +156,8 @@ export function MagazineSection({
           onNext={next}
         />
       )}
-    </SectionShell>
+      </SectionShell>
+    </TooltipColorScope>
   );
 }
 

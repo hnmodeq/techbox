@@ -37,9 +37,20 @@ describe("news discussion selection", () => {
 
   it("returns only the available real discussions", () => {
     const rows = new Map([["only", [{ id: "only-1", postId: "only" }]]]);
-    expect(selectNewsDiscussionComments(["only"], ["missing"], rows, 5)).toEqual([
+    expect(selectNewsDiscussionComments(["only"], ["missing"], rows, 4)).toEqual([
       { id: "only-1", postId: "only" },
     ]);
+  });
+
+  it("does not let the same person occupy multiple discussion slots", () => {
+    const rows = new Map([
+      ["a", [{ id: "a-1", postId: "a", authorKey: "same" }]],
+      ["b", [{ id: "b-1", postId: "b", authorKey: "same" }]],
+      ["c", [{ id: "c-1", postId: "c", authorKey: "other" }]],
+    ]);
+    const selected = selectNewsDiscussionComments(["a", "b", "c"], [], rows, 4);
+    expect(selected.map((row) => row.authorKey)).toEqual(expect.arrayContaining(["same", "other"]));
+    expect(selected.filter((row) => row.authorKey === "same")).toHaveLength(1);
   });
 
   it("queries the last seven days first, then the newest ten posts", () => {
@@ -47,6 +58,8 @@ describe("news discussion selection", () => {
     expect(data).toMatch(/const weekAgo = new Date\(Date\.now\(\) - 7 \* 864e5\)/);
     expect(data).toMatch(/take: 10,/);
     expect(data).toMatch(/parentId: null/);
+    expect(data).toMatch(/take = 4,/);
+    expect(data).toMatch(/authorKey: row\.authorId/);
     expect(data).toMatch(/selectNewsDiscussionComments\(/);
     // Homepage DB work stays serial to protect the small Neon pool.
     const latest = data.slice(data.indexOf("export async function getLatestInsights"));
@@ -62,7 +75,7 @@ describe("news discussion selection", () => {
 
 describe("interactive News discussion panel", () => {
   it("keeps the panel beside the story and routes a selected comment to a new NewsModal", () => {
-    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.25fr\)_minmax\(320px,\.75fr\)\]/);
+    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.15fr\)_minmax\(360px,\.85fr\)\]/);
     expect(section).toMatch(/import \{ NewsModal \}/);
     expect(section).toMatch(/<NewsModal/);
     expect(section).toMatch(/onOpenComment=\{setSelectedComment\}/);
@@ -85,10 +98,25 @@ describe("interactive News discussion panel", () => {
     expect(section).toMatch(/const previewStory = previewSlug/);
   });
 
-  it("visually connects the active comment to the displayed story", () => {
-    expect(section).toMatch(/color-mix\(in_oklch,var\(--insights-accent\)_10%/);
-    expect(section).toMatch(/start-0 w-1/);
-    expect(section).toMatch(/در حال نمایش گفتگوی این خبر/);
+  it("visually connects the active comment to the displayed story without an overlay label", () => {
+    expect(section).toMatch(/color-mix\(in_oklch,var\(--insights-accent\)_16%/);
+    // The marker sits inside a padded active row rather than colliding with
+    // avatars/text on the RTL-leading edge.
+    expect(section).toMatch(/start-2 w-1/);
+    expect(section).toMatch(/className="block w-full ps-5/);
+    expect(section).toMatch(/دربارهٔ: \{parentStory\.title\}/);
+    expect(section).not.toMatch(/در حال نمایش گفتگوی این خبر/);
+  });
+
+  it("keeps a smaller square News card and lets the opposite column stretch to it", () => {
+    expect(section).toMatch(/lg:aspect-square/);
+    expect(section).toMatch(/lg:h-\[48%\]/);
+    expect(section).toMatch(/lg:h-full/);
+    // Archive/sidebar actions now live inside the card rather than adding a
+    // third strip beneath it and breaking column alignment.
+    expect(section).toMatch(/<NewsActions \/>/);
+    expect(section).not.toMatch(/h-200/);
+    expect(section).not.toMatch(/bg-sky-50/);
   });
 
   it("does not mount a complete CommentSection on every homepage load", () => {

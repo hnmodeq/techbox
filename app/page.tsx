@@ -36,6 +36,7 @@ import { FamilyCommentsSection } from "@/features/home/components/sections/Famil
 import { MoreToExploreSection } from "@/features/home/components/sections/MoreToExploreSection";
 import { AuthorsSection } from "@/features/home/components/sections/AuthorsSection";
 import { AnnouncementBar } from "@/features/home/components/sections/AnnouncementBar";
+import { TooltipColorScope } from "@/components/ui/tooltip";
 import { FamilyProfilesSection } from "@/features/home/components/sections/FamilyProfilesSection";
 import { PartnersSection } from "@/features/home/components/sections/PartnersSection";
 
@@ -136,30 +137,41 @@ export default async function HomePage() {
     };
   };
 
+  const tooltipColorFor = (slug: ModuleSlug | null) =>
+    slug && config.moduleColorsEnabled !== false
+      ? resolveModuleColor(slug, config.moduleColors[slug])
+      : undefined;
+
+  const withModuleTooltip = (slug: ModuleSlug | null, node: React.ReactNode) => (
+    <TooltipColorScope color={tooltipColorFor(slug)}>{node}</TooltipColorScope>
+  );
+
   const sections: Array<{ key: SectionKey; node: React.ReactNode }> = [
     {
       key: "magazine",
-      node: <MagazineSection posts={magazinePosts} {...textFor("magazine")} />,
+      node: withModuleTooltip("blog", <MagazineSection posts={magazinePosts} {...textFor("magazine")} />),
     },
     {
       key: "video",
-      node: (
+      node: withModuleTooltip(
+        "media",
         <VideoSection
           videos={data.modules.media ?? []}
           highlightComments={data.videoHighlightComments}
           {...textFor("video")}
-        />
+        />,
       ),
     },
     {
       key: "insights",
-      node: (
+      node: withModuleTooltip(
+        "news",
         <InsightsSection
           data={data.latestInsights}
           accentColor={config.moduleColorsEnabled !== false
             ? resolveModuleColor("news", config.moduleColors.news)
             : undefined}
-        />
+        />,
       ),
     },
     {
@@ -168,23 +180,23 @@ export default async function HomePage() {
     },
     {
       key: "topPicks",
-      node: <TopPicksSection picks={data.topPicks ?? []} {...textFor("topPicks")} />,
+      node: withModuleTooltip("review", <TopPicksSection picks={data.topPicks ?? []} {...textFor("topPicks")} />),
     },
     {
       key: "timeline",
-      node: <TimelineSection events={data.timeline ?? []} {...textFor("timeline")} />,
+      node: withModuleTooltip("timeline", <TimelineSection events={data.timeline ?? []} {...textFor("timeline")} />),
     },
     {
       key: "deals",
-      node: <DealsSection products={data.modules.shop ?? []} {...textFor("deals")} />,
+      node: withModuleTooltip("shop", <DealsSection products={data.modules.shop ?? []} {...textFor("deals")} />),
     },
     {
       key: "tools",
-      node: <ToolsSection featured={data.toolsFeatured} {...textFor("tools")} />,
+      node: withModuleTooltip("tools", <ToolsSection featured={data.toolsFeatured} {...textFor("tools")} />),
     },
     {
       key: "community",
-      node: <CommunitySection topics={data.modules.forum ?? []} {...textFor("community")} />,
+      node: withModuleTooltip("forum", <CommunitySection topics={data.modules.forum ?? []} {...textFor("community")} />),
     },
     {
       key: "familyComments",
