@@ -97,6 +97,12 @@ export function InsightsSection({
     : fallbackStory;
   const previewStory = previewSlug ? storyBySlug.get(previewSlug) : undefined;
   const activeStory = previewStory ?? autoStory;
+  const showsCarouselProgress =
+    carouselStories.length > 1 &&
+    !previewSlug &&
+    !selectedComment &&
+    !reducedMotion &&
+    documentVisible;
 
   // The rotating default is intentionally paused by any direct interaction,
   // when the modal is open, in a background tab, and for reduced-motion
@@ -135,7 +141,12 @@ export function InsightsSection({
           {/* The card is a true 1:1 desktop panel. Its compact image/content
               split keeps the surrounding discussion column level with it. */}
           <div className="flex min-w-0 flex-col lg:aspect-square">
-            <LatestStory key={activeStory.slug} story={activeStory} />
+            <LatestStory
+              key={activeStory.slug}
+              story={activeStory}
+              showCarouselProgress={showsCarouselProgress}
+              progressKey={carouselIndex}
+            />
           </div>
 
           <div className="flex min-w-0 flex-col gap-6 lg:h-full">
@@ -190,11 +201,19 @@ function NewsActions() {
   );
 }
 
-function LatestStory({ story }: { story: ContentItem }) {
+function LatestStory({
+  story,
+  showCarouselProgress,
+  progressKey,
+}: {
+  story: ContentItem;
+  showCarouselProgress: boolean;
+  progressKey: number;
+}) {
   const fullScreenHref = `/${story.module}/${story.slug}`;
 
   return (
-    <article className="animate-in fade-in-0 flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-[color:color-mix(in_oklch,var(--insights-accent)_35%,var(--border))] bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)] duration-300 motion-reduce:animate-none">
+    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-[color:color-mix(in_oklch,var(--insights-accent)_35%,var(--border))] bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
       <div className="relative shrink-0 overflow-hidden bg-muted max-lg:aspect-video lg:h-[48%]">
         <RemoteImage
           src={story.image}
@@ -247,6 +266,15 @@ function LatestStory({ story }: { story: ContentItem }) {
           <NewsActions />
         </div>
       </div>
+
+      {showCarouselProgress && (
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1 bg-[color:color-mix(in_oklch,var(--insights-accent)_18%,transparent)]">
+          <span
+            key={progressKey}
+            className="hp-news-carousel-progress block h-full w-full bg-[color:var(--insights-accent)]"
+          />
+        </div>
+      )}
     </article>
   );
 }

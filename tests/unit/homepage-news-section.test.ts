@@ -90,6 +90,18 @@ describe("interactive News discussion panel", () => {
     expect(section).toMatch(/visibilitychange/);
   });
 
+  it("uses a smoother card swap and only shows the five-second timer in automatic mode", () => {
+    const css = read("design/globals.css");
+    expect(section).toMatch(/const showsCarouselProgress/);
+    expect(section).toMatch(/!previewSlug/);
+    expect(section).toMatch(/showCarouselProgress=\{showsCarouselProgress\}/);
+    expect(section).toMatch(/hp-news-carousel-progress/);
+    expect(section).toMatch(/hp-news-card-swap/);
+    expect(css).toMatch(/animation: hp-news-card-swap 700ms/);
+    expect(css).toMatch(/animation: hp-news-carousel-progress 5s linear/);
+    expect(css).toMatch(/transform-origin: right center/);
+  });
+
   it("previews the matching news on hover and focus, then restores the rotating default", () => {
     expect(section).toMatch(/onMouseEnter=\{\(\) => onPreview\(comment\.newsSlug\)\}/);
     expect(section).toMatch(/onFocusCapture=\{\(\) => onPreview\(comment\.newsSlug\)\}/);
