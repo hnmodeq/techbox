@@ -20,7 +20,7 @@ import {
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
 import { logDbFailure, noteDbSuccess, isDbUnreachable } from "@/lib/db-error";
-import { withCircuit, isCircuitOpenError } from "@/lib/db-circuit";
+import { withCircuit, isCircuitOpenError, circuitState } from "@/lib/db-circuit";
 
 /**
  * Run one homepage section, degrading to a fallback instead of taking the
@@ -643,6 +643,20 @@ const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v7"], {
 });
 
 export async function getHomeData(): Promise<HomeData> {
+  // Do not enter the cache when the breaker is already open.
+  //
+  // Every query inside would fail, and the deliberate "refuse to cache an
+  // empty homepage" throw would fire *inside* unstable_cache. Next reports
+  // that as a red dev overlay even though it is caught here and degrades
+  // correctly — so a transient pool hiccup looked like a crash.
+  //
+  // Skipping the doomed call removes the overlay for the common case and
+  // saves the work. A race is still possible (breaker closed on entry, all
+  // queries fail after) and is still handled by the catch below.
+  if (circuitState() === "open") {
+    return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
+  }
+
   try {
     return await cachedHomeData();
   } catch (e) {

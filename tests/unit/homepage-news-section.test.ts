@@ -50,6 +50,20 @@ describe("the section never navigates away", () => {
     expect(section).toMatch(/<ShareButton url=\{fullScreenHref\}/);
   });
 
+  it("puts the discussion beside the story, not beneath it", () => {
+    // Stacking left the newsletter column nearly empty and the section read
+    // as a tall band of whitespace.
+    expect(section).toMatch(/xl:grid-cols-\[minmax\(0,1\.15fr\)_minmax\(0,\.85fr\)_minmax\(300px,\.7fr\)\]/);
+    expect(section).toMatch(/lg:grid-cols-2/);
+  });
+
+  it("says something when the story has no comments yet", () => {
+    // The story can fall below the feature threshold; the column must not
+    // sit empty next to the card.
+    expect(section).toMatch(/هنوز دیدگاهی برای این خبر ثبت نشده/);
+    expect(section).toMatch(/comments\.length > 0 \?/);
+  });
+
   it("expands comments in place and mounts them lazily", () => {
     // CommentSection fetches on mount; this is the homepage.
     expect(section).toMatch(/\{open && \(\s*<CommentSection/);
@@ -129,5 +143,21 @@ describe("news excerpt bounds", () => {
 
   it("shows a live counter", () => {
     expect(editor).toMatch(/excerptWithinBounds/);
+  });
+});
+
+describe("the homepage degrades instead of throwing", () => {
+  const server = read("lib/home-server.ts");
+
+  it("does not enter the cache while the breaker is open", () => {
+    // Every query inside would fail and the deliberate "refuse to cache an
+    // empty homepage" throw would fire inside unstable_cache, which Next
+    // surfaces as a red dev overlay even though it is caught and handled.
+    expect(server).toMatch(/if \(circuitState\(\) === "open"\) \{/);
+    expect(server).toMatch(/import \{ withCircuit, isCircuitOpenError, circuitState \}/);
+  });
+
+  it("still catches the race where queries fail after entry", () => {
+    expect(server).toMatch(/return \{ modules: \{\}, ticker: \[\], generatedAt: new Date\(\)\.toISOString\(\) \};/);
   });
 });
