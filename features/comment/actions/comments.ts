@@ -34,8 +34,13 @@ export async function getCommentsAction(module: string, slug: string) {
       orderBy: { createdAt: "asc" },
       include: { author: { select: { name: true, username: true, avatar: true, verifiedType: true, verifiedLabel: true } } },
     });
-  } catch {
-    return [];
+  } catch (error) {
+    // A real failure (e.g. a dropped DB connection) must not be swallowed
+    // and shown to the reader as "no comments yet". Re-throwing lets the
+    // panel surface a load error with a retry instead of lying about an
+    // empty thread. Only a genuine no-comments result returns [] above.
+    console.error("[comments] failed to load comments:", error);
+    throw error;
   }
 }
 

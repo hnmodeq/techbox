@@ -90,7 +90,7 @@ function NewsActions() {
   };
 
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border pt-5">
+    <div className="mt-6 flex flex-wrap items-center gap-3">
       <button
         type="button"
         onClick={openSidebar}
@@ -113,9 +113,11 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
   const fullScreenHref = `/${story.module}/${story.slug}`;
 
   return (
-    // The card does not navigate. `group` drives a lift on hover so it reads
-    // as an object you can act on, without implying it is a link.
-    <article className="group">
+    // Rendered as a real panel so it reads as part of the same set as the
+    // discussion and newsletter cards to its left. The card does not
+    // navigate, and there is deliberately no hover lift — it is content,
+    // not a navigation target.
+    <article className="overflow-hidden rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
       {/* Square at lg and up.
           The left column carries the discussion panel stacked above the
           newsletter, which together run far taller than a 16/9 poster — so
@@ -123,34 +125,28 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
           under its actions. A 1:1 image absorbs most of that height.
 
           Below lg the columns stack and there is nothing to match, so the
-          wider 16/9 crop reads better on a phone. */}
+          wider 16/9 crop reads better on a phone.
+
+          The image is flush with the card's top edge; overflow-hidden clips
+          its corners to the panel radius so the photo and the surface read
+          as one object. */}
       <div
-        className="relative overflow-hidden bg-background max-lg:aspect-video lg:aspect-square"
+        className="relative overflow-hidden bg-muted max-lg:aspect-video lg:aspect-square"
       >
         <RemoteImage
           src={story.image}
           alt={story.title}
           sizes="(min-width: 1024px) 760px, 100vw"
           priority
-          className="transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
         />
       </div>
 
-      <div className="pt-5">
+      <div className="p-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-muted-foreground">
+          {/* Only the date lives here now — the comment count lives in the
+              discussion panel to the left, so the same number is not shown
+              twice on the page. */}
           <RelativeDate date={story.date} label="تاریخ انتشار" />
-          {(story.comments ?? 0) > 0 && (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <span className="cursor-default font-semibold text-[color:var(--insights-accent)]" />
-                }
-              >
-                <Num>{story.comments}</Num> دیدگاه
-              </TooltipTrigger>
-              <TooltipContent>تعداد دیدگاه‌های این خبر</TooltipContent>
-            </Tooltip>
-          )}
         </div>
 
         <h3 className="mt-2 text-[26px] font-bold leading-[38px] text-foreground md:text-[30px] md:leading-[42px]">

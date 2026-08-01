@@ -48,6 +48,7 @@ export default function CommentSection({ module, slug, initialComments, compact,
 }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // Use the shared AuthProvider — reads user from localStorage instantly
@@ -55,9 +56,14 @@ export default function CommentSection({ module, slug, initialComments, compact,
 
   const load = React.useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const data = await getCommentsAction(module, slug);
       setComments(nestFlat(data as any));
+    } catch {
+      // A failed fetch must not masquerade as "no comments yet". Keep the
+      // last known list and flag the error so the panel can offer a retry.
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -807,6 +813,15 @@ export default function CommentSection({ module, slug, initialComments, compact,
       >
         {loading ? (
           <CommentListSkeleton />
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
+            <p className="text-sm font-semibold paragraph-color">
+              بارگذاری دیدگاه‌ها با خطا مواجه شد.
+            </p>
+            <Button type="button" variant="outline" size="sm" onClick={() => { load(); }}>
+              تلاش دوباره
+            </Button>
+          </div>
         ) : comments.length === 0 ? (
           <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
         ) : (

@@ -10,31 +10,36 @@ const editor = read("app/admin/posts/new/page.tsx");
 const dialog = read("features/legal/components/TermsDialog.tsx");
 
 /** The selection rule, mirrored so the behaviour can be asserted directly. */
-const MIN_COMMENTS_FOR_FEATURE = 4;
 function pickFeatured(pool: Array<{ id: string }>, counts: Map<string, number>) {
-  const qualifying = pool.filter((p) => (counts.get(p.id) || 0) >= MIN_COMMENTS_FOR_FEATURE);
-  return (qualifying[0] ?? pool[0])?.id;
+  // Most approved comments in the window, ties broken by recency (the
+  // `pool` arrives date-desc and Array.prototype.sort is stable).
+  return [...pool].sort(
+    (a, b) => (counts.get(b.id) || 0) - (counts.get(a.id) || 0),
+  )[0]?.id;
 }
 
 describe("story selection", () => {
   // `pool` arrives date-desc.
   const pool = [{ id: "newest" }, { id: "mid" }, { id: "old" }];
 
-  it("prefers recency over popularity among qualifying stories", () => {
-    // The old rule sorted by comment count, which pinned the section to
-    // whatever went viral days ago — wrong under "آخرین خبر امروز".
+  it("leads with the recent story that has the most comments", () => {
+    // The section carries a comment rail and count, so surface the story
+    // people are actually discussing — not the newest regardless of
+    // engagement.
     const counts = new Map([["newest", 0], ["mid", 9], ["old", 50]]);
-    expect(pickFeatured(pool, counts)).toBe("mid");
+    expect(pickFeatured(pool, counts)).toBe("old");
   });
 
-  it("takes the newest as soon as it clears the threshold", () => {
-    const counts = new Map([["newest", 4], ["mid", 9], ["old", 50]]);
+  it("breaks ties toward the newest", () => {
+    const counts = new Map([["newest", 9], ["mid", 9], ["old", 9]]);
     expect(pickFeatured(pool, counts)).toBe("newest");
   });
 
-  it("falls back to the newest when nothing qualifies", () => {
-    // Common on a young site: the section must still render.
-    expect(pickFeatured(pool, new Map([["newest", 0], ["mid", 1]]))).toBe("newest");
+  it("falls back to the newest when none has comments", () => {
+    // Common on a young site: the section must still render. With no
+    // distinguishing comment count the stable sort keeps the date-desc
+    // order, so the newest story wins.
+    expect(pickFeatured(pool, new Map([["newest", 0], ["mid", 0]]))).toBe("newest");
     expect(pickFeatured(pool, new Map())).toBe("newest");
   });
 });

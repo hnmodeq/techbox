@@ -120,13 +120,6 @@ export function seededIndices(total: number, count: number, salt = 0): number[] 
 // §3 Latest Insights — the week's most-commented news
 // ═════════════════════════════════════════════════════════════════════
 
-/**
- * A story needs this many approved comments before it can be featured with
- * its discussion rail. Below it, the section falls back to the newest story
- * and the rail simply renders empty.
- */
-const MIN_COMMENTS_FOR_FEATURE = 4;
-
 function mapHighlightComment(row: any): HighlightComment | null {
   const name = row.author?.name || row.authorName || "";
   if (!name) return null;
@@ -184,24 +177,18 @@ export async function getLatestInsights(
   });
   const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
 
-  // Newest story that has a real discussion, else simply the newest.
+  // The lead is the recent story people are actually discussing: the one
+  // with the most approved comments in the window, breaking ties toward the
+  // newest. A strictly-newest rule would surface an empty story almost every
+  // time, and the section carries a comment rail, an inline reply box and a
+  // count — all dead space on something nobody has replied to.
   //
-  // The section is titled "آخرین خبر امروز" and carries a comment rail, an
-  // inline reply box and a comment count — all of which are dead space on a
-  // story nobody has replied to yet. At roughly four posts an hour a
-  // strictly-newest rule would surface an empty story almost every time.
-  //
-  // Sorting by comment count instead would pin the section to whatever went
-  // viral last week, which is not "today's latest". So: prefer recency, but
-  // only among stories that clear the bar.
-  //
-  // `pool` is already ordered date-desc from the query above, so the first
-  // match is the newest qualifying item. On a young site the fallback will
-  // fire often — tune the threshold rather than removing it.
-  const qualifying = pool.filter(
-    (post: any) => (countByPost.get(post.id) || 0) >= MIN_COMMENTS_FOR_FEATURE,
-  );
-  const featured = qualifying[0] ?? pool[0];
+  // `pool` is already ordered date-desc, and Array.prototype.sort is stable,
+  // so stories with equal comment counts keep their newest-first order.
+  const featured = [...pool].sort(
+    (a: any, b: any) =>
+      (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0),
+  )[0];
 
   // No comment rows are fetched here any more.
   //
