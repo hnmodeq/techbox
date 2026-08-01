@@ -27,6 +27,8 @@ export type SectionHeaderProps = {
   accentColor?: string;
   /** The Magazine line-and-action treatment. Defaults to on for all sections. */
   rule?: boolean;
+  /** Custom controls aligned with the standard "see all" action. */
+  actions?: React.ReactNode;
   className?: string;
 };
 
@@ -43,6 +45,7 @@ export function SectionHeader({
   onDark = false,
   accentColor,
   rule = true,
+  actions,
   className,
 }: SectionHeaderProps) {
   const style: HeaderStyle = {
@@ -70,7 +73,7 @@ export function SectionHeader({
           />
         )}
 
-        {href && (
+        {actions ?? (href && (
           <Link
             href={href}
             className={cn(
@@ -81,7 +84,7 @@ export function SectionHeader({
             {/* RTL: "forward" is a LEFT arrow */}
             {linkLabel} <span aria-hidden="true">←</span>
           </Link>
-        )}
+        ))}
       </div>
 
       {description && (

@@ -845,7 +845,7 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
 }
 
 @keyframes hp-news-card-swap {
-  from { opacity: 0.38; transform: translateY(8px); }
+  from { opacity: 0.38; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 

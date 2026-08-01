@@ -19,13 +19,12 @@ import type { LatestInsights, NewsHighlightComment } from "@/features/home/lib/h
 import { SectionShell, SectionHeader } from "../primitives";
 import { NewsletterCard } from "./NewsletterCard";
 import { NewsModal } from "@/features/news/components/NewsModal";
-import { Num } from "@/components/ui/num";
 import { AuthorLink } from "@/components/ui/author-link";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { RelativeDate } from "@/components/ui/relative-date";
 import { ShareButton } from "@/components/ui/share-button";
 import { Tooltip, TooltipColorScope, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { MessageCircle, Maximize2 } from "lucide-react";
+import { Maximize2 } from "lucide-react";
 
 export type InsightsSectionProps = {
   data?: LatestInsights;
@@ -135,9 +134,10 @@ export function InsightsSection({
           title={title}
           description="خبرهای تازه و گفتگوهای واقعی خوانندگان؛ هر دیدگاه شما را به خبر مربوط به آن می‌برد."
           accentColor={accentColor}
+          actions={<NewsActions header />}
         />
 
-        <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,.85fr)] lg:gap-10">
+        <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-10">
           {/* The card is a true 1:1 desktop panel. Its compact image/content
               split keeps the surrounding discussion column level with it. */}
           <div className="flex min-w-0 flex-col lg:aspect-square">
@@ -174,15 +174,15 @@ export function InsightsSection({
   );
 }
 
-/** The deliberate routes out of the homepage section, kept inside its card
- * so the two desktop columns finish at the same height. */
-function NewsActions() {
+/** The deliberate routes out of the homepage section, aligned in its shared
+ * header line so neither desktop column needs an extra action strip. */
+function NewsActions({ header = false }: { header?: boolean }) {
   const openSidebar = () => {
     window.dispatchEvent(new CustomEvent("tb_open_news_sidebar"));
   };
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2">
+    <div className={`${header ? "shrink-0" : "mt-4"} flex flex-wrap items-center gap-2`}>
       <button
         type="button"
         onClick={openSidebar}
@@ -213,7 +213,7 @@ function LatestStory({
   const fullScreenHref = `/${story.module}/${story.slug}`;
 
   return (
-    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-[color:color-mix(in_oklch,var(--insights-accent)_35%,var(--border))] bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
+    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--hp-r-md)] bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
       <div className="relative shrink-0 overflow-hidden bg-muted max-lg:aspect-video lg:h-[48%]">
         <RemoteImage
           src={story.image}
@@ -239,7 +239,7 @@ function LatestStory({
         </h3>
 
         {story.excerpt && (
-          <p className="mt-2 line-clamp-3 text-[14px] leading-[25px] text-muted-foreground">
+          <p className="mt-2 line-clamp-5 text-[14px] leading-[25px] text-muted-foreground">
             {story.excerpt}
           </p>
         )}
@@ -263,7 +263,6 @@ function LatestStory({
 
             <ShareButton url={fullScreenHref} label="اشتراک‌گذاری" className="min-h-9 text-[12px]" />
           </div>
-          <NewsActions />
         </div>
       </div>
 
@@ -296,41 +295,31 @@ function NewsDiscussion({
 }) {
   return (
     <section
-      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-border/70 bg-transparent p-5 sm:p-6"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--hp-r-md)] bg-transparent p-3 sm:p-4"
       onMouseLeave={onLeavePreview}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onLeavePreview();
       }}
       aria-label="گفتگوهای داغ خبرها"
     >
-      <h4 className="flex shrink-0 items-center gap-2 border-b border-border pb-4 text-[13px] font-extrabold tracking-[0.04em] text-foreground">
-        <MessageCircle className="size-4 text-[color:var(--insights-accent)]" aria-hidden="true" />
-        گفتگوهای داغ
-        {comments.length > 0 && (
-          <span className="font-semibold text-muted-foreground">
-            (<Num>{comments.length}</Num> گفتگو)
-          </span>
-        )}
-      </h4>
-
       {comments.length === 0 ? (
         <p className="my-auto text-center text-sm font-semibold text-muted-foreground">
           هنوز گفتگویی برای خبرهای تازه ثبت نشده است.
         </p>
       ) : (
         <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain pt-1"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
           style={{ scrollbarWidth: "thin" }}
         >
-          {comments.map((comment) => {
+          {comments.map((comment, index) => {
             const isActive = comment.newsSlug === activeNewsSlug;
             const parentStory = storiesBySlug.get(comment.newsSlug);
             return (
+              <React.Fragment key={comment.id}>
               <article
-                key={comment.id}
-                className={`relative my-1 rounded-[var(--hp-r-sm)] border-b border-[color:var(--hp-rule)] px-3 py-4 transition-[background-color,box-shadow] last:border-b-0 ${
+                className={`relative rounded-[var(--hp-r-sm)] px-3 py-4 transition-[box-shadow,color] ${
                   isActive
-                    ? "bg-[color:color-mix(in_oklch,var(--insights-accent)_16%,transparent)] ring-1 ring-[color:color-mix(in_oklch,var(--insights-accent)_35%,transparent)]"
+                    ? "ring-1 ring-[color:color-mix(in_oklch,var(--insights-accent)_45%,transparent)]"
                     : ""
                 }`}
                 onMouseEnter={() => onPreview(comment.newsSlug)}
@@ -375,15 +364,21 @@ function NewsDiscussion({
                     aria-label="باز کردن گفتگوی این خبر"
                   >
                     <span aria-hidden="true">•</span>
-                    <span>ارسال‌شده</span>
                     <RelativeDate
                       date={comment.date}
-                      label="تاریخ دیدگاه"
                       className="text-[12px] text-muted-foreground"
                     />
                   </button>
                 </div>
               </article>
+              {index < comments.length - 1 && (
+                <div
+                  aria-hidden="true"
+                  role="separator"
+                  className="mx-3 h-px bg-[color:var(--hp-rule)]"
+                />
+              )}
+              </React.Fragment>
             );
           })}
         </div>
