@@ -214,7 +214,7 @@ function NewsDiscussion({
   story: NonNullable<LatestInsights["story"]>;
 }) {
   return (
-    <section className="flex min-h-0 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
+    <section className="flex min-h-0 h-200 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
       <h4 className="mb-1 flex items-center gap-2 text-[13px] font-bold text-foreground">
         <MessageCircle className="size-4 text-[color:var(--insights-accent)]" aria-hidden="true" />
         گفتگوی خوانندگان
