@@ -120,6 +120,13 @@ export function seededIndices(total: number, count: number, salt = 0): number[] 
 // §3 Latest Insights — the week's most-commented news
 // ═════════════════════════════════════════════════════════════════════
 
+/**
+ * A story needs this many approved comments before it can be featured with
+ * its discussion rail. Below it, the section falls back to the newest story
+ * and the rail simply renders empty.
+ */
+const MIN_COMMENTS_FOR_FEATURE = 4;
+
 function mapHighlightComment(row: any): HighlightComment | null {
   const name = row.author?.name || row.authorName || "";
   if (!name) return null;
@@ -176,11 +183,25 @@ export async function getLatestInsights(
     where: { postId: { in: pool.map((post: any) => post.id) }, status: "approved", deletedAt: null },
   });
   const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
-  const featured = [...pool].sort((a: any, b: any) => {
-    const countDifference = (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0);
-    if (countDifference !== 0) return countDifference;
-    return b.date.getTime() - a.date.getTime();
-  })[0];
+
+  // Newest story that has a real discussion, else simply the newest.
+  //
+  // The section is titled "آخرین خبر امروز" and carries a comment rail, an
+  // inline reply box and a comment count — all of which are dead space on a
+  // story nobody has replied to yet. At roughly four posts an hour a
+  // strictly-newest rule would surface an empty story almost every time.
+  //
+  // Sorting by comment count instead would pin the section to whatever went
+  // viral last week, which is not "today's latest". So: prefer recency, but
+  // only among stories that clear the bar.
+  //
+  // `pool` is already ordered date-desc from the query above, so the first
+  // match is the newest qualifying item. On a young site the fallback will
+  // fire often — tune the threshold rather than removing it.
+  const qualifying = pool.filter(
+    (post: any) => (countByPost.get(post.id) || 0) >= MIN_COMMENTS_FOR_FEATURE,
+  );
+  const featured = qualifying[0] ?? pool[0];
 
   const rows = await prisma.comment.findMany({
     where: {
@@ -190,7 +211,9 @@ export async function getLatestInsights(
       deletedAt: null,
     },
     orderBy: [{ likes: "desc" }, { createdAt: "desc" }],
-    take: 3,
+    // The rail scrolls, so it can show more than the three that fitted
+    // before. Still bounded — this rides on every homepage render.
+    take: 10,
     select: {
       id: true,
       text: true,
