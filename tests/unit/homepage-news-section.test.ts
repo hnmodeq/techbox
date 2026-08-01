@@ -63,67 +63,50 @@ describe("the section never navigates away", () => {
     expect(storyCol).toMatch(/<NewsActions \/>/);
   });
 
-  it("says something when the story has no comments yet", () => {
-    // The story can fall below the feature threshold; the column must not
-    // sit empty next to the card.
-    expect(section).toMatch(/هنوز دیدگاهی برای این خبر ثبت نشده/);
-    expect(section).toMatch(/comments\.length > 0 \?/);
-  });
-
-  it("shows the comments open and scrollable, with a composer", () => {
-    // Same mechanism as the news sidebar: no toggle, the comments ARE the
-    // point of the column.
+  it("shows the thread open and scrollable, with a composer", () => {
+    // Same shape as the news sidebar: no toggle, because the comments are
+    // the point of this column.
     expect(section).not.toMatch(/همه دیدگاه‌ها و ثبت دیدگاه/);
     expect(section).not.toMatch(/aria-expanded/);
-    expect(section).toMatch(/overflow-y-auto/);
-    expect(section).toMatch(/<CommentSection/);
+    expect(section).toMatch(/listMaxHeight="360px"/);
   });
 
-  it("does not render the thread twice", () => {
-    // The rail already lists the server-rendered comments, so
-    // CommentSection is mounted for its composer only.
-    expect(section).toMatch(/hideList/);
+  it("keeps one source of truth for the thread", () => {
+    // An earlier version paired a server-rendered rail with a hidden
+    // CommentSection mounted only for its composer. Posting refetched the
+    // hidden list while the visible rail came from an hour-cached server
+    // payload, so a new comment appeared nowhere.
     const cs = read("features/comment/components/CommentSection.tsx");
-    expect(cs).toMatch(/\{!hideList && \(/);
+    expect(section).not.toMatch(/hideList/);
+    expect(cs).not.toMatch(/hideList/);
+    expect(section).not.toMatch(/LatestCommentRow/);
+    // CommentSection reloads its own list after a successful post.
+    expect(cs).toMatch(/startTransition\(\(\) => \{ load\(\); \}\)/);
   });
 
-  it("hides the header action", () => {
-    const header = section.slice(section.indexOf("<SectionHeader"), section.indexOf("<NewsActions"));
-    expect(header).not.toMatch(/href=/);
-    expect(section).toMatch(/title = "آخرین خبر امروز"/);
-  });
-});
-
-describe("section actions", () => {
-  it("opens the sidebar by event, with no network cost", () => {
-    expect(section).toMatch(/new CustomEvent\("tb_open_news_sidebar"\)/);
-    expect(shell).toMatch(/addEventListener\("tb_open_news_sidebar", open\)/);
-    expect(shell).toMatch(/removeEventListener\("tb_open_news_sidebar", open\)/);
-  });
-
-  it("links the archive", () => {
-    expect(section).toMatch(/href="\/news"/);
-    expect(section).toMatch(/بایگانی خبرهای قدیمی‌تر/);
+  it("scrolls the list but leaves the composer reachable", () => {
+    const cs = read("features/comment/components/CommentSection.tsx");
+    expect(cs).toMatch(/listMaxHeight \? "overflow-y-auto overscroll-contain pe-1" : ""/);
+    expect(cs).toMatch(/maxHeight: listMaxHeight/);
+    // The form is rendered before the list and outside the scroll region.
+    expect(cs.indexOf("handleTopSubmit}")).toBeLessThan(cs.indexOf("listMaxHeight ? { maxHeight"));
   });
 });
 
-describe("comment rows", () => {
-  it("links avatars and names to the author profile", () => {
-    expect(section).toMatch(/\/author\/\$\{author\.username\}/);
-    expect(section).toMatch(/بازدید از حساب کاربری \$\{author\.name\}/);
+describe("comment metadata", () => {
+  const cs = read("features/comment/components/CommentSection.tsx");
+
+  it("links comment authors to their profile", () => {
+    // AuthorLink resolves a slug from the username, falling back to a
+    // name map, so guests still render as a link rather than breaking.
+    expect(cs).toMatch(/<AuthorLink/);
   });
 
-  it("degrades to plain text for guests with no username", () => {
-    // author.username is nullable; a dead link would be worse than none.
-    expect(section).toMatch(/author\.username \? `\/author\/\$\{author\.username\}` : null/);
-    expect(section).toMatch(/profileHref \?/);
-  });
-
-  it("uses RelativeDate everywhere, so tooltips come free", () => {
-    expect(section).toMatch(/<RelativeDate date=\{story\.date\} label="تاریخ انتشار"/);
-    expect(section).toMatch(/<RelativeDate date=\{comment\.date\} label="تاریخ دیدگاه"/);
-    expect(section).not.toMatch(/\{story\.date_fa\}/);
-    expect(section).not.toMatch(/\{comment\.dateFa\}/);
+  it("uses RelativeDate for comment timestamps", () => {
+    // The old tooltip said "date of this comment", which the relative
+    // label already implies. RelativeDate shows the real Jalali date.
+    expect(cs).toMatch(/<RelativeDate\s+date=\{\(c as any\)\.createdAt\}/);
+    expect(cs).toMatch(/label="تاریخ دیدگاه"/);
   });
 });
 

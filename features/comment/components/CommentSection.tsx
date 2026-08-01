@@ -10,6 +10,7 @@ import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthorLink } from "@/components/ui/author-link";
 import { formatRelativeTime } from "@/lib/date-format";
+import { RelativeDate } from "@/components/ui/relative-date";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { toast } from "sonner";
@@ -30,20 +31,19 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-export default function CommentSection({ module, slug, initialComments, compact, hideList }: {
+export default function CommentSection({ module, slug, initialComments, compact, listMaxHeight }: {
   module: string;
   slug: string;
   initialComments?: number;
   compact?: boolean;
   /**
-   * Render only the composer, not the thread.
+   * Make the thread its own scroll region, capped at this CSS height.
    *
-   * The homepage news panel already shows the server-rendered comments in
-   * its own rail — with avatars and profile links this generic list does
-   * not have — so repeating them directly underneath would show every
-   * comment twice.
+   * For panels embedded in a page column — the homepage news section — an
+   * unbounded list would push everything below it off screen. The composer
+   * stays outside the scroller so it is always reachable.
    */
-  hideList?: boolean;
+  listMaxHeight?: string;
 }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -374,12 +374,14 @@ export default function CommentSection({ module, slug, initialComments, compact,
                         <TooltipContent>ویرایش شده در {formatRelativeTime((c as any).editedAt)}</TooltipContent>
                       </Tooltip>
                     )}
-                    <Tooltip>
-                      <TooltipTrigger render={<span className="text-[11px] paragraph-color shrink-0 cursor-default" />}>
-                        {formatRelativeTime((c as any).createdAt)}
-                      </TooltipTrigger>
-                      <TooltipContent>تاریخ انتشار این دیدگاه</TooltipContent>
-                    </Tooltip>
+                    {/* RelativeDate carries the real Jalali date in its
+                        tooltip; the old one just said "date of this comment",
+                        which the relative label already implies. */}
+                    <RelativeDate
+                      date={(c as any).createdAt}
+                      label="تاریخ دیدگاه"
+                      className="text-[11px] paragraph-color shrink-0"
+                    />
                   </div>
                 </div>
                 {/* Parsed comment: show text above strength/weakness */}
@@ -784,17 +786,19 @@ export default function CommentSection({ module, slug, initialComments, compact,
         </div>
       )}
 
-      {!hideList && (
-        <div className="space-y-1 min-h-[60px]">
-          {loading ? (
-            <CommentListSkeleton />
-          ) : comments.length === 0 ? (
-            <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
-          ) : (
-            sortedComments.map(c => renderNode(c, 0))
-          )}
-        </div>
-      )}
+      <div
+        className={`space-y-1 min-h-[60px] ${listMaxHeight ? "overflow-y-auto overscroll-contain pe-1" : ""}`}
+        style={listMaxHeight ? { maxHeight: listMaxHeight, scrollbarWidth: "thin" } : undefined}
+        {...(listMaxHeight ? { tabIndex: 0, "aria-label": "فهرست دیدگاه‌ها" } : {})}
+      >
+        {loading ? (
+          <CommentListSkeleton />
+        ) : comments.length === 0 ? (
+          <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
+        ) : (
+          sortedComments.map(c => renderNode(c, 0))
+        )}
+      </div>
     </section>
   );
 }

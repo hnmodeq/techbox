@@ -109,7 +109,8 @@ describe("homepage Video and Latest contracts", () => {
     expect(data).not.toMatch(/countDifference/);
     // Comments stay real and approved-only.
     expect(data).toMatch(/status: "approved"/);
-    expect(insights).toMatch(/data\?\.comments/);
+    // The section no longer renders a server-side comment rail; the live
+    // CommentSection owns the thread. Selection is still asserted above.
   });
 
   it("keeps the news section navigation-free", () => {
@@ -120,7 +121,7 @@ describe("homepage Video and Latest contracts", () => {
     expect(insights).toMatch(/<ShareButton url=\{fullScreenHref\}/);
     // Comments render in place, with a composer, like the news sidebar.
     expect(insights).toMatch(/<CommentSection/);
-    expect(insights).toMatch(/hideList/);
+    expect(insights).toMatch(/listMaxHeight/);
   });
 
   it("lets the page own the section background, not the section", () => {
