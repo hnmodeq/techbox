@@ -77,7 +77,7 @@ describe("the section never navigates away", () => {
     // the point of this column.
     expect(section).not.toMatch(/همه دیدگاه‌ها و ثبت دیدگاه/);
     expect(section).not.toMatch(/aria-expanded/);
-    expect(section).toMatch(/listMaxHeight="360px"/);
+    expect(section).toMatch(/fillHeight/);
   });
 
   it("keeps one source of truth for the thread", () => {
@@ -93,12 +93,21 @@ describe("the section never navigates away", () => {
     expect(cs).toMatch(/startTransition\(\(\) => \{ load\(\); \}\)/);
   });
 
-  it("scrolls the list but leaves the composer reachable", () => {
+  it("lets the list fill the panel rather than pinning a fixed height", () => {
+    // A fixed cap leaves dead space the moment the panel is made taller —
+    // which is exactly what happened when the panel grew to h-200 while the
+    // scroller stayed at 360px.
     const cs = read("features/comment/components/CommentSection.tsx");
-    expect(cs).toMatch(/listMaxHeight \? "overflow-y-auto overscroll-contain pe-1" : ""/);
-    expect(cs).toMatch(/maxHeight: listMaxHeight/);
-    // The form is rendered before the list and outside the scroll region.
-    expect(cs.indexOf("handleTopSubmit}")).toBeLessThan(cs.indexOf("listMaxHeight ? { maxHeight"));
+    expect(cs).toMatch(/min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1/);
+    // flex-1 only resolves if the section itself is a flex column.
+    expect(cs).toMatch(/fillHeight \? "flex min-h-0 flex-1 flex-col" : ""/);
+    // The panel must therefore have a height for it to fill.
+    expect(section).toMatch(/h-200/);
+  });
+
+  it("keeps the composer outside the scroll region", () => {
+    const cs = read("features/comment/components/CommentSection.tsx");
+    expect(cs.indexOf("handleTopSubmit}")).toBeLessThan(cs.indexOf("فهرست دیدگاه‌ها"));
   });
 });
 

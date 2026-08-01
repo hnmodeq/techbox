@@ -121,7 +121,7 @@ describe("homepage Video and Latest contracts", () => {
     expect(insights).toMatch(/<ShareButton url=\{fullScreenHref\}/);
     // Comments render in place, with a composer, like the news sidebar.
     expect(insights).toMatch(/<CommentSection/);
-    expect(insights).toMatch(/listMaxHeight/);
+    expect(insights).toMatch(/fillHeight/);
   });
 
   it("lets the page own the section background, not the section", () => {

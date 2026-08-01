@@ -31,19 +31,20 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-export default function CommentSection({ module, slug, initialComments, compact, listMaxHeight }: {
+export default function CommentSection({ module, slug, initialComments, compact, fillHeight }: {
   module: string;
   slug: string;
   initialComments?: number;
   compact?: boolean;
   /**
-   * Make the thread its own scroll region, capped at this CSS height.
+   * Let the thread grow to fill the parent instead of a fixed cap.
    *
-   * For panels embedded in a page column — the homepage news section — an
-   * unbounded list would push everything below it off screen. The composer
-   * stays outside the scroller so it is always reachable.
+   * Use when the embedding panel already has a height of its own: the list
+   * takes whatever is left after the composer, so changing the panel height
+   * needs no matching change here. Requires the parent to be a flex column
+   * with a resolved height.
    */
-  listMaxHeight?: string;
+  fillHeight?: boolean;
 }) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
@@ -584,7 +585,18 @@ export default function CommentSection({ module, slug, initialComments, compact,
   }, 0);
 
   return (
-    <section className={compact ? "mt-2 pt-2" : "mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10"}>
+    <section
+      className={
+        compact
+          ? // `fillHeight` makes this a flex column so the list below can
+            // grow into whatever height the embedding panel has. Without
+            // it the section is block-level, the list's flex-1 has nothing
+            // to resolve against, and the scroller keeps its own height
+            // while the panel stretches — leaving dead space underneath.
+            `mt-2 pt-2 ${fillHeight ? "flex min-h-0 flex-1 flex-col" : ""}`
+          : "mt-14 border-t-[length:var(--border-size)] border-[var(--border-color)] pt-10"
+      }
+    >
       {!compact && (
         <div className="flex items-center justify-between mb-6">
           {loading ? (
@@ -787,9 +799,11 @@ export default function CommentSection({ module, slug, initialComments, compact,
       )}
 
       <div
-        className={`space-y-1 min-h-[60px] ${listMaxHeight ? "overflow-y-auto overscroll-contain pe-1" : ""}`}
-        style={listMaxHeight ? { maxHeight: listMaxHeight, scrollbarWidth: "thin" } : undefined}
-        {...(listMaxHeight ? { tabIndex: 0, "aria-label": "فهرست دیدگاه‌ها" } : {})}
+        className={`space-y-1 min-h-[60px] ${
+          fillHeight ? "min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1" : ""
+        }`}
+        style={fillHeight ? { scrollbarWidth: "thin" } : undefined}
+        {...(fillHeight ? { tabIndex: 0, "aria-label": "فهرست دیدگاه‌ها" } : {})}
       >
         {loading ? (
           <CommentListSkeleton />
