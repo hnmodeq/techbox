@@ -79,10 +79,14 @@ describe("homepage Video and Latest contracts", () => {
     expect(data).toMatch(/seenAuthors\.has\(key\)/);
   });
 
-  it("renders the comment cards as squares", () => {
+  it("renders the comment cards at a fixed aspect ratio", () => {
+    // The exact ratio is a design choice and has already been retuned
+    // (1/1 -> 2/1). What must not regress is that the card is ratio-driven
+    // at all, and that the quote can shrink inside it — without min-h-0 and
+    // a line clamp, a long comment forces the box taller and the ratio
+    // silently stops holding.
     const card = video.slice(video.indexOf("function VideoCommentCard"));
-    expect(card).toMatch(/aspectRatio: "1\/1"/);
-    // A fixed ratio only holds if the quote block can shrink inside it.
+    expect(card).toMatch(/aspectRatio: "\d+\/\d+"/);
     expect(card).toMatch(/min-h-0 min-w-0 flex-1 overflow-hidden/);
     expect(card).toMatch(/line-clamp-4/);
     expect(card).not.toMatch(/min-h-\[210px\]/);
