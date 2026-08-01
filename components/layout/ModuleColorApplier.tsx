@@ -31,14 +31,15 @@ export function ModuleColorApplier() {
       }
     }
 
-    return () => {
-      // The component only unmounts with the application shell. Removing the
-      // runtime overrides prevents a stale colour set surviving hot reloads.
-      for (const slug of COLORABLE_MODULE_SLUGS) {
-        root.style.removeProperty(`--module-${slug}-color`);
-      }
-      delete root.dataset.moduleColors;
-    };
+    // Do not remove the variables in an effect cleanup. RootLayout writes
+    // the same values into the initial <html style>, and React Strict Mode
+    // deliberately runs setup → cleanup → setup in development. Cleaning the
+    // root in that middle step briefly exposed the blue --primary fallback
+    // before the configured colour was applied again.
+    //
+    // The next effect removes values explicitly when the colour system is
+    // disabled, and a full document navigation replaces <html>, so a cleanup
+    // here would only create a visible flash.
   }, [moduleColors, moduleColorsEnabled]);
 
   return null;

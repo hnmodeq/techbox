@@ -1,10 +1,17 @@
 # The localhost non-stop refresh loop — diagnosis
 
-## Short answer
+## Current local-development policy
 
-`next.config.mjs` applies production security headers (CSP) and
-`immutable` cache headers **in development too**. Both break `next dev`.
-The service worker was never the cause.
+`pnpm dev` and `pnpm dev:clean` use **Webpack** by default. The production
+build is unchanged; this only avoids a Windows/Turbopack HMR reload loop seen
+with stale browser chunks. `pnpm dev:turbo` and `pnpm dev:turbo:clean` remain
+available as explicit opt-ins once a browser profile has been verified clean.
+
+## Original diagnosis
+
+`next.config.mjs` applied production security headers (CSP) and `immutable`
+cache headers **in development too**. Both break `next dev`. The service worker
+was never the cause.
 
 ## Why the previous three fixes didn't work
 

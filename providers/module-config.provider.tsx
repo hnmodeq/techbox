@@ -80,6 +80,14 @@ export function ModuleConfigProvider({
   );
 
   useEffect(() => {
+    // RootLayout has already read this exact configuration on the server and
+    // serialized it into the first HTML response. Refetching it immediately
+    // after hydration made every page compete for a DB connection and could
+    // swap the server-rendered module colour for a late client value (the
+    // visible blue → orange flash on Magazine). Only recover client-side when
+    // the server could not provide a config at all.
+    if (serverConfig) return;
+
     fetch("/api/modules/enabled", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -102,7 +110,7 @@ export function ModuleConfigProvider({
       .catch(() => {
         setConfig((prev) => ({ ...prev, loading: false }));
       });
-  }, []);
+  }, [serverConfig]);
 
   const value = useMemo(() => config, [config]);
   return <ModuleConfigContext.Provider value={value}>{children}</ModuleConfigContext.Provider>;
