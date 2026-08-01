@@ -30,7 +30,21 @@ function nestFlat(rows: any[]): CommentNode[] {
   return roots;
 }
 
-export default function CommentSection({ module, slug, initialComments, compact }: { module: string; slug: string; initialComments?: number; compact?: boolean }) {
+export default function CommentSection({ module, slug, initialComments, compact, hideList }: {
+  module: string;
+  slug: string;
+  initialComments?: number;
+  compact?: boolean;
+  /**
+   * Render only the composer, not the thread.
+   *
+   * The homepage news panel already shows the server-rendered comments in
+   * its own rail — with avatars and profile links this generic list does
+   * not have — so repeating them directly underneath would show every
+   * comment twice.
+   */
+  hideList?: boolean;
+}) {
   const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
@@ -770,15 +784,17 @@ export default function CommentSection({ module, slug, initialComments, compact 
         </div>
       )}
 
-      <div className="space-y-1 min-h-[60px]">
-        {loading ? (
-          <CommentListSkeleton />
-        ) : comments.length === 0 ? (
-          <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
-        ) : (
-          sortedComments.map(c => renderNode(c, 0))
-        )}
-      </div>
+      {!hideList && (
+        <div className="space-y-1 min-h-[60px]">
+          {loading ? (
+            <CommentListSkeleton />
+          ) : comments.length === 0 ? (
+            <p className="text-sm font-semibold paragraph-color text-center py-6">هنوز دیدگاهی برای این مطلب ثبت نشده است. اولین نفر باشید!</p>
+          ) : (
+            sortedComments.map(c => renderNode(c, 0))
+          )}
+        </div>
+      )}
     </section>
   );
 }

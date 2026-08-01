@@ -51,10 +51,16 @@ describe("the section never navigates away", () => {
   });
 
   it("puts the discussion beside the story, not beneath it", () => {
-    // Stacking left the newsletter column nearly empty and the section read
-    // as a tall band of whitespace.
-    expect(section).toMatch(/xl:grid-cols-\[minmax\(0,1\.15fr\)_minmax\(0,\.85fr\)_minmax\(300px,\.7fr\)\]/);
-    expect(section).toMatch(/lg:grid-cols-2/);
+    // Story on the right (first in RTL); discussion and newsletter stacked
+    // in the left column so neither leaves a band of whitespace.
+    expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.25fr\)_minmax\(320px,\.75fr\)\]/);
+    const left = section.slice(section.indexOf("<NewsDiscussion"), section.indexOf("</div>", section.indexOf("<NewsDiscussion")));
+    expect(left).toMatch(/<NewsletterCard/);
+  });
+
+  it("puts the section actions under the story card", () => {
+    const storyCol = section.slice(section.indexOf("<LatestStory"), section.indexOf("<div className=\"flex min-w-0"));
+    expect(storyCol).toMatch(/<NewsActions \/>/);
   });
 
   it("says something when the story has no comments yet", () => {
@@ -64,11 +70,21 @@ describe("the section never navigates away", () => {
     expect(section).toMatch(/comments\.length > 0 \?/);
   });
 
-  it("expands comments in place and mounts them lazily", () => {
-    // CommentSection fetches on mount; this is the homepage.
-    expect(section).toMatch(/\{open && \(\s*<CommentSection/);
-    expect(section).toMatch(/grid-rows-\[1fr\]/);
+  it("shows the comments open and scrollable, with a composer", () => {
+    // Same mechanism as the news sidebar: no toggle, the comments ARE the
+    // point of the column.
+    expect(section).not.toMatch(/همه دیدگاه‌ها و ثبت دیدگاه/);
+    expect(section).not.toMatch(/aria-expanded/);
     expect(section).toMatch(/overflow-y-auto/);
+    expect(section).toMatch(/<CommentSection/);
+  });
+
+  it("does not render the thread twice", () => {
+    // The rail already lists the server-rendered comments, so
+    // CommentSection is mounted for its composer only.
+    expect(section).toMatch(/hideList/);
+    const cs = read("features/comment/components/CommentSection.tsx");
+    expect(cs).toMatch(/\{!hideList && \(/);
   });
 
   it("hides the header action", () => {
