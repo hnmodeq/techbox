@@ -64,11 +64,21 @@ export function InsightsSection({
 
       <NewsActions />
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(340px,.8fr)] lg:gap-10">
+      {/* Three tracks at xl: story · discussion · newsletter.
+          Stacking the comments under the story left the newsletter column
+          almost entirely empty, so the section read as a tall column of
+          whitespace. Side by side, the discussion fills that space and the
+          reader can see the story and the reaction to it at once.
+
+          At lg the newsletter drops below and story/comments stay paired;
+          below lg everything stacks. */}
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)_minmax(300px,.7fr)]">
         {/* In RTL, the first grid column is the right-hand lead. */}
         <div className="min-w-0">
           <LatestStory story={story} />
+        </div>
 
+        <div className="min-w-0">
           <CommentDisclosure
             story={story}
             comments={comments}
@@ -77,7 +87,7 @@ export function InsightsSection({
           />
         </div>
 
-        <aside className="flex min-w-0 flex-col gap-6">
+        <aside className="min-w-0 lg:col-span-2 xl:col-span-1">
           <NewsletterCard accentColor={accentColor} />
         </aside>
       </div>
@@ -207,18 +217,27 @@ function CommentDisclosure({
   onToggle: () => void;
 }) {
   return (
-    <div className="mt-6 border-t border-border pt-4">
-      {comments.length > 0 && (
+    <div className="flex h-full flex-col">
+      <h4 className="mb-3 text-[13px] font-bold text-muted-foreground">
+        گفتگوی خوانندگان
+      </h4>
+      {comments.length > 0 ? (
         <section
           aria-label="دیدگاه‌های خبر منتخب"
           tabIndex={0}
-          className="max-h-[320px] overflow-y-auto overscroll-contain focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="max-h-[420px] flex-1 overflow-y-auto overscroll-contain focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           style={{ scrollbarWidth: "thin" }}
         >
           {comments.map((comment) => (
             <LatestCommentRow key={comment.id} comment={comment} />
           ))}
         </section>
+      ) : (
+        // The story can fall below the comment threshold, so this column
+        // must say something rather than sitting empty next to the card.
+        <p className="flex-1 text-[13px] leading-[22px] text-muted-foreground">
+          هنوز دیدگاهی برای این خبر ثبت نشده. اولین نفر باشید.
+        </p>
       )}
 
       <button
@@ -228,7 +247,11 @@ function CommentDisclosure({
         className="mt-3 inline-flex min-h-11 items-center gap-2 text-[13px] font-bold text-[color:var(--insights-accent)] transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <MessageCircle className="size-4" aria-hidden="true" />
-        {open ? "بستن دیدگاه‌ها" : "همه دیدگاه‌ها و ثبت دیدگاه"}
+        {open
+          ? "بستن دیدگاه‌ها"
+          : comments.length > 0
+            ? "همه دیدگاه‌ها و ثبت دیدگاه"
+            : "ثبت دیدگاه"}
       </button>
 
       {/* Grid-rows transition instead of Motion: this section is in the
