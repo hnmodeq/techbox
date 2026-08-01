@@ -15,6 +15,42 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = new URL(req.url);
+
+  // Bulk form: ?commentIds=a,b,c
+  //
+  // Every CommentVote button used to fetch its own state on mount, so a
+  // thread of 20 comments fired 20 requests, each doing a session lookup
+  // plus two queries — 60 queries to render one page. On a small pool that
+  // is a reliable P2024, and the log showed these taking 2-3s apiece.
+  const bulk = searchParams.get("commentIds");
+  if (bulk) {
+    const ids = bulk.split(",").map((id) => id.trim()).filter(Boolean).slice(0, 100);
+    if (ids.length === 0) return NextResponse.json({ votes: {} });
+    try {
+      const [votes, comments] = await Promise.all([
+        prisma.commentVote.findMany({
+          where: { fingerprint: user.id, commentId: { in: ids }, vote: 1 },
+          select: { commentId: true },
+        }),
+        prisma.comment.findMany({
+          where: { id: { in: ids } },
+          select: { id: true, likes: true },
+        }),
+      ]);
+      const voted = new Set(votes.map((v) => v.commentId));
+      const result: Record<string, { voted: boolean; likes: number }> = {};
+      for (const comment of comments) {
+        result[comment.id] = {
+          voted: voted.has(comment.id),
+          likes: Math.max(0, comment.likes ?? 0),
+        };
+      }
+      return NextResponse.json({ votes: result });
+    } catch {
+      return NextResponse.json({ votes: {} });
+    }
+  }
+
   const commentId = searchParams.get("commentId");
   if (!commentId) {
     return NextResponse.json({ error: "commentId required" }, { status: 400 });

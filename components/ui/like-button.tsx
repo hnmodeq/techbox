@@ -187,6 +187,48 @@ export function LikeButton({ contentType, slug, initial = 0, tooltipLabel, hideT
   );
 }
 
+/**
+ * Coalesces per-comment vote lookups into one request.
+ *
+ * Every CommentVote mounts at the same time, so collecting for a single
+ * frame is enough to catch the whole thread. Failures resolve every waiter
+ * with null rather than rejecting — a missing vote state must not break
+ * rendering.
+ */
+type VoteState = { voted: boolean; likes: number };
+
+let voteQueue: Array<{ id: string; resolve: (state: VoteState | null) => void }> = [];
+let voteFrame: number | null = null;
+
+function flushVoteQueue() {
+  const batch = voteQueue;
+  voteQueue = [];
+  voteFrame = null;
+  if (batch.length === 0) return;
+
+  const ids = [...new Set(batch.map((entry) => entry.id))];
+  fetch(`/api/comments/vote?commentIds=${encodeURIComponent(ids.join(","))}`, {
+    cache: "no-store",
+  })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => {
+      const votes = data?.votes ?? {};
+      for (const entry of batch) entry.resolve(votes[entry.id] ?? null);
+    })
+    .catch(() => {
+      for (const entry of batch) entry.resolve(null);
+    });
+}
+
+function queueVoteFetch(id: string, resolve: (state: VoteState | null) => void) {
+  voteQueue.push({ id, resolve });
+  if (voteFrame !== null) return;
+  voteFrame =
+    typeof requestAnimationFrame === "function"
+      ? requestAnimationFrame(flushVoteQueue)
+      : (setTimeout(flushVoteQueue, 0) as unknown as number);
+}
+
 export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes?: number; initialDislikes?: number }) {
   // Read voted state from localStorage cache synchronously for instant render
   const cachedVoted = getCachedVote(id);
@@ -195,23 +237,26 @@ export function CommentVote({ id, initialLikes = 0 }: { id: string; initialLikes
   const [busy, setBusy] = useState(false);
   const [needLogin, setNeedLogin] = useState(false);
 
-  // Fetch existing vote state on mount to confirm cache and get accurate count
+  // Confirm the cached state against the server — but BATCHED.
+  //
+  // This used to fetch per comment on mount, so a 20-comment thread fired
+  // 20 requests, each doing a session lookup plus two queries. The log
+  // showed them taking 2-3s each and helping exhaust the connection pool.
+  // `queueVoteFetch` collects ids for one animation frame and issues a
+  // single ?commentIds=a,b,c request for all of them.
   useEffect(() => {
     let active = true;
-    fetch(`/api/comments/vote?commentId=${encodeURIComponent(id)}`, { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (!active || !data) return;
-        if (data.voted === true) {
-          setV("up");
-          setVoteCache(id, true);
-        } else {
-          setV(null);
-          setVoteCache(id, false);
-        }
-        if (typeof data.likes === "number") setL(data.likes);
-      })
-      .catch(() => {});
+    queueVoteFetch(id, (data) => {
+      if (!active || !data) return;
+      if (data.voted === true) {
+        setV("up");
+        setVoteCache(id, true);
+      } else {
+        setV(null);
+        setVoteCache(id, false);
+      }
+      if (typeof data.likes === "number") setL(data.likes);
+    });
 
     return () => { active = false; };
   }, [id]);
