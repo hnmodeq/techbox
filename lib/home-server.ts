@@ -536,7 +536,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   // Every block is individually try/caught. One failing section must
   // degrade to "section hidden", never take down the whole homepage.
 
-  const latestInsights = await section("latestInsights", { story: null, comments: [] } as any, () =>
+  const latestInsights = await section("latestInsights", { story: null, stories: [], comments: [] } as any, () =>
     getLatestInsights(normalizeCard, cardSelect));
 
   const videoHighlightComments = await section("videoHighlightComments", [] as any[], () =>

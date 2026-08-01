@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const deleteSchema = z.object({
   commentId: z.string().min(1),
@@ -58,6 +59,11 @@ export async function PATCH(req: NextRequest) {
         where: { id: commentId },
       });
     }
+
+    // A homepage preview can contain this exact approved comment. Invalidate
+    // its cache after a mutation so stale text/deleted rows are not sampled.
+    revalidatePath("/");
+    revalidateTag("home-data", "max");
 
     return NextResponse.json({ ok: true, hasReplies });
   } catch (e: any) {

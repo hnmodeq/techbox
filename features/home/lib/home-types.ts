@@ -81,10 +81,24 @@ export type VideoHighlightComment = HighlightComment & {
   videoSlug: string;
 };
 
-/** §3 — the most-commented news story of the current week and its comments. */
+/** A sampled approved comment tied to the News post it is discussing. */
+export type NewsHighlightComment = HighlightComment & {
+  /** The parent News post is delivered separately in LatestInsights.stories. */
+  newsSlug: string;
+};
+
+/**
+ * §3 — a rotating, comment-led view of recent News discussions.
+ *
+ * `stories` contains the unique News posts represented by `comments`; the
+ * homepage cycles through those posts while the discussion panel highlights
+ * the corresponding comment. `story` is the initial/default preview and is
+ * kept separately so a quiet site can still show a real News card.
+ */
 export type LatestInsights = {
   story: ContentItem | null;
-  comments: HighlightComment[];
+  stories: ContentItem[];
+  comments: NewsHighlightComment[];
 };
 
 /** §12 Authors — a contributor card. */

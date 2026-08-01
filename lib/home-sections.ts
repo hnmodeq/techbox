@@ -33,6 +33,7 @@ import type {
   MoreToExplore,
   HighlightComment,
   LatestInsights,
+  NewsHighlightComment,
   VideoHighlightComment,
 } from "@/features/home/lib/home-types";
 
@@ -138,70 +139,156 @@ function mapHighlightComment(row: any): HighlightComment | null {
 }
 
 /**
- * The right-hand lead of the Latest section is the published news item with
- * the most approved comments in the current seven-day window. Ties favour
- * the newer post. When a quiet week has no news, the newest published item
- * is a real-content fallback rather than an invented empty card.
+ * Pick distinct comment rows in an order that stays stable for the homepage
+ * cache window. Recent News receives priority; older members of the latest
+ * ten-post fallback only fill any remaining slots. Each post contributes at
+ * most one row, so the panel represents several conversations rather than a
+ * single busy article repeated five times.
+ */
+export function selectNewsDiscussionComments<T extends { postId: string }>(
+  recentPostIds: readonly string[],
+  fallbackPostIds: readonly string[],
+  rowsByPost: ReadonlyMap<string, readonly T[]>,
+  take = 5,
+): T[] {
+  const picked: T[] = [];
+  const appendPostIds = (postIds: readonly string[], salt: number) => {
+    const available = postIds.filter((postId) => (rowsByPost.get(postId)?.length ?? 0) > 0);
+    const slots = seededIndices(available.length, Math.max(0, take - picked.length), salt);
+    for (const index of slots) {
+      const postId = available[index];
+      const rows = rowsByPost.get(postId) ?? [];
+      if (rows.length === 0) continue;
+      // The parent-post choice and its comment choice both rotate hourly, but
+      // only on the server inside the cached payload — never during hydration.
+      picked.push(rows[seededIndex(rows.length, salt + index * 17)]);
+    }
+  };
+
+  appendPostIds(recentPostIds, 211);
+  if (picked.length < take) appendPostIds(fallbackPostIds, 487);
+  return picked;
+}
+
+/**
+ * The Latest News discussion is comment-led:
+ *
+ * - use News published in the last seven days first;
+ * - if that pool is quiet (or there was no News this week), extend to the
+ *   remaining newest ten published posts;
+ * - return one approved, top-level comment per represented News post.
+ *
+ * The first query supplies every News card the carousel/modal can display;
+ * comments are fetched once in bulk and grouped in memory. This deliberately
+ * replaces the old homepage-mounted CommentSection fetch, so the full live
+ * thread is loaded only after a reader opens its NewsModal.
  */
 export async function getLatestInsights(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
 ): Promise<LatestInsights> {
   const weekAgo = new Date(Date.now() - 7 * 864e5);
-  const weekly = await prisma.post.findMany({
-    where: {
-      module: "news",
-      ...PUBLISHED,
-      date: { gte: weekAgo, ...publicPostDateWhere() },
-    },
-    orderBy: { date: "desc" },
-    take: 30,
+  const latestPosts: any[] = await prisma.post.findMany({
+    where: { module: "news", ...PUBLISHED, date: publicPostDateWhere() },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 10,
     select: cardSelect,
   });
 
-  let pool: any[] = weekly as any[];
-  if (pool.length === 0) {
-    pool = await prisma.post.findMany({
-      where: { module: "news", ...PUBLISHED, date: publicPostDateWhere() },
-      orderBy: { date: "desc" },
-      take: 1,
-      select: cardSelect,
-    });
-  }
-  if (pool.length === 0) return { story: null, comments: [] };
+  if (latestPosts.length === 0) return { story: null, stories: [], comments: [] };
 
-  const counts = await prisma.comment.groupBy({
+  const postIds: string[] = latestPosts.map((post) => String(post.id));
+  // Keep these reads sequential. Homepage sections share the small Neon pool;
+  // two independent comment queries in parallel are enough to revive P2024
+  // failures while a page is revalidating.
+  const rawCounts = await prisma.comment.groupBy({
     by: ["postId"],
     _count: { _all: true },
-    where: { postId: { in: pool.map((post: any) => post.id) }, status: "approved", deletedAt: null },
+    where: { postId: { in: postIds }, status: "approved", deletedAt: null },
   });
-  const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
+  const counts = rawCounts as any[];
+  const rawCommentRows = await prisma.comment.findMany({
+    where: {
+      postId: { in: postIds },
+      parentId: null,
+      status: "approved",
+      deletedAt: null,
+      text: { not: "" },
+    },
+    // A bounded candidate pool keeps the homepage payload small. The final
+    // display is random/server-stable, not "most liked".
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 120,
+    select: {
+      id: true,
+      postId: true,
+      text: true,
+      authorName: true,
+      createdAt: true,
+      author: {
+        select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
+      },
+    },
+  });
+  const commentRows = rawCommentRows as any[];
 
-  // The lead is the recent story people are actually discussing: the one
-  // with the most approved comments in the window, breaking ties toward the
-  // newest. A strictly-newest rule would surface an empty story almost every
-  // time, and the section carries a comment rail, an inline reply box and a
-  // count — all dead space on something nobody has replied to.
-  //
-  // `pool` is already ordered date-desc, and Array.prototype.sort is stable,
-  // so stories with equal comment counts keep their newest-first order.
-  const featured = [...pool].sort(
-    (a: any, b: any) =>
-      (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0),
+  const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
+  const rowsByPost = new Map<string, typeof commentRows>();
+  for (const row of commentRows) {
+    // Suspended accounts do not get a highlighted promotional slot. Guests
+    // are still valid because they carry authorName and have no User record.
+    if (row.author && row.author.status !== "active") continue;
+    const rows = rowsByPost.get(row.postId) ?? [];
+    rows.push(row);
+    rowsByPost.set(row.postId, rows);
+  }
+
+  const recentPostIds = latestPosts
+    .filter((post) => post.date >= weekAgo)
+    .map((post) => post.id);
+  const recentSet = new Set(recentPostIds);
+  const fallbackPostIds = latestPosts
+    .filter((post) => !recentSet.has(post.id))
+    .map((post) => post.id);
+
+  const sampledRows = selectNewsDiscussionComments(
+    recentPostIds,
+    fallbackPostIds,
+    rowsByPost,
+    5,
+  );
+
+  const postById = new Map(latestPosts.map((post) => [post.id, post]));
+  const comments: NewsHighlightComment[] = [];
+  for (const row of sampledRows) {
+    const mapped = mapHighlightComment(row);
+    const post = postById.get(row.postId);
+    if (!mapped || !post) continue;
+    comments.push({ ...mapped, newsSlug: post.slug });
+  }
+
+  const sampledPostIds = new Set(sampledRows.map((row) => row.postId));
+  const sampledPosts = latestPosts.filter((post) => sampledPostIds.has(post.id));
+  const storyPool = sampledPosts.length > 0 ? sampledPosts : latestPosts;
+  const featured = [...storyPool].sort(
+    (a, b) => (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0),
   )[0];
 
-  // No comment rows are fetched here any more.
-  //
-  // The section used to render a server-side rail beside a hidden
-  // CommentSection. That combination silently broke posting — the visible
-  // rail came from this hour-cached payload and could not update — so the
-  // live CommentSection now owns the thread and fetches it client-side.
-  // Keeping this query would cost one extra round trip per homepage render
-  // to build a list nobody renders.
+  const stories = [...sampledPosts]
+    .sort((a, b) => {
+      if (a.id === featured.id) return -1;
+      if (b.id === featured.id) return 1;
+      return a.date.getTime() - b.date.getTime();
+    })
+    .map((post) => {
+      const story = normalize(post);
+      story.comments = countByPost.get(post.id) || 0;
+      return story;
+    });
 
   const story = normalize(featured);
   story.comments = countByPost.get(featured.id) || 0;
-  return { story, comments: [] };
+  return { story, stories, comments };
 }
 
 /**
