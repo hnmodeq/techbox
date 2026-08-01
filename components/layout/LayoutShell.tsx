@@ -18,6 +18,7 @@ import { AuthProvider, useAuth } from "@/providers/auth.provider"
 import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
 import { ModuleConfigProvider } from "@/providers/module-config.provider"
 import { ModuleColorApplier } from "@/components/layout/ModuleColorApplier"
+import { TooltipColorScope } from "@/components/ui/tooltip"
 import { TimelineLikesProvider } from "@/providers/timeline-likes.provider"
 import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
@@ -47,6 +48,13 @@ type LayoutShellProps = {
   children: React.ReactNode
   homeData?: HomeData
   serverModuleConfig?: SiteLayoutConfig
+}
+
+/** Module pages inherit their saved colour for every portalled tooltip. */
+function tooltipColorForPath(pathname: string): string | undefined {
+  const match = ["blog", "news", "media", "shop", "forum", "review", "download", "tools", "timeline"]
+    .find((slug) => pathname === `/${slug}` || pathname.startsWith(`/${slug}/`))
+  return match ? `var(--module-${match}-color, var(--primary))` : undefined
 }
 
 export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutShellProps) {
@@ -188,6 +196,7 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
+    <TooltipColorScope color={tooltipColorForPath(pathname)}>
     <div className="[--header-height:calc(var(--spacing)*14)]">
       {/*
         The main sidebar floats (overlay) rather than reserving layout
@@ -258,5 +267,6 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
         )}
       </div>
     </div>
+    </TooltipColorScope>
   )
 }
