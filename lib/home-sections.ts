@@ -203,36 +203,18 @@ export async function getLatestInsights(
   );
   const featured = qualifying[0] ?? pool[0];
 
-  const rows = await prisma.comment.findMany({
-    where: {
-      postId: featured.id,
-      parentId: null,
-      status: "approved",
-      deletedAt: null,
-    },
-    orderBy: [{ likes: "desc" }, { createdAt: "desc" }],
-    // The rail scrolls, so it can show more than the three that fitted
-    // before. Still bounded — this rides on every homepage render.
-    take: 10,
-    select: {
-      id: true,
-      text: true,
-      authorName: true,
-      createdAt: true,
-      author: {
-        select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
-      },
-    },
-  });
-
-  const comments = rows
-    .filter((row) => !row.author || row.author.status === "active")
-    .map(mapHighlightComment)
-    .filter((comment): comment is HighlightComment => Boolean(comment));
+  // No comment rows are fetched here any more.
+  //
+  // The section used to render a server-side rail beside a hidden
+  // CommentSection. That combination silently broke posting — the visible
+  // rail came from this hour-cached payload and could not update — so the
+  // live CommentSection now owns the thread and fetches it client-side.
+  // Keeping this query would cost one extra round trip per homepage render
+  // to build a list nobody renders.
 
   const story = normalize(featured);
   story.comments = countByPost.get(featured.id) || 0;
-  return { story, comments };
+  return { story, comments: [] };
 }
 
 /**

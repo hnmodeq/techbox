@@ -16,7 +16,7 @@
  */
 import * as React from "react";
 import Link from "next/link";
-import type { LatestInsights, HighlightComment } from "@/features/home/lib/home-types";
+import type { LatestInsights } from "@/features/home/lib/home-types";
 import { SectionShell, SectionHeader } from "../primitives";
 import { NewsletterCard } from "./NewsletterCard";
 import { Num } from "@/components/ui/num";
@@ -47,7 +47,6 @@ export function InsightsSection({
   if (!story) return null;
 
   const style: InsightsStyle = { "--insights-accent": accentColor || "var(--primary)" };
-  const comments = data?.comments ?? [];
 
   return (
     <SectionShell labelledBy={HEADING_ID} style={style}>
@@ -70,7 +69,7 @@ export function InsightsSection({
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">
-          <NewsDiscussion story={story} comments={comments} />
+          <NewsDiscussion story={story} />
           <NewsletterCard accentColor={accentColor} />
         </div>
       </div>
@@ -181,31 +180,32 @@ function LatestStory({ story }: { story: NonNullable<LatestInsights["story"]> })
 }
 
 /**
- * Reader discussion: server-rendered comments, plus a box to add one.
+ * Reader discussion — the live thread plus a box to add to it.
  *
  * Always open, matching the news sidebar: the comments ARE the point of
  * this column, so hiding them behind a toggle would be busywork.
  *
- * The rail shows the ten approved comments that already arrived with the
- * page — no request, instant paint, and they carry avatars and profile
- * links the generic list does not.
+ * `CommentSection` owns the thread outright rather than being paired with a
+ * separate server-rendered rail. An earlier version did exactly that, with
+ * the rail showing the ten comments delivered with the page and
+ * CommentSection mounted for its composer only. It was wrong: posting a
+ * comment refetched CommentSection's own state, which was hidden, while the
+ * visible rail came from an hour-cached server payload that cannot change
+ * client-side. You posted, saw a success toast, and your comment appeared
+ * nowhere.
  *
- * `CommentSection` sits underneath for its composer, with `hideList` so it
- * does not repeat the same thread directly below the rail. It still fetches
- * on mount, which is one query on the homepage; that is accepted so posting
- * works without an extra click, and it is the first thing to make lazy if
- * this page needs to shed load again.
+ * One list, one source of truth, and it updates the moment you post. It
+ * also brings replies, voting, sorting and AuthorLink profile links, none
+ * of which the rail had.
  */
 function NewsDiscussion({
   story,
-  comments,
 }: {
   story: NonNullable<LatestInsights["story"]>;
-  comments: HighlightComment[];
 }) {
   return (
     <section className="flex min-h-0 flex-col rounded-[var(--hp-r-md)] border border-border bg-[color:var(--hp-surface)] p-5">
-      <h4 className="mb-3 flex items-center gap-2 text-[13px] font-bold text-foreground">
+      <h4 className="mb-1 flex items-center gap-2 text-[13px] font-bold text-foreground">
         <MessageCircle className="size-4 text-[color:var(--insights-accent)]" aria-hidden="true" />
         گفتگوی خوانندگان
         {(story.comments ?? 0) > 0 && (
@@ -215,113 +215,16 @@ function NewsDiscussion({
         )}
       </h4>
 
-      {comments.length > 0 ? (
-        <div
-          aria-label="دیدگاه‌های این خبر"
-          tabIndex={0}
-          className="max-h-[360px] min-h-0 flex-1 overflow-y-auto overscroll-contain pe-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style={{ scrollbarWidth: "thin" }}
-        >
-          {comments.map((comment) => (
-            <LatestCommentRow key={comment.id} comment={comment} />
-          ))}
-        </div>
-      ) : (
-        // The featured story can fall below the comment threshold, so this
-        // column must say something rather than sitting empty.
-        <p className="text-[13px] leading-[22px] text-muted-foreground">
-          هنوز دیدگاهی برای این خبر ثبت نشده. اولین نفر باشید.
-        </p>
-      )}
-
-      <div className="mt-4 border-t border-border pt-4">
-        <CommentSection
-          module={story.module}
-          slug={story.slug}
-          initialComments={story.comments ?? 0}
-          compact
-          hideList
-        />
-      </div>
+      {/* The composer renders above the list and stays outside the scroll
+          region, so it is reachable however long the thread grows. */}
+      <CommentSection
+        module={story.module}
+        slug={story.slug}
+        initialComments={story.comments ?? 0}
+        compact
+        listMaxHeight="360px"
+      />
     </section>
-  );
-}
-
-function LatestCommentRow({ comment }: { comment: HighlightComment }) {
-  const { author } = comment;
-  const profileHref = author.username ? `/author/${author.username}` : null;
-
-  const avatar = (
-    <span className="block size-10 shrink-0 overflow-hidden rounded-full bg-background">
-      {author.avatar ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={author.avatar}
-          alt=""
-          width={40}
-          height={40}
-          loading="lazy"
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <span
-          aria-hidden="true"
-          className="flex h-full w-full items-center justify-center text-sm font-bold text-muted-foreground"
-        >
-          {author.name.trim()[0] ?? "؟"}
-        </span>
-      )}
-    </span>
-  );
-
-  return (
-    <div className="flex gap-3 border-b border-border py-4 last:border-b-0">
-      {/* Guest comments carry no username, so there is nothing to link to —
-          those render as plain text rather than a dead link. */}
-      {profileHref ? (
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Link
-                href={profileHref}
-                aria-label={`بازدید از حساب کاربری ${author.name}`}
-                className="block shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              />
-            }
-          >
-            {avatar}
-          </TooltipTrigger>
-          <TooltipContent>{`بازدید از حساب کاربری ${author.name}`}</TooltipContent>
-        </Tooltip>
-      ) : (
-        avatar
-      )}
-
-      <div className="min-w-0 flex-1">
-        <p className="line-clamp-3 text-[14px] leading-[22px] text-foreground">{comment.text}</p>
-        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] leading-[18px] text-muted-foreground">
-          {profileHref ? (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Link
-                    href={profileHref}
-                    className="font-semibold text-foreground transition-colors hover:text-[color:var(--insights-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
-                }
-              >
-                {author.name}
-              </TooltipTrigger>
-              <TooltipContent>{`بازدید از حساب کاربری ${author.name}`}</TooltipContent>
-            </Tooltip>
-          ) : (
-            <span className="font-semibold text-foreground">{author.name}</span>
-          )}
-          <span aria-hidden="true">•</span>
-          <RelativeDate date={comment.date} label="تاریخ دیدگاه" />
-        </div>
-      </div>
-    </div>
   );
 }
 
