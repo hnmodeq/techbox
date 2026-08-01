@@ -318,48 +318,65 @@ function randomSample<T>(items: readonly T[], take: number): T[] {
  * small rail; `content` is transferred only for rendered cards because the
  * reading-time formatter needs it.
  */
-async function getMagazinePostsUncached(): Promise<ContentItem[]> {
-  return section<ContentItem[]>("magazine", [], async (): Promise<ContentItem[]> => {
-    const where = {
-      module: "blog",
-      published: true,
-      deletedAt: null,
-      date: publicPostDateWhere(),
-    };
+/** The actual DB work behind the magazine rail. Extracted so a database
+ *  failure can be distinguished from a legitimate empty result. */
+async function loadMagazinePosts(): Promise<ContentItem[]> {
+  const where = {
+    module: "blog",
+    published: true,
+    deletedAt: null,
+    date: publicPostDateWhere(),
+  };
 
-    const latest = await prisma.post.findFirst({
-      where,
-      orderBy: [{ date: "desc" }, { id: "desc" }],
-      select: cardSelect,
-    });
-    if (!latest) return [];
-
-    const candidateIds = await prisma.post.findMany({
-      where: { ...where, id: { not: latest.id } },
-      select: { id: true },
-    });
-    const selectedIds = randomSample(candidateIds.map((post) => post.id), 4);
-
-    if (selectedIds.length === 0) return [normalizeCard(latest) as ContentItem];
-
-    const selected = await prisma.post.findMany({
-      where: { id: { in: selectedIds } },
-      select: cardSelect,
-    });
-    const selectedById = new Map<string, ContentItem>(
-      selected.map((post) => [post.id, normalizeCard(post) as ContentItem]),
-    );
-
-    // findMany does not preserve `in` ordering. Restore the random ID order
-    // so the compact rail does not quietly become deterministic by primary
-    // key, and keep the newest article in the lead position.
-    const compactPosts: ContentItem[] = [];
-    for (const id of selectedIds) {
-      const post = selectedById.get(id);
-      if (post) compactPosts.push(post);
-    }
-    return [normalizeCard(latest) as ContentItem, ...compactPosts];
+  const latest = await prisma.post.findFirst({
+    where,
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    select: cardSelect,
   });
+  if (!latest) return [];
+
+  const candidateIds = await prisma.post.findMany({
+    where: { ...where, id: { not: latest.id } },
+    select: { id: true },
+  });
+  const selectedIds = randomSample(candidateIds.map((post) => post.id), 4);
+
+  if (selectedIds.length === 0) return [normalizeCard(latest) as ContentItem];
+
+  const selected = await prisma.post.findMany({
+    where: { id: { in: selectedIds } },
+    select: cardSelect,
+  });
+  const selectedById = new Map<string, ContentItem>(
+    selected.map((post) => [post.id, normalizeCard(post) as ContentItem]),
+  );
+
+  // findMany does not preserve `in` ordering. Restore the random ID order
+  // so the compact rail does not quietly become deterministic by primary
+  // key, and keep the newest article in the lead position.
+  const compactPosts: ContentItem[] = [];
+  for (const id of selectedIds) {
+    const post = selectedById.get(id);
+    if (post) compactPosts.push(post);
+  }
+  return [normalizeCard(latest) as ContentItem, ...compactPosts];
+}
+
+async function getMagazinePostsUncached(): Promise<ContentItem[]> {
+  // Unlike the generic `section()` helper, a database failure must PROPAGATE
+  // here rather than degrade to `[]`. unstable_cache does not store a
+  // rejected promise, so a transient outage won't blank the magazine for the
+  // whole hour-long window — the next request retries. A legitimate empty
+  // result (no published blog posts) still returns `[]` and IS cached, which
+  // keeps a genuinely empty blog from hammering the DB on every render.
+  try {
+    const value = await withCircuit(loadMagazinePosts);
+    noteDbSuccess("home-data:magazine");
+    return value;
+  } catch (e) {
+    if (!isCircuitOpenError(e)) logDbFailure("home-data:magazine", e);
+    throw e;
+  }
 }
 
 // Keep the homepage compatible with the Full Route Cache. The magazine rail
