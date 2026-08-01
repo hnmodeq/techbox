@@ -98,15 +98,15 @@ describe("homepage Video and Latest contracts", () => {
     expect(video).toMatch(/flex min-w-0 flex-col justify-between gap-5/);
   });
 
-  it("features the NEWEST news that has a real discussion", () => {
-    // Was "most-commented this week", which pinned the section to whatever
-    // went viral days ago — wrong for a block titled "آخرین خبر امروز".
-    // Now: newest story clearing MIN_COMMENTS_FOR_FEATURE, else newest.
+  it("leads with the recent news that has the most comments", () => {
+    // The section carries a comment rail, an inline reply box and a count,
+    // so it surfaces the story people are actually discussing: the one with
+    // the most approved comments in the window, breaking ties toward the
+    // newest (the pool is date-desc and the sort is stable).
     expect(data).toMatch(/export async function getLatestInsights/);
-    expect(data).toMatch(/const MIN_COMMENTS_FOR_FEATURE = 4;/);
-    expect(data).toMatch(/>= MIN_COMMENTS_FOR_FEATURE/);
-    expect(data).toMatch(/const featured = qualifying\[0\] \?\? pool\[0\]/);
-    expect(data).not.toMatch(/countDifference/);
+    expect(data).toMatch(/const featured = \[\.\.\.pool\]\.sort/);
+    expect(data).toMatch(/countByPost\.get\(b\.id\)/);
+    expect(data).not.toMatch(/MIN_COMMENTS_FOR_FEATURE/);
     // Comments stay real and approved-only.
     expect(data).toMatch(/status: "approved"/);
     // The section no longer renders a server-side comment rail; the live

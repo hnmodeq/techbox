@@ -56,7 +56,7 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
     // section rather than a generic site-wide block. Falls back to the
     // standard brand panel when module colours are switched off.
     <aside
-      className="rounded-[var(--hp-r-lg)] p-7 text-[color:var(--hp-on-brand)] lg:sticky lg:top-24 dark:border dark:border-white/[0.08]"
+      className="rounded-[var(--hp-r-md)] p-7 text-[color:var(--hp-on-brand)] lg:sticky lg:top-24 dark:border dark:border-white/[0.08]"
       style={{ background: accentColor || "var(--hp-brand-ink)" }}
     >
       <h3 className="text-[22px] font-semibold leading-[30px]">
