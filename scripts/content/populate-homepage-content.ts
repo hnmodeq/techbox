@@ -507,6 +507,68 @@ const SOLUTIONS: Array<{ slug: string; author: string; text: string }> = [
 ];
 
 const DISCUSSIONS: Array<{ slug: string; author: string; text: string }> = [
+  // Follow-up voices for solved topics. The homepage feature can surface up to
+  // two of these beneath the accepted answer without repeating that answer.
+  {
+    slug: "prometheus-high-cardinality-guide",
+    author: "community_arash",
+    text: "در تجربه ما، قبل از حذف labelها یک recording rule برای metricهای پرکاربرد ساختیم تا dashboardهای عملیاتی آسیب نبینند. بعد از آن کاهش سری‌ها و حافظه خیلی قابل اندازه‌گیری‌تر شد.",
+  },
+  {
+    slug: "prometheus-high-cardinality-guide",
+    author: "community_nazanin",
+    text: "خوب است owner هر metric و دلیل وجود labelهای پرهزینه را هم مستند کنید؛ این کار از بازگشت همان cardinality در سرویس‌های جدید جلوگیری می‌کند.",
+  },
+  {
+    slug: "private-registry-imagepullbackoff",
+    author: "community_arash",
+    text: "ما با مقایسه تنظیمات DNS و proxy در node سالم و node مشکل‌دار، تفاوت را سریع پیدا کردیم. بررسی مستقیم pull با همان container runtime هم سرنخ خوبی می‌دهد.",
+  },
+  {
+    slug: "private-registry-imagepullbackoff",
+    author: "community_sara",
+    text: "بعد از حل رخداد، اضافه کردن یک تست دوره‌ای pull برای هر node مهم است تا مشکل گواهی یا credential پیش از rollout بعدی دیده شود.",
+  },
+  {
+    slug: "postgresql-connection-pool-pattern",
+    author: "community_mahsa",
+    text: "Dashboard اتصال باید هم تعداد اتصال‌های فعال و هم زمان انتظار برای گرفتن connection را نشان دهد؛ فقط دیدن تعداد connection برای تشخیص bottleneck کافی نیست.",
+  },
+  {
+    slug: "postgresql-connection-pool-pattern",
+    author: "community_elham",
+    text: "اگر pooler اضافه می‌کنید، کنترل دسترسی و TLS بین برنامه و pooler را هم در طراحی اولیه در نظر بگیرید؛ این لایه نباید به نقطه کور امنیتی تبدیل شود.",
+  },
+  {
+    slug: "proxmox-restore-drill-checklist",
+    author: "community_reza",
+    text: "بهتر است نتیجه هر Drill به یک runbook عملی تبدیل شود و وابستگی‌های خارج از VM مثل DNS، secret و دسترسی storage هم در سناریو بررسی شوند.",
+  },
+  {
+    slug: "proxmox-restore-drill-checklist",
+    author: "community_nazanin",
+    text: "ثبت زمان‌های واقعی restore و validation در چند نوبت، تفاوت بین RTO هدف و توان عملیاتی واقعی تیم را روشن می‌کند.",
+  },
+  {
+    slug: "terraform-state-locking-recovery",
+    author: "community_pouya",
+    text: "در تیم ما هر force-unlock یک رکورد رخداد کوتاه دارد: مالک lock، اجرای مرتبط و دلیل تصمیم. همین مستند کوچک در رخداد بعدی بسیار کمک‌کننده است.",
+  },
+  {
+    slug: "terraform-state-locking-recovery",
+    author: "community_elham",
+    text: "برای backend state، دسترسی نوشتن را محدود و لاگ audit را فعال نگه دارید تا هنگام lock باقی‌مانده بتوانید مالک آخرین تغییر را مشخص کنید.",
+  },
+  {
+    slug: "dns-split-horizon-debugging",
+    author: "community_mahsa",
+    text: "یک dashboard ساده از نرخ خطای resolve و زمان پاسخ resolverها کمک می‌کند مشکل‌های intermittent را قبل از گزارش کاربر ببینیم.",
+  },
+  {
+    slug: "dns-split-horizon-debugging",
+    author: "community_sara",
+    text: "برای سرویس‌های Kubernetes، مسیر DNS داخل خوشه را جدا از resolverهای VPN بررسی کنید؛ گاهی نام درست است اما مسیر query در یکی از این دو لایه تغییر کرده است.",
+  },
   {
     slug: "opentelemetry-trace-context-between-services",
     author: "community_pouya",
