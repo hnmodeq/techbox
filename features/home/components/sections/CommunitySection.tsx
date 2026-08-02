@@ -17,6 +17,7 @@ import { SectionShell, SectionHeader } from "../primitives";
 import { AuthorLink } from "@/components/ui/author-link";
 import { Num } from "@/components/ui/num";
 import { RelativeDate } from "@/components/ui/relative-date";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CheckCircle2, MessageCircle, Plus } from "lucide-react";
 import { NewForumTopicModal } from "@/features/forum/components/NewForumTopicModal";
 import { ForumTopicModal } from "@/features/forum/components/ForumTopicModal";
@@ -128,9 +129,10 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const isSolved = Boolean(topic.solved && answer?.text);
 
   return (
-    <article className="relative overflow-hidden border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] p-6 shadow-[var(--hp-shadow-card)]">
-      <div className="absolute inset-x-0 top-0 h-1 bg-[color:var(--community-accent)]" aria-hidden="true" />
-      <div className="flex items-center justify-end">
+    <article className="relative overflow-hidden bg-[color:var(--hp-surface)] p-6 shadow-[var(--hp-shadow-card)]">
+      <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--hp-solved)]" aria-hidden="true" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <TopicActivity topic={topic} />
         <TopicState solved={isSolved} />
       </div>
 
@@ -173,8 +175,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
         </p>
       )}
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--hp-border)] pt-4">
-        <TopicActivity topic={topic} />
+      <div className="mt-5 flex justify-end border-t border-[color:var(--hp-border)] pt-4">
         <Link
           href={`/${topic.module}/${topic.slug}`}
           className="text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -249,18 +250,19 @@ function TopicRow({ topic, onReply }: { topic: WithForumActivity; onReply: (topi
         <div className="mt-3">
           <TopicActivity topic={topic} />
         </div>
+      </div>
+
+      {/* In RTL this compact control column sits on the physical left edge. */}
+      <div className="flex shrink-0 flex-col items-end gap-3 pt-1">
+        <TopicState solved={false} compact />
         <button
           type="button"
           onClick={() => onReply(topic)}
-          className="mt-3 text-[12px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="text-[12px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          پاسخ دادن به این پرسش
+          پاسخ دادن به این مسئله
         </button>
-      </div>
-
-      {/* In RTL this compact state column sits on the physical left edge. */}
-      <div className="shrink-0 pt-1">
-        <TopicState solved={false} compact />
+        <TopicCounters topic={topic} />
       </div>
     </article>
   );
@@ -284,10 +286,25 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
         <span aria-hidden="true">•</span>
         <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
       </div>
-      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 ps-9 text-[11px] text-[color:var(--hp-ink-3)]">
-        <span><Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده</span>
-        <span><Num>{topic.views ?? 0}</Num> بار بازدید شده</span>
-      </div>
+    </div>
+  );
+}
+
+function TopicCounters({ topic }: { topic: WithForumActivity }) {
+  return (
+    <div className="flex flex-col items-end gap-1.5 text-[12px] font-bold text-[color:var(--hp-ink-2)]">
+      <Tooltip>
+        <TooltipTrigger render={<span className="cursor-default" />}>
+          <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده
+        </TooltipTrigger>
+        <TooltipContent>تعداد پاسخ‌های ثبت‌شده برای این مسئله</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger render={<span className="cursor-default" />}>
+          <Num>{topic.views ?? 0}</Num> بار بازدید شده
+        </TooltipTrigger>
+        <TooltipContent>تعداد دفعات بازدید از این مسئله</TooltipContent>
+      </Tooltip>
     </div>
   );
 }
@@ -303,9 +320,8 @@ function TopicState({ solved, compact = false }: { solved: boolean; compact?: bo
   }
 
   return (
-    <span className={`inline-flex items-center gap-1 text-[var(--warning)] ${compact ? "text-[11px]" : "text-[12px] font-bold"}`}>
-      <MessageCircle className={compact ? "size-3.5" : "size-4"} aria-hidden="true" />
-      باز
+    <span className={`max-w-36 text-end text-[var(--warning)] ${compact ? "text-[11px] leading-5" : "text-[12px] font-bold"}`}>
+      هنوز کسی این مسئله را حل نکرده
     </span>
   );
 }

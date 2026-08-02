@@ -17,9 +17,11 @@ describe("homepage Forum section", () => {
     expect(data).toMatch(/export async function getCommunityTopics/);
     expect(data).toMatch(/module: "forum"/);
     expect(data).toMatch(/date: \{ gte: weekAgo/);
-    expect(data).toMatch(/const hottest = \[\.\.\.topics\]/);
-    expect(data).toMatch(/seededIndex\(hottest\.length, 613\)/);
+    expect(data).toMatch(/const hottest = \[\.\.\.featurePool\]/);
+    expect(data).toMatch(/seededIndex\(featureChoices\.length, 613\)/);
     expect(data).toMatch(/!topic\.solved/);
+    expect(data).toMatch(/slice\(0, 3\)/);
+    expect(data).toMatch(/if \(openTopics\.length < 3 && !featured\.solved\)/);
     expect(community).toMatch(/const featured = list\[0\]/);
     expect(community).toMatch(/list\.slice\(1\)[\s\S]*?!topic\.solved/);
     expect(community).toMatch(/slice\(0, 4\)/);
@@ -50,7 +52,7 @@ describe("homepage Forum section", () => {
   it("keeps topic deep links but uses homepage modals for asking and replying", () => {
     expect(community).toMatch(/<NewForumTopicModal/);
     expect(community).toMatch(/<ForumTopicModal/);
-    expect(community).toMatch(/پاسخ دادن به این پرسش/);
+    expect(community).toMatch(/پاسخ دادن به این مسئله/);
     expect(community).toMatch(/href=\{`\/\$\{topic\.module\}\/\$\{topic\.slug\}`\}/);
     expect(topicModal).toMatch(/باز کردن در صفحهٔ کامل/);
     expect(topicModal).toMatch(/<CommentSection module="forum"/);

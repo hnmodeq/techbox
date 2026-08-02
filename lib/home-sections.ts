@@ -325,7 +325,7 @@ export async function getCommunityTopics(
   cardSelect: any,
 ): Promise<ContentItem[]> {
   const weekAgo = new Date(Date.now() - 7 * 864e5);
-  let topics: any[] = await prisma.post.findMany({
+  let featurePool: any[] = await prisma.post.findMany({
     where: {
       module: "forum",
       ...PUBLISHED,
@@ -336,19 +336,36 @@ export async function getCommunityTopics(
     select: cardSelect,
   });
 
-  // A quiet week should not erase the community from the homepage. Fall back
-  // to recent real topics only when there are too few seven-day candidates.
-  if (topics.length < 3) {
-    topics = await prisma.post.findMany({
+  // A quiet week still needs a real community feature.
+  if (featurePool.length === 0) {
+    featurePool = await prisma.post.findMany({
       where: { module: "forum", ...PUBLISHED, date: publicPostDateWhere() },
       orderBy: [{ date: "desc" }, { id: "desc" }],
       take: 40,
       select: cardSelect,
     }) as any[];
   }
-  if (topics.length === 0) return [];
+  if (featurePool.length === 0) return [];
 
+  // The left rail promises three unresolved questions. Pull a broader open
+  // pool so a hot solved feature from this week never consumes one of those
+  // slots, and merge it before bulk-enriching counts/activity.
+  const openFallback = await prisma.post.findMany({
+    where: {
+      module: "forum",
+      ...PUBLISHED,
+      solved: false,
+      date: publicPostDateWhere(),
+    },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 40,
+    select: cardSelect,
+  }) as any[];
+  const topicById = new Map<string, any>();
+  for (const topic of [...featurePool, ...openFallback]) topicById.set(topic.id, topic);
+  const topics = [...topicById.values()];
   const topicIds: string[] = topics.map((topic) => topic.id);
+
   const rawCounts = await prisma.comment.groupBy({
     by: ["postId"],
     _count: { _all: true },
@@ -391,23 +408,36 @@ export async function getCommunityTopics(
     activityByPost.set(comment.postId, comment);
   }
 
-  const hottest = [...topics]
+  const hottest = [...featurePool]
     .sort((a, b) =>
       (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
       (b.likes || 0) - (a.likes || 0) ||
       (b.views || 0) - (a.views || 0) ||
       b.date.getTime() - a.date.getTime(),
     )
-    .slice(0, Math.min(5, topics.length));
-  const featured = hottest[seededIndex(hottest.length, 613)];
+    .slice(0, Math.min(5, featurePool.length));
+  const unresolved = topics.filter((topic) => !topic.solved);
+  const solvedHottest = hottest.filter((topic) => topic.solved);
+  // Prefer a solved hot feature whenever there are already at least three
+  // real unresolved questions; this leaves the entire left rail for open work.
+  const featureChoices = unresolved.length >= 3 && solvedHottest.length > 0
+    ? solvedHottest
+    : hottest;
+  const featured = featureChoices[seededIndex(featureChoices.length, 613)];
 
-  const openTopics = topics
-    .filter((topic) => topic.id !== featured.id && !topic.solved)
+  let openTopics = unresolved
+    .filter((topic) => topic.id !== featured.id)
     .sort((a, b) =>
       (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
       b.date.getTime() - a.date.getTime(),
     )
-    .slice(0, 4);
+    .slice(0, 3);
+  // If the entire forum only has three unresolved questions and the hot
+  // feature is one of them, repeat that real question in the left rail rather
+  // than replacing it with fake content or showing fewer than three rows.
+  if (openTopics.length < 3 && !featured.solved) {
+    openTopics = [featured, ...openTopics].slice(0, 3);
+  }
 
   const toCard = (topic: any): ContentItem => {
     const card = normalize(topic);
