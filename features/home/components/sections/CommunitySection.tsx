@@ -82,9 +82,11 @@ export function CommunitySection({
       {/* In RTL, the first grid child lands on the physical right. The open
           questions therefore lead on the right and the featured topic plus
           direct question composer form the left participation column. */}
-      <div className="grid gap-8 lg:grid-cols-[minmax(360px,.95fr)_minmax(0,1.05fr)] lg:gap-10">
-        <ActiveTopicList topics={activeTopics} />
-        <div className="flex min-w-0 flex-col gap-6">
+      <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(360px,.95fr)_minmax(0,1.05fr)] lg:gap-10">
+        <div className="flex min-w-0 flex-col lg:h-full">
+          <ActiveTopicList topics={activeTopics} />
+        </div>
+        <div className="flex min-w-0 flex-col gap-6 lg:h-full">
           {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature />}
           <ForumQuestionPanel />
         </div>
@@ -126,8 +128,8 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const isSolved = Boolean(topic.solved && answer?.text);
 
   return (
-    <article className="relative overflow-hidden bg-[color:var(--hp-surface)] p-6">
-      <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--hp-solved)]" aria-hidden="true" />
+    <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
+      <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--community-accent)]" aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TopicActivity topic={topic} />
         <TopicState solved={isSolved} />
@@ -172,14 +174,6 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
         </p>
       )}
 
-      <div className="mt-5 flex justify-end border-t border-[color:var(--hp-border)] pt-4">
-        <Link
-          href={`/${topic.module}/${topic.slug}`}
-          className="text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          مشاهدهٔ گفتگو <span aria-hidden="true">←</span>
-        </Link>
-      </div>
     </article>
   );
 }
@@ -207,18 +201,18 @@ function ActiveTopicList({
   topics: WithForumActivity[];
 }) {
   return (
-    <div>
-      <h3 className="mb-4 text-[16px] font-bold text-[color:var(--hp-ink)]">
-        برخی از سوالات پرسیده شده در انجمن
-      </h3>
+    <div className="flex h-full flex-col">
       {topics.length === 0 ? (
         <p className="py-5 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
           فعلاً پرسش بازی برای نمایش نیست؛ شما می‌توانید گفتگوی بعدی را شروع کنید.
         </p>
       ) : (
-        <ul className="divide-y divide-[color:var(--hp-border)]">
+        <ul
+          className="grid flex-1 divide-y divide-[color:var(--hp-border)]"
+          style={{ gridTemplateRows: `repeat(${topics.length}, minmax(0, 1fr))` }}
+        >
           {topics.map((topic) => (
-            <li key={`${topic.module}-${topic.slug}`} className="py-4 first:pt-0 last:pb-0">
+            <li key={`${topic.module}-${topic.slug}`} className="flex min-h-0 py-4 first:pt-0 last:pb-0">
               <TopicRow topic={topic} />
             </li>
           ))}
@@ -230,7 +224,7 @@ function ActiveTopicList({
 
 function TopicRow({ topic }: { topic: WithForumActivity }) {
   return (
-    <article className="group flex items-start justify-between gap-4">
+    <article className="group flex h-full w-full items-start justify-between gap-4">
       <div className="min-w-0">
         <h3 className="text-[16px] font-bold leading-[25px] text-[color:var(--hp-ink)]">
           <Link
@@ -247,9 +241,8 @@ function TopicRow({ topic }: { topic: WithForumActivity }) {
       </div>
 
       {/* In RTL this compact control column sits on the physical left edge. */}
-      <div className="flex shrink-0 flex-col items-end gap-3 pt-1">
+      <div className="w-52 shrink-0 pt-1 text-left">
         <TopicState solved={false} compact />
-        <TopicCounters topic={topic} />
       </div>
     </article>
   );
@@ -272,6 +265,7 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
         />
         <span aria-hidden="true">•</span>
         <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
+        <TopicCounters topic={topic} />
       </div>
     </div>
   );
@@ -279,15 +273,15 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
 
 function TopicCounters({ topic }: { topic: WithForumActivity }) {
   return (
-    <div className="flex items-center justify-end gap-x-3 whitespace-nowrap text-[12px] font-bold text-[color:var(--hp-ink-2)]">
+    <div className="flex items-center gap-x-2 whitespace-nowrap text-[11px] font-bold text-[color:var(--community-accent)]">
       <Tooltip>
-        <TooltipTrigger render={<span className="cursor-default" />}>
+        <TooltipTrigger render={<span className="cursor-default rounded-[var(--hp-r-sm)] bg-[color:color-mix(in_oklch,var(--community-accent)_10%,transparent)] px-2 py-1" />}>
           <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده
         </TooltipTrigger>
         <TooltipContent>تعداد پاسخ‌های ثبت‌شده برای این مسئله</TooltipContent>
       </Tooltip>
       <Tooltip>
-        <TooltipTrigger render={<span className="cursor-default" />}>
+        <TooltipTrigger render={<span className="cursor-default rounded-[var(--hp-r-sm)] bg-[color:color-mix(in_oklch,var(--community-accent)_10%,transparent)] px-2 py-1" />}>
           <Num>{topic.views ?? 0}</Num> بار بازدید شده
         </TooltipTrigger>
         <TooltipContent>تعداد دفعات بازدید از این مسئله</TooltipContent>
@@ -307,7 +301,7 @@ function TopicState({ solved, compact = false }: { solved: boolean; compact?: bo
   }
 
   return (
-    <span className={`whitespace-nowrap text-end text-[var(--warning)] ${compact ? "text-[10px] leading-5" : "text-[12px] font-bold"}`}>
+    <span className={`block whitespace-nowrap text-[var(--warning)] ${compact ? "text-[11px] leading-5" : "text-[12px] font-bold"}`}>
       هنوز کسی این مسئله را حل نکرده
     </span>
   );
