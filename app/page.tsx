@@ -32,8 +32,6 @@ import { FinderSection } from "@/features/home/components/sections/FinderSection
 import { DealsSection } from "@/features/home/components/sections/DealsSection";
 import { ToolsSection } from "@/features/home/components/sections/ToolsSection";
 import { TopPicksSection } from "@/features/home/components/sections/TopPicksSection";
-import { FamilyCommentsSection } from "@/features/home/components/sections/FamilyCommentsSection";
-import { MoreToExploreSection } from "@/features/home/components/sections/MoreToExploreSection";
 import { AuthorsSection } from "@/features/home/components/sections/AuthorsSection";
 import { AnnouncementBar } from "@/features/home/components/sections/AnnouncementBar";
 import { TooltipColorScope } from "@/components/ui/tooltip";
@@ -204,14 +202,6 @@ export default async function HomePage() {
           {...textFor("community")}
         />,
       ),
-    },
-    {
-      key: "familyComments",
-      node: <FamilyCommentsSection comments={data.familyComments ?? []} />,
-    },
-    {
-      key: "moreToExplore",
-      node: <MoreToExploreSection data={data.moreToExplore} />,
     },
     {
       key: "authors",
