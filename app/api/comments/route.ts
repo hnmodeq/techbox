@@ -41,11 +41,11 @@ export async function GET(req: NextRequest) {
       where: { postId: post.id, parentId: null, status: "approved" },
       orderBy: { createdAt: "asc" },
       include: {
-        author: { select: { name: true, username: true, avatar: true } },
+        author: { select: { name: true, username: true, avatar: true, job: true } },
         replies: {
           where: { status: "approved" },
           orderBy: { createdAt: "asc" },
-          include: { author: { select: { name: true, username: true, avatar: true } } },
+          include: { author: { select: { name: true, username: true, avatar: true, job: true } } },
         },
       },
     });

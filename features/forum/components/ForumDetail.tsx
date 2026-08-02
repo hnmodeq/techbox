@@ -118,6 +118,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
               name={item.author?.name || "کاربر انجمن"}
               username={item.author?.username}
               avatar={item.author?.avatar || undefined}
+              job={(item.author as any)?.job}
               verifiedType={(item.author as any)?.verifiedType}
               verifiedLabel={(item.author as any)?.verifiedLabel}
             />

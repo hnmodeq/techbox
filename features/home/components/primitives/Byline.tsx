@@ -20,6 +20,7 @@ export type BylineAuthor = {
   name: string;
   username?: string;
   role?: string;
+  job?: string;
   avatar?: string;
 };
 
@@ -97,14 +98,14 @@ export function Byline({
           nameNode
         )}
 
-        {!hideRole && author.role && (
+        {!hideRole && (author.job || author.role) && (
           <span
             className={cn(
               "truncate text-[12px] leading-[18px]",
               onDark ? "text-[color:var(--hp-on-brand-mut)]" : "text-[color:var(--hp-ink-3)]",
             )}
           >
-            {author.role}
+            {author.job || author.role}
           </span>
         )}
 

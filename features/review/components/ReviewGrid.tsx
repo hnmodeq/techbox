@@ -55,7 +55,7 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
                     />
                     <div>
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{r.author?.name || "نویسنده تکباکس"}</div>
-                      <div className="text-[11px] paragraph-color">{r.author?.role || "تحلیلگر سخت‌افزار"}</div>
+                      <div className="text-[11px] paragraph-color">{r.author?.job || r.author?.role || "تحلیلگر سخت‌افزار"}</div>
                     </div>
                   </div>
 

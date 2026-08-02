@@ -147,6 +147,7 @@ function ForumFeedCard({item}:{item:ContentItem}){
  <div className={`line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-1 flex flex-wrap items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
  <span>{item.author?.name || "کاربر"}</span>
+ {item.author?.job && <span className="text-[10px]">{item.author.job}</span>}
  <CardStats module="forum" slug={item.slug} initialViews={item.views} initialLikes={item.likes} initialComments={item.comments || 0} showComments={true} />
  <ForumBadge slug={item.slug} fallback={null} />
  </div>

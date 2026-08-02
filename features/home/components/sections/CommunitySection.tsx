@@ -26,11 +26,17 @@ type WithForumActivity = ContentItem & {
   solved?: boolean;
   acceptedAnswer?: {
     text: string;
-    author: { name: string; username?: string; avatar?: string };
+    author: { name: string; username?: string; avatar?: string; job?: string };
   };
+  followUpReplies?: Array<{
+    id: string;
+    text: string;
+    date: string;
+    author: { name: string; username?: string; avatar?: string; job?: string; verifiedType?: string | null };
+  }>;
   lastActivity?: {
     date: string;
-    author: { name: string; username?: string; avatar?: string; verifiedType?: string | null };
+    author: { name: string; username?: string; avatar?: string; job?: string; verifiedType?: string | null };
   };
 };
 
@@ -131,9 +137,10 @@ function CommunityActions({
 
 function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const answer = topic.acceptedAnswer;
+  const followUpReplies = topic.followUpReplies ?? [];
 
   return (
-    <article className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
+    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
       <div className="flex min-w-0 items-center">
         <TopicActivity topic={topic} showSummary={false} />
       </div>
@@ -163,7 +170,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
             <CheckCircle2 className="size-4" aria-hidden="true" />
             پاسخ برتر
           </p>
-          <p className="mt-2 line-clamp-3 text-[14px] leading-[24px] text-[color:var(--hp-ink-2)]">
+          <p className="mt-2 line-clamp-4 text-[14px] leading-[24px] text-[color:var(--hp-ink-2)]">
             {answer.text}
           </p>
           <div className="mt-3">
@@ -171,6 +178,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
               name={answer.author.name}
               username={answer.author.username}
               avatar={answer.author.avatar}
+              job={answer.author.job}
               className="[&>div:last-child>div>span]:text-[12px]"
             />
           </div>
@@ -181,6 +189,30 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
         </p>
       )}
 
+      {followUpReplies.length > 0 && (
+        <section className="mt-auto border-t border-[color:var(--hp-rule)] pt-4" aria-label="ادامهٔ گفتگو">
+          <div className="divide-y divide-[color:var(--hp-rule)]">
+            {followUpReplies.map((reply, index) => (
+              <article key={reply.id} className={`py-3 ${index === 0 ? "pt-0" : ""}`}>
+                <p className="line-clamp-2 text-[13px] leading-6 text-[color:var(--hp-ink-2)]">
+                  {reply.text}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <AuthorLink
+                    name={reply.author.name}
+                    username={reply.author.username}
+                    avatar={reply.author.avatar}
+                    job={reply.author.job}
+                    verifiedType={reply.author.verifiedType}
+                    className="[&>div:first-child]:size-6 [&>div:last-child>div>span]:text-[11px]"
+                  />
+                  <RelativeDate date={reply.date} label="زمان پاسخ" className="text-[11px] text-[color:var(--hp-ink-3)]" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </article>
   );
 }
@@ -275,6 +307,7 @@ function TopicActivity({
           name={author?.name}
           username={author?.username}
           avatar={author?.avatar}
+          job={author?.job}
           verifiedType={author?.verifiedType}
           className="[&>div:first-child]:size-7 [&>div:last-child>div>span]:text-[12px]"
         />

@@ -47,6 +47,7 @@ export type ContentItem = {
       name: string;
       username?: string;
       avatar?: string;
+      job?: string;
       verifiedType?: string | null;
     };
   };

@@ -134,6 +134,7 @@ function mapHighlightComment(row: any): HighlightComment | null {
       name,
       username: row.author?.username ?? null,
       avatar: row.author?.avatar ?? null,
+      job: row.author?.job ?? null,
       verifiedType: row.author?.verifiedType ?? null,
     },
   };
@@ -245,7 +246,7 @@ export async function getLatestInsights(
       authorId: true,
       createdAt: true,
       author: {
-        select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
+        select: { name: true, username: true, avatar: true, job: true, verifiedType: true, status: true },
       },
     },
   });
@@ -380,11 +381,36 @@ export async function getCommunityTopics(
           id: true,
           text: true,
           authorName: true,
-          author: { select: { name: true, username: true, avatar: true } },
+          author: { select: { name: true, username: true, avatar: true, job: true } },
         },
       })
     : [];
   const acceptedById = new Map(acceptedRows.map((comment) => [comment.id, comment]));
+
+  // The resolved feature may show two additional real voices beneath its
+  // accepted answer. Keep them bounded and exclude the accepted answer so the
+  // card never repeats the same contribution.
+  const featureReplies = featuredRaw
+    ? await prisma.comment.findMany({
+        where: {
+          postId: featuredRaw.id,
+          parentId: null,
+          status: "approved",
+          deletedAt: null,
+          text: { not: "" },
+          ...(featuredRaw.acceptedCommentId ? { id: { not: featuredRaw.acceptedCommentId } } : {}),
+        },
+        orderBy: [{ likes: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+        take: 2,
+        select: {
+          id: true,
+          text: true,
+          createdAt: true,
+          authorName: true,
+          author: { select: { name: true, username: true, avatar: true, job: true, verifiedType: true, status: true } },
+        },
+      })
+    : [];
 
   const latestComments = topicIds.length > 0
     ? await prisma.comment.findMany({
@@ -395,7 +421,7 @@ export async function getCommunityTopics(
           postId: true,
           createdAt: true,
           authorName: true,
-          author: { select: { name: true, username: true, avatar: true, verifiedType: true, status: true } },
+          author: { select: { name: true, username: true, avatar: true, job: true, verifiedType: true, status: true } },
         },
       })
     : [];
@@ -417,8 +443,25 @@ export async function getCommunityTopics(
           name: accepted.author?.name || accepted.authorName || "کاربر",
           username: accepted.author?.username || "",
           avatar: accepted.author?.avatar || "",
+          job: accepted.author?.job || "",
         },
       };
+    }
+    if (featuredRaw && topic.id === featuredRaw.id && featureReplies.length > 0) {
+      (card as any).followUpReplies = featureReplies
+        .filter((reply) => !reply.author || reply.author.status === "active")
+        .map((reply) => ({
+          id: reply.id,
+          text: reply.text,
+          date: reply.createdAt.toISOString(),
+          author: {
+            name: reply.author?.name || reply.authorName || "کاربر انجمن",
+            username: reply.author?.username || "",
+            avatar: reply.author?.avatar || "",
+            job: reply.author?.job || "",
+            verifiedType: reply.author?.verifiedType || null,
+          },
+        }));
     }
     const activity = activityByPost.get(topic.id);
     if (activity) {
@@ -428,6 +471,7 @@ export async function getCommunityTopics(
           name: activity.author?.name || activity.authorName || "کاربر انجمن",
           username: activity.author?.username || "",
           avatar: activity.author?.avatar || "",
+          job: activity.author?.job || "",
           verifiedType: activity.author?.verifiedType || null,
         },
       };
@@ -506,7 +550,7 @@ export async function getLatestVideoHighlightComments(take = 4): Promise<VideoHi
       authorName: true,
       createdAt: true,
       author: {
-        select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
+        select: { name: true, username: true, avatar: true, job: true, verifiedType: true, status: true },
       },
       post: { select: { slug: true } },
     },
@@ -787,6 +831,7 @@ export async function getFamilyComments(blocklist: string[] = []): Promise<Famil
           name: true,
           username: true,
           avatar: true,
+          job: true,
           status: true,
           createdAt: true,
           verifiedType: true,
@@ -826,6 +871,7 @@ export async function getFamilyComments(blocklist: string[] = []): Promise<Famil
         name: c.author.name,
         username: c.author.username ?? null,
         avatar: c.author.avatar ?? null,
+        job: c.author.job?.trim() || null,
         verifiedType: c.author.verifiedType ?? null,
       },
       origin: {

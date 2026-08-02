@@ -182,6 +182,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
               name: pick.author?.name ?? "تحریریه",
               username: pick.author?.username,
               role: pick.author?.role,
+              job: pick.author?.job,
               avatar: pick.author?.avatar,
             }}
             date={pick.date_fa}

@@ -334,6 +334,7 @@ function NewsDiscussion({
                     name={comment.author.name}
                     username={comment.author.username ?? undefined}
                     avatar={comment.author.avatar ?? undefined}
+                    job={comment.author.job ?? undefined}
                     verifiedType={comment.author.verifiedType}
                   />
                   <button

@@ -52,6 +52,7 @@ export type FamilyComment = {
     name: string;
     username: string | null;
     avatar: string | null;
+    job: string | null;
     verifiedType: string | null;
   };
   origin: {
@@ -72,6 +73,7 @@ export type HighlightComment = {
     name: string;
     username: string | null;
     avatar: string | null;
+    job: string | null;
     verifiedType: string | null;
   };
 };

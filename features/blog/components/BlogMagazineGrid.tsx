@@ -463,7 +463,10 @@ function AuthorLine({ item, compact = false, inverted = false }: { item: Content
         sizes="28px"
         className="size-7 text-[10px] ring-1 ring-foreground/10"
       />
-      <span className={compact ? "line-clamp-1" : ""}>{name}</span>
+      <span className="min-w-0">
+        <span className={`block ${compact ? "line-clamp-1" : ""}`}>{name}</span>
+        {item.author?.job && <span className="block truncate text-[10px] font-normal opacity-80">{item.author.job}</span>}
+      </span>
     </div>
   );
 }
