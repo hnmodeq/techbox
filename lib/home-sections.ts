@@ -347,14 +347,13 @@ export async function getCommunityTopics(
   }
   if (featurePool.length === 0) return [];
 
-  // The left rail promises three unresolved questions. Pull a broader open
-  // pool so a hot solved feature from this week never consumes one of those
-  // slots, and merge it before bulk-enriching counts/activity.
-  const openFallback = await prisma.post.findMany({
+  // The activity rail needs enough real Forum material even when the recent
+  // feature pool is quiet or most questions have already been solved. Pull a
+  // broader forum pool, then let the rail prioritise unanswered topics below.
+  const railFallback = await prisma.post.findMany({
     where: {
       module: "forum",
       ...PUBLISHED,
-      solved: false,
       date: publicPostDateWhere(),
     },
     orderBy: [{ date: "desc" }, { id: "desc" }],
@@ -362,7 +361,7 @@ export async function getCommunityTopics(
     select: cardSelect,
   }) as any[];
   const topicById = new Map<string, any>();
-  for (const topic of [...featurePool, ...openFallback]) topicById.set(topic.id, topic);
+  for (const topic of [...featurePool, ...railFallback]) topicById.set(topic.id, topic);
   const topics = [...topicById.values()];
   const topicIds: string[] = topics.map((topic) => topic.id);
 
@@ -425,18 +424,27 @@ export async function getCommunityTopics(
     : hottest;
   const featured = featureChoices[seededIndex(featureChoices.length, 613)];
 
-  let openTopics = unresolved
+  const sortByActivity = (a: any, b: any) =>
+    (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
+    (b.likes || 0) - (a.likes || 0) ||
+    (b.views || 0) - (a.views || 0) ||
+    b.date.getTime() - a.date.getTime();
+
+  // Give unanswered questions priority, but backfill with solved threads so
+  // the homepage can present four distinct, real Forum topics. A solved row
+  // retains its true state in the component; it is never relabelled as open.
+  const openTopics = unresolved
     .filter((topic) => topic.id !== featured.id)
-    .sort((a, b) =>
-      (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
-      b.date.getTime() - a.date.getTime(),
-    )
-    .slice(0, 4);
-  // If the entire forum only has four unresolved questions and the hot
-  // feature is one of them, repeat that real question in the left rail rather
-  // than replacing it with fake content or showing fewer than three rows.
-  if (openTopics.length < 4 && !featured.solved) {
-    openTopics = [featured, ...openTopics].slice(0, 4);
+    .sort(sortByActivity);
+  const solvedTopics = topics
+    .filter((topic) => topic.solved && topic.id !== featured.id)
+    .sort(sortByActivity);
+  let railTopics = [...openTopics, ...solvedTopics].slice(0, 4);
+
+  // In a genuinely tiny Forum, the feature is still a real topic and is a
+  // better final rail item than a fabricated placeholder.
+  if (railTopics.length < 4 && !railTopics.some((topic) => topic.id === featured.id)) {
+    railTopics = [...railTopics, featured];
   }
 
   const toCard = (topic: any): ContentItem => {
@@ -468,7 +476,7 @@ export async function getCommunityTopics(
     return card;
   };
 
-  return [toCard(featured), ...openTopics.map(toCard)];
+  return [toCard(featured), ...railTopics.map(toCard)];
 }
 
 /**

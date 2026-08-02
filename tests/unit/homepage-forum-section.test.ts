@@ -12,17 +12,17 @@ describe("homepage Forum section", () => {
   const forum = read("features/forum/components/ForumList.tsx");
   const composer = read("features/forum/components/ForumQuestionPanel.tsx");
 
-  it("uses a random hot seven-day feature and at least three real open-topic slots", () => {
+  it("uses a random hot seven-day feature and a four-topic real activity rail", () => {
     expect(data).toMatch(/export async function getCommunityTopics/);
     expect(data).toMatch(/module: "forum"/);
     expect(data).toMatch(/date: \{ gte: weekAgo/);
     expect(data).toMatch(/const hottest = \[\.\.\.featurePool\]/);
     expect(data).toMatch(/seededIndex\(featureChoices\.length, 613\)/);
-    expect(data).toMatch(/!topic\.solved/);
-    expect(data).toMatch(/slice\(0, 4\)/);
-    expect(data).toMatch(/if \(openTopics\.length < 4 && !featured\.solved\)/);
+    expect(data).toMatch(/const railFallback = await prisma\.post\.findMany/);
+    expect(data).toMatch(/let railTopics = \[\.\.\.openTopics, \.\.\.solvedTopics\]\.slice\(0, 4\)/);
+    expect(data).toMatch(/return \[toCard\(featured\), \.\.\.railTopics\.map\(toCard\)\]/);
     expect(community).toMatch(/const featured = list\[0\] \?\? null/);
-    expect(community).toMatch(/list\.slice\(1\)[\s\S]*?!topic\.solved/);
+    expect(community).toMatch(/const activeTopics = list\.slice\(1, 5\)/);
     expect(community).toMatch(/فعلاً پرسش بازی برای نمایش نیست/);
   });
 
@@ -34,10 +34,11 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/text-\[var\(--warning\)\]/);
     expect(community).toMatch(/هنوز کسی این مسئله را حل نکرده/);
     expect(community).toMatch(/پاسخ ثبت شده/);
-    expect(community).toMatch(/بار بازدید شده/);
+    expect(community).not.toMatch(/بار بازدید شده/);
+    expect(community).toMatch(/ms-auto flex shrink-0/);
     expect(community).toMatch(/whitespace-nowrap/);
     expect(community).toMatch(/تعداد پاسخ‌های ثبت‌شده/);
-    expect(community).toMatch(/تعداد دفعات بازدید/);
+    expect(community).not.toMatch(/تعداد دفعات بازدید/);
     // Main feature is square-cornered/borderless, with its state line below.
     const feature = community.slice(community.indexOf("function FeaturedTopic"), community.indexOf("function EmptyCommunityFeature"));
     expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
@@ -60,8 +61,13 @@ describe("homepage Forum section", () => {
     expect(community).not.toMatch(/<NewForumTopicModal/);
     expect(community).not.toMatch(/<ForumTopicModal/);
     expect(community).not.toMatch(/پاسخ دادن به این مسئله/);
+    const headerActions = community.slice(community.indexOf("function CommunityActions"), community.indexOf("function FeaturedTopic"));
+    expect(headerActions).not.toMatch(/طرح پرسش جدید/);
     expect(community).toMatch(/href=\{`\/\$\{topic\.module\}\/\$\{topic\.slug\}`\}/);
     expect(composer).toMatch(/id="hp-forum-question"/);
+    expect(composer).toMatch(/rounded-\[12px\] bg-white p-1\.5/);
+    expect(composer).toMatch(/resize-none/);
+    expect(composer).not.toMatch(/resize-y/);
     expect(composer).toMatch(/window\.dispatchEvent\(new CustomEvent\("tb_open_auth"\)\)/);
   });
 

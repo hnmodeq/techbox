@@ -19,7 +19,7 @@ import { AuthorLink } from "@/components/ui/author-link";
 import { Num } from "@/components/ui/num";
 import { RelativeDate } from "@/components/ui/relative-date";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { CheckCircle2, MessageCircle, Plus } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { ForumQuestionPanel } from "@/features/forum/components/ForumQuestionPanel";
 
 /** findPosts() in lib/home-server.ts attaches these forum-only fields. */
@@ -56,12 +56,14 @@ export function CommunitySection({
   accentColor,
 }: CommunitySectionProps) {
   // getCommunityTopics() puts a random pick from the hottest seven-day
-  // pool first, then appends only still-open topics for this activity list.
+  // pool first, then appends a four-topic activity snapshot. The rail
+  // prioritises unanswered work but can also show genuinely solved threads
+  // when that is what keeps the homepage useful and full.
   // Even an empty community renders its real ask/browse affordances instead
   // of silently vanishing from the homepage.
   const list = (topics ?? []) as WithForumActivity[];
   const featured = list[0] ?? null;
-  const activeTopics = list.slice(1).filter((topic) => !topic.solved).slice(0, 4);
+  const activeTopics = list.slice(1, 5);
   const style: CommunityStyle = { "--community-accent": accentColor || "var(--primary)" };
 
   return (
@@ -102,24 +104,15 @@ function CommunityActions({
   showBrowse: boolean;
   moreLabel: string;
 }) {
+  if (!showBrowse) return null;
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Link
-        href="#hp-forum-question"
-        className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--hp-r-sm)] bg-[color:var(--community-accent)] px-3 text-[12px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <Plus className="size-4" aria-hidden="true" />
-        طرح پرسش جدید
-      </Link>
-      {showBrowse && (
-        <Link
-          href="/forum"
-          className="inline-flex min-h-10 items-center px-2 text-[12px] font-bold text-muted-foreground transition-colors hover:text-[color:var(--community-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {moreLabel}
-        </Link>
-      )}
-    </div>
+    <Link
+      href="/forum"
+      className="inline-flex min-h-10 items-center px-2 text-[12px] font-bold text-muted-foreground transition-colors hover:text-[color:var(--community-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      {moreLabel}
+    </Link>
   );
 }
 
@@ -128,7 +121,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const isSolved = Boolean(topic.solved && answer?.text);
 
   return (
-    <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
+    <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:color-mix(in_oklch,var(--community-accent)_7%,var(--hp-surface))] p-6">
       <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--community-accent)]" aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TopicActivity topic={topic} />
@@ -242,7 +235,7 @@ function TopicRow({ topic }: { topic: WithForumActivity }) {
 
       {/* In RTL this compact control column sits on the physical left edge. */}
       <div className="w-52 shrink-0 pt-1 text-left">
-        <TopicState solved={false} compact />
+        <TopicState solved={Boolean(topic.solved)} compact />
       </div>
     </article>
   );
@@ -254,8 +247,8 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
   const date = activity?.date ?? topic.date;
 
   return (
-    <div className="min-w-0 text-[12px] text-[color:var(--hp-ink-3)]">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--hp-ink-3)]">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
         <AuthorLink
           name={author?.name}
           username={author?.username}
@@ -265,26 +258,20 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
         />
         <span aria-hidden="true">•</span>
         <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
-        <TopicCounters topic={topic} />
       </div>
+      <TopicCounters topic={topic} />
     </div>
   );
 }
 
 function TopicCounters({ topic }: { topic: WithForumActivity }) {
   return (
-    <div className="flex items-center gap-x-2 whitespace-nowrap text-[11px] font-bold text-[color:var(--community-accent)]">
+    <div className="ms-auto flex shrink-0 items-center whitespace-nowrap text-[11px] font-bold text-[color:var(--community-accent)]">
       <Tooltip>
-        <TooltipTrigger render={<span className="cursor-default rounded-[var(--hp-r-sm)] bg-[color:color-mix(in_oklch,var(--community-accent)_10%,transparent)] px-2 py-1" />}>
+        <TooltipTrigger render={<span className="cursor-default" />}>
           <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده
         </TooltipTrigger>
         <TooltipContent>تعداد پاسخ‌های ثبت‌شده برای این مسئله</TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger render={<span className="cursor-default rounded-[var(--hp-r-sm)] bg-[color:color-mix(in_oklch,var(--community-accent)_10%,transparent)] px-2 py-1" />}>
-          <Num>{topic.views ?? 0}</Num> بار بازدید شده
-        </TooltipTrigger>
-        <TooltipContent>تعداد دفعات بازدید از این مسئله</TooltipContent>
       </Tooltip>
     </div>
   );
