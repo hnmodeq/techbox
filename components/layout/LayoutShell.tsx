@@ -48,6 +48,8 @@ type LayoutShellProps = {
   children: React.ReactNode
   homeData?: HomeData
   serverModuleConfig?: SiteLayoutConfig
+  /** Saved desktop navigation preference from the sidebar_state cookie. */
+  defaultSidebarOpen?: boolean
 }
 
 /** Module pages inherit their saved colour for every portalled tooltip. */
@@ -57,7 +59,7 @@ function tooltipColorForPath(pathname: string): string | undefined {
   return match ? `var(--module-${match}-color, var(--primary))` : undefined
 }
 
-export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutShellProps) {
+export function LayoutShell({ children, homeData, serverModuleConfig, defaultSidebarOpen = true }: LayoutShellProps) {
   const pathname = usePathname()
   const isAdmin = pathname.startsWith("/admin")
   const statsEnabled = /^\/(blog|news|media|review|download|shop|forum|search|author)(\/|$)/.test(pathname)
@@ -84,7 +86,7 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
               <ModuleConfigProvider serverConfig={serverModuleConfig}>
                 <ModuleColorApplier />
                 <TimelineLikesProvider enabled={timelineLikesEnabled}>
-                  <LayoutInner>{children}</LayoutInner>
+                  <LayoutInner defaultSidebarOpen={defaultSidebarOpen}>{children}</LayoutInner>
                 </TimelineLikesProvider>
               </ModuleConfigProvider>
               <Chatbot />
@@ -102,9 +104,14 @@ export function LayoutShell({ children, homeData, serverModuleConfig }: LayoutSh
   )
 }
 
-function LayoutInner({ children }: { children: React.ReactNode }) {
+function LayoutInner({
+  children,
+  defaultSidebarOpen,
+}: {
+  children: React.ReactNode
+  defaultSidebarOpen: boolean
+}) {
   const pathname = usePathname()
-  const isHome = pathname === "/"
   const { user } = useAuth()
   const userId = user?.id ?? ""
   const [newsOpen, setNewsOpen] = React.useState(false)
@@ -191,23 +198,24 @@ function LayoutInner({ children }: { children: React.ReactNode }) {
   // already loaded by this layout, so opening it fetches nothing.
   React.useEffect(() => {
     const open = () => setNewsOpen(true)
+    const toggle = () => setNewsOpen((current) => !current)
     window.addEventListener("tb_open_news_sidebar", open)
-    return () => window.removeEventListener("tb_open_news_sidebar", open)
+    window.addEventListener("tb_toggle_news_sidebar", toggle)
+    return () => {
+      window.removeEventListener("tb_open_news_sidebar", open)
+      window.removeEventListener("tb_toggle_news_sidebar", toggle)
+    }
   }, [])
 
   return (
     <TooltipColorScope color={tooltipColorForPath(pathname)}>
     <div className="[--header-height:calc(var(--spacing)*14)]">
       {/*
-        The main sidebar floats (overlay) rather than reserving layout
-        width — see docs/homepage-upgrade §1.5 (decision D3).
-
-        It starts CLOSED on the homepage only: `/` is a destination page
-        whose sections are designed against the full 1280px container, so
-        the chrome gets out of the way. Every other route keeps the
-        previous default-open behaviour.
+        The main sidebar reserves its desktop width in the flex layout. It
+        opens on a visitor's first entry, then the sidebar_state cookie keeps
+        their most recent open/closed choice across refreshes and visits.
       */}
-      <SidebarProvider className="min-h-svh w-full flex-col" defaultOpen={!isHome}>
+      <SidebarProvider className="min-h-svh w-full flex-col" defaultOpen={defaultSidebarOpen}>
         <SiteHeader
           hasUnreadNews={hasUnreadNews}
           newsOpen={newsOpen}

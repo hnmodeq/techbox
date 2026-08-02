@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "@fontsource/vazirmatn/300.css";
 import "@fontsource/vazirmatn/400.css";
 import "@fontsource/vazirmatn/500.css";
@@ -130,12 +131,16 @@ export default async function RootLayout({
   // Fire-and-forget: auto-publish any overdue scheduled posts (60s cooldown built in)
   autoPublishScheduled().catch(() => {});
   const colorsEnabled = moduleConfig?.moduleColorsEnabled !== false;
+  // First visit has no cookie and opens the navigation. Subsequent document
+  // visits use the state written by SidebarProvider when the reader toggles it.
+  const sidebarCookie = (await cookies()).get("sidebar_state")?.value;
+  const defaultSidebarOpen = sidebarCookie !== "false";
 
   return (
     <html
       lang="fa"
       dir="rtl"
-      data-main-sidebar-open="true"
+      data-main-sidebar-open={defaultSidebarOpen ? "true" : "false"}
       data-module-colors={colorsEnabled ? "enabled" : "disabled"}
       style={moduleColorStyle(moduleConfig)}
       className={cn(kalameh.variable, kalameh.className, "font-sans", "main-sidebar-booting", "news-sidebar-booting")}
@@ -154,7 +159,7 @@ export default async function RootLayout({
         <RuntimeEffects />
         <TooltipProvider>
           <ScrollRestoration />
-          <LayoutShell homeData={homeData} serverModuleConfig={moduleConfig}>{children}</LayoutShell>
+          <LayoutShell homeData={homeData} serverModuleConfig={moduleConfig} defaultSidebarOpen={defaultSidebarOpen}>{children}</LayoutShell>
           <Analytics />
           <SpeedInsights />
           <Toaster />
