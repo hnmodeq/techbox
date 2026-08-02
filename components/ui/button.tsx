@@ -117,11 +117,12 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
-    { className, variant = "primary", size = "md", loading, children, ...props },
+    { className, variant = "primary", size = "md", loading, children, disabled: disabledProp = false, ...props },
     ref
   ) => {
     const mappedVariant = mapVariant(variant);
     const mappedSize = mapSize(size);
+    const isDisabled = Boolean(loading || disabledProp);
     return (
       <ButtonPrimitive
         ref={ref}
@@ -132,7 +133,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             "bg-gradient-to-br from-[var(--home)] to-[var(--admin)] text-white hover:opacity-90",
           className
         )}
-        disabled={loading || props.disabled}
+        disabled={isDisabled}
         {...props}
       >
         {loading && (
