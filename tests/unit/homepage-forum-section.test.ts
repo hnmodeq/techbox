@@ -19,7 +19,7 @@ describe("homepage Forum section", () => {
     expect(data).toMatch(/const hottest = \[\.\.\.featurePool\]/);
     expect(data).toMatch(/seededIndex\(featureChoices\.length, 613\)/);
     expect(data).toMatch(/const railFallback = await prisma\.post\.findMany/);
-    expect(data).toMatch(/let railTopics = \[\.\.\.openTopics, \.\.\.solvedTopics\]\.slice\(0, 4\)/);
+    expect(data).toMatch(/const railTopics = \[\.\.\.openTopics, \.\.\.solvedTopics\]\.slice\(0, 4\)/);
     expect(data).toMatch(/return \[toCard\(featured\), \.\.\.railTopics\.map\(toCard\)\]/);
     expect(community).toMatch(/const featured = list\[0\] \?\? null/);
     expect(community).toMatch(/const activeTopics = list\.slice\(1, 5\)/);

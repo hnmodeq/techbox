@@ -439,13 +439,7 @@ export async function getCommunityTopics(
   const solvedTopics = topics
     .filter((topic) => topic.solved && topic.id !== featured.id)
     .sort(sortByActivity);
-  let railTopics = [...openTopics, ...solvedTopics].slice(0, 4);
-
-  // In a genuinely tiny Forum, the feature is still a real topic and is a
-  // better final rail item than a fabricated placeholder.
-  if (railTopics.length < 4 && !railTopics.some((topic) => topic.id === featured.id)) {
-    railTopics = [...railTopics, featured];
-  }
+  const railTopics = [...openTopics, ...solvedTopics].slice(0, 4);
 
   const toCard = (topic: any): ContentItem => {
     const card = normalize(topic);
