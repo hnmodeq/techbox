@@ -279,7 +279,7 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
 
 function TopicCounters({ topic }: { topic: WithForumActivity }) {
   return (
-    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-[12px] font-bold text-[color:var(--hp-ink-2)]">
+    <div className="flex items-center justify-end gap-x-3 whitespace-nowrap text-[12px] font-bold text-[color:var(--hp-ink-2)]">
       <Tooltip>
         <TooltipTrigger render={<span className="cursor-default" />}>
           <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده

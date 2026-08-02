@@ -35,12 +35,14 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/هنوز کسی این مسئله را حل نکرده/);
     expect(community).toMatch(/پاسخ ثبت شده/);
     expect(community).toMatch(/بار بازدید شده/);
+    expect(community).toMatch(/whitespace-nowrap/);
     expect(community).toMatch(/تعداد پاسخ‌های ثبت‌شده/);
     expect(community).toMatch(/تعداد دفعات بازدید/);
     // Main feature is square-cornered/borderless, with its state line below.
     const feature = community.slice(community.indexOf("function FeaturedTopic"), community.indexOf("function EmptyCommunityFeature"));
     expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
     expect(feature).not.toMatch(/border border-\[color:var\(--hp-border\)\]/);
+    expect(feature).not.toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
     expect(feature).toMatch(/absolute inset-x-0 bottom-0 h-1/);
     expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
   });
