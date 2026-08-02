@@ -261,7 +261,7 @@ function LeadArticle({
     // Rounded and elevated to match the Video section's comment card.
     // overflow-hidden clips the image to the same radius, so the photo and
     // the colour panel still read as one object.
-    <article className="hp-card overflow-hidden rounded-[var(--hp-r-md)] shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]">
+    <article className="hp-card overflow-hidden shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]">
       <button
         type="button"
         onClick={onOpen}
@@ -328,7 +328,7 @@ function ListRow({
         className="block shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         <div
-          className="relative w-[180px] overflow-hidden bg-muted sm:w-[150px]"
+          className="relative w-[180px] overflow-hidden rounded-[var(--hp-r-sm)] bg-muted sm:w-[150px]"
           style={{ aspectRatio: "1.3/1" }}
         >
           <RemoteImage

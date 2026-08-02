@@ -73,24 +73,25 @@ describe("page.tsx passes them to the section", () => {
 describe("MagazineSection visual contract", () => {
   const src = read("features/home/components/sections/MagazineSection.tsx");
 
-  it("rounds and elevates the lead card, and nothing else", () => {
-    // The lead now matches the Video section's comment card: one radius
-    // token plus the shared card shadow. The compact list rows stay square,
-    // so the Spiceworks density is preserved where it matters.
-    expect(src).toMatch(/rounded-\[var\(--hp-r-md\)\]/);
-    expect(src).toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
-    expect(src).toMatch(/hover:shadow-\[var\(--hp-shadow-hover\)\]/);
-    // Radius belongs to the lead <article> only.
-    expect([...src.matchAll(/rounded-\[var\(--hp-r-md\)\]/g)].length).toBe(1);
+  it("keeps the lead square-cornered while softly rounding compact article images", () => {
+    // The main Magazine lead is now a sharp editorial block. Small rail
+    // thumbnails retain a smaller radius so their image corners do not feel
+    // harsh against the otherwise dense list.
+    const lead = src.slice(src.indexOf("function LeadArticle"), src.indexOf("function ListRow"));
+    const rows = src.slice(src.indexOf("function ListRow"));
+    expect(lead).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
+    expect(lead).toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
+    expect(lead).toMatch(/hover:shadow-\[var\(--hp-shadow-hover\)\]/);
+    expect(rows).toMatch(/rounded-\[var\(--hp-r-sm\)\]/);
   });
 
   it("uses the shadcn border token for list separators", () => {
     // Magazine text and rules stay on the regular shadcn palette. The only
-    // homepage-specific aliases permitted are the lead card's radius and
-    // shadow, which deliberately match the Video comment card.
+    // homepage-specific aliases are the compact thumbnail radius and lead
+    // shadow treatment.
     expect(src).toMatch(/bg-border/);
     const hpTokens = new Set([...src.matchAll(/--hp-[a-z-]+/g)].map((m) => m[0]));
-    expect([...hpTokens].sort()).toEqual(["--hp-r-md", "--hp-shadow-card", "--hp-shadow-hover"]);
+    expect([...hpTokens].sort()).toEqual(["--hp-r-sm", "--hp-shadow-card", "--hp-shadow-hover"]);
   });
 
   it("draws separators as real flex items, not a pinned pseudo-element", () => {

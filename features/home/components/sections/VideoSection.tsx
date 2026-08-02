@@ -144,11 +144,11 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
     // h-full so the poster matches the section height instead of leaving a
     // gap. The 9/16 ratio stays as a MIN on small screens, where the column
     // stacks and there is no sibling to match.
-    <div className="mx-auto h-full w-full max-w-[390px] lg:max-w-none">
+    <div className="mx-auto flex h-full w-full max-w-[390px] flex-col lg:max-w-none">
       <button
         type="button"
         onClick={onOpen}
-        className="group relative block h-full w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="group relative block min-h-0 flex-1 w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <div className="relative h-full w-full overflow-hidden bg-background max-lg:aspect-9/16 lg:min-h-[520px]">
           {/* Above the fold whenever Video is ordered near the top, and the
@@ -178,6 +178,7 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
           </div>
         </div>
       </button>
+      <div aria-hidden="true" className="h-1 shrink-0 bg-[color:var(--video-accent)]" />
     </div>
   );
 }

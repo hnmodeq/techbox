@@ -8,7 +8,8 @@
  * members are currently talking. Every route remains a normal forum URL —
  * technical threads need deep links, long-form answers, and shareability.
  *
- * RTL: featured resolution sits on the right; active topics sit on the left.
+ * RTL: active topics sit on the right; featured resolution and direct composer
+ * sit on the left.
  */
 import * as React from "react";
 import Link from "next/link";
@@ -19,8 +20,7 @@ import { Num } from "@/components/ui/num";
 import { RelativeDate } from "@/components/ui/relative-date";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CheckCircle2, MessageCircle, Plus } from "lucide-react";
-import { NewForumTopicModal } from "@/features/forum/components/NewForumTopicModal";
-import { ForumTopicModal } from "@/features/forum/components/ForumTopicModal";
+import { ForumQuestionPanel } from "@/features/forum/components/ForumQuestionPanel";
 
 /** findPosts() in lib/home-server.ts attaches these forum-only fields. */
 type WithForumActivity = ContentItem & {
@@ -55,9 +55,6 @@ export function CommunitySection({
   showMore = true,
   accentColor,
 }: CommunitySectionProps) {
-  const [newTopicOpen, setNewTopicOpen] = React.useState(false);
-  const [replyTopic, setReplyTopic] = React.useState<WithForumActivity | null>(null);
-
   // getCommunityTopics() puts a random pick from the hottest seven-day
   // pool first, then appends only still-open topics for this activity list.
   // Even an empty community renders its real ask/browse affordances instead
@@ -77,18 +74,21 @@ export function CommunitySection({
           href={showMore ? "/forum" : undefined}
           linkLabel={moreLabel}
           accentColor={accentColor}
-          actions={<CommunityActions showBrowse={showMore} moreLabel={moreLabel} onAsk={() => setNewTopicOpen(true)} />}
+          actions={<CommunityActions showBrowse={showMore} moreLabel={moreLabel} />}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-10">
-        {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature onAsk={() => setNewTopicOpen(true)} />}
-        <ActiveTopicList topics={activeTopics} onReply={setReplyTopic} />
+      {/* In RTL, the first grid child lands on the physical right. The open
+          questions therefore lead on the right and the featured topic plus
+          direct question composer form the left participation column. */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(360px,.95fr)_minmax(0,1.05fr)] lg:gap-10">
+        <ActiveTopicList topics={activeTopics} />
+        <div className="flex min-w-0 flex-col gap-6">
+          {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature />}
+          <ForumQuestionPanel />
+        </div>
       </div>
-
-      <NewForumTopicModal open={newTopicOpen} onOpenChange={setNewTopicOpen} />
-      {replyTopic && <ForumTopicModal topic={replyTopic} onClose={() => setReplyTopic(null)} />}
     </SectionShell>
   );
 }
@@ -96,22 +96,19 @@ export function CommunitySection({
 function CommunityActions({
   showBrowse,
   moreLabel,
-  onAsk,
 }: {
   showBrowse: boolean;
   moreLabel: string;
-  onAsk: () => void;
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <button
-        type="button"
-        onClick={onAsk}
+      <Link
+        href="#hp-forum-question"
         className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--hp-r-sm)] bg-[color:var(--community-accent)] px-3 text-[12px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Plus className="size-4" aria-hidden="true" />
         طرح پرسش جدید
-      </button>
+      </Link>
       {showBrowse && (
         <Link
           href="/forum"
@@ -129,7 +126,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const isSolved = Boolean(topic.solved && answer?.text);
 
   return (
-    <article className="relative overflow-hidden bg-[color:var(--hp-surface)] p-6 shadow-[var(--hp-shadow-card)]">
+    <article className="relative overflow-hidden bg-[color:var(--hp-surface)] p-6">
       <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--hp-solved)]" aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TopicActivity topic={topic} />
@@ -187,30 +184,27 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   );
 }
 
-function EmptyCommunityFeature({ onAsk }: { onAsk: () => void }) {
+function EmptyCommunityFeature() {
   return (
     <div className="border border-dashed border-[color:var(--hp-border)] p-6 text-center">
       <p className="text-[18px] font-bold text-[color:var(--hp-ink)]">هنوز موضوعی در انجمن ثبت نشده است</p>
       <p className="mx-auto mt-2 max-w-md text-[14px] leading-6 text-[color:var(--hp-ink-3)]">
         اولین پرسش فنی را ثبت کنید تا گفتگوی بعدی جامعهٔ تکباکس از همین‌جا شروع شود.
       </p>
-      <button
-        type="button"
-        onClick={onAsk}
-        className="mt-5 text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      <a
+        href="#hp-forum-question"
+        className="mt-5 inline-block text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         طرح پرسش جدید
-      </button>
+      </a>
     </div>
   );
 }
 
 function ActiveTopicList({
   topics,
-  onReply,
 }: {
   topics: WithForumActivity[];
-  onReply: (topic: WithForumActivity) => void;
 }) {
   return (
     <div>
@@ -225,7 +219,7 @@ function ActiveTopicList({
         <ul className="divide-y divide-[color:var(--hp-border)]">
           {topics.map((topic) => (
             <li key={`${topic.module}-${topic.slug}`} className="py-4 first:pt-0 last:pb-0">
-              <TopicRow topic={topic} onReply={onReply} />
+              <TopicRow topic={topic} />
             </li>
           ))}
         </ul>
@@ -234,7 +228,7 @@ function ActiveTopicList({
   );
 }
 
-function TopicRow({ topic, onReply }: { topic: WithForumActivity; onReply: (topic: WithForumActivity) => void }) {
+function TopicRow({ topic }: { topic: WithForumActivity }) {
   return (
     <article className="group flex items-start justify-between gap-4">
       <div className="min-w-0">
@@ -255,13 +249,6 @@ function TopicRow({ topic, onReply }: { topic: WithForumActivity; onReply: (topi
       {/* In RTL this compact control column sits on the physical left edge. */}
       <div className="flex shrink-0 flex-col items-end gap-3 pt-1">
         <TopicState solved={false} compact />
-        <button
-          type="button"
-          onClick={() => onReply(topic)}
-          className="text-[12px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          پاسخ دادن به این مسئله
-        </button>
         <TopicCounters topic={topic} />
       </div>
     </article>
@@ -292,7 +279,7 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
 
 function TopicCounters({ topic }: { topic: WithForumActivity }) {
   return (
-    <div className="flex flex-col items-end gap-1.5 text-[12px] font-bold text-[color:var(--hp-ink-2)]">
+    <div className="flex flex-wrap justify-end gap-x-3 gap-y-1 text-[12px] font-bold text-[color:var(--hp-ink-2)]">
       <Tooltip>
         <TooltipTrigger render={<span className="cursor-default" />}>
           <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده

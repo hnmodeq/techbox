@@ -92,10 +92,12 @@ describe("homepage Video and Latest contracts", () => {
     expect(card).not.toMatch(/min-h-\[210px\]/);
   });
 
-  it("closes the gap under the quick-takes rail", () => {
+  it("closes the gap under the quick-takes rail and marks the main video with its module colour", () => {
     // justify-between spreads the slack between the comments and the rail
     // so the column finishes level with the tall portrait video.
     expect(video).toMatch(/flex min-w-0 flex-col justify-between gap-5/);
+    const latest = video.slice(video.indexOf("function LatestVideoCard"), video.indexOf("function QuickTakeCard"));
+    expect(latest).toMatch(/h-1 shrink-0 bg-\[color:var\(--video-accent\)\]/);
   });
 
   it("builds a diverse, comment-led rotation from recent News", () => {
