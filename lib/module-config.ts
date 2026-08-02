@@ -288,17 +288,35 @@ const cachedModuleConfig = unstable_cache(
 );
 
 /**
+ * `unstable_cache` persists successful values, but it does not coalesce
+ * simultaneous cache misses in a long-lived dev process. A browser reload
+ * loop could therefore turn one SiteSetting query into hundreds of identical
+ * attempts and exhaust the small local Neon pool. Share one in-flight read
+ * until it settles; normal cache semantics resume immediately afterwards.
+ */
+let moduleConfigInFlight: Promise<SiteLayoutConfig> | null = null;
+
+/**
  * Public, failure-tolerant config read. The visible application can keep
  * rendering with built-in defaults while a failed DB read is deliberately
  * kept OUTSIDE `cachedModuleConfig`, allowing the next request to retry.
  */
-export async function getModuleConfig(): Promise<SiteLayoutConfig> {
-  try {
-    return await cachedModuleConfig();
-  } catch (error) {
-    if (!isCircuitOpenError(error)) logDbFailure("module-config", error);
-    return getDefaultSiteLayoutConfig();
-  }
+export function getModuleConfig(): Promise<SiteLayoutConfig> {
+  if (moduleConfigInFlight) return moduleConfigInFlight;
+
+  const flight = (async () => {
+    try {
+      return await cachedModuleConfig();
+    } catch (error) {
+      if (!isCircuitOpenError(error)) logDbFailure("module-config", error);
+      return getDefaultSiteLayoutConfig();
+    } finally {
+      moduleConfigInFlight = null;
+    }
+  })();
+
+  moduleConfigInFlight = flight;
+  return flight;
 }
 
 /**

@@ -444,13 +444,24 @@ const cachedMagazinePosts = unstable_cache(getMagazinePostsUncached, ["home-maga
   tags: ["home-data"],
 });
 
+let magazinePostsInFlight: Promise<ContentItem[]> | null = null;
+
 export async function getMagazinePosts(): Promise<ContentItem[]> {
-  try {
-    return await cachedMagazinePosts();
-  } catch (error) {
-    if (!isCircuitOpenError(error)) logDbFailure("home-data:magazine", error);
-    return [];
-  }
+  if (magazinePostsInFlight) return magazinePostsInFlight;
+
+  const flight = (async () => {
+    try {
+      return await cachedMagazinePosts();
+    } catch (error) {
+      if (!isCircuitOpenError(error)) logDbFailure("home-data:magazine", error);
+      return [];
+    } finally {
+      magazinePostsInFlight = null;
+    }
+  })();
+
+  magazinePostsInFlight = flight;
+  return flight;
 }
 
 async function getLayoutHomeDataUncached(): Promise<HomeData> {
@@ -516,13 +527,24 @@ const cachedLayoutHomeData = unstable_cache(getLayoutHomeDataUncached, ["layout-
   tags: ["home-data"],
 });
 
-export async function getLayoutHomeData(): Promise<HomeData> {
-  try {
-    return await cachedLayoutHomeData();
-  } catch (error) {
-    if (!isCircuitOpenError(error)) logDbFailure("layout-data", error);
-    return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
-  }
+let layoutHomeDataInFlight: Promise<HomeData> | null = null;
+
+export function getLayoutHomeData(): Promise<HomeData> {
+  if (layoutHomeDataInFlight) return layoutHomeDataInFlight;
+
+  const flight = (async () => {
+    try {
+      return await cachedLayoutHomeData();
+    } catch (error) {
+      if (!isCircuitOpenError(error)) logDbFailure("layout-data", error);
+      return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
+    } finally {
+      layoutHomeDataInFlight = null;
+    }
+  })();
+
+  layoutHomeDataInFlight = flight;
+  return flight;
 }
 
 /** Exported for scripts/tests: unstable_cache needs a Next request context,
@@ -721,7 +743,9 @@ const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v8"], {
   tags: ["home-data"],
 });
 
-export async function getHomeData(): Promise<HomeData> {
+let homeDataInFlight: Promise<HomeData> | null = null;
+
+export function getHomeData(): Promise<HomeData> {
   // Do not enter the cache when the breaker is already open.
   //
   // Every query inside would fail, and the deliberate "refuse to cache an
@@ -733,20 +757,32 @@ export async function getHomeData(): Promise<HomeData> {
   // saves the work. A race is still possible (breaker closed on entry, all
   // queries fail after) and is still handled by the catch below.
   if (circuitState() === "open") {
-    return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
+    return Promise.resolve({ modules: {}, ticker: [], generatedAt: new Date().toISOString() });
   }
+  if (homeDataInFlight) return homeDataInFlight;
 
-  try {
-    return await cachedHomeData();
-  } catch (e) {
-    // Database unreachable → render an empty page rather than a 500. This
-    // result is NOT cached (the throw above prevents that), so the next
-    // request retries. Logged loudly because a silently blank homepage is
-    // very hard to diagnose from the outside.
-    // warn, not error: this path is the graceful fallback, not a crash.
-    if (!isCircuitOpenError(e) && logDbFailure("home-data", e) && isDbUnreachable(e)) {
-      console.warn("[home-data] serving an empty homepage until the database responds");
+  // A browser document-refresh loop must not multiply one full homepage
+  // render into hundreds of simultaneous Prisma query chains. Share this
+  // process-local promise while the cache is warming, then release it so
+  // normal tag invalidation and revalidation still work.
+  const flight = (async () => {
+    try {
+      return await cachedHomeData();
+    } catch (e) {
+      // Database unreachable → render an empty page rather than a 500. This
+      // result is NOT cached (the throw above prevents that), so the next
+      // request retries. Logged loudly because a silently blank homepage is
+      // very hard to diagnose from the outside.
+      // warn, not error: this path is the graceful fallback, not a crash.
+      if (!isCircuitOpenError(e) && logDbFailure("home-data", e) && isDbUnreachable(e)) {
+        console.warn("[home-data] serving an empty homepage until the database responds");
+      }
+      return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
+    } finally {
+      homeDataInFlight = null;
     }
-    return { modules: {}, ticker: [], generatedAt: new Date().toISOString() };
-  }
+  })();
+
+  homeDataInFlight = flight;
+  return flight;
 }
