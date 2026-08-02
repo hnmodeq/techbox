@@ -74,11 +74,11 @@ export function ForumQuestionPanel() {
   };
 
   return (
-    <section id="hp-forum-question" className="border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] p-5" aria-labelledby="hp-forum-question-title">
-      <h3 id="hp-forum-question-title" className="text-[17px] font-bold text-[color:var(--hp-ink)]">
+    <section id="hp-forum-question" className="rounded-[var(--hp-r-md)] bg-[color:var(--community-accent)] p-5 text-white" aria-labelledby="hp-forum-question-title">
+      <h3 id="hp-forum-question-title" className="text-[18px] font-bold">
         پرسش خود را مطرح کنید
       </h3>
-      <p className="mt-1 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
+      <p className="mt-1 text-[13px] leading-6 text-white/80">
         مسئله، خطا و آنچه تا امروز امتحان کرده‌اید را بنویسید تا پاسخ دقیق‌تری دریافت کنید.
       </p>
 
@@ -91,6 +91,7 @@ export function ForumQuestionPanel() {
           placeholder="عنوان واضح و دقیق پرسش"
           maxLength={200}
           disabled={submitting}
+          className="border-white/20 bg-white text-slate-900 placeholder:text-slate-500"
         />
         <label htmlFor="hp-forum-question-body" className="sr-only">جزئیات پرسش</label>
         <Textarea
@@ -98,12 +99,12 @@ export function ForumQuestionPanel() {
           value={body}
           onChange={(event) => setBody(event.target.value)}
           placeholder="جزئیات محیط، توپولوژی، خطا و راه‌حل‌هایی که امتحان کرده‌اید..."
-          className="min-h-28 resize-y"
+          className="min-h-28 resize-y border-white/20 bg-white text-slate-900 placeholder:text-slate-500"
           maxLength={5000}
           disabled={submitting}
         />
-        {error && <p role="alert" className="text-[12px] font-semibold text-destructive">{error}</p>}
-        <Button type="submit" disabled={submitting} className="w-full bg-[color:var(--community-accent)] text-white hover:opacity-90">
+        {error && <p role="alert" className="text-[12px] font-semibold text-white">{error}</p>}
+        <Button type="submit" disabled={submitting} className="w-full bg-white text-[color:var(--community-accent)] hover:bg-white/90">
           {submitting ? "در حال ثبت…" : "ثبت پرسش"}
         </Button>
       </form>
