@@ -43,6 +43,8 @@ export type HomeData = {
   finderChips?: Array<{ labelFa: string; href: string }>;
   /** §8 — admin-configured tool order/allow-list (SiteSetting). */
   toolsFeatured?: string[];
+  /** §9 — curated hot forum feature plus open discussion rows. */
+  communityTopics?: ContentItem[];
   /** §13 — sampled community members (staff excluded). */
   familyProfiles?: FamilyProfile[];
   /** §14 — companies we work with. */
@@ -134,6 +136,7 @@ export function HomeDataProvider({
         announcement: body.announcement ?? prev.announcement,
         familyProfiles: body.familyProfiles ?? prev.familyProfiles,
         partners: body.partners ?? prev.partners,
+        communityTopics: body.communityTopics ?? prev.communityTopics,
       }));
     };
 

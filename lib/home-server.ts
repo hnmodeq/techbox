@@ -8,6 +8,7 @@ import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
 import { getEnabledModules, getModuleConfig } from "@/lib/module-config";
 import {
   getLatestInsights,
+  getCommunityTopics,
   getLatestVideoHighlightComments,
   getDeals,
   getTopPicks,
@@ -526,7 +527,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
 
   // Filter moduleTakes to only include enabled modules
   const activeModuleTakes = Object.fromEntries(
-    Object.entries(moduleTakes).filter(([module]) => enabledModules.includes(module as any))
+    Object.entries(moduleTakes).filter(([module]) => module !== "forum" && enabledModules.includes(module as any))
   );
 
   // Sequential to avoid P2024 pool exhaustion – was Promise.all of 7 modules each doing 2-3 queries = up to 21 concurrent
@@ -587,6 +588,11 @@ export async function getHomeDataUncached(): Promise<HomeData> {
 
   const latestInsights = await section("latestInsights", { story: null, stories: [], comments: [] } as any, () =>
     getLatestInsights(normalizeCard, cardSelect));
+
+  const communityTopics = enabledModules.includes("forum")
+    ? await section("communityTopics", [] as ContentItem[], () =>
+        getCommunityTopics(normalizeCard, cardSelect))
+    : [];
 
   const videoHighlightComments = await section("videoHighlightComments", [] as any[], () =>
     getLatestVideoHighlightComments(4));
@@ -686,6 +692,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     ticker: tickerPosts.map(normalizeTickerCard),
     generatedAt: new Date().toISOString(),
     latestInsights,
+    communityTopics,
     videoHighlightComments,
     topPicks,
     timeline,

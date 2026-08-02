@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * §9 · Community — a working IT knowledge base, not a generic content rail.
  *
@@ -11,11 +13,13 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
-import { SectionShell, SectionHeader, Eyebrow } from "../primitives";
+import { SectionShell, SectionHeader } from "../primitives";
 import { AuthorLink } from "@/components/ui/author-link";
 import { Num } from "@/components/ui/num";
 import { RelativeDate } from "@/components/ui/relative-date";
-import { CheckCircle2, Eye, MessageCircle, Plus } from "lucide-react";
+import { CheckCircle2, MessageCircle, Plus } from "lucide-react";
+import { NewForumTopicModal } from "@/features/forum/components/NewForumTopicModal";
+import { ForumTopicModal } from "@/features/forum/components/ForumTopicModal";
 
 /** findPosts() in lib/home-server.ts attaches these forum-only fields. */
 type WithForumActivity = ContentItem & {
@@ -52,16 +56,16 @@ export function CommunitySection({
   showMore = true,
   accentColor,
 }: CommunitySectionProps) {
+  const [newTopicOpen, setNewTopicOpen] = React.useState(false);
+  const [replyTopic, setReplyTopic] = React.useState<WithForumActivity | null>(null);
+
   if (!topics || topics.length < MIN_TOPICS) return null;
 
+  // getCommunityTopics() puts a random pick from the hottest seven-day
+  // pool first, then appends only still-open topics for this activity list.
   const list = topics as WithForumActivity[];
-  // Prefer a verified resolution. A forum with no resolved topic still gets a
-  // useful fallback: the currently most-discussed question, without claiming
-  // that it has an accepted answer.
-  const featured =
-    list.find((topic) => topic.solved && topic.acceptedAnswer?.text) ??
-    [...list].sort((a, b) => (b.comments ?? 0) - (a.comments ?? 0))[0];
-  const activeTopics = list.filter((topic) => topic.slug !== featured.slug).slice(0, 4);
+  const featured = list[0];
+  const activeTopics = list.slice(1).filter((topic) => !topic.solved).slice(0, 4);
   const style: CommunityStyle = { "--community-accent": accentColor || "var(--primary)" };
 
   return (
@@ -74,29 +78,41 @@ export function CommunitySection({
           href={showMore ? "/forum" : undefined}
           linkLabel={moreLabel}
           accentColor={accentColor}
-          actions={<CommunityActions showBrowse={showMore} moreLabel={moreLabel} />}
+          actions={<CommunityActions showBrowse={showMore} moreLabel={moreLabel} onAsk={() => setNewTopicOpen(true)} />}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-10">
         <FeaturedTopic topic={featured} />
-        <ActiveTopicList topics={activeTopics} />
+        <ActiveTopicList topics={activeTopics} onReply={setReplyTopic} />
       </div>
+
+      <NewForumTopicModal open={newTopicOpen} onOpenChange={setNewTopicOpen} />
+      {replyTopic && <ForumTopicModal topic={replyTopic} onClose={() => setReplyTopic(null)} />}
     </SectionShell>
   );
 }
 
-function CommunityActions({ showBrowse, moreLabel }: { showBrowse: boolean; moreLabel: string }) {
+function CommunityActions({
+  showBrowse,
+  moreLabel,
+  onAsk,
+}: {
+  showBrowse: boolean;
+  moreLabel: string;
+  onAsk: () => void;
+}) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Link
-        href="/forum?new=1"
+      <button
+        type="button"
+        onClick={onAsk}
         className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--hp-r-sm)] bg-[color:var(--community-accent)] px-3 text-[12px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Plus className="size-4" aria-hidden="true" />
         طرح پرسش جدید
-      </Link>
+      </button>
       {showBrowse && (
         <Link
           href="/forum"
@@ -114,10 +130,9 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const isSolved = Boolean(topic.solved && answer?.text);
 
   return (
-    <article className="relative overflow-hidden rounded-[var(--hp-r-md)] border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] p-6 shadow-[var(--hp-shadow-card)]">
+    <article className="relative overflow-hidden border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] p-6 shadow-[var(--hp-shadow-card)]">
       <div className="absolute inset-x-0 top-0 h-1 bg-[color:var(--community-accent)]" aria-hidden="true" />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {topic.category ? <Eyebrow>{topic.category}</Eyebrow> : <span />}
+      <div className="flex items-center justify-end">
         <TopicState solved={isSolved} />
       </div>
 
@@ -173,30 +188,36 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   );
 }
 
-function ActiveTopicList({ topics }: { topics: WithForumActivity[] }) {
+function ActiveTopicList({
+  topics,
+  onReply,
+}: {
+  topics: WithForumActivity[];
+  onReply: (topic: WithForumActivity) => void;
+}) {
   if (topics.length === 0) return null;
 
   return (
-    <ul className="divide-y divide-[color:var(--hp-border)] border-y border-[color:var(--hp-border)]">
+    <div>
+      <h3 className="mb-4 text-[16px] font-bold text-[color:var(--hp-ink)]">
+        برخی از سوالات پرسیده شده در انجمن
+      </h3>
+      <ul className="divide-y divide-[color:var(--hp-border)]">
       {topics.map((topic) => (
         <li key={`${topic.module}-${topic.slug}`} className="py-4 first:pt-0 last:pb-0">
-          <TopicRow topic={topic} />
+          <TopicRow topic={topic} onReply={onReply} />
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   );
 }
 
-function TopicRow({ topic }: { topic: WithForumActivity }) {
+function TopicRow({ topic, onReply }: { topic: WithForumActivity; onReply: (topic: WithForumActivity) => void }) {
   return (
     <article className="group flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          {topic.category && <Eyebrow className="!text-[11px] !tracking-[1px]">{topic.category}</Eyebrow>}
-          <TopicState solved={Boolean(topic.solved)} compact />
-        </div>
-
-        <h3 className="mt-1 text-[16px] font-bold leading-[25px] text-[color:var(--hp-ink)]">
+        <h3 className="text-[16px] font-bold leading-[25px] text-[color:var(--hp-ink)]">
           <Link
             href={`/${topic.module}/${topic.slug}`}
             className="line-clamp-2 transition-colors group-hover:text-[color:var(--community-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -208,17 +229,18 @@ function TopicRow({ topic }: { topic: WithForumActivity }) {
         <div className="mt-3">
           <TopicActivity topic={topic} />
         </div>
+        <button
+          type="button"
+          onClick={() => onReply(topic)}
+          className="mt-3 text-[12px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          پاسخ دادن به این پرسش
+        </button>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-2 pt-1 text-[12px] text-[color:var(--hp-ink-3)]">
-        <span className="flex items-center gap-1.5" aria-label={`${topic.comments ?? 0} پاسخ`}>
-          <MessageCircle className="size-3.5" aria-hidden="true" />
-          <Num>{topic.comments ?? 0}</Num>
-        </span>
-        <span className="flex items-center gap-1.5" aria-label={`${topic.views ?? 0} بازدید`}>
-          <Eye className="size-3.5" aria-hidden="true" />
-          <Num>{topic.views ?? 0}</Num>
-        </span>
+      {/* In RTL this compact state column sits on the physical left edge. */}
+      <div className="shrink-0 pt-1">
+        <TopicState solved={false} compact />
       </div>
     </article>
   );
@@ -230,16 +252,22 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
   const date = activity?.date ?? topic.date;
 
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-[color:var(--hp-ink-3)]">
-      <AuthorLink
-        name={author?.name}
-        username={author?.username}
-        avatar={author?.avatar}
-        verifiedType={author?.verifiedType}
-        className="[&>div:first-child]:size-6 [&>div:last-child>div>span]:text-[12px]"
-      />
-      <span aria-hidden="true">•</span>
-      <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
+    <div className="min-w-0 text-[12px] text-[color:var(--hp-ink-3)]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <AuthorLink
+          name={author?.name}
+          username={author?.username}
+          avatar={author?.avatar}
+          verifiedType={author?.verifiedType}
+          className="[&>div:first-child]:size-7 [&>div:last-child>div>span]:text-[12px]"
+        />
+        <span aria-hidden="true">•</span>
+        <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
+      </div>
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 ps-9 text-[11px] text-[color:var(--hp-ink-3)]">
+        <span><Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده</span>
+        <span><Num>{topic.views ?? 0}</Num> بار بازدید شده</span>
+      </div>
     </div>
   );
 }
@@ -255,7 +283,7 @@ function TopicState({ solved, compact = false }: { solved: boolean; compact?: bo
   }
 
   return (
-    <span className={`inline-flex items-center gap-1 text-[color:var(--community-accent)] ${compact ? "text-[11px]" : "text-[12px] font-bold"}`}>
+    <span className={`inline-flex items-center gap-1 text-[var(--warning)] ${compact ? "text-[11px]" : "text-[12px] font-bold"}`}>
       <MessageCircle className={compact ? "size-3.5" : "size-4"} aria-hidden="true" />
       باز
     </span>

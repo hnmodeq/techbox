@@ -315,6 +315,133 @@ export async function getLatestInsights(
 }
 
 /**
+ * Forum homepage data: a random pick from the hottest recent questions plus
+ * four still-open topics. Keeping the selection here (rather than in the
+ * component) means counts, accepted answers and latest contributors arrive in
+ * one server payload with no browser-side query fan-out.
+ */
+export async function getCommunityTopics(
+  normalize: (p: any) => ContentItem,
+  cardSelect: any,
+): Promise<ContentItem[]> {
+  const weekAgo = new Date(Date.now() - 7 * 864e5);
+  let topics: any[] = await prisma.post.findMany({
+    where: {
+      module: "forum",
+      ...PUBLISHED,
+      date: { gte: weekAgo, ...publicPostDateWhere() },
+    },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 40,
+    select: cardSelect,
+  });
+
+  // A quiet week should not erase the community from the homepage. Fall back
+  // to recent real topics only when there are too few seven-day candidates.
+  if (topics.length < 3) {
+    topics = await prisma.post.findMany({
+      where: { module: "forum", ...PUBLISHED, date: publicPostDateWhere() },
+      orderBy: [{ date: "desc" }, { id: "desc" }],
+      take: 40,
+      select: cardSelect,
+    }) as any[];
+  }
+  if (topics.length === 0) return [];
+
+  const topicIds: string[] = topics.map((topic) => topic.id);
+  const rawCounts = await prisma.comment.groupBy({
+    by: ["postId"],
+    _count: { _all: true },
+    where: { postId: { in: topicIds }, status: "approved", deletedAt: null },
+  });
+  const counts = rawCounts as any[];
+  const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
+
+  const acceptedIds = topics
+    .map((topic) => topic.acceptedCommentId)
+    .filter((id): id is string => typeof id === "string" && id.length > 0);
+  const acceptedRows = acceptedIds.length > 0
+    ? await prisma.comment.findMany({
+        where: { id: { in: acceptedIds }, deletedAt: null },
+        select: {
+          id: true,
+          text: true,
+          authorName: true,
+          author: { select: { name: true, username: true, avatar: true } },
+        },
+      })
+    : [];
+  const acceptedById = new Map(acceptedRows.map((comment) => [comment.id, comment]));
+
+  const latestComments = await prisma.comment.findMany({
+    where: { postId: { in: topicIds }, status: "approved", deletedAt: null },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    take: 200,
+    select: {
+      postId: true,
+      createdAt: true,
+      authorName: true,
+      author: { select: { name: true, username: true, avatar: true, verifiedType: true, status: true } },
+    },
+  });
+  const activityByPost = new Map<string, (typeof latestComments)[number]>();
+  for (const comment of latestComments) {
+    if (activityByPost.has(comment.postId)) continue;
+    if (comment.author && comment.author.status !== "active") continue;
+    activityByPost.set(comment.postId, comment);
+  }
+
+  const hottest = [...topics]
+    .sort((a, b) =>
+      (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
+      (b.likes || 0) - (a.likes || 0) ||
+      (b.views || 0) - (a.views || 0) ||
+      b.date.getTime() - a.date.getTime(),
+    )
+    .slice(0, Math.min(5, topics.length));
+  const featured = hottest[seededIndex(hottest.length, 613)];
+
+  const openTopics = topics
+    .filter((topic) => topic.id !== featured.id && !topic.solved)
+    .sort((a, b) =>
+      (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
+      b.date.getTime() - a.date.getTime(),
+    )
+    .slice(0, 4);
+
+  const toCard = (topic: any): ContentItem => {
+    const card = normalize(topic);
+    card.comments = countByPost.get(topic.id) || 0;
+    const accepted = topic.acceptedCommentId ? acceptedById.get(topic.acceptedCommentId) : undefined;
+    if (accepted) {
+      (card as any).acceptedAnswer = {
+        text: accepted.text,
+        author: {
+          name: accepted.author?.name || accepted.authorName || "کاربر",
+          username: accepted.author?.username || "",
+          avatar: accepted.author?.avatar || "",
+        },
+      };
+    }
+    const activity = activityByPost.get(topic.id);
+    if (activity) {
+      card.lastActivity = {
+        date: activity.createdAt.toISOString(),
+        author: {
+          name: activity.author?.name || activity.authorName || "کاربر انجمن",
+          username: activity.author?.username || "",
+          avatar: activity.author?.avatar || "",
+          verifiedType: activity.author?.verifiedType || null,
+        },
+      };
+    }
+    return card;
+  };
+
+  return [toCard(featured), ...openTopics.map(toCard)];
+}
+
+/**
  * Real, rotating approved comments drawn from across ALL published videos,
  * not just the newest one. Each carries the slug of the video it belongs to
  * so the card can open that video's modal at that comment.
