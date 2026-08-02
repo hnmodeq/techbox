@@ -75,14 +75,22 @@ export function ForumQuestionPanel() {
 
   return (
     <section id="hp-forum-question" className="rounded-[var(--hp-r-md)] bg-[color:var(--community-accent)] p-5 text-white" aria-labelledby="hp-forum-question-title">
-      <h3 id="hp-forum-question-title" className="text-[18px] font-bold">
-        پرسش خود را مطرح کنید
-      </h3>
-      <p className="mt-1 text-[13px] leading-6 text-white/80">
-        مسئله، خطا و آنچه تا امروز امتحان کرده‌اید را بنویسید تا پاسخ دقیق‌تری دریافت کنید.
-      </p>
+      <form onSubmit={submit} className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h3 id="hp-forum-question-title" className="text-[18px] font-bold">
+            پرسش خود را مطرح کنید
+          </h3>
+          <Button
+            type="submit"
+            variant="ghost"
+            size="sm"
+            disabled={submitting}
+            className="text-white hover:bg-white/10 hover:text-white"
+          >
+            {submitting ? "در حال ثبت…" : "ثبت پرسش"}
+          </Button>
+        </div>
 
-      <form onSubmit={submit} className="mt-4 space-y-3">
         {/* Match the newsletter's clear white writing surface while keeping
             title and details separate for a useful Forum submission. */}
         <div className="rounded-[12px] bg-white p-1.5">
@@ -94,7 +102,7 @@ export function ForumQuestionPanel() {
             placeholder="عنوان واضح و دقیق پرسش"
             maxLength={200}
             disabled={submitting}
-            className="h-10 rounded-[8px] border-0 bg-transparent px-2 text-slate-900 placeholder:text-slate-500 focus-visible:ring-[color:var(--community-accent)]"
+            className="h-10 border-0 bg-transparent px-2 text-slate-900 placeholder:text-slate-500 focus-visible:border-0 focus-visible:ring-0"
           />
           <label htmlFor="hp-forum-question-body" className="sr-only">جزئیات پرسش</label>
           <Textarea
@@ -102,15 +110,15 @@ export function ForumQuestionPanel() {
             value={body}
             onChange={(event) => setBody(event.target.value)}
             placeholder="جزئیات محیط، توپولوژی، خطا و راه‌حل‌هایی که امتحان کرده‌اید..."
-            className="min-h-28 resize-none rounded-[8px] border-0 border-t border-slate-200 bg-transparent px-2 text-slate-900 placeholder:text-slate-500 focus-visible:ring-[color:var(--community-accent)]"
+            className="min-h-28 resize-none border-0 border-t border-slate-200 bg-transparent px-2 text-slate-900 placeholder:text-slate-500 focus-visible:border-slate-200 focus-visible:ring-0"
             maxLength={5000}
             disabled={submitting}
           />
         </div>
+        <p className="text-[13px] leading-6 text-white/80">
+          مسئله، خطا و آنچه تا امروز امتحان کرده‌اید را بنویسید تا پاسخ دقیق‌تری دریافت کنید.
+        </p>
         {error && <p role="alert" className="text-[12px] font-semibold text-white">{error}</p>}
-        <Button type="submit" disabled={submitting} className="w-full bg-white text-[color:var(--community-accent)] hover:bg-white/90">
-          {submitting ? "در حال ثبت…" : "ثبت پرسش"}
-        </Button>
       </form>
     </section>
   );
