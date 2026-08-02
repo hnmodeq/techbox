@@ -121,7 +121,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const isSolved = Boolean(topic.solved && answer?.text);
 
   return (
-    <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:color-mix(in_oklch,var(--community-accent)_7%,var(--hp-surface))] p-6">
+    <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
       <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--community-accent)]" aria-hidden="true" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <TopicActivity topic={topic} />

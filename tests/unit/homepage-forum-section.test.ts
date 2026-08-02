@@ -44,6 +44,8 @@ describe("homepage Forum section", () => {
     expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
     expect(feature).not.toMatch(/border border-\[color:var\(--hp-border\)\]/);
     expect(feature).not.toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
+    expect(feature).toMatch(/bg-\[color:var\(--hp-surface\)\]/);
+    expect(feature).not.toMatch(/color-mix\(in_oklch,var\(--community-accent\)/);
     expect(feature).toMatch(/absolute inset-x-0 bottom-0 h-1/);
     expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
   });
@@ -68,6 +70,10 @@ describe("homepage Forum section", () => {
     expect(composer).toMatch(/rounded-\[12px\] bg-white p-1\.5/);
     expect(composer).toMatch(/resize-none/);
     expect(composer).not.toMatch(/resize-y/);
+    expect(composer).toMatch(/focus-visible:ring-0/);
+    expect(composer).toMatch(/variant="ghost"/);
+    expect(composer.indexOf("ثبت پرسش")).toBeLessThan(composer.indexOf("عنوان واضح و دقیق پرسش"));
+    expect(composer.indexOf("مسئله، خطا و آنچه تا امروز امتحان کرده‌اید")).toBeGreaterThan(composer.indexOf("جزئیات محیط، توپولوژی"));
     expect(composer).toMatch(/window\.dispatchEvent\(new CustomEvent\("tb_open_auth"\)\)/);
   });
 
