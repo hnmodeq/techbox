@@ -380,6 +380,7 @@ export async function getCommunityTopics(
         select: {
           id: true,
           text: true,
+          createdAt: true,
           authorName: true,
           author: { select: { name: true, username: true, avatar: true, job: true } },
         },
@@ -439,6 +440,7 @@ export async function getCommunityTopics(
     if (accepted) {
       (card as any).acceptedAnswer = {
         text: accepted.text,
+        date: accepted.createdAt.toISOString(),
         author: {
           name: accepted.author?.name || accepted.authorName || "کاربر",
           username: accepted.author?.username || "",

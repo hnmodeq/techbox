@@ -148,9 +148,10 @@ describe("MagazineSection visual contract", () => {
   it("uses the existing shadcn tooltip and the server-derived reading time", () => {
     expect(src).toMatch(/TooltipTrigger/);
     // Publish dates go through the shared RelativeDate component, which
-    // renders the relative ladder and puts the real Jalali date in its
-    // tooltip behind this label.
-    expect(src).toMatch(/<RelativeDate date=\{item\.date\} label="تاریخ انتشار"/);
+    // renders the relative ladder and puts only the real Jalali date in its
+    // tooltip without a redundant prefix.
+    expect(src).toMatch(/<RelativeDate date=\{item\.date\} \/>/);
+    expect(src).not.toMatch(/label="تاریخ انتشار"/);
     // Reading time is still server-derived, but the badge shows the bare
     // duration and "زمان مطالعه" moved into the tooltip.
     expect(src).toMatch(/formatReadingTimeShort\(item\.readingTime\)/);

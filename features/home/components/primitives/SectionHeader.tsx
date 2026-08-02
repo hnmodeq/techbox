@@ -17,7 +17,7 @@ export type SectionHeaderProps = {
   description?: string;
   /** "See all" destination. Omit to hide the action. */
   href?: string;
-  /** Link label. Arrow is appended automatically. */
+  /** Link label. Rendered exactly as supplied. */
   linkLabel?: string;
   /** id for the <h2>, so the parent section can point at it. */
   headingId: string;
@@ -81,8 +81,7 @@ export function SectionHeader({
               onDark && "focus-visible:ring-primary-foreground",
             )}
           >
-            {/* RTL: "forward" is a LEFT arrow */}
-            {linkLabel} <span aria-hidden="true">←</span>
+            {linkLabel}
           </Link>
         ))}
       </div>

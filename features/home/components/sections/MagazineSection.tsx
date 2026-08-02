@@ -224,7 +224,7 @@ function PublicationMeta({
         className,
       )}
     >
-      <RelativeDate date={item.date} label="تاریخ انتشار" />
+      <RelativeDate date={item.date} />
 
       {readingTime && (
         <>
