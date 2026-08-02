@@ -5,12 +5,14 @@
  *
  * This never downloads or hotlinks images from social media or Google. It is
  * idempotent: the same storage paths are upserted and existing authored post
- * images are preserved. Blank/legacy fallback post images receive a generated
- * infrastructure or network cover so every public card has a real URL.
+ * images are preserved. By default it syncs only the community portraits.
+ * Pass --fill-content-covers only when intentionally applying the two shared
+ * generated covers to blank legacy posts.
  *
  * Run locally, where .env contains DATABASE_URL, SUPABASE_URL, and
  * SUPABASE_SERVICE_ROLE_KEY:
  *   pnpm content:sync-visuals
+ *   pnpm content:sync-visuals -- --fill-content-covers
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -43,6 +45,7 @@ loadEnvFile(path.resolve(".env.local"));
 
 const prisma = new PrismaClient();
 const VISUALS_ROOT = path.resolve("public/seed-visuals");
+const FILL_CONTENT_COVERS = process.argv.includes("--fill-content-covers");
 
 const AVATARS = [
   "community_mahsa",
@@ -90,15 +93,6 @@ async function main() {
     avatarUrls.set(username, url);
   }
 
-  const infrastructureUrl = await uploadWebp(
-    `seed-visuals/covers/${COVERS.infrastructure}`,
-    localVisual("covers", COVERS.infrastructure),
-  );
-  const networkUrl = await uploadWebp(
-    `seed-visuals/covers/${COVERS.network}`,
-    localVisual("covers", COVERS.network),
-  );
-
   let avatarUpdates = 0;
   for (const [username, avatar] of avatarUrls) {
     const result = await prisma.user.updateMany({
@@ -107,6 +101,23 @@ async function main() {
     });
     avatarUpdates += result.count;
   }
+
+  console.log(`✓ uploaded ${avatarUrls.size} AI-generated profile portraits`);
+  console.log(`✓ updated ${avatarUpdates} community profile rows`);
+
+  if (!FILL_CONTENT_COVERS) {
+    console.log("· content covers were skipped — upload unique images through the Admin editor when ready");
+    return;
+  }
+
+  const infrastructureUrl = await uploadWebp(
+    `seed-visuals/covers/${COVERS.infrastructure}`,
+    localVisual("covers", COVERS.infrastructure),
+  );
+  const networkUrl = await uploadWebp(
+    `seed-visuals/covers/${COVERS.network}`,
+    localVisual("covers", COVERS.network),
+  );
 
   // Do not replace a real editorial image. Only missing rows and the retired
   // local fallback become generated covers, preserving any administrator work.
@@ -138,9 +149,7 @@ async function main() {
     data: { image: infrastructureUrl },
   });
 
-  console.log(`✓ uploaded ${avatarUrls.size} AI-generated profile portraits and 2 editorial covers`);
-  console.log(`✓ updated ${avatarUpdates} community profile rows`);
-  console.log(`✓ attached generated covers to ${networkPosts.count + infrastructurePosts.count} public posts without images`);
+  console.log(`✓ attached shared generated covers to ${networkPosts.count + infrastructurePosts.count} public posts without images`);
 }
 
 main()
