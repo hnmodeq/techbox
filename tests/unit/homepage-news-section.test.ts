@@ -110,14 +110,14 @@ describe("interactive News discussion panel", () => {
     expect(section).toMatch(/const previewStory = previewSlug/);
   });
 
-  it("visually connects the active comment without painting it red", () => {
+  it("visually connects the active comment with only an inset marker", () => {
     // The marker sits inside a padded row rather than colliding with
-    // avatars/text on the RTL-leading edge. A ring, not a tinted fill,
-    // marks the active relationship to the News card.
+    // avatars/text on the RTL-leading edge. There is no tinted fill, ring,
+    // or redundant parent-News label around the active item.
     expect(section).toMatch(/start-2 w-1/);
     expect(section).toMatch(/className="block w-full ps-5/);
     expect(section).not.toMatch(/ring-1 ring-\[color:color-mix/);
-    expect(section).toMatch(/دربارهٔ: \{parentStory\.title\}/);
+    expect(section).not.toMatch(/دربارهٔ: \{parentStory\.title\}/);
     expect(section).not.toMatch(/bg-\[color:color-mix\(in_oklch,var\(--insights-accent\)_16%/);
     expect(section).not.toMatch(/در حال نمایش گفتگوی این خبر/);
   });
@@ -140,8 +140,11 @@ describe("interactive News discussion panel", () => {
     expect(section).not.toMatch(/border-b border-\[color:var\(--hp-rule\)\]/);
     expect(section).not.toMatch(/ارسال‌شده/);
     expect(section).not.toMatch(/تاریخ دیدگاه/);
-    // The panel keeps an aria-label, but has no visible heading/counter.
-    expect(section).not.toMatch(/<h4/);
+    expect(section).toMatch(/دیدگاه شما درباره خبرها/);
+    // The old panel heading/counter is absent; the source-level description
+    // may still refer to the historic feature name.
+    const discussion = section.slice(section.indexOf("function NewsDiscussion"));
+    expect(discussion).not.toMatch(/<h4[^>]*>\s*گفتگوهای داغ/);
   });
 
   it("does not mount a complete CommentSection on every homepage load", () => {
