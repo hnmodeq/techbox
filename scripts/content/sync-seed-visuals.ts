@@ -45,6 +45,7 @@ loadEnvFile(path.resolve(".env.local"));
 
 const prisma = new PrismaClient();
 const VISUALS_ROOT = path.resolve("public/seed-visuals");
+const CUSTOM_IMAGES_ROOT = path.resolve("public/content-images");
 const FILL_CONTENT_COVERS = process.argv.includes("--fill-content-covers");
 
 const AVATARS = [
@@ -63,9 +64,33 @@ const COVERS = {
   network: "network.webp",
 } as const;
 
+/** User-supplied development images. The owner deliberately allowed an
+ * arbitrary editorial assignment, so this map favours the visible Magazine
+ * and News cards rather than implying a factual relationship. */
+const CUSTOM_POST_IMAGES = [
+  { module: "blog", slug: "runbook-design-for-small-ops-teams", file: "quantum-computing-lab.webp" },
+  { module: "blog", slug: "capacity-planning-before-traffic-spike", file: "dug-nomad-exterior.webp" },
+  { module: "blog", slug: "database-migration-rollback-notes", file: "dug-nomad-interior.webp" },
+  { module: "blog", slug: "security-review-for-public-api", file: "broadcom-hba.webp" },
+  { module: "blog", slug: "incident-review-without-blame", file: "ai-dome-camera.webp" },
+  { module: "blog", slug: "choosing-slo-for-internal-services", file: "amd-epyc-server.webp" },
+  { module: "blog", slug: "kubernetes-resource-request-review", file: "supermicro-server.webp" },
+  { module: "blog", slug: "database-index-review-playbook", file: "large-scale-server.webp" },
+  { module: "news", slug: "weekly-infrastructure-brief-observability", file: "hpe-proliant-server.webp" },
+  { module: "news", slug: "weekly-infrastructure-brief-platform-teams", file: "solidigm-kvcache.webp" },
+  { module: "news", slug: "weekly-infrastructure-brief-data-resilience", file: "seagate-ironwolf.webp" },
+  { module: "news", slug: "weekly-infrastructure-brief-network-visibility", file: "dell-powerstore.webp" },
+] as const;
+
 function localVisual(...segments: string[]) {
   const file = path.join(VISUALS_ROOT, ...segments);
   if (!fs.existsSync(file)) throw new Error(`visual_source_missing:${file}`);
+  return file;
+}
+
+function localContentImage(fileName: string) {
+  const file = path.join(CUSTOM_IMAGES_ROOT, fileName);
+  if (!fs.existsSync(file)) throw new Error(`content_image_missing:${file}`);
   return file;
 }
 
@@ -104,6 +129,20 @@ async function main() {
 
   console.log(`✓ uploaded ${avatarUrls.size} AI-generated profile portraits`);
   console.log(`✓ updated ${avatarUpdates} community profile rows`);
+
+  let customImageUpdates = 0;
+  for (const image of CUSTOM_POST_IMAGES) {
+    const url = await uploadWebp(
+      `user-content/${image.file}`,
+      localContentImage(image.file),
+    );
+    const result = await prisma.post.updateMany({
+      where: { module: image.module, slug: image.slug, published: true, deletedAt: null },
+      data: { image: url },
+    });
+    customImageUpdates += result.count;
+  }
+  console.log(`✓ uploaded and linked ${customImageUpdates} user-supplied editorial images`);
 
   if (!FILL_CONTENT_COVERS) {
     console.log("· content covers were skipped — upload unique images through the Admin editor when ready");
