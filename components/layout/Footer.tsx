@@ -7,7 +7,6 @@ import { ButtonLink } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 
 const navigation = {
   main: [
@@ -98,12 +97,12 @@ export default function FooterSection() {
             </div>
           </div>
 
-          {/* LEFT column — newsletter */}
-          <div className="text-right">
-            <h4 className="text-sm font-semibold text-foreground mb-4">خبرنامه تکباکس</h4>
-            <div className="max-w-[260px]">
-              <NewsletterSignup compact />
-            </div>
+          {/* LEFT column — a trust commitment, not a duplicate navigation rail. */}
+          <div className="max-w-[340px] text-right">
+            <h4 className="text-sm font-semibold text-foreground">شفافیت تکباکس</h4>
+            <p className="mt-2 text-[12px] leading-6 text-muted-foreground">
+              اصلاحیه‌های فنی، تجربه‌های اجرایی و بازخوردهای شما برای دقیق‌تر شدن راهنماها و بررسی‌ها ثبت و پیگیری می‌شوند.
+            </p>
           </div>
         </div>
 

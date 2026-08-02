@@ -87,28 +87,16 @@ export function ToolsSection({
 }
 
 function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
-  // `new` and `version` are optional across the registry union.
-  const isNew = "new" in tool ? Boolean(tool.new) : false;
-  const version = "version" in tool ? (tool.version as string | undefined) : undefined;
-  const badge = isNew ? "جدید" : version;
-
   return (
     <Link
       href={tool.href}
-      className="hp-card group relative flex h-full flex-col items-center rounded-[var(--hp-r-md)] bg-transparent px-4 py-8 text-center transition-[background-color,box-shadow] duration-200 hover:bg-[color:var(--hp-surface)] hover:shadow-[var(--hp-shadow-card)] focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none dark:hover:bg-[color:var(--hp-surface-2)]"
+      className="group relative flex h-full flex-col items-center rounded-[var(--hp-r-md)] bg-transparent px-4 py-8 text-center focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
     >
-      {badge && (
-        <span className="absolute top-2 end-2 rounded-[4px] bg-[color:var(--hp-accent)] px-1.5 py-0.5 text-[11px] font-bold text-[color:var(--hp-on-accent)]">
-          {badge}
-        </span>
-      )}
-
-      {/* The icon draws in currentColor, so it inherits this colour and
-          follows the theme instead of carrying its own palette. */}
+      {/* Fixed monochrome technical glyph: icon colour never changes on hover. */}
       <ToolIcon
         slug={tool.slug}
-        size={72}
-        className="text-[color:var(--hp-ink-3)] transition-[transform,color] duration-200 group-hover:scale-[1.06] group-hover:text-[color:var(--tools-accent)] motion-reduce:transform-none"
+        size={56}
+        className="text-[color:var(--hp-ink-3)] motion-reduce:transform-none"
       />
 
       {/*
