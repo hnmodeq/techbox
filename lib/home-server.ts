@@ -284,6 +284,55 @@ async function findPosts(module: string, take: number) {
     // Non-fatal: best-answer preview just won't render.
   }
 
+  // Forum activity is different from a post's original author: the row should
+  // name the person who most recently kept the technical thread moving. One
+  // bulk query supplies it for every visible topic — never a query per row.
+  if (module === "forum" && posts.length > 0) {
+    try {
+      const topicIds = posts.map((post) => post.id);
+      const latestComments = await prisma.comment.findMany({
+        where: {
+          postId: { in: topicIds },
+          status: "approved",
+          deletedAt: null,
+        },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: 200,
+        select: {
+          postId: true,
+          createdAt: true,
+          authorName: true,
+          author: {
+            select: { name: true, username: true, avatar: true, verifiedType: true, status: true },
+          },
+        },
+      });
+      const activityByPost = new Map<string, (typeof latestComments)[number]>();
+      for (const comment of latestComments) {
+        if (activityByPost.has(comment.postId)) continue;
+        if (comment.author && comment.author.status !== "active") continue;
+        activityByPost.set(comment.postId, comment);
+      }
+      for (const item of normalized) {
+        const post = posts.find((candidate) => candidate.slug === item.slug);
+        const activity = post ? activityByPost.get(post.id) : undefined;
+        if (!activity) continue;
+        (item as ContentItem).lastActivity = {
+          date: activity.createdAt.toISOString(),
+          author: {
+            name: activity.author?.name || activity.authorName || "کاربر انجمن",
+            username: activity.author?.username || "",
+            avatar: activity.author?.avatar || "",
+            verifiedType: activity.author?.verifiedType || null,
+          },
+        };
+      }
+    } catch {
+      // A quiet or temporarily unavailable activity query must not hide the
+      // forum section; topic authors remain the honest fallback.
+    }
+  }
+
   return normalized;
 }
 
