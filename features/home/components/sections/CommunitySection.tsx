@@ -8,8 +8,8 @@
  * members are currently talking. Every route remains a normal forum URL —
  * technical threads need deep links, long-form answers, and shareability.
  *
- * RTL: active topics sit on the right; featured resolution and direct composer
- * sit on the left.
+ * RTL: unresolved active topics and the direct composer sit on the right;
+ * one solved featured resolution occupies the left.
  */
 import * as React from "react";
 import Link from "next/link";
@@ -36,7 +36,12 @@ type WithForumActivity = ContentItem & {
 };
 
 export type CommunitySectionProps = {
+  /** Only a genuinely solved topic may occupy the main feature card. */
+  featuredTopic?: ContentItem | null;
+  /** Distinct unresolved questions for the right-hand activity rail. */
   topics: ContentItem[];
+  /** Unique people who have created a Forum topic or approved reply. */
+  participantCount?: number;
   title?: string;
   moreLabel?: string;
   showTitle?: boolean;
@@ -48,22 +53,20 @@ const HEADING_ID = "hp-community-heading";
 type CommunityStyle = React.CSSProperties & { "--community-accent"?: string };
 
 export function CommunitySection({
+  featuredTopic,
   topics,
+  participantCount = 0,
   title = "انجمن تکباکس",
   moreLabel = "ورود به انجمن",
   showTitle = true,
   showMore = true,
   accentColor,
 }: CommunitySectionProps) {
-  // getCommunityTopics() puts a random pick from the hottest seven-day
-  // pool first, then appends a four-topic activity snapshot. The rail
-  // prioritises unanswered work but can also show genuinely solved threads
-  // when that is what keeps the homepage useful and full.
-  // Even an empty community renders its real ask/browse affordances instead
-  // of silently vanishing from the homepage.
-  const list = (topics ?? []) as WithForumActivity[];
-  const featured = list[0] ?? null;
-  const activeTopics = list.slice(1, 5);
+  // The data contract deliberately keeps the two columns separate: a random
+  // solved thread belongs in the left feature, while the right rail contains
+  // only random unresolved questions. The composer stays beneath that rail.
+  const featured = (featuredTopic ?? null) as WithForumActivity | null;
+  const activeTopics = ((topics ?? []) as WithForumActivity[]).slice(0, 4);
   const style: CommunityStyle = { "--community-accent": accentColor || "var(--primary)" };
 
   return (
@@ -81,16 +84,16 @@ export function CommunitySection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      {/* In RTL, the first grid child lands on the physical right. The open
-          questions therefore lead on the right and the featured topic plus
-          direct question composer form the left participation column. */}
+      {/* RTL grid order: the first child is physical right. It contains the
+          unresolved-topic rail and composer; the left stays dedicated to one
+          randomly chosen, genuinely solved feature. */}
       <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(360px,.95fr)_minmax(0,1.05fr)] lg:gap-10">
-        <div className="flex min-w-0 flex-col lg:h-full">
-          <ActiveTopicList topics={activeTopics} />
-        </div>
         <div className="flex min-w-0 flex-col gap-6 lg:h-full">
+          <ActiveTopicList topics={activeTopics} />
+          <ForumQuestionPanel participantCount={participantCount} />
+        </div>
+        <div className="flex min-w-0 flex-col lg:h-full">
           {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature />}
-          <ForumQuestionPanel />
         </div>
       </div>
     </SectionShell>
@@ -118,7 +121,7 @@ function CommunityActions({
 
 function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const answer = topic.acceptedAnswer;
-  const isSolved = Boolean(topic.solved && answer?.text);
+  const isSolved = Boolean(topic.solved);
 
   return (
     <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
@@ -174,9 +177,9 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
 function EmptyCommunityFeature() {
   return (
     <div className="border border-dashed border-[color:var(--hp-border)] p-6 text-center">
-      <p className="text-[18px] font-bold text-[color:var(--hp-ink)]">هنوز موضوعی در انجمن ثبت نشده است</p>
+      <p className="text-[18px] font-bold text-[color:var(--hp-ink)]">هنوز موضوع حل‌شده‌ای برای نمایش نیست</p>
       <p className="mx-auto mt-2 max-w-md text-[14px] leading-6 text-[color:var(--hp-ink-3)]">
-        اولین پرسش فنی را ثبت کنید تا گفتگوی بعدی جامعهٔ تکباکس از همین‌جا شروع شود.
+        با ثبت پرسش و پاسخ‌های دقیق، اولین راه‌حل قابل‌اتکای انجمن از همین‌جا شکل می‌گیرد.
       </p>
       <a
         href="#hp-forum-question"
@@ -194,7 +197,7 @@ function ActiveTopicList({
   topics: WithForumActivity[];
 }) {
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       {topics.length === 0 ? (
         <p className="py-5 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
           فعلاً پرسش بازی برای نمایش نیست؛ شما می‌توانید گفتگوی بعدی را شروع کنید.

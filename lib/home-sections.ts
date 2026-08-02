@@ -35,6 +35,7 @@ import type {
   LatestInsights,
   NewsHighlightComment,
   VideoHighlightComment,
+  CommunityData,
 } from "@/features/home/lib/home-types";
 
 const PUBLISHED = { published: true, deletedAt: null } as const;
@@ -315,65 +316,54 @@ export async function getLatestInsights(
 }
 
 /**
- * Forum homepage data: a random pick from the hottest recent questions plus
- * four still-open topics. Keeping the selection here (rather than in the
- * component) means counts, accepted answers and latest contributors arrive in
- * one server payload with no browser-side query fan-out.
+ * Forum homepage data keeps the two desktop columns semantically separate:
+ * the left feature is always one randomly rotated solved topic; the right
+ * rail is a random set of unresolved topics. All counts and activity are
+ * hydrated in one server payload, with no browser-side query fan-out.
  */
 export async function getCommunityTopics(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
-): Promise<ContentItem[]> {
-  const weekAgo = new Date(Date.now() - 7 * 864e5);
-  let featurePool: any[] = await prisma.post.findMany({
-    where: {
-      module: "forum",
-      ...PUBLISHED,
-      date: { gte: weekAgo, ...publicPostDateWhere() },
-    },
-    orderBy: [{ date: "desc" }, { id: "desc" }],
-    take: 40,
-    select: cardSelect,
-  });
+): Promise<CommunityData> {
+  const forumWhere = {
+    module: "forum",
+    ...PUBLISHED,
+    date: publicPostDateWhere(),
+  };
 
-  // A quiet week still needs a real community feature.
-  if (featurePool.length === 0) {
-    featurePool = await prisma.post.findMany({
-      where: { module: "forum", ...PUBLISHED, date: publicPostDateWhere() },
-      orderBy: [{ date: "desc" }, { id: "desc" }],
-      take: 40,
-      select: cardSelect,
-    }) as any[];
-  }
-  if (featurePool.length === 0) return [];
-
-  // The activity rail needs enough real Forum material even when the recent
-  // feature pool is quiet or most questions have already been solved. Pull a
-  // broader forum pool, then let the rail prioritise unanswered topics below.
-  const railFallback = await prisma.post.findMany({
-    where: {
-      module: "forum",
-      ...PUBLISHED,
-      date: publicPostDateWhere(),
-    },
+  // Keep candidate queries broad enough for visible rotation, then select the
+  // actual rendered rows in memory. Solved and unresolved states are queried
+  // independently so neither column can leak the other state.
+  const solvedPool = await prisma.post.findMany({
+    where: { ...forumWhere, solved: true },
     orderBy: [{ date: "desc" }, { id: "desc" }],
     take: 40,
     select: cardSelect,
   }) as any[];
-  const topicById = new Map<string, any>();
-  for (const topic of [...featurePool, ...railFallback]) topicById.set(topic.id, topic);
-  const topics = [...topicById.values()];
-  const topicIds: string[] = topics.map((topic) => topic.id);
+  const openPool = await prisma.post.findMany({
+    where: { ...forumWhere, solved: false },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 40,
+    select: cardSelect,
+  }) as any[];
 
-  const rawCounts = await prisma.comment.groupBy({
-    by: ["postId"],
-    _count: { _all: true },
-    where: { postId: { in: topicIds }, status: "approved", deletedAt: null },
-  });
-  const counts = rawCounts as any[];
-  const countByPost = new Map(counts.map((entry) => [entry.postId, entry._count._all || 0]));
+  // This is server-stable for an hour (the home cache window), which gives
+  // readers a genuinely rotating selection without a hydration mismatch.
+  const featuredRaw = solvedPool[seededIndex(solvedPool.length, 613)] ?? null;
+  const railTopics = seededIndices(openPool.length, 4, 719).map((index) => openPool[index]);
+  const visibleTopics = featuredRaw ? [featuredRaw, ...railTopics] : railTopics;
+  const topicIds: string[] = visibleTopics.map((topic) => topic.id);
 
-  const acceptedIds = topics
+  const rawCounts = topicIds.length > 0
+    ? await prisma.comment.groupBy({
+        by: ["postId"],
+        _count: { _all: true },
+        where: { postId: { in: topicIds }, status: "approved", deletedAt: null },
+      })
+    : [];
+  const countByPost = new Map(rawCounts.map((entry) => [entry.postId, entry._count._all || 0]));
+
+  const acceptedIds = visibleTopics
     .map((topic) => topic.acceptedCommentId)
     .filter((id): id is string => typeof id === "string" && id.length > 0);
   const acceptedRows = acceptedIds.length > 0
@@ -389,57 +379,25 @@ export async function getCommunityTopics(
     : [];
   const acceptedById = new Map(acceptedRows.map((comment) => [comment.id, comment]));
 
-  const latestComments = await prisma.comment.findMany({
-    where: { postId: { in: topicIds }, status: "approved", deletedAt: null },
-    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-    take: 200,
-    select: {
-      postId: true,
-      createdAt: true,
-      authorName: true,
-      author: { select: { name: true, username: true, avatar: true, verifiedType: true, status: true } },
-    },
-  });
+  const latestComments = topicIds.length > 0
+    ? await prisma.comment.findMany({
+        where: { postId: { in: topicIds }, status: "approved", deletedAt: null },
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        take: 200,
+        select: {
+          postId: true,
+          createdAt: true,
+          authorName: true,
+          author: { select: { name: true, username: true, avatar: true, verifiedType: true, status: true } },
+        },
+      })
+    : [];
   const activityByPost = new Map<string, (typeof latestComments)[number]>();
   for (const comment of latestComments) {
     if (activityByPost.has(comment.postId)) continue;
     if (comment.author && comment.author.status !== "active") continue;
     activityByPost.set(comment.postId, comment);
   }
-
-  const hottest = [...featurePool]
-    .sort((a, b) =>
-      (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
-      (b.likes || 0) - (a.likes || 0) ||
-      (b.views || 0) - (a.views || 0) ||
-      b.date.getTime() - a.date.getTime(),
-    )
-    .slice(0, Math.min(5, featurePool.length));
-  const unresolved = topics.filter((topic) => !topic.solved);
-  const solvedHottest = hottest.filter((topic) => topic.solved);
-  // Prefer a solved hot feature whenever there are already at least three
-  // real unresolved questions; this leaves the entire left rail for open work.
-  const featureChoices = unresolved.length >= 3 && solvedHottest.length > 0
-    ? solvedHottest
-    : hottest;
-  const featured = featureChoices[seededIndex(featureChoices.length, 613)];
-
-  const sortByActivity = (a: any, b: any) =>
-    (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
-    (b.likes || 0) - (a.likes || 0) ||
-    (b.views || 0) - (a.views || 0) ||
-    b.date.getTime() - a.date.getTime();
-
-  // Give unanswered questions priority, but backfill with solved threads so
-  // the homepage can present four distinct, real Forum topics. A solved row
-  // retains its true state in the component; it is never relabelled as open.
-  const openTopics = unresolved
-    .filter((topic) => topic.id !== featured.id)
-    .sort(sortByActivity);
-  const solvedTopics = topics
-    .filter((topic) => topic.solved && topic.id !== featured.id)
-    .sort(sortByActivity);
-  const railTopics = [...openTopics, ...solvedTopics].slice(0, 4);
 
   const toCard = (topic: any): ContentItem => {
     const card = normalize(topic);
@@ -470,7 +428,43 @@ export async function getCommunityTopics(
     return card;
   };
 
-  return [toCard(featured), ...railTopics.map(toCard)];
+  // Count distinct people across every public Forum topic and approved reply,
+  // not just the five selected cards. A registered account is the strongest
+  // identity; a named guest is used only when no account id exists.
+  let participantCount = 0;
+  try {
+    const topicContributors = await prisma.post.groupBy({
+      by: ["authorId", "authorName"],
+      where: forumWhere,
+    });
+    const replyContributors = await prisma.comment.groupBy({
+      by: ["authorId", "authorName"],
+      where: {
+        status: "approved",
+        deletedAt: null,
+        post: forumWhere,
+      },
+    });
+    const people = new Set<string>();
+    for (const contributor of [...topicContributors, ...replyContributors]) {
+      if (contributor.authorId) {
+        people.add(`user:${contributor.authorId}`);
+        continue;
+      }
+      const name = contributor.authorName.trim();
+      if (name) people.add(`guest:${name}`);
+    }
+    participantCount = people.size;
+  } catch {
+    // Content remains useful if the lightweight aggregate is temporarily
+    // unavailable; zero is honest and avoids inventing a participation count.
+  }
+
+  return {
+    featured: featuredRaw ? toCard(featuredRaw) : null,
+    topics: railTopics.map(toCard),
+    participantCount,
+  };
 }
 
 /**
