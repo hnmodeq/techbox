@@ -37,6 +37,18 @@ describe("alternating section bands", () => {
   });
 });
 
+describe("homepage ticker", () => {
+  const ticker = read("features/news/components/NewsTicker.tsx");
+  const css = read("design/globals.css");
+
+  it("moves at a calmer pace and colours each announcement by its module", () => {
+    expect(css).toMatch(/animation: techbox-ticker-scroll 82s linear infinite/);
+    expect(ticker).toMatch(/--ticker-accent/);
+    expect(ticker).toMatch(/var\(--module-\$\{itemModule\}-color, var\(--primary\)\)/);
+    expect(ticker).toMatch(/text-\[color:var\(--ticker-accent\)\]/);
+  });
+});
+
 describe("homepage images go through next/image", () => {
   it("routes every full-bleed card image through RemoteImage", () => {
     // Raw <img src={supabaseUrl}> skips AVIF/WebP negotiation and resizing,
@@ -62,5 +74,10 @@ describe("homepage images go through next/image", () => {
     expect(cmp).toMatch(/sizes: string;/);
     expect(cmp).toMatch(/fill/);
     expect(read("features/home/components/primitives/CardShell.tsx")).toMatch(/sizes=\{sizes \?\? "/);
+  });
+
+  it("ships the legacy local fallbacks used by old content rows", () => {
+    expect(fs.existsSync(path.resolve(__dirname, "../..", "public/assets/hooman.png"))).toBe(true);
+    expect(fs.existsSync(path.resolve(__dirname, "../..", "public/assets/blog-1.jpg"))).toBe(true);
   });
 });

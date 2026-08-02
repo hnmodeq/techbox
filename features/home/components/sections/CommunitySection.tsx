@@ -131,14 +131,11 @@ function CommunityActions({
 
 function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const answer = topic.acceptedAnswer;
-  const isSolved = Boolean(topic.solved);
 
   return (
-    <article className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
-      <div className="absolute inset-x-0 bottom-0 h-1 bg-[color:var(--community-accent)]" aria-hidden="true" />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <TopicActivity topic={topic} />
-        <TopicState solved={isSolved} />
+    <article className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
+      <div className="flex min-w-0 items-center">
+        <TopicActivity topic={topic} showSummary={false} />
       </div>
 
       <h3 className="mt-3 text-[22px] font-bold leading-[34px] text-[color:var(--hp-ink)]">
@@ -157,7 +154,11 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
       )}
 
       {answer?.text ? (
-        <div className="mt-5 rounded-[var(--hp-r-sm)] border-s-[3px] border-[color:var(--hp-solved)] bg-[color:var(--hp-solved)]/[0.08] p-4">
+        <div className="relative mt-5 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-solved)]/[0.08] p-4 ps-6">
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-4 start-2 w-1 rounded-full bg-[color:var(--hp-solved)]"
+          />
           <p className="flex items-center gap-1.5 text-[12px] font-bold text-[color:var(--hp-solved)]">
             <CheckCircle2 className="size-4" aria-hidden="true" />
             پاسخ برتر
@@ -242,6 +243,12 @@ function TopicRow({ topic }: { topic: WithForumActivity }) {
           </Link>
         </h3>
 
+        {topic.excerpt && (
+          <p className="mt-1 line-clamp-2 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
+            {topic.excerpt}
+          </p>
+        )}
+
         <div className="mt-3">
           <TopicActivity topic={topic} />
         </div>
@@ -250,13 +257,19 @@ function TopicRow({ topic }: { topic: WithForumActivity }) {
   );
 }
 
-function TopicActivity({ topic }: { topic: WithForumActivity }) {
+function TopicActivity({
+  topic,
+  showSummary = true,
+}: {
+  topic: WithForumActivity;
+  showSummary?: boolean;
+}) {
   const activity = topic.lastActivity;
   const author = activity?.author ?? topic.author;
   const date = activity?.date ?? topic.date;
 
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--hp-ink-3)]">
+    <div className="flex min-w-0 flex-col items-start text-[12px] text-[color:var(--hp-ink-3)]">
       <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
         <AuthorLink
           name={author?.name}
@@ -268,7 +281,7 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
         <span aria-hidden="true">•</span>
         <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
       </div>
-      <TopicSummary topic={topic} />
+      {showSummary && <TopicSummary topic={topic} />}
     </div>
   );
 }
@@ -279,27 +292,11 @@ function TopicSummary({ topic }: { topic: WithForumActivity }) {
   const stateClass = solved ? "text-[color:var(--hp-solved)]" : "text-[var(--warning)]";
 
   return (
-    <span className={`ms-auto block shrink-0 whitespace-nowrap text-[11px] leading-5 ${stateClass}`}>
+    <span className={`mt-1 ms-auto block shrink-0 whitespace-nowrap text-[11px] leading-5 ${stateClass}`}>
       <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده {solved ? "و این مسئله حل شده است" : "اما هنوز کسی این مسئله را حل نکرده است"}
     </span>
   );
 }
 
-function TopicState({ solved, compact = false }: { solved: boolean; compact?: boolean }) {
-  if (solved) {
-    return (
-      <span className={`inline-flex items-center gap-1 text-[color:var(--hp-solved)] ${compact ? "text-[11px]" : "text-[12px] font-bold"}`}>
-        <CheckCircle2 className={compact ? "size-3.5" : "size-4"} aria-hidden="true" />
-        حل‌شده
-      </span>
-    );
-  }
-
-  return (
-    <span className={`block whitespace-nowrap text-[var(--warning)] ${compact ? "text-[11px] leading-5" : "text-[12px] font-bold"}`}>
-      هنوز کسی این مسئله را حل نکرده
-    </span>
-  );
-}
 
 export default CommunitySection;

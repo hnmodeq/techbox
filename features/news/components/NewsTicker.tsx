@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type CSSProperties } from "react";
 import Link from "next/link";
 import { formatRelativeTime } from "@/lib/date-format";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
@@ -52,16 +52,20 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
           action: "منتشر شد",
         };
         const relativeDate = formatRelativeTime(item.date);
+        const style = {
+          "--ticker-accent": `var(--module-${itemModule}-color, var(--primary))`,
+        } as CSSProperties;
         return (
           <Link
             key={`${duplicate ? "duplicate" : "primary"}-${item.module}-${item.slug}-${index}`}
             href={`/${itemModule}/${item.slug}`}
             tabIndex={duplicate ? -1 : undefined}
-            className="ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-light text-foreground transition-colors duration-200 hover:text-foreground/80"
+            className="ticker-item group flex shrink-0 items-center gap-2 whitespace-nowrap text-xs font-light transition-opacity duration-200 hover:opacity-80"
+            style={style}
             dir="rtl"
           >
-            <span className="size-1.5 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span className="font-light text-foreground">
+            <span className="size-1.5 shrink-0 rounded-full bg-[color:var(--ticker-accent)]" />
+            <span className="font-light text-[color:var(--ticker-accent)]">
               {copy.type}{" "}<span>{item.title}</span>{" "}<span>{copy.action}.</span>
             </span>
             {relativeDate && <span className="shrink-0 font-light text-muted-foreground">{relativeDate}</span>}

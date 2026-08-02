@@ -280,7 +280,7 @@ html.theme-transitioning * {
 
 /* Home news ticker --------------------------------------------------------- */
 .ticker-track {
-  animation: techbox-ticker-scroll 46s linear infinite;
+  animation: techbox-ticker-scroll 82s linear infinite;
   will-change: transform;
 }
 

@@ -225,7 +225,7 @@ function PlayAffordance() {
   return (
     <span
       aria-hidden="true"
-      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-foreground shadow-sm"
+      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-sm"
     >
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
         <path d="M15 7.27a2 2 0 0 1 0 3.46L3 17.66A2 2 0 0 1 0 15.93V2.07A2 2 0 0 1 3 .34l12 6.93Z" fill="currentColor" />

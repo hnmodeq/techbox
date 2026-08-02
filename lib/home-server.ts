@@ -386,8 +386,13 @@ async function loadMagazinePosts(): Promise<ContentItem[]> {
   });
   if (!latest) return [];
 
+  // Keep the compact rail fresh: it rotates through the next newest eight
+  // real articles instead of occasionally surfacing an arbitrary old archive
+  // row beside today's lead.
   const candidateIds = await prisma.post.findMany({
     where: { ...where, id: { not: latest.id } },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 8,
     select: { id: true },
   });
   const selectedIds = randomSample(candidateIds.map((post) => post.id), 4);
@@ -434,7 +439,7 @@ async function getMagazinePostsUncached(): Promise<ContentItem[]> {
 // still rotates, but only once per hour instead of forcing a database-backed
 // render on every page refresh. That matters on free Neon because transfer and
 // compute are monthly quotas, not unlimited development resources.
-const cachedMagazinePosts = unstable_cache(getMagazinePostsUncached, ["home-magazine-v1"], {
+const cachedMagazinePosts = unstable_cache(getMagazinePostsUncached, ["home-magazine-v2"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

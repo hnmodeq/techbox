@@ -44,14 +44,23 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/whitespace-nowrap/);
     expect(community).not.toMatch(/تعداد پاسخ‌های ثبت‌شده/);
     expect(community).not.toMatch(/تعداد دفعات بازدید/);
-    // Main feature is square-cornered/borderless, with its state line below.
+    const topicRow = community.slice(community.indexOf("function TopicRow"), community.indexOf("function TopicActivity"));
+    expect(topicRow).toMatch(/topic\.excerpt/);
+    expect(topicRow).toMatch(/line-clamp-2 text-\[13px\]/);
+    // Main feature is square-cornered/borderless. Its only solved treatment
+    // is the accepted-answer marker — no duplicate «حل‌شده» label or accent bar.
     const feature = community.slice(community.indexOf("function FeaturedTopic"), community.indexOf("function EmptyCommunityFeature"));
     expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
     expect(feature).not.toMatch(/border border-\[color:var\(--hp-border\)\]/);
     expect(feature).not.toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
     expect(feature).toMatch(/bg-\[color:var\(--hp-surface\)\]/);
     expect(feature).not.toMatch(/color-mix\(in_oklch,var\(--community-accent\)/);
-    expect(feature).toMatch(/absolute inset-x-0 bottom-0 h-1/);
+    expect(feature).not.toMatch(/absolute inset-x-0 bottom-0 h-1/);
+    expect(feature).not.toMatch(/حل‌شده/);
+    expect(feature).toMatch(/showSummary=\{false\}/);
+    expect(feature).toMatch(/absolute inset-y-4 start-2 w-1/);
+    expect(feature).toMatch(/bg-\[color:var\(--hp-solved\)\]/);
+    expect(feature).not.toMatch(/border-s-\[3px\]/);
     expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
   });
 
