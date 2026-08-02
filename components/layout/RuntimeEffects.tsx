@@ -7,7 +7,8 @@ export function RuntimeEffects() {
     try {
       const root = document.documentElement;
 
-      const main = localStorage.getItem("takbox-sidebar-desktop-open");
+      const main = localStorage.getItem("techbox-sidebar-desktop-open")
+        ?? localStorage.getItem("takbox-sidebar-desktop-open");
       const news = localStorage.getItem("techbox-news-sidebar-open");
 
       root.dataset.mainSidebarOpen = main === null ? "true" : String(main === "true");

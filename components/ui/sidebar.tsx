@@ -31,6 +31,8 @@ const SIDEBAR_WIDTH = "14rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
+const SIDEBAR_STORAGE_KEY = "techbox-sidebar-desktop-open"
+const LEGACY_SIDEBAR_STORAGE_KEY = "takbox-sidebar-desktop-open"
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed"
@@ -82,8 +84,16 @@ function SidebarProvider({
         _setOpen(openState)
       }
 
-      // This sets the cookie to keep the sidebar state.
+      // Cookie drives the server-rendered first paint on the next visit;
+      // localStorage keeps the existing RuntimeEffects hint in sync as well.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      try {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, String(openState))
+        // Keep the old misspelled key in sync for visitors with an existing
+        // browser profile until RuntimeEffects has migrated it.
+        localStorage.setItem(LEGACY_SIDEBAR_STORAGE_KEY, String(openState))
+        document.documentElement.dataset.mainSidebarOpen = String(openState)
+      } catch {}
     },
     [setOpenProp, open]
   )

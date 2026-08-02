@@ -152,7 +152,6 @@ export function InsightsSection({
           <div className="flex min-w-0 flex-col gap-6 lg:h-full">
             <NewsDiscussion
               comments={comments}
-              storiesBySlug={storyBySlug}
               activeNewsSlug={activeStory.slug}
               onPreview={setPreviewSlug}
               onLeavePreview={() => setPreviewSlug(null)}
@@ -177,15 +176,16 @@ export function InsightsSection({
 /** The deliberate routes out of the homepage section, aligned in its shared
  * header line so neither desktop column needs an extra action strip. */
 function NewsActions({ header = false }: { header?: boolean }) {
-  const openSidebar = () => {
-    window.dispatchEvent(new CustomEvent("tb_open_news_sidebar"));
+  const toggleSidebar = () => {
+    window.dispatchEvent(new CustomEvent("tb_toggle_news_sidebar"));
   };
 
   return (
     <div className={`${header ? "shrink-0" : "mt-4"} flex flex-wrap items-center gap-2`}>
       <button
         type="button"
-        onClick={openSidebar}
+        data-news-toggle
+        onClick={toggleSidebar}
         className="inline-flex min-h-10 items-center gap-2 rounded-[var(--hp-r-sm)] border border-[color:var(--insights-accent)] px-3 text-[12px] font-bold text-[color:var(--insights-accent)] transition-colors hover:bg-[color:var(--insights-accent)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         اخبار ۲۴ ساعت گذشته
@@ -213,7 +213,7 @@ function LatestStory({
   const fullScreenHref = `/${story.module}/${story.slug}`;
 
   return (
-    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden rounded-[var(--hp-r-md)] bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
+    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
       <div className="relative shrink-0 overflow-hidden bg-muted max-lg:aspect-video lg:h-[48%]">
         <RemoteImage
           src={story.image}
@@ -280,14 +280,12 @@ function LatestStory({
 
 function NewsDiscussion({
   comments,
-  storiesBySlug,
   activeNewsSlug,
   onPreview,
   onLeavePreview,
   onOpenComment,
 }: {
   comments: NewsHighlightComment[];
-  storiesBySlug: ReadonlyMap<string, ContentItem>;
   activeNewsSlug: string;
   onPreview: (slug: string) => void;
   onLeavePreview: () => void;
@@ -295,13 +293,17 @@ function NewsDiscussion({
 }) {
   return (
     <section
-      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--hp-r-md)] bg-transparent p-3 sm:p-4"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden bg-transparent p-0"
       onMouseLeave={onLeavePreview}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onLeavePreview();
       }}
-      aria-label="گفتگوهای داغ خبرها"
+      aria-label="دیدگاه شما درباره خبرها"
     >
+      <h4 className="mb-3 shrink-0 text-[14px] font-bold text-foreground">
+        دیدگاه شما درباره خبرها
+      </h4>
+
       {comments.length === 0 ? (
         <p className="my-auto text-center text-sm font-semibold text-muted-foreground">
           هنوز گفتگویی برای خبرهای تازه ثبت نشده است.
@@ -313,7 +315,6 @@ function NewsDiscussion({
         >
           {comments.map((comment, index) => {
             const isActive = comment.newsSlug === activeNewsSlug;
-            const parentStory = storiesBySlug.get(comment.newsSlug);
             return (
               <React.Fragment key={comment.id}>
               <article
@@ -328,25 +329,7 @@ function NewsDiscussion({
                   />
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => onOpenComment(comment)}
-                  className="block w-full ps-5 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-label={`باز کردن گفتگوی خبر: ${comment.text}`}
-                >
-                  <span className="line-clamp-2 block whitespace-pre-wrap text-[15px] font-bold leading-6 text-foreground">
-                    {comment.text}
-                  </span>
-                  {parentStory && (
-                    <span className={`mt-1 line-clamp-1 block text-[11px] font-semibold ${
-                      isActive ? "text-[color:var(--insights-accent)]" : "text-muted-foreground"
-                    }`}>
-                      دربارهٔ: {parentStory.title}
-                    </span>
-                  )}
-                </button>
-
-                <div className="mt-3 flex items-center justify-between gap-3 ps-5">
+                <div className="mb-3 flex items-center justify-between gap-3 ps-5">
                   <AuthorLink
                     name={comment.author.name}
                     username={comment.author.username ?? undefined}
@@ -356,16 +339,26 @@ function NewsDiscussion({
                   <button
                     type="button"
                     onClick={() => onOpenComment(comment)}
-                    className="flex shrink-0 items-center gap-1.5 text-[12px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="shrink-0 text-[12px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label="باز کردن گفتگوی این خبر"
                   >
-                    <span aria-hidden="true">•</span>
                     <RelativeDate
                       date={comment.date}
                       className="text-[12px] text-muted-foreground"
                     />
                   </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenComment(comment)}
+                  className="block w-full ps-5 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label={`باز کردن گفتگوی خبر: ${comment.text}`}
+                >
+                  <span className="line-clamp-2 block whitespace-pre-wrap text-[15px] font-bold leading-6 text-foreground">
+                    {comment.text}
+                  </span>
+                </button>
               </article>
               {index < comments.length - 1 && (
                 <div
