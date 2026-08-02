@@ -1,561 +1,72 @@
-alright,
-
-let's continue with yourself!
-
-if you have enough context.
-
-if we couldn't continue or you stopped middle of the process I'm gonna switch to a new season with the markdown file that you wrote for me.
-
-
-
-note: idk that we need to have slugs pages for news or not! maybe it is good for SEO but we not gonna let users redirect to slug pages from our cards anyway. they can enter to news slugs from a google search, but for users who are currently in our website we not gonna redirect them to any news slugs. they just can read the news and comments on them from our cards including cards in news sidebar, news section in homepage and our news archive.
-
-
-
-i also have this error:
-
-
-
- 
-
- GET /api/comments/vote?commentId=cmrt66l1b0005i4tglx815c18 200 in 3.2s (next.js: 43ms, application-code: 3.2s)
-
- GET /api/comments/vote?commentId=cmrkprj6f00h0i48ohwbgxcjh 200 in 3.4s (next.js: 52ms, application-code: 3.4s)
-
- GET /api/comments/vote?commentId=cmrkprjb400h2i48o87rmiar7 200 in 2.1s (next.js: 4ms, application-code: 2.1s)
-
- GET /api/comments/vote?commentId=cmrkprj1s00gyi48odze6ew2x 200 in 1955ms (next.js: 2ms, application-code: 1952ms)
-
- GET /api/comments/vote?commentId=cmrt66l1b0005i4tglx815c18 200 in 1955ms (next.js: 2ms, application-code: 1953ms)
-
-✓ Compiled in 704ms
-
- GET /api/like?module=media&amp;slug=media-video-6-monitoring-stack 503 in 5.1s (next.js: 8ms, application-code: 5.0s)
-
- GET /api/like?module=media&amp;slug=media-video-6-monitoring-stack 503 in 10.0s (next.js: 26ms, application-code: 10.0s)
-
-[auth-server] connection pool timeout — too many concurrent queries
-
-[auth-server] → raise PRISMA_CONNECTION_LIMIT, or reduce concurrent queries
-
- GET /api/saved-content?module=media&amp;slug=media-video-6-monitoring-stack 200 in 10.1s (next.js: 18ms, application-code: 10.0s)
-
- GET /api/saved-content?module=media&amp;slug=media-video-6-monitoring-stack 200 in 10.1s (next.js: 35ms, application-code: 10.0s)
-
-[settings] database unreachable ([ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432](http://ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432))
-
-[settings] → run `pnpm db:doctor` to find which layer is failing
-
- POST / 200 in 20.3s (next.js: 32ms, application-code: 20.3s)
-
-  └─ ƒ getCommentsAction("media", "media-video-6-monitoring-stack") in 20236ms features/comment/actions/comments.ts
-
- POST / 200 in 15.2s (next.js: 3ms, application-code: 15.2s)
-
-  └─ ƒ getCommentsAction("media", "media-video-6-monitoring-stack") in 15214ms features/comment/actions/comments.ts
-
- GET / 200 in 487ms (next.js: 7ms, application-code: 480ms)
-
-[auth-server] connection pool timeout — too many concurrent queries (+1 identical suppressed)
-
-[auth-server] → raise PRISMA_CONNECTION_LIMIT, or reduce concurrent queries
-
- GET /api/auth/me 200 in 10.0s (next.js: 17ms, application-code: 10.0s)
-
-[db-circuit] 3 consecutive connectivity failures — pausing database reads for 5000ms to let the pool recover
-
- GET /api/modules/enabled 200 in 19.4s (next.js: 9ms, application-code: 19.4s)
-
- GET /terms 200 in 3.8s (next.js: 1068ms, application-code: 2.7s)
-
-[server-posts] Failed to fetch news: Error [PrismaClientKnownRequestError]: 
-
-Invalid `__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].post.findMany()` invocation in
-
-D:\Dev\techbox\.next\dev\server\chunks\ssr\[root-of-the-server]__090t3ie._.js:231:150
-
-  228 async function getDbModulePosts(module, take = 50) {
-
-  229     if (!process.env.DATABASE_URL) return [];
-
-  230     try {
-
-→ 231         const posts = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].post.findMany(
-
-Can't reach database server at `ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432`
-
-Please make sure your database server is running at `ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432`.
-
-    at &lt;unknown&gt; (lib\server-posts.ts:15:37)
-
-    at async getDbModulePosts (lib\server-posts.ts:15:19)
-
-    at async NewsPage (app\news\page.tsx:11:19)
-
-  13 |
-
-  14 |   try {
-
-&gt; 15 |     const posts = await [prisma.post](http://prisma.post).findMany({
-
-     |                                     ^
-
-  16 |       where: {
-
-  17 |         module,
-
-  18 |         published: true, {
-
-  code: 'P1001',
-
-  meta: {
-
-    modelName: 'Post',
-
-    database_location: '[ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432](http://ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432)'
-
-  },
-
-  clientVersion: '6.19.3'
-
-}
-
- GET /news 200 in 6.3s (next.js: 1148ms, application-code: 5.1s)
-
- GET /api/stats?module=news 503 in 10.0s (next.js: 36ms, application-code: 9.9s)
-
- GET /news/news-07 200 in 5.8s (next.js: 1998ms, application-code: 3.8s)
-
-[db-circuit] database recovered — resuming normal queries
-
- GET /api/stats?module=news 200 in 6.0s (next.js: 3ms, application-code: 6.0s)
-
- GET /api/posts?module=news&amp;slug=news-07 200 in 6.3s (next.js: 162ms, application-code: 6.2s)
-
- GET /api/saved-content?module=news&amp;slug=news-07 200 in 2.8s (next.js: 10ms, application-code: 2.8s)
-
- GET /api/like?module=news&amp;slug=news-07 200 in 4.3s (next.js: 5ms, application-code: 4.3s)
-
- GET /api/posts?module=news&amp;take=30 200 in 4.7s (next.js: 3ms, application-code: 4.6s)
-
- GET /api/posts?module=download&amp;take=30 200 in 1807ms (next.js: 2ms, application-code: 1805ms)
-
- GET /api/posts?module=blog&amp;take=30 200 in 5.3s (next.js: 3ms, application-code: 5.3s)
-
- GET /api/posts?module=forum&amp;take=30 200 in 5.3s (next.js: 3ms, application-code: 5.3s)
-
- GET /api/posts?module=media&amp;take=30 200 in 5.3s (next.js: 2ms, application-code: 5.3s)
-
- POST /api/views 200 in 8.6s (next.js: 96ms, application-code: 8.5s)
-
- GET /api/saved-content?module=news&amp;slug=news-07 200 in 3.0s (next.js: 2ms, application-code: 3.0s)
-
- GET /api/like?module=news&amp;slug=news-07 200 in 4.8s (next.js: 2ms, application-code: 4.8s)
-
- GET /api/posts?module=download&amp;take=30 200 in 1312ms (next.js: 3ms, application-code: 1309ms)
-
-⨯ upstream image [https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news11.webp](https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news11.webp) resolved to private ip ["10.10.34.35"]
-
-⨯ upstream image [https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news9.webp](https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news9.webp) resolved to private ip ["10.10.34.35"]
-
-⨯ upstream image [https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news5.webp](https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news5.webp) resolved to private ip ["10.10.34.35"]
-
-⨯ upstream image [https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news3.webp](https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news3.webp) resolved to private ip ["10.10.34.35"]
-
-⨯ upstream image [https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news1.webp](https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news1.webp) resolved to private ip ["10.10.34.35"]
-
-⨯ upstream image [https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news10.webp](https://nggwgcfkceuadvhxnczf.supabase.co/storage/v1/object/public/techbox/news-images/news10.webp) resolved to private ip ["10.10.34.35"]
-
- GET /api/posts?module=news&amp;take=30 200 in 4.5s (next.js: 2ms, application-code: 4.5s)
-
- GET /api/posts?module=blog&amp;take=30 200 in 4.3s (next.js: 3ms, application-code: 4.3s)
-
- GET /api/posts?module=forum&amp;take=30 200 in 4.1s (next.js: 3ms, application-code: 4.1s)
-
- GET /api/posts?module=media&amp;take=30 200 in 4.1s (next.js: 2ms, application-code: 4.1s)
-
- POST /news/news-07 200 in 4.4s (next.js: 9ms, application-code: 4.4s)
-
-  └─ ƒ getCommentsAction("news", "news-07") in 4422ms features/comment/actions/comments.ts
-
- GET /api/posts?module=news&amp;slug=news-07 200 in 2.3s (next.js: 3ms, application-code: 2.3s)
-
- POST / 200 in 4.0s (next.js: 4ms, application-code: 4.0s)
-
-  └─ ƒ getCommentsAction("news", "news-07") in 3997ms features/comment/actions/comments.ts
-
- GET /api/posts?module=news&amp;slug=news-07 200 in 982ms (next.js: 2ms, application-code: 980ms)
-
- GET / 200 in 661ms (next.js: 6ms, application-code: 656ms)
-
-[auth-server] connection pool timeout — too many concurrent queries
-
-[auth-server] → raise PRISMA_CONNECTION_LIMIT, or reduce concurrent queries
-
- GET /api/auth/me 200 in 10.0s (next.js: 13ms, application-code: 10.0s)
-
-[home-data:magazine] connection pool timeout — too many concurrent queries
-
-[home-data:magazine] → raise PRISMA_CONNECTION_LIMIT, or reduce concurrent queries
-
-[db-circuit] 3 consecutive connectivity failures — pausing database reads for 5000ms to let the pool recover
-
- GET /api/modules/enabled 200 in 20.2s (next.js: 5ms, application-code: 20.2s)
-
-[home-data:module:blog] database unreachable ([ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432](http://ep-withered-cell-awxzos6k-pooler.c-12.us-east-1.aws.neon.tech:5432))
-
-[home-data:module:blog] → run `pnpm db:doctor` to find which layer is failing
-
-revalidating cache with key: async function getHomeDataUncached() {
-
-    // Get enabled modules from DB config
-
-    const enabledModules = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$module$2d$config$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getEnabledModules"])();
-
-    // Filter moduleTakes to only include enabled modules
-
-    const activeModuleTakes = Object.fromEntries(Object.entries(moduleTakes).filter(([module])=&gt;enabledModules.includes(module)));
-
-    // Sequential to avoid P2024 pool exhaustion – was Promise.all of 7 modules each doing 2-3 queries = up to 21 concurrent
-
-    const modules = {};
-
-    let moduleFailures = 0;
-
-    for (const [module, take] of Object.entries(activeModuleTakes)){
-
-        try {
-
-            modules[module] = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$circuit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["withCircuit"])(()=&gt;findPosts(module, take));
-
-        } catch (e) {
-
-            moduleFailures++;
-
-            modules[module] = [];
-
-            if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$circuit$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["isCircuitOpenError"])(e)) (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$error$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["logDbFailure"])`home-data:module:${module}`, e);
-
-        }
-
-    }
-
-    // If EVERY module query failed, the database is unreachable or the pool
-
-    // is exhausted — this is not a genuinely empty site. Throwing here is
-
-    // deliberate: unstable_cache does not store a rejected promise, so the
-
-    // next request retries instead of serving a blank homepage for the full
-
-    // revalidate window. Caching a transient failure is how a one-off pool
-
-    // timeout turns into an hour of empty page.
-
-    const moduleCount = Object.keys(activeModuleTakes).length;
-
-    if (moduleCount &gt; 0 &amp;&amp; moduleFailures === moduleCount) {
-
-        // Deliberate: unstable_cache does not store a rejected promise, so
-
-        // throwing here means the next request retries instead of serving a
-
-        // blank homepage for the full revalidate window.
-
-        //
-
-        // Tagged with the circuit code because the caller catches this and
-
-        // degrades. Without the tag it is reported a second time as a fresh
-
-        // failure, which is how one blip produced four separate red overlays.
-
-        const err = new Error("home-data: all module queries failed — refusing to cache an empty homepage");
-
-        err.code = "DB_CIRCUIT_OPEN";
-
-        throw err;
-
-    }
-
-    // Ticker: only include posts from enabled modules
-
-    let tickerPosts = [];
-
-    try {
-
-        tickerPosts = await __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["prisma"].post.findMany({
-
-            where: {
-
-                published: true,
-
-                deletedAt: null,
-
-                module: {
-
-                    in: enabledModules
-
-                },
-
-                date: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$post$2d$date$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["publicPostDateWhere"])()
-
-            },
-
-            orderBy: {
-
-                date: "desc"
-
-            },
-
-            take: 30,
-
-            select: tickerSelect
-
-        });
-
-    } catch  {
-
-        tickerPosts = [];
-
-    }
-
-    // ── Homepage upgrade sections ───────────────────────────────────────
-
-    // Sequential for the same reason as the module loop above: parallelising
-
-    // these would put ~12 more concurrent queries on the Neon pool and
-
-    // reproduce the P2024 exhaustion this file was already fixed for.
-
-    //
-
-    // Every block is individually try/caught. One failing section must
-
-    // degrade to "section hidden", never take down the whole homepage.
-
-    const latestInsights = await section("latestInsights", {
-
-        story: null,
-
-        comments: []
-
-    }, ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getLatestInsights"])(normalizeCard, cardSelect));
-
-    const videoHighlightComments = await section("videoHighlightComments", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getLatestVideoHighlightComments"])(4));
-
-    const topPicks = await section("topPicks", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getTopPicks"])(normalizeCard, cardSelect));
-
-    // §7 Deals replaces the raw shop slice: prices must be resolved through
-
-    // the currency pipeline, which the generic findPosts() does not do.
-
-    const deals = await section("deals", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDeals"])(normalizeCard, cardSelect, [moduleTakes.shop](http://moduleTakes.shop) ?? 8));
-
-    if (deals.length) [modules.shop](http://modules.shop) = deals;
-
-    const timeline = await section("timeline", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getTimeline"])());
-
-    // Homepage SiteSetting keys, read as one batch.
-
-    let homeSettings = {};
-
-    try {
-
-        homeSettings = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$settings$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getSettings"])([
-
-            "home.familyComments.blocklist",
-
-            "home.finder.chips",
-
-            "[home.tools](http://home.tools).featured",
-
-            "home.announcement"
-
-        ]);
-
-    } catch (e) {
-
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$error$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["logDbFailure"])("home-data:settings", e);
-
-    }
-
-    const parseJsonArray = (raw)=&gt;{
-
-        if (!raw) return [];
-
-        try {
-
-            const v = JSON.parse(raw);
-
-            return Array.isArray(v) ? v : [];
-
-        } catch  {
-
-            return []; // malformed setting must not hide a section
-
-        }
-
-    };
-
-    const finderChips = parseJsonArray(homeSettings["home.finder.chips"]).filter((c)=&gt;c &amp;&amp; typeof c.labelFa === "string" &amp;&amp; typeof c.href === "string");
-
-    const toolsFeatured = parseJsonArray(homeSettings["[home.tools](http://home.tools).featured"]).filter((x)=&gt;typeof x === "string");
-
-    // §0 Announcement. Absent or malformed setting = disabled, which is the
-
-    // intended default (D7): the bar exists for campaigns, not permanently.
-
-    let announcement = null;
-
-    try {
-
-        const raw = homeSettings["home.announcement"];
-
-        if (raw) {
-
-            const parsed = JSON.parse(raw);
-
-            if (parsed &amp;&amp; typeof parsed === "object" &amp;&amp; parsed.enabled === true) {
-
-                announcement = {
-
-                    enabled: true,
-
-                    version: Number(parsed.version) || 1,
-
-                    textFa: String(parsed.textFa ?? ""),
-
-                    boldLeadFa: parsed.boldLeadFa ? String(parsed.boldLeadFa) : undefined,
-
-                    ctaLabelFa: parsed.ctaLabelFa ? String(parsed.ctaLabelFa) : undefined,
-
-                    href: parsed.href ? String(parsed.href) : undefined,
-
-                    startsAt: parsed.startsAt ?? null,
-
-                    endsAt: parsed.endsAt ?? null,
-
-                    tone: [
-
-                        "brand",
-
-                        "accent",
-
-                        "deal"
-
-                    ].includes(parsed.tone) ? parsed.tone : "brand"
-
-                };
-
-            }
-
-        }
-
-    } catch  {
-
-        announcement = null;
-
-    }
-
-    let familyComments = [];
-
-    try {
-
-        const raw = homeSettings["home.familyComments.blocklist"];
-
-        let blocklist = [];
-
-        if (raw) {
-
-            try {
-
-                const parsed = JSON.parse(raw);
-
-                if (Array.isArray(parsed)) blocklist = parsed.filter((x)=&gt;typeof x === "string");
-
-            } catch  {
-
-            // Malformed setting: ignore the blocklist rather than hide the section.
-
-            }
-
-        }
-
-        familyComments = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getFamilyComments"])(blocklist);
-
-    } catch (e) {
-
-        (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2d$error$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["logDbFailure"])("home-data:familyComments", e);
-
-    }
-
-    const moreToExplore = await section("moreToExplore", {
-
-        hero: null,
-
-        cards: []
-
-    }, ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getMoreToExplore"])(normalizeCard, cardSelect));
-
-    const authors = await section("authors", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getAuthors"])());
-
-    const familyProfiles = await section("familyProfiles", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getFamilyProfiles"])());
-
-    const partners = await section("partners", [], ()=&gt;(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$home$2d$sections$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getPartners"])());
-
-    return {
-
-        modules: modules,
-
-        ticker: [tickerPosts.map](http://tickerPosts.map)(normalizeTickerCard),
-
-        generatedAt: new Date().toISOString(),
-
-        latestInsights,
-
-        videoHighlightComments,
-
-        topPicks,
-
-        timeline,
-
-        familyComments,
-
-        moreToExplore,
-
-        authors,
-
-        finderChips,
-
-        toolsFeatured,
-
-        announcement,
-
-        familyProfiles,
-
-        partners
-
-    };
-
-}-home-data-v7-[] Error: home-data: all module queries failed — refusing to cache an empty homepage
-
-    at getHomeDataUncached (lib\home-server.ts:494:17)
-
-  492 |     // degrades. Without the tag it is reported a second time as a fresh
-
-  493 |     // failure, which is how one blip produced four separate red overlays.
-
-&gt; 494 |     const err = new Error(
-
-      |                 ^
-
-  495 |       "home-data: all module queries failed — refusing to cache an empt...
-
-  496 |     ) as Error &amp; { code?: string };
-
-  497 |     err.code = "DB_CIRCUIT_OPEN"; {
-
-  code: 'DB_CIRCUIT_OPEN'
-
-}
+in homepage forum section right side:
+1-the row that we have our avatars, publish date, topic status in it needs to be align bottom
+2-i see a dot between the user and the publish date, please remove it
+
+in homepage forum section left side:
+1-we have a row for user avatar, publish date, status badge, please move it from above of the question to below the question
+2-move the best answer publish date to bottom same row with the user avatar row
+3-let the question font follow module color
+
+in homepage news section:
+1-the main card publish date tooltip needs to show only the date (remove the تاریخ انتشار phrase)
+2-push more explanation for news to database, news titles can be short in a single line but the explanation needs to be 1 paragraph at least.
+
+in homepage shop section:
+1-let this section follow the same card as the /shop page cards! (in /shop page we see many products, please use same cards in homepage)
+2-let the discount percentage badge and the discount timer follow the module color, in both homepage shop section and the shop page itself
+
+in homepage review section:
+1-cards are too big!
+2-remove the number badge from these cards
+3-let the rating stars be yellow and detectable how many stars got filled
+4-need tooltips for the user avatar/name, guarantee badge, star rating
+5-remove the phrase "امتیاز تکباکس"
+6-put next and previous buttons left and right of the section to slide reviews.
+7-let more explanation be visible in the card, at least 1 paragraph
+8-move the price from right to left and move the shop button from left to right
+9-change the خرید از فروشگاه to ثبت سفارش این محصول از فروشگاه and with no arrow
+10-remove the phrase "نوشته" from the author name
+
+in homepage timeline section:
+1-use same modal or module here as the modal/module in /timeline page! we have a full and well designed timeline in this page
+please let the homepage timeline section use the same modal/module with all of its buttons/data/mechanism
+2-we have a grid background in the version of the homepage timeline section, let use it for our module in homepage timeline section and also the /timeline page too.
+i just want the top and bottom of the grid background be smoothly faded!
+3-the likes and comments in our timeline module also is not true or doesn't work. please check it
+
+tickbar:
+1-make sure the tickbar announce our last 10 contents posted in all modules (except the news and shop module), not the last week contents. all modules (videos/reviews/magazine/forum)
+2-let the main title have neutral color instead of module color
+3-i want a re-design for the way the tickbar is writing announcements for each module, and it gonna be like this:
+publish date > content title > module name > dot (and let only the module name and the dot follow the module color)
+
+in homepage tools section:
+1-change the hover effect to not change the background color, and remove the color change for the icon and let only the tools name have font color changes on hover
+2-remove the badges on tools like جدید and v2
+3-i don't like icons design, and i don't know how to make it better (please recommend a good design for the section and icons)
+
+homepage global:
+1-hide the بعضی از نظرات خانواده تکباکس section
+2-hide the بیشتر کاوش کنید section
+3-remove the newsletter panel from the footer
+4-gimme ideas/recommendation to fill the footer but not duplicated items which we already have in our main sidebar or somewhere else, i want a good idea for it
+
+homepage website info section:
+1-remove the phrase تاسیس 1402
+2-remove this section card background
+3-remove the 3 buttons of مستقل / آزمایش شده / انسانی
+4-change the phrase سازندگان تکباکس این ها هستند to برخی از نویسندگان تکباکس
+5-show only people who are member of the تیم تحریریه (not hard code or fake, real people from data base, i can confirm that we have only atiye hatami as a member of our تیم تحریریه)
+6-please remove the "about me" below the job title
+7-add tooltip for users avatar/name
+8-remove the phrase "تیمی که محتوای تکباکس را می‌نویسد، تست می‌کند و منتشر می‌کند."
+9-remove the بیشتر بخوانید phrase from user avatars
+10-make sure the content counter is working and is true
+11-let the content counter redirect to user profule "فعالیت محتوایی" tab, so people can see the content that this author published
+9-move the خانواده تکباکس section to website info section below the author profiles
+10-please remove the background from techbox family users cards
+11-make sure the total collaboration is true and correct (all likes/comments/topic creations/replies on topics need to be counted)
+12-exclude these people from the techbox familty: تیم تحریریه / تیم محتوای چند رسانه ای / تیم طراحی گرافیک / کارشناس فنی کارشناس فروش / تیم مارکتینگ / تیم پشتیبانی / تیم مدیریت
+(only normal users or normal verfied users or oraganization users or verfied oraganization users should be visible as the techbox familty members)
+13-remove the collaboration counter badge background
+14-remove the more button for the techbox family as "انجمن تکباکس"
