@@ -18,6 +18,7 @@ import { VideoModal, useVideoModal } from "@/components/content/VideoCard";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { RelativeDate } from "@/components/ui/relative-date";
 import { SectionShell, SectionHeader, ScrollRail } from "../primitives";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export type VideoSectionProps = {
   videos: ContentItem[];
@@ -241,16 +242,13 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
   // the flex item instead. A default-inline span ignores width/height, so
   // the avatar rendered at the image's natural size and blew the card open.
   const avatar = (
-    <span className="block size-11 shrink-0 overflow-hidden rounded-[var(--hp-r-sm)] bg-muted">
-      {comment.author.avatar ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={comment.author.avatar} alt={comment.author.name} width={44} height={44} loading="lazy" className="h-full w-full object-cover" />
-      ) : (
-        <span aria-hidden="true" className="flex h-full w-full items-center justify-center text-base font-bold text-muted-foreground">
-          {comment.author.name.trim()[0] ?? "؟"}
-        </span>
-      )}
-    </span>
+    <UserAvatar
+      name={comment.author.name}
+      username={comment.author.username}
+      src={comment.author.avatar}
+      sizes="44px"
+      className="block size-11 rounded-[var(--hp-r-sm)] text-base"
+    />
   );
 
   return (

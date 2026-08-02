@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 
 const nameToSlug: Record<string, string> = {
@@ -51,9 +51,14 @@ export function AuthorLink({
           />
         }
       >
-        <div className="relative h-7 w-7 sm:h-8 sm:w-8 shrink-0 rounded-full overflow-hidden ring-1 ring-border group-hover/author:ring-primary transition-all">
-          <Image src={avatar || "/assets/hooman.png"} alt={authorName} fill sizes="32px" className="object-cover" />
-        </div>
+        <UserAvatar
+          name={authorName}
+          username={username}
+          src={avatar}
+          alt={authorName}
+          sizes="32px"
+          className="h-7 w-7 ring-1 ring-border transition-all group-hover/author:ring-primary sm:h-8 sm:w-8"
+        />
         <div className="min-w-0 text-right">
           <div className="flex items-center gap-1">
             <span className="text-xs sm:text-sm font-extrabold text-foreground group-hover/author:text-primary transition-colors truncate">

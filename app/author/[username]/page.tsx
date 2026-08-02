@@ -1,11 +1,10 @@
-import Image from "next/image";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { Heart } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Icon } from "@/design/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { prisma } from "@/lib/db";
-import { blurProps } from "@/lib/image-placeholder";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { getUserActivities, getProfileContentModulesForAuthor } from "@/lib/user-activity";
 import { ProfileTabs } from "@/components/profile/ProfileTabs";
@@ -99,16 +98,13 @@ export default async function AuthorProfilePage({ params }: { params: Promise<{ 
             {/* ── RIGHT side: avatar + name + bio + stat icons ── */}
             <div className="flex flex-1 flex-col items-center gap-4 sm:flex-row sm:items-start">
               {/* Avatar */}
-              <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-full border shadow-sm">
-                <Image
-                  src={user.avatar || "/logo.png"}
-                  alt={user.name}
-                  fill
-                  className="object-cover"
-                  sizes="112px"
-                  {...blurProps(user.avatar || "/logo.png")}
-                />
-              </div>
+              <UserAvatar
+                name={user.name}
+                username={user.username}
+                src={user.avatar}
+                sizes="112px"
+                className="h-28 w-28 border text-4xl shadow-sm"
+              />
 
               {/* Name / role / bio / stat icons */}
               <div className="min-w-0 flex-1 space-y-3 text-right">

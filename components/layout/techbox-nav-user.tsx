@@ -126,8 +126,8 @@ export function TechboxNavUser() {
           ) : user ? (
             <>
               <Avatar className="h-8 w-8 shrink-0">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                <AvatarFallback colorKey={user.username || user.name}>{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-start text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate font-medium">{user.name}</span>
@@ -158,8 +158,8 @@ export function TechboxNavUser() {
               <>
                 <div className="flex items-center gap-2 px-2 py-2 text-start text-sm">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                    <AvatarFallback colorKey={user.username || user.name}>{user.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div className="grid min-w-0 flex-1 text-start text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>

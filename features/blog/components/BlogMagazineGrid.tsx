@@ -9,6 +9,7 @@ import { ArticleModal } from "@/features/blog/components/ArticleModal";
 import { formatRelativeDate } from "@/lib/date-format";
 import { Card } from "@/components/ui/card";
 import { blurProps } from "@/lib/image-placeholder";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 interface BlogMagazineGridProps {
   serverItems?: ContentItem[];
@@ -455,11 +456,13 @@ function AuthorLine({ item, compact = false, inverted = false }: { item: Content
 
   return (
     <div className={`flex items-center gap-2 text-xs font-bold ${inverted ? "text-white/70" : "text-muted-foreground"}`}>
-      {item.author?.avatar && (
-        <span className="relative size-7 overflow-hidden rounded-full bg-muted ring-1 ring-foreground/10">
-          <Image src={item.author.avatar} alt={name} fill className="object-cover" sizes="28px" />
-        </span>
-      )}
+      <UserAvatar
+        name={name}
+        username={item.author?.username}
+        src={item.author?.avatar}
+        sizes="28px"
+        className="size-7 text-[10px] ring-1 ring-foreground/10"
+      />
       <span className={compact ? "line-clamp-1" : ""}>{name}</span>
     </div>
   );

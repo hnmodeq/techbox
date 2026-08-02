@@ -21,6 +21,7 @@ import Link from "next/link";
 import type { AuthorCard } from "@/features/home/lib/home-types";
 import { ScrollRail } from "../primitives";
 import { Num } from "@/components/ui/num";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export type AuthorsSectionProps = {
   authors: AuthorCard[];
@@ -126,26 +127,14 @@ function AuthorTile({ author }: { author: AuthorCard }) {
       href={`/author/${author.username}`}
       className="group my-8 flex w-[240px] flex-col rounded-[var(--hp-r-md)] px-8 text-center transition-transform duration-300 hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none"
     >
-      <span className="mx-auto mb-6 block h-[116px] w-[116px] shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-surface)] sm:h-[160px] sm:w-[160px]">
-        {author.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={author.avatar}
-            alt={author.name}
-            width={160}
-            height={160}
-            loading="lazy"
-            className="h-full w-full object-cover object-center"
-          />
-        ) : (
-          <span
-            aria-hidden="true"
-            className="flex h-full w-full items-center justify-center text-4xl font-bold text-[color:var(--hp-ink-3)]"
-          >
-            {author.name.trim()[0] ?? "؟"}
-          </span>
-        )}
-      </span>
+      <UserAvatar
+        name={author.name}
+        username={author.username}
+        src={author.avatar}
+        sizes="160px"
+        className="mx-auto mb-6 h-[116px] w-[116px] text-4xl sm:h-[160px] sm:w-[160px]"
+        imageClassName="object-center"
+      />
 
       <p className="flex items-center justify-center gap-1.5 text-xl font-bold leading-7 text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
         {author.name}

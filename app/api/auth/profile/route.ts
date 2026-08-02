@@ -115,7 +115,7 @@ export async function PUT(req: NextRequest) {
         bio: updated.bio || "",
         birthday: updated.birthday || "",
         modules: Array.isArray(updated.modules) ? updated.modules : [],
-        avatar: updated.avatar || "/assets/hooman.png",
+        avatar: updated.avatar || "",
         emailVerified: !!updated.emailVerified,
       },
     });

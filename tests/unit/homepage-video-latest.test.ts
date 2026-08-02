@@ -30,10 +30,11 @@ describe("homepage Video and Latest contracts", () => {
 
   it("keeps the comment avatar softly rounded, and big enough to identify", () => {
     // 32px was too small to tell who was speaking; 44px on the small radius
-    // token. Still not a circle.
-    expect(video).toMatch(/block size-11 shrink-0 overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
-    // Scoped to the avatar: PlayAffordance is legitimately a circle.
+    // token. The shared avatar keeps an image when present and a stable
+    // initial-colour fallback otherwise.
     const avatarBlock = video.slice(video.indexOf("const avatar = ("), video.indexOf("<article"));
+    expect(avatarBlock).toMatch(/<UserAvatar/);
+    expect(avatarBlock).toMatch(/block size-11 rounded-\[var\(--hp-r-sm\)\]/);
     expect(avatarBlock).not.toMatch(/rounded-full/);
   });
 

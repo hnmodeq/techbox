@@ -9,6 +9,7 @@ import ModuleHeader from "@/components/effects/ModuleHeader";
 import { formatRelativeDate } from "@/lib/date-format";
 import { CardStats } from "@/components/ui/card-stats";
 import { ReviewRating } from "@/components/ui/review-rating";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[] }) {
   const { items } = useDbPosts("review", serverItems ?? [], 100);
@@ -45,7 +46,13 @@ export default function ReviewGrid({ serverItems }: { serverItems?: ContentItem[
                 {/* Author & stats footer */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mt-6 pt-4 border-t-[length:var(--border-size)] border-[var(--border-color)]">
                   <div className="flex items-center gap-3">
-                    <Image src={r.author?.avatar || "/assets/hooman.png"} width={36} height={36} className="h-9 w-9 rounded-full object-cover ring-1 ring-[var(--border-color)]" alt={r.author?.name || "نویسنده"} />
+                    <UserAvatar
+                      name={r.author?.name || "نویسنده"}
+                      username={r.author?.username}
+                      src={r.author?.avatar}
+                      sizes="36px"
+                      className="h-9 w-9 text-xs ring-1 ring-[var(--border-color)]"
+                    />
                     <div>
                       <div className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] font-bold text-[var(--primary-text)]">{r.author?.name || "نویسنده تکباکس"}</div>
                       <div className="text-[11px] paragraph-color">{r.author?.role || "تحلیلگر سخت‌افزار"}</div>

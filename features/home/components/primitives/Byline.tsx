@@ -14,6 +14,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export type BylineAuthor = {
   name: string;
@@ -57,7 +58,6 @@ export function Byline({
   className,
 }: BylineProps) {
   const px = AVATAR[size];
-  const initial = author.name?.trim()?.[0] ?? "؟";
 
   const nameNode = (
     <span
@@ -73,30 +73,17 @@ export function Byline({
 
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      {/* Avatar. Falls back to an initial disc rather than a broken image. */}
-      <span
-        className="relative shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)]"
+      {/* Stored photo when available; otherwise a stable coloured initial. */}
+      <UserAvatar
+        name={author.name}
+        username={author.username}
+        src={author.avatar}
+        alt=""
+        sizes={`${px}px`}
+        className="text-[11px]"
+        imageClassName="object-cover"
         style={{ width: px, height: px }}
-      >
-        {author.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={author.avatar}
-            alt=""
-            width={px}
-            height={px}
-            loading="lazy"
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span
-            aria-hidden="true"
-            className="flex h-full w-full items-center justify-center text-[11px] font-bold text-[color:var(--hp-brand)]"
-          >
-            {initial}
-          </span>
-        )}
-      </span>
+      />
 
       <span className="flex min-w-0 flex-col">
         {author.username && !noLink ? (

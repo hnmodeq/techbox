@@ -4,6 +4,7 @@ import * as React from "react"
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar"
 
 import { cn } from "@/lib/utils"
+import { userAvatarColors } from "@/components/ui/user-avatar"
 
 function Avatar({
   className,
@@ -40,17 +41,24 @@ function AvatarImage({ className, ...props }: AvatarPrimitive.Image.Props) {
 
 function AvatarFallback({
   className,
+  colorKey,
+  children,
+  style,
   ...props
-}: AvatarPrimitive.Fallback.Props) {
+}: AvatarPrimitive.Fallback.Props & { colorKey?: string }) {
+  const palette = userAvatarColors(colorKey || (typeof children === "string" ? children : "techbox-member"));
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
       className={cn(
-        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
+        "flex size-full items-center justify-center rounded-full text-sm font-bold group-data-[size=sm]/avatar:text-xs",
         className
       )}
+      style={{ backgroundColor: palette.background, color: palette.foreground, ...style }}
       {...props}
-    />
+    >
+      {children}
+    </AvatarPrimitive.Fallback>
   )
 }
 

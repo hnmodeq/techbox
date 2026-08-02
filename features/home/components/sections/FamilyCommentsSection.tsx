@@ -22,6 +22,7 @@ import * as React from "react";
 import Link from "next/link";
 import type { FamilyComment } from "@/features/home/lib/home-types";
 import { SectionShell, SectionHeader } from "../primitives";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 export type FamilyCommentsSectionProps = {
   comments: FamilyComment[];
@@ -80,26 +81,13 @@ function Testimonial({ comment }: { comment: FamilyComment }) {
           href={comment.origin.href}
           className="group flex items-center gap-3 focus-visible:outline-none"
         >
-          <span className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)]">
-            {comment.author.avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={comment.author.avatar}
-                alt={comment.author.name}
-                width={64}
-                height={64}
-                loading="lazy"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <span
-                aria-hidden="true"
-                className="flex h-full w-full items-center justify-center text-xl font-bold text-[color:var(--hp-ink-3)]"
-              >
-                {comment.author.name.trim()[0] ?? "؟"}
-              </span>
-            )}
-          </span>
+          <UserAvatar
+            name={comment.author.name}
+            username={comment.author.username}
+            src={comment.author.avatar}
+            sizes="64px"
+            className="h-16 w-16 text-xl"
+          />
 
           <span className="min-w-0">
             <span className="block truncate text-[16px] font-bold leading-6 text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
