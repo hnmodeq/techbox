@@ -48,7 +48,7 @@ export async function PATCH(req: NextRequest) {
         text,
         editedAt: new Date(),
       },
-      include: { author: { select: { name: true, username: true, avatar: true } } },
+      include: { author: { select: { name: true, username: true, avatar: true, job: true } } },
     });
 
     // A homepage preview can contain this exact approved comment. Invalidate

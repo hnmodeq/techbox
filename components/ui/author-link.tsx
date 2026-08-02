@@ -24,6 +24,7 @@ export function AuthorLink({
   name,
   avatar,
   role,
+  job,
   username,
   verifiedType,
   verifiedLabel,
@@ -31,13 +32,17 @@ export function AuthorLink({
 }: {
   name?: string;
   avatar?: string;
+  /** Legacy display role; used only when a real profile job is absent. */
   role?: string;
+  /** Public professional title from the user's profile. */
+  job?: string | null;
   username?: string;
   verifiedType?: string | null;
   verifiedLabel?: string | null;
   className?: string;
 }) {
   const authorName = name || "تحریریه";
+  const professionalTitle = job?.trim() || role?.trim() || "";
   const slug = username || nameToSlug[authorName.trim()] || authorName.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "-");
 
   return (
@@ -72,7 +77,7 @@ export function AuthorLink({
               />
             )}
           </div>
-          {role && <div className="text-[10px] sm:text-[11px] paragraph-color truncate">{role}</div>}
+          {professionalTitle && <div className="text-[10px] sm:text-[11px] paragraph-color truncate">{professionalTitle}</div>}
         </div>
       </TooltipTrigger>
       <TooltipContent>بازدید از حساب کاربری {authorName}</TooltipContent>

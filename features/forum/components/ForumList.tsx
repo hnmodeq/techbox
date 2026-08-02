@@ -275,6 +275,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                     <div className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1.5">
                       ایجاد شده توسط
                       <span className="font-semibold text-foreground/80">{t.author?.name || "کاربر تکباکس"}</span>
+                      {(t.author as any)?.job && <span className="truncate text-[10px]">{(t.author as any).job}</span>}
                       {(t.author as any)?.verifiedType && (
                         <VerifiedBadge
                           type={(t.author as any).verifiedType as "content" | "org" | "user"}

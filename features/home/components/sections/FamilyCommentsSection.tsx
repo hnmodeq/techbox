@@ -93,6 +93,7 @@ function Testimonial({ comment }: { comment: FamilyComment }) {
             <span className="block truncate text-[16px] font-bold leading-6 text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
               {comment.author.name}
             </span>
+            {comment.author.job && <span className="block truncate text-[12px] leading-5 text-[color:var(--hp-ink-3)]">{comment.author.job}</span>}
             {comment.memberSince && (
               <span className="block text-[13px] leading-5 text-[color:var(--hp-ink-3)]">
                 عضو از {comment.memberSince}

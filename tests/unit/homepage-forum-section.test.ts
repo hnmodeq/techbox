@@ -23,6 +23,9 @@ describe("homepage Forum section", () => {
     expect(data).toMatch(/topics: railTopics\.map\(toCard\)/);
     expect(data).toMatch(/const topicContributors = await prisma\.post\.groupBy/);
     expect(data).toMatch(/const replyContributors = await prisma\.comment\.groupBy/);
+    expect(data).toMatch(/const featureReplies = featuredRaw/);
+    expect(data).toMatch(/take: 2,/);
+    expect(data).toMatch(/followUpReplies = featureReplies/);
     expect(community).toMatch(/featuredTopic/);
     expect(community).toMatch(/const activeTopics = \(\(topics \?\? \[\]\) as WithForumActivity\[\]\)\.slice\(0, 4\)/);
     expect(community).toMatch(/<NewForumTopicModal open=\{questionOpen\}/);
@@ -61,6 +64,9 @@ describe("homepage Forum section", () => {
     expect(feature).toMatch(/absolute inset-y-4 start-2 w-1/);
     expect(feature).toMatch(/bg-\[color:var\(--hp-solved\)\]/);
     expect(feature).not.toMatch(/border-s-\[3px\]/);
+    expect(feature).toMatch(/h-full min-h-0 flex-1/);
+    expect(feature).toMatch(/followUpReplies\.length > 0/);
+    expect(feature).toMatch(/line-clamp-2 text-\[13px\]/);
     expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
   });
 

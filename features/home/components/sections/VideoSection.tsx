@@ -288,6 +288,7 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
         ) : avatar}
         <button type="button" onClick={onOpen} className="min-w-0 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <span className="block truncate text-[15px] font-bold text-[color:var(--video-accent)]">{comment.author.name}</span>
+          {comment.author.job && <span className="mt-0.5 block truncate text-[11px] text-muted-foreground">{comment.author.job}</span>}
           <RelativeDate date={comment.date} className="mt-0.5 block text-[12px] text-muted-foreground" />
         </button>
       </div>

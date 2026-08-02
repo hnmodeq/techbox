@@ -117,6 +117,7 @@ function HeroCard({ item }: { item: ContentItem }) {
                 name: item.author?.name ?? "تحریریه",
                 username: item.author?.username,
                 role: item.author?.role,
+                job: item.author?.job,
                 avatar: item.author?.avatar,
               }}
               date={item.date_fa}
