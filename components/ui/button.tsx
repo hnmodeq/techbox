@@ -127,6 +127,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <ButtonPrimitive
         ref={ref}
         data-slot="button"
+        // Base UI normalizes this boolean differently between its server and
+        // client primitive. The actual value is immediately reconciled from
+        // `isDisabled`; suppress only this known attribute-level mismatch.
+        suppressHydrationWarning
         className={cn(
           buttonVariants({ variant: mappedVariant, size: mappedSize }),
           variant === "vip" &&
