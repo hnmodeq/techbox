@@ -2,6 +2,7 @@ import { randomInt } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 import type { HomeData } from "@/features/home/lib/home-data";
+import type { CommunityData } from "@/features/home/lib/home-types";
 import type { ContentItem } from "@/lib/content";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
@@ -589,10 +590,10 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   const latestInsights = await section("latestInsights", { story: null, stories: [], comments: [] } as any, () =>
     getLatestInsights(normalizeCard, cardSelect));
 
-  const communityTopics = enabledModules.includes("forum")
-    ? await section("communityTopics", [] as ContentItem[], () =>
+  const community = enabledModules.includes("forum")
+    ? await section("community", { featured: null, topics: [], participantCount: 0 } as CommunityData, () =>
         getCommunityTopics(normalizeCard, cardSelect))
-    : [];
+    : { featured: null, topics: [], participantCount: 0 };
 
   const videoHighlightComments = await section("videoHighlightComments", [] as any[], () =>
     getLatestVideoHighlightComments(4));
@@ -692,7 +693,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     ticker: tickerPosts.map(normalizeTickerCard),
     generatedAt: new Date().toISOString(),
     latestInsights,
-    communityTopics,
+    community,
     videoHighlightComments,
     topPicks,
     timeline,
@@ -707,10 +708,10 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// Cache key bumped v6 -> v7: Latest Insights is now the weekly
-// most-commented news story with real comment cards, plus a video comment.
-// Window shortened 24h -> 1h so hourly-seeded comment slots rotate.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v7"], {
+// Cache key v8: Community now delivers a solved feature separately from a
+// random unresolved rail plus its live participant count. The one-hour window
+// matches the server-stable rotations used by the homepage sections.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v8"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

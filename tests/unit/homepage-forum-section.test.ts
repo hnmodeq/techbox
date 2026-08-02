@@ -12,17 +12,19 @@ describe("homepage Forum section", () => {
   const forum = read("features/forum/components/ForumList.tsx");
   const composer = read("features/forum/components/ForumQuestionPanel.tsx");
 
-  it("uses a random hot seven-day feature and a four-topic real activity rail", () => {
+  it("keeps random solved and unresolved Forum selections strictly separate", () => {
     expect(data).toMatch(/export async function getCommunityTopics/);
-    expect(data).toMatch(/module: "forum"/);
-    expect(data).toMatch(/date: \{ gte: weekAgo/);
-    expect(data).toMatch(/const hottest = \[\.\.\.featurePool\]/);
-    expect(data).toMatch(/seededIndex\(featureChoices\.length, 613\)/);
-    expect(data).toMatch(/const railFallback = await prisma\.post\.findMany/);
-    expect(data).toMatch(/const railTopics = \[\.\.\.openTopics, \.\.\.solvedTopics\]\.slice\(0, 4\)/);
-    expect(data).toMatch(/return \[toCard\(featured\), \.\.\.railTopics\.map\(toCard\)\]/);
-    expect(community).toMatch(/const featured = list\[0\] \?\? null/);
-    expect(community).toMatch(/const activeTopics = list\.slice\(1, 5\)/);
+    expect(data).toMatch(/where: \{ \.\.\.forumWhere, solved: true \}/);
+    expect(data).toMatch(/where: \{ \.\.\.forumWhere, solved: false \}/);
+    expect(data).toMatch(/seededIndex\(solvedPool\.length, 613\)/);
+    expect(data).toMatch(/seededIndices\(openPool\.length, 4, 719\)/);
+    expect(data).toMatch(/featured: featuredRaw \? toCard\(featuredRaw\) : null/);
+    expect(data).toMatch(/topics: railTopics\.map\(toCard\)/);
+    expect(data).toMatch(/const topicContributors = await prisma\.post\.groupBy/);
+    expect(data).toMatch(/const replyContributors = await prisma\.comment\.groupBy/);
+    expect(community).toMatch(/featuredTopic/);
+    expect(community).toMatch(/const activeTopics = \(\(topics \?\? \[\]\) as WithForumActivity\[\]\)\.slice\(0, 4\)/);
+    expect(community).toMatch(/<ForumQuestionPanel participantCount=\{participantCount\}/);
     expect(community).toMatch(/فعلاً پرسش بازی برای نمایش نیست/);
   });
 
@@ -51,10 +53,10 @@ describe("homepage Forum section", () => {
   });
 
   it("shows real latest forum activity from one bulk server query", () => {
-    expect(data).toMatch(/const latestComments = await prisma\.comment\.findMany/);
+    expect(data).toMatch(/const latestComments = topicIds\.length > 0/);
     expect(data).toMatch(/const activityByPost = new Map/);
     expect(data).toMatch(/lastActivity/);
-    expect(server).toMatch(/communityTopics/);
+    expect(server).toMatch(/const community = enabledModules\.includes\("forum"\)/);
     expect(community).toMatch(/const activity = topic\.lastActivity/);
   });
 
@@ -72,8 +74,12 @@ describe("homepage Forum section", () => {
     expect(composer).not.toMatch(/resize-y/);
     expect(composer).toMatch(/focus-visible:ring-0/);
     expect(composer).toMatch(/variant="ghost"/);
-    expect(composer.indexOf("ثبت پرسش")).toBeLessThan(composer.indexOf("عنوان واضح و دقیق پرسش"));
-    expect(composer.indexOf("مسئله، خطا و آنچه تا امروز امتحان کرده‌اید")).toBeGreaterThan(composer.indexOf("جزئیات محیط، توپولوژی"));
+    expect(composer).toMatch(/مسئله فنی خودتون رو با جامعه فنی در میون بگذارید/);
+    expect(composer).toMatch(/عنوان مسئله خودتون رو بنویسید/);
+    expect(composer).toMatch(/جزئیاتی که ممکن هست کمک کننده باشه برای رسیدن به جواب رو بنویسید/);
+    expect(composer).toMatch(/<Num>\{participantCount\}<\/Num>/);
+    expect(composer.indexOf("ثبت پرسش")).toBeLessThan(composer.indexOf("عنوان مسئله خودتون رو بنویسید"));
+    expect(composer.indexOf("تا به این لحظه")).toBeGreaterThan(composer.indexOf("جزئیاتی که ممکن هست کمک کننده"));
     expect(composer).toMatch(/window\.dispatchEvent\(new CustomEvent\("tb_open_auth"\)\)/);
   });
 

@@ -101,6 +101,13 @@ export type LatestInsights = {
   comments: NewsHighlightComment[];
 };
 
+/** §9 — a solved Forum feature, open-topic rail, and live participant count. */
+export type CommunityData = {
+  featured: ContentItem | null;
+  topics: ContentItem[];
+  participantCount: number;
+};
+
 /** §12 Authors — a contributor card. */
 export type AuthorCard = {
   name: string;

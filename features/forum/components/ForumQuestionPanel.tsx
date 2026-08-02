@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Num } from "@/components/ui/num";
 
 function makeSlug(title: string) {
   const base = title
@@ -18,7 +19,7 @@ function makeSlug(title: string) {
 }
 
 /** Always-visible homepage composer — a direct alternative to a modal. */
-export function ForumQuestionPanel() {
+export function ForumQuestionPanel({ participantCount = 0 }: { participantCount?: number }) {
   const router = useRouter();
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
@@ -78,7 +79,7 @@ export function ForumQuestionPanel() {
       <form onSubmit={submit} className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h3 id="hp-forum-question-title" className="text-[18px] font-bold">
-            پرسش خود را مطرح کنید
+            مسئله فنی خودتون رو با جامعه فنی در میون بگذارید
           </h3>
           <Button
             type="submit"
@@ -99,7 +100,7 @@ export function ForumQuestionPanel() {
             id="hp-forum-question-title-input"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="عنوان واضح و دقیق پرسش"
+            placeholder="عنوان مسئله خودتون رو بنویسید"
             maxLength={200}
             disabled={submitting}
             className="h-10 border-0 bg-transparent px-2 text-slate-900 placeholder:text-slate-500 focus-visible:border-0 focus-visible:ring-0"
@@ -109,14 +110,14 @@ export function ForumQuestionPanel() {
             id="hp-forum-question-body"
             value={body}
             onChange={(event) => setBody(event.target.value)}
-            placeholder="جزئیات محیط، توپولوژی، خطا و راه‌حل‌هایی که امتحان کرده‌اید..."
+            placeholder="جزئیاتی که ممکن هست کمک کننده باشه برای رسیدن به جواب رو بنویسید"
             className="min-h-28 resize-none border-0 border-t border-slate-200 bg-transparent px-2 text-slate-900 placeholder:text-slate-500 focus-visible:border-slate-200 focus-visible:ring-0"
             maxLength={5000}
             disabled={submitting}
           />
         </div>
         <p className="text-[13px] leading-6 text-white/80">
-          مسئله، خطا و آنچه تا امروز امتحان کرده‌اید را بنویسید تا پاسخ دقیق‌تری دریافت کنید.
+          تا به این لحظه <Num>{participantCount}</Num> کاربر متخصص در انجمن فعال هستند و احتمالا شما رو تا رسیدن به پاسخ همراهی میکنن.
         </p>
         {error && <p role="alert" className="text-[12px] font-semibold text-white">{error}</p>}
       </form>
