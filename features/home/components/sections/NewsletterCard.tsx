@@ -63,7 +63,7 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
         خبرنامه تکباکس
       </h3>
       <p className="mt-1.5 text-[13px] leading-[22px] text-[color:var(--hp-on-brand-mut)]">
-        هر هفته یک ایمیل: مهم‌ترین اخبار زیرساخت، تحلیل‌ها و تخفیف‌های فروشگاه.
+        منتخبی از مهم‌ترین خبرهای دنیای تکنولوژی به صورت هفتگی
       </p>
 
       {status === "ok" ? (
@@ -90,7 +90,7 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
               dir="ltr"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="آدرس پست الکترونیکی خودتون رو وارد کنید"
               className="h-9 min-w-0 flex-1 bg-transparent px-2 text-[15px] text-slate-800 placeholder:text-slate-500 focus:outline-none"
             />
             <button
