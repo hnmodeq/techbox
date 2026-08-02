@@ -298,10 +298,10 @@ function NewsDiscussion({
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onLeavePreview();
       }}
-      aria-label="دیدگاه شما درباره خبرها"
+      aria-label="برخی از دیدگاه‌های شما"
     >
-      <h4 className="mb-3 shrink-0 text-[14px] font-bold text-foreground">
-        دیدگاه شما درباره خبرها
+      <h4 className="mb-3 shrink-0 text-[14px] font-bold text-[color:var(--insights-accent)]">
+        برخی از دیدگاه‌های شما
       </h4>
 
       {comments.length === 0 ? (
@@ -355,7 +355,9 @@ function NewsDiscussion({
                   className="block w-full ps-5 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={`باز کردن گفتگوی خبر: ${comment.text}`}
                 >
-                  <span className="line-clamp-2 block whitespace-pre-wrap text-[15px] font-bold leading-6 text-foreground">
+                  <span className={`line-clamp-2 block whitespace-pre-wrap text-[15px] font-bold leading-6 ${
+                    isActive ? "text-[color:var(--insights-accent)]" : "text-foreground"
+                  }`}>
                     {comment.text}
                   </span>
                 </button>
