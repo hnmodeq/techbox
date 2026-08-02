@@ -56,8 +56,8 @@ const AVATARS = [
 ] as const;
 
 const COVERS = {
-  infrastructure: "infrastructure.jpg",
-  network: "network.jpg",
+  infrastructure: "infrastructure.webp",
+  network: "network.webp",
 } as const;
 
 function localVisual(...segments: string[]) {
@@ -66,14 +66,14 @@ function localVisual(...segments: string[]) {
   return file;
 }
 
-async function uploadJpeg(storagePath: string, localFile: string) {
+async function uploadWebp(storagePath: string, localFile: string) {
   const config = getSupabaseStorageConfig();
   const bytes = fs.readFileSync(localFile);
   await uploadSupabaseObject({
     bucket: config.publicBucket,
     path: storagePath,
-    body: new Blob([new Uint8Array(bytes)], { type: "image/jpeg" }),
-    contentType: "image/jpeg",
+    body: new Blob([new Uint8Array(bytes)], { type: "image/webp" }),
+    contentType: "image/webp",
     upsert: true,
   });
   return getSupabasePublicUrl(config.publicBucket, storagePath);
@@ -85,16 +85,16 @@ async function main() {
 
   const avatarUrls = new Map<string, string>();
   for (const username of AVATARS) {
-    const local = localVisual("avatars", `${username}.jpg`);
-    const url = await uploadJpeg(`seed-visuals/avatars/${username}.jpg`, local);
+    const local = localVisual("avatars", `${username}.webp`);
+    const url = await uploadWebp(`seed-visuals/avatars/${username}.webp`, local);
     avatarUrls.set(username, url);
   }
 
-  const infrastructureUrl = await uploadJpeg(
+  const infrastructureUrl = await uploadWebp(
     `seed-visuals/covers/${COVERS.infrastructure}`,
     localVisual("covers", COVERS.infrastructure),
   );
-  const networkUrl = await uploadJpeg(
+  const networkUrl = await uploadWebp(
     `seed-visuals/covers/${COVERS.network}`,
     localVisual("covers", COVERS.network),
   );
