@@ -26,6 +26,7 @@ type WithForumActivity = ContentItem & {
   solved?: boolean;
   acceptedAnswer?: {
     text: string;
+    date?: string;
     author: { name: string; username?: string; avatar?: string; job?: string };
   };
   followUpReplies?: Array<{
@@ -140,9 +141,9 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const followUpReplies = topic.followUpReplies ?? [];
 
   return (
-    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6">
+    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6 dark:bg-[color:color-mix(in_oklch,var(--hp-surface)_86%,white)]">
       <div className="flex min-w-0 items-center">
-        <TopicActivity topic={topic} showSummary={false} />
+        <TopicActivity topic={topic} />
       </div>
 
       <h3 className="mt-3 text-[22px] font-bold leading-[34px] text-[color:var(--hp-ink)]">
@@ -161,15 +162,18 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
       )}
 
       {answer?.text ? (
-        <div className="relative mt-5 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-solved)]/[0.08] p-4 ps-6">
+        <div className="relative mt-5 p-4 ps-6">
           <span
             aria-hidden="true"
             className="absolute inset-y-4 start-2 w-1 rounded-full bg-[color:var(--hp-solved)]"
           />
-          <p className="flex items-center gap-1.5 text-[12px] font-bold text-[color:var(--hp-solved)]">
-            <CheckCircle2 className="size-4" aria-hidden="true" />
-            پاسخ برتر
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="flex items-center gap-1.5 text-[12px] font-bold text-[color:var(--hp-solved)]">
+              <CheckCircle2 className="size-4" aria-hidden="true" />
+              پاسخ برتر
+            </p>
+            {answer.date && <RelativeDate date={answer.date} className="text-[11px] text-[color:var(--hp-ink-3)]" />}
+          </div>
           <p className="mt-2 line-clamp-4 text-[14px] leading-[24px] text-[color:var(--hp-ink-2)]">
             {answer.text}
           </p>
@@ -190,7 +194,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
       )}
 
       {followUpReplies.length > 0 && (
-        <section className="mt-auto border-t border-[color:var(--hp-rule)] pt-4" aria-label="ادامهٔ گفتگو">
+        <section className="mt-auto border-t border-[color:var(--hp-rule)] pt-4 ps-6" aria-label="ادامهٔ گفتگو">
           <div className="divide-y divide-[color:var(--hp-rule)]">
             {followUpReplies.map((reply, index) => (
               <article key={reply.id} className={`py-3 ${index === 0 ? "pt-0" : ""}`}>
@@ -206,7 +210,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
                     verifiedType={reply.author.verifiedType}
                     className="[&>div:first-child]:size-6 [&>div:last-child>div>span]:text-[11px]"
                   />
-                  <RelativeDate date={reply.date} label="زمان پاسخ" className="text-[11px] text-[color:var(--hp-ink-3)]" />
+                  <RelativeDate date={reply.date} className="text-[11px] text-[color:var(--hp-ink-3)]" />
                 </div>
               </article>
             ))}
@@ -301,7 +305,7 @@ function TopicActivity({
   const date = activity?.date ?? topic.date;
 
   return (
-    <div className="flex min-w-0 flex-col items-start text-[12px] text-[color:var(--hp-ink-3)]">
+    <div className="flex min-w-0 w-full flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--hp-ink-3)] lg:flex-nowrap">
       <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
         <AuthorLink
           name={author?.name}
@@ -312,7 +316,7 @@ function TopicActivity({
           className="[&>div:first-child]:size-7 [&>div:last-child>div>span]:text-[12px]"
         />
         <span aria-hidden="true">•</span>
-        <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
+        <RelativeDate date={date} className="text-[12px] text-[color:var(--hp-ink-3)]" />
       </div>
       {showSummary && <TopicSummary topic={topic} />}
     </div>
@@ -325,7 +329,7 @@ function TopicSummary({ topic }: { topic: WithForumActivity }) {
   const stateClass = solved ? "text-[color:var(--hp-solved)]" : "text-[var(--warning)]";
 
   return (
-    <span className={`mt-1 ms-auto block shrink-0 whitespace-nowrap text-[11px] leading-5 ${stateClass}`}>
+    <span className={`ms-auto block shrink-0 whitespace-nowrap text-[11px] leading-5 ${stateClass}`}>
       <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده {solved ? "و این مسئله حل شده است" : "اما هنوز کسی این مسئله را حل نکرده است"}
     </span>
   );

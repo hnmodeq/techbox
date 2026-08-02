@@ -60,14 +60,22 @@ describe("homepage Forum section", () => {
     expect(feature).not.toMatch(/color-mix\(in_oklch,var\(--community-accent\)/);
     expect(feature).not.toMatch(/absolute inset-x-0 bottom-0 h-1/);
     expect(feature).not.toMatch(/حل‌شده/);
-    expect(feature).toMatch(/showSummary=\{false\}/);
+    expect(feature).not.toMatch(/showSummary=\{false\}/);
+    expect(feature).toMatch(/<TopicActivity topic=\{topic\} \/>/);
     expect(feature).toMatch(/absolute inset-y-4 start-2 w-1/);
     expect(feature).toMatch(/bg-\[color:var\(--hp-solved\)\]/);
     expect(feature).not.toMatch(/border-s-\[3px\]/);
     expect(feature).toMatch(/h-full min-h-0 flex-1/);
     expect(feature).toMatch(/followUpReplies\.length > 0/);
     expect(feature).toMatch(/line-clamp-2 text-\[13px\]/);
+    expect(feature).toMatch(/answer\.date && <RelativeDate date=\{answer\.date\}/);
+    expect(feature).not.toMatch(/bg-\[color:var\(--hp-solved\)\]\/\[0\.08\]/);
+    expect(feature).toMatch(/ps-6/);
     expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
+    const activity = community.slice(community.indexOf("function TopicActivity"), community.indexOf("function TopicSummary"));
+    expect(activity).toMatch(/lg:flex-nowrap/);
+    expect(activity).not.toMatch(/label="آخرین فعالیت"/);
+    expect(activity).not.toMatch(/label="زمان پاسخ"/);
   });
 
   it("shows real latest forum activity from one bulk server query", () => {
