@@ -44,8 +44,6 @@ export type CommunitySectionProps = {
 };
 
 const HEADING_ID = "hp-community-heading";
-const MIN_TOPICS = 3;
-
 type CommunityStyle = React.CSSProperties & { "--community-accent"?: string };
 
 export function CommunitySection({
@@ -59,12 +57,12 @@ export function CommunitySection({
   const [newTopicOpen, setNewTopicOpen] = React.useState(false);
   const [replyTopic, setReplyTopic] = React.useState<WithForumActivity | null>(null);
 
-  if (!topics || topics.length < MIN_TOPICS) return null;
-
   // getCommunityTopics() puts a random pick from the hottest seven-day
   // pool first, then appends only still-open topics for this activity list.
-  const list = topics as WithForumActivity[];
-  const featured = list[0];
+  // Even an empty community renders its real ask/browse affordances instead
+  // of silently vanishing from the homepage.
+  const list = (topics ?? []) as WithForumActivity[];
+  const featured = list[0] ?? null;
   const activeTopics = list.slice(1).filter((topic) => !topic.solved).slice(0, 4);
   const style: CommunityStyle = { "--community-accent": accentColor || "var(--primary)" };
 
@@ -84,7 +82,7 @@ export function CommunitySection({
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-10">
-        <FeaturedTopic topic={featured} />
+        {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature onAsk={() => setNewTopicOpen(true)} />}
         <ActiveTopicList topics={activeTopics} onReply={setReplyTopic} />
       </div>
 
@@ -188,6 +186,24 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   );
 }
 
+function EmptyCommunityFeature({ onAsk }: { onAsk: () => void }) {
+  return (
+    <div className="border border-dashed border-[color:var(--hp-border)] p-6 text-center">
+      <p className="text-[18px] font-bold text-[color:var(--hp-ink)]">هنوز موضوعی در انجمن ثبت نشده است</p>
+      <p className="mx-auto mt-2 max-w-md text-[14px] leading-6 text-[color:var(--hp-ink-3)]">
+        اولین پرسش فنی را ثبت کنید تا گفتگوی بعدی جامعهٔ تکباکس از همین‌جا شروع شود.
+      </p>
+      <button
+        type="button"
+        onClick={onAsk}
+        className="mt-5 text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        طرح پرسش جدید
+      </button>
+    </div>
+  );
+}
+
 function ActiveTopicList({
   topics,
   onReply,
@@ -195,20 +211,24 @@ function ActiveTopicList({
   topics: WithForumActivity[];
   onReply: (topic: WithForumActivity) => void;
 }) {
-  if (topics.length === 0) return null;
-
   return (
     <div>
       <h3 className="mb-4 text-[16px] font-bold text-[color:var(--hp-ink)]">
         برخی از سوالات پرسیده شده در انجمن
       </h3>
-      <ul className="divide-y divide-[color:var(--hp-border)]">
-      {topics.map((topic) => (
-        <li key={`${topic.module}-${topic.slug}`} className="py-4 first:pt-0 last:pb-0">
-          <TopicRow topic={topic} onReply={onReply} />
-        </li>
-      ))}
-      </ul>
+      {topics.length === 0 ? (
+        <p className="py-5 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
+          فعلاً پرسش بازی برای نمایش نیست؛ شما می‌توانید گفتگوی بعدی را شروع کنید.
+        </p>
+      ) : (
+        <ul className="divide-y divide-[color:var(--hp-border)]">
+          {topics.map((topic) => (
+            <li key={`${topic.module}-${topic.slug}`} className="py-4 first:pt-0 last:pb-0">
+              <TopicRow topic={topic} onReply={onReply} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
