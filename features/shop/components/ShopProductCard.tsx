@@ -87,7 +87,7 @@ function DiscountTimer({ endsAt, small = false }: { endsAt: string; small?: bool
   return (
     <span
       className={cn(
-        "font-bold text-[#ef394e] tabular-nums tracking-wider",
+        "font-bold text-[color:var(--module-shop-color,var(--primary))] tabular-nums tracking-wider",
         small ? "text-[10px] leading-none" : "text-[11px] leading-none"
       )}
       dir="ltr"
@@ -154,7 +154,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
       {/* Dot left, badge right */}
       <div className="flex items-center justify-between px-3 pt-3 h-6" dir="ltr">
         <span className="size-[6px] rounded-full shrink-0 bg-foreground/60" aria-hidden />
-        {badgeText && <span className="text-[10px] font-bold leading-none text-[#ef394e] tracking-tight">{badgeText}</span>}
+        {badgeText && <span className="text-[10px] font-bold leading-none text-[color:var(--module-shop-color,var(--primary))] tracking-tight">{badgeText}</span>}
       </div>
 
       <div className="relative w-full aspect-[4/3] p-4 flex items-center justify-center bg-transparent">
@@ -246,7 +246,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         <div className="flex items-end justify-between gap-2">
           <div className="shrink-0">
             {discount > 0 ? (
-              <span className="inline-flex h-5 min-w-7 items-center justify-center rounded-full bg-[#ef394e] px-1.5 text-[11px] font-bold leading-none text-white">
+              <span className="inline-flex h-5 min-w-7 items-center justify-center rounded-full bg-[color:var(--module-shop-color,var(--primary))] px-1.5 text-[11px] font-bold leading-none text-white">
                 {discount.toLocaleString("fa-IR")}٪
               </span>
             ) : (
@@ -273,7 +273,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         </div>
         {p.discountEndsAt && discount > 0 && (
           <div className="flex items-center justify-between gap-1 border-t border-border/30 pt-1.5 mt-0.5">
-            <span className="text-[10px] font-medium text-[#ef394e]">اتمام پیشنهاد</span>
+            <span className="text-[10px] font-medium text-[color:var(--module-shop-color,var(--primary))]">اتمام پیشنهاد</span>
             <DiscountTimer endsAt={p.discountEndsAt} small />
           </div>
         )}
