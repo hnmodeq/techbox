@@ -42,9 +42,13 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const requestedSlugs = parseSlugs(searchParams.get("slugs"));
-    const visibleSlugs = await getVisibleNewsSlugs(requestedSlugs);
 
-    if (visibleSlugs.length === 0) {
+    // This endpoint is called with the already-rendered public-news list.
+    // A second Post query merely to re-validate those identifiers queued
+    // behind auth and made the header badge take 10–15 seconds on Neon. A
+    // nonexistent slug is harmless here: it is never rendered by the caller
+    // and has no read row, so it cannot expose non-public content.
+    if (requestedSlugs.length === 0) {
       return NextResponse.json(
         { isLoggedIn: true, unreadCount: 0, unreadSlugs: [] },
         { headers: cacheHeaders(PRIVATE_NO_STORE) }
@@ -52,11 +56,11 @@ export async function GET(req: NextRequest) {
     }
 
     const reads = await prisma.userNewsRead.findMany({
-      where: { userId: user.id, slug: { in: visibleSlugs } },
+      where: { userId: user.id, slug: { in: requestedSlugs } },
       select: { slug: true },
     });
     const readSlugs = new Set(reads.map((read) => read.slug));
-    const unreadSlugs = visibleSlugs.filter((slug) => !readSlugs.has(slug));
+    const unreadSlugs = requestedSlugs.filter((slug) => !readSlugs.has(slug));
 
     return NextResponse.json(
       { isLoggedIn: true, unreadCount: unreadSlugs.length, unreadSlugs },
@@ -85,15 +89,19 @@ export async function POST(req: NextRequest) {
     const readAt = new Date();
 
     if (visibleSlugs.length > 0) {
-      await prisma.$transaction(
-        visibleSlugs.map((slug) =>
-          prisma.userNewsRead.upsert({
-            where: { userId_slug: { userId: user.id, slug } },
-            update: { readAt },
-            create: { userId: user.id, slug, readAt },
-          })
-        )
-      );
+      // One createMany plus one updateMany replaces N individual upserts.
+      // Opening the News sidebar can mark 15–100 stories at once, and the
+      // old transaction queued every one of those statements through Neon.
+      await prisma.$transaction([
+        prisma.userNewsRead.createMany({
+          data: visibleSlugs.map((slug) => ({ userId: user.id, slug, readAt })),
+          skipDuplicates: true,
+        }),
+        prisma.userNewsRead.updateMany({
+          where: { userId: user.id, slug: { in: visibleSlugs } },
+          data: { readAt },
+        }),
+      ]);
     }
 
     return NextResponse.json(

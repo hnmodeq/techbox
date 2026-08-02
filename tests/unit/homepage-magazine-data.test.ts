@@ -29,6 +29,8 @@ describe("homepage magazine data contract", () => {
   it("samples four distinct database candidates without fake content", () => {
     // The candidate query transfers IDs only; selected cards then receive
     // the normal card select, which carries real tags, dates and content.
+    expect(homeServer).toMatch(/orderBy: \[\{ date: "desc" \}, \{ id: "desc" \}\]/);
+    expect(homeServer).toMatch(/take: 8,/);
     expect(homeServer).toMatch(/select: \{ id: true \}/);
     expect(homeServer).toMatch(/randomSample\(candidateIds\.map\(\(post\) => post\.id\), 4\)/);
     expect(homeServer).toMatch(/where: \{ id: \{ in: selectedIds \} \}/);

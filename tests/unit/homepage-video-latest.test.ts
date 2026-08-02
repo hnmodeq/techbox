@@ -100,6 +100,12 @@ describe("homepage Video and Latest contracts", () => {
     expect(latest).toMatch(/h-1 shrink-0 bg-\[color:var\(--video-accent\)\]/);
   });
 
+  it("keeps homepage play affordances dark on white in every site theme", () => {
+    const play = video.slice(video.indexOf("function PlayAffordance"), video.indexOf("function VideoCommentCard"));
+    expect(play).toMatch(/bg-white\/90 text-slate-900/);
+    expect(play).not.toMatch(/text-foreground/);
+  });
+
   it("builds a diverse, comment-led rotation from recent News", () => {
     // Recent News has priority, then the latest-ten fallback fills any empty
     // slots. One sampled top-level comment per post makes every carousel
