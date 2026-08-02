@@ -201,7 +201,6 @@ export default async function HomePage() {
         <CommunitySection
           featuredTopic={data.community?.featured}
           topics={data.community?.topics ?? []}
-          participantCount={data.community?.participantCount ?? 0}
           {...textFor("community")}
         />,
       ),

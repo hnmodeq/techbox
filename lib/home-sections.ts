@@ -335,7 +335,14 @@ export async function getCommunityTopics(
   // actual rendered rows in memory. Solved and unresolved states are queried
   // independently so neither column can leak the other state.
   const solvedPool = await prisma.post.findMany({
-    where: { ...forumWhere, solved: true },
+    // A feature is only useful when the reader can immediately see its best
+    // answer. Solved topics without an approved accepted reply stay out of
+    // this main-card pool rather than producing an empty answer treatment.
+    where: {
+      ...forumWhere,
+      solved: true,
+      acceptedComment: { is: { status: "approved", deletedAt: null, text: { not: "" } } },
+    },
     orderBy: [{ date: "desc" }, { id: "desc" }],
     take: 40,
     select: cardSelect,
@@ -368,7 +375,7 @@ export async function getCommunityTopics(
     .filter((id): id is string => typeof id === "string" && id.length > 0);
   const acceptedRows = acceptedIds.length > 0
     ? await prisma.comment.findMany({
-        where: { id: { in: acceptedIds }, deletedAt: null },
+        where: { id: { in: acceptedIds }, status: "approved", deletedAt: null, text: { not: "" } },
         select: {
           id: true,
           text: true,

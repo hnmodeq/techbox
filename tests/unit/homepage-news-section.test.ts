@@ -130,6 +130,9 @@ describe("interactive News discussion panel", () => {
     // Header actions avoid adding a third strip beneath the card.
     expect(section).toMatch(/actions=\{<NewsActions header \/>\}/);
     expect(section).not.toMatch(/<NewsActions \/>/);
+    const actions = section.slice(section.indexOf("function NewsActions"), section.indexOf("function LatestStory"));
+    expect(actions).toMatch(/بایگانی خبرهای قدیمی‌تر/);
+    expect(actions).toMatch(/text-\[color:var\(--insights-accent\)\]/);
     expect(section).not.toMatch(/h-200/);
     expect(section).not.toMatch(/bg-sky-50/);
   });

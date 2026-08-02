@@ -193,7 +193,7 @@ function NewsActions({ header = false }: { header?: boolean }) {
 
       <Link
         href="/news"
-        className="inline-flex min-h-10 items-center gap-2 rounded-[var(--hp-r-sm)] px-3 text-[12px] font-bold text-muted-foreground transition-colors hover:text-[color:var(--insights-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="inline-flex min-h-10 items-center gap-2 rounded-[var(--hp-r-sm)] px-3 text-[12px] font-bold text-[color:var(--insights-accent)] transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         بایگانی خبرهای قدیمی‌تر
       </Link>
