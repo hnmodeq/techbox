@@ -23,6 +23,9 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/const featured = list\[0\]/);
     expect(community).toMatch(/list\.slice\(1\)[\s\S]*?!topic\.solved/);
     expect(community).toMatch(/slice\(0, 4\)/);
+    expect(community).toMatch(/const featured = list\[0\] \?\? null/);
+    expect(community).toMatch(/هنوز موضوعی در انجمن ثبت نشده است/);
+    expect(community).toMatch(/فعلاً پرسش بازی برای نمایش نیست/);
   });
 
   it("uses a professional answer feature and a separate open-question activity list", () => {
