@@ -14,7 +14,8 @@ describe("homepage Forum section", () => {
 
   it("keeps random solved and unresolved Forum selections strictly separate", () => {
     expect(data).toMatch(/export async function getCommunityTopics/);
-    expect(data).toMatch(/where: \{ \.\.\.forumWhere, solved: true \}/);
+    expect(data).toMatch(/solved: true,/);
+    expect(data).toMatch(/acceptedComment: \{ is: \{ status: "approved"/);
     expect(data).toMatch(/where: \{ \.\.\.forumWhere, solved: false \}/);
     expect(data).toMatch(/seededIndex\(solvedPool\.length, 613\)/);
     expect(data).toMatch(/seededIndices\(openPool\.length, 4, 719\)/);
@@ -24,7 +25,8 @@ describe("homepage Forum section", () => {
     expect(data).toMatch(/const replyContributors = await prisma\.comment\.groupBy/);
     expect(community).toMatch(/featuredTopic/);
     expect(community).toMatch(/const activeTopics = \(\(topics \?\? \[\]\) as WithForumActivity\[\]\)\.slice\(0, 4\)/);
-    expect(community).toMatch(/<ForumQuestionPanel participantCount=\{participantCount\}/);
+    expect(community).toMatch(/<NewForumTopicModal open=\{questionOpen\}/);
+    expect(community).not.toMatch(/<ForumQuestionPanel/);
     expect(community).toMatch(/فعلاً پرسش بازی برای نمایش نیست/);
   });
 
@@ -36,10 +38,11 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/text-\[var\(--warning\)\]/);
     expect(community).toMatch(/هنوز کسی این مسئله را حل نکرده/);
     expect(community).toMatch(/پاسخ ثبت شده/);
+    expect(community).toMatch(/اما هنوز کسی این مسئله را حل نکرده است/);
     expect(community).not.toMatch(/بار بازدید شده/);
-    expect(community).toMatch(/ms-auto flex shrink-0/);
+    expect(community).toMatch(/ms-auto block shrink-0/);
     expect(community).toMatch(/whitespace-nowrap/);
-    expect(community).toMatch(/تعداد پاسخ‌های ثبت‌شده/);
+    expect(community).not.toMatch(/تعداد پاسخ‌های ثبت‌شده/);
     expect(community).not.toMatch(/تعداد دفعات بازدید/);
     // Main feature is square-cornered/borderless, with its state line below.
     const feature = community.slice(community.indexOf("function FeaturedTopic"), community.indexOf("function EmptyCommunityFeature"));
@@ -60,14 +63,17 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/const activity = topic\.lastActivity/);
   });
 
-  it("keeps topic deep links, hides row replies, and gives the homepage a direct composer", () => {
-    expect(community).toMatch(/<ForumQuestionPanel/);
-    expect(community).not.toMatch(/<NewForumTopicModal/);
+  it("keeps topic deep links, restores the header question modal, and retains the question panel", () => {
+    expect(community).not.toMatch(/<ForumQuestionPanel/);
+    expect(community).toMatch(/<NewForumTopicModal/);
     expect(community).not.toMatch(/<ForumTopicModal/);
     expect(community).not.toMatch(/پاسخ دادن به این مسئله/);
     const headerActions = community.slice(community.indexOf("function CommunityActions"), community.indexOf("function FeaturedTopic"));
-    expect(headerActions).not.toMatch(/طرح پرسش جدید/);
+    expect(headerActions).toMatch(/طرح پرسش جدید/);
+    expect(headerActions).toMatch(/onClick=\{onAsk\}/);
+    expect(headerActions).toMatch(/text-\[color:var\(--community-accent\)\]/);
     expect(community).toMatch(/href=\{`\/\$\{topic\.module\}\/\$\{topic\.slug\}`\}/);
+    expect(composer).toMatch(/Retained "question panel" component/);
     expect(composer).toMatch(/id="hp-forum-question"/);
     expect(composer).toMatch(/rounded-\[12px\] bg-white p-1\.5/);
     expect(composer).toMatch(/resize-none/);

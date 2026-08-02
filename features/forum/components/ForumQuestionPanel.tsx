@@ -18,7 +18,10 @@ function makeSlug(title: string) {
   return `${base || "topic"}-${Date.now().toString(36)}`;
 }
 
-/** Always-visible homepage composer — a direct alternative to a modal. */
+/**
+ * Retained "question panel" component for future homepage use. It is not
+ * currently mounted: the Community header opens NewForumTopicModal instead.
+ */
 export function ForumQuestionPanel({ participantCount = 0 }: { participantCount?: number }) {
   const router = useRouter();
   const [title, setTitle] = React.useState("");

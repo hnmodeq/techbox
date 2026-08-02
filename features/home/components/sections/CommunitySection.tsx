@@ -8,8 +8,8 @@
  * members are currently talking. Every route remains a normal forum URL —
  * technical threads need deep links, long-form answers, and shareability.
  *
- * RTL: unresolved active topics and the direct composer sit on the right;
- * one solved featured resolution occupies the left.
+ * RTL: unresolved active topics sit on the right; one solved featured
+ * resolution occupies the left. Question submission is opened from the header.
  */
 import * as React from "react";
 import Link from "next/link";
@@ -18,9 +18,8 @@ import { SectionShell, SectionHeader } from "../primitives";
 import { AuthorLink } from "@/components/ui/author-link";
 import { Num } from "@/components/ui/num";
 import { RelativeDate } from "@/components/ui/relative-date";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { CheckCircle2 } from "lucide-react";
-import { ForumQuestionPanel } from "@/features/forum/components/ForumQuestionPanel";
+import { CheckCircle2, Plus } from "lucide-react";
+import { NewForumTopicModal } from "@/features/forum/components/NewForumTopicModal";
 
 /** findPosts() in lib/home-server.ts attaches these forum-only fields. */
 type WithForumActivity = ContentItem & {
@@ -40,8 +39,6 @@ export type CommunitySectionProps = {
   featuredTopic?: ContentItem | null;
   /** Distinct unresolved questions for the right-hand activity rail. */
   topics: ContentItem[];
-  /** Unique people who have created a Forum topic or approved reply. */
-  participantCount?: number;
   title?: string;
   moreLabel?: string;
   showTitle?: boolean;
@@ -55,7 +52,6 @@ type CommunityStyle = React.CSSProperties & { "--community-accent"?: string };
 export function CommunitySection({
   featuredTopic,
   topics,
-  participantCount = 0,
   title = "انجمن تکباکس",
   moreLabel = "ورود به انجمن",
   showTitle = true,
@@ -64,7 +60,8 @@ export function CommunitySection({
 }: CommunitySectionProps) {
   // The data contract deliberately keeps the two columns separate: a random
   // solved thread belongs in the left feature, while the right rail contains
-  // only random unresolved questions. The composer stays beneath that rail.
+  // only random unresolved questions.
+  const [questionOpen, setQuestionOpen] = React.useState(false);
   const featured = (featuredTopic ?? null) as WithForumActivity | null;
   const activeTopics = ((topics ?? []) as WithForumActivity[]).slice(0, 4);
   const style: CommunityStyle = { "--community-accent": accentColor || "var(--primary)" };
@@ -79,23 +76,24 @@ export function CommunitySection({
           href={showMore ? "/forum" : undefined}
           linkLabel={moreLabel}
           accentColor={accentColor}
-          actions={<CommunityActions showBrowse={showMore} moreLabel={moreLabel} />}
+          actions={<CommunityActions showBrowse={showMore} moreLabel={moreLabel} onAsk={() => setQuestionOpen(true)} />}
         />
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      {/* RTL grid order: the first child is physical right. It contains the
-          unresolved-topic rail and composer; the left stays dedicated to one
-          randomly chosen, genuinely solved feature. */}
+      {/* RTL grid order: the first child is physical right and contains only
+          the unresolved-topic rail. The left stays dedicated to one randomly
+          chosen, genuinely solved feature. */}
       <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(360px,.95fr)_minmax(0,1.05fr)] lg:gap-10">
-        <div className="flex min-w-0 flex-col gap-6 lg:h-full">
+        <div className="flex min-w-0 flex-col lg:h-full">
           <ActiveTopicList topics={activeTopics} />
-          <ForumQuestionPanel participantCount={participantCount} />
         </div>
         <div className="flex min-w-0 flex-col lg:h-full">
-          {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature />}
+          {featured ? <FeaturedTopic topic={featured} /> : <EmptyCommunityFeature onAsk={() => setQuestionOpen(true)} />}
         </div>
       </div>
+
+      <NewForumTopicModal open={questionOpen} onOpenChange={setQuestionOpen} />
     </SectionShell>
   );
 }
@@ -103,19 +101,31 @@ export function CommunitySection({
 function CommunityActions({
   showBrowse,
   moreLabel,
+  onAsk,
 }: {
   showBrowse: boolean;
   moreLabel: string;
+  onAsk: () => void;
 }) {
-  if (!showBrowse) return null;
-
   return (
-    <Link
-      href="/forum"
-      className="inline-flex min-h-10 items-center px-2 text-[12px] font-bold text-muted-foreground transition-colors hover:text-[color:var(--community-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-    >
-      {moreLabel}
-    </Link>
+    <div className="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        onClick={onAsk}
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--hp-r-sm)] bg-[color:var(--community-accent)] px-3 text-[12px] font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Plus className="size-4" aria-hidden="true" />
+        طرح پرسش جدید
+      </button>
+      {showBrowse && (
+        <Link
+          href="/forum"
+          className="inline-flex min-h-10 items-center px-2 text-[12px] font-bold text-[color:var(--community-accent)] transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {moreLabel}
+        </Link>
+      )}
+    </div>
   );
 }
 
@@ -174,19 +184,20 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   );
 }
 
-function EmptyCommunityFeature() {
+function EmptyCommunityFeature({ onAsk }: { onAsk: () => void }) {
   return (
     <div className="border border-dashed border-[color:var(--hp-border)] p-6 text-center">
       <p className="text-[18px] font-bold text-[color:var(--hp-ink)]">هنوز موضوع حل‌شده‌ای برای نمایش نیست</p>
       <p className="mx-auto mt-2 max-w-md text-[14px] leading-6 text-[color:var(--hp-ink-3)]">
         با ثبت پرسش و پاسخ‌های دقیق، اولین راه‌حل قابل‌اتکای انجمن از همین‌جا شکل می‌گیرد.
       </p>
-      <a
-        href="#hp-forum-question"
-        className="mt-5 inline-block text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      <button
+        type="button"
+        onClick={onAsk}
+        className="mt-5 text-[13px] font-bold text-[color:var(--community-accent)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         طرح پرسش جدید
-      </a>
+      </button>
     </div>
   );
 }
@@ -235,11 +246,6 @@ function TopicRow({ topic }: { topic: WithForumActivity }) {
           <TopicActivity topic={topic} />
         </div>
       </div>
-
-      {/* In RTL this compact control column sits on the physical left edge. */}
-      <div className="w-52 shrink-0 pt-1 text-left">
-        <TopicState solved={Boolean(topic.solved)} compact />
-      </div>
     </article>
   );
 }
@@ -262,21 +268,20 @@ function TopicActivity({ topic }: { topic: WithForumActivity }) {
         <span aria-hidden="true">•</span>
         <RelativeDate date={date} label="آخرین فعالیت" className="text-[12px] text-[color:var(--hp-ink-3)]" />
       </div>
-      <TopicCounters topic={topic} />
+      <TopicSummary topic={topic} />
     </div>
   );
 }
 
-function TopicCounters({ topic }: { topic: WithForumActivity }) {
+/** The reply count and resolution state read as one concise status sentence. */
+function TopicSummary({ topic }: { topic: WithForumActivity }) {
+  const solved = Boolean(topic.solved);
+  const stateClass = solved ? "text-[color:var(--hp-solved)]" : "text-[var(--warning)]";
+
   return (
-    <div className="ms-auto flex shrink-0 items-center whitespace-nowrap text-[11px] font-bold text-[color:var(--community-accent)]">
-      <Tooltip>
-        <TooltipTrigger render={<span className="cursor-default" />}>
-          <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده
-        </TooltipTrigger>
-        <TooltipContent>تعداد پاسخ‌های ثبت‌شده برای این مسئله</TooltipContent>
-      </Tooltip>
-    </div>
+    <span className={`ms-auto block shrink-0 whitespace-nowrap text-[11px] leading-5 ${stateClass}`}>
+      <Num>{topic.comments ?? 0}</Num> پاسخ ثبت شده {solved ? "و این مسئله حل شده است" : "اما هنوز کسی این مسئله را حل نکرده است"}
+    </span>
   );
 }
 
