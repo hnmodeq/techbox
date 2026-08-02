@@ -250,7 +250,7 @@ export async function GET(req: NextRequest) {
         username: p.author?.username || "",
         role: p.author?.roleFa || p.author?.role || "عضو انجمن",
         job: p.author?.job || "",
-        avatar: p.author?.avatar || "/assets/hooman.png",
+        avatar: p.author?.avatar || "",
         verifiedType: (p.author as any)?.verifiedType || null,
         verifiedLabel: (p.author as any)?.verifiedLabel || null,
       },

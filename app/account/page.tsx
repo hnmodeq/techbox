@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -425,14 +425,14 @@ export default function AccountPage() {
 
       <div className="grid lg:grid-cols-3 gap-6 mt-6">
         <Card className="p-6 text-center space-y-4 h-fit">
-          <div className="relative w-32 h-32 mx-auto mb-6">
-            {avatar && avatar !== "/assets/hooman.png" ? (
-              <Image src={avatar} width={128} height={128} className="h-32 w-32 rounded-xl object-cover ring-2 ring-border shadow" alt={user?.name || "کاربر"} />
-            ) : (
-              <div className="h-32 w-32 rounded-xl bg-muted border flex items-center justify-center text-muted-foreground">
-                <Icon name="user" size={48} />
-              </div>
-            )}
+          <div className="w-32 h-32 mx-auto mb-6">
+            <UserAvatar
+              name={user?.name || "کاربر"}
+              username={user?.username}
+              src={avatar}
+              sizes="128px"
+              className="h-32 w-32 rounded-xl text-5xl ring-2 ring-border shadow"
+            />
           </div>
           <div className="pt-2">
             <label className="cursor-pointer rounded-md border border-input bg-background hover:bg-muted text-foreground px-4 py-1.5 text-xs shadow-sm font-bold transition-colors">

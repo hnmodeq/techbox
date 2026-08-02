@@ -125,8 +125,8 @@ export function ForumCard({ topic }: { topic: ForumTopicItem }) {
               className="relative z-10 flex items-center gap-2.5 group/author hover:opacity-90 transition-opacity"
             >
               <Avatar className="h-9 w-9 shrink-0 ring-1 ring-border group-hover/author:ring-[var(--primary)] transition-all">
-                <AvatarImage src={topic.author?.avatar || "/assets/hooman.png"} alt={authorName} />
-                <AvatarFallback>{authorName.charAt(0)}</AvatarFallback>
+                <AvatarImage src={topic.author?.avatar || undefined} alt={authorName} />
+                <AvatarFallback colorKey={topic.author?.username || authorName}>{authorName.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
                 <div className="text-xs font-bold text-foreground group-hover/author:text-[var(--primary)] transition-colors flex items-center gap-1">

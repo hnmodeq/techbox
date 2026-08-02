@@ -1,6 +1,6 @@
 "use client";
-import Image from "next/image";
 import type { ContentItem } from "@/lib/content";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -62,7 +62,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
     serverItems && serverItems.length > 0
       ? (serverItems.map((t) => ({
           ...t,
-          avatar: t.author?.avatar || "/assets/hooman.png",
+          avatar: t.author?.avatar || "",
         })) as any)
       : null
   );
@@ -104,7 +104,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
         const nextItems = Array.isArray(data)
           ? data.map((t: ForumPost) => ({
               ...t,
-              avatar: t.author?.avatar || "/assets/hooman.png",
+              avatar: t.author?.avatar || "",
             }))
           : [];
         setDbItems(nextItems as (ForumPost & { avatar: string })[]);
@@ -166,8 +166,8 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
         excerpt: values.body.slice(0, 140),
         content: values.body,
         tags: ["پرسش", "تکباکس"],
-        author: { name: "شما", role: "عضو", avatar: "/assets/hooman.png" },
-        avatar: "/assets/hooman.png",
+        author: { name: "شما", role: "عضو", avatar: "" },
+        avatar: "",
         date: new Date().toISOString(),
         date_fa: new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(new Date()),
         likes: 0,
@@ -240,12 +240,12 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
                     }}
                     className="shrink-0 mt-0.5 hover:opacity-80 transition-opacity cursor-pointer"
                   >
-                    <Image
+                    <UserAvatar
+                      name={t.author?.name || "کاربر"}
+                      username={t.author?.username}
                       src={t.avatar}
-                      alt={t.author?.name || "کاربر"}
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full object-cover ring-1 ring-border"
+                      sizes="40px"
+                      className="h-10 w-10 ring-1 ring-border"
                     />
                   </button>
 

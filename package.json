@@ -29,6 +29,7 @@
     "storage:import-qnap": "tsx scripts/import-qnap-product-images.ts",
     "content:remove-retired": "tsx scripts/remove-retired-content.ts",
     "content:populate-home": "tsx scripts/content/populate-homepage-content.ts",
+    "content:sync-visuals": "tsx scripts/content/sync-seed-visuals.ts",
     "check:content": "tsx scripts/checks/content.ts",
     "check:storage": "tsx scripts/checks/storage.ts",
     "check:db": "tsx scripts/checks/db.ts",

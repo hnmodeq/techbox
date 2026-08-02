@@ -117,7 +117,7 @@ export default function ForumDetail({ slug, initialItem = null }: ForumDetailPro
             <AuthorLink
               name={item.author?.name || "کاربر انجمن"}
               username={item.author?.username}
-              avatar={item.author?.avatar || "/assets/hooman.png"}
+              avatar={item.author?.avatar || undefined}
               verifiedType={(item.author as any)?.verifiedType}
               verifiedLabel={(item.author as any)?.verifiedLabel}
             />

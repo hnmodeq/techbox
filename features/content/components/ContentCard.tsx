@@ -9,9 +9,9 @@ import { ButtonLink } from "@/components/ui/button";
 import { Icon } from "@/design/icons";
 import { CardStats } from "@/components/ui/card-stats";
 import { ForumBadge } from "@/components/ui/forum-badge";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 const fallbackImage = "/assets/blog-1.jpg";
-const fallbackAvatar = "/assets/hooman.png";
 
 /** Small engagement stat with a central-system icon. */
 function Stat({ icon, value }: { icon: "like" | "view" | "comment"; value: string | number }) {
@@ -136,9 +136,13 @@ function VideoFeedCard({item}:{item:ContentItem}){
 function ForumFeedCard({item}:{item:ContentItem}){
  return (
  <Link href={`/${item.module}/${item.slug}`} className="group/bg-[var(--card-background)] text-[var(--primary-text)] border-[length:var(--border-size)] border-[var(--border-color)] rounded-[var(--corner-radius)] shadow-[var(--shadow-size)] flex gap-2.5 rounded-[var(--corner-radius)] p-2 transition-colors hover:bg-[color-mix(in_oklch,var(--muted-background)_45%,transparent)]">
- <div className="relative mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
- <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "کاربر"} fill sizes="32px" className="object-cover" />
- </div>
+ <UserAvatar
+ name={item.author?.name || "کاربر"}
+ username={item.author?.username}
+ src={item.author?.avatar}
+ sizes="32px"
+ className="mt-0.5 h-8 w-8 rounded-[var(--corner-radius)] text-[11px]"
+ />
  <div className="min-w-0 flex-1">
  <div className={`line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="mt-1 flex flex-wrap items-center gap-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">
@@ -186,9 +190,13 @@ function ReviewFeedCard({item}:{item:ContentItem}){
  <div className="min-w-0 flex-1 space-y-1">
  <div className={`line-clamp-2 text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] transition-colors ${moduleHover(item.module)}`}>{item.title}</div>
  <div className="flex items-center gap-2">
- <div className="relative h-5 w-5 overflow-hidden rounded-[var(--corner-radius)] bg-[var(--muted-background)]">
- <Image src={item.author?.avatar || fallbackAvatar} alt={item.author?.name || "نویسنده"} fill sizes="20px" className="object-cover" />
- </div>
+ <UserAvatar
+ name={item.author?.name || "نویسنده"}
+ username={item.author?.username}
+ src={item.author?.avatar}
+ sizes="20px"
+ className="h-5 w-5 rounded-[var(--corner-radius)] text-[8px]"
+ />
  <span className="text-[length:var(--paragraph-font-size)] text-[var(--paragraph-color)] paragraph-color">{item.author?.name || "تکباکس"}</span>
  </div>
           <div className="mt-1">

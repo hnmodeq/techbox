@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { blurProps } from "@/lib/image-placeholder";
 import { formatRelativeDate } from "@/lib/date-format";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -91,15 +92,13 @@ function ArticleAuthorMeta({
             {job}
           </div>
         )}
-        <div className="relative col-start-2 row-span-2 row-start-1 size-8 overflow-hidden rounded-full ring-1 ring-white/40">
-          <Image
-            src={author?.avatar || "/logo.png"}
-            alt={name}
-            fill
-            sizes="32px"
-            className="object-cover"
-          />
-        </div>
+        <UserAvatar
+          name={name}
+          username={author?.username}
+          src={author?.avatar}
+          sizes="32px"
+          className="relative col-start-2 row-span-2 row-start-1 size-8 text-xs ring-1 ring-white/40"
+        />
       </TooltipTrigger>
       <TooltipContent>بازدید از حساب کاربری {name}</TooltipContent>
     </Tooltip>
