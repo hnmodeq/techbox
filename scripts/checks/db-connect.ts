@@ -108,6 +108,19 @@ function parseUrl(raw: string): Parsed | null {
   }
 }
 
+/**
+ * The doctor runs only a handful of serial probes, so it must never inherit
+ * Prisma's hardware-derived default pool (33 on the owner's Windows host).
+ * That default can itself exhaust a small Neon pooler and turn the diagnostic
+ * into a false P2024. Force one short-lived connection without mutating .env.
+ */
+function doctorPrismaUrl(raw: string): string {
+  const url = new URL(raw);
+  url.searchParams.set("connection_limit", "1");
+  url.searchParams.set("pool_timeout", "15");
+  return url.toString();
+}
+
 // ─── probes ───────────────────────────────────────────────────────────
 
 function tcpProbe(
@@ -392,9 +405,15 @@ async function main() {
   // against a different schema. Running the real client is the only way
   // to rule those out.
   step(5, "Prisma query");
+  let doctorClient: { $disconnect: () => Promise<void> } | undefined;
   try {
     const { PrismaClient } = await import("@prisma/client");
-    const client = new PrismaClient({ log: [] });
+    const client = new PrismaClient({
+      log: [],
+      datasources: { db: { url: doctorPrismaUrl(dbUrl) } },
+    });
+    doctorClient = client;
+    console.log("  · probe pool  1 connection (isolated from the app pool)");
     const started = Date.now();
     const rows = await client.$queryRawUnsafe<{ v: string }[]>("select version() as v");
     pass("select version()", `${Date.now() - started}ms`);
@@ -423,9 +442,11 @@ async function main() {
       pass("generated client", "in sync with schema.prisma");
     }
 
-    const [posts, users] = await Promise.all([client.post.count(), client.user.count()]);
+    // Keep the probe fully serial: it deliberately has a one-connection pool
+    // and should never manufacture the pool pressure it is diagnosing.
+    const posts = await client.post.count();
+    const users = await client.user.count();
     pass("row counts", `posts ${posts} \u00b7 users ${users}`);
-    await client.$disconnect();
   } catch (e: any) {
     // Prisma prefixes several connection failures with a generic
     // "Invalid prisma.$queryRaw... invocation" line. That was all the
@@ -440,6 +461,8 @@ async function main() {
     const detail = useful || lines.find((line) => !/^Invalid `?prisma\./i.test(line)) || message;
     const code = inferredCode ? ` [${inferredCode}]` : "";
     fail("Prisma", `${redact(detail)}${code}`, prismaHint(inferredCode));
+  } finally {
+    await doctorClient?.$disconnect().catch(() => {});
   }
 
   report();
