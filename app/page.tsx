@@ -196,7 +196,7 @@ export default async function HomePage() {
     },
     {
       key: "community",
-      node: withModuleTooltip("forum", <CommunitySection topics={data.modules.forum ?? []} {...textFor("community")} />),
+      node: withModuleTooltip("forum", <CommunitySection topics={data.communityTopics ?? []} {...textFor("community")} />),
     },
     {
       key: "familyComments",
