@@ -10,10 +10,9 @@ describe("homepage Forum section", () => {
   const data = read("lib/home-sections.ts");
   const server = read("lib/home-server.ts");
   const forum = read("features/forum/components/ForumList.tsx");
-  const topicModal = read("features/forum/components/ForumTopicModal.tsx");
-  const newTopicModal = read("features/forum/components/NewForumTopicModal.tsx");
+  const composer = read("features/forum/components/ForumQuestionPanel.tsx");
 
-  it("uses a random hot seven-day feature and only open topics in the list", () => {
+  it("uses a random hot seven-day feature and at least three real open-topic slots", () => {
     expect(data).toMatch(/export async function getCommunityTopics/);
     expect(data).toMatch(/module: "forum"/);
     expect(data).toMatch(/date: \{ gte: weekAgo/);
@@ -22,23 +21,28 @@ describe("homepage Forum section", () => {
     expect(data).toMatch(/!topic\.solved/);
     expect(data).toMatch(/slice\(0, 3\)/);
     expect(data).toMatch(/if \(openTopics\.length < 3 && !featured\.solved\)/);
-    expect(community).toMatch(/const featured = list\[0\]/);
-    expect(community).toMatch(/list\.slice\(1\)[\s\S]*?!topic\.solved/);
-    expect(community).toMatch(/slice\(0, 4\)/);
     expect(community).toMatch(/const featured = list\[0\] \?\? null/);
-    expect(community).toMatch(/هنوز موضوعی در انجمن ثبت نشده است/);
+    expect(community).toMatch(/list\.slice\(1\)[\s\S]*?!topic\.solved/);
     expect(community).toMatch(/فعلاً پرسش بازی برای نمایش نیست/);
   });
 
-  it("uses a professional answer feature and a separate open-question activity list", () => {
+  it("uses the requested professional card and activity-list presentation", () => {
     expect(community).toMatch(/پاسخ برتر/);
-    expect(community).toMatch(/هنوز پاسخ برتری/);
     expect(community).toMatch(/برخی از سوالات پرسیده شده در انجمن/);
     expect(community).not.toMatch(/Eyebrow/);
     expect(community).not.toMatch(/border-y border/);
     expect(community).toMatch(/text-\[var\(--warning\)\]/);
+    expect(community).toMatch(/هنوز کسی این مسئله را حل نکرده/);
     expect(community).toMatch(/پاسخ ثبت شده/);
     expect(community).toMatch(/بار بازدید شده/);
+    expect(community).toMatch(/تعداد پاسخ‌های ثبت‌شده/);
+    expect(community).toMatch(/تعداد دفعات بازدید/);
+    // Main feature is square-cornered/borderless, with its state line below.
+    const feature = community.slice(community.indexOf("function FeaturedTopic"), community.indexOf("function EmptyCommunityFeature"));
+    expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
+    expect(feature).not.toMatch(/border border-\[color:var\(--hp-border\)\]/);
+    expect(feature).toMatch(/absolute inset-x-0 bottom-0 h-1/);
+    expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
   });
 
   it("shows real latest forum activity from one bulk server query", () => {
@@ -49,14 +53,14 @@ describe("homepage Forum section", () => {
     expect(community).toMatch(/const activity = topic\.lastActivity/);
   });
 
-  it("keeps topic deep links but uses homepage modals for asking and replying", () => {
-    expect(community).toMatch(/<NewForumTopicModal/);
-    expect(community).toMatch(/<ForumTopicModal/);
-    expect(community).toMatch(/پاسخ دادن به این مسئله/);
+  it("keeps topic deep links, hides row replies, and gives the homepage a direct composer", () => {
+    expect(community).toMatch(/<ForumQuestionPanel/);
+    expect(community).not.toMatch(/<NewForumTopicModal/);
+    expect(community).not.toMatch(/<ForumTopicModal/);
+    expect(community).not.toMatch(/پاسخ دادن به این مسئله/);
     expect(community).toMatch(/href=\{`\/\$\{topic\.module\}\/\$\{topic\.slug\}`\}/);
-    expect(topicModal).toMatch(/باز کردن در صفحهٔ کامل/);
-    expect(topicModal).toMatch(/<CommentSection module="forum"/);
-    expect(newTopicModal).toMatch(/window\.dispatchEvent\(new CustomEvent\("tb_open_auth"\)\)/);
+    expect(composer).toMatch(/id="hp-forum-question"/);
+    expect(composer).toMatch(/window\.dispatchEvent\(new CustomEvent\("tb_open_auth"\)\)/);
   });
 
   it("still supports the Forum page query parameter as a direct route", () => {
