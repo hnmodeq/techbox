@@ -77,6 +77,21 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
     defaultValues: { title: "", body: "" },
   });
 
+  // Homepage's primary community CTA lands here. Keep the interaction on the
+  // real Forum route so a question has a shareable URL and full editor.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("new") === "1") {
+      setShowNew(true);
+    }
+  }, []);
+
+  const onNewTopicOpenChange = (open: boolean) => {
+    setShowNew(open);
+    if (!open && new URLSearchParams(window.location.search).get("new") === "1") {
+      router.replace("/forum", { scroll: false });
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
     fetch("/api/posts?module=forum&take=100", { cache: "no-store" })
@@ -164,7 +179,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
       };
       setLocal((l) => [nt as ForumPost & { avatar: string }, ...l]);
       newTopicForm.reset();
-      setShowNew(false);
+      onNewTopicOpenChange(false);
     } catch {
       setSubmitError("خطا در اتصال به سرور.");
     }
@@ -175,7 +190,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-extrabold text-foreground">انجمن</h1>
-        <Button onClick={() => setShowNew(true)} size="sm">+ موضوع جدید</Button>
+        <Button onClick={() => onNewTopicOpenChange(true)} size="sm">طرح پرسش جدید</Button>
       </div>
 
       {/* Topic list */}
@@ -198,7 +213,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
           <div className="text-4xl mb-4">💬</div>
           <p className="text-foreground font-bold mb-1">هنوز موضوعی ثبت نشده</p>
           <p className="text-muted-foreground text-sm mb-4">اولین نفری باشید که سؤال یا بحثی را شروع می‌کند.</p>
-          <Button onClick={() => setShowNew(true)} size="sm">اولین موضوع را ایجاد کنید</Button>
+          <Button onClick={() => onNewTopicOpenChange(true)} size="sm">اولین موضوع را ایجاد کنید</Button>
         </div>
       ) : (
         <div className="space-y-2">
@@ -306,7 +321,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
       )}
 
       {/* New topic dialog */}
-      <Dialog open={showNew} onOpenChange={setShowNew}>
+      <Dialog open={showNew} onOpenChange={onNewTopicOpenChange}>
         <DialogContent className="sm:max-w-2xl" dir="rtl">
           <DialogHeader>
             <DialogTitle>موضوع جدید در انجمن تکباکس</DialogTitle>
@@ -342,7 +357,7 @@ export default function ForumList({ serverItems }: { serverItems?: any[] }) {
               />
               {submitError && <p className="text-sm text-destructive">{submitError}</p>}
               <DialogFooter className="flex gap-2 justify-end">
-                <Button type="button" variant="ghost" onClick={() => setShowNew(false)}>انصراف</Button>
+                <Button type="button" variant="ghost" onClick={() => onNewTopicOpenChange(false)}>انصراف</Button>
                 <Button type="submit" loading={newTopicForm.formState.isSubmitting}>ارسال موضوع</Button>
               </DialogFooter>
             </form>

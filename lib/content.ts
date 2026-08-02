@@ -40,6 +40,16 @@ export type ContentItem = {
   likes: number;
   views: number;
   comments?: number;
+  /** Forum-only latest real contribution, attached by the homepage query. */
+  lastActivity?: {
+    date: string;
+    author: {
+      name: string;
+      username?: string;
+      avatar?: string;
+      verifiedType?: string | null;
+    };
+  };
   category?: string;
   seoTitle?: string | null;
   seoDescription?: string | null;
