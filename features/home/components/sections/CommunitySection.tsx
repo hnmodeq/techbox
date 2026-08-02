@@ -307,7 +307,7 @@ function TopicState({ solved, compact = false }: { solved: boolean; compact?: bo
   }
 
   return (
-    <span className={`max-w-36 text-end text-[var(--warning)] ${compact ? "text-[11px] leading-5" : "text-[12px] font-bold"}`}>
+    <span className={`whitespace-nowrap text-end text-[var(--warning)] ${compact ? "text-[10px] leading-5" : "text-[12px] font-bold"}`}>
       هنوز کسی این مسئله را حل نکرده
     </span>
   );
