@@ -19,8 +19,8 @@ describe("homepage Forum section", () => {
     expect(data).toMatch(/const hottest = \[\.\.\.featurePool\]/);
     expect(data).toMatch(/seededIndex\(featureChoices\.length, 613\)/);
     expect(data).toMatch(/!topic\.solved/);
-    expect(data).toMatch(/slice\(0, 3\)/);
-    expect(data).toMatch(/if \(openTopics\.length < 3 && !featured\.solved\)/);
+    expect(data).toMatch(/slice\(0, 4\)/);
+    expect(data).toMatch(/if \(openTopics\.length < 4 && !featured\.solved\)/);
     expect(community).toMatch(/const featured = list\[0\] \?\? null/);
     expect(community).toMatch(/list\.slice\(1\)[\s\S]*?!topic\.solved/);
     expect(community).toMatch(/فعلاً پرسش بازی برای نمایش نیست/);
@@ -28,7 +28,7 @@ describe("homepage Forum section", () => {
 
   it("uses the requested professional card and activity-list presentation", () => {
     expect(community).toMatch(/پاسخ برتر/);
-    expect(community).toMatch(/برخی از سوالات پرسیده شده در انجمن/);
+    expect(community).not.toMatch(/برخی از سوالات پرسیده شده در انجمن/);
     expect(community).not.toMatch(/Eyebrow/);
     expect(community).not.toMatch(/border-y border/);
     expect(community).toMatch(/text-\[var\(--warning\)\]/);

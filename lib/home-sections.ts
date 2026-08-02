@@ -431,12 +431,12 @@ export async function getCommunityTopics(
       (countByPost.get(b.id) || 0) - (countByPost.get(a.id) || 0) ||
       b.date.getTime() - a.date.getTime(),
     )
-    .slice(0, 3);
-  // If the entire forum only has three unresolved questions and the hot
+    .slice(0, 4);
+  // If the entire forum only has four unresolved questions and the hot
   // feature is one of them, repeat that real question in the left rail rather
   // than replacing it with fake content or showing fewer than three rows.
-  if (openTopics.length < 3 && !featured.solved) {
-    openTopics = [featured, ...openTopics].slice(0, 3);
+  if (openTopics.length < 4 && !featured.solved) {
+    openTopics = [featured, ...openTopics].slice(0, 4);
   }
 
   const toCard = (topic: any): ContentItem => {
