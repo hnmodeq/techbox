@@ -140,7 +140,8 @@ describe("interactive News discussion panel", () => {
     expect(section).not.toMatch(/border-b border-\[color:var\(--hp-rule\)\]/);
     expect(section).not.toMatch(/ارسال‌شده/);
     expect(section).not.toMatch(/تاریخ دیدگاه/);
-    expect(section).toMatch(/دیدگاه شما درباره خبرها/);
+    expect(section).toMatch(/برخی از دیدگاه‌های شما/);
+    expect(section).toMatch(/text-\[color:var\(--insights-accent\)\]/);
     // The old panel heading/counter is absent; the source-level description
     // may still refer to the historic feature name.
     const discussion = section.slice(section.indexOf("function NewsDiscussion"));
