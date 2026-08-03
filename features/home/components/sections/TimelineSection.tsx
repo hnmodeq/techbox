@@ -1,8 +1,8 @@
 /**
  * §6 · Timeline — TechBox original
  *
- * Uses the full interactive TimelineContainer from /timeline page,
- * backed by the grid background with smoothly faded top and bottom.
+ * Absolute black in dark mode, absolute light in light mode, grid background
+ * with top/bottom and left/right smooth fadeouts.
  */
 import * as React from "react";
 import type { TimelineCard } from "@/features/home/lib/home-types";
@@ -55,13 +55,15 @@ export function TimelineSection({
       aria-labelledby={HEADING_ID}
       className="relative w-full overflow-hidden bg-white dark:bg-black py-14 lg:py-20 text-foreground"
     >
-      {/* Grid texture with smoothly faded top and bottom */}
+      {/* Grid texture with smoothly faded top, bottom, left, and right */}
       <div
         aria-hidden="true"
-        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
+        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.14]"
         style={{
-          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+          maskComposite: "intersect",
+          WebkitMaskComposite: "source-in",
         }}
       />
 

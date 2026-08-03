@@ -3,11 +3,6 @@
 /**
  * §9 · Community — a working IT knowledge base, not a generic content rail.
  *
- * The homepage balances proof and participation: one real resolved topic
- * shows the value of the forum, while a compact activity list shows where
- * members are currently talking. Every route remains a normal forum URL —
- * technical threads need deep links, long-form answers, and shareability.
- *
  * RTL: unresolved active topics sit on the right; one solved featured
  * resolution occupies the left. Question submission is opened from the header.
  */
@@ -21,7 +16,6 @@ import { RelativeDate } from "@/components/ui/relative-date";
 import { CheckCircle2, Plus } from "lucide-react";
 import { NewForumTopicModal } from "@/features/forum/components/NewForumTopicModal";
 
-/** findPosts() in lib/home-server.ts attaches these forum-only fields. */
 type WithForumActivity = ContentItem & {
   solved?: boolean;
   acceptedAnswer?: {
@@ -42,9 +36,7 @@ type WithForumActivity = ContentItem & {
 };
 
 export type CommunitySectionProps = {
-  /** Only a genuinely solved topic may occupy the main feature card. */
   featuredTopic?: ContentItem | null;
-  /** Distinct unresolved questions for the right-hand activity rail. */
   topics: ContentItem[];
   title?: string;
   moreLabel?: string;
@@ -65,9 +57,6 @@ export function CommunitySection({
   showMore = true,
   accentColor,
 }: CommunitySectionProps) {
-  // The data contract deliberately keeps the two columns separate: a random
-  // solved thread belongs in the left feature, while the right rail contains
-  // only random unresolved questions.
   const [questionOpen, setQuestionOpen] = React.useState(false);
   const featured = (featuredTopic ?? null) as WithForumActivity | null;
   const activeTopics = ((topics ?? []) as WithForumActivity[]).slice(0, 4);
@@ -88,9 +77,6 @@ export function CommunitySection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      {/* RTL grid order: the first child is physical right and contains only
-          the unresolved-topic rail. The left stays dedicated to one randomly
-          chosen, genuinely solved feature. */}
       <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(360px,.95fr)_minmax(0,1.05fr)] lg:gap-10">
         <div className="flex min-w-0 flex-col lg:h-full">
           <ActiveTopicList topics={activeTopics} />
@@ -141,7 +127,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const followUpReplies = topic.followUpReplies ?? [];
 
   return (
-    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6 dark:bg-[color:color-mix(in_oklch,var(--hp-surface)_86%,white)]">
+    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-transparent p-6">
       <h3 className="text-[22px] font-bold leading-[34px] text-[color:var(--community-accent)]">
         <Link
           href={`/${topic.module}/${topic.slug}`}
@@ -157,7 +143,8 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
         </p>
       )}
 
-      <div className="mt-3">
+      {/* Moved from above to below the question */}
+      <div className="mt-4">
         <TopicActivity topic={topic} />
       </div>
 
@@ -174,7 +161,8 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
           <p className="mt-2 line-clamp-4 text-[14px] leading-[24px] text-[color:var(--hp-ink-2)]">
             {answer.text}
           </p>
-          <div className="mt-3 flex flex-wrap items-end justify-between gap-2">
+          {/* Best answer publish date on same row with user avatar row */}
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <AuthorLink
               name={answer.author.name}
               username={answer.author.username}
@@ -237,11 +225,7 @@ function EmptyCommunityFeature({ onAsk }: { onAsk: () => void }) {
   );
 }
 
-function ActiveTopicList({
-  topics,
-}: {
-  topics: WithForumActivity[];
-}) {
+function ActiveTopicList({ topics }: { topics: WithForumActivity[] }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {topics.length === 0 ? (
@@ -254,7 +238,7 @@ function ActiveTopicList({
           style={{ gridTemplateRows: `repeat(${topics.length}, minmax(0, 1fr))` }}
         >
           {topics.map((topic) => (
-            <li key={`${topic.module}-${topic.slug}`} className="flex min-h-0 py-4 first:pt-0 last:pb-0">
+            <li key={`${topic.module}-${topic.slug}`} className="flex min-h-0 py-4 first:pt-0 last:pb-0 items-end">
               <TopicRow topic={topic} />
             </li>
           ))}
@@ -266,8 +250,8 @@ function ActiveTopicList({
 
 function TopicRow({ topic }: { topic: WithForumActivity }) {
   return (
-    <article className="group flex h-full w-full items-start justify-between gap-4">
-      <div className="min-w-0">
+    <article className="group flex h-full w-full items-end justify-between gap-4">
+      <div className="min-w-0 w-full flex flex-col justify-end">
         <h3 className="text-[16px] font-bold leading-[25px] text-[color:var(--hp-ink)]">
           <Link
             href={`/${topic.module}/${topic.slug}`}
@@ -320,7 +304,6 @@ function TopicActivity({
   );
 }
 
-/** The reply count and resolution state read as one concise status sentence. */
 function TopicSummary({ topic }: { topic: WithForumActivity }) {
   const solved = Boolean(topic.solved);
   const stateClass = solved ? "text-[color:var(--hp-solved)]" : "text-[var(--warning)]";
@@ -331,6 +314,5 @@ function TopicSummary({ topic }: { topic: WithForumActivity }) {
     </span>
   );
 }
-
 
 export default CommunitySection;

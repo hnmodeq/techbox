@@ -13,6 +13,7 @@ const navigation = {
     { name: "درباره ما", href: "/about" },
     { name: "ارتباط با ما", href: "/contact" },
     { name: "فرصت‌های شغلی", href: "/work-with-us" },
+    { name: "قوانین و مقررات", href: "/terms" },
   ],
   social: [
     {
@@ -49,92 +50,55 @@ const navigation = {
   ],
 };
 
-// Two-column footer:
-//  - RIGHT column: the quick links (full height)
-//  - LEFT  column: newsletter on top, social icons below
-// Bottom row: copyright (right) + design team (left).
 export default function FooterSection() {
   return (
-    <footer className="border-t w-full mt-auto">
-      <div className="mx-auto px-10 pb-6 w-full pt-10">
-        {/* Parent: flex so justify-around spreads both columns with equal gaps
-            on both sides and between them. Mobile stacks (flex-col). */}
-        <div className="flex gap-6 flex-col md:flex-row md:justify-center w-full">
-          {/* Quick links & social icons */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              {navigation.main.map((item) => (
-                <ButtonLink
-                  key={item.name}
-                  href={item.href}
-                  variant="ghost"
-                  size="sm"
-                  className="font-normal text-muted-foreground hover:text-foreground"
-                >
-                  {item.name}
-                </ButtonLink>
-              ))}
-            </div>
+    <footer className="border-t w-full mt-auto bg-background">
+      <div className="mx-auto px-6 pb-4 w-full pt-8 max-w-[1280px]">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {navigation.main.map((item) => (
+              <ButtonLink
+                key={item.name}
+                href={item.href}
+                variant="ghost"
+                size="sm"
+                className="font-normal text-muted-foreground hover:text-foreground text-xs"
+              >
+                {item.name}
+              </ButtonLink>
+            ))}
+          </div>
 
-            <div className="flex gap-2 justify-center">
-              {navigation.social.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={item.name}
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  <item.icon className="size-5 transition-transform hover:scale-110" />
-                </a>
-              ))}
-            </div>
+          <div className="flex gap-2 justify-center">
+            {navigation.social.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={item.name}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon" }),
+                  "text-muted-foreground hover:text-foreground size-8"
+                )}
+              >
+                <item.icon className="size-4 transition-transform hover:scale-110" />
+              </a>
+            ))}
           </div>
         </div>
 
-        <Separator className="mt-8" />
+        <Separator className="my-6" />
 
-        {/* Bottom row: copyright & design team */}
-        <div className="pt-4 pb-2 flex flex-col items-center justify-between gap-2 sm:flex-row text-xs">
-          {/* رستاک — copyright line, RIGHT */}
+        {/* Decreased sub footer height */}
+        <div className="py-1 flex flex-col items-center justify-between gap-2 sm:flex-row text-[11px]">
           <p className="text-muted-foreground text-center sm:text-right">
-            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت {" "}
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <span
-                    tabIndex={0}
-                    className="text-sky-500 cursor-pointer"
-                  />
-                }
-              >
-                هونامیک ارتباط رستاک
-              </TooltipTrigger>
-              <TooltipContent>در دست طراحی</TooltipContent>
-            </Tooltip>
-          {" "}   میباشد.
+            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت{" "}
+            <span className="text-foreground font-semibold">هونامیک ارتباط رستاک</span> می‌باشد.
           </p>
 
-          {/* بومیم — design team, LEFT */}
           <p className="text-muted-foreground">
-            طراحی شده توسط{" "}
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <span
-                    tabIndex={0}
-                    className="text-[#f5b301] cursor-pointer"
-                  />
-                }
-              >
-                بومیم
-              </TooltipTrigger>
-              <TooltipContent>در دست طراحی</TooltipContent>
-            </Tooltip>
+            توسعه داده شده با استانداردهای زیرساخت و فناوری اطلاعات
           </p>
         </div>
       </div>

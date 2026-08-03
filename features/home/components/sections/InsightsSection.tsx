@@ -1,17 +1,5 @@
 "use client";
 
-/**
- * §3 · خبرها و گفتگوهای داغ
- *
- * The story card and discussion panel are deliberately one interaction:
- * every row is a real approved comment from a different recent News post.
- * The card automatically cycles through their parent stories, pauses to
- * preview a hovered/focused row, and opens a full NewsModal on selection.
- *
- * Full comment threads are intentionally NOT mounted on the homepage. They
- * load only in NewsModal, where posting/replies/votes have one visible live
- * source of truth and do not compete with the initial homepage render.
- */
 import * as React from "react";
 import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
@@ -39,7 +27,6 @@ type InsightsStyle = React.CSSProperties & { "--insights-accent"?: string };
 
 function useReducedMotion() {
   const [reduced, setReduced] = React.useState(false);
-
   React.useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setReduced(query.matches);
@@ -47,20 +34,17 @@ function useReducedMotion() {
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
   }, []);
-
   return reduced;
 }
 
 function useDocumentVisible() {
   const [visible, setVisible] = React.useState(true);
-
   React.useEffect(() => {
     const update = () => setVisible(!document.hidden);
     update();
     document.addEventListener("visibilitychange", update);
     return () => document.removeEventListener("visibilitychange", update);
   }, []);
-
   return visible;
 }
 
@@ -103,9 +87,6 @@ export function InsightsSection({
     !reducedMotion &&
     documentVisible;
 
-  // The rotating default is intentionally paused by any direct interaction,
-  // when the modal is open, in a background tab, and for reduced-motion
-  // visitors. A reader should always be in control of what they are reading.
   React.useEffect(() => {
     if (
       carouselStories.length < 2 ||
@@ -138,9 +119,7 @@ export function InsightsSection({
         />
 
         <div className="grid items-stretch gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-10">
-          {/* The card is a true 1:1 desktop panel. Its compact image/content
-              split keeps the surrounding discussion column level with it. */}
-          <div className="flex min-w-0 flex-col lg:aspect-square">
+          <div className="flex min-w-0 flex-col">
             <LatestStory
               key={activeStory.slug}
               story={activeStory}
@@ -157,7 +136,6 @@ export function InsightsSection({
               onLeavePreview={() => setPreviewSlug(null)}
               onOpenComment={setSelectedComment}
             />
-            <NewsletterCard accentColor={accentColor} />
           </div>
         </div>
 
@@ -173,8 +151,6 @@ export function InsightsSection({
   );
 }
 
-/** The deliberate routes out of the homepage section, aligned in its shared
- * header line so neither desktop column needs an extra action strip. */
 function NewsActions({ header = false }: { header?: boolean }) {
   const toggleSidebar = () => {
     window.dispatchEvent(new CustomEvent("tb_toggle_news_sidebar"));
@@ -213,8 +189,8 @@ function LatestStory({
   const fullScreenHref = `/${story.module}/${story.slug}`;
 
   return (
-    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden bg-[color:var(--hp-surface)] shadow-[var(--hp-shadow-card)]">
-      <div className="relative shrink-0 overflow-hidden bg-muted max-lg:aspect-video lg:h-[48%]">
+    <article className="hp-news-card-swap relative flex h-full min-h-0 flex-col overflow-hidden bg-transparent shadow-[var(--hp-shadow-card)]">
+      <div className="relative shrink-0 overflow-hidden bg-muted aspect-video w-full">
         <RemoteImage
           src={story.image}
           alt={story.title}

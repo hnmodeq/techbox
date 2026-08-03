@@ -1,24 +1,9 @@
 /**
  * §5 · Our Top Picks — Tom's Guide `best-picks--tabbed-`
  *
- * Grid values are TG's own, measured from their live CSS:
- *   --wdn-listv2-gridX: 1.4   (mobile — the 0.4 deliberately peeks the
- *                              next card so the rail reads as scrollable)
- *   --wdn-listv2-gridX: 3     (>= 900px)
- *   gap 10px mobile / 20px desktop
- *
- * TG's cards carry a "Short List Includes" block; ours carries the verdict
- * — score, live price, warranty — because that is the equivalent
- * at-a-glance summary for a product review.
- *
- * The byline is pinned to the bottom with margin-top:auto, exactly as TG
- * does it, so bylines line up across cards of different title lengths.
- *
- * TechBox addition: a footer strip with the live price and a buy link.
- * Neither source can do content→commerce in one hop; we own the checkout.
- *
- * Server Component.
- * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §5
+ * Review section with compact cards, yellow star rating, tooltips for avatar/name,
+ * guarantee badge, and star rating, price on left and shop button on right,
+ * and no card background.
  */
 import * as React from "react";
 import Link from "next/link";
@@ -28,6 +13,7 @@ import { faPrice, faRating, faCount, faDiscountedPrice, isDiscountLive } from "@
 import { Num } from "@/components/ui/num";
 import { RemoteImage } from "@/components/ui/remote-image";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ShieldCheck } from "lucide-react";
 
 export type TopPicksSectionProps = {
   picks: TopPickCard[];
@@ -39,7 +25,6 @@ export type TopPicksSectionProps = {
 };
 
 const HEADING_ID = "hp-toppicks-heading";
-
 type TopPicksStyle = React.CSSProperties & { "--top-picks-accent"?: string };
 
 export function TopPicksSection({
@@ -68,12 +53,6 @@ export function TopPicksSection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      {/*
-        A rail rather than a grid, so the section gets ScrollRail's prev/next
-        chips at both ends and can hold more than three reviews without
-        growing the page. The fractional widths keep TG's "peek the next
-        card" behaviour on touch, where the arrows are hidden.
-      */}
       <ScrollRail label={title} gap={20} arrowsOnMobile>
         {picks.map((pick) => (
           <div
@@ -92,26 +71,27 @@ function PickCard({ pick }: { pick: TopPickCard }) {
   const p = pick.product;
   const live = isDiscountLive(p.discountPercent, p.discountEndsAt);
   const deal = live ? faDiscountedPrice(p.priceAmount, p.discountPercent) : null;
-  const stars = Math.round(pick.rating ?? 0);
+  const ratingValue = pick.rating ?? 0;
+  const stars = Math.round(ratingValue);
 
   return (
-    <article className="hp-card flex h-full flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] transition-shadow duration-200 hover:shadow-[var(--hp-shadow-hover)]">
+    <article className="hp-card flex h-full flex-col overflow-hidden bg-transparent transition-shadow duration-200">
       <Link href={`/${pick.module}/${pick.slug}`} className="group block focus-visible:outline-none">
         <div
-          className="relative w-full overflow-hidden bg-[color:var(--hp-brand-tint)]"
+          className="relative w-full overflow-hidden bg-muted rounded-[var(--hp-r-sm)]"
           style={{ aspectRatio: "16/9" }}
         >
           <RemoteImage
             src={pick.image}
             alt={pick.title}
             sizes="(min-width: 900px) 420px, 71vw"
-            className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
+            className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none object-cover"
           />
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 text-[17px] font-bold leading-[26px] text-[color:var(--hp-ink)]">
+      <div className="flex flex-1 flex-col py-3 px-1">
+        <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)]">
           <Link
             href={`/${pick.module}/${pick.slug}`}
             className="transition-colors hover:text-[color:var(--top-picks-accent)] focus-visible:outline-none"
@@ -121,45 +101,41 @@ function PickCard({ pick }: { pick: TopPickCard }) {
         </h3>
 
         {pick.excerpt && (
-          <p className="mt-1.5 line-clamp-4 text-[13px] leading-[21px] text-[color:var(--hp-ink-3)]">
+          <p className="mt-1.5 line-clamp-4 text-[13px] leading-[22px] text-[color:var(--hp-ink-3)]">
             {pick.excerpt}
           </p>
         )}
 
-        {/* Verdict — our equivalent of TG's "Short List Includes". */}
-        <div className="mt-3">
-          {/* Rating is hidden entirely when null — never defaults to a
-              flattering 5. */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
           {pick.rating != null && (
             <Tooltip>
               <TooltipTrigger
-                render={<div className="flex w-fit cursor-default items-center gap-2" />}
+                render={<div className="flex w-fit cursor-default items-center gap-1.5" />}
               >
                 <span className="flex" aria-hidden="true">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <svg
                       key={n}
-                      width="16"
-                      height="16"
+                      width="14"
+                      height="14"
                       viewBox="0 0 20 20"
-                      className={n <= stars ? "text-[#f9bc00]" : "text-[color:var(--hp-border)]"}
-                      fill="currentColor"
+                      className={n <= stars ? "text-[#f9bc00] fill-[#f9bc00]" : "text-muted-foreground/30 fill-muted-foreground/15"}
                     >
                       <path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
                     </svg>
                   ))}
                 </span>
-                <span className="text-[14px] font-bold text-[color:var(--hp-ink)]">
+                <span className="text-[13px] font-bold text-[color:var(--hp-ink)]">
                   {faRating(pick.rating)}
                 </span>
                 {pick.ratingCount ? (
-                  <span className="text-[12px] text-[color:var(--hp-ink-3)]">
+                  <span className="text-[11px] text-[color:var(--hp-ink-3)]">
                     ({faCount(pick.ratingCount, "رأی")})
                   </span>
                 ) : null}
               </TooltipTrigger>
               <TooltipContent dir="rtl" className="text-right">
-                <p className="font-semibold">امتیاز تکباکس: {faRating(pick.rating)} از ۵</p>
+                <p className="font-semibold">امتیاز: {faRating(pick.rating)} از ۵</p>
                 {pick.ratingCount ? (
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     بر پایهٔ {faCount(pick.ratingCount, "رأی")}
@@ -169,67 +145,74 @@ function PickCard({ pick }: { pick: TopPickCard }) {
             </Tooltip>
           )}
 
-          <ul className="mt-2 space-y-0.5 text-[12px] leading-[20px] text-[color:var(--hp-ink-2)]">
-            {p.model && (
-              <li className="flex gap-1.5">
-                <span aria-hidden="true" className="text-[color:var(--hp-brand)]">•</span>
-                <span>مدل: <Num latin>{p.model}</Num></span>
-              </li>
-            )}
-            {p.warranty && (
-              <li className="flex gap-1.5">
-                <span aria-hidden="true" className="text-[color:var(--hp-brand)]">•</span>
-                <span>گارانتی: {p.warranty}</span>
-              </li>
-            )}
-          </ul>
+          {p.warranty && (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground cursor-default">
+                    <ShieldCheck className="size-3.5 text-emerald-500" />
+                    {p.warranty}
+                  </span>
+                }
+              />
+              <TooltipContent dir="rtl">گارانتی معتبر محصول</TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
-        {/* TG pins the byline to the bottom of the card. */}
         <div className="mt-auto pt-3">
-          <Byline
-            author={{
-              name: pick.author?.name ?? "تحریریه",
-              username: pick.author?.username,
-              role: pick.author?.role,
-              job: pick.author?.job,
-              avatar: pick.author?.avatar,
-            }}
-            date={pick.date_fa}
-            datePrefix="آخرین بروزرسانی"
-            size="md"
-          />
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <div className="w-fit">
+                  <Byline
+                    author={{
+                      name: pick.author?.name ?? "تحریریه",
+                      username: pick.author?.username,
+                      role: pick.author?.role,
+                      job: pick.author?.job,
+                      avatar: pick.author?.avatar,
+                    }}
+                    date={pick.date_fa}
+                    size="sm"
+                    hideRole
+                  />
+                </div>
+              }
+            >
+              <TooltipContent dir="rtl">
+                نویسنده مقاله: {pick.author?.name ?? "تحریریه"}
+              </TooltipContent>
+            </Tooltip>
+          </Tooltip>
         </div>
       </div>
 
-      {/* Content → commerce in one hop. Neither source has a checkout. */}
-      {/* Order is reversed from the obvious reading: the document is RTL, so
-          the FIRST child lands on the right. Button first puts the CTA on the
-          right and the price on the left, which is what was asked for. */}
-      <div className="flex items-center justify-between gap-3 border-t border-[color:var(--hp-border)] bg-[color:var(--hp-brand-tint)] px-5 py-3">
-        <Link
-          href={`/shop/${p.slug}`}
-          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-4 py-2 text-[13px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
-        >
-          ثبت سفارش این محصول از فروشگاه
-        </Link>
-
-        <div className="min-w-0 text-left">
+      {/* Price on left, shop button on right */}
+      <div className="flex items-center justify-between gap-3 border-t border-[color:var(--hp-border)] bg-transparent pt-3 pb-1">
+        <div className="min-w-0 text-right">
           {deal ? (
             <>
-              <p className="hp-numeric truncate text-[17px] font-bold text-[color:var(--hp-ink)]">
+              <p className="hp-numeric truncate text-[15px] font-bold text-[color:var(--hp-ink)]">
                 {deal.now}
               </p>
-              <p className="hp-numeric truncate text-[12px] text-[color:var(--hp-ink-3)] line-through">
+              <p className="hp-numeric truncate text-[11px] text-[color:var(--hp-ink-3)] line-through">
                 {deal.was}
               </p>
             </>
           ) : (
-            <p className="hp-numeric truncate text-[17px] font-bold text-[color:var(--hp-ink)]">
+            <p className="hp-numeric truncate text-[15px] font-bold text-[color:var(--hp-ink)]">
               {faPrice(p.priceAmount) || "تماس بگیرید"}
             </p>
           )}
         </div>
+
+        <Link
+          href={`/shop/${p.slug}`}
+          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-3 py-1.5 text-[12px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
+        >
+          ثبت سفارش این محصول از فروشگاه
+        </Link>
       </div>
     </article>
   );

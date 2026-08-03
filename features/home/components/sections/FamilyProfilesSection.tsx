@@ -1,13 +1,16 @@
 /**
- * §12C · Family profiles rail — "خانوادهٔ تکباکس"
+ * §12C · Family profiles rail — "و همچنین ..."
  *
- * Clean member tiles with no background card and no background badge on collaboration counter.
+ * Clean member tiles with no background card, no badge background,
+ * and correct verified badge support.
  */
 import * as React from "react";
 import Link from "next/link";
 import type { FamilyProfile } from "@/features/home/lib/home-types";
 import { ScrollRail } from "../primitives";
 import { Num } from "@/components/ui/num";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type FamilyProfilesRailProps = {
   profiles: FamilyProfile[];
@@ -46,47 +49,62 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
   const activity = profile.postCount + profile.commentCount;
 
   return (
-    <Link
-      href={`/author/${profile.username}`}
-      className="group flex w-[190px] flex-col items-center p-4 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none"
-    >
-      <span className="mb-3 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)] ring-1 ring-border">
-        {profile.avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={profile.avatar}
-            alt={profile.name}
-            width={80}
-            height={80}
-            loading="lazy"
-            className="h-full w-full object-cover"
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Link
+            href={`/author/${profile.username}`}
+            className="group flex w-[190px] flex-col items-center p-4 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none bg-transparent"
           />
-        ) : (
-          <span
-            aria-hidden="true"
-            className="flex h-full w-full items-center justify-center text-2xl font-bold text-[color:var(--hp-ink-3)]"
-          >
-            {profile.name.trim()[0] ?? "؟"}
+        }
+      >
+        <span className="mb-3 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)] ring-1 ring-border">
+          {profile.avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={profile.avatar}
+              alt={profile.name}
+              width={80}
+              height={80}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="flex h-full w-full items-center justify-center text-2xl font-bold text-[color:var(--hp-ink-3)]"
+            >
+              {profile.name.trim()[0] ?? "؟"}
+            </span>
+          )}
+        </span>
+
+        <p className="w-full flex items-center justify-center gap-1 truncate text-[15px] font-bold leading-6 text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
+          {profile.name}
+          {profile.verifiedType && (
+            <VerifiedBadge
+              type={profile.verifiedType as "content" | "org" | "user"}
+              size={14}
+            />
+          )}
+        </p>
+
+        {profile.job && (
+          <p className="mt-0.5 line-clamp-2 text-[12px] leading-[18px] text-[color:var(--hp-ink-3)]">
+            {profile.job}
+          </p>
+        )}
+
+        {activity > 0 && (
+          <span className="mt-2 text-[11px] text-[color:var(--hp-ink-3)] bg-transparent">
+            <Num>{activity}</Num> مشارکت
           </span>
         )}
-      </span>
-
-      <p className="w-full truncate text-[15px] font-bold leading-6 text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--hp-brand)]">
-        {profile.name}
-      </p>
-
-      {profile.job && (
-        <p className="mt-0.5 line-clamp-2 text-[12px] leading-[18px] text-[color:var(--hp-ink-3)]">
-          {profile.job}
-        </p>
-      )}
-
-      {activity > 0 && (
-        <span className="mt-2 text-[11px] text-[color:var(--hp-ink-3)]">
-          <Num>{activity}</Num> مشارکت
-        </span>
-      )}
-    </Link>
+      </TooltipTrigger>
+      <TooltipContent dir="rtl">
+        {profile.name} — {profile.job || "عضو انجمن"}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { TimelineEvent } from '@/types/timeline';
 import { TimelineCard } from './TimelineCard';
 import { TimelineSuggestions } from './TimelineSuggestions';
 import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-// ─── Constants ──────────────────────────────────────────────────────────────
-const SPACER_H = 24;   // h-6
-const DOT_SIZE = 16;   // size-4
-const DOT_GAP  = 16;   // mt-4
+const SPACER_H = 24;
+const DOT_SIZE = 16;
+const DOT_GAP  = 16;
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
   if (isNaN(d.getTime())) return '';
@@ -26,8 +24,6 @@ function relativeDate(dateGr: Date | string): string {
   const years = Math.floor(days / 365.2425);
   return `${years.toLocaleString('fa-IR')} سال پیش`;
 }
-
-// ─── Sub-components ─────────────────────────────────────────────────────────
 
 function TodayMarker() {
   return (
@@ -54,25 +50,20 @@ function EventItem({ event, index }: { event: TimelineEvent; index: number }) {
       data-parallax
       data-event-index={index}
     >
-      {/* Date label */}
       <div className="mb-2 text-center text-xs font-bold text-muted-foreground h-6 flex items-center justify-center">
         {relativeDate(event.dateGr)}
       </div>
 
-      {/* Dot — sits on the line */}
       <div className="relative z-10 flex items-center justify-center">
         <div className="size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
       </div>
 
-      {/* Card */}
       <div className="mt-4">
         <TimelineCard event={event} importance={event.importance} />
       </div>
     </motion.div>
   );
 }
-
-// ─── Main Component ─────────────────────────────────────────────────────────
 
 interface TimelineContainerProps {
   events: TimelineEvent[];
@@ -82,10 +73,7 @@ interface TimelineContainerProps {
 export function TimelineContainer({ events, heightClassName }: TimelineContainerProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [topPad, setTopPad] = useState(0);
-  const [canScrollTowardOlder, setCanScrollTowardOlder] = useState(false);
-  const [canScrollTowardNewer, setCanScrollTowardNewer] = useState(false);
 
-  // ── Vertical centering ──
   useEffect(() => {
     const update = () => {
       const el = scrollRef.current;
@@ -100,27 +88,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     return () => { window.removeEventListener('resize', update); clearTimeout(t); };
   }, []);
 
-  // ── Scroll state ──
-  const checkScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    const absLeft = Math.abs(el.scrollLeft);
-    setCanScrollTowardNewer(absLeft > 10);
-    setCanScrollTowardOlder(absLeft < maxScroll - 10);
-  }, []);
-
-  useEffect(() => {
-    checkScroll();
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', checkScroll, { passive: true });
-    window.addEventListener('resize', checkScroll);
-    const t = setTimeout(checkScroll, 200);
-    return () => { el.removeEventListener('scroll', checkScroll); window.removeEventListener('resize', checkScroll); clearTimeout(t); };
-  }, [checkScroll]);
-
-  // ── Keyboard navigation ──
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       const el = scrollRef.current;
@@ -135,36 +102,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  // ── Parallax depth ──
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    let rafId: number;
-    const handleScroll = () => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        const rect = el.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        el.querySelectorAll<HTMLElement>('[data-parallax]').forEach((card) => {
-          const cardRect = card.getBoundingClientRect();
-          const cardCenterX = cardRect.left + cardRect.width / 2;
-          const dist = Math.abs(cardCenterX - centerX);
-          const maxDist = rect.width / 2;
-          const t = Math.min(dist / maxDist, 1);
-          const scale = 1 + (1 - t) * 0.025;
-          const opacity = 0.65 + (1 - t) * 0.35;
-          card.style.transform = `scale(${scale})`;
-          card.style.opacity = String(opacity);
-          card.style.transition = 'transform 0.15s ease-out, opacity 0.15s ease-out';
-        });
-      });
-    };
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => { el.removeEventListener('scroll', handleScroll); cancelAnimationFrame(rafId); };
-  }, [events]);
-
-  // ── Find the event card closest to viewport center ──
   const findCenteredIndex = useCallback((): number => {
     const el = scrollRef.current;
     if (!el) return 0;
@@ -179,7 +116,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     return closest >= 0 ? closest : 0;
   }, []);
 
-  // ── Scroll to a specific event by index ──
   const scrollToEvent = useCallback((index: number) => {
     const el = scrollRef.current;
     if (!el) return;
@@ -191,7 +127,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     el.scrollBy({ left: offset, behavior: 'smooth' });
   }, []);
 
-  // ── Navigation actions ──
   const scrollToOldest = () => scrollRef.current?.scrollTo({ left: -(scrollRef.current.scrollWidth - scrollRef.current.clientWidth), behavior: 'smooth' });
   const scrollToToday = () => scrollRef.current?.scrollTo({ left: 0, behavior: 'smooth' });
   const scrollToPrev = () => { const idx = findCenteredIndex(); if (idx > 0) scrollToEvent(idx - 1); };
@@ -200,20 +135,20 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const lineTop = topPad + SPACER_H + DOT_SIZE / 2;
 
   return (
-    <div className="relative flex flex-col w-full" dir="rtl" style={{ gap: 0 }}>
-      {/* Same faded grid texture the homepage timeline band uses, so the two
-          surfaces read as one feature rather than two designs. */}
+    <div className="relative flex flex-col w-full bg-white dark:bg-black text-foreground overflow-hidden" dir="rtl">
+      {/* Grid texture with smoothly faded top, bottom, left, and right */}
       <div
         aria-hidden="true"
-        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.04]"
+        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.14]"
         style={{
-          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+          maskComposite: "intersect",
+          WebkitMaskComposite: "source-in",
         }}
       />
 
-      {/* Row 1: Navigation buttons */}
-      <div className="flex items-center pt-30 pb-10 justify-center gap-5">
+      <div className="relative z-10 flex items-center pt-10 pb-6 justify-center gap-5">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <ChevronsRight className="size-3.5" /> امروز
         </button>
@@ -231,12 +166,11 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         </button>
       </div>
 
-      {/* Row 2: Timeline */}
       <div
         ref={scrollRef}
         tabIndex={0}
         dir="rtl"
-        className={`relative w-full overflow-x-auto overflow-y-hidden bg-background text-foreground outline-none h-120`}
+        className={`relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none ${heightClassName || 'h-[500px]'}`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         <style>{`div::-webkit-scrollbar { display: none; }`}</style>
@@ -246,29 +180,25 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
           style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
           onDragStart={(e) => e.preventDefault()}
         >
-          {/* Continuous horizontal line */}
           <div
             className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
             style={{ top: lineTop, width: '100%' }}
           />
 
-          {/* Today marker */}
           <TodayMarker />
 
-          {/* Events */}
           {events.map((event, index) => (
             <EventItem key={event.id} event={event} index={index} />
           ))}
 
-          {/* Suggestion box */}
           <TimelineSuggestions />
         </div>
       </div>
 
-      {/* Row 3: Event counter */}
-      <p className="text-center pb-50 text-[10px] text-muted-foreground">
+      <p className="relative z-10 text-center pb-8 pt-6 text-[11px] text-muted-foreground">
         {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
       </p>
     </div>
   );
 }
+export default TimelineContainer;
