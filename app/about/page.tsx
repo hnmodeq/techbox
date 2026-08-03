@@ -1,6 +1,7 @@
 import * as React from "react";
 import { pageMetadata } from "@/lib/seo";
 import { prisma } from "@/lib/db";
+import { sanitizeAdminHtml } from "@/lib/sanitize-html";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -41,7 +42,7 @@ export default async function AboutPage() {
         <div className="max-w-5xl mx-auto px-4 py-16 sm:py-20 relative">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">درباره تکباکس</h1>
           {description ? (
-            <div className="mt-4 prose prose-sm max-w-2xl leading-7 text-muted-foreground" dangerouslySetInnerHTML={{ __html: description }} />
+            <div className="mt-4 prose prose-sm max-w-2xl leading-7 text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeAdminHtml(description) }} />
           ) : (
             <p className="mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl leading-7">
               رسانه تخصصی فناوری اطلاعات، زیرساخت، شبکه، سرور، ذخیره‌سازی و امنیت — برای مهندسان ایرانی

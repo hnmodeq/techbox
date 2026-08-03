@@ -36,3 +36,12 @@ uploads/
 test-check.*
 readme/data.md
 readme/tree.md
+
+# Local prompt/scratch notes. readme/next-prompts.txt leaked a Neon password
+# and a GitHub PAT into history once — these files stay local, permanently.
+readme/next-prompts.txt
+readme/temporary
+readme/*.local.*
+*.secrets
+.secrets/
+gitleaks.sarif

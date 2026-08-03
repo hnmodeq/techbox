@@ -1,0 +1,54 @@
+# Gitleaks configuration for TechBox.
+#
+# This exists because real credentials reached this repository's history once
+# already (a Neon database password and a GitHub PAT, via readme/next-prompts.txt).
+# Rotation fixed the exposure; this file is what stops the next one, because
+# "remember not to paste secrets" is not a control.
+
+[extend]
+# Start from the upstream ruleset — AWS keys, GitHub tokens, Slack tokens,
+# private keys, and ~150 other providers.
+useDefault = true
+
+[[rules]]
+id = "neon-postgres-password"
+description = "Neon/PostgreSQL connection string with an inline password"
+regex = '''postgres(?:ql)?://[A-Za-z0-9_.-]+:(?!password\b|PASSWORD\b|YOUR_PASSWORD\b|p\b)[^\s:@/]{8,}@[A-Za-z0-9.-]+'''
+tags = ["database", "credential"]
+
+[[rules]]
+id = "neon-role-password"
+description = "Neon role password (npg_ prefix)"
+regex = '''npg_[A-Za-z0-9]{16,}'''
+tags = ["database", "credential"]
+
+[[rules]]
+id = "supabase-service-role-key"
+description = "Supabase service-role JWT — server-only, never NEXT_PUBLIC_"
+regex = '''eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}'''
+tags = ["supabase", "credential"]
+
+[[rules]]
+id = "auth-secret-assignment"
+description = "AUTH_SECRET assigned a real-looking value"
+regex = '''AUTH_SECRET\s*=\s*["']?(?!ci-only|your-|change-me|placeholder)[A-Za-z0-9+/=_-]{24,}'''
+tags = ["session", "credential"]
+
+[allowlist]
+description = "Documentation placeholders and test fixtures"
+paths = [
+  '''\.env\.example$''',
+  '''^docs/''',
+  '''^README\.md$''',
+  '''^CONTRIBUTING\.md$''',
+  '''^SECURITY\.md$''',
+  '''^\.gitleaks\.toml$''',
+  '''^tests/unit/db-pool-config\.test\.ts$''',
+]
+regexes = [
+  '''YOUR_PASSWORD''',
+  '''YOURPROJECT''',
+  '''postgresql://user:password@''',
+  '''postgresql://u:p@''',
+  '''ci-only-auth-secret''',
+]
