@@ -1,17 +1,7 @@
 /**
  * §12C · Family profiles rail — "خانوادهٔ تکباکس"
  *
- * A random sample of ordinary community members. Staff are excluded on
- * purpose: they already appear in the authors rail above, and showing them
- * twice would make the community look smaller than it is.
- *
- * Rendered inside WebsiteInfoSection, which owns the band and the heading
- * landmark, so this exports a bare rail rather than its own <section>.
- *
- * Card follows the Spiceworks member-tile pattern: circular avatar, handle,
- * one line of context, and a small activity stat.
- *
- * Server Component (ScrollRail is the client part).
+ * Clean member tiles with no background card and no background badge on collaboration counter.
  */
 import * as React from "react";
 import Link from "next/link";
@@ -58,9 +48,9 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
   return (
     <Link
       href={`/author/${profile.username}`}
-      className="group flex w-[190px] flex-col items-center rounded-[var(--hp-r-md)] p-5 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none"
+      className="group flex w-[190px] flex-col items-center p-4 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none"
     >
-      <span className="mb-3 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)]">
+      <span className="mb-3 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)] ring-1 ring-border">
         {profile.avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -91,12 +81,8 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
         </p>
       )}
 
-      <p className="mt-2 text-[11px] leading-4 text-[color:var(--hp-ink-3)]">
-        {profile.memberSince && <>عضو از {profile.memberSince}</>}
-      </p>
-
       {activity > 0 && (
-        <span className="mt-2 px-2 py-0.5 text-[11px] text-[color:var(--hp-ink-3)]">
+        <span className="mt-2 text-[11px] text-[color:var(--hp-ink-3)]">
           <Num>{activity}</Num> مشارکت
         </span>
       )}

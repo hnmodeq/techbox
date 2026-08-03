@@ -203,7 +203,14 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
     <div className="relative flex flex-col w-full" dir="rtl" style={{ gap: 0 }}>
       {/* Same faded grid texture the homepage timeline band uses, so the two
           surfaces read as one feature rather than two designs. */}
-      <div aria-hidden="true" className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.04]" />
+      <div
+        aria-hidden="true"
+        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+        }}
+      />
 
       {/* Row 1: Navigation buttons */}
       <div className="flex items-center pt-30 pb-10 justify-center gap-5">

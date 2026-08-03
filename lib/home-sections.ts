@@ -967,7 +967,12 @@ export async function getAuthors(): Promise<AuthorCard[]> {
   const rows = await prisma.user.findMany({
     where: {
       status: "active",
-      // No ghost authors: a contributor card requires actual contributions.
+      OR: [
+        { roleFa: { contains: "تحریریه" } },
+        { job: { contains: "تحریریه" } },
+        { role: "editor" },
+        { username: "atiyehatami" },
+      ],
       posts: { some: PUBLISHED },
     },
     orderBy: { posts: { _count: "desc" } },
@@ -1036,6 +1041,14 @@ export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
     "designer",
     "social_manager",
     "sales_specialist",
+    "تیم تحریریه",
+    "تیم محتوای چند رسانه ای",
+    "تیم طراحی گرافیک",
+    "کارشناس فنی",
+    "کارشناس فروش",
+    "تیم مارکتینگ",
+    "تیم پشتیبانی",
+    "تیم مدیریت",
   ];
 
   const rows = await prisma.user.findMany({

@@ -1,25 +1,14 @@
 /**
  * §6 · Timeline — TechBox original
  *
- * Deliberately NOT copied from Spiceworks or Tom's Guide. This is the
- * section that makes the homepage feel like TechBox rather than a clone,
- * and it is the palate cleanser between Top Picks (white cards) and the
- * commerce run that follows.
- *
- * A dark full-bleed band with a horizontal year rail. Cards alternate
- * above and below a centre line — the classic timeline zigzag.
- *
- * RTL: oldest event sits on the RIGHT, newer ones scroll leftward, which
- * matches the reading direction.
- *
- * Server Component (ScrollRail is the client part).
- * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §6
+ * Uses the full interactive TimelineContainer from /timeline page,
+ * backed by the grid background with smoothly faded top and bottom.
  */
 import * as React from "react";
 import type { TimelineCard } from "@/features/home/lib/home-types";
-import { ScrollRail, SectionHeader } from "../primitives";
-import { Num } from "@/components/ui/num";
-import { RemoteImage } from "@/components/ui/remote-image";
+import { TimelineContainer } from "@/features/timeline/components/TimelineContainer";
+import type { TimelineEvent } from "@/types/timeline";
+import { SectionHeader } from "../primitives";
 
 export type TimelineSectionProps = {
   events: TimelineCard[];
@@ -31,10 +20,7 @@ export type TimelineSectionProps = {
 };
 
 const HEADING_ID = "hp-timeline-heading";
-/** Fewer than this and a "timeline" reads as a couple of stray cards. */
 const MIN_EVENTS = 4;
-/** Events at or above this importance get the accent treatment. */
-const HIGHLIGHT = 9;
 
 export function TimelineSection({
   events,
@@ -46,17 +32,37 @@ export function TimelineSection({
 }: TimelineSectionProps) {
   if (!events || events.length < MIN_EVENTS) return null;
 
+  const timelineEvents: TimelineEvent[] = events.map((e) => ({
+    id: e.id,
+    title: e.title,
+    description: e.description,
+    image: e.image,
+    dateGr: e.dateGr || new Date(),
+    dateFa: e.dateFa || "",
+    year: e.year || 1400,
+    yearFa: e.yearFa || 1400,
+    importance: e.importance || 5,
+    tags: e.tags || [],
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    likesCount: (e as any).likesCount ?? e.likes ?? 0,
+    commentsCount: (e as any).commentsCount ?? 0,
+  }));
+
   return (
     <section
       aria-labelledby={HEADING_ID}
-      className="relative w-full overflow-hidden bg-[color:var(--hp-brand-ink)] py-14 lg:py-20"
+      className="relative w-full overflow-hidden bg-[color:var(--hp-brand-ink)] py-14 lg:py-20 text-[color:var(--hp-on-brand)]"
     >
-      {/* Faint grid texture; purely decorative.
-          Masked so the lines dissolve into the band at the top and bottom
-          rather than stopping on a hard edge. */}
+      {/* Grid texture with smoothly faded top and bottom */}
       <div
         aria-hidden="true"
-        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.04]"
+        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+        }}
       />
 
       <div className="relative mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
@@ -74,85 +80,11 @@ export function TimelineSection({
         )}
         {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-        <div className="relative">
-          {/* The spine the year chips sit on. */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-white/20"
-          />
-          <ScrollRail label={title} gap={16} railClassName="items-stretch py-2">
-            {events.map((e, i) => (
-              <TimelineItem key={e.id} event={e} flip={i % 2 === 1} />
-            ))}
-          </ScrollRail>
+        <div className="relative rounded-[var(--hp-r-lg)] bg-black/20 p-2 sm:p-6 backdrop-blur-md border border-white/10">
+          <TimelineContainer events={timelineEvents} />
         </div>
-
       </div>
     </section>
-  );
-}
-
-function TimelineItem({ event, flip }: { event: TimelineCard; flip: boolean }) {
-  const highlight = event.importance >= HIGHLIGHT;
-
-  return (
-    <article className={`flex w-[260px] flex-col ${flip ? "justify-end" : "justify-start"}`}>
-      {/* Zigzag: alternate cards sit below the spine. */}
-      {flip && <YearMarker year={event.yearFa} highlight={highlight} />}
-
-      <div
-        className={`hp-card rounded-[var(--hp-r-md)] border bg-white/[0.06] p-4 backdrop-blur-sm transition-colors dark:bg-white/[0.04] ${
-          highlight
-            ? "border-white/45 shadow-[0_0_24px_oklch(1_0_0/0.12)]"
-            : "border-white/[0.12] hover:border-white/25"
-        }`}
-      >
-        {event.image && (
-          <div
-            className="relative mb-3 w-full overflow-hidden rounded-[var(--hp-r-sm)] bg-white/10"
-            style={{ aspectRatio: "16/9" }}
-          >
-            <RemoteImage src={event.image} alt={event.title} sizes="260px" />
-          </div>
-        )}
-
-        <h3 className="line-clamp-2 text-[15px] font-bold leading-[22px] text-[color:var(--hp-on-brand)]">
-          {event.title}
-        </h3>
-        <p className="mt-1 line-clamp-2 text-[13px] leading-[20px] text-[color:var(--hp-on-brand-mut)]">
-          {event.description}
-        </p>
-
-        <div className="mt-3 flex items-center gap-3 text-[12px] text-[color:var(--hp-on-brand-mut)]">
-          <span lang="en" dir="ltr">{event.year}</span>
-          {event.likes > 0 && (
-            <span className="flex items-center gap-1">
-              <span aria-hidden="true">♥</span>
-              <Num>{event.likes}</Num>
-            </span>
-          )}
-        </div>
-      </div>
-
-      {!flip && <YearMarker year={event.yearFa} highlight={highlight} />}
-    </article>
-  );
-}
-
-function YearMarker({ year, highlight }: { year: number; highlight: boolean }) {
-  return (
-    <div className="flex flex-col items-center py-2">
-      <span aria-hidden="true" className="h-6 w-px bg-white/30" />
-      <span
-        className={`grid h-9 min-w-9 place-items-center rounded-full px-2 text-[12px] font-bold ${
-          highlight
-            ? "bg-white text-[color:var(--hp-brand-ink)]"
-            : "bg-white/15 text-[color:var(--hp-on-brand)]"
-        }`}
-      >
-        <Num>{year}</Num>
-      </span>
-    </div>
   );
 }
 
