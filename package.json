@@ -104,13 +104,5 @@
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   },
-  "packageManager": "pnpm@10.12.1",
-  "pnpm": {
-    "overrides": {
-      "postcss": "^8.5.25",
-      "sharp": "^0.35.3",
-      "fast-uri": "^3.1.4",
-      "brace-expansion": "^1.1.17"
-    }
-  }
+  "packageManager": "pnpm@10.12.1"
 }
