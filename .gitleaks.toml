@@ -4,6 +4,9 @@
 # already (a Neon database password and a GitHub PAT, via readme/next-prompts.txt).
 # Rotation fixed the exposure; this file is what stops the next one, because
 # "remember not to paste secrets" is not a control.
+#
+# NOTE ON REGEX DIALECT: gitleaks compiles patterns with Go's RE2, which has no
+# lookahead/lookbehind. Exclusions belong in [allowlist], not in the pattern.
 
 [extend]
 # Start from the upstream ruleset — AWS keys, GitHub tokens, Slack tokens,
@@ -11,15 +14,17 @@
 useDefault = true
 
 [[rules]]
-id = "neon-postgres-password"
-description = "Neon/PostgreSQL connection string with an inline password"
-regex = '''postgres(?:ql)?://[A-Za-z0-9_.-]+:(?!password\b|PASSWORD\b|YOUR_PASSWORD\b|p\b)[^\s:@/]{8,}@[A-Za-z0-9.-]+'''
-tags = ["database", "credential"]
-
-[[rules]]
 id = "neon-role-password"
 description = "Neon role password (npg_ prefix)"
 regex = '''npg_[A-Za-z0-9]{16,}'''
+tags = ["database", "credential"]
+
+[[rules]]
+id = "postgres-inline-password"
+description = "PostgreSQL connection string with an inline password"
+# Placeholder forms (user:password@, u:p@, :YOUR_PASSWORD@) are filtered by the
+# allowlist below rather than by a lookahead, which RE2 does not support.
+regex = '''postgres(?:ql)?://[A-Za-z0-9_.-]+:[^\s:@/]{6,}@[A-Za-z0-9.-]+'''
 tags = ["database", "credential"]
 
 [[rules]]
@@ -31,11 +36,11 @@ tags = ["supabase", "credential"]
 [[rules]]
 id = "auth-secret-assignment"
 description = "AUTH_SECRET assigned a real-looking value"
-regex = '''AUTH_SECRET\s*=\s*["']?(?!ci-only|your-|change-me|placeholder)[A-Za-z0-9+/=_-]{24,}'''
+regex = '''AUTH_SECRET\s*=\s*["']?[A-Za-z0-9+/=_-]{24,}'''
 tags = ["session", "credential"]
 
 [allowlist]
-description = "Documentation placeholders and test fixtures"
+description = "Documentation placeholders, fixtures, and CI-only values"
 paths = [
   '''\.env\.example$''',
   '''^docs/''',
@@ -43,12 +48,27 @@ paths = [
   '''^CONTRIBUTING\.md$''',
   '''^SECURITY\.md$''',
   '''^\.gitleaks\.toml$''',
+  '''^\.github/workflows/''',
   '''^tests/unit/db-pool-config\.test\.ts$''',
 ]
+# Anything matching one of these is a documented placeholder, a unit-test
+# fixture, or the ephemeral CI database — never a real credential.
 regexes = [
   '''YOUR_PASSWORD''',
   '''YOURPROJECT''',
-  '''postgresql://user:password@''',
-  '''postgresql://u:p@''',
+  '''PASSWORD@''',
+  '''postgres(?:ql)?://user:password@''',
+  '''postgres(?:ql)?://u:p@''',
+  '''postgres(?:ql)?://techbox:techbox@''',
   '''ci-only-auth-secret''',
+  '''your-super-secret''',
+  '''change-me''',
+  '''placeholder''',
+]
+# Browser storage keys look like generic API keys to the default ruleset.
+# `tb_compare_v1` is a localStorage key, not a credential.
+stopwords = [
+  "tb_compare_v1",
+  "tb_session",
+  "takbox-theme",
 ]
