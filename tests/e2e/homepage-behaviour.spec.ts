@@ -115,10 +115,16 @@ test.describe('homepage behaviour (replaces source-text assertions)', () => {
     const ticker = page.locator('[class*="ticker"]').first();
     if (!(await ticker.count())) test.skip(true, 'no ticker rendered');
 
-    const emptyItems = await ticker.evaluate((el) =>
-      [...el.querySelectorAll('a,span')].filter((n) => !(n.textContent || '').trim()).length,
+    // Only the announcement links carry meaning. Separator dots, icon
+    // wrappers and the aria-hidden marquee duplicate are intentionally
+    // textless, so counting every <span> flags 20 false positives.
+    const emptyLinks = await ticker.evaluate((el) =>
+      [...el.querySelectorAll('a[href]')]
+        .filter((a) => !a.closest('[aria-hidden="true"]'))
+        .filter((a) => !(a.textContent || '').trim())
+        .map((a) => a.getAttribute('href') || '(no href)'),
     );
-    expect(emptyItems, 'ticker items should always carry text').toBe(0);
+    expect(emptyLinks, `ticker links with no label:\n${emptyLinks.join('\n')}`).toEqual([]);
   });
 
   test('every section that renders has a labelled heading in the a11y tree', async ({ page }) => {
