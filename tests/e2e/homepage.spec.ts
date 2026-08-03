@@ -138,8 +138,33 @@ test.describe('homepage', () => {
 
     // Catches the class of bug introduced when --primary flipped to
     // near-white in dark mode: text painted the same colour as its parent.
+    //
+    // Colours are resolved through a canvas rather than parsed out of the
+    // computed-style string. Tailwind v4 emits oklch(), so the old
+    // `c.match(/[\d.]+/g).slice(0,3)` read `oklch(0.985 0 0)` as the numbers
+    // [0.985, 0, 0] and compared them against an 0-255 threshold — every
+    // element on the page looked "indistinguishable" no matter how much
+    // contrast it actually had. Painting the colour and reading the pixel
+    // back gives real sRGB for any notation the browser supports.
     const invisible = await page.evaluate(() => {
-      const parse = (c: string) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+
+      const cache = new Map<string, [number, number, number, number]>();
+      const parse = (c: string): [number, number, number, number] => {
+        const hit = cache.get(c);
+        if (hit) return hit;
+        ctx.clearRect(0, 0, 1, 1);
+        ctx.fillStyle = '#000';
+        ctx.fillStyle = c; // invalid values leave the previous value in place
+        ctx.fillRect(0, 0, 1, 1);
+        const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
+        const out: [number, number, number, number] = [r, g, b, a / 255];
+        cache.set(c, out);
+        return out;
+      };
+
       const bad: string[] = [];
       for (const el of [...document.querySelectorAll('h2,h3,p,a,button,span')].slice(0, 400)) {
         const text = (el.textContent || '').trim();
@@ -147,19 +172,44 @@ test.describe('homepage', () => {
         const s = getComputedStyle(el);
         if (s.visibility === 'hidden' || s.display === 'none' || Number(s.opacity) < 0.1) continue;
 
+        // Walk up for the first opaque background. An element sitting on a
+        // photo or gradient has no solid colour to compare against, so skip
+        // it rather than guess — those are covered by the contrast audit,
+        // not by this smoke check.
         let bgEl: Element | null = el;
-        let bg = 'rgba(0, 0, 0, 0)';
+        let bg: [number, number, number, number] | null = null;
+        let overMedia = false;
         while (bgEl) {
-          const c = getComputedStyle(bgEl).backgroundColor;
-          if (c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent') { bg = c; break; }
+          const cs = getComputedStyle(bgEl);
+          if (cs.backgroundImage && cs.backgroundImage !== 'none') { overMedia = true; break; }
+          const c = parse(cs.backgroundColor);
+          if (c[3] > 0.95) { bg = c; break; }
           bgEl = bgEl.parentElement;
         }
-        const [fr, fg, fb] = parse(s.color);
-        const [br, bg2, bb] = parse(bg);
-        if ([fr, fg, fb, br, bg2, bb].some((n) => Number.isNaN(n))) continue;
-        const lum = (r: number, g: number, b: number) => 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        if (Math.abs(lum(fr, fg, fb) - lum(br, bg2, bb)) < 12) {
-          bad.push(`${el.tagName}: "${text.slice(0, 40)}"`);
+        if (overMedia) continue;
+        // Nothing opaque all the way up: the page background applies.
+        if (!bg) bg = parse(getComputedStyle(document.body).backgroundColor);
+        if (bg[3] < 0.95) continue;
+
+        const [fr, fg, fb, fa] = parse(s.color);
+        if (fa < 0.5) continue; // deliberately faded text is not a contrast bug
+        const [br, bg2, bb] = bg;
+
+        // WCAG relative luminance + contrast ratio, rather than a raw
+        // difference of weighted sums. 1.6:1 is far below AA (4.5:1) — this
+        // test is looking for text that is genuinely invisible, not text
+        // that merely reads low-contrast.
+        const chan = (v: number) => {
+          const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+        };
+        const rl = (r: number, g: number, b: number) =>
+          0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
+        const l1 = rl(fr, fg, fb);
+        const l2 = rl(br, bg2, bb);
+        const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        if (ratio < 1.6) {
+          bad.push(`${el.tagName}: "${text.slice(0, 40)}" (contrast ${ratio.toFixed(2)}:1)`);
         }
       }
       return bad;
@@ -176,9 +226,32 @@ test.describe('homepage', () => {
           if (img.getAttribute('width') && img.getAttribute('height')) return false;
           const own = getComputedStyle(img).aspectRatio;
           if (own && own !== 'auto') return false;
-          const parent = img.parentElement;
-          const p = parent ? getComputedStyle(parent).aspectRatio : 'auto';
-          return !p || p === 'auto';
+
+          // A next/image `fill` is absolutely positioned and stretched to its
+          // container, so it contributes no layout of its own and cannot
+          // shift anything. What matters is that the container reserves the
+          // space — via aspect-ratio, an explicit height, or min-height.
+          // The old check only looked at the immediate parent's
+          // aspect-ratio, so it flagged ShopProductCard and NewsSidebarCard,
+          // which reserve space with `aspect-[4/3]` on a wrapper and
+          // `min-h-[300px]` respectively. Both are correct; the assertion
+          // was not. It only surfaced once the E2E database had real
+          // products to render.
+          const cs = getComputedStyle(img);
+          const filled = cs.position === 'absolute' || cs.position === 'fixed';
+
+          let node: HTMLElement | null = filled ? img.parentElement : img;
+          for (let depth = 0; node && depth < 4; depth += 1, node = node.parentElement) {
+            const ncs = getComputedStyle(node);
+            if (ncs.aspectRatio && ncs.aspectRatio !== 'auto') return false;
+            if (parseFloat(ncs.minHeight) > 0) return false;
+            // An explicit, non-auto height also reserves the box.
+            if (ncs.height !== 'auto' && parseFloat(ncs.height) > 0 && node !== img) {
+              const inline = node.style.height || '';
+              if (inline || ncs.flexGrow === '0') return false;
+            }
+          }
+          return true;
         })
         .map((img) => img.getAttribute('src')?.slice(0, 70) || '(no src)'),
     );
