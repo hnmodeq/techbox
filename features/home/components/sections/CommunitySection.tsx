@@ -142,11 +142,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
 
   return (
     <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--hp-surface)] p-6 dark:bg-[color:color-mix(in_oklch,var(--hp-surface)_86%,white)]">
-      <div className="flex min-w-0 items-center">
-        <TopicActivity topic={topic} />
-      </div>
-
-      <h3 className="mt-3 text-[22px] font-bold leading-[34px] text-[color:var(--hp-ink)]">
+      <h3 className="text-[22px] font-bold leading-[34px] text-[color:var(--community-accent)]">
         <Link
           href={`/${topic.module}/${topic.slug}`}
           className="transition-colors hover:text-[color:var(--community-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -161,23 +157,24 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
         </p>
       )}
 
+      <div className="mt-3">
+        <TopicActivity topic={topic} />
+      </div>
+
       {answer?.text ? (
         <div className="relative mt-5 p-4 ps-6">
           <span
             aria-hidden="true"
             className="absolute inset-y-4 start-2 w-1 rounded-full bg-[color:var(--hp-solved)]"
           />
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="flex items-center gap-1.5 text-[12px] font-bold text-[color:var(--hp-solved)]">
-              <CheckCircle2 className="size-4" aria-hidden="true" />
-              پاسخ برتر
-            </p>
-            {answer.date && <RelativeDate date={answer.date} className="text-[11px] text-[color:var(--hp-ink-3)]" />}
-          </div>
+          <p className="flex items-center gap-1.5 text-[12px] font-bold text-[color:var(--hp-solved)]">
+            <CheckCircle2 className="size-4" aria-hidden="true" />
+            پاسخ برتر
+          </p>
           <p className="mt-2 line-clamp-4 text-[14px] leading-[24px] text-[color:var(--hp-ink-2)]">
             {answer.text}
           </p>
-          <div className="mt-3">
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-2">
             <AuthorLink
               name={answer.author.name}
               username={answer.author.username}
@@ -185,6 +182,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
               job={answer.author.job}
               className="[&>div:last-child>div>span]:text-[12px]"
             />
+            {answer.date && <RelativeDate date={answer.date} className="text-[11px] text-[color:var(--hp-ink-3)]" />}
           </div>
         </div>
       ) : (
@@ -305,8 +303,8 @@ function TopicActivity({
   const date = activity?.date ?? topic.date;
 
   return (
-    <div className="flex min-w-0 w-full flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--hp-ink-3)] lg:flex-nowrap">
-      <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+    <div className="flex min-w-0 w-full flex-wrap items-end gap-x-3 gap-y-1 text-[12px] text-[color:var(--hp-ink-3)] lg:flex-nowrap">
+      <div className="flex min-w-0 flex-wrap items-end gap-x-2 gap-y-1">
         <AuthorLink
           name={author?.name}
           username={author?.username}
@@ -315,7 +313,6 @@ function TopicActivity({
           verifiedType={author?.verifiedType}
           className="[&>div:first-child]:size-7 [&>div:last-child>div>span]:text-[12px]"
         />
-        <span aria-hidden="true">•</span>
         <RelativeDate date={date} className="text-[12px] text-[color:var(--hp-ink-3)]" />
       </div>
       {showSummary && <TopicSummary topic={topic} />}
