@@ -53,6 +53,7 @@ model User {
 
   // Role system
   userRoles UserRole[]
+  teamMemberships TeamMember[]
 
   @@index([role, status], name: "user_role_status_idx")
   @@index([status], name: "user_status_idx")
@@ -726,6 +727,18 @@ model TeamSection {
 model TeamMember {
   id        String   @id @default(cuid())
   sectionId String
+  /// Optional link to a real account.
+  ///
+  /// The admin panel already accepted a userId to copy name/job/avatar from,
+  /// but threw it away afterwards, leaving rows that were plain text. Storing
+  /// it lets a team section resolve to actual users — needed for "show only
+  /// تیم تحریریه members" on the homepage, where a card has to link to a
+  /// profile and show a real post count.
+  ///
+  /// Nullable on purpose: not every person listed on the About page has an
+  /// account. SetNull rather than Cascade, so deleting a user leaves the
+  /// About page entry intact instead of silently emptying a section.
+  userId    String?
   name      String
   role      String?  @default("")
   avatar    String?
@@ -733,8 +746,10 @@ model TeamMember {
   createdAt DateTime @default(now())
 
   section TeamSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  user    User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([sectionId, order])
+  @@index([userId])
 }
 
 /// Companies TechBox works with — shown on the homepage and fully

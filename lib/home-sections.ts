@@ -963,7 +963,29 @@ export async function getMoreToExplore(
 // §12 Authors
 // ═════════════════════════════════════════════════════════════════════
 
+/** The About-page section whose members are the editorial team. */
+const EDITORIAL_SECTION = "تیم تحریریه";
+
 export async function getAuthors(): Promise<AuthorCard[]> {
+  // Who counts as an "author" is an editorial decision, not a permission
+  // level. It lives in the About page's تیم تحریریه section, so read the
+  // linked accounts from there rather than inferring it from an RBAC role —
+  // content_writer is a set of permissions, and plenty of people hold it
+  // without being on the masthead.
+  //
+  // TeamMember.userId is nullable (not every listed person has an account),
+  // so only linked members can appear here.
+  const editorial = await prisma.teamMember.findMany({
+    where: {
+      userId: { not: null },
+      section: { title: EDITORIAL_SECTION, enabled: true },
+    },
+    select: { userId: true },
+  });
+  const editorialIds = editorial
+    .map((m) => m.userId)
+    .filter((id): id is string => Boolean(id));
+
   const rows = await prisma.user.findMany({
     where: {
       status: "active",
@@ -974,6 +996,10 @@ export async function getAuthors(): Promise<AuthorCard[]> {
         { username: "atiyehatami" },
       ],
       posts: { some: PUBLISHED },
+      // Empty section → fall back to every contributor. A homepage that
+      // silently loses its authors block because nobody has been linked yet
+      // is worse than showing more people than intended.
+      ...(editorialIds.length > 0 ? { id: { in: editorialIds } } : {}),
     },
     orderBy: { posts: { _count: "desc" } },
     take: 12,

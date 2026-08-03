@@ -24,6 +24,8 @@ export function WebsiteInfoSection({
   title = "دربارهٔ تکباکس",
   showTitle = true,
 }: WebsiteInfoSectionProps) {
+  // One author is a valid masthead — تیم تحریریه may genuinely have a single
+  // member, so neither rail has a minimum beyond "not empty".
   const hasAuthors = authors && authors.length > 0;
   const hasProfiles = profiles && profiles.length > 0;
 

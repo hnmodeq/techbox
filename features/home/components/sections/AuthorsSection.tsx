@@ -26,8 +26,13 @@ export type AuthorsRailProps = {
   title?: string;
 };
 
-/** Below four, a "carousel" is just a short row. */
-const MIN_AUTHORS = 4;
+/**
+ * One author is a legitimate masthead — تیم تحریریه may genuinely have a
+ * single member. The old floor of four came from treating this as a
+ * "carousel"; it is a list of the people who write here, and hiding it
+ * because there are only two of them would be wrong.
+ */
+const MIN_AUTHORS = 1;
 
 export function AuthorsRail({
   authors,

@@ -21,24 +21,38 @@ export async function POST(req: NextRequest) {
   let memberName = name || "";
   let memberRole = role || "";
   let memberAvatar = avatar || null;
+  // Only persist a userId we have verified exists, so a bad id from the
+  // client cannot create a dangling reference.
+  let linkedUserId: string | null = null;
 
   // If userId provided, auto-fill from user record
   if (userId) {
     const dbUser = await prisma.user.findUnique({
       where: { id: userId },
-      select: { name: true, job: true, roleFa: true, avatar: true },
+      select: { id: true, name: true, job: true, roleFa: true, avatar: true },
     });
     if (dbUser) {
       memberName = memberName || dbUser.name;
       memberRole = memberRole || dbUser.job || dbUser.roleFa || "";
       memberAvatar = memberAvatar || dbUser.avatar;
+      // Keep the link. Previously the id was used to copy these three fields
+      // and then dropped, which left the row as loose text with no route back
+      // to the account.
+      linkedUserId = dbUser.id;
     }
   }
 
   if (!memberName) return NextResponse.json({ error: "name required" }, { status: 400 });
 
   const member = await prisma.teamMember.create({
-    data: { sectionId, name: memberName, role: memberRole, avatar: memberAvatar, order: order ?? 0 },
+    data: {
+      sectionId,
+      userId: linkedUserId,
+      name: memberName,
+      role: memberRole,
+      avatar: memberAvatar,
+      order: order ?? 0,
+    },
   });
   return NextResponse.json(member, { status: 201 });
 }

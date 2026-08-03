@@ -132,12 +132,7 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
 
               {/* Date + reading time — bottom of image */}
               <div className="absolute bottom-3 right-3 flex items-center gap-3 text-white/70 text-xs">
-                <Tooltip>
-                  <TooltipTrigger render={<span className="cursor-default" />}>
-                    {formatRelativeDate(item.date)}
-                  </TooltipTrigger>
-                  <TooltipContent>تاریخ انتشار</TooltipContent>
-                </Tooltip>
+                <span>{formatRelativeDate(item.date)}</span>
                 {readingTime && (
                   <>
                     <span className="text-white/40">•</span>

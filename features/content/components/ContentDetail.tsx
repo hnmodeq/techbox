@@ -64,12 +64,7 @@ export default function ContentDetail({ item }: { item: ContentItem }) {
             {/* Date + reading time over image bottom */}
             <div className="absolute bottom-3 right-3 flex items-center gap-2 text-white/80 text-xs">
               <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger render={<span className="cursor-default" />}>
-                    {formatRelativeDate(item.date)}
-                  </TooltipTrigger>
-                  <TooltipContent>تاریخ انتشار</TooltipContent>
-                </Tooltip>
+                <span>{formatRelativeDate(item.date)}</span>
                 {isBlog && readingTime && (
                   <>
                     <span className="text-white/40">•</span>
