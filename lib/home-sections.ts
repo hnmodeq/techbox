@@ -771,7 +771,12 @@ export async function getTimeline(): Promise<TimelineCard[]> {
       yearFa: true,
       importance: true,
       tags: true,
-      _count: { select: { likes: true } },
+      dateGr: true,
+      // Comment count matters as much as likes now that the homepage cards
+      // show both. Without it every card rendered "0 comments" regardless of
+      // the real figure, which is the bug behind "likes and comments are not
+      // true or don't work".
+      _count: { select: { likes: true, comments: true } },
     },
   });
 
@@ -781,11 +786,16 @@ export async function getTimeline(): Promise<TimelineCard[]> {
     description: e.description,
     image: e.image ?? null,
     dateFa: e.dateFa,
+    dateGr: e.dateGr,
     year: e.year,
     yearFa: e.yearFa,
     importance: e.importance,
     tags: Array.isArray(e.tags) ? (e.tags as string[]).slice(0, 4) : [],
     likes: e._count.likes,
+    // Named to match what the shared TimelineCard reads, so the homepage and
+    // /timeline can render from the same shape.
+    likesCount: e._count.likes,
+    commentsCount: e._count.comments,
   }));
 }
 

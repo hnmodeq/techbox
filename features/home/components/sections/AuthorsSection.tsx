@@ -1,20 +1,16 @@
 /**
- * §12 · About + Authors — Tom's Guide `about-1`
+ * §12B · Authors rail — the contributor carousel.
  *
- * TG stacks two halves inside one widget:
- *   A. a dark manifesto panel — EST badge, headline, three bordered
- *      feature cards
- *   B. a lighter carousel of contributor cards, avatars 116px on mobile
- *      and 160px from 700px up (their measured values)
- *
- * The positioning paragraph is the Persian equivalent of the Spiceworks
- * one-liner the owner asked for: community + marketplace for IT pros.
+ * Rendered inside WebsiteInfoSection, which owns the surrounding band and
+ * the manifesto above it. Exported as a bare rail (no <section>, no heading
+ * landmark) because the parent already provides both; nesting a second
+ * labelled section inside one band produced two landmarks for what reads as
+ * one block.
  *
  * Only users with at least one published post appear — a contributor card
  * for someone who has never contributed would be fiction.
  *
  * Server Component (ScrollRail is the client part).
- * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §12
  */
 import * as React from "react";
 import Link from "next/link";
@@ -25,63 +21,34 @@ import { UserAvatar } from "@/components/ui/user-avatar";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-export type AuthorsSectionProps = {
+export type AuthorsRailProps = {
   authors: AuthorCard[];
   title?: string;
 };
 
-const HEADING_ID = "hp-authors-heading";
 /** Below four, a "carousel" is just a short row. */
 const MIN_AUTHORS = 4;
 
-export function AuthorsSection({
+export function AuthorsRail({
   authors,
   title = "برخی از نویسندگان تکباکس",
-}: AuthorsSectionProps) {
+}: AuthorsRailProps) {
   if (!authors || authors.length < MIN_AUTHORS) return null;
 
   return (
-    <section aria-labelledby={HEADING_ID} className="w-full px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-[var(--hp-r-lg)]">
-        {/* ── Half A: manifesto ─────────────────────────────────── */}
-        <div className="bg-[color:var(--hp-brand-ink)] px-6 py-16 text-[color:var(--hp-on-brand)] sm:px-8 lg:py-20 dark:border dark:border-white/[0.08] dark:border-b-0">
-          <div className="mx-auto max-w-4xl">
-            <h2
-              id={HEADING_ID}
-              className="text-center text-[26px] font-medium leading-8 md:text-5xl md:leading-[60px]"
-            >
-              مرجع روزانهٔ شما در فناوری اطلاعات.
-            </h2>
-
-            <div
-              aria-hidden="true"
-              className="mx-auto my-3 h-0.5 w-24 bg-gradient-to-l from-transparent via-current to-transparent opacity-40"
-            />
-
-            <p className="text-center text-xl font-light leading-8 text-[color:var(--hp-on-brand-mut)] md:text-2xl">
-              تکباکس یک جامعهٔ آنلاین و بازارگاه است که در آن متخصصان فناوری اطلاعات
-              می‌توانند مشاوره بگیرند، شبکه‌های خود را مدیریت کنند، و محصولات و خدمات
-              IT را کشف و خریداری کنند.
-            </p>
-          </div>
-        </div>
-
-        {/* ── Half B: contributors ──────────────────────────────── */}
-        <div className="px-6 pb-4 md:px-12">
-          <div className="p-8 pb-4">
-            <p className="text-base font-semibold leading-6 text-[color:var(--hp-ink)] md:text-3xl md:leading-8">
-              {title}
-            </p>
-          </div>
-
-          <ScrollRail label={title} gap={20} railClassName="pb-2">
-            {authors.map((a) => (
-              <AuthorTile key={a.username} author={a} />
-            ))}
-          </ScrollRail>
-        </div>
+    <div className="px-6 pb-4 md:px-12">
+      <div className="p-8 pb-4">
+        <p className="text-base font-semibold leading-6 text-[color:var(--hp-ink)] md:text-3xl md:leading-8">
+          {title}
+        </p>
       </div>
-    </section>
+
+      <ScrollRail label={title} gap={20} railClassName="pb-2">
+        {authors.map((a) => (
+          <AuthorTile key={a.username} author={a} />
+        ))}
+      </ScrollRail>
+    </div>
   );
 }
 
@@ -143,10 +110,10 @@ function AuthorTile({ author }: { author: AuthorCard }) {
         href={`/author/${author.username}?tab=content`}
         className="mt-auto text-xs font-bold leading-4 text-[color:var(--hp-brand)] transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
       >
-        <Num>{author.postCount}</Num> مطلب
+        <Num>{author.postCount}</Num> مطلب منتشر کرده است
       </Link>
     </div>
   );
 }
 
-export default AuthorsSection;
+export default AuthorsRail;

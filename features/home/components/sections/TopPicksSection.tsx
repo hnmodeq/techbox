@@ -23,10 +23,11 @@
 import * as React from "react";
 import Link from "next/link";
 import type { TopPickCard } from "@/features/home/lib/home-types";
-import { SectionShell, SectionHeader, Byline, Eyebrow } from "../primitives";
+import { SectionShell, SectionHeader, Byline, ScrollRail } from "../primitives";
 import { faPrice, faRating, faCount, faDiscountedPrice, isDiscountLive } from "@/lib/format-price";
 import { Num } from "@/components/ui/num";
 import { RemoteImage } from "@/components/ui/remote-image";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export type TopPicksSectionProps = {
   picks: TopPickCard[];
@@ -68,19 +69,21 @@ export function TopPicksSection({
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
       {/*
-        TG peeks the next card on mobile (gridX 1.4). A horizontal scroll
-        with a fractional basis reproduces that without a carousel script.
+        A rail rather than a grid, so the section gets ScrollRail's prev/next
+        chips at both ends and can hold more than three reviews without
+        growing the page. The fractional widths keep TG's "peek the next
+        card" behaviour on touch, where the arrows are hidden.
       */}
-      <ul className="hp-rail gap-2.5 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible">
-        {picks.map((pick, i) => (
-          <li
+      <ScrollRail label={title} gap={20} arrowsOnMobile>
+        {picks.map((pick) => (
+          <div
             key={`${pick.module}-${pick.slug}`}
-            className="w-[78%] shrink-0 sm:w-[46%] md:w-auto"
+            className="w-[78%] shrink-0 sm:w-[46%] lg:w-[31%]"
           >
             <PickCard pick={pick} />
-          </li>
+          </div>
         ))}
-      </ul>
+      </ScrollRail>
     </SectionShell>
   );
 }
@@ -128,30 +131,42 @@ function PickCard({ pick }: { pick: TopPickCard }) {
           {/* Rating is hidden entirely when null — never defaults to a
               flattering 5. */}
           {pick.rating != null && (
-            <div className="flex items-center gap-2">
-              <span className="flex" aria-hidden="true">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <svg
-                    key={n}
-                    width="16"
-                    height="16"
-                    viewBox="0 0 20 20"
-                    className={n <= stars ? "text-[#f9bc00]" : "text-[color:var(--hp-border)]"}
-                    fill="currentColor"
-                  >
-                    <path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-                  </svg>
-                ))}
-              </span>
-              <span className="text-[14px] font-bold text-[color:var(--hp-ink)]">
-                {faRating(pick.rating)}
-              </span>
-              {pick.ratingCount ? (
-                <span className="text-[12px] text-[color:var(--hp-ink-3)]">
-                  ({faCount(pick.ratingCount, "رأی")})
+            <Tooltip>
+              <TooltipTrigger
+                render={<div className="flex w-fit cursor-default items-center gap-2" />}
+              >
+                <span className="flex" aria-hidden="true">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <svg
+                      key={n}
+                      width="16"
+                      height="16"
+                      viewBox="0 0 20 20"
+                      className={n <= stars ? "text-[#f9bc00]" : "text-[color:var(--hp-border)]"}
+                      fill="currentColor"
+                    >
+                      <path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
+                    </svg>
+                  ))}
                 </span>
-              ) : null}
-            </div>
+                <span className="text-[14px] font-bold text-[color:var(--hp-ink)]">
+                  {faRating(pick.rating)}
+                </span>
+                {pick.ratingCount ? (
+                  <span className="text-[12px] text-[color:var(--hp-ink-3)]">
+                    ({faCount(pick.ratingCount, "رأی")})
+                  </span>
+                ) : null}
+              </TooltipTrigger>
+              <TooltipContent dir="rtl" className="text-right">
+                <p className="font-semibold">امتیاز تکباکس: {faRating(pick.rating)} از ۵</p>
+                {pick.ratingCount ? (
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    بر پایهٔ {faCount(pick.ratingCount, "رأی")}
+                  </p>
+                ) : null}
+              </TooltipContent>
+            </Tooltip>
           )}
 
           <ul className="mt-2 space-y-0.5 text-[12px] leading-[20px] text-[color:var(--hp-ink-2)]">
@@ -188,8 +203,18 @@ function PickCard({ pick }: { pick: TopPickCard }) {
       </div>
 
       {/* Content → commerce in one hop. Neither source has a checkout. */}
+      {/* Order is reversed from the obvious reading: the document is RTL, so
+          the FIRST child lands on the right. Button first puts the CTA on the
+          right and the price on the left, which is what was asked for. */}
       <div className="flex items-center justify-between gap-3 border-t border-[color:var(--hp-border)] bg-[color:var(--hp-brand-tint)] px-5 py-3">
-        <div className="min-w-0">
+        <Link
+          href={`/shop/${p.slug}`}
+          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-4 py-2 text-[13px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
+        >
+          ثبت سفارش این محصول از فروشگاه
+        </Link>
+
+        <div className="min-w-0 text-left">
           {deal ? (
             <>
               <p className="hp-numeric truncate text-[17px] font-bold text-[color:var(--hp-ink)]">
@@ -205,13 +230,6 @@ function PickCard({ pick }: { pick: TopPickCard }) {
             </p>
           )}
         </div>
-
-        <Link
-          href={`/shop/${p.slug}`}
-          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-4 py-2 text-[13px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
-        >
-          ثبت سفارش این محصول از فروشگاه
-        </Link>
       </div>
     </article>
   );

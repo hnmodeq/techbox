@@ -34,12 +34,18 @@ export type TimelineCard = {
   description: string;
   image: string | null;
   dateFa: string;
+  dateGr: Date | string;
   year: number;
   yearFa: number;
   /** 1–10. Events at >= 8 get the accent treatment. */
   importance: number;
   tags: string[];
   likes: number;
+  /** Named to match the shared /timeline TimelineCard component, which reads
+   *  `likesCount`/`commentsCount` and falls back to -1 (hidden) without them.
+   *  The homepage used to omit both, so every card showed zero engagement. */
+  likesCount: number;
+  commentsCount: number;
 };
 
 /** §10 Family Comments — a sampled comment from anywhere on the site. */

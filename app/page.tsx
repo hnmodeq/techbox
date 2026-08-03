@@ -32,10 +32,9 @@ import { FinderSection } from "@/features/home/components/sections/FinderSection
 import { DealsSection } from "@/features/home/components/sections/DealsSection";
 import { ToolsSection } from "@/features/home/components/sections/ToolsSection";
 import { TopPicksSection } from "@/features/home/components/sections/TopPicksSection";
-import { AuthorsSection } from "@/features/home/components/sections/AuthorsSection";
+import { WebsiteInfoSection } from "@/features/home/components/sections/WebsiteInfoSection";
 import { AnnouncementBar } from "@/features/home/components/sections/AnnouncementBar";
 import { TooltipColorScope } from "@/components/ui/tooltip";
-import { FamilyProfilesSection } from "@/features/home/components/sections/FamilyProfilesSection";
 import { PartnersSection } from "@/features/home/components/sections/PartnersSection";
 
 /**
@@ -55,8 +54,7 @@ type SectionKey =
   | "community"
   | "familyComments"
   | "moreToExplore"
-  | "authors"
-  | "familyProfiles"
+  | "websiteInfo"
   | "partners";
 
 const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
@@ -71,8 +69,7 @@ const SECTION_MODULE: Record<SectionKey, ModuleSlug | null> = {
   community: "forum",
   familyComments: null, // sampled across every module
   moreToExplore: null,  // mixed-module rediscovery
-  authors: null,        // people, not a content module
-  familyProfiles: null, // community members
+  websiteInfo: null,    // manifesto + authors + community, not a content module
   partners: null,       // companies, admin-managed
 };
 
@@ -89,9 +86,8 @@ const SECTION_FALLBACK_ORDER: Record<SectionKey, number> = {
   community: 9,
   familyComments: 10,
   moreToExplore: 11,
-  authors: 12,
-  familyProfiles: 13,
-  partners: 14,
+  websiteInfo: 12,
+  partners: 13,
 };
 
 // Keep the public homepage in Next's route cache and refresh it hourly.
@@ -204,12 +200,16 @@ export default async function HomePage() {
       ),
     },
     {
-      key: "authors",
-      node: <AuthorsSection authors={data.authors ?? []} />,
-    },
-    {
-      key: "familyProfiles",
-      node: <FamilyProfilesSection profiles={data.familyProfiles ?? []} />,
+      // Manifesto + authors + community members are one closing statement
+      // about the site, so they share a section, a band, and a single
+      // admin-controlled ordering slot.
+      key: "websiteInfo",
+      node: (
+        <WebsiteInfoSection
+          authors={data.authors ?? []}
+          profiles={data.familyProfiles ?? []}
+        />
+      ),
     },
     {
       key: "partners",

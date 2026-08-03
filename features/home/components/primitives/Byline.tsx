@@ -68,7 +68,7 @@ export function Byline({
         onDark ? "text-[color:var(--hp-on-brand)]" : "text-[color:var(--hp-ink)]",
       )}
     >
-      نوشتهٔ {author.name}
+      {author.name}
     </span>
   );
 

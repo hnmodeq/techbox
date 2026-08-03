@@ -200,7 +200,11 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const lineTop = topPad + SPACER_H + DOT_SIZE / 2;
 
   return (
-    <div className="flex flex-col w-full" dir="rtl" style={{ gap: 0 }}>
+    <div className="relative flex flex-col w-full" dir="rtl" style={{ gap: 0 }}>
+      {/* Same faded grid texture the homepage timeline band uses, so the two
+          surfaces read as one feature rather than two designs. */}
+      <div aria-hidden="true" className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.04]" />
+
       {/* Row 1: Navigation buttons */}
       <div className="flex items-center pt-30 pb-10 justify-center gap-5">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">

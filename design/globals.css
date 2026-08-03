@@ -858,3 +858,29 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
   .hp-news-card-swap,
   .hp-news-carousel-progress { animation: none; }
 }
+
+/* ── Timeline grid texture ─────────────────────────────────────────────
+   Shared by the homepage timeline band and the /timeline page so the two
+   surfaces read as the same feature. The mask fades the grid out at the
+   top and bottom edges; without it the lines stop dead against the band
+   boundary and look like a rendering seam. */
+.hp-grid-texture {
+  background-image:
+    linear-gradient(to right, currentColor 1px, transparent 1px),
+    linear-gradient(to bottom, currentColor 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 18%,
+    black 82%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 18%,
+    black 82%,
+    transparent 100%
+  );
+}

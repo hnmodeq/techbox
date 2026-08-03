@@ -51,15 +51,12 @@ export function TimelineSection({
       aria-labelledby={HEADING_ID}
       className="relative w-full overflow-hidden bg-[color:var(--hp-brand-ink)] py-14 lg:py-20"
     >
-      {/* Faint grid texture; purely decorative. */}
+      {/* Faint grid texture; purely decorative.
+          Masked so the lines dissolve into the band at the top and bottom
+          rather than stopping on a hard edge. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
+        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.04]"
       />
 
       <div className="relative mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">

@@ -1,49 +1,54 @@
 /**
- * §13 · Family Profiles — "خانوادهٔ تکباکس"
+ * §12C · Family profiles rail — "خانوادهٔ تکباکس"
  *
  * A random sample of ordinary community members. Staff are excluded on
- * purpose: they already appear in §12 Authors, and showing them twice
- * would make the community look smaller than it is.
+ * purpose: they already appear in the authors rail above, and showing them
+ * twice would make the community look smaller than it is.
  *
- * Card follows the Spiceworks member-tile pattern: circular avatar,
- * handle, one line of context, and a small activity stat.
+ * Rendered inside WebsiteInfoSection, which owns the band and the heading
+ * landmark, so this exports a bare rail rather than its own <section>.
+ *
+ * Card follows the Spiceworks member-tile pattern: circular avatar, handle,
+ * one line of context, and a small activity stat.
  *
  * Server Component (ScrollRail is the client part).
  */
 import * as React from "react";
 import Link from "next/link";
 import type { FamilyProfile } from "@/features/home/lib/home-types";
-import { SectionShell, SectionHeader, ScrollRail } from "../primitives";
+import { ScrollRail } from "../primitives";
 import { Num } from "@/components/ui/num";
 
-export type FamilyProfilesSectionProps = {
+export type FamilyProfilesRailProps = {
   profiles: FamilyProfile[];
   title?: string;
 };
 
-const HEADING_ID = "hp-profiles-heading";
 const MIN = 4;
 
-export function FamilyProfilesSection({
+export function FamilyProfilesRail({
   profiles,
   title = "خانوادهٔ تکباکس",
-}: FamilyProfilesSectionProps) {
+}: FamilyProfilesRailProps) {
   if (!profiles || profiles.length < MIN) return null;
 
   return (
-    <SectionShell labelledBy={HEADING_ID}>
-      <SectionHeader
-        headingId={HEADING_ID}
-        title={title}
-        description="اعضایی که هر روز در انجمن، نظرات و محتوای تکباکس مشارکت می‌کنند."
-      />
+    <div className="px-6 pb-10 md:px-12">
+      <div className="p-8 pb-4">
+        <p className="text-base font-semibold leading-6 text-[color:var(--hp-ink)] md:text-3xl md:leading-8">
+          {title}
+        </p>
+        <p className="mt-2 max-w-2xl text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
+          اعضایی که هر روز در انجمن، نظرات و محتوای تکباکس مشارکت می‌کنند.
+        </p>
+      </div>
 
       <ScrollRail label={title} gap={16}>
         {profiles.map((p) => (
           <ProfileCard key={p.username} profile={p} />
         ))}
       </ScrollRail>
-    </SectionShell>
+    </div>
   );
 }
 
@@ -99,4 +104,4 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
   );
 }
 
-export default FamilyProfilesSection;
+export default FamilyProfilesRail;
