@@ -8,6 +8,8 @@ import type { HomeAdvertisement } from "@/features/home/lib/home-advertisements"
 
 export type HomeAdvertisementBannerProps = {
   advertisement: HomeAdvertisement;
+  /** Tools/Website Info stay black even when the site theme is light. */
+  inverted?: boolean;
 };
 
 function dismissalKey(advertisement: HomeAdvertisement) {
@@ -18,7 +20,7 @@ function dismissalKey(advertisement: HomeAdvertisement) {
  * Campaign creative rendered at the top of its owning homepage band.
  * It deliberately uses the exact same gutters/max-width as SectionShell.
  */
-export function HomeAdvertisementBanner({ advertisement }: HomeAdvertisementBannerProps) {
+export function HomeAdvertisementBanner({ advertisement, inverted = false }: HomeAdvertisementBannerProps) {
   const [dismissed, setDismissed] = React.useState(false);
 
   React.useEffect(() => {
@@ -60,16 +62,19 @@ export function HomeAdvertisementBanner({ advertisement }: HomeAdvertisementBann
       className="w-full px-4 pt-6 sm:px-6 lg:px-8"
       data-home-ad={advertisement.id}
     >
-      <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-[var(--hp-r-sm)] bg-black">
-        {/* No margin below this bar: the label physically touches the image. */}
-        <div className="flex h-7 items-center gap-1 bg-black px-1.5 text-white" dir="rtl">
+      <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-[var(--hp-r-sm)]">
+        {/* Fully transparent—no background on this row or its parent. */}
+        <div
+          className={`flex h-7 items-center gap-1 px-1.5 ${inverted ? "text-white" : "text-foreground"}`}
+          dir="rtl"
+        >
           <Tooltip>
             <TooltipTrigger
               render={
                 <button
                   type="button"
                   onClick={close}
-                  className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-white/65 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+                  className="inline-flex size-6 shrink-0 items-center justify-center rounded-full text-current opacity-65 transition-[color,opacity] hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
                   aria-label="بستن این تبلیغ"
                 />
               }
@@ -78,7 +83,7 @@ export function HomeAdvertisementBanner({ advertisement }: HomeAdvertisementBann
             </TooltipTrigger>
             <TooltipContent>بستن این تبلیغ</TooltipContent>
           </Tooltip>
-          <span className="text-[11px] font-medium leading-none text-white/60">تبلیغات</span>
+          <span className="text-[11px] font-medium leading-none text-current opacity-60">تبلیغات</span>
         </div>
 
         {advertisement.href ? (

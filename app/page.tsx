@@ -263,6 +263,7 @@ export default async function HomePage() {
                 <HomeAdvertisementBanner
                   key={`${advertisement.id}:v${advertisement.version}`}
                   advertisement={advertisement}
+                  inverted={s.key === "tools" || s.key === "websiteInfo"}
                 />
               ))}
               {s.node}
