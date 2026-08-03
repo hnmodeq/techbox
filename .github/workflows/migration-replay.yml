@@ -83,13 +83,38 @@ jobs:
           pnpm exec prisma migrate diff \
             --from-url "$DATABASE_URL" \
             --to-schema-datamodel prisma/schema.prisma \
-            --exit-code \
-            --script > /tmp/drift.sql && echo "No drift." && exit 0
+            --script > /tmp/drift.sql
 
-          echo "::error::The replayed database does not match schema.prisma."
-          echo "Missing statements:"
-          cat /tmp/drift.sql
-          exit 1
+          # Two categories of diff are expected forever and are NOT drift:
+          #
+          #  1. DROP INDEX post_*_trgm — pg_trgm GIN indexes created by
+          #     20260711000001_p3_search_indexes. Prisma cannot model a GIN
+          #     index, so it proposes dropping them on every single diff.
+          #     Honouring that would turn site search into a seq scan.
+          #
+          #  2. UserNotificationState.lastReadAt SET DEFAULT — declared with
+          #     @default(dbgenerated(...)), which Prisma always re-proposes
+          #     even when the default is already present and correct.
+          #
+          # Everything else is a genuine regression: a column, index or
+          # constraint that exists in schema.prisma but that no migration
+          # creates — the exact class of bug that made `db push` state
+          # unreproducible and broke a from-empty rebuild.
+          grep -vE '^\s*(--.*)?$' /tmp/drift.sql \
+            | grep -vE '^DROP INDEX "post_(title|excerpt|content|category|authorname)_trgm";$' \
+            | grep -vE '^ALTER TABLE "UserNotificationState" ALTER COLUMN "lastReadAt" SET DEFAULT' \
+            > /tmp/real-drift.sql || true
+
+          if [ -s /tmp/real-drift.sql ]; then
+            echo "::error::The replayed database does not match schema.prisma."
+            echo "Statements that no migration accounts for:"
+            cat /tmp/real-drift.sql
+            echo ""
+            echo "Fix: write a migration for these instead of using 'prisma db push'."
+            exit 1
+          fi
+
+          echo "No unexpected drift. The chain rebuilds schema.prisma from empty."
 
       - name: Seed fixtures against the rebuilt schema
         env:
