@@ -77,7 +77,7 @@ export function TopPicksSection({
             key={`${pick.module}-${pick.slug}`}
             className="w-[78%] shrink-0 sm:w-[46%] md:w-auto"
           >
-            <PickCard pick={pick} rank={i + 1} />
+            <PickCard pick={pick} />
           </li>
         ))}
       </ul>
@@ -85,7 +85,7 @@ export function TopPicksSection({
   );
 }
 
-function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
+function PickCard({ pick }: { pick: TopPickCard }) {
   const p = pick.product;
   const live = isDiscountLive(p.discountPercent, p.discountEndsAt);
   const deal = live ? faDiscountedPrice(p.priceAmount, p.discountPercent) : null;
@@ -104,9 +104,6 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
             sizes="(min-width: 900px) 420px, 71vw"
             className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none"
           />
-          <span className="absolute top-2 start-2 rounded-[4px] bg-[color:var(--hp-brand)] px-2 py-0.5 text-[12px] font-bold text-[color:var(--hp-on-brand)]">
-            <Num>{rank}</Num>
-          </span>
         </div>
       </Link>
 
@@ -121,15 +118,13 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
         </h3>
 
         {pick.excerpt && (
-          <p className="mt-1.5 line-clamp-2 text-[13px] leading-[21px] text-[color:var(--hp-ink-3)]">
+          <p className="mt-1.5 line-clamp-4 text-[13px] leading-[21px] text-[color:var(--hp-ink-3)]">
             {pick.excerpt}
           </p>
         )}
 
         {/* Verdict — our equivalent of TG's "Short List Includes". */}
         <div className="mt-3">
-          <Eyebrow className="mb-1.5">امتیاز تکباکس</Eyebrow>
-
           {/* Rating is hidden entirely when null — never defaults to a
               flattering 5. */}
           {pick.rating != null && (
@@ -141,7 +136,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
                     width="16"
                     height="16"
                     viewBox="0 0 20 20"
-                    className={n <= stars ? "text-[color:var(--hp-accent)]" : "text-[color:var(--hp-border)]"}
+                    className={n <= stars ? "text-[#f9bc00]" : "text-[color:var(--hp-border)]"}
                     fill="currentColor"
                   >
                     <path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
@@ -215,7 +210,7 @@ function PickCard({ pick, rank }: { pick: TopPickCard; rank: number }) {
           href={`/shop/${p.slug}`}
           className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-4 py-2 text-[13px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
         >
-          خرید از فروشگاه <span aria-hidden="true">←</span>
+          ثبت سفارش این محصول از فروشگاه
         </Link>
       </div>
     </article>
