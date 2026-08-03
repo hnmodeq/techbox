@@ -225,7 +225,7 @@ function LatestStory({
 
       <div className="flex min-h-0 flex-1 flex-col p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-muted-foreground">
-          <RelativeDate date={story.date} label="تاریخ انتشار" />
+          <RelativeDate date={story.date} />
           {story.source && (
             <>
               <span aria-hidden="true">•</span>
