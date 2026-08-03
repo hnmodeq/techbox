@@ -172,6 +172,37 @@ jobs:
     timeout-minutes: 20
     needs: build
     if: ${{ needs.build.result == 'success' }}
+
+    # An ephemeral Postgres for the suite.
+    #
+    # This job used to run with no DATABASE_URL. Every Prisma call failed
+    # ("You must provide a nonempty URL"), each homepage section caught the
+    # error and self-hid, and the tests were asserting against a near-empty
+    # page — which is why "renders at least half the sections" and "no
+    # invisible text in dark mode" failed on every run regardless of the
+    # commit. A throwaway container is the right fixture here: deterministic,
+    # no shared state, and no production credential in CI.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: techbox
+          POSTGRES_PASSWORD: techbox
+          POSTGRES_DB: techbox_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U techbox"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://techbox:techbox@127.0.0.1:5432/techbox_e2e?connection_limit=1
+      DIRECT_URL: postgresql://techbox:techbox@127.0.0.1:5432/techbox_e2e
+      NEXT_PUBLIC_SITE_URL: https://hnmodeq-techbox.vercel.app
+      E2E_SEED_CONFIRM: yes
+
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -186,6 +217,10 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Apply migrations
+        run: pnpm exec prisma migrate deploy
+      - name: Seed deterministic E2E fixtures
+        run: pnpm exec tsx prisma/seed-e2e.ts
       - name: Install Playwright Browsers
         # The default Playwright CDN (playwright.azureedge.net) returns HTTP 403
         # in some regions/networks. Retry against the Microsoft Azure CDN mirror,
