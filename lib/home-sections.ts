@@ -1006,7 +1006,27 @@ export async function getAuthors(): Promise<AuthorCard[]> {
  * up with empty signups.
  */
 export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
-  const STAFF = ["super_admin", "admin", "editor"];
+  // Every staff role, not just the three the first version listed.
+  // "خانوادهٔ تکباکس" is meant to show the community — ordinary members and
+  // verified members and organisations. Anyone who works on the site belongs
+  // in the authors/team surfaces instead, so the whole RBAC staff set is
+  // excluded here. `admin` and `editor` are legacy values kept for rows
+  // created before seed-roles.ts settled on the current names.
+  const STAFF = [
+    "super_admin",
+    "admin",
+    "editor",
+    "content_writer",
+    "product_manager",
+    "price_manager",
+    "order_manager",
+    "support_agent",
+    "moderator",
+    "analyst",
+    "designer",
+    "social_manager",
+    "sales_specialist",
+  ];
 
   const rows = await prisma.user.findMany({
     where: {
@@ -1015,6 +1035,7 @@ export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
       OR: [{ posts: { some: PUBLISHED } }, { comments: { some: { status: "approved", deletedAt: null } } }],
     },
     select: {
+      id: true,
       name: true,
       username: true,
       job: true,
@@ -1028,6 +1049,25 @@ export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
 
   if (rows.length < 4) return []; // a row of two looks like a mistake
 
+  // Likes are part of "مشارکت" but `Like` carries a bare `userId` with no
+  // Prisma relation, so `_count` cannot reach them. One grouped query over
+  // the users on screen is cheaper than N per-user counts, and
+  // `like_user_created_idx` covers it.
+  //
+  // Forum topic creations and replies need no special handling: a topic is
+  // a Post and a reply is a Comment, so both are already in `_count`.
+  const userIds = rows.map((u) => u.id);
+  const likeGroups = userIds.length
+    ? await prisma.like.groupBy({
+        by: ["userId"],
+        where: { userId: { in: userIds }, deletedAt: null },
+        _count: { _all: true },
+      })
+    : [];
+  const likesByUser = new Map(
+    likeGroups.map((g) => [g.userId, g._count._all] as const),
+  );
+
   const mapped: FamilyProfile[] = rows.map((u) => ({
     name: u.name,
     username: u.username,
@@ -1036,7 +1076,10 @@ export async function getFamilyProfiles(): Promise<FamilyProfile[]> {
     memberSince: u.createdAt ? faYear(gregorianToJalali(u.createdAt).year) : "",
     verifiedType: u.verifiedType ?? null,
     postCount: u._count.posts,
-    commentCount: u._count.comments,
+    // Comments + likes given. The card sums postCount + commentCount into
+    // one "مشارکت" figure, so folding likes in here keeps that total honest
+    // without widening the FamilyProfile type.
+    commentCount: u._count.comments + (likesByUser.get(u.id) ?? 0),
   }));
 
   // Hourly rotation, distinct salt so this does not move in lockstep with

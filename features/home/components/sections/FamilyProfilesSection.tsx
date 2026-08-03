@@ -36,8 +36,6 @@ export function FamilyProfilesSection({
         headingId={HEADING_ID}
         title={title}
         description="اعضایی که هر روز در انجمن، نظرات و محتوای تکباکس مشارکت می‌کنند."
-        href="/forum"
-        linkLabel="انجمن تکباکس"
       />
 
       <ScrollRail label={title} gap={16}>
@@ -55,7 +53,7 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
   return (
     <Link
       href={`/author/${profile.username}`}
-      className="hp-card group flex w-[190px] flex-col items-center rounded-[var(--hp-r-md)] border border-[color:var(--hp-border)] bg-[color:var(--hp-surface)] p-5 text-center transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[var(--hp-shadow-hover)] focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none"
+      className="group flex w-[190px] flex-col items-center rounded-[var(--hp-r-md)] p-5 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none motion-reduce:transform-none"
     >
       <span className="mb-3 h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[color:var(--hp-brand-tint)]">
         {profile.avatar ? (
@@ -93,7 +91,7 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
       </p>
 
       {activity > 0 && (
-        <span className="mt-2 rounded-[4px] bg-[color:var(--hp-brand-tint)] px-2 py-0.5 text-[11px] text-[color:var(--hp-ink-3)]">
+        <span className="mt-2 px-2 py-0.5 text-[11px] text-[color:var(--hp-ink-3)]">
           <Num>{activity}</Num> مشارکت
         </span>
       )}

@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -79,11 +80,17 @@ export function ProfileTabs({
   authoredPosts: any[]
   activities: UserActivity[]
 }) {
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get("tab") === "content" ? "author" : "user"
+
   // Authors: two tabs — user activity + content activity
   // Normal users: activity inline, no tab chrome
   if (isAuthor) {
     return (
-      <Tabs defaultValue="user" className="mt-10">
+      // `?tab=content` opens the content tab directly. The homepage author
+      // cards link their post count here, so the number lands the reader on
+      // the posts it counts instead of a generic profile.
+      <Tabs defaultValue={initialTab} className="mt-10">
         <TabsList className="flex h-auto flex-wrap gap-1 mb-6">
           <TabsTrigger value="user">فعالیت کاربری</TabsTrigger>
           <TabsTrigger value="author">فعالیت محتوایی</TabsTrigger>
