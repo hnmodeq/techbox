@@ -56,40 +56,17 @@ export function FinderSection({
   return (
     <section
       aria-labelledby={HEADING_ID}
-      className="w-full px-4 py-6 sm:px-6 lg:px-8"
+      className="w-full px-4 py-8 sm:px-6 lg:px-8"
     >
       <div className="mx-auto w-full max-w-[1280px]">
-        <div className="relative overflow-hidden rounded-[var(--hp-r-finder)] bg-[color:var(--hp-brand-ink)] px-6 pb-12 pt-8 md:px-[45px] md:pb-[70px] md:pt-5 dark:border dark:border-white/[0.08]">
-          {/* Decorative disks — TG places two, 230px and 130px, bleeding
-              off opposite corners. Mirrored for RTL. */}
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 start-0 h-[230px] w-[230px] -translate-x-1/2 translate-y-[70%] rounded-full bg-white/[0.07] rtl:translate-x-1/2"
-          />
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 end-0 h-[130px] w-[130px] translate-x-1/4 translate-y-[75%] rounded-full bg-white/[0.07] rtl:-translate-x-1/4"
-          />
-          <svg
-            aria-hidden="true"
-            className="pointer-events-none absolute top-4 start-4 h-[88px] w-[88px] opacity-[0.12]"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          >
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
-          </svg>
-
-          <div className="relative mx-auto max-w-3xl">
+        <div className="relative mx-auto max-w-3xl text-center">
             <h2
               id={HEADING_ID}
-              className="hp-gradient-text mb-2 text-center text-2xl font-medium tracking-[0.4px] md:text-3xl"
+              className="mb-2 text-2xl font-bold tracking-[0.4px] text-foreground md:text-3xl"
             >
               {title}
             </h2>
-            <p className="mb-[26px] text-center text-[15px] leading-[26px] text-[color:var(--hp-on-brand-mut)]">
+            <p className="mb-6 text-[15px] leading-[26px] text-muted-foreground">
               در مقالات، ویدیوها، ابزارها و کل کاتالوگ فروشگاه جست‌وجو کنید.
             </p>
 
@@ -99,14 +76,14 @@ export function FinderSection({
               action="/search"
               method="GET"
               role="search"
-              className="mb-[25px] flex items-center gap-2 rounded-2xl bg-white p-2"
+              className="mb-6 flex items-center gap-2 rounded-2xl border bg-card p-2 shadow-sm"
             >
               <label htmlFor="hp-finder-q" className="sr-only">
                 جست‌وجو در تکباکس
               </label>
               <svg
                 aria-hidden="true"
-                className="ms-2 h-5 w-5 shrink-0 text-slate-500"
+                className="ms-2 h-5 w-5 shrink-0 text-muted-foreground"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -121,7 +98,7 @@ export function FinderSection({
                 type="search"
                 required
                 placeholder="مثلاً: ذخیره‌ساز مناسب بکاپ ۳۰ کاربر"
-                className="min-w-0 flex-1 bg-transparent p-1.5 text-lg text-slate-700 placeholder:text-slate-500 focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent p-1.5 text-base text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
               <button
                 type="submit"
@@ -137,14 +114,13 @@ export function FinderSection({
                 <li key={chip.href} className="flex">
                   <Link
                     href={chip.href}
-                    className="flex w-full items-center justify-center rounded-[200px] border-2 border-white px-6 py-2 text-center text-[15px] leading-5 text-white transition-transform duration-200 hover:-translate-y-0.5 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none motion-reduce:transform-none md:text-base"
+                    className="flex w-full items-center justify-center rounded-[200px] border border-border px-6 py-2 text-center text-[15px] leading-5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:text-base"
                   >
                     {chip.labelFa}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
         </div>
       </div>
     </section>

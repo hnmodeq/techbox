@@ -53,12 +53,12 @@ export function TimelineSection({
   return (
     <section
       aria-labelledby={HEADING_ID}
-      className="relative w-full overflow-hidden bg-[color:var(--hp-brand-ink)] py-14 lg:py-20 text-[color:var(--hp-on-brand)]"
+      className="relative w-full overflow-hidden bg-white dark:bg-black py-14 lg:py-20 text-foreground"
     >
       {/* Grid texture with smoothly faded top and bottom */}
       <div
         aria-hidden="true"
-        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.06]"
+        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
         style={{
           maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
           WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
@@ -73,14 +73,13 @@ export function TimelineSection({
             description="از ترانزیستور تا دیتاسنترهای هوش مصنوعی — نقاط عطفی که زیرساخت امروز را ساختند."
             href={showMore ? "/timeline" : undefined}
             linkLabel={moreLabel}
-            onDark
             accentColor={accentColor}
             className="mb-8"
           />
         )}
         {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-        <div className="relative rounded-[var(--hp-r-lg)] bg-black/20 p-2 sm:p-6 backdrop-blur-md border border-white/10">
+        <div className="relative p-0">
           <TimelineContainer events={timelineEvents} />
         </div>
       </div>

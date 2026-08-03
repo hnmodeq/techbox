@@ -18,7 +18,7 @@ const MIN = 4;
 
 export function FamilyProfilesRail({
   profiles,
-  title = "خانوادهٔ تکباکس",
+  title = "و همچنین ...",
 }: FamilyProfilesRailProps) {
   if (!profiles || profiles.length < MIN) return null;
 

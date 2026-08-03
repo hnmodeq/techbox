@@ -56,64 +56,52 @@ const navigation = {
 export default function FooterSection() {
   return (
     <footer className="border-t w-full mt-auto">
-      <div className="mx-auto px-10 pb-8 w-full pt-12">
+      <div className="mx-auto px-10 pb-6 w-full pt-10">
         {/* Parent: flex so justify-around spreads both columns with equal gaps
             on both sides and between them. Mobile stacks (flex-col). */}
-        <div className="flex gap-6 flex-col md:flex-row md:justify-around w-full">
-          {/* RIGHT column — quick links (top) + social icons (below the links) */}
-          <div className="md:flex md:flex-col md:gap-6">
-            <div className="flex flex-col gap-2 md:items-start">
+        <div className="flex gap-6 flex-col md:flex-row md:justify-center w-full">
+          {/* Quick links & social icons */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               {navigation.main.map((item) => (
                 <ButtonLink
                   key={item.name}
                   href={item.href}
                   variant="ghost"
                   size="sm"
-                  className="justify-center md:justify-center font-normal text-muted-foreground hover:text-foreground"
+                  className="font-normal text-muted-foreground hover:text-foreground"
                 >
                   {item.name}
                 </ButtonLink>
               ))}
             </div>
 
-            <div>
-              <div className="flex gap-2 md:justify-start">
-                {navigation.social.map((item) => (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={item.name}
-                    className={cn(
-                      buttonVariants({ variant: "ghost", size: "icon" }),
-                      "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <item.icon className="size-5 transition-transform hover:scale-110" />
-                  </a>
-                ))}
-              </div>
+            <div className="flex gap-2 justify-center">
+              {navigation.social.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.name}
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "icon" }),
+                    "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="size-5 transition-transform hover:scale-110" />
+                </a>
+              ))}
             </div>
-          </div>
-
-          {/* LEFT column — a trust commitment, not a duplicate navigation rail. */}
-          <div className="max-w-[340px] text-right">
-            <h4 className="text-sm font-semibold text-foreground">شفافیت تکباکس</h4>
-            <p className="mt-2 text-[12px] leading-6 text-muted-foreground">
-              اصلاحیه‌های فنی، تجربه‌های اجرایی و بازخوردهای شما برای دقیق‌تر شدن راهنماها و بررسی‌ها ثبت و پیگیری می‌شوند.
-            </p>
           </div>
         </div>
 
-        <Separator className="mt-12" />
+        <Separator className="mt-8" />
 
-        {/* Bottom row: copyright (right, mentions رستاک) + design team (left, mentions بومیم).
-            Both names show a "در دست طراحی" tooltip on hover, keep their color,
-            stay clickable (cursor-pointer) but navigate nowhere. */}
-        <div className="pt-6 flex flex-col items-center justify-around gap-2 sm:flex-row">
+        {/* Bottom row: copyright & design team */}
+        <div className="pt-4 pb-2 flex flex-col items-center justify-between gap-2 sm:flex-row text-xs">
           {/* رستاک — copyright line, RIGHT */}
-          <p className="text-xs text-muted-foreground text-center sm:text-right order-1 sm:order-1">
+          <p className="text-muted-foreground text-center sm:text-right">
             © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت {" "}
             <Tooltip>
               <TooltipTrigger
@@ -132,7 +120,7 @@ export default function FooterSection() {
           </p>
 
           {/* بومیم — design team, LEFT */}
-          <p className="text-xs text-muted-foreground order-2 sm:order-2">
+          <p className="text-muted-foreground">
             طراحی شده توسط{" "}
             <Tooltip>
               <TooltipTrigger
