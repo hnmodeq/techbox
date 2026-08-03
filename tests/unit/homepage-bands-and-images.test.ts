@@ -58,7 +58,6 @@ describe("homepage images go through next/image", () => {
       "features/home/components/sections/VideoSection.tsx",
       "features/home/components/sections/TopPicksSection.tsx",
       "features/home/components/sections/MoreToExploreSection.tsx",
-      "features/home/components/sections/TimelineSection.tsx",
       "features/home/components/primitives/CardShell.tsx",
     ]) {
       const src = read(file);
@@ -81,6 +80,16 @@ describe("homepage images go through next/image", () => {
     const card = read("features/shop/components/ShopProductCard.tsx");
     expect(card).toMatch(/from "next\/image"/);
     expect(card).not.toMatch(/<img[\s>]/);
+
+    // TimelineSection does the same thing: it now renders the interactive
+    // TimelineContainer from /timeline rather than its own cards, so the
+    // image lives in TimelineCard. Same constraint, different owner.
+    const timeline = read("features/home/components/sections/TimelineSection.tsx");
+    expect(timeline).toMatch(/<TimelineContainer/);
+    expect(timeline).not.toMatch(/<img[\s>]/);
+
+    const timelineCard = read("features/timeline/components/TimelineCard.tsx");
+    expect(timelineCard).toMatch(/from 'next\/image'/);
   });
 
   it("always passes sizes, so Next never assumes 100vw", () => {
