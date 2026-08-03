@@ -69,6 +69,7 @@ regexes = [
 # `tb_compare_v1` is a localStorage key, not a credential.
 stopwords = [
   "tb_compare_v1",
+  "tb_consultation_v1",
   "tb_session",
   "takbox-theme",
 ]
