@@ -61,6 +61,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Inspect the known migration-19 production drift
+        id: reconcile19
+        run: pnpm exec tsx scripts/checks/verify-reconcile-19.ts
+
+      - name: Resolve migration 19 only after catalog verification
+        if: ${{ steps.reconcile19.outputs.state == 'failed-but-reconciled' }}
+        run: pnpm exec prisma migrate resolve --applied 20260802000019_reconcile_dbpush_drift
+
       - name: Apply committed migrations
         run: pnpm exec prisma migrate deploy
 
