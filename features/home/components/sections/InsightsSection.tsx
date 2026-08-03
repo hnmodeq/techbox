@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { ContentItem } from "@/lib/content";
 import type { LatestInsights, NewsHighlightComment } from "@/features/home/lib/home-types";
 import { SectionShell, SectionHeader } from "../primitives";
-import { NewsletterCard } from "./NewsletterCard";
 import { NewsModal } from "@/features/news/components/NewsModal";
 import { AuthorLink } from "@/components/ui/author-link";
 import { RemoteImage } from "@/components/ui/remote-image";

@@ -1,0 +1,77 @@
+name: Timeline engagement release
+
+# One-time/explicit production operation. The direct database credential is a
+# GitHub Actions secret: workflows can consume it, but neither maintainers nor
+# agents can read it back and GitHub redacts it from logs.
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type APPLY_TIMELINE_RELEASE to migrate and seed production'
+        required: true
+        type: string
+      usernames:
+        description: 'Optional approved comma-separated usernames (blank = community_* only)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-timeline-engagement
+  cancel-in-progress: false
+
+jobs:
+  migrate-and-seed:
+    name: Apply migration and approved engagement
+    if: ${{ inputs.confirmation == 'APPLY_TIMELINE_RELEASE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # A direct/non-pooled URL is deliberate: schema migrations must not run
+      # through Neon's transaction pooler. The one-off seed can use it too.
+      DATABASE_URL: ${{ secrets.DIRECT_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      TIMELINE_ENGAGEMENT_CONFIRM: production-authorized
+      APPROVED_USERNAMES: ${{ inputs.usernames }}
+
+    steps:
+      - name: Require the protected database secret
+        run: |
+          if [ -z "$DIRECT_URL" ]; then
+            echo "::error::Repository secret DIRECT_URL is not configured."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply committed migrations
+        run: pnpm exec prisma migrate deploy
+
+      - name: Seed approved timeline engagement
+        shell: bash
+        run: |
+          args=(--apply)
+          if [ -n "$APPROVED_USERNAMES" ]; then
+            args+=("--usernames=$APPROVED_USERNAMES")
+          fi
+          pnpm exec tsx scripts/content/seed-timeline-engagement.ts "${args[@]}"
+
+      - name: Confirm migration status
+        run: pnpm exec prisma migrate status

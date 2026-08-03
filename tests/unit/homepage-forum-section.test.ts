@@ -56,7 +56,10 @@ describe("homepage Forum section", () => {
     expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
     expect(feature).not.toMatch(/border border-\[color:var\(--hp-border\)\]/);
     expect(feature).not.toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
-    expect(feature).toMatch(/bg-\[color:var\(--hp-surface\)\]/);
+    // The section band owns the surface; the featured answer must not paint a
+    // competing card background over it.
+    expect(feature).toMatch(/bg-transparent/);
+    expect(feature).not.toMatch(/bg-\[color:var\(--hp-surface\)\]/);
     expect(feature).not.toMatch(/color-mix\(in_oklch,var\(--community-accent\)/);
     expect(feature).not.toMatch(/absolute inset-x-0 bottom-0 h-1/);
     expect(feature).not.toMatch(/حل‌شده/);

@@ -139,8 +139,8 @@ preview and the target environment before applying.
 
 ## Database migrations
 
-There are 16 committed migration directories: the `0_init` baseline plus
-migrations through `20260725000015_support_ticket_access`.
+There are 23 committed migration directories: the `0_init` baseline plus
+migrations through `20260803000021_timeline_user_identity`.
 
 ```bash
 # Inspect first

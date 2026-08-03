@@ -122,9 +122,10 @@ describe("interactive News discussion panel", () => {
     expect(section).not.toMatch(/در حال نمایش گفتگوی این خبر/);
   });
 
-  it("keeps a smaller square News card and lets the opposite column stretch to it", () => {
-    expect(section).toMatch(/lg:aspect-square/);
-    expect(section).toMatch(/lg:h-\[48%\]/);
+  it("keeps a responsive News card and lets the discussion column stretch beside it", () => {
+    // The current card uses a 16:9 media frame instead of forcing the whole
+    // article square; both desktop columns still stretch through the grid.
+    expect(section).toMatch(/aspect-video w-full/);
     expect(section).toMatch(/lg:h-full/);
     expect(section).toMatch(/lg:grid-cols-\[minmax\(0,1\.05fr\)_minmax\(360px,\.95fr\)\]/);
     // Header actions avoid adding a third strip beneath the card.
@@ -183,9 +184,12 @@ describe("existing section exits and newsletter", () => {
     expect(section).toMatch(/<ShareButton url=\{fullScreenHref\}/);
   });
 
-  it("wears the news module colour and keeps terms in a dialog", () => {
+  it("keeps newsletter terms in a dialog without mounting the newsletter inside News", () => {
     expect(newsletter).toMatch(/accentColor \|\| "var\(--hp-brand-ink\)"/);
-    expect(section).toMatch(/<NewsletterCard accentColor=\{accentColor\}/);
+    // The latest layout intentionally removed the newsletter from this
+    // discussion row; retaining an unused import would still ship its client
+    // code, so guard both the JSX and import.
+    expect(section).not.toMatch(/NewsletterCard/);
     expect(newsletter).toMatch(/<TermsDialog>/);
     expect(dialog).toMatch(/if \(!open \|\| loadedRef\.current\) return/);
   });

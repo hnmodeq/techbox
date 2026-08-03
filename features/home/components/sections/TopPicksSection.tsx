@@ -179,11 +179,10 @@ function PickCard({ pick }: { pick: TopPickCard }) {
                   />
                 </div>
               }
-            >
-              <TooltipContent dir="rtl">
-                نویسنده مقاله: {pick.author?.name ?? "تحریریه"}
-              </TooltipContent>
-            </Tooltip>
+            />
+            <TooltipContent dir="rtl">
+              نویسنده مقاله: {pick.author?.name ?? "تحریریه"}
+            </TooltipContent>
           </Tooltip>
         </div>
       </div>

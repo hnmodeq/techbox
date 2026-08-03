@@ -46,6 +46,8 @@ model User {
   passwordResetTokens PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   verificationRequests VerificationRequest[]
+  timelineComments TimelineComment[]
+  timelineLikes TimelineLike[]
 
   // Follow system
   followers Follow[] @relation("UserFollowers")
@@ -322,6 +324,7 @@ model TimelineComment {
   id         String   @id @default(cuid())
   eventId    String
   parentId   String?
+  userId     String?
   authorName String   @default("مهمان")
   text       String
   status     String   @default("approved")
@@ -330,11 +333,13 @@ model TimelineComment {
   createdAt  DateTime @default(now())
 
   event   TimelineEvent       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  author  User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
   parent  TimelineComment?    @relation("TimelineCommentReplies", fields: [parentId], references: [id])
   replies TimelineComment[]   @relation("TimelineCommentReplies")
   votes   TimelineCommentVote[]
 
   @@index([eventId, status, createdAt], name: "timeline_comment_event_status_created_idx")
+  @@index([userId, createdAt], name: "timeline_comment_user_created_idx")
   @@index([parentId], name: "timeline_comment_parent_idx")
   @@index([status, createdAt], name: "timeline_comment_status_created_idx")
 }
@@ -359,6 +364,7 @@ model TimelineLike {
   createdAt   DateTime @default(now())
 
   event TimelineEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([fingerprint, eventId], name: "timeline_fingerprint_eventId")
   @@index([eventId, createdAt], name: "timeline_like_event_created_idx")
