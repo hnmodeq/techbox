@@ -36,4 +36,11 @@ describe("timeline engagement integrity", () => {
     expect(container.match(/hp-grid-texture/g)).toHaveLength(1);
     expect(container.indexOf("hp-grid-texture")).toBeGreaterThan(container.indexOf("ref={scrollRef}"));
   });
+
+  it("lets the suggestion API—not an optional provider tree—decide authentication", () => {
+    const suggestions = read("features/timeline/components/TimelineSuggestions.tsx");
+    expect(suggestions).not.toMatch(/useAuth/);
+    expect(suggestions).toMatch(/res\.status === 401/);
+    expect(suggestions).toMatch(/tb_open_auth/);
+  });
 });

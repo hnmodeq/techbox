@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/providers/auth.provider';
 
 type Suggestion = {
   id: string;
@@ -26,7 +25,6 @@ function formatTime(iso: string): string {
 }
 
 export function TimelineSuggestions() {
-  const { user } = useAuth();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
@@ -47,11 +45,9 @@ export function TimelineSuggestions() {
     e.preventDefault();
     if (!text.trim() || submitting) return;
 
-    if (!user) {
-      window.dispatchEvent(new CustomEvent('tb_open_auth'));
-      return;
-    }
-
+    // The API session is authoritative. Avoid coupling this reusable timeline
+    // card to a particular React provider tree; guests receive 401 below and
+    // the existing authentication modal opens from that server response.
     setSubmitting(true);
     setError('');
     try {
