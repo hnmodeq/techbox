@@ -71,7 +71,10 @@ describe("homepage Forum section", () => {
     expect(feature).toMatch(/answer\.date && <RelativeDate date=\{answer\.date\}/);
     expect(feature).not.toMatch(/bg-\[color:var\(--hp-solved\)\]\/\[0\.08\]/);
     expect(feature).toMatch(/ps-6/);
-    expect(feature.indexOf("<TopicActivity")).toBeLessThan(feature.indexOf("<h3"));
+    // The title leads the card; the activity metadata row sits under it.
+    // (Reversed in d08c80c — metadata below the heading reads better and
+    // keeps the topic name as the first thing a screen reader announces.)
+    expect(feature.indexOf("<TopicActivity")).toBeGreaterThan(feature.indexOf("<h3"));
     const activity = community.slice(community.indexOf("function TopicActivity"), community.indexOf("function TopicSummary"));
     expect(activity).toMatch(/lg:flex-nowrap/);
     expect(activity).not.toMatch(/label="آخرین فعالیت"/);

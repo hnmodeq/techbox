@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { withCircuit } from "@/lib/db-circuit";
+import { sanitizeAdminHtml } from "@/lib/sanitize-html";
 
 /**
  * The terms body, for the in-page dialog.
@@ -17,8 +18,11 @@ export async function GET() {
     const row = await withCircuit(() =>
       prisma.siteSetting.findUnique({ where: { key: "terms.content" } }),
     );
+    // Sanitised at the boundary: TermsDialog injects this response with
+    // dangerouslySetInnerHTML, so the client must never receive markup it
+    // would be unsafe to render.
     return NextResponse.json(
-      { content: row?.value ?? "" },
+      { content: sanitizeAdminHtml(row?.value ?? "") },
       { headers: { "Cache-Control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800" } },
     );
   } catch {

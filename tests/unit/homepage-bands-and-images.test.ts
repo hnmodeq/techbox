@@ -56,7 +56,6 @@ describe("homepage images go through next/image", () => {
     for (const file of [
       "features/home/components/sections/MagazineSection.tsx",
       "features/home/components/sections/VideoSection.tsx",
-      "features/home/components/sections/DealsSection.tsx",
       "features/home/components/sections/TopPicksSection.tsx",
       "features/home/components/sections/MoreToExploreSection.tsx",
       "features/home/components/sections/TimelineSection.tsx",
@@ -66,6 +65,22 @@ describe("homepage images go through next/image", () => {
       expect(src).toMatch(/<RemoteImage/);
       expect(src).toMatch(/from "@\/components\/ui\/remote-image"/);
     }
+  });
+
+  it("lets composing sections delegate to a card that owns the image", () => {
+    // DealsSection deliberately renders no image of its own: it defers to
+    // ShopProductCard so homepage commerce and /shop cannot drift apart.
+    // The constraint that matters is "no raw <img>", not "contains the
+    // literal string <RemoteImage" — asserting the latter made a safe
+    // refactor look like a regression.
+    const deals = read("features/home/components/sections/DealsSection.tsx");
+    expect(deals).toMatch(/<ShopProductCard/);
+    expect(deals).not.toMatch(/<img[\s>]/);
+
+    // ...and the card it delegates to optimises through next/image.
+    const card = read("features/shop/components/ShopProductCard.tsx");
+    expect(card).toMatch(/from "next\/image"/);
+    expect(card).not.toMatch(/<img[\s>]/);
   });
 
   it("always passes sizes, so Next never assumes 100vw", () => {
