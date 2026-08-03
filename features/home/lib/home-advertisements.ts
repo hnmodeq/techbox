@@ -19,8 +19,8 @@ export type HomeAdvertisement = {
   image: string;
   alt: string;
   href?: string;
-  /** Render immediately after this homepage section. */
-  afterSection: HomeAdPlacement;
+  /** Render inside this homepage band, before the section content. */
+  section: HomeAdPlacement;
   enabled: boolean;
   order: number;
   /** Bump when creative changes so a previously dismissed ad may appear again. */
@@ -42,7 +42,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/bazar-instagram-shops.webp`,
     alt: "فروشگاه‌های اینستاگرامی، اومدن توی بازار",
     href: "https://digikala.ir",
-    afterSection: "magazine",
+    section: "magazine",
     enabled: true,
     order: 0,
     version: 1,
@@ -52,7 +52,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/home-favorites.webp`,
     alt: "محبوب‌ترین‌های خانه با تخفیف ویژه",
     href: "https://zoomit.ir",
-    afterSection: "video",
+    section: "video",
     enabled: true,
     order: 1,
     version: 1,
@@ -62,7 +62,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/vitaplex-hair-care.webp`,
     alt: "محصولات تخصصی مراقبت از مو ویتاپلکس",
     href: "https://khanoomi.ir",
-    afterSection: "insights",
+    section: "insights",
     enabled: true,
     order: 2,
     version: 1,
@@ -72,7 +72,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/filmnet-koori.webp`,
     alt: "سریال کوری در فیلم‌نت",
     href: "https://digiato.ir",
-    afterSection: "topPicks",
+    section: "topPicks",
     enabled: true,
     order: 3,
     version: 1,
@@ -82,7 +82,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/golden-time-jewelry.webp`,
     alt: "تخفیف طلای ۱۸ عیار",
     href: "https://time.ir",
-    afterSection: "timeline",
+    section: "timeline",
     enabled: true,
     order: 4,
     version: 1,
@@ -92,7 +92,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/centella-skincare.webp`,
     alt: "سرم پوستی سنتلا برای درخشش پوست",
     href: "https://irancell.ir",
-    afterSection: "deals",
+    section: "deals",
     enabled: true,
     order: 5,
     version: 1,
@@ -102,7 +102,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/digipet-pet-food.webp`,
     alt: "خرید قسطی غذای حیوانات خانگی",
     href: "https://digikala.ir",
-    afterSection: "tools",
+    section: "tools",
     enabled: true,
     order: 6,
     version: 1,
@@ -112,7 +112,7 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     image: `${STORAGE_BASE}/otaghak-villa.webp`,
     alt: "رزرو اقساطی ویلا در اتاقک",
     href: "https://digiato.ir",
-    afterSection: "community",
+    section: "community",
     enabled: true,
     order: 7,
     version: 1,
@@ -154,12 +154,18 @@ export function parseHomeAdvertisements(raw: unknown): HomeAdvertisement[] {
     const image = typeof item.image === "string" ? item.image.trim() : "";
     const alt = typeof item.alt === "string" ? item.alt.trim() : "";
     const href = typeof item.href === "string" ? item.href.trim() : "";
-    const afterSection = typeof item.afterSection === "string" ? item.afterSection : "";
+    // `afterSection` is the first-release field name. Read it for a seamless
+    // migration, but every API/admin response now emits the truthful `section`.
+    const section = typeof item.section === "string"
+      ? item.section
+      : typeof item.afterSection === "string"
+        ? item.afterSection
+        : "";
 
     if (!id || seen.has(id) || !/^[-a-zA-Z0-9_]{2,80}$/.test(id)) continue;
     if (!image.startsWith("https://") || !image.toLowerCase().endsWith(".webp")) continue;
     if (!alt || alt.length > 180) continue;
-    if (!PLACEMENTS.has(afterSection)) continue;
+    if (!PLACEMENTS.has(section)) continue;
     if (!isSafeAdvertisementHref(href)) continue;
 
     seen.add(id);
@@ -168,7 +174,7 @@ export function parseHomeAdvertisements(raw: unknown): HomeAdvertisement[] {
       image,
       alt,
       href: href || undefined,
-      afterSection: afterSection as HomeAdPlacement,
+      section: section as HomeAdPlacement,
       enabled: item.enabled !== false,
       order: typeof item.order === "number" && Number.isFinite(item.order)
         ? Math.max(0, Math.trunc(item.order))

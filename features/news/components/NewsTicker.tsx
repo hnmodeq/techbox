@@ -57,9 +57,7 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
             style={style}
             dir="rtl"
           >
-            {/* RTL reading order requested by editorial:
-                dot → module → title → publication date. */}
-            <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-[color:var(--ticker-accent)]" />
+            {/* RTL reading order: module → title → publication date. */}
             <span className="font-light text-[color:var(--ticker-accent)]">{moduleTitle}</span>
             <span className="font-light text-foreground">{item.title}</span>
             {relativeDate && <span className="shrink-0 font-light text-muted-foreground">{relativeDate}</span>}

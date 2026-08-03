@@ -88,12 +88,9 @@ export function TimelineSuggestions() {
 
   return (
     <div className="flex shrink-0 flex-col items-center" style={{ width: 380 }}>
-      {/* Spacer to align with cards */}
-      <div className="h-6" />
-      {/* Dot on the line */}
-      <div className="relative z-10 size-4 rounded-full border-2 border-background bg-primary shadow-sm" />
-      {/* Box */}
-      <div className="mt-4 w-full rounded-lg border border-border bg-card shadow-sm overflow-hidden flex flex-col" style={{ maxHeight: 440 }}>
+      {/* Empty date row keeps this box aligned with the event cards. */}
+      <div className="h-7" aria-hidden="true" />
+      <div className="mt-3 flex w-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm" style={{ maxHeight: 440 }}>
         {/* Header */}
         <div className="px-4 py-3 border-b border-border bg-muted/30">
           <h3 className="text-sm font-bold text-foreground">پیشنهاد رویداد جدید</h3>

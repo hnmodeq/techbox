@@ -739,10 +739,10 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// Cache key v9 includes the admin-managed advertisement payload. The one-hour
-// window matches the server-stable rotations used by the homepage sections;
-// admin writes also invalidate the `home-data` tag immediately.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v9"], {
+// Cache key v10 migrates advertisement placement from "after a section" to
+// "inside, above its section". A fresh key prevents an old cached JSON shape
+// from hiding banners during the rolling deployment.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v10"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

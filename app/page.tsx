@@ -18,7 +18,6 @@
  *
  * Docs: docs/homepage-upgrade/
  */
-import { Fragment } from "react";
 import { HomeDataProvider } from "@/features/home/lib/home-data";
 import { getHomeData, getMagazinePosts } from "@/lib/home-server";
 import { getModuleConfig, type ModuleSlug } from "@/lib/module-config";
@@ -240,27 +239,34 @@ export default async function HomePage() {
             own 1280 container. */}
         {visible.map((s, index) => {
           const advertisements = (data.advertisements ?? [])
-            .filter((advertisement) => advertisement.enabled && advertisement.afterSection === s.key)
+            .filter((advertisement) => advertisement.enabled && advertisement.section === s.key)
             .sort((a, b) => a.order - b.order);
+          // Match the few sections that intentionally own an absolute
+          // background so their advertisement still reads as part of them.
+          const background = s.key === "tools" || s.key === "websiteInfo"
+            ? "#000"
+            : s.key === "timeline"
+              ? "light-dark(#fff, #000)"
+              : index % 2 === 0
+                ? "var(--hp-band-a)"
+                : "var(--hp-band-b)";
 
           return (
-            <Fragment key={s.key}>
-              <div
-                className="w-full"
-                style={{
-                  background: index % 2 === 0 ? "var(--hp-band-a)" : "var(--hp-band-b)",
-                }}
-              >
-                {s.node}
-              </div>
-
+            <div
+              key={s.key}
+              className="w-full"
+              style={{ background }}
+            >
+              {/* Advertisements share the section band and its 1280px content
+                  width. They are no longer standalone bands between rows. */}
               {advertisements.map((advertisement) => (
                 <HomeAdvertisementBanner
                   key={`${advertisement.id}:v${advertisement.version}`}
                   advertisement={advertisement}
                 />
               ))}
-            </Fragment>
+              {s.node}
+            </div>
           );
         })}
       </div>

@@ -14,9 +14,10 @@ describe("ticker editorial order and module names", () => {
     expect(ticker).not.toMatch(/const moduleCopy/);
   });
 
-  it("renders dot, module, title, then publication date in RTL source order", () => {
-    const item = ticker.slice(ticker.indexOf("RTL reading order"), ticker.indexOf("</Link>", ticker.indexOf("RTL reading order")));
-    expect(item.indexOf("aria-hidden")).toBeLessThan(item.indexOf("{moduleTitle}"));
+  it("renders module, title, then publication date with no leading dot", () => {
+    const start = ticker.indexOf("RTL reading order");
+    const item = ticker.slice(start, ticker.indexOf("</Link>", start));
+    expect(item).not.toMatch(/rounded-full/);
     expect(item.indexOf("{moduleTitle}")).toBeLessThan(item.indexOf("{item.title}"));
     expect(item.indexOf("{item.title}")).toBeLessThan(item.indexOf("{relativeDate}"));
   });

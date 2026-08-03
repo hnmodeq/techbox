@@ -11,7 +11,9 @@ describe("alternating section bands", () => {
   it("stripes from the RENDERED index, not from each section", () => {
     // Computing this per section would break the rhythm the moment an admin
     // reorders or hides one.
-    expect(page).toMatch(/index % 2 === 0 \? "var\(--hp-band-a\)" : "var\(--hp-band-b\)"/);
+    expect(page).toMatch(/index % 2 === 0/);
+    expect(page).toMatch(/\? "var\(--hp-band-a\)"/);
+    expect(page).toMatch(/: "var\(--hp-band-b\)"/);
     expect(page).toMatch(/visible\.map\(\(s, index\)/);
   });
 

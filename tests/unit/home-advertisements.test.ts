@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 import {
   DEFAULT_HOME_ADVERTISEMENTS,
   isSafeAdvertisementHref,
@@ -34,6 +36,32 @@ describe("homepage advertisements", () => {
       { ...valid }, // duplicate id
     ]));
     expect(parsed).toEqual([valid]);
+  });
+
+  it("migrates the first-release afterSection field without hiding saved ads", () => {
+    const current = DEFAULT_HOME_ADVERTISEMENTS[0];
+    const legacy: Record<string, unknown> = { ...current, afterSection: "video" };
+    delete legacy.section;
+    const [parsed] = parseHomeAdvertisements([legacy]);
+    expect(parsed.section).toBe("video");
+    expect(parsed).not.toHaveProperty("afterSection");
+  });
+
+  it("renders creatives inside/above their band at section width and without recompression", () => {
+    const root = path.resolve(__dirname, "../..");
+    const component = fs.readFileSync(
+      path.join(root, "features/home/components/sections/HomeAdvertisement.tsx"),
+      "utf8",
+    );
+    const page = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
+    expect(component).toMatch(/max-w-\[1280px\]/);
+    expect(component).not.toMatch(/max-w-\[1440px\]/);
+    expect(component).toMatch(/unoptimized/);
+    expect(component).toMatch(/بستن این تبلیغ/);
+    expect(component).toMatch(/تبلیغات/);
+    expect(component.indexOf("<X ")).toBeLessThan(component.indexOf("تبلیغات</span>"));
+    const band = page.slice(page.indexOf("visible.map"));
+    expect(band.indexOf("<HomeAdvertisementBanner")).toBeLessThan(band.indexOf("{s.node}"));
   });
 
   it("respects an explicitly saved empty campaign list", () => {

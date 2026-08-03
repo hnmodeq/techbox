@@ -23,7 +23,7 @@ const advertisementSchema = z.object({
   href: z.string().trim().max(500).optional().default("").refine(isSafeAdvertisementHref, {
     message: "advertisement link must be an internal path or HTTPS URL",
   }),
-  afterSection: z.enum(HOME_AD_PLACEMENTS),
+  section: z.enum(HOME_AD_PLACEMENTS),
   enabled: z.boolean(),
   order: z.number().int().min(0).max(1000),
   version: z.number().int().min(1).max(1_000_000),

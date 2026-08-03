@@ -90,15 +90,32 @@ export default function FooterSection() {
 
         <Separator className="my-6" />
 
-        {/* Decreased sub footer height */}
-        <div className="py-1 flex flex-col items-center justify-between gap-2 sm:flex-row text-[11px]">
-          <p className="text-muted-foreground text-center sm:text-right">
+        {/* Restored compact sub-footer from the earlier design: both names
+            retain their original colours and explanatory tooltips. */}
+        <div className="flex flex-col items-center justify-between gap-2 py-1 text-[11px] sm:flex-row">
+          <p className="text-center text-muted-foreground sm:text-right">
             © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت{" "}
-            <span className="text-foreground font-semibold">هونامیک ارتباط رستاک</span> می‌باشد.
+            <Tooltip>
+              <TooltipTrigger
+                render={<span tabIndex={0} className="cursor-help font-semibold text-sky-500" />}
+              >
+                هونامیک ارتباط رستاک
+              </TooltipTrigger>
+              <TooltipContent>در دست طراحی</TooltipContent>
+            </Tooltip>{" "}
+            می‌باشد.
           </p>
 
           <p className="text-muted-foreground">
-            توسعه داده شده با استانداردهای زیرساخت و فناوری اطلاعات
+            طراحی شده توسط{" "}
+            <Tooltip>
+              <TooltipTrigger
+                render={<span tabIndex={0} className="cursor-help font-semibold text-[#f5b301]" />}
+              >
+                بومیم
+              </TooltipTrigger>
+              <TooltipContent>در دست طراحی</TooltipContent>
+            </Tooltip>
           </p>
         </div>
       </div>

@@ -9,6 +9,7 @@ describe("homepage tools and website-info requirements", () => {
   const registry = read("config/modules.config.ts");
   const websiteInfo = read("features/home/components/sections/WebsiteInfoSection.tsx");
   const profiles = read("features/home/components/sections/FamilyProfilesSection.tsx");
+  const footer = read("components/layout/Footer.tsx");
   const data = read("lib/home-sections.ts");
 
   it("uses absolute black bands and keeps the tools heading visual-only hidden", () => {
@@ -33,5 +34,13 @@ describe("homepage tools and website-info requirements", () => {
 
   it("labels member activity as completed participation", () => {
     expect(profiles).toMatch(/مشارکت انجام شده/);
+  });
+
+  it("restores the colourful tooltip sub-footer for رستاک and بومیم", () => {
+    expect(footer).toMatch(/هونامیک ارتباط رستاک/);
+    expect(footer).toMatch(/text-sky-500/);
+    expect(footer).toMatch(/بومیم/);
+    expect(footer).toMatch(/text-\[#f5b301\]/);
+    expect(footer.match(/<TooltipContent>در دست طراحی<\/TooltipContent>/g)).toHaveLength(2);
   });
 });

@@ -888,3 +888,29 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
     transparent 100%
   );
 }
+
+/* Cards now fade as they enter or leave the timeline viewport instead of
+   being cut off by a hard rectangular edge. */
+.timeline-scroll-fade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 6%,
+    black 94%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 6%,
+    black 94%,
+    transparent 100%
+  );
+}
+
+@media (max-width: 640px) {
+  .timeline-scroll-fade {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 3%, black 97%, transparent 100%);
+  }
+}

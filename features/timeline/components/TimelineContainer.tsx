@@ -7,9 +7,9 @@ import { TimelineCard } from './TimelineCard';
 import { TimelineSuggestions } from './TimelineSuggestions';
 import { ChevronRight, ChevronLeft, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
-const SPACER_H = 24;
-const DOT_SIZE = 16;
-const DOT_GAP  = 16;
+const DATE_ROW_H = 28;
+const CARD_GAP = 12;
+const CARD_H = 360;
 
 function relativeDate(dateGr: Date | string): string {
   const d = typeof dateGr === 'string' ? new Date(dateGr) : dateGr;
@@ -28,12 +28,8 @@ function relativeDate(dateGr: Date | string): string {
 function TodayMarker() {
   return (
     <div className="relative flex shrink-0 flex-col items-center" style={{ width: 100 }}>
-      <div className="h-6 flex items-center justify-center">
-        <span className="text-[11px] font-extrabold text-primary">امروز</span>
-      </div>
-      <div className="relative z-10 flex items-center justify-center">
-        <div className="size-5 rounded-full bg-primary shadow-md shadow-primary/30" />
-        <div className="absolute size-5 rounded-full bg-primary animate-ping opacity-25" />
+      <div className="flex h-7 items-center justify-center">
+        <span className="text-sm font-extrabold text-primary sm:text-base">امروز</span>
       </div>
     </div>
   );
@@ -50,15 +46,11 @@ function EventItem({ event, index }: { event: TimelineEvent; index: number }) {
       data-parallax
       data-event-index={index}
     >
-      <div className="mb-2 text-center text-xs font-bold text-muted-foreground h-6 flex items-center justify-center">
+      <div className="flex h-7 items-center justify-center text-center text-sm font-bold text-muted-foreground sm:text-base">
         {relativeDate(event.dateGr)}
       </div>
 
-      <div className="relative z-10 flex items-center justify-center">
-        <div className="size-4 rounded-full border-2 border-background bg-foreground shadow-sm" />
-      </div>
-
-      <div className="mt-4">
+      <div className="mt-3">
         <TimelineCard event={event} importance={event.importance} />
       </div>
     </motion.div>
@@ -79,7 +71,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
       const el = scrollRef.current;
       if (!el) return;
       const containerH = el.clientHeight;
-      const contentH = SPACER_H + DOT_SIZE + DOT_GAP + 360;
+      const contentH = DATE_ROW_H + CARD_GAP + CARD_H;
       setTopPad(Math.max(0, (containerH - contentH) / 2));
     };
     update();
@@ -132,8 +124,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const scrollToPrev = () => { const idx = findCenteredIndex(); if (idx > 0) scrollToEvent(idx - 1); };
   const scrollToNext = () => { const idx = findCenteredIndex(); if (idx < events.length - 1) scrollToEvent(idx + 1); };
 
-  const lineTop = topPad + SPACER_H + DOT_SIZE / 2;
-
   return (
     <div className="relative flex w-full flex-col overflow-hidden bg-transparent text-foreground" dir="rtl">
       <div className="relative z-10 flex items-center pt-10 pb-6 justify-center gap-5">
@@ -158,7 +148,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         ref={scrollRef}
         tabIndex={0}
         dir="rtl"
-        className={`relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none [&::-webkit-scrollbar]:hidden ${heightClassName || 'h-[500px]'}`}
+        className={`timeline-scroll-fade relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none [&::-webkit-scrollbar]:hidden ${heightClassName || 'h-[500px]'}`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         <div
@@ -170,11 +160,6 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
               travels with the cards. One layer also avoids the doubled dark
               seam that looked like a black border around grid cells. */}
           <div aria-hidden="true" className="hp-grid-texture pointer-events-none absolute inset-0" />
-
-          <div
-            className="pointer-events-none absolute left-0 z-[1] h-[3px] rounded-full bg-border/60"
-            style={{ top: lineTop, width: '100%' }}
-          />
 
           <TodayMarker />
 

@@ -37,6 +37,19 @@ describe("timeline engagement integrity", () => {
     expect(container.indexOf("hp-grid-texture")).toBeGreaterThan(container.indexOf("ref={scrollRef}"));
   });
 
+  it("hides the timeline line/dots, enlarges dates, and fades both viewport edges", () => {
+    const container = read("features/timeline/components/TimelineContainer.tsx");
+    const suggestions = read("features/timeline/components/TimelineSuggestions.tsx");
+    const css = read("design/globals.css");
+    expect(container).not.toMatch(/h-\[3px\]/);
+    expect(container).not.toMatch(/animate-ping/);
+    expect(suggestions).not.toMatch(/rounded-full/);
+    expect(container).toMatch(/text-sm font-bold text-muted-foreground sm:text-base/);
+    expect(container).toMatch(/timeline-scroll-fade/);
+    expect(css).toMatch(/\.timeline-scroll-fade/);
+    expect(css).toMatch(/transparent 0%[\s\S]*black 6%[\s\S]*black 94%[\s\S]*transparent 100%/);
+  });
+
   it("lets the suggestion API—not an optional provider tree—decide authentication", () => {
     const suggestions = read("features/timeline/components/TimelineSuggestions.tsx");
     expect(suggestions).not.toMatch(/useAuth/);

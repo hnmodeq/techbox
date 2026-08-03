@@ -19,17 +19,17 @@ import {
 } from "@/features/home/lib/home-advertisements";
 
 const PLACEMENT_LABELS: Record<HomeAdPlacement, string> = {
-  magazine: "بعد از مجله",
-  video: "بعد از ویدیوها",
-  insights: "بعد از تازه‌ترین دیدگاه‌ها",
-  finder: "بعد از جستجوگر",
-  topPicks: "بعد از بررسی‌ها",
-  timeline: "بعد از گاه‌شمار",
-  deals: "بعد از فروشگاه",
-  tools: "بعد از ابزارها",
-  community: "بعد از انجمن",
-  websiteInfo: "بعد از اطلاعات سایت",
-  partners: "بعد از همکاران تجاری",
+  magazine: "بالای بخش مجله",
+  video: "بالای بخش ویدیوها",
+  insights: "بالای بخش تازه‌ترین دیدگاه‌ها",
+  finder: "بالای بخش جستجوگر",
+  topPicks: "بالای بخش بررسی‌ها",
+  timeline: "بالای بخش گاه‌شمار",
+  deals: "بالای بخش فروشگاه",
+  tools: "بالای بخش ابزارها",
+  community: "بالای بخش انجمن",
+  websiteInfo: "بالای بخش اطلاعات سایت",
+  partners: "بالای بخش همکاران تجاری",
 };
 
 function newId() {
@@ -82,7 +82,7 @@ function AdvertisementsContent() {
         image: "",
         alt: "",
         href: undefined,
-        afterSection: "magazine",
+        section: "magazine",
         enabled: true,
         order: current.length,
         version: 1,
@@ -174,7 +174,7 @@ function AdvertisementsContent() {
           colorVar="--admin"
           title="تبلیغات صفحه اصلی"
           titleClassName="text-[var(--admin)]"
-          description="آپلود WebP، تعیین جایگاه بین بخش‌ها، ترتیب و وضعیت نمایش بنرها"
+          description="آپلود WebP، تعیین بخش میزبان، ترتیب و وضعیت نمایش بنرها"
         >
           <ButtonLink href="/" variant="ghost" size="sm">پیش‌نمایش سایت</ButtonLink>
           <Button type="button" variant="ghost" size="sm" onClick={load} disabled={loading || saving}>
@@ -231,6 +231,7 @@ function AdvertisementsContent() {
                         alt={advertisement.alt || "پیش‌نمایش تبلیغ"}
                         fill
                         sizes="(max-width: 1024px) 100vw, 900px"
+                        unoptimized
                         className="object-contain"
                       />
                     </div>
@@ -265,8 +266,8 @@ function AdvertisementsContent() {
                       <Label htmlFor={`ad-placement-${advertisement.id}`}>جایگاه نمایش</Label>
                       <select
                         id={`ad-placement-${advertisement.id}`}
-                        value={advertisement.afterSection}
-                        onChange={(event) => update(advertisement.id, "afterSection", event.target.value as HomeAdPlacement)}
+                        value={advertisement.section}
+                        onChange={(event) => update(advertisement.id, "section", event.target.value as HomeAdPlacement)}
                         className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {HOME_AD_PLACEMENTS.map((placement) => (
