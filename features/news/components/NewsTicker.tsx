@@ -34,8 +34,11 @@ function getModule(item: TickerItem): ModuleSlug {
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const { items: liveItems } = useHomeTicker();
   const live = liveItems.length ? liveItems : items;
+  // The ticker is a compact cross-module recency feed: the ten newest
+  // eligible rows across Video, Reviews, Magazine, Forum, and other active
+  // modules — never News or Shop, which have their own dedicated surfaces.
   const filtered = useMemo(
-    () => live.filter((item) => item.module !== "news" && item.module !== "shop").slice(0, 30),
+    () => live.filter((item) => item.module !== "news" && item.module !== "shop").slice(0, 10),
     [live]
   );
   if (!filtered.length) return null;
@@ -64,11 +67,10 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
             style={style}
             dir="rtl"
           >
-            <span className="size-1.5 shrink-0 rounded-full bg-[color:var(--ticker-accent)]" />
-            <span className="font-light text-[color:var(--ticker-accent)]">
-              {copy.type}{" "}<span>{item.title}</span>{" "}<span>{copy.action}.</span>
-            </span>
             {relativeDate && <span className="shrink-0 font-light text-muted-foreground">{relativeDate}</span>}
+            <span className="font-light text-foreground">{item.title}</span>
+            <span className="font-light text-[color:var(--ticker-accent)]">{copy.type}</span>
+            <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-[color:var(--ticker-accent)]" />
           </Link>
         );
       })}
