@@ -1,0 +1,97 @@
+name: Migration Replay
+
+# Proves the migration chain can rebuild the schema from nothing.
+#
+# This is disaster-recovery insurance. The chain was NOT replayable until
+# 20260724000012b: ten models (Order, OrderItem, AuditLog, ConsultationRequest,
+# Follow, IpBan, SavedContent, SearchLog, TeamMember, TeamSection) existed only
+# because someone ran `prisma db push` against the live database, so
+# `migrate deploy` on an empty database died at 20260725000013 with
+# `relation "Order" does not exist`.
+#
+# A green run here means: a fresh database can be built from source, and
+# `prisma migrate diff` finds no drift between the replayed schema and
+# schema.prisma.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'prisma/**'
+      - '.github/workflows/migration-replay.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'prisma/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migration-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  replay:
+    name: Replay migrations on an empty database
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: techbox
+          POSTGRES_PASSWORD: techbox
+          POSTGRES_DB: techbox_replay
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U techbox"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://techbox:techbox@127.0.0.1:5432/techbox_replay
+      DIRECT_URL: postgresql://techbox:techbox@127.0.0.1:5432/techbox_replay
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Replay every migration from empty
+        run: pnpm exec prisma migrate deploy
+
+      - name: Fail if the replayed schema drifts from schema.prisma
+        run: |
+          pnpm exec prisma migrate diff \
+            --from-url "$DATABASE_URL" \
+            --to-schema-datamodel prisma/schema.prisma \
+            --exit-code \
+            --script > /tmp/drift.sql && echo "No drift." && exit 0
+
+          echo "::error::The replayed database does not match schema.prisma."
+          echo "Missing statements:"
+          cat /tmp/drift.sql
+          exit 1
+
+      - name: Seed fixtures against the rebuilt schema
+        env:
+          E2E_SEED_CONFIRM: yes
+        run: pnpm exec tsx prisma/seed-e2e.ts
