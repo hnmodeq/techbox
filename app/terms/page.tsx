@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { pageMetadata } from "@/lib/seo";
+import { sanitizeAdminHtml } from "@/lib/sanitize-html";
 import { TermsDialog } from "@/features/legal/components/TermsDialog";
 import { Button } from "@/components/ui/button";
 
@@ -35,7 +36,7 @@ export default async function TermsPage() {
 
       {content ? (
         <article className="prose prose-sm max-w-none leading-8 text-foreground">
-          <div dangerouslySetInnerHTML={{ __html: content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeAdminHtml(content) }} />
         </article>
       ) : (
         <div className="text-center py-16 border border-dashed border-border rounded-xl">

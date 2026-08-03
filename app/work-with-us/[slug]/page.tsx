@@ -33,7 +33,8 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
   let termsContent = "";
   try {
     const row = await (await import("@/lib/db")).prisma.siteSetting.findUnique({ where: { key: "terms.content" } });
-    if (row?.value) termsContent = row.value;
+    // TermsModal renders this with dangerouslySetInnerHTML.
+    if (row?.value) termsContent = (await import("@/lib/sanitize-html")).sanitizeAdminHtml(row.value);
   } catch {}
 
   return (
