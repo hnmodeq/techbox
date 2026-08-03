@@ -46,8 +46,8 @@ export function TimelineSection({
     published: true,
     createdAt: new Date(),
     updatedAt: new Date(),
-    likesCount: (e as any).likesCount ?? e.likes ?? 0,
-    commentsCount: (e as any).commentsCount ?? 0,
+    likesCount: e.likesCount ?? e.likes ?? 0,
+    commentsCount: e.commentsCount ?? 0,
   }));
 
   return (
@@ -55,18 +55,6 @@ export function TimelineSection({
       aria-labelledby={HEADING_ID}
       className="relative w-full overflow-hidden bg-white dark:bg-black py-14 lg:py-20 text-foreground"
     >
-      {/* Grid texture with smoothly faded top, bottom, left, and right */}
-      <div
-        aria-hidden="true"
-        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.14]"
-        style={{
-          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          maskComposite: "intersect",
-          WebkitMaskComposite: "source-in",
-        }}
-      />
-
       <div className="relative mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8">
         {showTitle && (
           <SectionHeader

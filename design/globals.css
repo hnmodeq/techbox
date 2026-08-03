@@ -865,9 +865,13 @@ html[data-news-sidebar-open="true"] .news-sidebar-toggle {
    top and bottom edges; without it the lines stop dead against the band
    boundary and look like a rendering seam. */
 .hp-grid-texture {
+  /* An explicit translucent token is softer than inheriting `currentColor`.
+     The old black foreground + element opacity could form dark one-pixel
+     seams where two texture layers overlapped. */
+  --hp-grid-line: color-mix(in oklch, var(--foreground) 12%, transparent);
   background-image:
-    linear-gradient(to right, currentColor 1px, transparent 1px),
-    linear-gradient(to bottom, currentColor 1px, transparent 1px);
+    linear-gradient(to right, var(--hp-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hp-grid-line) 1px, transparent 1px);
   background-size: 48px 48px;
   -webkit-mask-image: linear-gradient(
     to bottom,

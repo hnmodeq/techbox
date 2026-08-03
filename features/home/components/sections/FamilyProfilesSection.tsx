@@ -97,7 +97,7 @@ function ProfileCard({ profile }: { profile: FamilyProfile }) {
 
         {activity > 0 && (
           <span className="mt-2 text-[11px] text-[color:var(--hp-ink-3)] bg-transparent">
-            <Num>{activity}</Num> مشارکت
+            <Num>{activity}</Num> مشارکت انجام شده
           </span>
         )}
       </TooltipTrigger>

@@ -1,6 +1,7 @@
 import { prisma } from "./db";
 import { logDbFailure } from "./db-error";
 import { withCircuit, isCircuitOpenError } from "./db-circuit";
+import { DEFAULT_HOME_ADVERTISEMENTS } from "@/features/home/lib/home-advertisements";
 
 const DEFAULTS: Record<string, string> = {
   "comments.mode": "auto_approve",
@@ -21,6 +22,7 @@ const DEFAULTS: Record<string, string> = {
   "newsletter.email.nodemailer_user": "",
   "newsletter.email.nodemailer_pass": "",
   "newsletter.email.from_address": "TechBox Newsletter <newsletter@techbox.local>",
+  "home.advertisements": JSON.stringify(DEFAULT_HOME_ADVERTISEMENTS),
 };
 
 /**

@@ -23,12 +23,15 @@ export interface TimelineEvent {
   updatedAt: Date | string;
   comments?: TimelineComment[];
   likes?: TimelineLike[];
+  likesCount?: number;
+  commentsCount?: number;
 }
 
 export interface TimelineComment {
   id: string;
   eventId: string;
   parentId: string | null;
+  userId?: string | null;
   authorName: string;
   text: string;
   likes: number;
@@ -51,6 +54,7 @@ export interface TimelineCommentVote {
 export interface TimelineLike {
   id: string;
   fingerprint: string;
+  userId?: string | null;
   eventId: string;
   event?: TimelineEvent;
 }

@@ -6,6 +6,7 @@ import { logAudit } from "@/lib/audit-log";
 import { z } from "zod";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
+import { DEFAULT_HOME_ADVERTISEMENTS } from "@/features/home/lib/home-advertisements";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
   "shop.banners": "[]",
@@ -31,6 +32,7 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "home.announcement": '{"enabled":false,"version":1,"textFa":"","tone":"brand"}',
   "home.finder.chips": "[]",
   "home.tools.featured": "[]",
+  "home.advertisements": JSON.stringify(DEFAULT_HOME_ADVERTISEMENTS),
   "home.familyComments.blocklist": "[]",
   "auth.require_email_verification": "false",
   "email.provider": "resend",
@@ -62,7 +64,7 @@ function settingPermission(key: string, access: "view" | "edit") {
   if (key.startsWith("email.") || key.startsWith("newsletter.email.")) return `settings:email:${access}`;
   if (key.startsWith("auth.")) return `settings:auth:${access}`;
   if (key.startsWith("currency.")) return `settings:price:${access}`;
-  if (key === "shop.banners") return `banner:${access}`;
+  if (key === "shop.banners" || key === "home.advertisements") return `banner:${access}`;
   if (key.startsWith("terms.")) return `terms:${access}`;
   if (key.startsWith("modules.")) return `module:${access}`;
   if (key.startsWith("hero.")) return `hero:${access}`;

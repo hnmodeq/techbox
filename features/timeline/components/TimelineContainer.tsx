@@ -135,19 +135,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
   const lineTop = topPad + SPACER_H + DOT_SIZE / 2;
 
   return (
-    <div className="relative flex flex-col w-full bg-white dark:bg-black text-foreground overflow-hidden" dir="rtl">
-      {/* Grid texture with smoothly faded top, bottom, left, and right */}
-      <div
-        aria-hidden="true"
-        className="hp-grid-texture pointer-events-none absolute inset-0 opacity-[0.08] dark:opacity-[0.14]"
-        style={{
-          maskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent), linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          maskComposite: "intersect",
-          WebkitMaskComposite: "source-in",
-        }}
-      />
-
+    <div className="relative flex w-full flex-col overflow-hidden bg-transparent text-foreground" dir="rtl">
       <div className="relative z-10 flex items-center pt-10 pb-6 justify-center gap-5">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <ChevronsRight className="size-3.5" /> امروز
@@ -170,18 +158,21 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         ref={scrollRef}
         tabIndex={0}
         dir="rtl"
-        className={`relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none ${heightClassName || 'h-[500px]'}`}
+        className={`relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none [&::-webkit-scrollbar]:hidden ${heightClassName || 'h-[500px]'}`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
       >
-        <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-
         <div
           className="relative flex min-w-max items-start gap-6 px-[8%]"
           style={{ userSelect: 'none', WebkitUserSelect: 'none', height: '100%', paddingTop: topPad }}
           onDragStart={(e) => e.preventDefault()}
         >
+          {/* The texture belongs to the scroll track—not the viewport—so it
+              travels with the cards. One layer also avoids the doubled dark
+              seam that looked like a black border around grid cells. */}
+          <div aria-hidden="true" className="hp-grid-texture pointer-events-none absolute inset-0" />
+
           <div
-            className="pointer-events-none absolute left-0 h-[3px] rounded-full bg-border/60"
+            className="pointer-events-none absolute left-0 z-[1] h-[3px] rounded-full bg-border/60"
             style={{ top: lineTop, width: '100%' }}
           />
 

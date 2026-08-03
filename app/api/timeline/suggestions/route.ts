@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
     const suggestion = await prisma.timelineComment.create({
       data: {
         eventId: SUGGESTIONS_EVENT_ID,
+        userId: user.id,
         text: text.trim(),
         authorName: user.name || user.username || "عضو تکباکس",
       },

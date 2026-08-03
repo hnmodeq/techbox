@@ -21,6 +21,7 @@ import {
   getPartners,
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
+import { parseHomeAdvertisements } from "@/features/home/lib/home-advertisements";
 import { logDbFailure, noteDbSuccess, isDbUnreachable } from "@/lib/db-error";
 import { withCircuit, isCircuitOpenError, circuitState } from "@/lib/db-circuit";
 
@@ -643,6 +644,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
       "home.familyComments.blocklist",
       "home.finder.chips",
       "home.tools.featured",
+      "home.advertisements",
       "home.announcement",
     ]);
   } catch (e) {
@@ -663,6 +665,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     .filter((c) => c && typeof c.labelFa === "string" && typeof c.href === "string");
   const toolsFeatured = parseJsonArray(homeSettings["home.tools.featured"])
     .filter((x) => typeof x === "string");
+  const advertisements = parseHomeAdvertisements(homeSettings["home.advertisements"]);
 
   // §0 Announcement. Absent or malformed setting = disabled, which is the
   // intended default (D7): the bar exists for campaigns, not permanently.
@@ -729,16 +732,17 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     authors,
     finderChips,
     toolsFeatured,
+    advertisements,
     announcement,
     familyProfiles,
     partners,
   };
 }
 
-// Cache key v8: Community now delivers a solved feature separately from a
-// random unresolved rail plus its live participant count. The one-hour window
-// matches the server-stable rotations used by the homepage sections.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v8"], {
+// Cache key v9 includes the admin-managed advertisement payload. The one-hour
+// window matches the server-stable rotations used by the homepage sections;
+// admin writes also invalidate the `home-data` tag immediately.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v9"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

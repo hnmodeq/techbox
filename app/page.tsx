@@ -18,6 +18,7 @@
  *
  * Docs: docs/homepage-upgrade/
  */
+import { Fragment } from "react";
 import { HomeDataProvider } from "@/features/home/lib/home-data";
 import { getHomeData, getMagazinePosts } from "@/lib/home-server";
 import { getModuleConfig, type ModuleSlug } from "@/lib/module-config";
@@ -36,6 +37,7 @@ import { WebsiteInfoSection } from "@/features/home/components/sections/WebsiteI
 import { AnnouncementBar } from "@/features/home/components/sections/AnnouncementBar";
 import { TooltipColorScope } from "@/components/ui/tooltip";
 import { PartnersSection } from "@/features/home/components/sections/PartnersSection";
+import { HomeAdvertisementBanner } from "@/features/home/components/sections/HomeAdvertisement";
 
 /**
  * Which module slug gates each section, so the admin panel keeps control.
@@ -236,17 +238,31 @@ export default async function HomePage() {
             the admin panel keeps the light/dark/light rhythm intact. Each
             wrapper is full-width; the sections themselves still centre their
             own 1280 container. */}
-        {visible.map((s, index) => (
-          <div
-            key={s.key}
-            className="w-full"
-            style={{
-              background: index % 2 === 0 ? "var(--hp-band-a)" : "var(--hp-band-b)",
-            }}
-          >
-            {s.node}
-          </div>
-        ))}
+        {visible.map((s, index) => {
+          const advertisements = (data.advertisements ?? [])
+            .filter((advertisement) => advertisement.enabled && advertisement.afterSection === s.key)
+            .sort((a, b) => a.order - b.order);
+
+          return (
+            <Fragment key={s.key}>
+              <div
+                className="w-full"
+                style={{
+                  background: index % 2 === 0 ? "var(--hp-band-a)" : "var(--hp-band-b)",
+                }}
+              >
+                {s.node}
+              </div>
+
+              {advertisements.map((advertisement) => (
+                <HomeAdvertisementBanner
+                  key={`${advertisement.id}:v${advertisement.version}`}
+                  advertisement={advertisement}
+                />
+              ))}
+            </Fragment>
+          );
+        })}
       </div>
     </HomeDataProvider>
   );

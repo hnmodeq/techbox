@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { ContentItem, ModuleSlug } from "@/lib/content";
+import type { HomeAdvertisement } from "./home-advertisements";
 import type {
   TopPickCard,
   TimelineCard,
@@ -50,6 +51,8 @@ export type HomeData = {
   familyProfiles?: FamilyProfile[];
   /** §14 — companies we work with. */
   partners?: PartnerCard[];
+  /** Full-width, admin-managed advertisements inserted between sections. */
+  advertisements?: HomeAdvertisement[];
   /** §0 — campaign banner; null when disabled or outside its window. */
   announcement?: {
     enabled: boolean;
@@ -134,6 +137,7 @@ export function HomeDataProvider({
         authors: body.authors ?? prev.authors,
         finderChips: body.finderChips ?? prev.finderChips,
         toolsFeatured: body.toolsFeatured ?? prev.toolsFeatured,
+        advertisements: body.advertisements ?? prev.advertisements,
         announcement: body.announcement ?? prev.announcement,
         familyProfiles: body.familyProfiles ?? prev.familyProfiles,
         partners: body.partners ?? prev.partners,

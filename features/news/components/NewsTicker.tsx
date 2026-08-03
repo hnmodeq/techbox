@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatRelativeTime } from "@/lib/date-format";
 import { moduleMeta, type ModuleSlug } from "@/lib/content";
 import { useHomeTicker } from "@/features/home/lib/home-data";
+import { useModuleTitles } from "@/providers/module-config.provider";
 
 type TickerItem = {
   slug: string;
@@ -16,23 +17,13 @@ type TickerItem = {
 type NewsTickerProps = { items: TickerItem[]; className?: string };
 
 const KNOWN: ModuleSlug[] = ["blog", "news", "media", "review", "tools", "download", "shop", "forum"];
-const moduleCopy: Partial<Record<ModuleSlug, { type: string; action: string }>> = {
-  blog: { type: "مقاله", action: "منتشر شد" },
-  news: { type: "خبر", action: "منتشر شد" },
-  media: { type: "ویدیو", action: "منتشر شد" },
-  review: { type: "نقد و بررسی", action: "منتشر شد" },
-  download: { type: "فایل", action: "اضافه شد" },
-  shop: { type: "محصول", action: "اضافه شد" },
-  forum: { type: "موضوع", action: "ایجاد شد" },
-  tools: { type: "ابزار", action: "اضافه شد" },
-};
-
 function getModule(item: TickerItem): ModuleSlug {
   return KNOWN.includes(item.module as ModuleSlug) ? (item.module as ModuleSlug) : "blog";
 }
 
 export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
   const { items: liveItems } = useHomeTicker();
+  const moduleTitles = useModuleTitles();
   const live = liveItems.length ? liveItems : items;
   // The ticker is a compact cross-module recency feed: the ten newest
   // eligible rows across Video, Reviews, Magazine, Forum, and other active
@@ -50,10 +41,9 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
     >
       {filtered.map((item, index) => {
         const itemModule = getModule(item);
-        const copy = moduleCopy[itemModule] ?? {
-          type: moduleMeta[itemModule]?.titleFa || itemModule,
-          action: "منتشر شد",
-        };
+        // Admin-managed `modules.titles` is the same source the main sidebar
+        // uses. Never substitute a second hardcoded ticker vocabulary here.
+        const moduleTitle = moduleTitles[itemModule] || moduleMeta[itemModule]?.titleFa || itemModule;
         const relativeDate = formatRelativeTime(item.date);
         const style = {
           "--ticker-accent": `var(--module-${itemModule}-color, var(--primary))`,
@@ -67,10 +57,12 @@ export default function NewsTicker({ items, className = "" }: NewsTickerProps) {
             style={style}
             dir="rtl"
           >
-            {relativeDate && <span className="shrink-0 font-light text-muted-foreground">{relativeDate}</span>}
-            <span className="font-light text-foreground">{item.title}</span>
-            <span className="font-light text-[color:var(--ticker-accent)]">{copy.type}</span>
+            {/* RTL reading order requested by editorial:
+                dot → module → title → publication date. */}
             <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-[color:var(--ticker-accent)]" />
+            <span className="font-light text-[color:var(--ticker-accent)]">{moduleTitle}</span>
+            <span className="font-light text-foreground">{item.title}</span>
+            {relativeDate && <span className="shrink-0 font-light text-muted-foreground">{relativeDate}</span>}
           </Link>
         );
       })}

@@ -17,7 +17,6 @@ import * as React from "react";
 import Link from "next/link";
 import { toolRoutes } from "@/config/modules.config";
 import { ToolIcon } from "@/design/icons/tools";
-import { SectionHeader } from "../primitives";
 
 export type ToolsSectionProps = {
   /** Optional slug allow-list/order from SiteSetting `home.tools.featured`. */
@@ -31,14 +30,16 @@ export type ToolsSectionProps = {
 
 const HEADING_ID = "hp-tools-heading";
 
-type ToolsStyle = React.CSSProperties & { "--tools-accent"?: string };
+type ToolsStyle = React.CSSProperties & {
+  "--tools-accent"?: string;
+  "--hp-ink"?: string;
+  "--hp-ink-3"?: string;
+  "--hp-brand"?: string;
+};
 
 export function ToolsSection({
   featured,
   title = "ابزارها و اپلیکیشن‌ها",
-  moreLabel = "مشاهده همه ابزارها",
-  showTitle = true,
-  showMore = true,
   accentColor,
 }: ToolsSectionProps) {
   const all = [...toolRoutes];
@@ -53,28 +54,26 @@ export function ToolsSection({
 
   if (!tools.length) return null;
 
-  const style: ToolsStyle = { "--tools-accent": accentColor || "var(--primary)" };
+  const toolAccent = accentColor || "var(--module-tools-color, #60a5fa)";
+  const style: ToolsStyle = {
+    "--tools-accent": toolAccent,
+    "--hp-brand": toolAccent,
+    "--hp-ink": "#ffffff",
+    "--hp-ink-3": "rgb(255 255 255 / 0.68)",
+  };
 
   return (
     <section
       aria-labelledby={HEADING_ID}
-      className="w-full bg-[color:var(--hp-bg)] px-4 py-12 sm:px-6 lg:px-8 lg:py-16"
+      className="w-full bg-black px-4 py-10 text-white sm:px-6 lg:px-8 lg:py-12"
       style={style}
     >
       <div className="mx-auto w-full max-w-[1280px]">
-        {showTitle && (
-          <SectionHeader
-            headingId={HEADING_ID}
-            title={title}
-            description="ابزارهای آنلاین و آسان IT. محاسبه ظرفیت، انتخاب سخت‌افزار و زیرشبکه — بدون نصب."
-            href={showMore ? "/tools" : undefined}
-            linkLabel={moreLabel}
-            accentColor={accentColor}
-          />
-        )}
-        {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
+        {/* The visual header and its former “more” action are deliberately
+            hidden; the accessible heading keeps the section landmark named. */}
+        <h2 id={HEADING_ID} className="sr-only">{title}</h2>
 
-        <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
+        <ul className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
           {tools.map((tool) => (
             <li key={tool.slug}>
               <ToolTile tool={tool} />
@@ -92,26 +91,20 @@ function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
       href={tool.href}
       className="group relative flex h-full flex-col items-center rounded-[var(--hp-r-md)] bg-transparent px-4 py-8 text-center focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
     >
-      {/* Fixed monochrome technical glyph: icon colour never changes on hover. */}
       <ToolIcon
         slug={tool.slug}
         size={56}
-        className="text-[color:var(--hp-ink-3)] motion-reduce:transform-none"
+        className="text-[color:var(--hp-ink-3)] transition-colors duration-200 group-hover:text-[color:var(--tools-accent)] motion-reduce:transform-none"
       />
 
-      {/*
-        Spiceworks breaks the tool name onto two lines and keeps the block
-        a fixed height so the grid baseline stays level. `text-wrap:
-        balance` + min-height reproduces that without hardcoding a break.
-      */}
       <h3
         className="mt-4 text-[18px] font-bold leading-[28px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--tools-accent)]"
-        style={{ textWrap: "balance", minHeight: "56px" }}
+        style={{ textWrap: "balance" }}
       >
         {tool.titleFa}
       </h3>
 
-      <p className="mt-1 line-clamp-2 text-[13px] leading-[22px] text-[color:var(--hp-ink-3)]">
+      <p className="mt-0.5 line-clamp-3 text-[13px] leading-[21px] text-[color:var(--hp-ink-3)]">
         {tool.descriptionFa}
       </p>
     </Link>

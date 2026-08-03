@@ -80,17 +80,15 @@ describe("homepage Video and Latest contracts", () => {
     expect(data).toMatch(/seenAuthors\.has\(key\)/);
   });
 
-  it("renders the comment cards at a fixed aspect ratio", () => {
-    // The exact ratio is a design choice and has already been retuned
-    // (1/1 -> 2/1). What must not regress is that the card is ratio-driven
-    // at all, and that the quote can shrink inside it — without min-h-0 and
-    // a line clamp, a long comment forces the box taller and the ratio
-    // silently stops holding.
+  it("keeps comment text visible when the browser or sidebar narrows the grid", () => {
+    // A fixed 2:1 ratio made a narrow card only ~70px tall, leaving no room
+    // for its quote. The card now owns a real minimum height while the quote
+    // remains clamped and shrinkable inside it.
     const card = video.slice(video.indexOf("function VideoCommentCard"));
-    expect(card).toMatch(/aspectRatio: "\d+\/\d+"/);
+    expect(card).toMatch(/min-h-\[190px\]/);
+    expect(card).not.toMatch(/aspectRatio: "\d+\/\d+"/);
     expect(card).toMatch(/min-h-0 min-w-0 flex-1 overflow-hidden/);
     expect(card).toMatch(/line-clamp-4/);
-    expect(card).not.toMatch(/min-h-\[210px\]/);
   });
 
   it("closes the gap under the quick-takes rail and marks the main video with its module colour", () => {

@@ -26,27 +26,39 @@ export async function GET(req: NextRequest) {
   try {
     const events = await prisma.timelineEvent.findMany({
       where: adminScope ? undefined : { published: true },
-      orderBy: {
-        dateGr: 'asc',
-      },
-      include: {
-        comments: {
-          where: { status: 'approved' },
-          select: { id: true, authorName: true, text: true, createdAt: true },
-          orderBy: { createdAt: 'desc' },
+      orderBy: { dateGr: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        image: true,
+        dateGr: true,
+        dateFa: true,
+        year: true,
+        yearFa: true,
+        importance: true,
+        tags: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            likes: true,
+            comments: { where: { status: 'approved' } },
+          },
         },
-        likes: { select: { id: true } },
       },
     });
 
-    if (events && events.length > 0) {
-      const transformedEvents = events.map((event: any) => ({
+    if (events.length > 0) {
+      const transformedEvents = events.map(({ _count, ...event }) => ({
         ...event,
         image: event.image || null,
         tags: Array.isArray(event.tags) ? event.tags : [],
-        // Stable counts — no 0-during-loading flicker, real from DB.
-        likesCount: Array.isArray(event.likes) ? event.likes.length : 0,
-        commentsCount: Array.isArray(event.comments) ? event.comments.length : 0,
+        // Stable, approved-only counts. Comment bodies load only when a card
+        // is opened, avoiding a full-thread payload for every event.
+        likesCount: _count.likes,
+        commentsCount: _count.comments,
       }));
       return NextResponse.json(transformedEvents);
     }

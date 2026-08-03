@@ -178,6 +178,7 @@ export const SIDEBAR_PERMISSIONS: SidebarPermissionItem[] = [
   { href: "/admin/orders", permission: "order:list:view" },
   { href: "/admin/consultations", permission: "consultation:view" },
   { href: "/admin/shop-banners", permission: "banner:view" },
+  { href: "/admin/home-advertisements", permission: "banner:view" },
 
   // Users
   { href: "/admin/users", permission: "user:list:view" },

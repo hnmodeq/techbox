@@ -15,9 +15,33 @@ interface TimelineCardProps {
   importance: number;
 }
 
+type TimelineCommentView = {
+  id?: string;
+  authorName: string;
+  text: string;
+  createdAt: string;
+};
+
+function visibleComment(comment: {
+  id?: string;
+  authorName?: string;
+  text?: string;
+  createdAt?: Date | string;
+}): TimelineCommentView | null {
+  const text = String(comment.text || '').trim();
+  if (!text || text.startsWith('[missing]') || text.startsWith('[future]')) return null;
+  const createdAt = comment.createdAt ? new Date(comment.createdAt) : new Date();
+  return {
+    id: comment.id,
+    authorName: comment.authorName || 'عضو تکباکس',
+    text,
+    createdAt: Number.isNaN(createdAt.getTime()) ? new Date().toISOString() : createdAt.toISOString(),
+  };
+}
+
 export function TimelineCard({ event, style, importance }: TimelineCardProps) {
-  const serverLikes = typeof (event as any).likesCount === 'number' ? (event as any).likesCount : -1;
-  const serverComments = typeof (event as any).commentsCount === 'number' ? (event as any).commentsCount : -1;
+  const serverLikes = typeof event.likesCount === 'number' ? event.likesCount : -1;
+  const serverComments = typeof event.commentsCount === 'number' ? event.commentsCount : -1;
 
   const { liked: contextLiked, setLiked: setContextLiked } = useTimelineLiked(event.id);
   const [localLiked, setLocalLiked] = useState<boolean | null>(null);
@@ -27,21 +51,16 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   const [commentsCount, setCommentsCount] = useState<number>(serverComments);
   const [likeBusy, setLikeBusy] = useState(false);
 
+  const initialComments = (event.comments ?? [])
+    .map(visibleComment)
+    .filter((comment): comment is TimelineCommentView => Boolean(comment));
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<Array<{ id?: string; authorName: string; text: string; createdAt: string }>>(
-    Array.isArray((event as any).comments)
-      ? (event as any).comments
-          .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
-          .map((c: any) => ({
-            id: c.id,
-            authorName: c.authorName || 'عضو تکباکس',
-            text: c.text,
-            createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date(c.createdAt).toISOString(),
-          }))
-      : []
-  );
+  const [comments, setComments] = useState<TimelineCommentView[]>(initialComments);
+  const [commentsLoaded, setCommentsLoaded] = useState(initialComments.length > 0);
+  const [commentsLoading, setCommentsLoading] = useState(false);
   const [newCommentText, setNewCommentText] = useState('');
   const [commentError, setCommentError] = useState('');
+  const [commentNotice, setCommentNotice] = useState('');
 
   // Ref for the comment scroll area — used to trap wheel events
   const commentScrollRef = useRef<HTMLDivElement>(null);
@@ -68,10 +87,10 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     return () => el.removeEventListener('wheel', onWheel);
   }, [showComments]);
 
-  // Extract event sub-properties for stable dependency tracking
-  const eventLikesCount = (event as any).likesCount;
-  const eventCommentsCount = (event as any).commentsCount;
-  const eventComments = (event as any).comments;
+  // Extract event sub-properties for stable dependency tracking.
+  const eventLikesCount = event.likesCount;
+  const eventCommentsCount = event.commentsCount;
+  const eventComments = event.comments;
 
   // Keep local state in sync if the parent re-fetches the event payload.
   useEffect(() => {
@@ -83,16 +102,12 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   }, [eventCommentsCount]);
 
   useEffect(() => {
-    if (Array.isArray(eventComments)) {
+    if (Array.isArray(eventComments) && eventComments.length > 0) {
       const filtered = eventComments
-        .filter((c: any) => !String(c.text || '').startsWith('[missing]') && !String(c.text || '').startsWith('[future]'))
-        .map((c: any) => ({
-          id: c.id,
-          authorName: c.authorName || 'عضو تکباکس',
-          text: c.text,
-          createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date(c.createdAt).toISOString(),
-        }));
+        .map(visibleComment)
+        .filter((comment): comment is TimelineCommentView => Boolean(comment));
       setComments(filtered);
+      setCommentsLoaded(true);
     }
   }, [eventComments]);
 
@@ -102,6 +117,38 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
       : importance >= 6
         ? 'w-64 sm:w-72'
         : 'w-60 sm:w-64';
+
+  const loadComments = async () => {
+    if (commentsLoaded || commentsLoading) return;
+    setCommentsLoading(true);
+    setCommentError('');
+    try {
+      const response = await fetch(`/api/timeline/comments?eventId=${encodeURIComponent(event.id)}`, {
+        cache: 'no-store',
+      });
+      const data = await response.json();
+      if (!response.ok || !Array.isArray(data)) {
+        throw new Error(data?.message || data?.error || 'comment_load_failed');
+      }
+      const loaded = data
+        .map(visibleComment)
+        .filter((comment: TimelineCommentView | null): comment is TimelineCommentView => Boolean(comment));
+      setComments(loaded);
+      setCommentsCount(loaded.length);
+      setCommentsLoaded(true);
+    } catch {
+      setCommentError('خطا در دریافت دیدگاه‌ها');
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  const toggleComments = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next = !showComments;
+    setShowComments(next);
+    if (next) void loadComments();
+  };
 
   const handleLikeToggle = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -158,6 +205,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
     e.preventDefault();
     e.stopPropagation();
     setCommentError('');
+    setCommentNotice('');
     if (!newCommentText.trim()) return;
 
     try {
@@ -174,17 +222,18 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
 
       if (res.ok) {
         const created = await res.json();
-        setComments((prev) => [
-          {
-            id: created.id,
-            authorName: created.authorName || 'شما',
-            text: created.text,
-            createdAt: new Date(created.createdAt || Date.now()).toISOString(),
-          },
-          ...prev,
-        ]);
-        setCommentsCount((n) => n + 1);
         setNewCommentText('');
+        if (created.status === 'pending') {
+          setCommentNotice(created.message || 'دیدگاه شما پس از تأیید نمایش داده می‌شود.');
+        } else {
+          const comment = visibleComment(created);
+          if (comment) {
+            setComments((prev) => [comment, ...prev]);
+            setCommentsCount((n) => Math.max(0, n) + 1);
+            setCommentsLoaded(true);
+          }
+          setCommentNotice('دیدگاه شما ثبت شد.');
+        }
       } else {
         const err = await res.json();
         setCommentError(err.message || err.error || 'خطا در ثبت نظر');
@@ -279,7 +328,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                   render={
                     <button
                       type="button"
-                      onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
+                      onClick={toggleComments}
                       className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer font-bold"
                       aria-expanded={showComments}
                     />
@@ -304,7 +353,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-border shrink-0">
-              <span className="text-sm font-bold text-foreground">دیدگاه‌های شما</span>
+              <span className="text-sm font-bold text-foreground">دیدگاه‌های کاربران</span>
               <button
                 type="button"
                 onClick={() => setShowComments(false)}
@@ -322,7 +371,12 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               style={{ scrollbarWidth: 'thin' }}
             >
               <ul className="space-y-2 p-3 text-right">
-                {comments.length === 0 && (
+                {commentsLoading && (
+                  <li className="rounded-md bg-muted/20 p-2.5 text-center text-xs text-muted-foreground">
+                    در حال دریافت دیدگاه‌ها…
+                  </li>
+                )}
+                {!commentsLoading && comments.length === 0 && !commentError && (
                   <li className="rounded-md bg-muted/20 p-2.5 text-xs text-muted-foreground border border-border text-center">
                     هنوز نظری ثبت نشده است.
                   </li>
@@ -345,7 +399,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                 <Input
                   type="text"
                   value={newCommentText}
-                  onChange={(e) => { setNewCommentText(e.target.value); setCommentError(''); }}
+                  onChange={(e) => { setNewCommentText(e.target.value); setCommentError(''); setCommentNotice(''); }}
                   placeholder="نظر شما..."
                   className="h-9 flex-1 text-sm bg-background"
                 />
@@ -354,6 +408,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
                 </Button>
               </div>
               {commentError && <p className="text-[11px] text-destructive mt-1.5">{commentError}</p>}
+              {commentNotice && <p className="mt-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">{commentNotice}</p>}
             </form>
           </div>
         )}

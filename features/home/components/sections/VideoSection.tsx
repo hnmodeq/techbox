@@ -252,13 +252,11 @@ function VideoCommentCard({ comment, onOpen }: { comment: VideoHighlightComment;
   );
 
   return (
-    // Square by request. min-h-0 lets the quote block actually shrink inside
-    // the fixed ratio, and line-clamp keeps a long comment from demanding
-    // more height than the square allows.
-    <article
-      className="flex w-full flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-border bg-background p-5 shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)]"
-      style={{ aspectRatio: "2/1" }}
-    >
+    // A fixed 2:1 ratio collapsed these cards to ~70px tall when the main
+    // sidebar reduced the available desktop width, hiding the quote entirely.
+    // A real minimum height keeps all four comments readable at every width;
+    // the grid may still make them wider when space is available.
+    <article className="flex min-h-[190px] w-full flex-col overflow-hidden rounded-[var(--hp-r-md)] border border-border bg-background p-4 shadow-[var(--hp-shadow-card)] transition-shadow hover:shadow-[var(--hp-shadow-hover)] sm:p-5">
       {/* Most of the card opens the existing modal at this real comment. */}
       <button
         type="button"

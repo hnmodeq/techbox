@@ -63,7 +63,7 @@ export function LayoutShell({ children, homeData, serverModuleConfig, defaultSid
   const pathname = usePathname()
   const isAdmin = pathname.startsWith("/admin")
   const statsEnabled = /^\/(blog|news|media|review|download|shop|forum|search|author)(\/|$)/.test(pathname)
-  const timelineLikesEnabled = pathname === "/timeline" || pathname.startsWith("/timeline/")
+  const timelineLikesEnabled = pathname === "/" || pathname === "/timeline" || pathname.startsWith("/timeline/")
 
   // Admin pages have their own layout — skip the main site chrome
   if (isAdmin) {

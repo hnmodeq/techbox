@@ -34,6 +34,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DIRECT_URL }}
       DIRECT_URL: ${{ secrets.DIRECT_URL }}
       TIMELINE_ENGAGEMENT_CONFIRM: production-authorized
+      HOME_ADVERTISEMENTS_CONFIRM: production-authorized
       APPROVED_USERNAMES: ${{ inputs.usernames }}
 
     steps:
@@ -80,6 +81,9 @@ jobs:
             args+=("--usernames=$APPROVED_USERNAMES")
           fi
           pnpm exec tsx scripts/content/seed-timeline-engagement.ts "${args[@]}"
+
+      - name: Persist initial homepage advertisements without overwriting admin data
+        run: pnpm exec tsx scripts/content/seed-home-advertisements.ts --apply
 
       - name: Confirm migration status
         run: pnpm exec prisma migrate status

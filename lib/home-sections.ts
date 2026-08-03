@@ -776,7 +776,12 @@ export async function getTimeline(): Promise<TimelineCard[]> {
       // show both. Without it every card rendered "0 comments" regardless of
       // the real figure, which is the bug behind "likes and comments are not
       // true or don't work".
-      _count: { select: { likes: true, comments: true } },
+      _count: {
+        select: {
+          likes: true,
+          comments: { where: { status: "approved" } },
+        },
+      },
     },
   });
 
@@ -986,36 +991,52 @@ export async function getAuthors(): Promise<AuthorCard[]> {
     .map((m) => m.userId)
     .filter((id): id is string => Boolean(id));
 
-  const rows = await prisma.user.findMany({
+  const authorSelect = {
+    name: true,
+    username: true,
+    roleFa: true,
+    role: true,
+    job: true,
+    bio: true,
+    avatar: true,
+    verifiedType: true,
+    verifiedLabel: true,
+    _count: { select: { posts: { where: PUBLISHED } } },
+  } as const;
+
+  // If the editorial section has linked accounts, it is authoritative. When
+  // it is empty (the current production state after the new userId migration),
+  // first retain the legacy editorial-role match and then fall back to actual
+  // published contributors. The final fallback is what prevents the entire
+  // author rail from silently disappearing while an admin links the team.
+  let rows = await prisma.user.findMany({
     where: {
       status: "active",
-      OR: [
-        { roleFa: { contains: "تحریریه" } },
-        { job: { contains: "تحریریه" } },
-        { role: "editor" },
-        { username: "atiyehatami" },
-      ],
       posts: { some: PUBLISHED },
-      // Empty section → fall back to every contributor. A homepage that
-      // silently loses its authors block because nobody has been linked yet
-      // is worse than showing more people than intended.
-      ...(editorialIds.length > 0 ? { id: { in: editorialIds } } : {}),
+      ...(editorialIds.length > 0
+        ? { id: { in: editorialIds } }
+        : {
+            OR: [
+              { roleFa: { contains: "تحریریه" } },
+              { job: { contains: "تحریریه" } },
+              { role: "editor" },
+              { username: "atiyehatami" },
+            ],
+          }),
     },
     orderBy: { posts: { _count: "desc" } },
     take: 12,
-    select: {
-      name: true,
-      username: true,
-      roleFa: true,
-      role: true,
-      job: true,
-      bio: true,
-      avatar: true,
-      verifiedType: true,
-      verifiedLabel: true,
-      _count: { select: { posts: true } },
-    },
+    select: authorSelect,
   });
+
+  if (rows.length === 0) {
+    rows = await prisma.user.findMany({
+      where: { status: "active", posts: { some: PUBLISHED } },
+      orderBy: { posts: { _count: "desc" } },
+      take: 12,
+      select: authorSelect,
+    });
+  }
 
   return rows.map((u) => ({
     name: u.name,

@@ -17,13 +17,13 @@ export async function GET() {
   }
 
   const likes = await prisma.timelineLike.findMany({
-    where: { fingerprint: user.id },
-    select: { eventId: true }
+    where: { OR: [{ userId: user.id }, { fingerprint: user.id }] },
+    select: { eventId: true },
   });
 
-    return NextResponse.json({
-      likedEventIds: likes.map((l: any) => l.eventId),
-    isLoggedIn: true
+  return NextResponse.json({
+    likedEventIds: likes.map((like) => like.eventId),
+    isLoggedIn: true,
   });
 }
 
