@@ -1,14 +1,37 @@
 import { prisma, printIssues, safeJsonArray, isHttpUrl, isLocalUrl, type Issue } from './_shared';
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function checkUrl(url: string) {
-  try {
-    const head = await fetch(url, { method: 'HEAD', cache: 'no-store', signal: AbortSignal.timeout(8000) });
-    if (head.ok) return { ok: true, status: head.status };
-    const get = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
-    return { ok: get.ok, status: get.status };
-  } catch (e: any) {
-    return { ok: false, error: e?.message || 'request_failed' };
+  let lastStatus: number | undefined;
+  let lastError: string | undefined;
+
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { Range: 'bytes=0-0' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      });
+      lastStatus = response.status;
+      if (response.ok) return { ok: true, status: response.status };
+      if (![429, 502, 503, 504].includes(response.status)) {
+        return { ok: false, status: response.status, transient: false };
+      }
+      const retryAfter = Number(response.headers.get('retry-after'));
+      await wait(Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : 500 * (2 ** attempt));
+    } catch (error: any) {
+      lastError = error?.message || 'request_failed';
+      await wait(500 * (2 ** attempt));
+    }
   }
+
+  // A rate-limited/transient provider response does not prove the object is
+  // missing. Report it, but do not turn an informational integrity job red.
+  return { ok: false, status: lastStatus, error: lastError, transient: true };
 }
 
 function isRetiredVercelBlobUrl(url: string) {
@@ -47,14 +70,16 @@ async function main() {
     const result = await checkUrl(target.url);
     if (!result.ok) {
       const retired = isRetiredVercelBlobUrl(target.url);
+      const transient = result.transient === true;
       issues.push({
-        level: retired ? 'warning' : 'error',
+        level: retired || transient ? 'warning' : 'error',
         scope: target.scope,
         id: target.id,
-        message: `${target.field} URL failed (${result.status || result.error || 'unknown'})${retired ? ' — retired Vercel Blob reference' : ''}`,
+        message: `${target.field} URL failed (${result.status || result.error || 'unknown'})${retired ? ' — retired Vercel Blob reference' : transient ? ' — transient provider response after retries' : ''}`,
         hint: target.url,
       });
     }
+    await wait(25);
   }
 
   const errorCount = printIssues('TechBox Supabase storage/URL validation', issues);
