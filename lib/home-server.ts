@@ -207,6 +207,8 @@ function normalizeCard(p: any) {
     discountPercent: (p as any).discountPercent ?? null,
     discountEndsAt: (p as any).discountEndsAt ? (p as any).discountEndsAt.toISOString() : null,
     availability: p.availability,
+    warranty: p.warranty ?? null,
+    specs: p.specs && typeof p.specs === "object" ? p.specs : null,
       author: {
         name: p.author?.name || p.authorName || "کاربر تکباکس",
         username: p.author?.username || "",
@@ -739,9 +741,9 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// v11: review lead/archive, mixed shop quotas, newest-first timeline, and
-// ten-frame media storyboards all change the cached homepage contract.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v11"], {
+// v12: review cards now carry real product commerce and approved comments;
+// shop cards also include their complete specs/warranty payload.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v12"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

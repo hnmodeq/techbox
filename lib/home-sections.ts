@@ -26,6 +26,7 @@ import type { ContentItem } from "@/lib/content";
 import type {
   FamilyProfile,
   PartnerCard,
+  ReviewHomeCard,
   TimelineCard,
   FamilyComment,
   AuthorCard,
@@ -585,39 +586,121 @@ export async function getLatestVideoHighlightComments(take = 4): Promise<VideoHi
 export async function getTopPicks(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
-): Promise<ContentItem[]> {
+): Promise<ReviewHomeCard[]> {
   const where = {
     module: "review",
     ...PUBLISHED,
     date: publicPostDateWhere(),
+    reviewedProductId: { not: null },
+    reviewedProduct: { is: { module: "shop", published: true, deletedAt: null } },
   };
-
-  const latest: any = await prisma.post.findFirst({
-    where,
-    orderBy: [{ date: "desc" }, { id: "desc" }],
-    select: cardSelect,
-  });
-  if (!latest) return [];
-
-  // IDs only keeps the random archive selection cheap even as reviews grow.
   const candidates = await prisma.post.findMany({
-    where: { ...where, id: { not: latest.id } },
+    where,
     orderBy: [{ date: "desc" }, { id: "desc" }],
     select: { id: true },
   });
-  const selectedIds = seededIndices(candidates.length, 4, 941)
-    .map((index) => candidates[index].id);
-  if (selectedIds.length === 0) return [normalize(latest)];
+  if (candidates.length === 0) return [];
+  const latestId = candidates[0].id;
+  const archive = candidates.slice(1);
+  const selectedIds = [
+    latestId,
+    ...seededIndices(archive.length, 4, 941).map((index) => archive[index].id),
+  ];
 
-  const selected: any[] = await prisma.post.findMany({
+  const rows: any[] = await prisma.post.findMany({
     where: { id: { in: selectedIds } },
-    select: cardSelect,
+    select: {
+      ...cardSelect,
+      reviewedProduct: {
+        select: {
+          slug: true,
+          title: true,
+          image: true,
+          date: true,
+          brand: true,
+          model: true,
+          priceLabel: true,
+          priceAmount: true,
+          sourcePriceAmount: true,
+          sourceCurrency: true,
+          priceAdjustmentPercent: true,
+          sellerBenefitPercent: true,
+          discountPercent: true,
+          discountEndsAt: true,
+          availability: true,
+          warranty: true,
+          specs: true,
+          rating: true,
+          ratingCount: true,
+        },
+      },
+      comments: {
+        where: { parentId: null, status: "approved", deletedAt: null, text: { not: "" } },
+        orderBy: [{ likes: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+        take: 6,
+        select: {
+          id: true,
+          text: true,
+          authorName: true,
+          createdAt: true,
+          author: { select: { name: true, username: true, avatar: true, job: true, verifiedType: true, status: true } },
+        },
+      },
+    },
   });
-  const byId = new Map<string, ContentItem>(selected.map((review) => [review.id, normalize(review)]));
-  return [normalize(latest), ...selectedIds.flatMap((id) => {
-    const review = byId.get(id);
-    return review ? [review] : [];
-  })];
+  const rates = await getCurrencyRates();
+  const mapped = new Map<string, ReviewHomeCard>();
+  for (const row of rows) {
+    const base = normalize(row);
+    const rawProduct = row.reviewedProduct;
+    if (!rawProduct) continue;
+    const finalPrice = rawProduct.sourcePriceAmount
+      ? priceFromRates(rawProduct, rates)
+      : rawProduct.priceAmount;
+    const product: ContentItem = {
+      slug: rawProduct.slug,
+      module: "shop",
+      title: rawProduct.title,
+      excerpt: "",
+      image: rawProduct.image ?? undefined,
+      tags: [],
+      author: { name: "فروشگاه تکباکس" },
+      date: rawProduct.date.toISOString(),
+      date_fa: formatPostDateFa(rawProduct.date),
+      likes: 0,
+      views: 0,
+      brand: rawProduct.brand,
+      model: rawProduct.model,
+      priceLabel: rawProduct.priceLabel,
+      priceAmount: finalPrice,
+      discountPercent: rawProduct.discountPercent,
+      discountEndsAt: rawProduct.discountEndsAt?.toISOString() ?? null,
+      availability: rawProduct.availability,
+      warranty: rawProduct.warranty,
+      specs: rawProduct.specs && typeof rawProduct.specs === "object" && !Array.isArray(rawProduct.specs) ? rawProduct.specs : null,
+      rating: rawProduct.rating,
+      ratingCount: rawProduct.ratingCount,
+    };
+    mapped.set(row.id, {
+      ...base,
+      product,
+      highlightComments: row.comments
+        .filter((comment: any) => !comment.author || comment.author.status === "active")
+        .map((comment: any) => ({
+          id: comment.id,
+          text: comment.text,
+          date: comment.createdAt.toISOString(),
+          author: {
+            name: comment.author?.name || comment.authorName || "عضو تکباکس",
+            username: comment.author?.username ?? null,
+            avatar: comment.author?.avatar ?? null,
+            job: comment.author?.job ?? null,
+            verifiedType: comment.author?.verifiedType ?? null,
+          },
+        })),
+    });
+  }
+  return selectedIds.flatMap((id) => mapped.has(id) ? [mapped.get(id)!] : []);
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -640,6 +723,8 @@ export async function getDeals(
     sourceCurrency: true,
     priceAdjustmentPercent: true,
     sellerBenefitPercent: true,
+    specs: true,
+    warranty: true,
   };
   const baseWhere = {
     module: "shop",
@@ -657,6 +742,14 @@ export async function getDeals(
     { title: { contains: "رک", mode: "insensitive" } },
     { title: { contains: "rack", mode: "insensitive" } },
   ];
+  // Tower detection must not negate JSON predicates: PostgreSQL's NULL/JSON
+  // three-valued logic was excluding every tower and leaving only six cards.
+  const rackExclusionSignals: any[] = [
+    { model: { contains: "XU", mode: "insensitive" } },
+    { model: { contains: "U-", mode: "insensitive" } },
+    { title: { contains: "رک", mode: "insensitive" } },
+    { title: { contains: "rack", mode: "insensitive" } },
+  ];
   const metaSelect = { id: true, discountPercent: true, date: true } as const;
 
   // Keep these sequential for the single-connection production pool.
@@ -667,7 +760,7 @@ export async function getDeals(
     select: metaSelect,
   });
   const towerCandidates = await prisma.post.findMany({
-    where: { ...baseWhere, NOT: { OR: rackSignals } },
+    where: { ...baseWhere, NOT: { OR: rackExclusionSignals } },
     orderBy: [{ date: "desc" }, { id: "desc" }],
     take: 80,
     select: metaSelect,

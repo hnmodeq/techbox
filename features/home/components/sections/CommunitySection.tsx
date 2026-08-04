@@ -127,7 +127,10 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const followUpReplies = topic.followUpReplies ?? [];
 
   return (
-    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-emerald-50 p-6 dark:bg-emerald-950/25">
+    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-transparent p-0">
+      {/* Green belongs to the solved QUESTION only; answers remain on the
+          section's normal surface so the two content types stay distinct. */}
+      <div className="bg-emerald-50 p-6 dark:bg-emerald-950/25">
       <h3 className="text-[22px] font-bold leading-[34px] text-[color:var(--community-accent)]">
         <Link
           href={`/${topic.module}/${topic.slug}`}
@@ -147,9 +150,10 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
       <div className="mt-4">
         <TopicActivity topic={topic} />
       </div>
+      </div>
 
       {answer?.text ? (
-        <div className="relative mt-5 p-4 ps-6">
+        <div className="relative mx-6 mt-5 p-4 ps-6">
           <span
             aria-hidden="true"
             className="absolute inset-y-4 start-2 w-1 rounded-full bg-[color:var(--hp-solved)]"
@@ -174,13 +178,13 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
           </div>
         </div>
       ) : (
-        <p className="mt-5 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
+        <p className="mx-6 mt-5 text-[13px] leading-6 text-[color:var(--hp-ink-3)]">
           هنوز پاسخ برتری برای این موضوع ثبت نشده است؛ تجربهٔ شما می‌تواند راه‌حل بعدی باشد.
         </p>
       )}
 
       {followUpReplies.length > 0 && (
-        <section className="mt-auto border-t border-[color:var(--hp-rule)] pt-4 ps-6" aria-label="ادامهٔ گفتگو">
+        <section className="mx-6 mb-6 mt-auto border-t border-[color:var(--hp-rule)] pt-4 ps-6" aria-label="ادامهٔ گفتگو">
           <div className="divide-y divide-[color:var(--hp-rule)]">
             {followUpReplies.map((reply, index) => (
               <article key={reply.id} className={`py-3 ${index === 0 ? "pt-0" : ""}`}>

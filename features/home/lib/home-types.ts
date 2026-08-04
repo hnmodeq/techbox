@@ -10,6 +10,25 @@
  */
 import type { ContentItem } from "@/lib/content";
 
+export type ReviewHomeComment = {
+  id: string;
+  text: string;
+  date: string;
+  author: {
+    name: string;
+    username: string | null;
+    avatar: string | null;
+    job: string | null;
+    verifiedType: string | null;
+  };
+};
+
+/** Homepage review enriched with its real shop product and approved voices. */
+export type ReviewHomeCard = ContentItem & {
+  product: ContentItem;
+  highlightComments: ReviewHomeComment[];
+};
+
 /** §6 Timeline — an IT/computing milestone. */
 export type TimelineCard = {
   id: string;

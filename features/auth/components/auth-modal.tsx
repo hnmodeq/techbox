@@ -47,7 +47,9 @@ export function AuthModal() {
   const { login } = useAuth();
 
   useEffect(() => {
-    const handleOpen = () => {
+    const handleOpen = (event: Event) => {
+      const requestedMode = (event as CustomEvent<{ mode?: Mode }>).detail?.mode;
+      if (requestedMode === "login" || requestedMode === "register") setMode(requestedMode);
       setIsOpen(true);
       setView("form");
       setErrorMsg("");

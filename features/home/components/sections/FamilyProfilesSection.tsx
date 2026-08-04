@@ -21,7 +21,7 @@ const MIN = 4;
 
 export function FamilyProfilesRail({
   profiles,
-  title = "و همچنین ...",
+  title = "برخی از اعضای فعال تکباکس",
 }: FamilyProfilesRailProps) {
   if (!profiles || profiles.length < MIN) return null;
 
@@ -32,7 +32,7 @@ export function FamilyProfilesRail({
           {title}
         </p>
         <p className="mt-2 max-w-2xl text-[15px] leading-[28px] text-[color:var(--hp-ink-3)]">
-          اعضایی که هر روز در انجمن، نظرات و محتوای تکباکس مشارکت می‌کنند.
+          از شما تشکر میکنیم که باعث به وجود اومدن و روز به روز پیشرفت جامعه فناوری دیتاسنتری ایران هستین.
         </p>
       </div>
 

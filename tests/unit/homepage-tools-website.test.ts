@@ -21,7 +21,7 @@ describe("homepage tools and website-info requirements", () => {
 
   it("uses one RAID feature and a 2x2 image grid with saturation hover", () => {
     expect(tools).not.toMatch(/ToolIcon/);
-    expect(tools).toMatch(/<ToolTile tool=\{raid\} featured/);
+    expect(tools).toMatch(/<ToolTile tool=\{raid\} \/>/);
     expect(tools).toMatch(/sm:grid-cols-2/);
     expect(tools).toMatch(/grayscale saturate-0/);
     expect(tools).toMatch(/group-hover:grayscale-0 group-hover:saturate-100/);

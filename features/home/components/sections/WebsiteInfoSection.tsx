@@ -8,6 +8,7 @@ import * as React from "react";
 import type { AuthorCard, FamilyProfile } from "@/features/home/lib/home-types";
 import { AuthorsRail } from "./AuthorsSection";
 import { FamilyProfilesRail } from "./FamilyProfilesSection";
+import { CommunityJoinActions } from "./CommunityJoinActions";
 
 export type WebsiteInfoSectionProps = {
   authors: AuthorCard[];
@@ -44,14 +45,13 @@ export function WebsiteInfoSection({
               id={HEADING_ID}
               className="text-2xl font-bold leading-8 md:text-4xl md:leading-[50px] text-[color:var(--hp-ink)]"
             >
-              {showTitle ? "مرجع روزانهٔ شما در فناوری اطلاعات." : <span className="sr-only">{title}</span>}
+              {showTitle ? "عضو خانواده IT ایران باشید تا با هم رشد کنیم" : <span className="sr-only">{title}</span>}
             </h2>
 
             <p className="mt-4 text-lg font-light leading-8 text-[color:var(--hp-ink-3)] md:text-xl">
-              تکباکس یک جامعهٔ آنلاین و بازارگاه است که در آن متخصصان فناوری اطلاعات
-              می‌توانند مشاوره بگیرند، شبکه‌های خود را مدیریت کنند، و محصولات و خدمات
-              IT را کشف و خریداری کنند.
+              شما میتونید در تکباکس هم به عنوان نویسنده و هم به عنوان عضوی از این خانواده ثبت نام کنید. ما تلاش میکنیم تا جای خالی جامعه‌ای با دانش فناوری‌های دیتاسنتری رو با هم پر کنیم، خوشحال میشیم شما هم عضوی از این خانواده باشید.
             </p>
+            <CommunityJoinActions />
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import type { ContentItem, ModuleSlug } from "@/lib/content";
 import type { HomeAdvertisement } from "./home-advertisements";
 import type {
   TimelineCard,
+  ReviewHomeCard,
   FamilyComment,
   AuthorCard,
   MoreToExplore,
@@ -30,8 +31,8 @@ export type HomeData = {
   insights?: ContentItem[];
   /** §2 — sampled approved comments on the newest video. */
   videoHighlightComments?: VideoHighlightComment[];
-  /** §5 — newest review followed by four rotating archive reviews. */
-  topPicks?: ContentItem[];
+  /** §5 — reviews joined to shop pricing and approved review comments. */
+  topPicks?: ReviewHomeCard[];
   /** §6 — up to 12 IT milestones. */
   timeline?: TimelineCard[];
   /** §10 — 3 sampled comments from across all modules. */

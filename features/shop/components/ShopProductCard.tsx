@@ -79,7 +79,7 @@ function getSpecValue(specs: Record<string, string>, possibleKeys: string[]): st
 }
 
 // ── Timer ─────────────────────────────────────────────────────────────────────
-function DiscountTimer({ endsAt, small = false }: { endsAt: string; small?: boolean }) {
+export function DiscountTimer({ endsAt, small = false }: { endsAt: string; small?: boolean }) {
   const t = useCountdown(endsAt);
   if (!t || t.expired) return null;
   const pad = (n: number) => n.toString().padStart(2, "0").replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[parseInt(d)]);
@@ -113,24 +113,85 @@ function RatingLine({ rating, count }: { rating?: number | null; count?: number 
   );
 }
 
-// ── Main card ─────────────────────────────────────────────────────────────────
-export default function ShopProductCard({ product: p }: { product: ContentItem }) {
-  const isUnavailable = p.availability === "ناموجود" || p.availability === "اتمام موجودی";
-  const specs = (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? (p.specs as Record<string, string>) : {};
-
+export function ShopCardCommerce({ product: p }: { product: ContentItem }) {
   const priceAmount = p.priceAmount && p.priceAmount > 0 ? p.priceAmount : parsePriceLabel(p.priceLabel);
   const discountState = useCountdown(p.discountEndsAt);
   const discount = discountState?.expired ? 0 : (p.discountPercent ?? 0);
   const discountedPrice = discount > 0 ? Math.round(priceAmount * (1 - discount / 100)) : priceAmount;
+  const orig = formatPrice(priceAmount);
+  const disc = formatPrice(discountedPrice);
+
+  return (
+    <div className="mt-auto flex flex-col gap-1 px-3 pb-3 pt-2">
+      <div className="flex items-end justify-between gap-2">
+        <div className="shrink-0">
+          {discount > 0 ? (
+            <span className="inline-flex h-5 min-w-7 items-center justify-center rounded-full bg-[color:var(--module-shop-color,var(--primary))] px-1.5 text-[11px] font-bold leading-none text-white">
+              {discount.toLocaleString("fa-IR")}٪
+            </span>
+          ) : (
+            <span className="block h-5" />
+          )}
+        </div>
+        <div className="flex flex-col items-end text-left" dir="rtl">
+          {priceAmount <= 0 ? (
+            <span className="text-[11px] font-semibold text-muted-foreground">تماس بگیرید</span>
+          ) : (
+            <>
+              {discount > 0 && (
+                <div className="flex items-baseline gap-1 opacity-60">
+                  <span className="text-[11px] text-muted-foreground line-through">{orig.number}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <span className="text-[13px] font-bold leading-none text-foreground">{disc.number}</span>
+                <span className="text-[10px] font-normal text-muted-foreground">تومان</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      {p.discountEndsAt && discount > 0 && (
+        <div className="mt-0.5 flex items-center justify-between gap-1 border-t border-border/30 pt-1.5">
+          <span className="text-[10px] font-medium text-[color:var(--module-shop-color,var(--primary))]">اتمام پیشنهاد</span>
+          <DiscountTimer endsAt={p.discountEndsAt} small />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function ShopInlinePrice({ product: p }: { product: ContentItem }) {
+  const priceAmount = p.priceAmount && p.priceAmount > 0 ? p.priceAmount : parsePriceLabel(p.priceLabel);
+  const discountState = useCountdown(p.discountEndsAt);
+  const discount = discountState?.expired ? 0 : (p.discountPercent ?? 0);
+  const finalPrice = discount > 0 ? Math.round(priceAmount * (1 - discount / 100)) : priceAmount;
+  if (priceAmount <= 0) return <span className="text-[10px] text-muted-foreground">استعلام قیمت</span>;
+  return (
+    <span className="inline-flex items-center gap-1 whitespace-nowrap">
+      {discount > 0 && (
+        <span className="rounded-full bg-[color:var(--module-shop-color,var(--primary))] px-1.5 py-0.5 text-[9px] font-bold text-white">
+          {discount.toLocaleString("fa-IR")}٪
+        </span>
+      )}
+      <span className="text-[11px] font-bold text-foreground">{formatPrice(finalPrice).number}</span>
+      <span className="text-[9px] text-muted-foreground">تومان</span>
+    </span>
+  );
+}
+
+// ── Main card ─────────────────────────────────────────────────────────────────
+export default function ShopProductCard({ product: p }: { product: ContentItem }) {
+  const specs = (p.specs && typeof p.specs === "object" && !Array.isArray(p.specs)) ? (p.specs as Record<string, string>) : {};
+
+  const discountState = useCountdown(p.discountEndsAt);
+  const discount = discountState?.expired ? 0 : (p.discountPercent ?? 0);
 
   const validMajorSpecs = MAJOR_SPECS.map((def) => {
     const value = getSpecValue(specs, def.possibleKeys);
     return value ? { ...def, value } : null;
   })
     .filter(Boolean) as Array<MajorSpecDef & { value: string }>;
-
-  const orig = formatPrice(priceAmount);
-  const disc = formatPrice(discountedPrice);
 
   const badgeText = discount >= 25 ? "پیشنهاد شگفت‌انگیز" : discount > 0 ? "فروش ویژه" : null;
 
@@ -242,42 +303,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         )}
       </div>
 
-      <div className="mt-auto flex flex-col gap-1 px-3 pb-3 pt-2">
-        <div className="flex items-end justify-between gap-2">
-          <div className="shrink-0">
-            {discount > 0 ? (
-              <span className="inline-flex h-5 min-w-7 items-center justify-center rounded-full bg-[color:var(--module-shop-color,var(--primary))] px-1.5 text-[11px] font-bold leading-none text-white">
-                {discount.toLocaleString("fa-IR")}٪
-              </span>
-            ) : (
-              <span className="h-5 block" />
-            )}
-          </div>
-          <div className="flex flex-col items-end text-left" dir="rtl">
-            {priceAmount <= 0 ? (
-              <span className="text-[11px] font-semibold text-muted-foreground">تماس بگیرید</span>
-            ) : (
-              <>
-                {discount > 0 && (
-                  <div className="flex items-baseline gap-1 opacity-60">
-                    <span className="text-[11px] text-muted-foreground line-through">{orig.number}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
-                  <span className="text-[13px] font-bold leading-none text-foreground">{disc.number}</span>
-                  <span className="text-[10px] font-normal text-muted-foreground">تومان</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-        {p.discountEndsAt && discount > 0 && (
-          <div className="flex items-center justify-between gap-1 border-t border-border/30 pt-1.5 mt-0.5">
-            <span className="text-[10px] font-medium text-[color:var(--module-shop-color,var(--primary))]">اتمام پیشنهاد</span>
-            <DiscountTimer endsAt={p.discountEndsAt} small />
-          </div>
-        )}
-      </div>
+      <ShopCardCommerce product={p} />
     </Link>
   );
 }

@@ -50,7 +50,7 @@ export function ToolsSection({
           ابزارهایی که کار شما رو شاید راحت‌تر کنه
         </p>
 
-        <ToolTile tool={raid} featured />
+        <ToolTile tool={raid} />
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {compact.map((tool) => <ToolTile key={tool.slug} tool={tool} />)}
         </div>
@@ -59,25 +59,23 @@ export function ToolsSection({
   );
 }
 
-function ToolTile({ tool, featured = false }: { tool: ToolRoute; featured?: boolean }) {
+function ToolTile({ tool }: { tool: ToolRoute }) {
   return (
     <Link
       href={tool.href}
-      className={`group relative isolate flex w-full overflow-hidden border border-border bg-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)] ${
-        featured ? "min-h-[280px] sm:min-h-[340px]" : "min-h-[220px] sm:min-h-[270px]"
-      }`}
+      className="group relative isolate flex min-h-[135px] w-full overflow-hidden border border-border bg-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)] sm:min-h-[145px]"
     >
       <Image
         src={tool.image}
         alt=""
         fill
         quality={95}
-        sizes={featured ? "(min-width: 1280px) 1280px, 100vw" : "(min-width: 640px) 50vw, 100vw"}
-        className="-z-20 object-cover grayscale saturate-0 transition-[filter,transform] duration-500 ease-out group-hover:scale-[1.015] group-hover:grayscale-0 group-hover:saturate-100 motion-reduce:transform-none"
+        sizes={tool.slug === "raid-calculator" ? "(min-width: 1280px) 1280px, 100vw" : "(min-width: 640px) 50vw, 100vw"}
+        className="-z-20 object-cover grayscale saturate-0 transition-[filter] duration-500 ease-out group-hover:grayscale-0 group-hover:saturate-100"
       />
       <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
-      <span className="mt-auto block w-full p-5 text-right sm:p-7">
-        <span className="block text-xl font-bold leading-8 sm:text-2xl">{tool.titleFa}</span>
+      <span className="mt-auto block w-full p-4 text-right sm:p-5">
+        <span className="block text-xl font-bold leading-8 text-[color:var(--tools-accent)] sm:text-2xl">{tool.titleFa}</span>
         <span className="mt-1 block max-w-3xl text-sm leading-6 text-white/78 sm:text-[15px]">
           {tool.descriptionFa}
         </span>

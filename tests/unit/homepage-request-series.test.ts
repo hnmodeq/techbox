@@ -51,16 +51,19 @@ describe("homepage request series", () => {
     expect(magazine).toMatch(/مشاهده محتواهایی با موضوع \$\{primaryTag\}/);
   });
 
-  it("uses newest review as the feature and removes commerce from homepage reviews", () => {
+  it("uses product-led review cards with shared shop commerce and real comments", () => {
     const section = read("features/home/components/sections/TopPicksSection.tsx");
     const data = read("lib/home-sections.ts");
     expect(section).toMatch(/const \[latest, \.\.\.archive\] = picks/);
     expect(section).toMatch(/<LatestReviewCard item=\{latest\}/);
-    expect(section).toMatch(/archive\.slice\(0, 4\)/);
-    for (const forbidden of ["faPrice", "ShieldCheck", "ratingCount", "ثبت سفارش"]) {
-      expect(section).not.toContain(forbidden);
-    }
-    expect(data).toMatch(/seededIndices\(candidates\.length, 4, 941\)/);
+    expect(section).toMatch(/ShopCardCommerce/);
+    expect(section).toMatch(/ShopInlinePrice/);
+    expect(section).toMatch(/مشاهده این محصول در فروشگاه/);
+    expect(section).toMatch(/دیدگاه خوانندگان درباره بررسی‌ها/);
+    expect(section).toMatch(/pickDistinctComments\(picks, 3\)/);
+    expect(data).toMatch(/seededIndices\(archive\.length, 4, 941\)/);
+    expect(data).toMatch(/highlightComments/);
+    expect(data).toMatch(/reviewedProduct/);
   });
 
   it("mixes sold/discounted shop products with a six-rack/two-tower quota", () => {
@@ -68,6 +71,9 @@ describe("homepage request series", () => {
     expect(data).toMatch(/prisma\.orderItem\.groupBy/);
     expect(data).toMatch(/chooseMixed\(rackCandidates, 6\)/);
     expect(data).toMatch(/chooseMixed\(towerCandidates, 2\)/);
+    expect(data).toMatch(/rackExclusionSignals/);
+    expect(data).toMatch(/specs: true/);
+    expect(data).toMatch(/warranty: true/);
     expect(data).toMatch(/discountPercent/);
   });
 
@@ -98,6 +104,42 @@ describe("homepage request series", () => {
     expect(ticker).toMatch(/Smoothstep/);
     expect(ticker).toMatch(/animation\.playbackRate = rate/);
     expect(css).not.toMatch(/animation-play-state: paused/);
+  });
+
+  it("keeps the solved-question green background away from its answers", () => {
+    const forum = read("features/home/components/sections/CommunitySection.tsx");
+    const feature = forum.slice(forum.indexOf("function FeaturedTopic"), forum.indexOf("function EmptyCommunityFeature"));
+    expect(feature).toMatch(/QUESTION only/);
+    expect(feature).toMatch(/<div className="bg-emerald-50 p-6/);
+    expect(feature).toMatch(/<div className="relative mx-6 mt-5/);
+  });
+
+  it("uses equal compact tool heights, no transform hover and module-coloured titles", () => {
+    const tools = read("features/home/components/sections/ToolsSection.tsx");
+    expect(tools).toMatch(/min-h-\[135px\]/);
+    expect(tools).not.toMatch(/group-hover:scale/);
+    expect(tools).toMatch(/text-\[color:var\(--tools-accent\)\]/);
+  });
+
+  it("adds membership and authenticated author-request flows", () => {
+    const website = read("features/home/components/sections/WebsiteInfoSection.tsx");
+    const actions = read("features/home/components/sections/CommunityJoinActions.tsx");
+    const auth = read("features/auth/components/auth-modal.tsx");
+    expect(website).toMatch(/عضو خانواده IT ایران باشید تا با هم رشد کنیم/);
+    expect(actions).toMatch(/عضویت/);
+    expect(actions).toMatch(/درخواست نویسندگی/);
+    expect(actions).toMatch(/لطفا ابتدا ثبت نام کنید و دوباره برگردید/);
+    expect(actions).toMatch(/type: "content"/);
+    expect(auth).toMatch(/detail\?\.mode/);
+  });
+
+  it("keeps footer seamless and chat tab surfaces transparent", () => {
+    const footer = read("components/layout/Footer.tsx");
+    const chat = read("features/chat/components/Chatbot.tsx");
+    expect(footer).toMatch(/bg-white dark:bg-black/);
+    expect(footer).not.toMatch(/<footer className="border-t/);
+    expect(chat).toMatch(/variant="line"/);
+    expect(chat.match(/data-active:bg-transparent/g)?.length).toBeGreaterThanOrEqual(2);
   });
 
   it("extracts and stores ten WebP storyboard frames for video hover", () => {

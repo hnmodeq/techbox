@@ -52,7 +52,7 @@ const navigation = {
 
 export default function FooterSection() {
   return (
-    <footer className="border-t w-full mt-auto bg-background">
+    <footer className="mt-auto w-full bg-white dark:bg-black">
       <div className="mx-auto px-6 pb-4 w-full pt-8 max-w-[1280px]">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-wrap items-center justify-center gap-6">
