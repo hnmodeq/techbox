@@ -13,7 +13,8 @@ jobs:
     timeout-minutes: 20
     env:
       DATABASE_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      # Project URL is public (it already prefixes every public Storage URL).
+      SUPABASE_URL: https://nggwgcfkceuadvhxnczf.supabase.co
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       SUPABASE_PUBLIC_BUCKET: ${{ vars.SUPABASE_PUBLIC_BUCKET }}
       DRIVE_CATALOG_CONFIRM: yes
