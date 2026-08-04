@@ -4,6 +4,8 @@ import {
  BookOpen,
  Clapperboard,
  ShoppingBag,
+ HardDrive,
+ Database,
  Users,
  ShieldCheck,
  Download,
@@ -47,13 +49,14 @@ export const navItems: NavItem[] = [
  },
  {
  title: "فروشگاه",
- href: "/landing/storage/shop",
+ href: "/shop/storage",
  icon: ShoppingBag,
  iconClassName: moduleColors.shop.base,
  iconHoverClassName: moduleColors.shop.hover,
  iconActiveClassName: moduleColors.shop.active,
  children: [
-   { title: "ذخیره‌ساز", href: "/landing/storage/shop", icon: ShoppingBag, iconClassName: moduleColors.shop.base, iconHoverClassName: moduleColors.shop.hover, iconActiveClassName: moduleColors.shop.active },
+   { title: "ذخیره‌ساز", href: "/shop/storage", icon: Database, iconClassName: moduleColors.shop.base, iconHoverClassName: moduleColors.shop.hover, iconActiveClassName: moduleColors.shop.active },
+   { title: "درایو HDD و SSD", href: "/shop/drive", icon: HardDrive, iconClassName: moduleColors.shop.base, iconHoverClassName: moduleColors.shop.hover, iconActiveClassName: moduleColors.shop.active },
  ],
  },
  {

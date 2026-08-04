@@ -110,7 +110,7 @@ export default function CheckoutPage() {
           <ShoppingCart className="size-16 mx-auto text-muted-foreground/30" />
           <h1 className="text-xl font-bold">سبد خرید خالی است</h1>
           <p className="text-sm text-muted-foreground">محصولاتی که می‌خواهید بخرید را از فروشگاه اضافه کنید.</p>
-          <ButtonLink href="/shop" className="mt-4">بازگشت به فروشگاه</ButtonLink>
+          <ButtonLink href="/shop/storage" className="mt-4">بازگشت به فروشگاه</ButtonLink>
         </Card>
       </main>
     );
@@ -225,7 +225,7 @@ export default function CheckoutPage() {
                   {busy ? "در حال اتصال..." : pendingPayment ? "تلاش مجدد برای پرداخت" : "ثبت سفارش و پرداخت"}
                 </Button>
 
-                <ButtonLink href="/shop" variant="ghost" className="w-full gap-2" size="sm">
+                <ButtonLink href="/shop/storage" variant="ghost" className="w-full gap-2" size="sm">
                   <ArrowLeft className="size-3" />
                   بازگشت به فروشگاه
                 </ButtonLink>

@@ -3,6 +3,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toolRoutes } from "@/config/modules.config";
+import { ToolsConsultationPanel } from "./ToolsConsultationPanel";
 
 export type ToolsSectionProps = {
   featured?: string[];
@@ -54,6 +55,14 @@ export function ToolsSection({
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {compact.map((tool) => <ToolTile key={tool.slug} tool={tool} />)}
         </div>
+
+        <div className="my-7 flex items-center gap-4" aria-label="یا">
+          <span aria-hidden="true" className="h-px flex-1 bg-border" />
+          <span className="text-sm font-black text-muted-foreground">یا</span>
+          <span aria-hidden="true" className="h-px flex-1 bg-border" />
+        </div>
+
+        <ToolsConsultationPanel />
       </div>
     </section>
   );
@@ -71,11 +80,11 @@ function ToolTile({ tool }: { tool: ToolRoute }) {
         fill
         quality={95}
         sizes={tool.slug === "raid-calculator" ? "(min-width: 1280px) 1280px, 100vw" : "(min-width: 640px) 50vw, 100vw"}
-        className="-z-20 object-cover grayscale saturate-0 transition-[filter] duration-500 ease-out group-hover:grayscale-0 group-hover:saturate-100"
+        className="-z-20 object-cover saturate-100"
       />
       <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/95 via-black/70 to-black/55" />
       <span className="mt-auto block w-full p-3 text-right sm:p-4">
-        <span className="block text-xl font-bold leading-8 text-[color:var(--tools-accent)] sm:text-2xl">{tool.titleFa}</span>
+        <span className="block text-xl font-bold leading-8 text-white/90 transition-colors group-hover:text-[color:var(--tools-accent)] sm:text-2xl">{tool.titleFa}</span>
         <span className="mt-1 block max-w-3xl text-sm leading-6 text-white/78 sm:text-[15px]">
           {tool.descriptionFa}
         </span>

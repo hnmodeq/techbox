@@ -1,6 +1,7 @@
 import type { ContentItem } from "@/lib/content";
 import { moduleMeta } from "@/lib/content";
 import { absoluteUrl, siteUrl } from "@/lib/seo";
+import { isDriveProduct } from "@/lib/shop-product-kind";
 
 type AnyRecord = Record<string, any>;
 
@@ -157,6 +158,7 @@ export function ProductJsonLd({ item }: { item: any }) {
     ? Math.round(basePriceToman * (discount > 0 ? 1 - discount / 100 : 1) * 10)
     : undefined;
   const unavailable = ["ناموجود", "اتمام موجودی"].includes(item.availability || "");
+  const drive = isDriveProduct(item);
   return (
     <>
       <JsonLd
@@ -184,7 +186,7 @@ export function ProductJsonLd({ item }: { item: any }) {
           }),
         })}
       />
-      <BreadcrumbJsonLd items={[{ name: "خانه", url: "/" }, { name: "فروشگاه", url: "/landing/storage/shop" }, { name: item.title, url: `/shop/${item.slug}` }]} />
+      <BreadcrumbJsonLd items={[{ name: "خانه", url: "/" }, { name: drive ? "فروشگاه درایو" : "فروشگاه ذخیره‌ساز", url: drive ? "/shop/drive" : "/shop/storage" }, { name: item.title, url: `/shop/${item.slug}` }]} />
     </>
   );
 }

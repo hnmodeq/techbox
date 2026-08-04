@@ -117,7 +117,7 @@ export default function AdminInboxPage() {
 
   const TAB_LABELS: Record<string, string> = {
     feedback: "بازخوردها",
-    support: "تیکت‌های پشتیبانی",
+    support: "درخواست‌های مشاوره",
     contact: "تماس‌ها",
   };
 
@@ -125,13 +125,13 @@ export default function AdminInboxPage() {
     <main className="min-h-dvh px-4 py-10" dir="rtl">
       <Toaster dir="rtl" />
       <section className="mx-auto max-w-4xl space-y-6">
-        <PageHeader colorVar="--admin" title="صندوق پیام‌ها" titleClassName="text-[var(--admin)]" description="بازخوردها، تیکت‌های پشتیبانی و پیام‌های تماس">
+        <PageHeader colorVar="--admin" title="صندوق پیام‌ها" titleClassName="text-[var(--admin)]" description="بازخوردها، درخواست‌های مشاوره و پیام‌های تماس">
         </PageHeader>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
           <TabsList className="w-full grid grid-cols-3">
             <TabsTrigger value="feedback">بازخورد</TabsTrigger>
-            <TabsTrigger value="support">تیکت</TabsTrigger>
+            <TabsTrigger value="support">مشاوره</TabsTrigger>
             <TabsTrigger value="contact">تماس</TabsTrigger>
           </TabsList>
 
@@ -182,7 +182,7 @@ export default function AdminInboxPage() {
                   )}
                   <div className="flex gap-1.5">
                     {activeTicket.status === "new" && <Button variant="ghost" size="xs" onClick={() => { markStatus(activeTicket.id, "read"); setActiveTicket(null); }}>خوانده‌شد</Button>}
-                    {activeTicket.status !== "closed" && <Button variant="ghost" size="xs" onClick={() => { markStatus(activeTicket.id, "closed"); setActiveTicket(null); }}>بستن تیکت</Button>}
+                    {activeTicket.status !== "closed" && <Button variant="ghost" size="xs" onClick={() => { markStatus(activeTicket.id, "closed"); setActiveTicket(null); }}>بستن مشاوره</Button>}
                   </div>
                 </Card>
               ) : (

@@ -97,19 +97,21 @@ function LatestReviewCard({ item }: { item: ReviewHomeCard }) {
         />
       </Link>
       <div className="flex flex-col p-6 sm:p-8">
-        <span className="text-5xl font-black leading-tight text-[color:var(--top-picks-accent)] sm:text-7xl">{label}</span>
-        <h3 className="mt-3 text-left text-2xl font-bold leading-9 text-foreground sm:text-3xl sm:leading-10" dir="ltr">
-          <Link href={`/review/${item.slug}`} className="transition-colors hover:text-[color:var(--top-picks-accent)]">
-            {item.product.title}
-          </Link>
-        </h3>
+        <div className="flex min-w-0 items-baseline justify-between gap-4">
+          <span className="shrink-0 whitespace-nowrap text-lg font-black leading-8 text-[color:var(--top-picks-accent)] sm:text-2xl">{label}</span>
+          <h3 className="min-w-0 flex-1 truncate text-left text-xl font-bold leading-9 text-foreground sm:text-2xl" dir="ltr">
+            <Link href={`/review/${item.slug}`} className="block truncate transition-colors hover:text-[color:var(--top-picks-accent)]">
+              {item.product.title}
+            </Link>
+          </h3>
+        </div>
         {item.excerpt && <p className="mt-3 line-clamp-4 text-sm leading-7 text-muted-foreground">{item.excerpt}</p>}
         <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
           <ReviewAuthor author={item.author} />
           <RelativeDate date={item.date} className="pb-0.5 text-xs text-muted-foreground" />
         </div>
-        <div className="mt-auto border-t border-border pt-3">
-          <ShopCardCommerce product={item.product} />
+        <div className="mt-auto pt-3">
+          <ReviewCardPrice product={item.product} />
           <ReviewActions item={item} />
         </div>
       </div>
@@ -131,21 +133,32 @@ function CompactReviewCard({ item }: { item: ReviewHomeCard }) {
       </Link>
       <div className="flex flex-1 flex-col p-4">
         <RelativeDate date={item.date} className="text-[11px] text-muted-foreground" />
-        <div className="mt-1 flex items-start justify-between gap-3">
-          <span className="shrink-0 text-xs font-black leading-6 text-[color:var(--top-picks-accent)]">{label}</span>
-          <h3 className="min-w-0 flex-1 text-left text-base font-bold leading-6 text-foreground" dir="ltr">
-            <Link href={`/review/${item.slug}`} className="line-clamp-2 transition-colors hover:text-[color:var(--top-picks-accent)]">
+        <div className="mt-1 flex min-w-0 items-baseline justify-between gap-2">
+          <span className="shrink-0 whitespace-nowrap text-[10px] font-black leading-6 text-[color:var(--top-picks-accent)] sm:text-[11px]">{label}</span>
+          <h3 className="min-w-0 flex-1 truncate text-left text-sm font-bold leading-6 text-foreground" dir="ltr">
+            <Link href={`/review/${item.slug}`} className="block truncate transition-colors hover:text-[color:var(--top-picks-accent)]">
               {item.product.title}
             </Link>
           </h3>
         </div>
         {item.excerpt && <p className="mt-2 line-clamp-3 text-xs leading-5 text-muted-foreground">{item.excerpt}</p>}
-        <div className="mt-auto border-t border-border pt-2">
-          <ShopCardCommerce product={item.product} />
+        <div className="mt-auto pt-2">
+          <ReviewCardPrice product={item.product} />
           <ReviewActions item={item} compact />
         </div>
       </div>
     </article>
+  );
+}
+
+function ReviewCardPrice({ product }: { product: ReviewHomeCard["product"] }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<div className="cursor-default" />}>
+        <ShopCardCommerce product={product} />
+      </TooltipTrigger>
+      <TooltipContent>قیمت این محصول در فروشگاه</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -163,7 +176,7 @@ function ReviewActions({ item, compact = false }: { item: ReviewHomeCard; compac
         href={`/shop/${item.product.slug}`}
         variant="ghost"
         size={compact ? "lg" : "xl"}
-        className="bg-transparent font-bold text-muted-foreground hover:bg-transparent hover:text-[color:var(--top-picks-accent)]"
+        className="bg-transparent font-bold text-muted-foreground hover:bg-transparent! hover:text-[color:var(--top-picks-accent)] dark:hover:bg-transparent!"
       >
         مشاهده این محصول در فروشگاه
       </ButtonLink>
@@ -229,7 +242,12 @@ function ReviewCommentCard({ comment }: { comment: CommentWithReview }) {
           <span className="line-clamp-1 text-xs font-bold text-foreground transition-colors group-hover:text-[color:var(--top-picks-accent)]">
             {comment.product.title}
           </span>
-          <ShopInlinePrice product={comment.product} />
+          <Tooltip>
+            <TooltipTrigger render={<span className="cursor-default" />}>
+              <ShopInlinePrice product={comment.product} />
+            </TooltipTrigger>
+            <TooltipContent>قیمت این محصول در فروشگاه</TooltipContent>
+          </Tooltip>
         </div>
         <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">{comment.text}</p>
         <div className="mt-2 flex items-center justify-between gap-2">
@@ -250,16 +268,20 @@ function ReviewCommentCard({ comment }: { comment: CommentWithReview }) {
 }
 
 function pickDistinctComments(picks: ReviewHomeCard[], take: number): CommentWithReview[] {
-  const seen = new Set<string>();
+  const seenAuthors = new Set<string>();
+  const seenProducts = new Set<string>();
   const output: CommentWithReview[] = [];
   for (const review of picks) {
+    if (seenProducts.has(review.product.slug)) continue;
     for (const comment of review.highlightComments) {
       const authorKey = comment.author.username || comment.author.name;
-      if (seen.has(authorKey)) continue;
-      seen.add(authorKey);
+      if (seenAuthors.has(authorKey)) continue;
+      seenAuthors.add(authorKey);
+      seenProducts.add(review.product.slug);
       output.push({ ...comment, reviewSlug: review.slug, product: review.product });
-      if (output.length >= take) return output;
+      break; // exactly one highlighted comment per reviewed product
     }
+    if (output.length >= take) return output;
   }
   return output;
 }

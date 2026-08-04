@@ -182,7 +182,7 @@ export default async function HomePage() {
     },
     {
       key: "deals",
-      node: withModuleTooltip("shop", <DealsSection products={data.modules.shop ?? []} {...textFor("deals")} />),
+      node: withModuleTooltip("shop", <DealsSection products={data.modules.shop ?? []} driveProducts={data.driveDeals ?? []} {...textFor("deals")} />),
     },
     {
       key: "tools",

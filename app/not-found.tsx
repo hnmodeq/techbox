@@ -22,7 +22,7 @@ export default function NotFound() {
         <Link href="/blog" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">بلاگ</Link>
         <Link href="/news" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">اخبار</Link>
         <Link href="/tools" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--tools)] transition-colors">ابزارها</Link>
-        <Link href="/shop" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">فروشگاه</Link>
+        <Link href="/shop/storage" className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors">فروشگاه</Link>
       </div>
     </main>
   );

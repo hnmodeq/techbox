@@ -30,7 +30,8 @@ const sidebarModuleMap: Record<string, string> = {
   "/news": "news",
   "/media": "media",
   "/shop": "shop",
-  "/landing/storage/shop": "shop",
+  "/shop/storage": "shop",
+  "/shop/drive": "shop",
   "/tools": "tools",
   "/forum": "forum",
   "/review": "review",
@@ -62,7 +63,7 @@ export function TechboxNavMain() {
     <SidebarGroup>
       <SidebarMenu>
         {navItems.map((item) => {
-          const active = isActive(pathname, item.href)
+          const active = isActive(pathname, item.href) || Boolean(item.children?.some((child) => isActive(pathname, child.href)))
           const Icon = item.icon
           const hasChildren = Boolean(item.children?.length)
           return (

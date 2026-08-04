@@ -19,7 +19,7 @@ export default function ComparePage() {
           <p className="text-[13px] text-muted-foreground">
             محصولاتی که می‌خواهید مقایسه کنید را از صفحه محصول اضافه کنید.
           </p>
-          <Link href="/landing/storage/shop">
+          <Link href="/shop/storage">
             <Button className="mt-2">مشاهده فروشگاه</Button>
           </Link>
         </div>
@@ -36,7 +36,7 @@ export default function ComparePage() {
       <nav className="mb-6 flex items-center gap-1.5 text-[11px] text-muted-foreground">
         <Link href="/" className="hover:text-foreground">خانه</Link>
         <span>/</span>
-        <Link href="/landing/storage/shop" className="hover:text-foreground">فروشگاه</Link>
+        <Link href="/shop/storage" className="hover:text-foreground">فروشگاه</Link>
         <span>/</span>
         <span className="text-foreground">مقایسه محصولات</span>
       </nav>
@@ -132,7 +132,7 @@ export default function ComparePage() {
       </div>
 
       <div className="mt-6 flex items-center gap-3">
-        <Link href="/landing/storage/shop">
+        <Link href="/shop/storage">
           <Button variant="outline" size="sm" className="gap-1">
             <ArrowRight className="size-3.5" />
             بازگشت به فروشگاه

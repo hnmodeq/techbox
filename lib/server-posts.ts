@@ -76,6 +76,7 @@ export async function getDbModulePosts(
           sourcePrice: p.sourcePriceAmount,
           sourceCurrency: (p.sourceCurrency as CurrencyCode) || "USD",
           productAdjustmentPercent: p.priceAdjustmentPercent ?? 0,
+          sellerBenefitPercent: p.sellerBenefitPercent ?? 35,
           rates: rates as any,
         });
       }

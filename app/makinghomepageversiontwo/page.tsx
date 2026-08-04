@@ -202,7 +202,7 @@ function ProductDecision({ products }: { products: HomeV2Product[] }) {
             <h2 id="v2-products-title" className="mt-1 text-3xl font-black text-foreground">زیرساخت مناسب، نه صرفاً تخفیف بیشتر</h2>
             <p className="mt-2 text-sm text-muted-foreground">شش رک‌مونت و دو تاور؛ ترکیبی از فروش واقعی، تخفیف و تازگی موجودی.</p>
           </div>
-          <Link href="/shop" className="text-sm font-bold text-foreground underline underline-offset-4">مشاهده فروشگاه</Link>
+          <Link href="/shop/storage" className="text-sm font-bold text-foreground underline underline-offset-4">مشاهده فروشگاه</Link>
         </div>
 
         <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">

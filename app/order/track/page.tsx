@@ -97,7 +97,7 @@ export default function OrderTrackPage() {
           <Package className="mx-auto size-16 text-muted-foreground/30" />
           <h1 className="text-[20px] font-bold">سفارش در دسترس نیست</h1>
           <p className="text-[13px] text-muted-foreground">{error || "لطفاً شناسه سفارش را بررسی کنید."}</p>
-          <Link href="/landing/storage/shop"><Button className="mt-2">بازگشت به فروشگاه</Button></Link>
+          <Link href="/shop/storage"><Button className="mt-2">بازگشت به فروشگاه</Button></Link>
         </div>
       </main>
     );
@@ -188,7 +188,7 @@ export default function OrderTrackPage() {
               <CreditCard className="size-4" />تکمیل پرداخت
             </Button>
           )}
-          <Link href="/landing/storage/shop"><Button variant="outline" size="sm">بازگشت به فروشگاه</Button></Link>
+          <Link href="/shop/storage"><Button variant="outline" size="sm">بازگشت به فروشگاه</Button></Link>
         </div>
       </div>
     </main>

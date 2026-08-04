@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { parseFooterSocials, type FooterSocialKey } from "@/features/footer/footer-socials";
 
 type Settings = {
   "comments.mode": string;
@@ -31,6 +32,7 @@ type Settings = {
   "currency.eur_rate": string;
   "currency.aed_rate": string;
   "currency.global_adjustment_percent": string;
+  "footer.socials": string;
 };
 
 const DEFAULTS: Settings = {
@@ -49,6 +51,7 @@ const DEFAULTS: Settings = {
   "currency.eur_rate": "200000",
   "currency.aed_rate": "51500",
   "currency.global_adjustment_percent": "0",
+  "footer.socials": JSON.stringify(parseFooterSocials(null)),
 };
 
 function editPermissionForSetting(key: keyof Settings) {
@@ -57,6 +60,7 @@ function editPermissionForSetting(key: keyof Settings) {
   if (key.startsWith("email.")) return "settings:email:edit";
   if (key.startsWith("auth.")) return "settings:auth:edit";
   if (key.startsWith("currency.")) return "settings:price:edit";
+  if (key.startsWith("footer.")) return "settings:*:edit";
   return "settings:*:edit";
 }
 
@@ -119,6 +123,12 @@ function SettingsContent() {
   };
 
   const commentsHidden = settings["comments.hidden_globally"] === "true";
+  const footerSocials = parseFooterSocials(settings["footer.socials"]);
+  const updateFooterSocial = (key: FooterSocialKey, patch: Partial<(typeof footerSocials)[FooterSocialKey]>) => {
+    const next = parseFooterSocials(settings["footer.socials"]);
+    next[key] = { ...next[key], ...patch };
+    setSettings((current) => ({ ...current, "footer.socials": JSON.stringify(next) }));
+  };
 
   return (
     <main className="min-h-dvh px-4 py-10 space-y-6" dir="rtl">
@@ -274,6 +284,40 @@ function SettingsContent() {
                 </div>
               )}
             </div>
+          </CardContent>
+        </Card>
+        </PermissionGate>
+
+        <PermissionGate permission="settings:*:view">
+        <Card className="space-y-5 border p-6 shadow-sm">
+          <CardHeader className="p-0">
+            <CardTitle>شبکه‌های اجتماعی فوتر</CardTitle>
+            <CardDescription>نمایش و نشانی اینستاگرام، یوتیوب و تلگرام را مستقل کنترل کنید.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 p-0">
+            {([
+              ["instagram", "Instagram"],
+              ["youtube", "YouTube"],
+              ["telegram", "Telegram"],
+            ] as const).map(([key, label]) => (
+              <div key={key} className="grid gap-3 rounded-md border border-border p-3 sm:grid-cols-[auto_1fr] sm:items-center">
+                <div className="flex min-w-28 items-center justify-between gap-3">
+                  <Label htmlFor={`footer-${key}`}>{label}</Label>
+                  <Switch
+                    id={`footer-${key}`}
+                    checked={footerSocials[key].enabled}
+                    onCheckedChange={(enabled) => updateFooterSocial(key, { enabled })}
+                  />
+                </div>
+                <Input
+                  dir="ltr"
+                  type="url"
+                  value={footerSocials[key].url}
+                  onChange={(event) => updateFooterSocial(key, { url: event.target.value })}
+                  placeholder="https://..."
+                />
+              </div>
+            ))}
           </CardContent>
         </Card>
         </PermissionGate>

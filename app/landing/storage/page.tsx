@@ -74,7 +74,7 @@ export default async function StorageLandingPage() {
               از ۲ تا ۲۴ Bay، از Celeron اقتصادی تا Xeon سازمانی، با قابلیت مجازی‌سازی، دوربین مداربسته، بکاپ خودکار و قیمت دلاری لحظه‌ای. تمام محصولات QNAP واقعی با گارانتی تکباکس.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <ButtonLink href="/landing/storage/shop" size="lg" className="bg-white text-black hover:bg-white/90">ورود به فروشگاه ذخیره‌ساز</ButtonLink>
+              <ButtonLink href="/shop/storage" size="lg" className="bg-white text-black hover:bg-white/90">ورود به فروشگاه ذخیره‌ساز</ButtonLink>
               <ButtonLink href="/tools/nas-selector" variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10">انتخاب ذخیره‌ساز شبکه</ButtonLink>
               <ButtonLink href="/tools/raid-calculator" variant="ghost" size="lg" className="text-white/70 hover:text-white">محاسبه فضای ذخیره‌ساز</ButtonLink>
             </div>
@@ -106,13 +106,13 @@ export default async function StorageLandingPage() {
       <section className="bg-card border rounded-xl p-4 sm:p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[14px] font-bold">بر اساس برند</h2>
-          <Link href="/shop" className="text-[11px] text-primary hover:underline">مشاهده همه برندها ←</Link>
+          <Link href="/shop/storage" className="text-[11px] text-primary hover:underline">مشاهده همه برندها ←</Link>
         </div>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
           {BRANDS.map((b) => (
             <Link
               key={b.slug}
-              href={`/shop?brand=${b.slug}`}
+              href={`/shop/storage?brand=${b.slug}`}
               className="group flex flex-col items-center gap-2 rounded-lg border bg-card p-3 hover:border-primary hover:bg-accent transition-colors"
             >
               <div className="size-10 rounded-full bg-muted flex items-center justify-center text-[11px] font-black group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
@@ -129,7 +129,7 @@ export default async function StorageLandingPage() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-black">منتخب ذخیره‌سازهای سازمانی</h2>
-          <Link href="/landing/storage/shop" className="text-[12px] text-primary hover:underline">مشاهده همه در فروشگاه ←</Link>
+          <Link href="/shop/storage" className="text-[12px] text-primary hover:underline">مشاهده همه در فروشگاه ←</Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-px bg-border border rounded-xl overflow-hidden">
           {nasProducts.map((p) => (
@@ -156,7 +156,7 @@ export default async function StorageLandingPage() {
         <h2 className="text-[14px] font-bold mb-4">بر اساس کاربری</h2>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
           {USAGES.map((u) => (
-            <Link key={u.id} href={`/shop?category=NAS&usage=${u.id}`} className="flex flex-col items-center gap-2 rounded-lg border bg-card p-3 hover:border-primary hover:bg-accent transition-colors group">
+            <Link key={u.id} href={`/shop/storage?category=NAS&usage=${u.id}`} className="flex flex-col items-center gap-2 rounded-lg border bg-card p-3 hover:border-primary hover:bg-accent transition-colors group">
               <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                 <u.icon className="size-5" />
               </div>
@@ -170,7 +170,7 @@ export default async function StorageLandingPage() {
       {/* Price ranges */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {PRICE_RANGES.map((pr) => (
-          <Link key={pr.label} href={`/shop?price=${pr.range}`} className={`rounded-xl border p-4 flex flex-col gap-2 hover:shadow-md transition-shadow ${pr.accent}`}>
+          <Link key={pr.label} href={`/shop/storage?price=${pr.range}`} className={`rounded-xl border p-4 flex flex-col gap-2 hover:shadow-md transition-shadow ${pr.accent}`}>
             <span className="text-[12px] font-bold">{pr.label}</span>
             <span className="text-[11px] text-muted-foreground">ذخیره‌سازهای {pr.label}</span>
             <span className="text-[10px] text-primary mt-2">مشاهده ←</span>
@@ -181,7 +181,7 @@ export default async function StorageLandingPage() {
       {/* CPU types – dark blue cards like Digikala */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {CPU_TYPES.map((cpu) => (
-          <Link key={cpu.name} href={`/shop?cpu=${encodeURIComponent(cpu.name)}`} className={`rounded-xl p-4 text-white flex flex-col gap-1 hover:scale-[1.02] transition-transform ${cpu.color}`}>
+          <Link key={cpu.name} href={`/shop/storage?cpu=${encodeURIComponent(cpu.name)}`} className={`rounded-xl p-4 text-white flex flex-col gap-1 hover:scale-[1.02] transition-transform ${cpu.color}`}>
             <Cpu className="size-5 text-white/80" />
             <span className="text-[13px] font-black">{cpu.name}</span>
             <span className="text-[11px] text-white/70">{cpu.desc}</span>
@@ -193,7 +193,7 @@ export default async function StorageLandingPage() {
       {/* Bay types */}
       <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {BAY_TYPES.map((b) => (
-          <Link key={b.bay} href={`/shop?bay=${b.bay}`} className="rounded-xl border bg-card p-4 flex flex-col gap-1 hover:border-primary hover:bg-accent transition-colors">
+          <Link key={b.bay} href={`/shop/storage?bay=${b.bay}`} className="rounded-xl border bg-card p-4 flex flex-col gap-1 hover:border-primary hover:bg-accent transition-colors">
             <HardDrive className="size-5 text-muted-foreground" />
             <span className="text-[13px] font-bold">{b.label}</span>
             <span className="text-[11px] text-muted-foreground">{b.desc}</span>
@@ -233,8 +233,8 @@ export default async function StorageLandingPage() {
           <p className="text-[12px] text-background/70 mt-1">۱۴۴ محصول QNAP واقعی با قیمت دلاری و تبدیل لحظه‌ای به تومان، با فیلتر کاربردی Bay، CPU، RAM، 10GbE</p>
         </div>
         <div className="flex gap-2">
-          <ButtonLink href="/landing/storage/shop" size="lg" className="bg-background text-foreground hover:bg-background/90">ورود به فروشگاه /shop</ButtonLink>
-          <ButtonLink href="/shop" variant="outline" size="lg" className="border-background/20 text-background hover:bg-background/10">مشاهده همه محصولات</ButtonLink>
+          <ButtonLink href="/shop/storage" size="lg" className="bg-background text-foreground hover:bg-background/90">ورود به فروشگاه /shop</ButtonLink>
+          <ButtonLink href="/shop/storage" variant="outline" size="lg" className="border-background/20 text-background hover:bg-background/10">مشاهده همه محصولات</ButtonLink>
         </div>
       </section>
     </main>

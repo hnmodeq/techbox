@@ -66,12 +66,12 @@ export function SupportForm() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
             <CheckIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
           </div>
-          <h3 className="text-lg font-bold mb-2">پیام شما ارسال شد</h3>
+          <h3 className="text-lg font-bold mb-2">درخواست مشاوره شما ثبت شد</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            تیم پشتیبانی به زودی پاسخ شما را ارسال خواهد کرد.
+            تیم فنی به‌زودی پاسخ شما را در همین گفت‌وگو ثبت خواهد کرد.
           </p>
           <Button variant="outline" onClick={() => setStatus("idle")}>
-            ارسال پیام جدید
+            ثبت درخواست جدید
           </Button>
         </CardContent>
       </Card>
@@ -116,7 +116,7 @@ export function SupportForm() {
                 <FormItem>
                   <FormLabel>عنوان</FormLabel>
                   <FormControl>
-                    <Input placeholder="موضوع پیام شما" {...field} />
+                    <Input placeholder="موضوع مشاوره" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +129,7 @@ export function SupportForm() {
                 <FormItem>
                   <FormLabel>پیام</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="توضیحات کامل پیام خود را بنویسید..." className="min-h-[120px]" {...field} />
+                    <Textarea placeholder="نیاز، محدودیت‌ها و وضعیت فعلی زیرساخت را توضیح دهید..." className="min-h-[120px]" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -139,7 +139,7 @@ export function SupportForm() {
               <p className="text-sm text-destructive">خطا در ارسال پیام. لطفاً دوباره تلاش کنید.</p>
             )}
             <Button type="submit" className="w-full" loading={status === "loading"}>
-              {status === "loading" ? "در حال ارسال..." : "ارسال پیام به پشتیبانی"}
+              {status === "loading" ? "در حال ارسال..." : "ثبت درخواست مشاوره"}
             </Button>
           </form>
         </Form>

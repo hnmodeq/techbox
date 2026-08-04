@@ -288,7 +288,7 @@ const apiGroups: ApiGroup[] = [
       {
         method: "POST",
         path: "/api/support",
-        description: "ارسال تیکت پشتیبانی",
+        description: "ارسال درخواست مشاوره و ایجاد گفت‌وگوی قابل پیگیری",
         body: "{ name, email, subject?, message }",
       },
       {

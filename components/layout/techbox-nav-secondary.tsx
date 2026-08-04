@@ -9,24 +9,21 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { TicketIcon, SendIcon, HelpCircleIcon, BadgeCheckIcon } from "lucide-react"
+import { TicketIcon, HelpCircleIcon } from "lucide-react"
 
 export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const items = [
     {
-      title: "تیکت پشتیبانی",
+      title: "مشاوره",
       event: "tb_open_support",
       icon: TicketIcon,
-    },
-    {
-      title: "پیشنهادات",
-      event: "tb_open_feedback",
-      icon: SendIcon,
+      className: "text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
     },
     {
       title: "سوالات پرتکرار",
       event: "tb_open_faq",
       icon: HelpCircleIcon,
+      className: undefined,
     },
   ]
 
@@ -40,6 +37,7 @@ export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   size="sm"
+                  className={item.className}
                   onClick={() => window.dispatchEvent(new CustomEvent(item.event))}
                 >
                   <Icon className="size-4" />

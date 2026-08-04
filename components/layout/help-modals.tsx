@@ -346,7 +346,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
             email: email.toLowerCase().trim(),
           });
         }
-        toast.success("تیکت شما ثبت شد");
+        toast.success("درخواست مشاوره شما ثبت شد");
         setSubject("");
         setMessage("");
         setView("list");
@@ -394,7 +394,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
       <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden" dir="rtl">
         <div className="p-6 sm:p-7 space-y-4 max-h-[80vh] overflow-y-auto">
           <DialogHeader className="text-center space-y-2">
-            <DialogTitle className="text-lg font-black">تیکت پشتیبانی</DialogTitle>
+            <DialogTitle className="text-lg font-black">مشاوره</DialogTitle>
             <DialogDescription className="text-xs">مشکل خود را ثبت کنید و گفتگو را پیگیری کنید.</DialogDescription>
           </DialogHeader>
 
@@ -406,14 +406,14 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
               onClick={() => setView("new")}
               className={`h-8 rounded-md text-xs font-bold transition-colors ${view === "new" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
             >
-              ثبت تیکت جدید
+              درخواست مشاوره جدید
             </button>
             <button
               type="button"
               onClick={() => { setView("list"); loadTickets(); }}
               className={`h-8 rounded-md text-xs font-bold transition-colors ${view === "list" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
             >
-              تیکت‌های من
+              مشاوره‌های من
             </button>
           </div>
           )}
@@ -434,14 +434,14 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="sp-subject" className="text-xs font-bold">موضوع</Label>
-                <Input id="sp-subject" value={subject} onChange={(e) => setSubject(e.target.value)} className="h-9 text-sm" placeholder="موضوع تیکت" />
+                <Input id="sp-subject" value={subject} onChange={(e) => setSubject(e.target.value)} className="h-9 text-sm" placeholder="موضوع مشاوره" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="sp-msg" className="text-xs font-bold">توضیحات</Label>
                 <Textarea id="sp-msg" value={message} onChange={(e) => setMessage(e.target.value)} className="min-h-[90px] text-sm" placeholder="مشکل یا سوال خود را شرح دهید..." />
               </div>
               <Button type="submit" disabled={busy} className="w-full h-10 font-bold">
-                {busy ? "در حال ارسال..." : "ثبت تیکت"}
+                {busy ? "در حال ارسال..." : "ثبت درخواست مشاوره"}
               </Button>
             </form>
           )}
@@ -453,8 +453,8 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
                 <div className="flex items-center justify-center py-8"><Spinner className="size-5" /></div>
               ) : tickets.length === 0 ? (
                 <Card className="p-6 text-center text-sm text-muted-foreground space-y-3">
-                  <p>هنوز تیکتی ثبت نکرده‌اید.</p>
-                  <Button type="button" variant="link" size="sm" onClick={() => setView("new")}>ثبت تیکت جدید</Button>
+                  <p>هنوز درخواست مشاوره‌ای ثبت نکرده‌اید.</p>
+                  <Button type="button" variant="link" size="sm" onClick={() => setView("new")}>درخواست مشاوره جدید</Button>
                 </Card>
               ) : (
                 <>
@@ -509,7 +509,7 @@ function SupportModal({ open, onClose, defaultName, defaultEmail }: { open: bool
                 ))}
               </div>
               {activeTicket.status === "closed" && (
-                <div className="text-center text-xs text-muted-foreground py-2">این تیکت بسته شده است.</div>
+                <div className="text-center text-xs text-muted-foreground py-2">این درخواست مشاوره بسته شده است.</div>
               )}
               {/* Reply box — locked when the ticket is closed */}
               {activeTicket.status !== "closed" && (

@@ -5,8 +5,9 @@ import Link from "next/link";
 import { blurProps } from "@/lib/image-placeholder";
 import type { ContentItem } from "@/lib/content";
 import { useCountdown } from "@/hooks/useCountdown";
-import { Star, Cpu, MemoryStick, HardDrive, Network, Truck, ShieldCheck } from "lucide-react";
+import { Star, Cpu, MemoryStick, HardDrive, Network, Truck, ShieldCheck, Gauge, Cable, Ruler } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isDriveProduct } from "@/lib/shop-product-kind";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ── Price helpers ─────────────────────────────────────────────────────────────
@@ -31,24 +32,29 @@ function parsePriceLabel(label: string | null | undefined): number {
 // ── Major specs – 4: CPU / RAM / Bay / Network ──
 type MajorSpecDef = {
   Icon: React.ElementType;
+  label: string;
   possibleKeys: string[];
 };
 
-const MAJOR_SPECS: MajorSpecDef[] = [
+const STORAGE_MAJOR_SPECS: MajorSpecDef[] = [
   {
     Icon: HardDrive,
+    label: "تعداد جایگاه درایو",
     possibleKeys: ["Drive Bay", "Bay", "تعداد جایگاه دیسک", "تعداد جایگاه دیسک (Bay)", "جایگاه"],
   },
   {
     Icon: Cpu,
+    label: "پردازنده",
     possibleKeys: ["CPU", "پردازنده", "Processor"],
   },
   {
     Icon: MemoryStick,
+    label: "حافظه رم",
     possibleKeys: ["System Memory", "RAM", "حافظه رم", "رم", "Memory", "حافظه"],
   },
   {
     Icon: Network,
+    label: "رابط شبکه",
     possibleKeys: [
       "10 Gigabit Ethernet Port",
       "2.5 Gigabit Ethernet Port (2.5G/1G/100M)",
@@ -59,6 +65,29 @@ const MAJOR_SPECS: MajorSpecDef[] = [
       "کارت شبکه",
       "شبکه",
     ],
+  },
+];
+
+const DRIVE_MAJOR_SPECS: MajorSpecDef[] = [
+  {
+    Icon: HardDrive,
+    label: "ظرفیت",
+    possibleKeys: ["Capacity", "ظرفیت"],
+  },
+  {
+    Icon: Gauge,
+    label: "سرعت",
+    possibleKeys: ["Sequential Read", "سرعت خواندن ترتیبی", "Rotational Speed", "سرعت چرخش"],
+  },
+  {
+    Icon: Cable,
+    label: "نوع رابط",
+    possibleKeys: ["Interface", "رابط"],
+  },
+  {
+    Icon: Ruler,
+    label: "فرم فاکتور",
+    possibleKeys: ["Form Factor", "فرم فاکتور"],
   },
 ];
 
@@ -187,7 +216,8 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
   const discountState = useCountdown(p.discountEndsAt);
   const discount = discountState?.expired ? 0 : (p.discountPercent ?? 0);
 
-  const validMajorSpecs = MAJOR_SPECS.map((def) => {
+  const majorSpecDefs = isDriveProduct(p) ? DRIVE_MAJOR_SPECS : STORAGE_MAJOR_SPECS;
+  const validMajorSpecs = majorSpecDefs.map((def) => {
     const value = getSpecValue(specs, def.possibleKeys);
     return value ? { ...def, value } : null;
   })
@@ -247,7 +277,7 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
                   </span>
                 }
               />
-              <TooltipContent side="bottom">گارانتی هونامیک ارتباط رستاک</TooltipContent>
+              <TooltipContent side="bottom">{warrantyText}</TooltipContent>
             </Tooltip>
           )}
         </div>
@@ -286,17 +316,17 @@ export default function ShopProductCard({ product: p }: { product: ContentItem }
         {/* 4 major specs with shadcn tooltips — icons only, no labels */}
         {validMajorSpecs.length > 0 && (
           <div className="mt-1 grid grid-cols-4 gap-1 border-y border-border/40 py-2">
-            {validMajorSpecs.slice(0, 4).map(({ Icon, value }, idx) => (
+            {validMajorSpecs.slice(0, 4).map(({ Icon, label, value }, idx) => (
               <Tooltip key={idx}>
                 <TooltipTrigger
                   render={
-                    <div className="flex flex-col items-center gap-0.5 text-center cursor-default">
+                    <div className="flex flex-col items-center gap-0.5 text-center cursor-default" aria-label={`${label}: ${value}`}>
                       <Icon className="size-3.5 text-muted-foreground/70" />
                       <span className="line-clamp-1 w-full text-[9px] leading-3 text-foreground/80 invisible">{String(value).slice(0, 22)}</span>
                     </div>
                   }
                 />
-                <TooltipContent side="bottom">{String(value).slice(0, 60)}</TooltipContent>
+                <TooltipContent side="bottom">{label}: {String(value).slice(0, 60)}</TooltipContent>
               </Tooltip>
             ))}
           </div>

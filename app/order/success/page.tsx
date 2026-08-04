@@ -76,7 +76,7 @@ export default function OrderSuccessPage() {
               پیگیری سفارش
             </Button>
           </Link>
-          <Link href="/landing/storage/shop">
+          <Link href="/shop/storage">
             <Button variant="outline" size="lg" className="gap-2">
               <Package className="size-4" />
               ادامه خرید

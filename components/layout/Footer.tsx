@@ -1,122 +1,146 @@
 "use client";
 
-import Link from "next/link";
-import { SVGProps } from "react";
-import { Separator } from "@/components/ui/separator";
-import { ButtonLink } from "@/components/ui/button";
-import { buttonVariants } from "@/components/ui/button";
+import { useEffect, useState, type ReactNode, type SVGProps } from "react";
+import { MessageSquarePlus } from "lucide-react";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { DEFAULT_FOOTER_SOCIALS, parseFooterSocials, type FooterSocialKey } from "@/features/footer/footer-socials";
 
-const navigation = {
-  main: [
-    { name: "درباره ما", href: "/about" },
-    { name: "ارتباط با ما", href: "/contact" },
-    { name: "فرصت‌های شغلی", href: "/work-with-us" },
-    { name: "قوانین و مقررات", href: "/terms" },
-  ],
-  social: [
-    {
-      name: "Instagram",
-      href: "https://instagram.com/techbox",
-      icon: (props: SVGProps<SVGSVGElement>) => (
-        <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-          <path d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" />
-        </svg>
-      ),
-    },
-    {
-      name: "X",
-      href: "https://x.com/techbox",
-      icon: (props: SVGProps<SVGSVGElement>) => (
-        <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-          <path d="M13.6823 10.6218L20.2391 3H18.6854L12.9921 9.61788L8.44486 3H3.2002L10.0765 13.0074L3.2002 21H4.75404L10.7663 14.0113L15.5685 21H20.8131L13.6819 10.6218H13.6823ZM11.5541 13.0956L10.8574 12.0991L5.31391 4.16971H7.70053L12.1742 10.5689L12.8709 11.5655L18.6861 19.8835H16.2995L11.5541 13.096V13.0956Z" />
-        </svg>
-      ),
-    },
-    {
-      name: "YouTube",
-      href: "https://youtube.com/@techbox",
-      icon: (props: SVGProps<SVGSVGElement>) => (
-        <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
-          <path
-            fillRule="evenodd"
-            d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 01-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 01-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 011.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418ZM15.194 12 10 15V9l5.194 3Z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
-    },
-  ],
-};
+const links = [
+  { name: "درباره ما", href: "/about" },
+  { name: "ارتباط با ما", href: "/contact" },
+  { name: "فرصت‌های شغلی", href: "/work-with-us" },
+  { name: "قوانین و مقررات", href: "/terms" },
+];
+
+function InstagramIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...props}>
+      <defs>
+        <linearGradient id="footer-instagram-gradient" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFD600" />
+          <stop offset="0.42" stopColor="#FF0169" />
+          <stop offset="0.78" stopColor="#D300C5" />
+          <stop offset="1" stopColor="#7638FA" />
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="20" height="20" rx="6" fill="url(#footer-instagram-gradient)" />
+      <circle cx="12" cy="12" r="4.1" fill="none" stroke="white" strokeWidth="1.8" />
+      <circle cx="17.3" cy="6.8" r="1.15" fill="white" />
+    </svg>
+  );
+}
+
+function YouTubeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...props}>
+      <path fill="#FF0000" d="M21.58 7.19a2.73 2.73 0 0 0-1.92-1.93C17.97 4.8 12 4.8 12 4.8s-5.97 0-7.66.46a2.73 2.73 0 0 0-1.92 1.93C1.96 8.89 1.96 12 1.96 12s0 3.11.46 4.81a2.73 2.73 0 0 0 1.92 1.93c1.69.46 7.66.46 7.66.46s5.97 0 7.66-.46a2.73 2.73 0 0 0 1.92-1.93c.46-1.7.46-4.81.46-4.81s0-3.11-.46-4.81Z" />
+      <path fill="white" d="m10 15.1 5.2-3.1L10 8.9v6.2Z" />
+    </svg>
+  );
+}
+
+function TelegramIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" {...props}>
+      <circle cx="12" cy="12" r="10" fill="#229ED9" />
+      <path fill="white" d="M17.75 7.35 15.8 17c-.15.68-.54.85-1.1.53l-2.97-2.19-1.43 1.38c-.16.16-.29.29-.6.29l.21-3.02 5.5-4.97c.24-.21-.05-.33-.37-.12l-6.8 4.28-2.93-.92c-.64-.2-.65-.64.13-.95l11.45-4.41c.53-.2.99.13.86.45Z" />
+    </svg>
+  );
+}
+
+const socialItems: Array<{
+  key: FooterSocialKey;
+  name: string;
+  icon: (props: SVGProps<SVGSVGElement>) => ReactNode;
+}> = [
+  { key: "instagram", name: "Instagram", icon: InstagramIcon },
+  { key: "youtube", name: "YouTube", icon: YouTubeIcon },
+  { key: "telegram", name: "Telegram", icon: TelegramIcon },
+];
 
 export default function FooterSection() {
+  const [socials, setSocials] = useState(DEFAULT_FOOTER_SOCIALS);
+
+  useEffect(() => {
+    fetch("/api/settings?key=footer.socials", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => setSocials(parseFooterSocials(data?.["footer.socials"])))
+      .catch(() => {});
+  }, []);
+
   return (
     <footer className="mt-auto w-full bg-white dark:bg-black">
-      <div className="mx-auto px-6 pb-4 w-full pt-8 max-w-[1280px]">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            {navigation.main.map((item) => (
-              <ButtonLink
-                key={item.name}
-                href={item.href}
-                variant="ghost"
-                size="sm"
-                className="font-normal text-muted-foreground hover:bg-transparent hover:text-foreground text-xs"
-              >
-                {item.name}
-              </ButtonLink>
-            ))}
-          </div>
+      <div
+        className="mx-auto grid w-full max-w-[1280px] gap-x-10 gap-y-6 px-6 pb-7 pt-8 md:grid-cols-2 md:grid-rows-2 md:items-center"
+        dir="ltr"
+      >
+        {/* Top right */}
+        <p className="text-center text-[11px] leading-6 text-muted-foreground md:col-start-2 md:row-start-1 md:text-right" dir="rtl">
+          © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت{" "}
+          <Tooltip>
+            <TooltipTrigger render={<span tabIndex={0} className="cursor-help font-semibold text-sky-500" />}>
+              هونامیک ارتباط رستاک
+            </TooltipTrigger>
+            <TooltipContent>در دست طراحی</TooltipContent>
+          </Tooltip>{" "}
+          می‌باشد.
+        </p>
 
-          <div className="flex gap-2 justify-center">
-            {navigation.social.map((item) => (
+        {/* Top left: four navigation links + Suggestions = five controls. */}
+        <div className="flex flex-wrap items-center justify-center gap-1 md:col-start-1 md:row-start-1 md:justify-start" dir="rtl">
+          {links.map((item) => (
+            <ButtonLink
+              key={item.name}
+              href={item.href}
+              variant="ghost"
+              size="sm"
+              className="bg-transparent text-xs font-normal text-muted-foreground hover:bg-transparent! hover:text-foreground dark:hover:bg-transparent!"
+            >
+              {item.name}
+            </ButtonLink>
+          ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => window.dispatchEvent(new CustomEvent("tb_open_feedback"))}
+            className="bg-transparent text-xs font-normal text-muted-foreground hover:bg-transparent! hover:text-foreground dark:hover:bg-transparent!"
+          >
+            <MessageSquarePlus className="size-3.5" />
+            پیشنهادات
+          </Button>
+        </div>
+
+        {/* Bottom right */}
+        <p className="text-center text-[11px] text-muted-foreground md:col-start-2 md:row-start-2 md:text-right" dir="rtl">
+          طراحی شده توسط{" "}
+          <Tooltip>
+            <TooltipTrigger render={<span tabIndex={0} className="cursor-help font-semibold text-[#f5b301]" />}>
+              بومیم
+            </TooltipTrigger>
+            <TooltipContent>در دست طراحی</TooltipContent>
+          </Tooltip>
+        </p>
+
+        {/* Bottom left */}
+        <div className="flex items-center justify-center gap-2 md:col-start-1 md:row-start-2 md:justify-start">
+          {socialItems.map((item) => {
+            const setting = socials[item.key];
+            if (!setting.enabled) return null;
+            return (
               <a
-                key={item.name}
-                href={item.href}
+                key={item.key}
+                href={setting.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={item.name}
-                className={cn(
-                  buttonVariants({ variant: "ghost", size: "icon" }),
-                  "size-8 text-muted-foreground hover:bg-transparent hover:text-foreground"
-                )}
+                className="group/social inline-flex size-9 items-center justify-center bg-transparent outline-none hover:bg-transparent focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <item.icon className="size-4 transition-transform hover:scale-110" />
+                <item.icon className="size-5 grayscale opacity-60 transition-[filter,opacity] duration-200 group-hover/social:grayscale-0 group-hover/social:opacity-100 group-focus-visible/social:grayscale-0 group-focus-visible/social:opacity-100" />
               </a>
-            ))}
-          </div>
-        </div>
-
-        <Separator className="my-6" />
-
-        {/* Restored compact sub-footer from the earlier design: both names
-            retain their original colours and explanatory tooltips. */}
-        <div className="flex flex-col items-center justify-between gap-2 py-1 text-[11px] sm:flex-row">
-          <p className="text-center text-muted-foreground sm:text-right">
-            © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت{" "}
-            <Tooltip>
-              <TooltipTrigger
-                render={<span tabIndex={0} className="cursor-help font-semibold text-sky-500" />}
-              >
-                هونامیک ارتباط رستاک
-              </TooltipTrigger>
-              <TooltipContent>در دست طراحی</TooltipContent>
-            </Tooltip>{" "}
-            می‌باشد.
-          </p>
-
-          <p className="text-muted-foreground">
-            طراحی شده توسط{" "}
-            <Tooltip>
-              <TooltipTrigger
-                render={<span tabIndex={0} className="cursor-help font-semibold text-[#f5b301]" />}
-              >
-                بومیم
-              </TooltipTrigger>
-              <TooltipContent>در دست طراحی</TooltipContent>
-            </Tooltip>
-          </p>
+            );
+          })}
         </div>
       </div>
     </footer>

@@ -131,7 +131,7 @@ const moduleList: ModuleMeta[] = [
   { key: "blog", slug: "blog", title: "Blog", titleFa: "مجله آنلاین", href: "/blog", color: "var(--primary)", icon: "blog", descriptionFa: "مقالات تخصصی" },
   { key: "news", slug: "news", title: "News", titleFa: "اخبار", href: "/news", color: "var(--primary)", icon: "news", descriptionFa: "اخبار دنیای تکنولوژی" },
   { key: "media", slug: "media", title: "Media", titleFa: "ویدیوهای کوتاه", href: "/media", color: "var(--primary)", icon: "media", descriptionFa: "ویدئو و پادکست" },
-  { key: "shop", slug: "shop", title: "Shop", titleFa: "فروشگاه", href: "/shop", color: "var(--primary)", icon: "shop", descriptionFa: "خرید تجهیزات" },
+  { key: "shop", slug: "shop", title: "Shop", titleFa: "فروشگاه", href: "/shop/storage", color: "var(--primary)", icon: "shop", descriptionFa: "خرید ذخیره‌ساز و درایو" },
   { key: "tools", slug: "tools", title: "Tools", titleFa: "ابزارهای کاربردی", href: "/tools", color: "var(--tools)", icon: "tools", descriptionFa: "ابزارهای محاسباتی" },
   { key: "download", slug: "download", title: "Download", titleFa: "دانلود", href: "/download", color: "var(--primary)", icon: "downloadModule", descriptionFa: "مرکز دانلود" },
   { key: "timeline", slug: "timeline", title: "Timeline", titleFa: "گاه‌شمار تکنولوژی", href: "/timeline", color: "var(--primary)", icon: "timeline", descriptionFa: "تاریخچه و رویدادهای فناوری" },

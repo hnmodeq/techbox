@@ -38,12 +38,14 @@ describe("homepage review presentation", () => {
     expect(section).not.toMatch(/group-hover:scale/);
   });
 
-  it("uses review-coloured labels and a review-first two-action hierarchy", () => {
+  it("uses one-line review-coloured labels and a review-first two-action hierarchy", () => {
     expect(section).toMatch(/--module-review-color/);
     expect(section).toMatch(/reviewProductLabel\(item\.product\)/);
-    expect(section).toMatch(/text-\[color:var\(--top-picks-accent\)\]/);
+    expect(section).toMatch(/whitespace-nowrap text-lg/);
+    expect(section).toMatch(/block truncate transition-colors/);
     expect(section).toMatch(/مطالعه بررسی/);
     expect(section).toMatch(/variant="ghost"/);
+    expect(section).toMatch(/hover:bg-transparent!/);
     expect(section).toMatch(/مشاهده این محصول در فروشگاه/);
   });
 
@@ -60,5 +62,13 @@ describe("homepage review presentation", () => {
     expect(section).toMatch(/group-hover:text-\[color:var\(--top-picks-accent\)\]/);
     expect(section).toMatch(/<TooltipContent dir="rtl">\{comment\.author\.name\} — \{job\}<\/TooltipContent>/);
     expect(section).not.toMatch(/group-hover:underline/);
+  });
+
+  it("uses one product per highlighted comment and explains every displayed price", () => {
+    expect(section).toMatch(/const seenProducts = new Set<string>\(\)/);
+    expect(section).toMatch(/seenProducts\.add\(review\.product\.slug\)/);
+    expect(section).toMatch(/exactly one highlighted comment per reviewed product/);
+    expect(section.match(/قیمت این محصول در فروشگاه/g)?.length).toBeGreaterThanOrEqual(2);
+    expect(section).not.toMatch(/mt-auto border-t border-border pt-[23]/);
   });
 });

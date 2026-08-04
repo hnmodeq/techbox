@@ -24,7 +24,8 @@ const staticRoutes = [
   { path: "/media", priority: 0.85, changeFrequency: "daily" as const },
   { path: "/review", priority: 0.85, changeFrequency: "weekly" as const },
   { path: "/download", priority: 0.8, changeFrequency: "weekly" as const },
-  { path: "/landing/storage/shop", priority: 0.8, changeFrequency: "weekly" as const },
+  { path: "/shop/storage", priority: 0.85, changeFrequency: "daily" as const },
+  { path: "/shop/drive", priority: 0.85, changeFrequency: "daily" as const },
   { path: "/forum", priority: 0.8, changeFrequency: "daily" as const },
   { path: "/timeline", priority: 0.75, changeFrequency: "weekly" as const },
   { path: "/tools", priority: 0.7, changeFrequency: "monthly" as const },
@@ -39,7 +40,7 @@ const staticRoutes = [
 ];
 
 function moduleForStaticPath(path: string): ModuleSlug | null {
-  if (path === "/landing/storage/shop") return "shop";
+  if (path === "/shop/storage" || path === "/shop/drive") return "shop";
   const first = path.split("/").filter(Boolean)[0];
   return DEFAULT_MODULE_SLUGS.includes(first as ModuleSlug) ? first as ModuleSlug : null;
 }

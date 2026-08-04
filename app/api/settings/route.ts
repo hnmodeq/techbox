@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cacheHeaders, PUBLIC_CONTENT_CACHE } from "@/lib/cache-headers";
+import { cacheHeaders, PRIVATE_NO_STORE, PUBLIC_CONTENT_CACHE } from "@/lib/cache-headers";
 
-const PUBLIC_KEYS = ["shop.banners"];
+const PUBLIC_KEYS = ["shop.banners", "footer.socials"];
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
       const setting = await prisma.siteSetting.findUnique({ where: { key } });
       return NextResponse.json(
         { [key]: setting?.value ?? null },
-        { headers: cacheHeaders(PUBLIC_CONTENT_CACHE) }
+        { headers: cacheHeaders(key === "footer.socials" ? PRIVATE_NO_STORE : PUBLIC_CONTENT_CACHE) }
       );
     }
     const settings = await prisma.siteSetting.findMany({ where: { key: { in: PUBLIC_KEYS } } });

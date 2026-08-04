@@ -619,6 +619,8 @@ export async function getTopPicks(
           date: true,
           brand: true,
           model: true,
+          category: true,
+          tags: true,
           priceLabel: true,
           priceAmount: true,
           sourcePriceAmount: true,
@@ -663,7 +665,7 @@ export async function getTopPicks(
       title: rawProduct.title,
       excerpt: "",
       image: rawProduct.image ?? undefined,
-      tags: [],
+      tags: Array.isArray(rawProduct.tags) ? rawProduct.tags : [],
       author: { name: "فروشگاه تکباکس" },
       date: rawProduct.date.toISOString(),
       date_fa: formatPostDateFa(rawProduct.date),
@@ -671,6 +673,7 @@ export async function getTopPicks(
       views: 0,
       brand: rawProduct.brand,
       model: rawProduct.model,
+      category: rawProduct.category,
       priceLabel: rawProduct.priceLabel,
       priceAmount: finalPrice,
       discountPercent: rawProduct.discountPercent,
@@ -760,7 +763,13 @@ export async function getDeals(
     select: metaSelect,
   });
   const towerCandidates = await prisma.post.findMany({
-    where: { ...baseWhere, NOT: { OR: rackExclusionSignals } },
+    where: {
+      ...baseWhere,
+      AND: [
+        { NOT: { OR: rackExclusionSignals } },
+        { OR: [{ category: null }, { category: { notIn: ["Enterprise HDD", "Enterprise SSD"] } }] },
+      ],
+    },
     orderBy: [{ date: "desc" }, { id: "desc" }],
     take: 80,
     select: metaSelect,
@@ -823,6 +832,96 @@ export async function getDeals(
 
   return selectedIds.flatMap((id) => {
     const row = rowById.get(id);
+    if (!row) return [];
+    const item = normalize(row);
+    if (rates) {
+      const final = priceFromRates(row, rates);
+      if (final > 0) item.priceAmount = final;
+    }
+    return [item];
+  });
+}
+
+/** Commonly used enterprise drives shown as the second half of the homepage
+ * shop section. Real completed-order quantities lead; views and recency are
+ * honest fallbacks while the new catalogue has not accumulated sales yet. */
+export async function getDriveDeals(
+  normalize: (p: any) => ContentItem,
+  cardSelect: any,
+  take = 8,
+): Promise<ContentItem[]> {
+  const priceSelect = {
+    ...cardSelect,
+    sourcePriceAmount: true,
+    sourceCurrency: true,
+    priceAdjustmentPercent: true,
+    sellerBenefitPercent: true,
+    specs: true,
+    warranty: true,
+  };
+  const candidates = await prisma.post.findMany({
+    where: {
+      module: "shop",
+      ...PUBLISHED,
+      date: publicPostDateWhere(),
+      category: { in: ["Enterprise HDD", "Enterprise SSD"] },
+      availability: { in: ["موجود", "موجود برای مشاوره"] },
+    },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 80,
+    select: { id: true, category: true, brand: true, views: true, date: true },
+  });
+  if (candidates.length === 0) return [];
+
+  const salesGroups = await prisma.orderItem.groupBy({
+    by: ["postId"],
+    where: {
+      module: "shop",
+      postId: { in: candidates.map((row) => row.id) },
+      order: { status: { in: ["paid", "processing", "shipped", "delivered", "completed"] } },
+    },
+    _sum: { quantity: true },
+  });
+  const sales = new Map(salesGroups.map((row) => [row.postId, row._sum.quantity ?? 0]));
+  const quota = Math.max(1, Math.floor(take / 2));
+
+  const chooseDiverse = (category: "Enterprise HDD" | "Enterprise SSD") => {
+    const pool = candidates
+      .filter((row) => row.category === category)
+      .sort((a, b) =>
+        (sales.get(b.id) ?? 0) - (sales.get(a.id) ?? 0)
+        || b.views - a.views
+        || b.date.getTime() - a.date.getTime());
+    const selected: typeof pool = [];
+    const seenBrands = new Set<string>();
+    for (const row of pool) {
+      const brand = row.brand || "";
+      if (brand && seenBrands.has(brand)) continue;
+      selected.push(row);
+      if (brand) seenBrands.add(brand);
+      if (selected.length >= quota) return selected;
+    }
+    for (const row of pool) {
+      if (!selected.some((item) => item.id === row.id)) selected.push(row);
+      if (selected.length >= quota) break;
+    }
+    return selected;
+  };
+
+  const selectedIds = [
+    ...chooseDiverse("Enterprise HDD"),
+    ...chooseDiverse("Enterprise SSD"),
+  ].slice(0, take).map((row) => row.id);
+  const rows: any[] = await prisma.post.findMany({
+    where: { id: { in: selectedIds } },
+    select: priceSelect,
+  });
+  const byId = new Map(rows.map((row) => [row.id, row]));
+  let rates: CurrencyRates | null = null;
+  try { rates = await getCurrencyRates(); } catch {}
+
+  return selectedIds.flatMap((id) => {
+    const row = byId.get(id);
     if (!row) return [];
     const item = normalize(row);
     if (rates) {

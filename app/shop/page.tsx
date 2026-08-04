@@ -8,5 +8,5 @@ export const metadata = pageMetadata({
 });
 
 export default function ShopPage() {
-  redirect("/landing/storage/shop");
+  redirect("/shop/storage");
 }

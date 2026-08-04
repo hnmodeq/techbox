@@ -112,7 +112,7 @@ const categoryHints: Record<ModuleSlug, string[]> = {
   review: ["سرور", "شبکه", "ذخیره‌سازی", "امنیت", "برق و رک"],
   tools: ["شبکه", "ذخیره‌سازی", "ابزار"],
   download: ["سیستم‌عامل", "فریم‌ور", "درایور", "ابزار", "مانیتورینگ"],
-  shop: ["سرور", "شبکه", "NAS", "امنیت", "برق و رک"],
+  shop: ["سرور", "شبکه", "NAS", "Enterprise HDD", "Enterprise SSD", "امنیت", "برق و رک"],
   forum: ["پرسش", "شبکه", "امنیت", "بکاپ", "مانیتورینگ"],
   timeline: ["تاریخچه", "رویداد", "معماری", "سخت‌افزار", "نرم‌افزار"],
 };
@@ -879,7 +879,7 @@ function NewPostInner() {
                             <Select value={field.value || ""} onValueChange={field.onChange}>
                               <SelectTrigger><SelectValue placeholder="انتخاب برند…" /></SelectTrigger>
                               <SelectContent>
-                                {["Dell","HPE","QNAP","Synology","Cisco","Fortinet","MikroTik","Huawei","Aruba","Juniper","Palo Alto","Netgear","سایر"].map((b) => (
+                                {["Dell","HPE","QNAP","Synology","Seagate","Western Digital","Toshiba","Samsung","Micron","Solidigm","KIOXIA","Cisco","Fortinet","MikroTik","Huawei","Aruba","Juniper","Palo Alto","Netgear","سایر"].map((b) => (
                                   <SelectItem key={b} value={b}>{b}</SelectItem>
                                 ))}
                               </SelectContent>
@@ -922,6 +922,7 @@ function NewPostInner() {
                                 <SelectItem value="">بدون گارانتی</SelectItem>
                                 <SelectItem value="هونامیک ارتباط رستاک">هونامیک ارتباط رستاک</SelectItem>
                                 <SelectItem value="گارانتی اصالت و سلامت محصول">گارانتی اصالت و سلامت محصول</SelectItem>
+                                <SelectItem value="گارانتی ۵ ساله سازنده">گارانتی ۵ ساله سازنده</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>

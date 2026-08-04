@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     });
     if (openCount >= MAX_OPEN_TICKETS) {
       return NextResponse.json(
-        { error: "too_many_tickets", message: `شما در حال حاضر ${MAX_OPEN_TICKETS.toLocaleString("fa-IR")} تیکت باز دارید` },
+        { error: "too_many_tickets", message: `شما در حال حاضر ${MAX_OPEN_TICKETS.toLocaleString("fa-IR")} درخواست مشاوره باز دارید` },
         { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) }
       );
     }
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         ok: true,
         ticketId: ticket.id,
         accessToken,
-        message: "تیکت شما ثبت شد. تیم پشتیبانی به‌زودی پاسخ می‌دهد.",
+        message: "درخواست مشاوره شما ثبت شد. تیم فنی به‌زودی پاسخ می‌دهد.",
       },
       { headers: cacheHeaders(PRIVATE_NO_STORE) }
     );
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     if (e instanceof z.ZodError) {
       return NextResponse.json({ error: e.errors[0].message }, { status: 400, headers: cacheHeaders(PRIVATE_NO_STORE) });
     }
-    return NextResponse.json({ error: "خطا در ثبت تیکت" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
+    return NextResponse.json({ error: "خطا در ثبت درخواست مشاوره" }, { status: 500, headers: cacheHeaders(PRIVATE_NO_STORE) });
   }
 }
 

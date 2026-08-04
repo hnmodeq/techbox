@@ -19,12 +19,13 @@ describe("homepage tools and website-info requirements", () => {
     expect(tools).not.toMatch(/<SectionHeader/);
   });
 
-  it("uses one RAID feature and a 2x2 image grid with saturation hover", () => {
+  it("uses one RAID feature and a 2x2 fully-colour image grid", () => {
     expect(tools).not.toMatch(/ToolIcon/);
     expect(tools).toMatch(/<ToolTile tool=\{raid\} \/>/);
     expect(tools).toMatch(/sm:grid-cols-2/);
-    expect(tools).toMatch(/grayscale saturate-0/);
-    expect(tools).toMatch(/group-hover:grayscale-0 group-hover:saturate-100/);
+    expect(tools).toMatch(/object-cover saturate-100/);
+    expect(tools).not.toMatch(/grayscale|saturate-0|group-hover:saturate/);
+    expect(tools).toMatch(/group-hover:text-\[color:var\(--tools-accent\)\]/);
     expect(tools).toMatch(/ابزارهایی که کار شما رو شاید راحت‌تر کنه/);
     expect(registry.match(/tools\/home-cards\/.*\.webp/g)).toHaveLength(5);
   });

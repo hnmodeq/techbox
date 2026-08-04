@@ -7,6 +7,7 @@ import { z } from "zod";
 import { revalidateTag, revalidatePath } from "next/cache";
 import { HERO_MAGIC_DEFAULTS } from "@/lib/hero-magic-settings";
 import { DEFAULT_HOME_ADVERTISEMENTS } from "@/features/home/lib/home-advertisements";
+import { DEFAULT_FOOTER_SOCIALS, parseFooterSocials } from "@/features/footer/footer-socials";
 
 const SETTINGS_DEFAULTS: Record<string, string> = {
   "shop.banners": "[]",
@@ -35,6 +36,7 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "home.tools.featured": "[]",
   "home.advertisements": JSON.stringify(DEFAULT_HOME_ADVERTISEMENTS),
   "home.familyComments.blocklist": "[]",
+  "footer.socials": JSON.stringify(DEFAULT_FOOTER_SOCIALS),
   "auth.require_email_verification": "false",
   "email.provider": "resend",
   "email.nodemailer_host": "smtp.gmail.com",
@@ -130,6 +132,19 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: "jobs.resume_retention_days must be 1-365" }, { status: 400 });
       }
     }
+    if (updates["footer.socials"]) {
+      try {
+        const raw = JSON.parse(updates["footer.socials"]);
+        for (const key of ["instagram", "youtube", "telegram"] as const) {
+          if (!raw?.[key] || typeof raw[key].enabled !== "boolean" || typeof raw[key].url !== "string") throw new Error("invalid");
+          const url = new URL(raw[key].url);
+          if (url.protocol !== "https:") throw new Error("invalid");
+        }
+        updates["footer.socials"] = JSON.stringify(parseFooterSocials(raw));
+      } catch {
+        return NextResponse.json({ error: "footer.socials must contain valid HTTPS Instagram, YouTube and Telegram settings" }, { status: 400 });
+      }
+    }
 
     // Upsert each setting
     for (const [key, value] of Object.entries(updates)) {
@@ -149,6 +164,9 @@ export async function PATCH(req: NextRequest) {
       revalidateTag("module-config", "max");
       revalidateTag("home-data", "max");
       revalidatePath("/");
+    }
+    if (touched.some((k) => k.startsWith("footer."))) {
+      revalidatePath("/", "layout");
     }
     if (touched.some((k) => k.startsWith("currency."))) {
       // Prices are derived from these rates on the server.

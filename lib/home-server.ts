@@ -12,6 +12,7 @@ import {
   getCommunityTopics,
   getLatestVideoHighlightComments,
   getDeals,
+  getDriveDeals,
   getTopPicks,
   getTimeline,
   getFamilyComments,
@@ -636,6 +637,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   const deals = await section("deals", [] as any[], () =>
     getDeals(normalizeCard, cardSelect, moduleTakes.shop ?? 8));
   if (deals.length) modules.shop = deals;
+  const driveDeals = await section("driveDeals", [] as any[], () =>
+    getDriveDeals(normalizeCard, cardSelect, 8));
 
   const timeline = await section("timeline", [] as any[], () => getTimeline());
 
@@ -728,6 +731,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     community,
     videoHighlightComments,
     topPicks,
+    driveDeals,
     timeline,
     familyComments,
     moreToExplore,
@@ -741,9 +745,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// v12: review cards now carry real product commerce and approved comments;
-// shop cards also include their complete specs/warranty payload.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v12"], {
+// v13: the shop section includes a separately selected HDD/SSD catalogue.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v13"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal, X, Search, ChevronDown, ChevronUp, ArrowUpDown, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { driveType, hasEnoughShopSpecs, isDriveProduct, shopSpec, type ShopProductKind } from "@/lib/shop-product-kind";
 import ShopProductCard from "./ShopProductCard";
 import ShopBanner, { type ShopBannerItem } from "./ShopBanner";
 
@@ -55,9 +56,22 @@ const BRAND_FA: Record<string, string> = {
   Apple: "اپل",
   Acer: "ایسر",
   MSI: "ام‌اس‌آی",
+  Seagate: "سیگیت",
+  "Western Digital": "وسترن دیجیتال",
+  WD: "وسترن دیجیتال",
+  Toshiba: "توشیبا",
+  Samsung: "سامسونگ",
+  Micron: "مایکرون",
+  Solidigm: "سالیدایم",
+  KIOXIA: "کیوکسیا",
 };
 
 const PAGE_SIZE = 20;
+
+function capacityRank(value: string) {
+  const number = Number.parseFloat(value.replace(",", ".")) || 0;
+  return /TB/i.test(value) ? number * 1000 : number;
+}
 
 // ── Price resolve ───────────────────────────────────────────────────────────
 function resolvePrice(item: ContentItem): number {
@@ -137,9 +151,52 @@ function FilterSection({
   );
 }
 
+function DriveFilterOptions({
+  options,
+  selected,
+  onChange,
+  ltr = false,
+}: {
+  options: string[];
+  selected: Set<string>;
+  onChange: (next: Set<string>) => void;
+  ltr?: boolean;
+}) {
+  return (
+    <div className="space-y-1">
+      {options.map((option) => (
+        <label key={option} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1.5 hover:bg-muted/40">
+          <input
+            type="checkbox"
+            checked={selected.has(option)}
+            onChange={(event) => {
+              const next = new Set(selected);
+              event.target.checked ? next.add(option) : next.delete(option);
+              onChange(next);
+            }}
+            className="size-4 rounded border-border accent-primary"
+          />
+          <span className="text-[12px]" dir={ltr ? "ltr" : "rtl"}>{option}</span>
+        </label>
+      ))}
+      {options.length === 0 && <p className="text-[11px] text-muted-foreground">اطلاعاتی ثبت نشده است</p>}
+    </div>
+  );
+}
+
 // ── Main ShopGrid ────────────────────────────────────────────────────────────
-export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] }) {
-  const { items } = useDbPosts("shop", serverItems ?? [], 200);
+export default function ShopGrid({
+  serverItems,
+  kind = "storage",
+}: {
+  serverItems?: ContentItem[];
+  kind?: ShopProductKind;
+}) {
+  const { items: allItems } = useDbPosts("shop", serverItems ?? [], 250);
+  const items = useMemo(
+    () => allItems.filter((item) => kind === "drive" ? isDriveProduct(item) : !isDriveProduct(item)),
+    [allItems, kind],
+  );
   const banners = useShopBanners();
 
   const [sort, setSort] = useState<SortKey>("relevant");
@@ -158,6 +215,12 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     cpu: false,
     memory: false,
     features: false,
+    driveType: false,
+    capacity: false,
+    interface: false,
+    formFactor: false,
+    speed: false,
+    endurance: false,
   });
   const toggleSection = (k: string) => setOpenMap((m) => ({ ...m, [k]: !m[k] }));
 
@@ -280,39 +343,48 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
   const [filterRedundant, setFilterRedundant] = useState(false);
   const [filterM2, setFilterM2] = useState(false);
 
+  const distinctDriveValues = useCallback((keys: readonly string[]) => {
+    const values = new Set<string>();
+    for (const item of items) {
+      const value = shopSpec(item, keys);
+      if (value) values.add(value);
+    }
+    return Array.from(values);
+  }, [items]);
+  const allDriveTypes = useMemo(() => Array.from(new Set(items.map(driveType).filter(Boolean))) as string[], [items]);
+  const allDriveCapacities = useMemo(
+    () => distinctDriveValues(["Capacity", "ظرفیت"]).sort((a, b) => capacityRank(a) - capacityRank(b)),
+    [distinctDriveValues],
+  );
+  const allDriveInterfaces = useMemo(
+    () => distinctDriveValues(["Interface", "رابط"]).sort(),
+    [distinctDriveValues],
+  );
+  const allDriveFormFactors = useMemo(
+    () => distinctDriveValues(["Form Factor", "فرم فاکتور"]).sort(),
+    [distinctDriveValues],
+  );
+  const allDriveSpeeds = useMemo(
+    () => distinctDriveValues(["Sequential Read", "سرعت خواندن ترتیبی", "Rotational Speed", "سرعت چرخش"]),
+    [distinctDriveValues],
+  );
+  const allDriveEndurance = useMemo(
+    () => distinctDriveValues(["DWPD", "Workload Rate", "نرخ بار کاری"]),
+    [distinctDriveValues],
+  );
+  const [selectedDriveTypes, setSelectedDriveTypes] = useState<Set<string>>(new Set());
+  const [selectedDriveCapacities, setSelectedDriveCapacities] = useState<Set<string>>(new Set());
+  const [selectedDriveInterfaces, setSelectedDriveInterfaces] = useState<Set<string>>(new Set());
+  const [selectedDriveFormFactors, setSelectedDriveFormFactors] = useState<Set<string>>(new Set());
+  const [selectedDriveSpeeds, setSelectedDriveSpeeds] = useState<Set<string>>(new Set());
+  const [selectedDriveEndurance, setSelectedDriveEndurance] = useState<Set<string>>(new Set());
+
   const sorted = useMemo(() => {
     let list = [...items];
 
-    // ── Filter out products with no specs or insufficient specs ──
-    // A product must have at least 2 of the 4 major specs to be shown
-    list = list.filter((item) => {
-      const specs = (item.specs && typeof item.specs === "object" && !Array.isArray(item.specs))
-        ? item.specs as Record<string, unknown>
-        : {};
-
-      // Count how many of the 4 major specs exist with non-empty values
-      const hasBay = !!(specs["Drive Bay"] || specs["Bay"] || specs["تعداد جایگاه دیسک"]);
-      const hasCpu = !!(specs["CPU"] || specs["پردازنده"]);
-      const hasRam = !!(specs["System Memory"] || specs["RAM"] || specs["حافظه رم"]);
-      const hasNetwork = !!(
-        specs["10 Gigabit Ethernet Port"] ||
-        specs["2.5 Gigabit Ethernet Port (2.5G/1G/100M)"] ||
-        specs["2.5 Gigabit Ethernet Port"] ||
-        specs["Network Card"]
-      );
-
-      const majorSpecCount = [hasBay, hasCpu, hasRam, hasNetwork].filter(Boolean).length;
-
-      // Also count total non-empty specs
-      const totalSpecs = Object.values(specs).filter((v) => {
-        if (!v) return false;
-        const s = String(v).trim().toLowerCase();
-        return s && !["n/a", "na", "-", ""].includes(s);
-      }).length;
-
-      // Must have at least 2 major specs AND at least 3 total specs
-      return majorSpecCount >= 2 && totalSpecs >= 3;
-    });
+    // Both catalogues reject thin rows, but each validates the four specs its
+    // own card renders (NAS: bay/CPU/RAM/network; drive: capacity/speed/interface/form factor).
+    list = list.filter(hasEnoughShopSpecs);
 
     if (onlyAvailable) list = list.filter((i) => i.availability !== "ناموجود" && i.availability !== "اتمام موجودی");
     if (priceFilter) {
@@ -354,6 +426,25 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         const c = parseM2Count(it.specs as any);
         return c !== null;
       });
+    }
+
+    if (selectedDriveTypes.size > 0) {
+      list = list.filter((item) => selectedDriveTypes.has(driveType(item)));
+    }
+    if (selectedDriveCapacities.size > 0) {
+      list = list.filter((item) => selectedDriveCapacities.has(shopSpec(item, ["Capacity", "ظرفیت"])));
+    }
+    if (selectedDriveInterfaces.size > 0) {
+      list = list.filter((item) => selectedDriveInterfaces.has(shopSpec(item, ["Interface", "رابط"])));
+    }
+    if (selectedDriveFormFactors.size > 0) {
+      list = list.filter((item) => selectedDriveFormFactors.has(shopSpec(item, ["Form Factor", "فرم فاکتور"])));
+    }
+    if (selectedDriveSpeeds.size > 0) {
+      list = list.filter((item) => selectedDriveSpeeds.has(shopSpec(item, ["Sequential Read", "سرعت خواندن ترتیبی", "Rotational Speed", "سرعت چرخش"])));
+    }
+    if (selectedDriveEndurance.size > 0) {
+      list = list.filter((item) => selectedDriveEndurance.has(shopSpec(item, ["DWPD", "Workload Rate", "نرخ بار کاری"])));
     }
 
     switch (sort) {
@@ -402,14 +493,14 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     });
 
     return list;
-  }, [items, sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2]);
+  }, [items, sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2, selectedDriveTypes, selectedDriveCapacities, selectedDriveInterfaces, selectedDriveFormFactors, selectedDriveSpeeds, selectedDriveEndurance]);
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2]);
+  }, [sort, onlyAvailable, priceFilter, selectedBrands, selectedCats, selectedBays, selectedCpuFamilies, selectedMemories, filter10GbE, filterRedundant, filterM2, selectedDriveTypes, selectedDriveCapacities, selectedDriveInterfaces, selectedDriveFormFactors, selectedDriveSpeeds, selectedDriveEndurance]);
 
   useEffect(() => {
     const el = loaderRef.current;
@@ -436,7 +527,12 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     (filter10GbE ? 1 : 0) +
     (filterRedundant ? 1 : 0) +
     (filterM2 ? 1 : 0) +
-    0;
+    selectedDriveTypes.size +
+    selectedDriveCapacities.size +
+    selectedDriveInterfaces.size +
+    selectedDriveFormFactors.size +
+    selectedDriveSpeeds.size +
+    selectedDriveEndurance.size;
 
   const clearAllFilters = useCallback(() => {
     setOnlyAvailable(false);
@@ -449,6 +545,12 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
     setFilter10GbE(false);
     setFilterRedundant(false);
     setFilterM2(false);
+    setSelectedDriveTypes(new Set());
+    setSelectedDriveCapacities(new Set());
+    setSelectedDriveInterfaces(new Set());
+    setSelectedDriveFormFactors(new Set());
+    setSelectedDriveSpeeds(new Set());
+    setSelectedDriveEndurance(new Set());
   }, []);
 
   const fmtSliderPrice = (v: number) => {
@@ -566,12 +668,12 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         </div>
       </FilterSection>
 
-      {/* Category = کاربری */}
-      <FilterSection title="کاربری" open={!!openMap.category} onToggle={() => toggleSection("category")} badgeCount={selectedCats.size}>
+      {/* Category / usage */}
+      <FilterSection title={kind === "drive" ? "دسته‌بندی" : "کاربری"} open={!!openMap.category} onToggle={() => toggleSection("category")} badgeCount={selectedCats.size}>
         <div className="space-y-3">
           <div className="relative">
             <Search className="absolute right-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-            <Input value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="جستجوی کاربری…" className="h-8 text-xs pr-7 bg-muted/40" />
+            <Input value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder={kind === "drive" ? "جستجوی دسته‌بندی…" : "جستجوی کاربری…"} className="h-8 text-xs pr-7 bg-muted/40" />
           </div>
           <div className="space-y-0.5">
             {filteredCats.map((cat) => (
@@ -594,6 +696,8 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
         </div>
       </FilterSection>
 
+      {kind === "storage" ? (
+        <>
       {/* ── Practical filters – 7 important for IT buyer ── */}
       <FilterSection title="تعداد جایگاه دیسک (Bay)" open={!!openMap.bay} onToggle={() => toggleSection("bay")} badgeCount={selectedBays.size}>
         <div className="grid grid-cols-3 gap-2">
@@ -658,6 +762,29 @@ export default function ShopGrid({ serverItems }: { serverItems?: ContentItem[] 
           </label>
         </div>
       </FilterSection>
+        </>
+      ) : (
+        <>
+          <FilterSection title="نوع درایو" open={!!openMap.driveType} onToggle={() => toggleSection("driveType")} badgeCount={selectedDriveTypes.size}>
+            <DriveFilterOptions options={allDriveTypes} selected={selectedDriveTypes} onChange={setSelectedDriveTypes} />
+          </FilterSection>
+          <FilterSection title="ظرفیت" open={!!openMap.capacity} onToggle={() => toggleSection("capacity")} badgeCount={selectedDriveCapacities.size}>
+            <DriveFilterOptions options={allDriveCapacities} selected={selectedDriveCapacities} onChange={setSelectedDriveCapacities} ltr />
+          </FilterSection>
+          <FilterSection title="رابط اتصال" open={!!openMap.interface} onToggle={() => toggleSection("interface")} badgeCount={selectedDriveInterfaces.size}>
+            <DriveFilterOptions options={allDriveInterfaces} selected={selectedDriveInterfaces} onChange={setSelectedDriveInterfaces} ltr />
+          </FilterSection>
+          <FilterSection title="فرم فاکتور" open={!!openMap.formFactor} onToggle={() => toggleSection("formFactor")} badgeCount={selectedDriveFormFactors.size}>
+            <DriveFilterOptions options={allDriveFormFactors} selected={selectedDriveFormFactors} onChange={setSelectedDriveFormFactors} ltr />
+          </FilterSection>
+          <FilterSection title="سرعت خواندن / چرخش" open={!!openMap.speed} onToggle={() => toggleSection("speed")} badgeCount={selectedDriveSpeeds.size}>
+            <DriveFilterOptions options={allDriveSpeeds} selected={selectedDriveSpeeds} onChange={setSelectedDriveSpeeds} ltr />
+          </FilterSection>
+          <FilterSection title="دوام و نرخ بار کاری" open={!!openMap.endurance} onToggle={() => toggleSection("endurance")} badgeCount={selectedDriveEndurance.size}>
+            <DriveFilterOptions options={allDriveEndurance} selected={selectedDriveEndurance} onChange={setSelectedDriveEndurance} ltr />
+          </FilterSection>
+        </>
+      )}
     </div>
   );
 

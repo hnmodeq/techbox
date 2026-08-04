@@ -33,6 +33,8 @@ export type HomeData = {
   videoHighlightComments?: VideoHighlightComment[];
   /** §5 — reviews joined to shop pricing and approved review comments. */
   topPicks?: ReviewHomeCard[];
+  /** §7 — commonly used enterprise HDD/SSD rows below storage deals. */
+  driveDeals?: ContentItem[];
   /** §6 — up to 12 IT milestones. */
   timeline?: TimelineCard[];
   /** §10 — 3 sampled comments from across all modules. */
@@ -131,6 +133,7 @@ export function HomeDataProvider({
         latestInsights: body.latestInsights ?? prev.latestInsights,
         videoHighlightComments: body.videoHighlightComments ?? prev.videoHighlightComments,
         topPicks: body.topPicks ?? prev.topPicks,
+        driveDeals: body.driveDeals ?? prev.driveDeals,
         timeline: body.timeline ?? prev.timeline,
         familyComments: body.familyComments ?? prev.familyComments,
         moreToExplore: body.moreToExplore ?? prev.moreToExplore,

@@ -11,9 +11,9 @@ const items = [
   { label: "ابزارها", href: "/tools", icon: Wrench, active: (path: string) => path === "/tools" || path.startsWith("/tools/") },
   {
     label: "فروشگاه",
-    href: "/landing/storage/shop",
+    href: "/shop/storage",
     icon: ShoppingBag,
-    active: (path: string) => path.startsWith("/shop") || path.startsWith("/landing/storage/shop"),
+    active: (path: string) => path.startsWith("/shop"),
   },
   { label: "حساب", href: "/account", icon: UserRound, active: (path: string) => path === "/account" },
 ] as const;
