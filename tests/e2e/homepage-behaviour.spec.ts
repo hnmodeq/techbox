@@ -42,6 +42,10 @@ test.describe('homepage behaviour (replaces source-text assertions)', () => {
     // pipeline — regardless of which component renders it.
     const rawOriginals = await page.evaluate(() =>
       [...document.querySelectorAll('img')]
+        // Owner-supplied 2880×600 WebP advertisements deliberately bypass a
+        // second Next/WebP encode to preserve their typography. They are
+        // already compressed delivery assets, not raw editorial originals.
+        .filter((img) => !img.closest('[data-home-ad]'))
         .map((img) => img.currentSrc || img.src)
         .filter((src) => src && !src.startsWith('data:') && !src.startsWith('blob:'))
         .filter((src) => {

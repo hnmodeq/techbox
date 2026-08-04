@@ -46,6 +46,13 @@ test.describe('public smoke tests', () => {
     await expectHealthyPage(page, '/', /تکباکس|TechBox|پاتوق/);
   });
 
+  test('isolated homepage V2 beta renders without replacing home', async ({ page }) => {
+    test.setTimeout(90_000);
+    await expectHealthyPage(page, '/makinghomepageversiontwo', /میز روزانهٔ متخصصان زیرساخت/);
+    await expect(page.getByRole('heading', { level: 1, name: /میز روزانهٔ متخصصان زیرساخت/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /بازگشت به خانه فعلی/ })).toHaveAttribute('href', '/');
+  });
+
   test('main module pages render', async ({ page }) => {
     test.setTimeout(90_000);
     for (const path of ['/blog', '/news', '/media', '/review', '/download', '/shop', '/forum', '/timeline', '/tools']) {
