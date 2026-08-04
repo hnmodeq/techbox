@@ -63,7 +63,7 @@ function ToolTile({ tool }: { tool: ToolRoute }) {
   return (
     <Link
       href={tool.href}
-      className="group relative isolate flex min-h-[135px] w-full overflow-hidden border border-border bg-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)] sm:min-h-[145px]"
+      className="group relative isolate flex min-h-[90px] w-full overflow-hidden border border-border bg-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)] sm:min-h-[96px]"
     >
       <Image
         src={tool.image}
@@ -73,8 +73,8 @@ function ToolTile({ tool }: { tool: ToolRoute }) {
         sizes={tool.slug === "raid-calculator" ? "(min-width: 1280px) 1280px, 100vw" : "(min-width: 640px) 50vw, 100vw"}
         className="-z-20 object-cover grayscale saturate-0 transition-[filter] duration-500 ease-out group-hover:grayscale-0 group-hover:saturate-100"
       />
-      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
-      <span className="mt-auto block w-full p-4 text-right sm:p-5">
+      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/95 via-black/70 to-black/55" />
+      <span className="mt-auto block w-full p-3 text-right sm:p-4">
         <span className="block text-xl font-bold leading-8 text-[color:var(--tools-accent)] sm:text-2xl">{tool.titleFa}</span>
         <span className="mt-1 block max-w-3xl text-sm leading-6 text-white/78 sm:text-[15px]">
           {tool.descriptionFa}

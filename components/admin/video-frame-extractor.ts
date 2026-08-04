@@ -25,17 +25,28 @@ function canvasWebP(canvas: HTMLCanvasElement, quality = 0.9) {
   });
 }
 
-/** Decode ten evenly spaced frames in the admin's browser. This avoids an
- * ffmpeg binary in Vercel while still producing real WebP storyboard frames. */
-export async function extractVideoFrames(file: File, count = 10): Promise<{ frames: File[]; duration: number }> {
+async function extractFromSource(source: File | string, count: number): Promise<{ frames: File[]; duration: number }> {
   if (count < 10) throw new Error("at_least_ten_frames_required");
-  const objectUrl = URL.createObjectURL(file);
+
+  const remote = typeof source === "string";
+  let videoSource = source as string;
+  if (remote) {
+    const parsed = new URL(source);
+    if (parsed.protocol !== "https:") throw new Error("secure_video_url_required");
+  } else {
+    videoSource = URL.createObjectURL(source);
+  }
+
   const video = document.createElement("video");
-  video.preload = "metadata";
+  // Existing Supabase videos expose Access-Control-Allow-Origin: *. Setting
+  // this before src keeps the canvas origin-clean when frames are generated
+  // from an already-uploaded video rather than a local File.
+  if (remote) video.crossOrigin = "anonymous";
+  video.preload = remote ? "auto" : "metadata";
   video.muted = true;
   video.playsInline = true;
   const metadataReady = waitFor(video, "loadedmetadata");
-  video.src = objectUrl;
+  video.src = videoSource;
 
   try {
     await metadataReady;
@@ -65,6 +76,18 @@ export async function extractVideoFrames(file: File, count = 10): Promise<{ fram
   } finally {
     video.removeAttribute("src");
     video.load();
-    URL.revokeObjectURL(objectUrl);
+    if (!remote) URL.revokeObjectURL(videoSource);
   }
+}
+
+/** Decode ten evenly spaced frames from a newly selected local video. This
+ * avoids an ffmpeg binary in Vercel while still producing real WebP frames. */
+export function extractVideoFrames(file: File, count = 10) {
+  return extractFromSource(file, count);
+}
+
+/** Generate the same storyboard from an existing public video URL. The video
+ * is streamed into the admin's browser and is never uploaded again. */
+export function extractVideoFramesFromUrl(url: string, count = 10) {
+  return extractFromSource(url, count);
 }

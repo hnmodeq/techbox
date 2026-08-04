@@ -116,7 +116,7 @@ describe("homepage request series", () => {
 
   it("uses equal compact tool heights, no transform hover and module-coloured titles", () => {
     const tools = read("features/home/components/sections/ToolsSection.tsx");
-    expect(tools).toMatch(/min-h-\[135px\]/);
+    expect(tools).toMatch(/min-h-\[90px\]/);
     expect(tools).not.toMatch(/group-hover:scale/);
     expect(tools).toMatch(/text-\[color:var\(--tools-accent\)\]/);
   });

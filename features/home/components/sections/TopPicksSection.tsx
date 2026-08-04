@@ -5,8 +5,13 @@ import type { ReviewHomeCard, ReviewHomeComment } from "@/features/home/lib/home
 import { RemoteImage } from "@/components/ui/remote-image";
 import { RelativeDate } from "@/components/ui/relative-date";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { ButtonLink } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ShopCardCommerce, ShopInlinePrice } from "@/features/shop/components/ShopProductCard";
-import { SectionShell, SectionHeader, Byline } from "../primitives";
+import { reviewProductLabel } from "@/features/home/lib/review-label";
+import { cn } from "@/lib/utils";
+import { SectionShell, SectionHeader } from "../primitives";
 
 export type TopPicksSectionProps = {
   picks: ReviewHomeCard[];
@@ -20,6 +25,7 @@ export type TopPicksSectionProps = {
 const HEADING_ID = "hp-toppicks-heading";
 type TopPicksStyle = React.CSSProperties & { "--top-picks-accent"?: string };
 type CommentWithReview = ReviewHomeComment & { reviewSlug: string; product: ReviewHomeCard["product"] };
+type ReviewAuthorData = ReviewHomeCard["author"];
 
 export function TopPicksSection({
   picks,
@@ -31,7 +37,9 @@ export function TopPicksSection({
 }: TopPicksSectionProps) {
   if (!picks?.length) return null;
   const [latest, ...archive] = picks;
-  const style: TopPicksStyle = { "--top-picks-accent": accentColor || "var(--primary)" };
+  const style: TopPicksStyle = {
+    "--top-picks-accent": accentColor || "var(--module-review-color, var(--primary))",
+  };
   const comments = pickDistinctComments(picks, 3);
 
   return (
@@ -57,12 +65,12 @@ export function TopPicksSection({
           ))}
         </div>
 
-        <div className="border border-border p-4 sm:p-5">
+        <div className="p-4 sm:p-5">
           <h3 className="text-base font-black text-foreground">دیدگاه خوانندگان درباره بررسی‌ها</h3>
           <div className="mt-3 grid gap-3">
             {comments.map((comment) => <ReviewCommentCard key={comment.id} comment={comment} />)}
             {comments.length === 0 && (
-              <p className="flex min-h-40 items-center justify-center border border-dashed border-border text-center text-sm text-muted-foreground">
+              <p className="flex min-h-40 items-center justify-center text-center text-sm text-muted-foreground">
                 هنوز دیدگاهی برای بررسی‌ها ثبت نشده است.
               </p>
             )}
@@ -74,31 +82,35 @@ export function TopPicksSection({
 }
 
 function LatestReviewCard({ item }: { item: ReviewHomeCard }) {
+  const label = reviewProductLabel(item.product);
   return (
     <article className="grid overflow-hidden border border-border bg-card md:grid-cols-[1.2fr_.8fr]">
-      <Link href={`/review/${item.slug}`} className="group relative min-h-[300px] md:min-h-[460px]">
+      <Link
+        href={`/review/${item.slug}`}
+        className="group relative min-h-[300px] overflow-hidden bg-white md:min-h-[460px] dark:bg-black"
+      >
         <RemoteImage
           src={item.product.image || item.image}
           alt={item.product.title}
           sizes="(min-width: 1024px) 730px, 100vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transform-none"
+          className="object-contain p-8 sm:p-12"
         />
       </Link>
       <div className="flex flex-col p-6 sm:p-8">
-        <span className="text-5xl font-black leading-none text-[color:var(--top-picks-accent)]/15 sm:text-7xl">بررسی</span>
-        <RelativeDate date={item.date} className="mt-4 text-xs text-muted-foreground" />
-        <h3 className="mt-2 text-2xl font-bold leading-9 text-foreground sm:text-3xl sm:leading-10">
+        <span className="text-5xl font-black leading-tight text-[color:var(--top-picks-accent)] sm:text-7xl">{label}</span>
+        <h3 className="mt-3 text-left text-2xl font-bold leading-9 text-foreground sm:text-3xl sm:leading-10" dir="ltr">
           <Link href={`/review/${item.slug}`} className="transition-colors hover:text-[color:var(--top-picks-accent)]">
             {item.product.title}
           </Link>
         </h3>
         {item.excerpt && <p className="mt-3 line-clamp-4 text-sm leading-7 text-muted-foreground">{item.excerpt}</p>}
-        <div className="mt-5"><Byline author={item.author} date={item.date_fa} size="sm" hideRole /></div>
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+          <ReviewAuthor author={item.author} />
+          <RelativeDate date={item.date} className="pb-0.5 text-xs text-muted-foreground" />
+        </div>
         <div className="mt-auto border-t border-border pt-3">
           <ShopCardCommerce product={item.product} />
-          <Link href={`/shop/${item.product.slug}`} className="mt-2 flex h-10 items-center justify-center bg-[color:var(--module-shop-color,var(--primary))] px-4 text-sm font-bold text-white">
-            مشاهده این محصول در فروشگاه
-          </Link>
+          <ReviewActions item={item} />
         </div>
       </div>
     </article>
@@ -106,53 +118,130 @@ function LatestReviewCard({ item }: { item: ReviewHomeCard }) {
 }
 
 function CompactReviewCard({ item }: { item: ReviewHomeCard }) {
+  const label = reviewProductLabel(item.product);
   return (
     <article className="flex h-full flex-col border border-border bg-card">
-      <Link href={`/review/${item.slug}`} className="group relative aspect-[16/10] overflow-hidden bg-muted">
+      <Link href={`/review/${item.slug}`} className="relative aspect-[16/10] overflow-hidden bg-white dark:bg-black">
         <RemoteImage
           src={item.product.image || item.image}
           alt={item.product.title}
           sizes="(min-width: 1024px) 330px, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none"
+          className="object-contain p-5"
         />
-        <span className="absolute inset-x-3 bottom-2 z-10 text-4xl font-black text-white/65 drop-shadow">بررسی</span>
       </Link>
       <div className="flex flex-1 flex-col p-4">
         <RelativeDate date={item.date} className="text-[11px] text-muted-foreground" />
-        <h3 className="mt-1 line-clamp-2 text-base font-bold leading-6 text-foreground">
-          <Link href={`/review/${item.slug}`} className="transition-colors hover:text-[color:var(--top-picks-accent)]">
-            {item.product.title}
-          </Link>
-        </h3>
+        <div className="mt-1 flex items-start justify-between gap-3">
+          <span className="shrink-0 text-xs font-black leading-6 text-[color:var(--top-picks-accent)]">{label}</span>
+          <h3 className="min-w-0 flex-1 text-left text-base font-bold leading-6 text-foreground" dir="ltr">
+            <Link href={`/review/${item.slug}`} className="line-clamp-2 transition-colors hover:text-[color:var(--top-picks-accent)]">
+              {item.product.title}
+            </Link>
+          </h3>
+        </div>
         {item.excerpt && <p className="mt-2 line-clamp-3 text-xs leading-5 text-muted-foreground">{item.excerpt}</p>}
         <div className="mt-auto border-t border-border pt-2">
           <ShopCardCommerce product={item.product} />
-          <Link href={`/shop/${item.product.slug}`} className="mt-2 flex h-9 items-center justify-center bg-[color:var(--module-shop-color,var(--primary))] px-3 text-xs font-bold text-white">
-            مشاهده این محصول در فروشگاه
-          </Link>
+          <ReviewActions item={item} compact />
         </div>
       </div>
     </article>
   );
 }
 
-function ReviewCommentCard({ comment }: { comment: CommentWithReview }) {
+function ReviewActions({ item, compact = false }: { item: ReviewHomeCard; compact?: boolean }) {
   return (
-    <Link href={`/review/${comment.reviewSlug}`} className="group grid min-h-32 grid-cols-[4.5rem_1fr] gap-3 border border-border p-3 transition-colors hover:bg-muted/30">
-      <div className="relative aspect-square overflow-hidden bg-white">
+    <div className={cn("mt-2 grid gap-1.5", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
+      <ButtonLink
+        href={`/review/${item.slug}`}
+        size={compact ? "lg" : "xl"}
+        className="bg-[color:var(--top-picks-accent)] font-bold text-white hover:bg-[color:var(--top-picks-accent)] hover:opacity-85"
+      >
+        مطالعه بررسی
+      </ButtonLink>
+      <ButtonLink
+        href={`/shop/${item.product.slug}`}
+        variant="ghost"
+        size={compact ? "lg" : "xl"}
+        className="bg-transparent font-bold text-muted-foreground hover:bg-transparent hover:text-[color:var(--top-picks-accent)]"
+      >
+        مشاهده این محصول در فروشگاه
+      </ButtonLink>
+    </div>
+  );
+}
+
+function ReviewAuthor({ author }: { author: ReviewAuthorData }) {
+  const job = author.job?.trim() || author.role?.trim() || "عضو تکباکس";
+  const content = (
+    <>
+      <UserAvatar
+        name={author.name}
+        username={author.username}
+        src={author.avatar}
+        sizes="32px"
+        className="size-8 text-[11px]"
+      />
+      <span className="flex min-w-0 flex-col">
+        <span className="flex items-center gap-1 text-xs font-bold text-foreground transition-colors group-hover/review-author:text-[color:var(--top-picks-accent)]">
+          {author.name}
+          {author.verifiedType && (
+            <VerifiedBadge
+              type={author.verifiedType as "content" | "org" | "user"}
+              label={author.verifiedLabel}
+              size={13}
+            />
+          )}
+        </span>
+        <span className="max-w-48 truncate text-[11px] leading-4 text-muted-foreground">{job}</span>
+      </span>
+    </>
+  );
+
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={author.username ? (
+          <Link
+            href={`/author/${author.username}`}
+            className="group/review-author inline-flex min-w-0 items-center gap-2 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        ) : (
+          <span className="group/review-author inline-flex min-w-0 cursor-default items-center gap-2" />
+        )}
+      >
+        {content}
+      </TooltipTrigger>
+      <TooltipContent dir="rtl">{author.name} — {job}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function ReviewCommentCard({ comment }: { comment: CommentWithReview }) {
+  const job = comment.author.job?.trim() || "عضو تکباکس";
+  return (
+    <Link href={`/review/${comment.reviewSlug}`} className="group grid min-h-32 grid-cols-[4.5rem_1fr] gap-3 p-3">
+      <div className="relative aspect-square overflow-hidden bg-white dark:bg-black">
         <RemoteImage src={comment.product.image} alt={comment.product.title} sizes="72px" className="object-contain p-1" />
       </div>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-          <span className="line-clamp-1 text-xs font-bold text-foreground group-hover:underline">{comment.product.title}</span>
+          <span className="line-clamp-1 text-xs font-bold text-foreground transition-colors group-hover:text-[color:var(--top-picks-accent)]">
+            {comment.product.title}
+          </span>
           <ShopInlinePrice product={comment.product} />
         </div>
         <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">{comment.text}</p>
         <div className="mt-2 flex items-center justify-between gap-2">
-          <span className="flex min-w-0 items-center gap-2">
-            <UserAvatar name={comment.author.name} username={comment.author.username} src={comment.author.avatar} sizes="24px" className="size-6 text-[10px]" />
-            <span className="truncate text-[11px] font-bold text-foreground">{comment.author.name}</span>
-          </span>
+          <Tooltip>
+            <TooltipTrigger
+              render={<span className="flex min-w-0 cursor-default items-center gap-2" />}
+            >
+              <UserAvatar name={comment.author.name} username={comment.author.username} src={comment.author.avatar} sizes="24px" className="size-6 text-[10px]" />
+              <span className="truncate text-[11px] font-bold text-foreground">{comment.author.name}</span>
+            </TooltipTrigger>
+            <TooltipContent dir="rtl">{comment.author.name} — {job}</TooltipContent>
+          </Tooltip>
           <RelativeDate date={comment.date} className="shrink-0 text-[10px] text-muted-foreground" />
         </div>
       </div>

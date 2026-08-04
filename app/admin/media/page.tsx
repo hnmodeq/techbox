@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { AdminGuard } from "@/components/admin/layout/admin-guard";
 import { AdminLoading, AdminEmpty, AdminError } from "@/components/admin/admin-states";
+import { LegacyVideoStoryboardBackfill } from "@/components/admin/legacy-video-storyboard-backfill";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -136,6 +137,8 @@ function MediaContent() {
         <Card><CardContent className="p-3"><div className="text-xs text-muted-foreground">ویدیوها</div><div className="text-lg font-bold">{stats.videos.toLocaleString("fa-IR")}</div></CardContent></Card>
         <Card><CardContent className="p-3"><div className="text-xs text-muted-foreground">حجم کل</div><div className="text-lg font-bold" dir="ltr">{formatBytes(stats.totalSize)}</div></CardContent></Card>
       </div>
+
+      <LegacyVideoStoryboardBackfill />
 
       {/* Filters */}
       <Card className="p-3">

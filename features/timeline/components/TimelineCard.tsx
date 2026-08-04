@@ -260,7 +260,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
   return (
     <div
       style={style}
-      className={`${widthClass} shrink-0 flex flex-col justify-start relative select-none`}
+      className={`${widthClass} group shrink-0 flex flex-col justify-start relative select-none`}
       onDragStart={(e) => e.preventDefault()}
     >
       <div className="relative h-[340px] sm:h-[360px] w-full rounded-lg overflow-hidden shadow-sm border border-border flex flex-col justify-end bg-card">
@@ -271,7 +271,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
               src={event.image}
               alt={event.title || 'تصویر رویداد'}
               fill
-              className="object-cover pointer-events-none"
+              className="object-cover saturate-100 pointer-events-none"
               draggable={false}
               sizes="(max-width: 768px) 100vw, 320px"
             />
@@ -284,7 +284,7 @@ export function TimelineCard({ event, style, importance }: TimelineCardProps) {
         {/* Card content */}
         <div className="relative z-10 p-4 flex flex-col justify-end h-full text-foreground">
           <div className="flex-1 flex flex-col justify-end overflow-hidden mb-4">
-            <h3 className="font-bold text-foreground mb-2 line-clamp-2 leading-6">
+            <h3 className="font-bold text-foreground mb-2 line-clamp-2 leading-6 transition-colors group-hover:text-[color:var(--module-timeline-color,var(--primary))]">
               {event.title}
             </h3>
             <p className="text-sm text-muted-foreground line-clamp-6 leading-5">
