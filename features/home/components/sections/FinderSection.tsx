@@ -24,7 +24,6 @@
  * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §4
  */
 import * as React from "react";
-import Link from "next/link";
 
 export type FinderChip = { labelFa: string; href: string };
 
@@ -36,23 +35,9 @@ export type FinderSectionProps = {
 
 const HEADING_ID = "hp-finder-heading";
 
-/**
- * Fallback chips. Each maps to a query that returns real catalogue rows —
- * a chip leading to an empty result page would be worse than no chip.
- */
-const DEFAULT_CHIPS: FinderChip[] = [
-  { labelFa: "ذخیره‌ساز شبکه (NAS)", href: "/search?q=NAS" },
-  { labelFa: "مناسب بکاپ سازمانی", href: "/search?q=%D8%A8%DA%A9%D8%A7%D9%BE" },
-  { labelFa: "رک‌مونت و دیتاسنتر", href: "/search?q=%D8%B1%DA%A9%E2%80%8C%D9%85%D9%88%D9%86%D8%AA" },
-  { labelFa: "دارای گارانتی رسمی", href: "/search?q=%DA%AF%D8%A7%D8%B1%D8%A7%D9%86%D8%AA%DB%8C" },
-];
-
 export function FinderSection({
-  chips,
   title = "دنبال چی می‌گردی؟",
 }: FinderSectionProps) {
-  const links = chips?.length ? chips : DEFAULT_CHIPS;
-
   return (
     <section
       aria-labelledby={HEADING_ID}
@@ -109,18 +94,8 @@ export function FinderSection({
               </button>
             </form>
 
-            <ul className="grid grid-cols-2 gap-2 md:flex md:flex-wrap md:justify-center">
-              {links.map((chip) => (
-                <li key={chip.href} className="flex">
-                  <Link
-                    href={chip.href}
-                    className="flex w-full items-center justify-center rounded-[200px] border border-border px-6 py-2 text-center text-[15px] leading-5 text-foreground transition-colors duration-200 hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:text-base"
-                  >
-                    {chip.labelFa}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Finder suggestion chips are intentionally hidden for now.
+                Their admin data remains intact for a future re-enable. */}
         </div>
       </div>
     </section>

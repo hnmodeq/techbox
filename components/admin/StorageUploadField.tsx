@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { extractVideoFrames } from "@/components/admin/video-frame-extractor";
 
 export type StorageUploadResult = {
   ok: boolean;
@@ -12,6 +13,8 @@ export type StorageUploadResult = {
   pathname: string;
   url: string;
   downloadUrl: string;
+  videoFrames?: string[];
+  videoDurationSeconds?: number;
 };
 
 function formatBytes(bytes: number) {
@@ -31,18 +34,21 @@ export function StorageUploadField({
   kind = "image",
   folder = "uploads/images",
   accept,
+  generateVideoFrames = false,
   onUploaded,
 }: {
   label?: string;
   kind?: "image" | "avatar" | "video" | "download" | "file";
   folder?: string;
   accept?: string;
+  generateVideoFrames?: boolean;
   onUploaded?: (result: StorageUploadResult) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<StorageUploadResult | null>(null);
   const [error, setError] = useState("");
+  const [frameStatus, setFrameStatus] = useState("");
   const [copied, setCopied] = useState(false);
 
   const upload = async () => {
@@ -50,6 +56,7 @@ export function StorageUploadField({
     setBusy(true);
     setError("");
     setResult(null);
+    setFrameStatus("");
     setCopied(false);
 
     const body = new FormData();
@@ -61,8 +68,38 @@ export function StorageUploadField({
       const res = await fetch("/api/admin/upload", { method: "POST", body, credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || data?.error || "upload_failed");
-      setResult(data);
-      onUploaded?.(data);
+
+      let completed: StorageUploadResult = data;
+      if (generateVideoFrames && kind === "video") {
+        try {
+          setFrameStatus("در حال استخراج ۱۰ فریم واقعی از ویدیو…");
+          const extracted = await extractVideoFrames(file, 10);
+          const framesBody = new FormData();
+          for (const frame of extracted.frames) framesBody.append("frames", frame);
+          const framesResponse = await fetch("/api/admin/video-frames", {
+            method: "POST",
+            body: framesBody,
+            credentials: "include",
+          });
+          const framesData = await framesResponse.json();
+          if (!framesResponse.ok || !Array.isArray(framesData.urls)) {
+            throw new Error(framesData?.error || "storyboard_upload_failed");
+          }
+          completed = {
+            ...data,
+            videoFrames: framesData.urls,
+            videoDurationSeconds: extracted.duration,
+          };
+          setFrameStatus("۱۰ فریم WebP برای پیش‌نمایش هاور ساخته شد.");
+        } catch {
+          // Video upload remains successful when a local codec cannot be
+          // decoded by the browser; the editor can still provide a poster.
+          setFrameStatus("ویدیو آپلود شد، اما مرورگر نتوانست فریم‌های پیش‌نمایش را استخراج کند.");
+        }
+      }
+
+      setResult(completed);
+      onUploaded?.(completed);
     } catch (e: any) {
       setError(e?.message || "خطا در آپلود فایل");
     } finally {
@@ -96,6 +133,7 @@ export function StorageUploadField({
 
       {file && <div className="text-xs paragraph-color">{file.name} • {formatBytes(file.size)} • {file.type || "unknown"}</div>}
       {error && <div className="text-xs text-[var(--danger)]">{error}</div>}
+      {frameStatus && <div className="text-xs text-muted-foreground">{frameStatus}</div>}
       {result && (
         <div className="space-y-1 text-xs">
           <div className="font-mono text-[var(--primary-text)] break-all" dir="ltr">{result.url}</div>

@@ -28,6 +28,7 @@ const TOP_LEVEL_KEYS = new Set([
   "moduleColorsEnabled",
   "unifiedModuleColor",
   "moduleColors",
+  "moduleColorsDark",
   "titles",
 ]);
 
@@ -41,15 +42,19 @@ export async function PATCH(req: NextRequest) {
     const tickerVisible = body.tickerVisible !== false;
     const moduleColorsEnabled = body.moduleColorsEnabled !== false;
     const unifiedModuleColor = "var(--primary)"; // retained for older settings payloads; disabled mode is now pure shadcn.
-    const incomingColors: Record<string, unknown> = (body.moduleColors && typeof body.moduleColors === "object")
-      ? body.moduleColors as Record<string, unknown>
-      : {};
-    const moduleColors = Object.fromEntries(
-      COLORABLE_MODULE_SLUGS.flatMap((slug) => {
-        const color = incomingColors[slug];
-        return isModuleColor(color) ? [[slug, color.trim()]] : [];
-      }),
-    );
+    const sanitizePalette = (value: unknown) => {
+      const incoming: Record<string, unknown> = value && typeof value === "object"
+        ? value as Record<string, unknown>
+        : {};
+      return Object.fromEntries(
+        COLORABLE_MODULE_SLUGS.flatMap((slug) => {
+          const color = incoming[slug];
+          return isModuleColor(color) ? [[slug, color.trim()]] : [];
+        }),
+      );
+    };
+    const moduleColors = sanitizePalette(body.moduleColors);
+    const moduleColorsDark = sanitizePalette(body.moduleColorsDark);
 
     // No strict validation — frontend now always sends complete objects
     const moduleEntries: Record<string, any> = {};
@@ -65,6 +70,7 @@ export async function PATCH(req: NextRequest) {
       moduleColorsEnabled,
       unifiedModuleColor,
       moduleColors,
+      moduleColorsDark,
       titles: (body.titles && typeof body.titles === "object") ? body.titles : {},
     } as SiteLayoutConfig;
 

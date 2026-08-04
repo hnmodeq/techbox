@@ -3,29 +3,12 @@
  *
  * These sit alongside the existing `ContentItem` rather than replacing it —
  * most sections consume plain ContentItems, and only the ones with extra
- * shape (product-linked reviews, timeline events, sampled comments,
- * author cards) need their own type.
+ * shape (timeline events, sampled comments and author cards) need their own
+ * type.
  *
  * Docs: docs/homepage-upgrade/03-DATA-CONTRACTS.md §1
  */
 import type { ContentItem } from "@/lib/content";
-
-/** §5 Our Top Picks — a review joined to the shop product it reviews. */
-export type TopPickCard = ContentItem & {
-  product: {
-    slug: string;
-    title: string;
-    image: string | null;
-    /** Final Toman price, computed server-side. Never trust a client price. */
-    priceAmount: number | null;
-    discountPercent: number | null;
-    discountEndsAt: string | null;
-    warranty: string | null;
-    availability: string | null;
-    brand: string | null;
-    model: string | null;
-  };
-};
 
 /** §6 Timeline — an IT/computing milestone. */
 export type TimelineCard = {

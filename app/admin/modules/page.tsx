@@ -36,6 +36,7 @@ export default function AdminModulesPage() {
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<TabId>("modules");
   const [colorDialogSlug, setColorDialogSlug] = useState<ModuleSlug | null>(null);
+  const [colorMode, setColorMode] = useState<"light" | "dark">("light");
   // ─── Module names (source of truth) ───
   const [moduleNames, setModuleNames] = useState<Record<string, string>>({});
   const [nameDefaults, setNameDefaults] = useState<Record<string, string>>({});
@@ -120,6 +121,7 @@ export default function AdminModulesPage() {
         moduleColorsEnabled: config.moduleColorsEnabled,
         unifiedModuleColor: config.unifiedModuleColor,
         moduleColors: config.moduleColors,
+        moduleColorsDark: config.moduleColorsDark,
         titles: config.titles,
         ...moduleData,
       };
@@ -515,7 +517,7 @@ export default function AdminModulesPage() {
             <CardHeader className="p-0">
               <CardTitle>رنگ‌های ماژول‌ها</CardTitle>
               <CardDescription>
-                هنگام فعال بودن، رنگ هر ماژول را با یک پالت بصری انتخاب کنید. هنگام غیرفعال بودن، همه‌چیز از توکن‌های پیش‌فرض شادسی‌ان استفاده می‌کند.
+                برای هر ماژول دو پالت مستقلِ حالت روشن و تاریک انتخاب کنید. رنگ‌های فعلی به‌عنوان پالت تاریک حفظ شده‌اند.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 pt-4 space-y-4">
@@ -536,12 +538,31 @@ export default function AdminModulesPage() {
               </div>
 
               {config.moduleColorsEnabled !== false ? (
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold">رنگ هر ماژول</Label>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2 rounded-lg border p-1">
+                    <button
+                      type="button"
+                      onClick={() => setColorMode("light")}
+                      className={`rounded-md px-3 py-2 text-xs font-bold transition-colors ${colorMode === "light" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      حالت روشن
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setColorMode("dark")}
+                      className={`rounded-md px-3 py-2 text-xs font-bold transition-colors ${colorMode === "dark" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      حالت تاریک
+                    </button>
+                  </div>
+                  <Label className="text-xs font-semibold">
+                    رنگ هر ماژول در {colorMode === "light" ? "حالت روشن" : "حالت تاریک"}
+                  </Label>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {ALL_MODULES.map((slug) => {
                       const meta = moduleMeta[slug];
-                      const savedColor = config.moduleColors?.[slug];
+                      const palette = colorMode === "light" ? config.moduleColors : config.moduleColorsDark;
+                      const savedColor = palette?.[slug];
                       const visibleColor = resolveModuleColor(slug, savedColor);
                       return (
                         <div key={slug} className="flex items-center gap-3 rounded-lg border p-3">
@@ -569,20 +590,24 @@ export default function AdminModulesPage() {
                     <ModuleColorDialog
                       open
                       onOpenChange={(open) => { if (!open) setColorDialogSlug(null); }}
-                      moduleName={moduleMeta[colorDialogSlug]?.titleFa || colorDialogSlug}
-                      value={resolveModuleColor(colorDialogSlug, config.moduleColors?.[colorDialogSlug])}
+                      moduleName={`${moduleMeta[colorDialogSlug]?.titleFa || colorDialogSlug} — ${colorMode === "light" ? "حالت روشن" : "حالت تاریک"}`}
+                      value={resolveModuleColor(
+                        colorDialogSlug,
+                        (colorMode === "light" ? config.moduleColors : config.moduleColorsDark)?.[colorDialogSlug],
+                      )}
                       defaultValue={MODULE_COLOR_DEFAULTS[colorDialogSlug]}
                       onChange={(color) => {
-                        setConfig((prev) => ({
-                          ...prev,
-                          moduleColors: { ...(prev.moduleColors || {}), [colorDialogSlug]: color },
-                        }));
+                        setConfig((prev) => {
+                          const key = colorMode === "light" ? "moduleColors" : "moduleColorsDark";
+                          return { ...prev, [key]: { ...(prev[key] || {}), [colorDialogSlug]: color } };
+                        });
                       }}
                       onReset={() => {
                         setConfig((prev) => {
-                          const moduleColors = { ...(prev.moduleColors || {}) };
-                          delete moduleColors[colorDialogSlug];
-                          return { ...prev, moduleColors };
+                          const key = colorMode === "light" ? "moduleColors" : "moduleColorsDark";
+                          const palette = { ...(prev[key] || {}) };
+                          delete palette[colorDialogSlug];
+                          return { ...prev, [key]: palette };
                         });
                       }}
                     />
@@ -600,8 +625,9 @@ export default function AdminModulesPage() {
                 <div className="flex flex-wrap gap-2">
                   {ALL_MODULES.slice(0, 6).map((slug) => {
                     const meta = moduleMeta[slug];
+                    const previewPalette = colorMode === "light" ? config.moduleColors : config.moduleColorsDark;
                     const color = config.moduleColorsEnabled !== false
-                      ? resolveModuleColor(slug, config.moduleColors?.[slug])
+                      ? resolveModuleColor(slug, previewPalette?.[slug])
                       : "var(--primary)";
                     return (
                       <span

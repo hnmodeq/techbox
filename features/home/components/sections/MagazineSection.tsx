@@ -188,15 +188,22 @@ function ArticleTags({
         className,
       )}
     >
-      <Link
-        href={`/blog/tag/${encodeURIComponent(primaryTag)}`}
-        className={cn(
-          "decoration-1 underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          onPrimary ? "hover:text-[color:var(--magazine-on-accent)]" : "hover:text-[color:var(--magazine-accent)]",
-        )}
-      >
-        {primaryTag}
-      </Link>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <Link
+              href={`/blog/tag/${encodeURIComponent(primaryTag)}`}
+              className={cn(
+                "decoration-1 underline-offset-4 transition-colors hover:underline focus-visible:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                onPrimary ? "hover:text-[color:var(--magazine-on-accent)]" : "hover:text-[color:var(--magazine-accent)]",
+              )}
+            />
+          }
+        >
+          {primaryTag}
+        </TooltipTrigger>
+        <TooltipContent>{`مشاهده محتواهایی با موضوع ${primaryTag}`}</TooltipContent>
+      </Tooltip>
     </div>
   );
 }

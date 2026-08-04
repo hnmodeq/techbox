@@ -30,10 +30,11 @@ describe("ScrollRail arrow affordance", () => {
     expect(rail).not.toMatch(/disabled \? "pointer-events-none opacity-0"/);
   });
 
-  it("gives bare arrows a backdrop so they survive dark artwork", () => {
-    // Bare arrows are drawn over video thumbnails; bare currentColor
-    // vanished against them.
-    expect(rail).toMatch(/bg-background\/90 text-foreground shadow-\[var\(--hp-shadow-card\)\] backdrop-blur-sm/);
+  it("uses one transparent borderless arrow component and flips only its visual", () => {
+    expect(rail).toMatch(/border-0 bg-transparent text-foreground shadow-none/);
+    expect(rail).toMatch(/dir === "next" \? "rotate-180"/);
+    expect(rail).not.toMatch(/bg-background\/90/);
+    expect(rail).not.toMatch(/border-\[color:var\(--hp-brand\)\]/);
   });
 
   it("can show arrows below the md breakpoint", () => {

@@ -19,9 +19,21 @@ describe("module colour delivery", () => {
   it("writes the saved module variables into server-rendered html", () => {
     expect(layout).toMatch(/import \{ COLORABLE_MODULE_SLUGS, resolveModuleColor \}/);
     expect(layout).toMatch(/function moduleColorStyle\(config: SiteLayoutConfig \| undefined\)/);
-    expect(layout).toMatch(/style\[`--module-\$\{slug\}-color`\] = resolveModuleColor/);
+    expect(layout).toMatch(/style\[`--module-\$\{slug\}-color-light`\] = resolveModuleColor/);
+    expect(layout).toMatch(/style\[`--module-\$\{slug\}-color-dark`\] = resolveModuleColor/);
     expect(layout).toMatch(/style=\{moduleColorStyle\(moduleConfig\)\}/);
     expect(layout).toMatch(/data-module-colors=\{colorsEnabled \? "enabled" : "disabled"\}/);
+  });
+
+  it("keeps separate light/dark admin palettes and treats legacy colors as dark", () => {
+    const css = read("design/globals.css");
+    const admin = read("app/admin/modules/page.tsx");
+    expect(moduleConfig).toMatch(/KEY_MODULE_COLORS_DARK = "modules\.custom_colors"/);
+    expect(moduleConfig).toMatch(/KEY_MODULE_COLORS_LIGHT = "modules\.custom_colors_light"/);
+    expect(moduleConfig).toMatch(/moduleColorsDark/);
+    expect(admin).toMatch(/حالت روشن/);
+    expect(admin).toMatch(/حالت تاریک/);
+    expect(css).toMatch(/html\.dark[\s\S]*--module-blog-color: var\(--module-blog-color-dark/);
   });
 
   it("does not immediately refetch and replace server-provided configuration", () => {

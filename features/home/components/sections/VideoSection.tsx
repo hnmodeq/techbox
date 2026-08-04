@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { RelativeDate } from "@/components/ui/relative-date";
 import { SectionShell, SectionHeader, ScrollRail } from "../primitives";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { useVideoStoryboard } from "@/components/content/use-video-storyboard";
 
 export type VideoSectionProps = {
   videos: ContentItem[];
@@ -141,6 +142,7 @@ export function VideoSection({
 }
 
 function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => void }) {
+  const storyboard = useVideoStoryboard(item.gallery);
   return (
     // h-full so the poster matches the section height instead of leaving a
     // gap. The 9/16 ratio stays as a MIN on small screens, where the column
@@ -149,6 +151,7 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
       <button
         type="button"
         onClick={onOpen}
+        {...storyboard.handlers}
         className="group relative block min-h-0 flex-1 w-full overflow-hidden text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <div className="relative h-full w-full overflow-hidden bg-background max-lg:aspect-9/16 lg:min-h-[520px]">
@@ -161,9 +164,18 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
             sizes="(min-width: 1024px) 390px, 100vw"
             priority
           />
-          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+          {storyboard.frame && (
+            <RemoteImage
+              key={storyboard.frame}
+              src={storyboard.frame}
+              alt=""
+              sizes="(min-width: 1024px) 390px, 100vw"
+              className="z-[1]"
+            />
+          )}
+          <div aria-hidden="true" className="absolute inset-0 z-[2] bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
           <PlayAffordance />
-          <div className="absolute inset-x-5 bottom-5 text-white">
+          <div className="absolute inset-x-5 bottom-5 z-10 text-white">
             <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-white/75">
               <RelativeDate date={item.date} />
               {item.videoDuration && (
@@ -185,10 +197,12 @@ function LatestVideoCard({ item, onOpen }: { item: ContentItem; onOpen: () => vo
 }
 
 function QuickTakeCard({ item, onOpen }: { item: ContentItem; onOpen: () => void }) {
+  const storyboard = useVideoStoryboard(item.gallery);
   return (
     <button
       type="button"
       onClick={onOpen}
+      {...storyboard.handlers}
       className="hp-card group relative w-[172px] overflow-hidden bg-background text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:w-[200px]"
       style={{ aspectRatio: "9/16" }}
     >
@@ -197,12 +211,15 @@ function QuickTakeCard({ item, onOpen }: { item: ContentItem; onOpen: () => void
         alt={item.title}
         sizes="200px"
       />
-      <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+      {storyboard.frame && (
+        <RemoteImage key={storyboard.frame} src={storyboard.frame} alt="" sizes="200px" className="z-[1]" />
+      )}
+      <div aria-hidden="true" className="absolute inset-0 z-[2] bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
 
       {item.videoDuration && (
         <Tooltip>
           <TooltipTrigger
-            render={<span className="absolute top-2 end-2 rounded-[4px] bg-black/70 px-1.5 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm" dir="ltr" />}
+            render={<span className="absolute top-2 end-2 z-10 rounded-[4px] bg-black/70 px-1.5 py-0.5 text-[11px] font-bold text-white backdrop-blur-sm" dir="ltr" />}
           >
             {item.videoDuration}
           </TooltipTrigger>
@@ -212,7 +229,7 @@ function QuickTakeCard({ item, onOpen }: { item: ContentItem; onOpen: () => void
 
       <PlayAffordance />
 
-      <div className="absolute inset-x-3 bottom-3">
+      <div className="absolute inset-x-3 bottom-3 z-10">
         <RelativeDate date={item.date} className="mb-1 block text-[11px] leading-4 text-white/70" />
         <h3 className="line-clamp-2 text-[14px] font-bold leading-[20px] text-white transition-colors group-hover:text-[color:var(--video-accent)]">
           {item.title}
@@ -226,7 +243,7 @@ function PlayAffordance() {
   return (
     <span
       aria-hidden="true"
-      className="absolute inset-0 m-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-sm"
+      className="absolute inset-0 z-10 m-auto flex size-12 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-sm"
     >
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
         <path d="M15 7.27a2 2 0 0 1 0 3.46L3 17.66A2 2 0 0 1 0 15.93V2.07A2 2 0 0 1 3 .34l12 6.93Z" fill="currentColor" />

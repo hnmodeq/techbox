@@ -126,7 +126,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
 
   return (
     <div className="relative flex w-full flex-col overflow-hidden bg-transparent text-foreground" dir="rtl">
-      <div className="relative z-10 flex items-center pt-10 pb-6 justify-center gap-5">
+      <div className="relative z-10 flex items-center justify-center gap-5 pb-2 pt-8">
         <button onClick={scrollToToday} className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
           <ChevronsRight className="size-3.5" /> امروز
         </button>
@@ -148,7 +148,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         ref={scrollRef}
         tabIndex={0}
         dir="rtl"
-        className={`timeline-scroll-fade relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none [&::-webkit-scrollbar]:hidden ${heightClassName || 'h-[500px]'}`}
+        className={`timeline-scroll-fade relative z-10 w-full overflow-x-auto overflow-y-hidden bg-transparent text-foreground outline-none [&::-webkit-scrollbar]:hidden ${heightClassName || 'h-[440px]'}`}
         style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         <div
@@ -171,7 +171,7 @@ export function TimelineContainer({ events, heightClassName }: TimelineContainer
         </div>
       </div>
 
-      <p className="relative z-10 text-center pb-8 pt-6 text-[11px] text-muted-foreground">
+      <p className="relative z-10 pb-6 pt-1 text-center text-[11px] text-muted-foreground">
         {events.length.toLocaleString('fa-IR')} رویداد ثبت شده
       </p>
     </div>

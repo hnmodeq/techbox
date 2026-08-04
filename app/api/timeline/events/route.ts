@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   try {
     const events = await prisma.timelineEvent.findMany({
       where: adminScope ? undefined : { published: true },
-      orderBy: { dateGr: 'asc' },
+      orderBy: { dateGr: 'desc' },
       select: {
         id: true,
         title: true,

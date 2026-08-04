@@ -1,22 +1,13 @@
-/**
- * §5 · Our Top Picks — Tom's Guide `best-picks--tabbed-`
- *
- * Review section with compact cards, yellow star rating, tooltips for avatar/name,
- * guarantee badge, and star rating, price on left and shop button on right,
- * and no card background.
- */
+/** Review homepage: newest review feature + four rotating archive cards. */
 import * as React from "react";
 import Link from "next/link";
-import type { TopPickCard } from "@/features/home/lib/home-types";
-import { SectionShell, SectionHeader, Byline, ScrollRail } from "../primitives";
-import { faPrice, faRating, faCount, faDiscountedPrice, isDiscountLive } from "@/lib/format-price";
-import { Num } from "@/components/ui/num";
+import type { ContentItem } from "@/lib/content";
 import { RemoteImage } from "@/components/ui/remote-image";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ShieldCheck } from "lucide-react";
+import { RelativeDate } from "@/components/ui/relative-date";
+import { SectionShell, SectionHeader, Byline } from "../primitives";
 
 export type TopPicksSectionProps = {
-  picks: TopPickCard[];
+  picks: ContentItem[];
   title?: string;
   moreLabel?: string;
   showTitle?: boolean;
@@ -36,7 +27,7 @@ export function TopPicksSection({
   accentColor,
 }: TopPicksSectionProps) {
   if (!picks?.length) return null;
-
+  const [latest, ...archive] = picks;
   const style: TopPicksStyle = { "--top-picks-accent": accentColor || "var(--primary)" };
 
   return (
@@ -45,7 +36,7 @@ export function TopPicksSection({
         <SectionHeader
           headingId={HEADING_ID}
           title={title}
-          description="کارشناسان ما هر سال ده‌ها محصول را تست می‌کنند. این‌ها قهرمانان فعلی دسته‌بندی خود هستند."
+          description="جدیدترین بررسی تکباکس، در کنار انتخابی تازه از آرشیو بررسی‌های تخصصی."
           href={showMore ? "/review" : undefined}
           linkLabel={moreLabel}
           accentColor={accentColor}
@@ -53,165 +44,64 @@ export function TopPicksSection({
       )}
       {!showTitle && <h2 id={HEADING_ID} className="sr-only">{title}</h2>}
 
-      <ScrollRail label={title} gap={20} arrowsOnMobile>
-        {picks.map((pick) => (
-          <div
-            key={`${pick.module}-${pick.slug}`}
-            className="w-[78%] shrink-0 sm:w-[46%] lg:w-[31%]"
-          >
-            <PickCard pick={pick} />
-          </div>
-        ))}
-      </ScrollRail>
+      <LatestReviewCard item={latest} />
+      {archive.length > 0 && (
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {archive.slice(0, 4).map((item) => (
+            <CompactReviewCard key={`${item.module}-${item.slug}`} item={item} />
+          ))}
+        </div>
+      )}
     </SectionShell>
   );
 }
 
-function PickCard({ pick }: { pick: TopPickCard }) {
-  const p = pick.product;
-  const live = isDiscountLive(p.discountPercent, p.discountEndsAt);
-  const deal = live ? faDiscountedPrice(p.priceAmount, p.discountPercent) : null;
-  const ratingValue = pick.rating ?? 0;
-  const stars = Math.round(ratingValue);
-
+function LatestReviewCard({ item }: { item: ContentItem }) {
   return (
-    <article className="hp-card flex h-full flex-col overflow-hidden bg-transparent transition-shadow duration-200">
-      <Link href={`/${pick.module}/${pick.slug}`} className="group block focus-visible:outline-none">
-        <div
-          className="relative w-full overflow-hidden bg-muted rounded-[var(--hp-r-sm)]"
-          style={{ aspectRatio: "16/9" }}
-        >
-          <RemoteImage
-            src={pick.image}
-            alt={pick.title}
-            sizes="(min-width: 900px) 420px, 71vw"
-            className="transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transform-none object-cover"
-          />
-        </div>
+    <article className="grid overflow-hidden border border-border bg-card md:grid-cols-[1.25fr_.75fr]">
+      <Link href={`/${item.module}/${item.slug}`} className="group relative min-h-[300px] md:min-h-[430px]">
+        <RemoteImage
+          src={item.image}
+          alt={item.title}
+          sizes="(min-width: 1024px) 760px, 100vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transform-none"
+        />
       </Link>
-
-      <div className="flex flex-1 flex-col py-3 px-1">
-        <h3 className="line-clamp-2 text-[16px] font-bold leading-[24px] text-[color:var(--hp-ink)]">
-          <Link
-            href={`/${pick.module}/${pick.slug}`}
-            className="transition-colors hover:text-[color:var(--top-picks-accent)] focus-visible:outline-none"
-          >
-            {pick.title}
+      <div className="flex flex-col justify-center p-6 sm:p-8">
+        <RelativeDate date={item.date} className="text-xs text-muted-foreground" />
+        <h3 className="mt-2 text-2xl font-bold leading-9 text-foreground sm:text-3xl sm:leading-10">
+          <Link href={`/${item.module}/${item.slug}`} className="transition-colors hover:text-[color:var(--top-picks-accent)]">
+            {item.title}
           </Link>
         </h3>
-
-        {pick.excerpt && (
-          <p className="mt-1.5 line-clamp-4 text-[13px] leading-[22px] text-[color:var(--hp-ink-3)]">
-            {pick.excerpt}
-          </p>
-        )}
-
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-          {pick.rating != null && (
-            <Tooltip>
-              <TooltipTrigger
-                render={<div className="flex w-fit cursor-default items-center gap-1.5" />}
-              >
-                <span className="flex" aria-hidden="true">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <svg
-                      key={n}
-                      width="14"
-                      height="14"
-                      viewBox="0 0 20 20"
-                      className={n <= stars ? "text-[#f9bc00] fill-[#f9bc00]" : "text-muted-foreground/30 fill-muted-foreground/15"}
-                    >
-                      <path d="M10 1.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-                    </svg>
-                  ))}
-                </span>
-                <span className="text-[13px] font-bold text-[color:var(--hp-ink)]">
-                  {faRating(pick.rating)}
-                </span>
-                {pick.ratingCount ? (
-                  <span className="text-[11px] text-[color:var(--hp-ink-3)]">
-                    ({faCount(pick.ratingCount, "رأی")})
-                  </span>
-                ) : null}
-              </TooltipTrigger>
-              <TooltipContent dir="rtl" className="text-right">
-                <p className="font-semibold">امتیاز: {faRating(pick.rating)} از ۵</p>
-                {pick.ratingCount ? (
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    بر پایهٔ {faCount(pick.ratingCount, "رأی")}
-                  </p>
-                ) : null}
-              </TooltipContent>
-            </Tooltip>
-          )}
-
-          {p.warranty && (
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground cursor-default">
-                    <ShieldCheck className="size-3.5 text-emerald-500" />
-                    {p.warranty}
-                  </span>
-                }
-              />
-              <TooltipContent dir="rtl">گارانتی معتبر محصول</TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-
-        <div className="mt-auto pt-3">
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <div className="w-fit">
-                  <Byline
-                    author={{
-                      name: pick.author?.name ?? "تحریریه",
-                      username: pick.author?.username,
-                      role: pick.author?.role,
-                      job: pick.author?.job,
-                      avatar: pick.author?.avatar,
-                    }}
-                    date={pick.date_fa}
-                    size="sm"
-                    hideRole
-                  />
-                </div>
-              }
-            />
-            <TooltipContent dir="rtl">
-              نویسنده مقاله: {pick.author?.name ?? "تحریریه"}
-            </TooltipContent>
-          </Tooltip>
+        {item.excerpt && <p className="mt-3 line-clamp-5 text-sm leading-7 text-muted-foreground">{item.excerpt}</p>}
+        <div className="mt-6">
+          <Byline author={item.author} date={item.date_fa} size="sm" hideRole />
         </div>
       </div>
+    </article>
+  );
+}
 
-      {/* Price on left, shop button on right */}
-      <div className="flex items-center justify-between gap-3 border-t border-[color:var(--hp-border)] bg-transparent pt-3 pb-1">
-        <div className="min-w-0 text-right">
-          {deal ? (
-            <>
-              <p className="hp-numeric truncate text-[15px] font-bold text-[color:var(--hp-ink)]">
-                {deal.now}
-              </p>
-              <p className="hp-numeric truncate text-[11px] text-[color:var(--hp-ink-3)] line-through">
-                {deal.was}
-              </p>
-            </>
-          ) : (
-            <p className="hp-numeric truncate text-[15px] font-bold text-[color:var(--hp-ink)]">
-              {faPrice(p.priceAmount) || "تماس بگیرید"}
-            </p>
-          )}
-        </div>
-
-        <Link
-          href={`/shop/${p.slug}`}
-          className="shrink-0 rounded-[var(--hp-r-sm)] bg-[color:var(--hp-accent)] px-3 py-1.5 text-[12px] font-bold text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
-        >
-          ثبت سفارش این محصول از فروشگاه
-        </Link>
+function CompactReviewCard({ item }: { item: ContentItem }) {
+  return (
+    <article className="flex h-full flex-col border border-border bg-transparent">
+      <Link href={`/${item.module}/${item.slug}`} className="group relative aspect-[16/10] overflow-hidden bg-muted">
+        <RemoteImage
+          src={item.image}
+          alt={item.title}
+          sizes="(min-width: 1024px) 310px, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-400 group-hover:scale-[1.025] motion-reduce:transform-none"
+        />
+      </Link>
+      <div className="flex flex-1 flex-col p-4">
+        <RelativeDate date={item.date} className="text-[11px] text-muted-foreground" />
+        <h3 className="mt-1 line-clamp-2 text-base font-bold leading-6 text-foreground">
+          <Link href={`/${item.module}/${item.slug}`} className="transition-colors hover:text-[color:var(--top-picks-accent)]">
+            {item.title}
+          </Link>
+        </h3>
+        {item.excerpt && <p className="mt-2 line-clamp-3 text-xs leading-5 text-muted-foreground">{item.excerpt}</p>}
       </div>
     </article>
   );

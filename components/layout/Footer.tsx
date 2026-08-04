@@ -62,7 +62,7 @@ export default function FooterSection() {
                 href={item.href}
                 variant="ghost"
                 size="sm"
-                className="font-normal text-muted-foreground hover:text-foreground text-xs"
+                className="font-normal text-muted-foreground hover:bg-transparent hover:text-foreground text-xs"
               >
                 {item.name}
               </ButtonLink>
@@ -79,7 +79,7 @@ export default function FooterSection() {
                 aria-label={item.name}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "icon" }),
-                  "text-muted-foreground hover:text-foreground size-8"
+                  "size-8 text-muted-foreground hover:bg-transparent hover:text-foreground"
                 )}
               >
                 <item.icon className="size-4 transition-transform hover:scale-110" />

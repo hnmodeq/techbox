@@ -54,7 +54,7 @@ export function DealsSection({
         <SectionHeader
           headingId={HEADING_ID}
           title={title}
-          description="تخفیف‌های امروز را از دست ندهید. بهترین کاهش قیمت‌ها روی سخت‌افزار سازمانی."
+          description="ترکیبی از پرفروش‌ترین‌ها و بیشترین تخفیف‌ها؛ شش ذخیره‌ساز رک‌مونت و دو مدل تاور."
           href={showMore ? "/shop" : undefined}
           linkLabel={moreLabel}
           accentColor={accentColor}

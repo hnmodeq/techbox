@@ -58,7 +58,7 @@ describe("homepage advertisements", () => {
     expect(component).not.toMatch(/max-w-\[1440px\]/);
     expect(component).toMatch(/unoptimized/);
     expect(component).not.toMatch(/bg-black/);
-    expect(page).toMatch(/inverted=\{s\.key === "tools" \|\| s\.key === "websiteInfo"\}/);
+    expect(component).toMatch(/overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
     expect(component).toMatch(/بستن این تبلیغ/);
     expect(component).toMatch(/تبلیغات/);
     expect(component.indexOf("<X ")).toBeLessThan(component.indexOf("تبلیغات</span>"));

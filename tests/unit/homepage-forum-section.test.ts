@@ -56,10 +56,10 @@ describe("homepage Forum section", () => {
     expect(feature).not.toMatch(/rounded-\[var\(--hp-r-md\)\]/);
     expect(feature).not.toMatch(/border border-\[color:var\(--hp-border\)\]/);
     expect(feature).not.toMatch(/shadow-\[var\(--hp-shadow-card\)\]/);
-    // The section band owns the surface; the featured answer must not paint a
-    // competing card background over it.
-    expect(feature).toMatch(/bg-transparent/);
-    expect(feature).not.toMatch(/bg-\[color:var\(--hp-surface\)\]/);
+    // The solved feature is intentionally distinguished with a quiet green
+    // surface while the open-question list remains on the plain band.
+    expect(feature).toMatch(/bg-emerald-50/);
+    expect(feature).toMatch(/dark:bg-emerald-950\/25/);
     expect(feature).not.toMatch(/color-mix\(in_oklch,var\(--community-accent\)/);
     expect(feature).not.toMatch(/absolute inset-x-0 bottom-0 h-1/);
     expect(feature).not.toMatch(/حل‌شده/);
@@ -72,6 +72,7 @@ describe("homepage Forum section", () => {
     expect(feature).toMatch(/followUpReplies\.length > 0/);
     expect(feature).toMatch(/line-clamp-2 text-\[13px\]/);
     expect(feature).toMatch(/answer\.date && <RelativeDate date=\{answer\.date\}/);
+    expect(feature).toMatch(/className="-me-2 text-\[11px\]/);
     expect(feature).not.toMatch(/bg-\[color:var\(--hp-solved\)\]\/\[0\.08\]/);
     expect(feature).toMatch(/ps-6/);
     // The title leads the card; the activity metadata row sits under it.

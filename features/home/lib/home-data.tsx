@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import type { ContentItem, ModuleSlug } from "@/lib/content";
 import type { HomeAdvertisement } from "./home-advertisements";
 import type {
-  TopPickCard,
   TimelineCard,
   FamilyComment,
   AuthorCard,
@@ -31,8 +30,8 @@ export type HomeData = {
   insights?: ContentItem[];
   /** §2 — sampled approved comments on the newest video. */
   videoHighlightComments?: VideoHighlightComment[];
-  /** §5 — up to 3 reviews joined to their shop product. */
-  topPicks?: TopPickCard[];
+  /** §5 — newest review followed by four rotating archive reviews. */
+  topPicks?: ContentItem[];
   /** §6 — up to 12 IT milestones. */
   timeline?: TimelineCard[];
   /** §10 — 3 sampled comments from across all modules. */

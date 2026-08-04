@@ -149,6 +149,33 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Theme-specific module palettes. RootLayout supplies the light/dark source
+   values in the first HTML response; switching theme only swaps references,
+   so there is no delayed client recolour. */
+html {
+  --module-blog-color: var(--module-blog-color-light, var(--primary));
+  --module-news-color: var(--module-news-color-light, var(--primary));
+  --module-media-color: var(--module-media-color-light, var(--primary));
+  --module-shop-color: var(--module-shop-color-light, var(--primary));
+  --module-forum-color: var(--module-forum-color-light, var(--primary));
+  --module-review-color: var(--module-review-color-light, var(--primary));
+  --module-download-color: var(--module-download-color-light, var(--primary));
+  --module-tools-color: var(--module-tools-color-light, var(--primary));
+  --module-timeline-color: var(--module-timeline-color-light, var(--primary));
+}
+
+html.dark {
+  --module-blog-color: var(--module-blog-color-dark, var(--primary));
+  --module-news-color: var(--module-news-color-dark, var(--primary));
+  --module-media-color: var(--module-media-color-dark, var(--primary));
+  --module-shop-color: var(--module-shop-color-dark, var(--primary));
+  --module-forum-color: var(--module-forum-color-dark, var(--primary));
+  --module-review-color: var(--module-review-color-dark, var(--primary));
+  --module-download-color: var(--module-download-color-dark, var(--primary));
+  --module-tools-color: var(--module-tools-color-dark, var(--primary));
+  --module-timeline-color: var(--module-timeline-color-dark, var(--primary));
+}
+
 html {
   font-family: var(--font-kalameh-stack);
   font-synthesis-weight: none;
@@ -286,11 +313,6 @@ html.theme-transitioning * {
 
 .ticker-group {
   padding-inline-end: 2rem;
-}
-
-.ticker-wrapper:hover .ticker-track,
-.ticker-wrapper:focus-within .ticker-track {
-  animation-play-state: paused;
 }
 
 @keyframes techbox-ticker-scroll {

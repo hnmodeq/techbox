@@ -8,8 +8,6 @@ import type { HomeAdvertisement } from "@/features/home/lib/home-advertisements"
 
 export type HomeAdvertisementBannerProps = {
   advertisement: HomeAdvertisement;
-  /** Tools/Website Info stay black even when the site theme is light. */
-  inverted?: boolean;
 };
 
 function dismissalKey(advertisement: HomeAdvertisement) {
@@ -20,7 +18,7 @@ function dismissalKey(advertisement: HomeAdvertisement) {
  * Campaign creative rendered at the top of its owning homepage band.
  * It deliberately uses the exact same gutters/max-width as SectionShell.
  */
-export function HomeAdvertisementBanner({ advertisement, inverted = false }: HomeAdvertisementBannerProps) {
+export function HomeAdvertisementBanner({ advertisement }: HomeAdvertisementBannerProps) {
   const [dismissed, setDismissed] = React.useState(false);
 
   React.useEffect(() => {
@@ -62,10 +60,10 @@ export function HomeAdvertisementBanner({ advertisement, inverted = false }: Hom
       className="w-full px-4 pt-6 sm:px-6 lg:px-8"
       data-home-ad={advertisement.id}
     >
-      <div className="mx-auto w-full max-w-[1280px] overflow-hidden rounded-[var(--hp-r-sm)]">
+      <div className="mx-auto w-full max-w-[1280px]">
         {/* Fully transparent—no background on this row or its parent. */}
         <div
-          className={`flex h-7 items-center gap-1 px-1.5 ${inverted ? "text-white" : "text-foreground"}`}
+          className="flex h-7 items-center gap-1 px-1.5 text-foreground"
           dir="rtl"
         >
           <Tooltip>
@@ -86,16 +84,18 @@ export function HomeAdvertisementBanner({ advertisement, inverted = false }: Hom
           <span className="text-[11px] font-medium leading-none text-current opacity-60">تبلیغات</span>
         </div>
 
-        {advertisement.href ? (
-          <a
-            href={advertisement.href}
-            rel="sponsored noopener noreferrer"
-            className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-inset"
-            aria-label={advertisement.alt}
-          >
-            {creative}
-          </a>
-        ) : creative}
+        <div className="overflow-hidden rounded-[var(--hp-r-sm)]">
+          {advertisement.href ? (
+            <a
+              href={advertisement.href}
+              rel="sponsored noopener noreferrer"
+              className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+              aria-label={advertisement.alt}
+            >
+              {creative}
+            </a>
+          ) : creative}
+        </div>
       </div>
     </div>
   );

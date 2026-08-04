@@ -127,7 +127,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
   const followUpReplies = topic.followUpReplies ?? [];
 
   return (
-    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-transparent p-6">
+    <article className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-emerald-50 p-6 dark:bg-emerald-950/25">
       <h3 className="text-[22px] font-bold leading-[34px] text-[color:var(--community-accent)]">
         <Link
           href={`/${topic.module}/${topic.slug}`}
@@ -170,7 +170,7 @@ function FeaturedTopic({ topic }: { topic: WithForumActivity }) {
               job={answer.author.job}
               className="[&>div:last-child>div>span]:text-[12px]"
             />
-            {answer.date && <RelativeDate date={answer.date} className="text-[11px] text-[color:var(--hp-ink-3)]" />}
+            {answer.date && <RelativeDate date={answer.date} className="-me-2 text-[11px] text-[color:var(--hp-ink-3)]" />}
           </div>
         </div>
       ) : (

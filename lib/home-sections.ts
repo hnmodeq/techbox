@@ -26,7 +26,6 @@ import type { ContentItem } from "@/lib/content";
 import type {
   FamilyProfile,
   PartnerCard,
-  TopPickCard,
   TimelineCard,
   FamilyComment,
   AuthorCard,
@@ -580,89 +579,45 @@ export async function getLatestVideoHighlightComments(take = 4): Promise<VideoHi
 }
 
 // ═════════════════════════════════════════════════════════════════════
-// §5 Our Top Picks — reviews linked to a real, buyable product
+// §5 Reviews — newest feature plus rotating archive
 // ═════════════════════════════════════════════════════════════════════
 
 export async function getTopPicks(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
-): Promise<TopPickCard[]> {
-  const rows = await prisma.post.findMany({
-    where: {
-      module: "review",
-      ...PUBLISHED,
-      date: publicPostDateWhere(),
-      reviewedProductId: { not: null },
-      // Never advertise something that cannot be bought.
-      reviewedProduct: {
-        published: true,
-        deletedAt: null,
-        NOT: { availability: "ناموجود" },
-      },
-    },
-    orderBy: [{ rating: "desc" }, { date: "desc" }],
-    take: 3,
-    select: {
-      ...cardSelect,
-      reviewedProduct: {
-        select: {
-          slug: true,
-          title: true,
-          image: true,
-          priceAmount: true,
-          sourcePriceAmount: true,
-          sourceCurrency: true,
-          priceAdjustmentPercent: true,
-          sellerBenefitPercent: true,
-          discountPercent: true,
-          discountEndsAt: true,
-          warranty: true,
-          availability: true,
-          brand: true,
-          model: true,
-        },
-      },
-    },
+): Promise<ContentItem[]> {
+  const where = {
+    module: "review",
+    ...PUBLISHED,
+    date: publicPostDateWhere(),
+  };
+
+  const latest: any = await prisma.post.findFirst({
+    where,
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    select: cardSelect,
   });
+  if (!latest) return [];
 
-  if (!rows.length) return [];
+  // IDs only keeps the random archive selection cheap even as reviews grow.
+  const candidates = await prisma.post.findMany({
+    where: { ...where, id: { not: latest.id } },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    select: { id: true },
+  });
+  const selectedIds = seededIndices(candidates.length, 4, 941)
+    .map((index) => candidates[index].id);
+  if (selectedIds.length === 0) return [normalize(latest)];
 
-  // One rates read for the whole section, not one per product.
-  let rates: CurrencyRates | null = null;
-  try {
-    rates = await getCurrencyRates();
-  } catch {
-    // Fall back to stored prices rather than dropping every card.
-  }
-
-  const out: TopPickCard[] = [];
-  for (const r of rows as any[]) {
-    const p = r.reviewedProduct;
-    if (!p) continue;
-
-    // Price resolves server-side. The client never computes a price —
-    // that is an existing security invariant of this codebase.
-    const finalPrice: number | null = rates
-      ? priceFromRates(p, rates)
-      : (p.priceAmount ?? null);
-
-    out.push({
-      ...normalize(r),
-      product: {
-        slug: p.slug,
-        title: p.title,
-        image: p.image ?? null,
-        priceAmount: finalPrice,
-        discountPercent: p.discountPercent ?? null,
-        discountEndsAt: p.discountEndsAt ? p.discountEndsAt.toISOString() : null,
-        warranty: p.warranty ?? null,
-        availability: p.availability ?? null,
-        brand: p.brand ?? null,
-        model: p.model ?? null,
-      },
-    });
-  }
-  return out;
+  const selected: any[] = await prisma.post.findMany({
+    where: { id: { in: selectedIds } },
+    select: cardSelect,
+  });
+  const byId = new Map<string, ContentItem>(selected.map((review) => [review.id, normalize(review)]));
+  return [normalize(latest), ...selectedIds.flatMap((id) => {
+    const review = byId.get(id);
+    return review ? [review] : [];
+  })];
 }
 
 // ═════════════════════════════════════════════════════════════════════
@@ -670,16 +625,9 @@ export async function getTopPicks(
 // ═════════════════════════════════════════════════════════════════════
 
 /**
- * Shop products for the deals rail.
- *
- * Prefers genuinely discounted, in-stock items. If there are fewer than
- * `take` of those, it backfills with the newest products so the rail is
- * never half-empty — still 100% real rows, just not all on offer.
- *
- * Prices are resolved from ONE rates read (see priceFromRates), because all
- * shop rows store a source price in USD and the displayed Toman figure is
- * derived from live rates. Reading `priceAmount` directly would show a
- * stale number.
+ * Homepage shop mix: alternating best-selling and highest-discount products,
+ * constrained to six rackmount systems and two tower/desktop systems.
+ * Prices still resolve from one shared currency-rate read.
  */
 export async function getDeals(
   normalize: (p: any) => ContentItem,
@@ -693,60 +641,102 @@ export async function getDeals(
     priceAdjustmentPercent: true,
     sellerBenefitPercent: true,
   };
+  const baseWhere = {
+    module: "shop",
+    ...PUBLISHED,
+    date: publicPostDateWhere(),
+    availability: "موجود",
+  };
+  // QNAP exposes form factor in Persian specs; model fallbacks cover older
+  // imported rows whose specs predate that field.
+  const rackSignals: any[] = [
+    { specs: { path: ["فرم فاکتور"], string_contains: "Rackmount" } },
+    { specs: { path: ["formFactor"], equals: "rackmount" } },
+    { model: { contains: "XU", mode: "insensitive" } },
+    { model: { contains: "U-", mode: "insensitive" } },
+    { title: { contains: "رک", mode: "insensitive" } },
+    { title: { contains: "rack", mode: "insensitive" } },
+  ];
+  const metaSelect = { id: true, discountPercent: true, date: true } as const;
 
-  const discounted = await prisma.post.findMany({
+  // Keep these sequential for the single-connection production pool.
+  const rackCandidates = await prisma.post.findMany({
+    where: { ...baseWhere, OR: rackSignals },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 80,
+    select: metaSelect,
+  });
+  const towerCandidates = await prisma.post.findMany({
+    where: { ...baseWhere, NOT: { OR: rackSignals } },
+    orderBy: [{ date: "desc" }, { id: "desc" }],
+    take: 80,
+    select: metaSelect,
+  });
+  const candidateIds = [...rackCandidates, ...towerCandidates].map((row) => row.id);
+  if (candidateIds.length === 0) return [];
+
+  const salesGroups = await prisma.orderItem.groupBy({
+    by: ["postId"],
     where: {
       module: "shop",
-      ...PUBLISHED,
-      date: publicPostDateWhere(),
-      discountPercent: { gt: 0 },
-      // Never advertise a deal on something that cannot be bought.
-      availability: "موجود",
+      postId: { in: candidateIds },
+      order: { status: { in: ["paid", "processing", "shipped", "delivered", "completed"] } },
     },
-    // Postgres orders NULLs FIRST on DESC, so `discountPercent: "desc"`
-    // alone would rank the 97 non-discounted rows above the 9 real deals.
-    // The `gt: 0` filter above excludes nulls here, and the backfill query
-    // below sorts by date only — so no NULL ever wins a discount sort.
-    orderBy: [{ discountPercent: "desc" }, { date: "desc" }],
-    take,
+    _sum: { quantity: true },
+  });
+  const sales = new Map(salesGroups.map((row) => [row.postId, row._sum.quantity ?? 0]));
+
+  type Candidate = (typeof rackCandidates)[number];
+  const chooseMixed = (pool: Candidate[], quota: number) => {
+    const sold = [...pool].sort((a, b) =>
+      (sales.get(b.id) ?? 0) - (sales.get(a.id) ?? 0) || b.date.getTime() - a.date.getTime());
+    const discounted = [...pool]
+      .filter((row) => (row.discountPercent ?? 0) > 0)
+      .sort((a, b) =>
+        (b.discountPercent ?? 0) - (a.discountPercent ?? 0) || b.date.getTime() - a.date.getTime());
+    const fallback = [...pool].sort((a, b) => b.date.getTime() - a.date.getTime());
+    const picked: Candidate[] = [];
+    const add = (row: Candidate | undefined) => {
+      if (row && !picked.some((item) => item.id === row.id) && picked.length < quota) picked.push(row);
+    };
+    for (let index = 0; picked.length < quota && index < Math.max(sold.length, discounted.length); index++) {
+      add(sold[index]);
+      add(discounted[index]);
+    }
+    for (const row of fallback) add(row);
+    return picked.slice(0, quota);
+  };
+
+  // Editorial quota: six rackmount storage systems and two tower/desktop NAS.
+  const selectedMeta = [
+    ...chooseMixed(rackCandidates, 6),
+    ...chooseMixed(towerCandidates, 2),
+  ].slice(0, take);
+  const selectedIds = selectedMeta.map((row) => row.id);
+  if (selectedIds.length === 0) return [];
+
+  const selectedRows: any[] = await prisma.post.findMany({
+    where: { id: { in: selectedIds } },
     select: priceSelect,
   });
+  const rowById = new Map<string, any>(selectedRows.map((row) => [row.id, row]));
 
-  let rows: any[] = discounted;
-
-  if (rows.length < take) {
-    const fill = await prisma.post.findMany({
-      where: {
-        module: "shop",
-        ...PUBLISHED,
-        date: publicPostDateWhere(),
-        availability: "موجود",
-        id: { notIn: rows.map((r) => r.id) },
-      },
-      orderBy: { date: "desc" },
-      take: take - rows.length,
-      select: priceSelect,
-    });
-    rows = [...rows, ...fill];
-  }
-
-  if (!rows.length) return [];
-
-  // One rates read for the whole rail, not one per product.
   let rates: CurrencyRates | null = null;
   try {
     rates = await getCurrencyRates();
   } catch {
-    // Keep stored amounts rather than dropping the rail.
+    // Keep stored prices rather than dropping the section.
   }
 
-  return rows.map((r) => {
-    const item = normalize(r);
+  return selectedIds.flatMap((id) => {
+    const row = rowById.get(id);
+    if (!row) return [];
+    const item = normalize(row);
     if (rates) {
-      const final = priceFromRates(r, rates);
+      const final = priceFromRates(row, rates);
       if (final > 0) item.priceAmount = final;
     }
-    return item;
+    return [item];
   });
 }
 
@@ -757,7 +747,7 @@ export async function getDeals(
 export async function getTimeline(): Promise<TimelineCard[]> {
   const rows = await prisma.timelineEvent.findMany({
     where: { published: true },
-    orderBy: { dateGr: "asc" },
+    orderBy: { dateGr: "desc" },
     // The full arc matters here: taking 12 of 20 chopped the timeline at
     // 1999 and lost AWS, Docker, Kubernetes and everything after.
     take: 24,

@@ -51,8 +51,10 @@ export type SiteLayoutConfig = ModuleConfigMap & {
   moduleColorsEnabled: boolean;
   /** Unified color when moduleColorsEnabled is false (CSS value) */
   unifiedModuleColor: string;
-  /** Per-module custom colors (CSS values) */
+  /** Per-module custom colors for light mode (CSS values). */
   moduleColors: Partial<Record<ModuleSlug, string>>;
+  /** Per-module custom colors for dark mode. Legacy colors migrate here. */
+  moduleColorsDark: Partial<Record<ModuleSlug, string>>;
   /** Single source of truth for each module's DISPLAY NAME (titleFa).
    *  Overrides moduleMeta/sidebar titles everywhere. */
   titles: Record<ModuleSlug, string>;
@@ -147,6 +149,7 @@ export function getDefaultSiteLayoutConfig(): SiteLayoutConfig {
     moduleColorsEnabled: true,
     unifiedModuleColor: "var(--primary)",
     moduleColors: {},
+    moduleColorsDark: {},
     titles: { ...DEFAULT_MODULE_TITLES },
   };
 }
@@ -166,7 +169,10 @@ const KEY_HERO_VISIBLE = "hero.visible";
 const KEY_TICKER_VISIBLE = "ticker.visible";
 const KEY_MODULE_COLORS_ENABLED = "modules.colors_enabled";
 const KEY_UNIFIED_MODULE_COLOR = "modules.unified_color";
-const KEY_MODULE_COLORS = "modules.custom_colors";
+// Existing key becomes the dark palette so current production colours remain
+// exactly as they are in dark mode.
+const KEY_MODULE_COLORS_DARK = "modules.custom_colors";
+const KEY_MODULE_COLORS_LIGHT = "modules.custom_colors_light";
 const KEY_MODULE_TITLES = "modules.titles";
 
 // ─── Read Config (cached) ─────────────────────────────────────────────
@@ -207,7 +213,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
     KEY_HERO_VISIBLE,
     KEY_MODULE_COLORS_ENABLED,
     KEY_UNIFIED_MODULE_COLOR,
-    KEY_MODULE_COLORS,
+    KEY_MODULE_COLORS_DARK,
+    KEY_MODULE_COLORS_LIGHT,
     KEY_MODULE_TITLES,
   ];
   const rows = await withCircuit(() =>
@@ -233,7 +240,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   const tickerVisibleRaw = getRaw(KEY_TICKER_VISIBLE);
   const colorsEnabledRaw = getRaw(KEY_MODULE_COLORS_ENABLED);
   const unifiedColorRaw = getRaw(KEY_UNIFIED_MODULE_COLOR);
-  const moduleColorsRaw = getRaw(KEY_MODULE_COLORS);
+  const moduleColorsDarkRaw = getRaw(KEY_MODULE_COLORS_DARK);
+  const moduleColorsLightRaw = getRaw(KEY_MODULE_COLORS_LIGHT);
   const moduleTitlesRaw = getRaw(KEY_MODULE_TITLES);
 
   const enabledMap = parseJsonSafe<Partial<Record<ModuleSlug, boolean>>>(enabledRaw, {});
@@ -268,7 +276,8 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
   // Module color system
   const moduleColorsEnabled = colorsEnabledRaw !== "false";
   const unifiedModuleColor = unifiedColorRaw || "var(--primary)";
-  const moduleColors = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleColorsRaw, {});
+  const moduleColors = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleColorsLightRaw, {});
+  const moduleColorsDark = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleColorsDarkRaw, {});
 
   // Module display names (source of truth). Overlay DB overrides on the defaults.
   const moduleTitlesMap = parseJsonSafe<Partial<Record<ModuleSlug, string>>>(moduleTitlesRaw, {});
@@ -278,12 +287,12 @@ async function getModuleConfigUncached(): Promise<SiteLayoutConfig> {
     if (typeof override === "string" && override.trim()) titles[slug] = override.trim();
   }
 
-  return { ...defaults, heroVisible, tickerVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, titles };
+  return { ...defaults, heroVisible, tickerVisible, moduleColorsEnabled, unifiedModuleColor, moduleColors, moduleColorsDark, titles };
 }
 
 const cachedModuleConfig = unstable_cache(
   getModuleConfigUncached,
-  ["module-config-v1"],
+  ["module-config-v2-light-dark-palettes"],
   { revalidate: 86400, tags: ["module-config"] },
 );
 
@@ -400,7 +409,8 @@ export async function saveModuleConfig(config: SiteLayoutConfig, updatedBy: stri
     { key: KEY_TICKER_VISIBLE, value: String(config.tickerVisible ?? true) },
     { key: KEY_MODULE_COLORS_ENABLED, value: String(config.moduleColorsEnabled ?? true) },
     { key: KEY_UNIFIED_MODULE_COLOR, value: config.unifiedModuleColor || "var(--primary)" },
-    { key: KEY_MODULE_COLORS, value: JSON.stringify(config.moduleColors || {}) },
+    { key: KEY_MODULE_COLORS_LIGHT, value: JSON.stringify(config.moduleColors || {}) },
+    { key: KEY_MODULE_COLORS_DARK, value: JSON.stringify(config.moduleColorsDark || {}) },
   ];
 
   for (const { key, value } of updates) {

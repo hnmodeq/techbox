@@ -25,6 +25,7 @@ const SETTINGS_DEFAULTS: Record<string, string> = {
   "modules.colors_enabled": "true",
   "modules.unified_color": "var(--primary)",
   "modules.custom_colors": "{}",
+  "modules.custom_colors_light": "{}",
   "modules.titles": "{}",
   "hero.visible": "true",
   // Homepage upgrade (docs/homepage-upgrade). All optional; absent or

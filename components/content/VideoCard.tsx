@@ -23,6 +23,7 @@ import CommentSection from "@/features/comment/components/CommentSection";
 import { blurProps } from "@/lib/image-placeholder";
 import { formatRelativeDate } from "@/lib/date-format";
 import { zIndex } from "@/design";
+import { useVideoStoryboard } from "@/components/content/use-video-storyboard";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface VideoItem {
@@ -37,15 +38,18 @@ export interface VideoItem {
   views?: number;
   comments?: number;
   module?: string;
+  gallery?: string[];
 }
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
 export function VideoCard({ video, onOpen }: { video: VideoItem; onOpen: () => void }) {
+  const storyboard = useVideoStoryboard(video.gallery);
   return (
     <button
       type="button"
       onClick={onOpen}
+      {...storyboard.handlers}
       className="group relative w-full aspect-[9/16] p-0 rounded-[var(--corner-radius)] overflow-hidden border border-border shadow-sm bg-card flex flex-col justify-end text-right cursor-pointer"
     >
       <Image
@@ -56,6 +60,9 @@ export function VideoCard({ video, onOpen }: { video: VideoItem; onOpen: () => v
         sizes="200px"
         {...blurProps(video.image || "/assets/blog-1.jpg")}
       />
+      {storyboard.frame && (
+        <Image key={storyboard.frame} src={storyboard.frame} alt="" fill sizes="200px" className="z-[1] object-cover" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent z-10 pointer-events-none" />
 
       {/* Date (right) + Duration (left) — top bar */}

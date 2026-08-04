@@ -4,23 +4,18 @@ import path from "node:path";
 
 const read = (p: string) => fs.readFileSync(path.resolve(__dirname, "../..", p), "utf8");
 
-describe("alternating section bands", () => {
+describe("absolute homepage section bands", () => {
   const page = read("app/page.tsx");
-  const css = read("design/globals.css");
 
-  it("stripes from the RENDERED index, not from each section", () => {
-    // Computing this per section would break the rhythm the moment an admin
-    // reorders or hides one.
-    expect(page).toMatch(/index % 2 === 0/);
-    expect(page).toMatch(/\? "var\(--hp-band-a\)"/);
-    expect(page).toMatch(/: "var\(--hp-band-b\)"/);
-    expect(page).toMatch(/visible\.map\(\(s, index\)/);
+  it("uses pure white in light mode and pure black in dark mode for every rendered section", () => {
+    expect(page).toMatch(/visible\.map\(\(s\)/);
+    expect(page).toMatch(/className="w-full bg-white dark:bg-black"/);
+    expect(page).not.toMatch(/index % 2 === 0/);
   });
 
-  it("defines both bands in light and dark", () => {
-    expect([...css.matchAll(/--hp-band-a:/g)].length).toBeGreaterThanOrEqual(2);
-    expect([...css.matchAll(/--hp-band-b:/g)].length).toBeGreaterThanOrEqual(2);
-    expect(css).toMatch(/--color-hp-band-a:\s*var\(--hp-band-a\)/);
+  it("keeps the absolute rule on sections that previously forced black", () => {
+    expect(read("features/home/components/sections/ToolsSection.tsx")).toMatch(/bg-white[^"]*dark:bg-black/);
+    expect(read("features/home/components/sections/WebsiteInfoSection.tsx")).toMatch(/bg-white[^"]*dark:bg-black/);
   });
 
   it("leaves no section painting its own competing background", () => {

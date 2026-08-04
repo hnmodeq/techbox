@@ -18,12 +18,6 @@ export type WebsiteInfoSectionProps = {
 
 const HEADING_ID = "hp-website-info-heading";
 
-type WebsiteInfoStyle = React.CSSProperties & {
-  "--hp-ink"?: string;
-  "--hp-ink-3"?: string;
-  "--hp-brand"?: string;
-};
-
 export function WebsiteInfoSection({
   authors,
   profiles,
@@ -37,17 +31,10 @@ export function WebsiteInfoSection({
 
   if (!hasAuthors && !hasProfiles) return null;
 
-  const style: WebsiteInfoStyle = {
-    "--hp-ink": "#ffffff",
-    "--hp-ink-3": "rgb(255 255 255 / 0.68)",
-    "--hp-brand": "#ffffff",
-  };
-
   return (
     <section
       aria-labelledby={HEADING_ID}
-      className="w-full bg-black px-4 py-6 text-white sm:px-6 lg:px-8"
-      style={style}
+      className="w-full bg-white px-4 py-6 text-foreground dark:bg-black sm:px-6 lg:px-8"
     >
       <div className="mx-auto w-full max-w-[1280px] overflow-hidden">
         {/* Manifesto without card background */}

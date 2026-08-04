@@ -81,6 +81,13 @@ function formatBytes(bytes: number) {
   return `${value >= 10 || unit === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[unit]}`;
 }
 
+function formatVideoDuration(seconds: number) {
+  const total = Math.max(0, Math.round(seconds));
+  const minutes = Math.floor(total / 60);
+  const remainder = total % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+}
+
 function parseSpecs(input: string) {
   const trimmed = input.trim();
   if (!trimmed) return {};
@@ -797,10 +804,17 @@ function NewPostInner() {
                         kind="video"
                         folder="videos"
                         accept="video/mp4,video/webm,video/quicktime"
+                        generateVideoFrames
                         onUploaded={(r) => {
                           form.setValue("videoUrl", r.url);
                           form.setValue("videoMimeType", r.contentType);
                           form.setValue("videoFileSize", formatBytes(r.size));
+                          if (r.videoDurationSeconds) {
+                            form.setValue("videoDuration", formatVideoDuration(r.videoDurationSeconds));
+                          }
+                          if (r.videoFrames?.length) {
+                            form.setValue("gallery", r.videoFrames.join("\n"));
+                          }
                         }}
                       />
                     </AccordionContent>

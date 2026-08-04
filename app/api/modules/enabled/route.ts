@@ -27,6 +27,7 @@ export async function GET() {
       moduleColorsEnabled: config.moduleColorsEnabled !== false,
       unifiedModuleColor: config.unifiedModuleColor || "var(--primary)",
       moduleColors: config.moduleColors || {},
+      moduleColorsDark: config.moduleColorsDark || {},
       titles: config.titles || {},
     }, {
       headers: cacheHeaders(PUBLIC_CONTENT_CACHE),

@@ -10,6 +10,7 @@ import {
   MoonIcon,
   NewspaperIcon,
   PanelLeftIcon,
+  SearchIcon,
   ShoppingCartIcon,
   SunIcon,
 } from "lucide-react"
@@ -46,6 +47,7 @@ import {
 } from "@/lib/jalali"
 import { cn } from "@/lib/utils"
 import { useCart } from "@/providers/cart.provider"
+import { HeaderSearch } from "@/components/layout/floating-search"
 
 type Crumb = {
   label: string
@@ -449,7 +451,7 @@ function DateTimeDisplay() {
         render={
           <button
             type="button"
-            className="hidden h-8 min-w-[12rem] items-center justify-center gap-2 whitespace-nowrap rounded-md px-3 py-1 text-xs text-muted-foreground md:flex"
+            className="hidden h-8 w-[12.125rem] shrink-0 items-center justify-end gap-2 whitespace-nowrap rounded-md px-3 py-1 text-left text-xs text-muted-foreground md:flex"
             suppressHydrationWarning
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -659,6 +661,7 @@ function CartButton() {
             variant="ghost"
             size="icon-sm"
             className="relative"
+            data-cart-toggle
             onClick={() => setOpen(true)}
             aria-label="سبد خرید"
           />
@@ -711,13 +714,14 @@ export function SiteHeader({
           <CartButton />
           <NotificationsButton />
           <ThemeToggle />
+          <React.Suspense fallback={<span className="inline-flex size-8 items-center justify-center text-muted-foreground"><SearchIcon className="size-4" /></span>}>
+            <HeaderSearch />
+          </React.Suspense>
           <TechboxBreadcrumb />
           {/* Removed separator after breadcrumb */}
         </div>
 
-        <div className="flex flex-[1.2] justify-center px-2">
-          {/* Search is the floating bottom-center component */}
-        </div>
+        <div className="hidden flex-[1.2] lg:block" aria-hidden="true" />
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-1">
           <DateTimeDisplay />

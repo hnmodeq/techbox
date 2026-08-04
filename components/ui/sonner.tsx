@@ -65,6 +65,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         toastOptions={{
           classNames: {
             toast: "cn-toast cursor-pointer",
+            closeButton: "!flex !size-6 !items-center !justify-center !border-border !bg-background !text-foreground !opacity-100 [&>svg]:!block [&>svg]:!size-3.5",
           },
         }}
         {...props}

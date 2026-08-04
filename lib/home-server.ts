@@ -137,8 +137,8 @@ const tickerSelect = {
   date: true,
 } as const;
 
-function firstGalleryImage(value: unknown) {
-  return Array.isArray(value) ? value.slice(0, 3) : [];
+function firstGalleryImage(value: unknown, take = 3) {
+  return Array.isArray(value) ? value.slice(0, take) : [];
 }
 
 /**
@@ -182,7 +182,7 @@ function normalizeCard(p: any) {
     videoDuration: p.videoDuration,
     videoMimeType: p.videoMimeType,
     videoFileSize: p.videoFileSize,
-    gallery: firstGalleryImage(p.gallery),
+    gallery: firstGalleryImage(p.gallery, p.module === "media" ? 10 : 3),
     tags: Array.isArray(p.tags) ? p.tags.slice(0, 8) : [],
     date: p.date.toISOString(),
     date_fa: formatPostDateFa(p.date),
@@ -739,10 +739,9 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// Cache key v10 migrates advertisement placement from "after a section" to
-// "inside, above its section". A fresh key prevents an old cached JSON shape
-// from hiding banners during the rolling deployment.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v10"], {
+// v11: review lead/archive, mixed shop quotas, newest-first timeline, and
+// ten-frame media storyboards all change the cached homepage contract.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v11"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

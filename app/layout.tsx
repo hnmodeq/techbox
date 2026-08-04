@@ -43,7 +43,8 @@ function moduleColorStyle(config: SiteLayoutConfig | undefined): ModuleColorStyl
 
   const style: ModuleColorStyle = {};
   for (const slug of COLORABLE_MODULE_SLUGS) {
-    style[`--module-${slug}-color`] = resolveModuleColor(slug, config.moduleColors[slug]);
+    style[`--module-${slug}-color-light`] = resolveModuleColor(slug, config.moduleColors[slug]);
+    style[`--module-${slug}-color-dark`] = resolveModuleColor(slug, config.moduleColorsDark[slug]);
   }
   return style;
 }

@@ -284,10 +284,7 @@ function NewsDiscussion({
           هنوز گفتگویی برای خبرهای تازه ثبت نشده است.
         </p>
       ) : (
-        <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
-          style={{ scrollbarWidth: "thin" }}
-        >
+        <div className="min-h-0 flex-1">
           {comments.map((comment, index) => {
             const isActive = comment.newsSlug === activeNewsSlug;
             return (

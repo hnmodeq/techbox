@@ -123,6 +123,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 function CartDrawer() {
   const ctx = useContext(Ctx);
+  const asideRef = React.useRef<HTMLElement>(null);
   const open = ctx?.open ?? false;
   const setOpen = ctx?.setOpen;
 
@@ -131,17 +132,39 @@ function CartDrawer() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen?.(false);
     };
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (asideRef.current?.contains(target)) return;
+      if (target.closest("[data-cart-toggle]")) return;
+      setOpen?.(false);
+    };
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("mousedown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("mousedown", onPointerDown);
+    };
   }, [open, setOpen]);
 
-  if (!ctx || !ctx.open) return null;
+  if (!ctx) return null;
   const { items, remove, setQty, clear, count } = ctx;
 
   return (
-    <div dir="rtl" className="fixed inset-0" style={{ zIndex: zIndex.cart }}>
-      <button className="fixed inset-0 bg-black/50" onClick={() => ctx.setOpen(false)} aria-label="بستن سبد خرید" />
-      <aside className="absolute left-0 top-0 flex h-full w-[380px] max-w-[92vw] flex-col border-r border-border bg-card p-4 shadow-lg">
+    <div
+      dir="rtl"
+      aria-hidden={!open}
+      className="pointer-events-none fixed inset-0"
+      style={{ zIndex: zIndex.cart }}
+    >
+      {/* No dimming overlay: the page remains visible and interactive, like
+          the news sidebar. The drawer itself slides in from the left. */}
+      <aside
+        ref={asideRef}
+        inert={!open}
+        className={`pointer-events-auto absolute left-0 top-0 flex h-full w-[380px] max-w-[92vw] flex-col border-r border-border bg-card p-4 shadow-lg transition-transform duration-300 ease-in-out motion-reduce:transition-none ${
+          open ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-lg font-bold">سبد خرید ({count.toLocaleString("fa-IR")})</h3>
           <Button variant="ghost" size="icon" onClick={() => ctx.setOpen(false)} aria-label="بستن سبد">
@@ -201,7 +224,7 @@ export function useCart(): CartCtx {
 export function CartIconButton() {
   const { count, setOpen } = useCart();
   return (
-    <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="relative gap-1" aria-label="سبد خرید">
+    <Button variant="outline" size="sm" data-cart-toggle onClick={() => setOpen(true)} className="relative gap-1" aria-label="سبد خرید">
       <span>🛒</span>
       <span className="hidden sm:inline">سبد</span>
       {count > 0 && (

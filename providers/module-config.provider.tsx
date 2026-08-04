@@ -14,8 +14,10 @@ type ModuleConfigClient = {
   moduleColorsEnabled: boolean;
   /** Unified color when moduleColorsEnabled is false */
   unifiedModuleColor: string;
-  /** Per-module custom colors */
+  /** Per-module custom colors for light mode. */
   moduleColors: Partial<Record<ModuleSlug, string>>;
+  /** Per-module custom colors for dark mode. */
+  moduleColorsDark: Partial<Record<ModuleSlug, string>>;
   /** Module display names — single source of truth (overrides moduleMeta/sidebar) */
   titles: Partial<Record<ModuleSlug, string>>;
   loading: boolean;
@@ -32,6 +34,7 @@ const defaultConfig: ModuleConfigClient = {
   moduleColorsEnabled: true,
   unifiedModuleColor: "var(--primary)",
   moduleColors: {},
+  moduleColorsDark: {},
   titles: {},
   loading: true,
 };
@@ -60,6 +63,7 @@ function serverConfigToClient(data: SiteLayoutConfig): ModuleConfigClient {
     moduleColorsEnabled: data.moduleColorsEnabled !== false,
     unifiedModuleColor: data.unifiedModuleColor || "var(--primary)",
     moduleColors: data.moduleColors || {},
+    moduleColorsDark: data.moduleColorsDark || {},
     titles: data.titles || {},
     loading: false,
   };
@@ -103,6 +107,7 @@ export function ModuleConfigProvider({
           moduleColorsEnabled: data.moduleColorsEnabled !== false,
           unifiedModuleColor: data.unifiedModuleColor || "var(--primary)",
           moduleColors: data.moduleColors || {},
+          moduleColorsDark: data.moduleColorsDark || {},
           titles,
           loading: false,
         });

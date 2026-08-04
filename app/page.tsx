@@ -21,7 +21,6 @@
 import { HomeDataProvider } from "@/features/home/lib/home-data";
 import { getHomeData, getMagazinePosts } from "@/lib/home-server";
 import { getModuleConfig, type ModuleSlug } from "@/lib/module-config";
-import { resolveModuleColor } from "@/config/module-colors";
 
 import { MagazineSection } from "@/features/home/components/sections/MagazineSection";
 import { VideoSection } from "@/features/home/components/sections/VideoSection";
@@ -127,14 +126,14 @@ export default async function HomePage() {
       // Disabled means ordinary shadcn tokens. Sections only receive a
       // custom value when the administrator has turned module colours on.
       accentColor: slug && config.moduleColorsEnabled !== false
-        ? resolveModuleColor(slug, config.moduleColors[slug])
+        ? `var(--module-${slug}-color)`
         : undefined,
     };
   };
 
   const tooltipColorFor = (slug: ModuleSlug | null) =>
     slug && config.moduleColorsEnabled !== false
-      ? resolveModuleColor(slug, config.moduleColors[slug])
+      ? `var(--module-${slug}-color)`
       : undefined;
 
   const withModuleTooltip = (slug: ModuleSlug | null, node: React.ReactNode) => (
@@ -164,7 +163,7 @@ export default async function HomePage() {
         <InsightsSection
           data={data.latestInsights}
           accentColor={config.moduleColorsEnabled !== false
-            ? resolveModuleColor("news", config.moduleColors.news)
+            ? "var(--module-news-color)"
             : undefined}
         />,
       ),
@@ -231,31 +230,17 @@ export default async function HomePage() {
 
         {/* Screen readers need one h1; the visual hierarchy starts at h2. */}
         <h1 className="sr-only">تکباکس — پاتوق بچه‌های فناوری اطلاعات</h1>
-        {/* Alternating full-bleed bands.
-            The stripe is computed from the RENDERED index, not from a colour
-            baked into each section, so hiding or reordering any section in
-            the admin panel keeps the light/dark/light rhythm intact. Each
-            wrapper is full-width; the sections themselves still centre their
-            own 1280 container. */}
-        {visible.map((s, index) => {
+        {/* Every homepage band now follows one absolute surface rule:
+            pure white in light mode, pure black in dark mode. */}
+        {visible.map((s) => {
           const advertisements = (data.advertisements ?? [])
             .filter((advertisement) => advertisement.enabled && advertisement.section === s.key)
             .sort((a, b) => a.order - b.order);
-          // Match the few sections that intentionally own an absolute
-          // background so their advertisement still reads as part of them.
-          const background = s.key === "tools" || s.key === "websiteInfo"
-            ? "#000"
-            : s.key === "timeline"
-              ? "light-dark(#fff, #000)"
-              : index % 2 === 0
-                ? "var(--hp-band-a)"
-                : "var(--hp-band-b)";
 
           return (
             <div
               key={s.key}
-              className="w-full"
-              style={{ background }}
+              className="w-full bg-white dark:bg-black"
             >
               {/* Advertisements share the section band and its 1280px content
                   width. They are no longer standalone bands between rows. */}
@@ -263,7 +248,6 @@ export default async function HomePage() {
                 <HomeAdvertisementBanner
                   key={`${advertisement.id}:v${advertisement.version}`}
                   advertisement={advertisement}
-                  inverted={s.key === "tools" || s.key === "websiteInfo"}
                 />
               ))}
               {s.node}

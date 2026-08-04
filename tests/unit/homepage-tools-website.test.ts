@@ -12,18 +12,21 @@ describe("homepage tools and website-info requirements", () => {
   const footer = read("components/layout/Footer.tsx");
   const data = read("lib/home-sections.ts");
 
-  it("uses absolute black bands and keeps the tools heading visual-only hidden", () => {
-    expect(tools).toMatch(/className="w-full bg-black/);
-    expect(websiteInfo).toMatch(/className="w-full bg-black/);
+  it("uses absolute theme bands and keeps the original section heading visually hidden", () => {
+    expect(tools).toMatch(/bg-white[^"]*dark:bg-black/);
+    expect(websiteInfo).toMatch(/bg-white[^"]*dark:bg-black/);
     expect(tools).toMatch(/<h2 id=\{HEADING_ID\} className="sr-only"/);
     expect(tools).not.toMatch(/<SectionHeader/);
   });
 
-  it("colours both tool titles and icons with the module accent on hover", () => {
-    expect(tools.match(/group-hover:text-\[color:var\(--tools-accent\)\]/g)?.length).toBeGreaterThanOrEqual(2);
-    expect(tools).toMatch(/mt-0\.5 line-clamp-3/);
-    expect(registry).toMatch(/محاسبه بازه IP، Subnet Mask، تعداد میزبان و CIDR شبکه/);
-    expect(registry).toMatch(/باتری موردنیاز و زمان پشتیبانی تجهیزات رک/);
+  it("uses one RAID feature and a 2x2 image grid with saturation hover", () => {
+    expect(tools).not.toMatch(/ToolIcon/);
+    expect(tools).toMatch(/<ToolTile tool=\{raid\} featured/);
+    expect(tools).toMatch(/sm:grid-cols-2/);
+    expect(tools).toMatch(/grayscale saturate-0/);
+    expect(tools).toMatch(/group-hover:grayscale-0 group-hover:saturate-100/);
+    expect(tools).toMatch(/ابزارهایی که کار شما رو شاید راحت‌تر کنه/);
+    expect(registry.match(/tools\/home-cards\/.*\.webp/g)).toHaveLength(5);
   });
 
   it("restores real contributors when the editorial-team mapping is empty", () => {

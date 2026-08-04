@@ -1,25 +1,10 @@
-/**
- * §8 · Tools — Spiceworks "Tools & Apps"
- *
- * Spiceworks uses flat coloured illustrations above a two-line, centred
- * name, five across, with NO card chrome at all — the tiles float on the
- * section background and only gain a surface on hover. That restraint is
- * the look; adding borders would break it.
- *
- * Data comes from `toolRoutes` in config/modules.config.ts, the same
- * registry /tools renders from, so a tool appears here the moment its
- * route ships and disappears if it is removed. No hardcoded tool list.
- *
- * Server Component.
- * Docs: docs/homepage-upgrade/02-DESIGN-SPEC.md §8
- */
+/** Homepage tools: one RAID feature plus a 2×2 image grid. */
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { toolRoutes } from "@/config/modules.config";
-import { ToolIcon } from "@/design/icons/tools";
 
 export type ToolsSectionProps = {
-  /** Optional slug allow-list/order from SiteSetting `home.tools.featured`. */
   featured?: string[];
   title?: string;
   moreLabel?: string;
@@ -29,13 +14,8 @@ export type ToolsSectionProps = {
 };
 
 const HEADING_ID = "hp-tools-heading";
-
-type ToolsStyle = React.CSSProperties & {
-  "--tools-accent"?: string;
-  "--hp-ink"?: string;
-  "--hp-ink-3"?: string;
-  "--hp-brand"?: string;
-};
+type ToolsStyle = React.CSSProperties & { "--tools-accent"?: string; "--hp-brand"?: string };
+type ToolRoute = (typeof toolRoutes)[number];
 
 export function ToolsSection({
   featured,
@@ -43,70 +23,65 @@ export function ToolsSection({
   accentColor,
 }: ToolsSectionProps) {
   const all = [...toolRoutes];
-
-  // Admin override reorders and filters; anything unknown is ignored
-  // rather than rendered as a broken tile.
-  const tools = featured?.length
+  // Admin ordering still matters, but the homepage always keeps all five
+  // shipped tools. RAID is promoted independently into the full-width slot.
+  const preferred = featured?.length
     ? featured
-        .map((slug) => all.find((t) => t.slug === slug))
-        .filter((t): t is (typeof all)[number] => Boolean(t))
-    : all;
+        .map((slug) => all.find((tool) => tool.slug === slug))
+        .filter((tool): tool is ToolRoute => Boolean(tool))
+    : [];
+  const ordered = [...preferred, ...all.filter((tool) => !preferred.some((item) => item.slug === tool.slug))];
+  const raid = ordered.find((tool) => tool.slug === "raid-calculator");
+  const compact = ordered.filter((tool) => tool.slug !== "raid-calculator").slice(0, 4);
+  if (!raid || compact.length < 4) return null;
 
-  if (!tools.length) return null;
-
-  const toolAccent = accentColor || "var(--module-tools-color, #60a5fa)";
-  const style: ToolsStyle = {
-    "--tools-accent": toolAccent,
-    "--hp-brand": toolAccent,
-    "--hp-ink": "#ffffff",
-    "--hp-ink-3": "rgb(255 255 255 / 0.68)",
-  };
+  const toolAccent = accentColor || "var(--module-tools-color, var(--primary))";
+  const style: ToolsStyle = { "--tools-accent": toolAccent, "--hp-brand": toolAccent };
 
   return (
     <section
       aria-labelledby={HEADING_ID}
-      className="w-full bg-black px-4 py-10 text-white sm:px-6 lg:px-8 lg:py-12"
+      className="w-full bg-white px-4 py-10 text-foreground dark:bg-black sm:px-6 lg:px-8 lg:py-12"
       style={style}
     >
       <div className="mx-auto w-full max-w-[1280px]">
-        {/* The visual header and its former “more” action are deliberately
-            hidden; the accessible heading keeps the section landmark named. */}
         <h2 id={HEADING_ID} className="sr-only">{title}</h2>
+        <p className="mb-6 text-center text-xl font-bold text-foreground sm:text-2xl">
+          ابزارهایی که کار شما رو شاید راحت‌تر کنه
+        </p>
 
-        <ul className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
-          {tools.map((tool) => (
-            <li key={tool.slug}>
-              <ToolTile tool={tool} />
-            </li>
-          ))}
-        </ul>
+        <ToolTile tool={raid} featured />
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {compact.map((tool) => <ToolTile key={tool.slug} tool={tool} />)}
+        </div>
       </div>
     </section>
   );
 }
 
-function ToolTile({ tool }: { tool: (typeof toolRoutes)[number] }) {
+function ToolTile({ tool, featured = false }: { tool: ToolRoute; featured?: boolean }) {
   return (
     <Link
       href={tool.href}
-      className="group relative flex h-full flex-col items-center rounded-[var(--hp-r-md)] bg-transparent px-4 py-8 text-center focus-visible:ring-2 focus-visible:ring-[color:var(--hp-brand)] focus-visible:outline-none"
+      className={`group relative isolate flex w-full overflow-hidden border border-border bg-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)] ${
+        featured ? "min-h-[280px] sm:min-h-[340px]" : "min-h-[220px] sm:min-h-[270px]"
+      }`}
     >
-      <ToolIcon
-        slug={tool.slug}
-        size={56}
-        className="text-[color:var(--hp-ink-3)] transition-colors duration-200 group-hover:text-[color:var(--tools-accent)] motion-reduce:transform-none"
+      <Image
+        src={tool.image}
+        alt=""
+        fill
+        quality={95}
+        sizes={featured ? "(min-width: 1280px) 1280px, 100vw" : "(min-width: 640px) 50vw, 100vw"}
+        className="-z-20 object-cover grayscale saturate-0 transition-[filter,transform] duration-500 ease-out group-hover:scale-[1.015] group-hover:grayscale-0 group-hover:saturate-100 motion-reduce:transform-none"
       />
-
-      <h3
-        className="mt-4 text-[18px] font-bold leading-[28px] text-[color:var(--hp-ink)] transition-colors group-hover:text-[color:var(--tools-accent)]"
-        style={{ textWrap: "balance" }}
-      >
-        {tool.titleFa}
-      </h3>
-
-      <p className="mt-0.5 line-clamp-3 text-[13px] leading-[21px] text-[color:var(--hp-ink-3)]">
-        {tool.descriptionFa}
-      </p>
+      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
+      <span className="mt-auto block w-full p-5 text-right sm:p-7">
+        <span className="block text-xl font-bold leading-8 sm:text-2xl">{tool.titleFa}</span>
+        <span className="mt-1 block max-w-3xl text-sm leading-6 text-white/78 sm:text-[15px]">
+          {tool.descriptionFa}
+        </span>
+      </span>
     </Link>
   );
 }

@@ -178,10 +178,8 @@ function RailArrow({
       className={cn(
         "absolute top-1/2 z-10 -translate-y-1/2 items-center justify-center rounded-full",
         onMobile ? "flex" : "hidden md:flex",
-        bare ? "size-11 transition-colors duration-200" : "h-14 w-14 border transition-opacity duration-200", // 56px — TG exact
-        bare
-          ? "bg-background/90 text-foreground shadow-[var(--hp-shadow-card)] backdrop-blur-sm hover:text-primary"
-          : "border-[color:var(--hp-brand)] bg-[var(--hp-arrow-bg)] text-white hover:opacity-100",
+        bare ? "size-11" : "h-14 w-14",
+        "border-0 bg-transparent text-foreground shadow-none transition-[color,opacity] duration-200 hover:text-primary",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         // Dim rather than vanish. An arrow that disappears at each end makes
         // the rail look like it has no controls in exactly the state every
@@ -191,7 +189,7 @@ function RailArrow({
       )}
     >
       <svg width="16" height="18" viewBox="0 0 16 18" fill="none" aria-hidden="true"
-        className={dir === "prev" ? "rotate-180" : undefined}>
+        className={dir === "next" ? "rotate-180" : undefined}>
         <path
           fillRule="evenodd"
           clipRule="evenodd"

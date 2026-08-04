@@ -14,7 +14,7 @@ import { useModuleConfig } from "@/providers/module-config.provider";
  * without having to reload or leave stale colours in the DOM.
  */
 export function ModuleColorApplier() {
-  const { moduleColorsEnabled, moduleColors } = useModuleConfig();
+  const { moduleColorsEnabled, moduleColors, moduleColorsDark } = useModuleConfig();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -23,11 +23,14 @@ export function ModuleColorApplier() {
     root.dataset.moduleColors = enabled ? "enabled" : "disabled";
 
     for (const slug of COLORABLE_MODULE_SLUGS) {
-      const property = `--module-${slug}-color`;
+      const lightProperty = `--module-${slug}-color-light`;
+      const darkProperty = `--module-${slug}-color-dark`;
       if (enabled) {
-        root.style.setProperty(property, resolveModuleColor(slug, moduleColors[slug]));
+        root.style.setProperty(lightProperty, resolveModuleColor(slug, moduleColors[slug]));
+        root.style.setProperty(darkProperty, resolveModuleColor(slug, moduleColorsDark[slug]));
       } else {
-        root.style.removeProperty(property);
+        root.style.removeProperty(lightProperty);
+        root.style.removeProperty(darkProperty);
       }
     }
 
@@ -40,7 +43,7 @@ export function ModuleColorApplier() {
     // The next effect removes values explicitly when the colour system is
     // disabled, and a full document navigation replaces <html>, so a cleanup
     // here would only create a visible flash.
-  }, [moduleColors, moduleColorsEnabled]);
+  }, [moduleColors, moduleColorsDark, moduleColorsEnabled]);
 
   return null;
 }
