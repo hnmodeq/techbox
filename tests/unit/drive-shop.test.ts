@@ -40,10 +40,12 @@ describe("enterprise drive shop", () => {
     const storage = read("app/shop/storage/page.tsx");
     const drive = read("app/shop/drive/page.tsx");
     const legacy = read("app/landing/storage/shop/page.tsx");
+    const nextConfig = read("next.config.mjs");
     expect(rootRoute).toMatch(/redirect\("\/shop\/storage"\)/);
     expect(storage).toMatch(/<ShopGrid serverItems=\{storageSystems\} kind="storage"/);
     expect(drive).toMatch(/<ShopGrid serverItems=\{drives\} kind="drive"/);
     expect(legacy).toMatch(/redirect\("\/shop\/storage"\)/);
+    expect(nextConfig).toMatch(/source: '\/shop', destination: '\/shop\/storage', permanent: true/);
   });
 
   it("uses drive-aware cards and useful drive filters without cloning the shop design", () => {

@@ -34,6 +34,13 @@ const nextConfig = {
     qualities: [75, 95, 100],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
   },
+  async redirects() {
+    return [
+      { source: '/shop', destination: '/shop/storage', permanent: true },
+      { source: '/landing/storage/shop', destination: '/shop/storage', permanent: true },
+      { source: '/support', destination: '/consultation', permanent: true },
+    ];
+  },
   // Security headers + better caching for static assets.
   //
   // IMPORTANT: these are PRODUCTION-ONLY. In `next dev` they actively break
