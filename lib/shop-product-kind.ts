@@ -29,11 +29,11 @@ export function isDriveProduct(item: ShopProductLike): boolean {
   const explicitProduct = shopSpec(item, ["Product Type", "نوع محصول"]).toLowerCase();
   if (DRIVE_TYPE_VALUES.has(explicitProduct) || explicitProduct.includes("drive")) return true;
 
-  const category = (item.category || "").normalize("NFKC").toLowerCase();
-  if (DRIVE_IDENTITY.test(category)) return true;
-
   const specs = specsRecord(item.specs);
   if (specs["Drive Bay"] || specs["Bay"] || specs["CPU"] || specs["پردازنده"]) return false;
+
+  const category = (item.category || "").normalize("NFKC").toLowerCase();
+  if (DRIVE_IDENTITY.test(category)) return true;
 
   const identity = [item.title, item.model, ...(item.tags ?? [])]
     .filter((value): value is string => typeof value === "string" && Boolean(value.trim()))
