@@ -13,7 +13,7 @@ test.describe('Authentication Flows', () => {
     await page.goto('/admin/login');
     await page.fill('input[autocomplete="username"]', 'wronguser');
     await page.fill('input[placeholder="••••••••"]', 'wrongpass');
-    await page.getByRole('button', { name: 'ورود', exact: true }).click();
+    await page.locator('form').getByRole('button', { name: 'ورود', exact: true }).click();
     await expect(page.getByText(/نام کاربری یا رمز عبور اشتباه است|اطلاعات ورود صحیح نیست|خطا در ورود/)).toBeVisible();
   });
 });
