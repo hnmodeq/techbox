@@ -270,6 +270,16 @@ async function main() {
   const sslmode = parsed.params.get("sslmode");
   if (sslmode) console.log(`  \u00b7 sslmode  ${sslmode}`);
 
+  for (const key of ["sslmode", "channel_binding", "connection_limit", "pool_timeout", "connect_timeout"]) {
+    if (parsed.params.getAll(key).length > 1) {
+      warn(
+        `duplicate ${key}`,
+        `${parsed.params.getAll(key).length} copies`,
+        `Keep exactly one ${key} parameter. Copy a fresh connection string from Neon instead of appending options to an older URL.`,
+      );
+    }
+  }
+
   if (!/-pooler\./.test(parsed.host)) {
     warn(
       "DATABASE_URL does not use the -pooler host",
@@ -507,7 +517,7 @@ function prismaHint(code?: string): string {
     case "P1000":
       return "Authentication failed. The password in DATABASE_URL is wrong, or it contains a character that must be percent-encoded (@ : / ? # %).";
     case "P1001":
-      return "Prisma cannot reach the server even though the raw socket tests above passed. Check that connect_timeout is not too low and that the Neon project is not suspended.";
+      return "Prisma cannot authenticate/connect even though TCP and TLS passed. Copy fresh pooled and direct URLs from Neon, remove duplicate parameters, and verify that .env.local is not overriding .env with an old password.";
     case "P1002":
       return "The server was reached but timed out during handshake. Raise connect_timeout in DATABASE_URL.";
     case "P1003":
@@ -515,7 +525,7 @@ function prismaHint(code?: string): string {
     case "P1017":
       return "The server closed the connection. On Neon this usually means the compute suspended mid-query; the next request wakes it.";
     case "P2024":
-      return "Connection pool timeout. Too many concurrent queries for connection_limit. Dev already uses 5; raise PRISMA_CONNECTION_LIMIT if needed.";
+      return "The doctor uses one isolated connection and runs one serial query, so this is not application concurrency. Prisma could not establish its first connection before pool_timeout; refresh the Neon URL/password and remove duplicate connection parameters.";
     default:
       return "";
   }
