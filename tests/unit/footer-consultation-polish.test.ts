@@ -12,17 +12,19 @@ describe("footer and consultation navigation", () => {
     expect(secondary).not.toContain("پیشنهادات");
     expect(footer).toContain("پیشنهادات");
     expect(footer).toMatch(/tb_open_feedback/);
-    expect(footer).toMatch(/links\.map/);
+    expect(footer).toMatch(/companyLinks\.map/);
+    expect(footer).toMatch(/discoveryLinks\.map/);
   });
 
-  it("uses one balanced four-column row on desktop", () => {
+  it("uses a full Digikala-inspired multi-tier footer without fake trust badges", () => {
     const footer = read("components/layout/Footer.tsx");
-    expect(footer).toMatch(/lg:grid-cols-\[auto_minmax\(280px,1fr\)_auto_minmax\(320px,1\.35fr\)\]/);
-    expect(footer).toMatch(/lg:col-start-4 lg:row-start-1/); // copyright, physical right
-    expect(footer).toMatch(/lg:col-start-3 lg:row-start-1/); // designer
-    expect(footer).toMatch(/lg:col-start-2 lg:row-start-1/); // buttons
-    expect(footer).toMatch(/lg:col-start-1 lg:row-start-1/); // socials, physical left
-    expect(footer).not.toMatch(/MessageSquarePlus/);
+    expect(footer).toMatch(/lg:grid-cols-5/); // assurance rail
+    expect(footer).toMatch(/lg:grid-cols-\[\.8fr_\.9fr_1fr_1\.35fr\]/); // link/newsletter columns
+    expect(footer).toContain("وب‌اپلیکیشن تکباکس");
+    expect(footer).toMatch(/beforeinstallprompt/);
+    expect(footer).toMatch(/\/api\/newsletter\/subscribe/);
+    expect(footer).toContain("تکباکس؛ رسانه، جامعه و فروشگاه تخصصی زیرساخت");
+    expect(footer).not.toMatch(/MessageSquarePlus|enamad|نماد اعتماد/);
   });
 
   it("removes X and uses platform-colour Instagram, YouTube and Telegram icons", () => {

@@ -137,7 +137,7 @@ describe("homepage request series", () => {
   it("keeps footer seamless and chat tab surfaces transparent", () => {
     const footer = read("components/layout/Footer.tsx");
     const chat = read("features/chat/components/Chatbot.tsx");
-    expect(footer).toMatch(/bg-white dark:bg-black/);
+    expect(footer).toMatch(/bg-white[^\"]*dark:bg-black/);
     expect(footer).not.toMatch(/<footer className="border-t/);
     expect(chat).toMatch(/variant="line"/);
     expect(chat.match(/data-active:bg-transparent/g)?.length).toBeGreaterThanOrEqual(2);
