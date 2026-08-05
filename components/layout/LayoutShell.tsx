@@ -14,7 +14,7 @@ import { CartProvider } from "@/providers/cart.provider"
 import { CompareProvider } from "@/providers/compare.provider"
 import { StatsProvider } from "@/providers/stats.provider"
 import { ThemeProvider } from "@/providers/theme.provider"
-import { AuthProvider, useAuth } from "@/providers/auth.provider"
+import { useAuth } from "@/providers/auth.provider"
 import { HomeDataProvider, type HomeData } from "@/features/home/lib/home-data"
 import { ModuleConfigProvider } from "@/providers/module-config.provider"
 import { ModuleColorApplier } from "@/components/layout/ModuleColorApplier"
@@ -70,34 +70,30 @@ export function LayoutShell({ children, homeData, serverModuleConfig, defaultSid
   if (isAdmin || isStandaloneLogin) {
     return (
       <ThemeProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        {children}
       </ThemeProvider>
     )
   }
 
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <CartProvider>
-          <CompareProvider>
-            <StatsProvider enabled={statsEnabled}>
-            <HomeDataProvider initialData={homeData}>
-              <ModuleConfigProvider serverConfig={serverModuleConfig}>
-                <ModuleColorApplier />
-                <TimelineLikesProvider enabled={timelineLikesEnabled}>
-                  <LayoutInner defaultSidebarOpen={defaultSidebarOpen}>{children}</LayoutInner>
-                </TimelineLikesProvider>
-              </ModuleConfigProvider>
-              <Chatbot />
-              <AuthModal />
-              <HelpModals />
-            </HomeDataProvider>
-            </StatsProvider>
-          </CompareProvider>
-        </CartProvider>
-      </AuthProvider>
+      <CartProvider>
+        <CompareProvider>
+          <StatsProvider enabled={statsEnabled}>
+          <HomeDataProvider initialData={homeData}>
+            <ModuleConfigProvider serverConfig={serverModuleConfig}>
+              <ModuleColorApplier />
+              <TimelineLikesProvider enabled={timelineLikesEnabled}>
+                <LayoutInner defaultSidebarOpen={defaultSidebarOpen}>{children}</LayoutInner>
+              </TimelineLikesProvider>
+            </ModuleConfigProvider>
+            <Chatbot />
+            <AuthModal />
+            <HelpModals />
+          </HomeDataProvider>
+          </StatsProvider>
+        </CompareProvider>
+      </CartProvider>
     </ThemeProvider>
   )
 }

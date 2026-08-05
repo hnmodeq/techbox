@@ -26,51 +26,28 @@ type PrismaClientInstance = InstanceType<typeof PrismaClient>;
  * Versioning the key means a config change discards the stale client and
  * builds a fresh one on the next request.
  */
-const CLIENT_CONFIG_VERSION = 5;
+const CLIENT_CONFIG_VERSION = 6;
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClientInstance;
   prismaConfigVersion?: number;
+  /** Exact effective URL, kept in memory only so an env-file reload can retire
+   * the old pool. It is never logged or returned. */
+  prismaUrl?: string;
+  /** Monotonic identity used to stop late failures from disconnecting a newer
+   * healthy pool that another request has already created. */
+  prismaGeneration?: number;
 };
 
-function getPrismaClient(): PrismaClientInstance {
-  if (globalForPrisma.prisma && globalForPrisma.prismaConfigVersion === CLIENT_CONFIG_VERSION) {
-    return globalForPrisma.prisma;
-  }
-  if (globalForPrisma.prisma) {
-    // Stale config. Drop the old pool rather than leaking it.
-    void globalForPrisma.prisma.$disconnect().catch(() => {});
-    globalForPrisma.prisma = undefined;
-  }
-
+function runtimeDatabaseUrl(): { dbUrl: string; isDev: boolean } {
   // One Prisma connection per serverless instance is the safe Neon default.
-  // Concurrency comes from independent Vercel instances and Neon's pooler, not
-  // from opening ten PostgreSQL sessions inside every function instance.
-  //
-  // Local dev is the opposite situation: a single long-lived Node process
-  // serves every request, Turbopack re-renders on each save, and React
-  // Strict Mode double-invokes. With connection_limit=1 a page that issues
-  // a few dozen sequential queries can queue past pool_timeout and fail
-  // with P2024 even though the database is perfectly healthy. So dev gets
-  // a small pool; production keeps the serverless-safe default of 1.
+  // Local development is one long-lived process serving page renders and API
+  // requests together, so it needs a bounded multi-connection pool.
   const isDev = process.env.NODE_ENV !== "production";
   let dbUrl = process.env.DATABASE_URL || "";
 
-  // In DEVELOPMENT, override any connection_limit already in the URL.
-  //
-  // .env.example tells you to put `connection_limit=1` in DATABASE_URL,
-  // which is right for serverless production — but the guard below used to
-  // be "only add settings if the URL has none", so a correctly-configured
-  // .env meant local dev ran on a pool of ONE. One `next dev` process then
-  // served the homepage (~9 sequential section queries) plus
-  // /api/notifications, /api/auth/me, /api/modules/enabled and
-  // /api/news/read-state concurrently through a single connection. Everything
-  // after the first query queued until pool_timeout and failed P2024, which
-  // tripped the circuit breaker and blanked sections — while the database
-  // itself was perfectly healthy.
-  //
-  // Production still honours whatever the URL says: one connection per
-  // serverless instance remains the correct Neon default there.
+  // The checked-in example carries production-safe values. Replace them only
+  // in development; production must honour the deployment URL exactly.
   if (dbUrl && isDev) {
     dbUrl = dbUrl
       .replace(/([?&])connection_limit=\d+/g, "$1")
@@ -81,46 +58,65 @@ function getPrismaClient(): PrismaClientInstance {
   }
 
   if (dbUrl && !dbUrl.includes("connection_limit=")) {
-    const fallback = isDev ? 8 : 1;
-    const configured = Number(process.env.PRISMA_CONNECTION_LIMIT || String(fallback));
+    const fallbackLimit = isDev ? 8 : 1;
+    const configuredLimit = Number(process.env.PRISMA_CONNECTION_LIMIT || String(fallbackLimit));
     const connectionLimit =
-      Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : fallback;
-    // 30s was far too patient. When Neon's free-tier compute suspends and
-    // closes pooled connections, every queued query sat for the full window
-    // before failing, so a two-second blip presented as a multi-minute hang
-    // and requests piled up behind it. 10s is still generous for a cold
-    // start (measured wake ~0.5-2s) while failing fast enough that the
-    // circuit breaker in lib/db-circuit.ts can trip and shed load.
-    const poolTimeout = Number(process.env.PRISMA_POOL_TIMEOUT || (isDev ? 10 : 15));
+      Number.isInteger(configuredLimit) && configuredLimit > 0 && configuredLimit <= 10
+        ? configuredLimit
+        : fallbackLimit;
+
+    // A healthy local Neon query can still queue behind the homepage render,
+    // auth hydration and a module navigation. Ten seconds was shorter than a
+    // measured cold dev render and produced false P2024 failures even though
+    // the isolated doctor was green. Keep production fail-fast, but give the
+    // single local process enough time for its bounded queue to drain.
+    const fallbackPoolTimeout = isDev ? 30 : 15;
+    const configuredPoolTimeout = Number(
+      process.env.PRISMA_POOL_TIMEOUT || String(fallbackPoolTimeout),
+    );
+    const poolTimeout =
+      Number.isInteger(configuredPoolTimeout) &&
+      configuredPoolTimeout >= 5 &&
+      configuredPoolTimeout <= 60
+        ? configuredPoolTimeout
+        : fallbackPoolTimeout;
+
     const sep = dbUrl.includes("?") ? "&" : "?";
     dbUrl = `${dbUrl}${sep}connection_limit=${connectionLimit}&pool_timeout=${poolTimeout}`;
   }
 
-  // Prisma's own logger is the source of the multi-paragraph
-  // "Invalid `prisma.x.findMany()` invocation ... Can't reach database
-  // server" blocks, complete with Turbopack-mangled chunk paths. Those are
-  // emitted BEFORE our code ever sees the error, so the rate-limiting in
-  // lib/db-error.ts cannot suppress them, and they drown the one-line
-  // summary that actually says what to do.
-  //
-  // Errors are still surfaced — every caller receives the exception and
-  // logs it through logDbFailure(), which prints a single readable line
-  // plus a remedy. Silencing the raw channel removes duplication, not
-  // information. "warn" is kept because Prisma uses it for genuinely
-  // novel things (pool saturation hints, deprecations) that we do not
-  // otherwise report.
-  // Say which database this process actually connects to.
-  //
-  // "did I really switch providers?" is otherwise unanswerable from the
-  // logs: the URL lives only in .env, Prisma never echoes it, and a stale
-  // .env or a leftover .env.local silently wins. Host and database only —
-  // never the credentials.
+  return { dbUrl, isDev };
+}
+
+function getPrismaClient(): PrismaClientInstance {
+  const { dbUrl, isDev } = runtimeDatabaseUrl();
+
+  // Next reloads .env files without necessarily restarting its Node process.
+  // Version-only caching therefore retained a pool built from the previous URL.
+  // Compare the effective URL too, while never printing or exporting it.
+  if (
+    globalForPrisma.prisma &&
+    globalForPrisma.prismaConfigVersion === CLIENT_CONFIG_VERSION &&
+    globalForPrisma.prismaUrl === dbUrl
+  ) {
+    return globalForPrisma.prisma;
+  }
+
+  if (globalForPrisma.prisma) {
+    const staleClient = globalForPrisma.prisma;
+    globalForPrisma.prisma = undefined;
+    void staleClient.$disconnect().catch(() => {});
+  }
+
+  // Say which database this process actually connects to. Host/database/pool
+  // only — the URL and credentials are never logged.
   if (isDev && dbUrl) {
     try {
       const parsed = new URL(dbUrl);
+      const params = new URLSearchParams(parsed.search);
       console.log(
         `[db] ${parsed.hostname}${parsed.pathname} ` +
-          `(pool ${new URLSearchParams(parsed.search).get("connection_limit") ?? "?"})`,
+          `(pool ${params.get("connection_limit") ?? "?"}, timeout ${params.get("pool_timeout") ?? "?"}s)`,
       );
     } catch {
       console.warn("[db] DATABASE_URL is not a parseable URL");
@@ -128,14 +124,16 @@ function getPrismaClient(): PrismaClientInstance {
   }
 
   const client = new PrismaClient({
+    // Callers receive and classify every exception. Keeping Prisma's raw error
+    // channel quiet prevents one handled outage from becoming many dev overlays.
     log: process.env.PRISMA_VERBOSE === "1" ? ["query", "warn", "error"] : ["warn"],
     datasources: { db: { url: dbUrl } },
   });
-  // Cache one client per Node process in every environment. The previous lazy
-  // wrapper cached only in development, so every production proxy property
-  // access constructed another Prisma pool inside the same serverless worker.
+
   globalForPrisma.prisma = client;
   globalForPrisma.prismaConfigVersion = CLIENT_CONFIG_VERSION;
+  globalForPrisma.prismaUrl = dbUrl;
+  globalForPrisma.prismaGeneration = (globalForPrisma.prismaGeneration ?? 0) + 1;
   return client;
 }
 
@@ -143,13 +141,30 @@ let resetInFlight: Promise<void> | null = null;
 
 /** Drop a poisoned/stale pool once, then let the next proxy access build a
  * fresh client. Concurrent failures share the same reset instead of creating
- * a disconnect/reconnect storm. */
-export function resetPrismaPool(): Promise<void> {
+ * a disconnect/reconnect storm. `expectedGeneration` prevents a late P2024
+ * from an old pool from disconnecting the healthy replacement pool. */
+export function resetPrismaPool(expectedGeneration?: number): Promise<void> {
   if (resetInFlight) return resetInFlight;
+  if (
+    expectedGeneration !== undefined &&
+    globalForPrisma.prismaGeneration !== expectedGeneration
+  ) {
+    return Promise.resolve();
+  }
+
   resetInFlight = (async () => {
+    // Re-check after entering the async reset in case another request replaced
+    // the pool between the caller's failure and this task starting.
+    if (
+      expectedGeneration !== undefined &&
+      globalForPrisma.prismaGeneration !== expectedGeneration
+    ) {
+      return;
+    }
     const client = globalForPrisma.prisma;
     globalForPrisma.prisma = undefined;
     globalForPrisma.prismaConfigVersion = undefined;
+    globalForPrisma.prismaUrl = undefined;
     if (client) {
       await Promise.race([
         client.$disconnect().catch(() => {}),
@@ -163,11 +178,15 @@ export function resetPrismaPool(): Promise<void> {
 /** Retry one connectivity/pool failure through a newly-created Prisma pool.
  * Never retries validation, uniqueness, permission, or other application errors. */
 export async function withFreshPrismaRetry<T>(run: () => Promise<T>): Promise<T> {
+  // Materialize the lazy client before recording its generation. Otherwise a
+  // concurrent reset could make this attempt appear to belong to the wrong pool.
+  getPrismaClient();
+  const attemptGeneration = globalForPrisma.prismaGeneration;
   try {
     return await run();
   } catch (error) {
     if (!isDbUnreachable(error)) throw error;
-    await resetPrismaPool();
+    await resetPrismaPool(attemptGeneration);
     return run();
   }
 }

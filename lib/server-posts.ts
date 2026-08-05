@@ -1,4 +1,5 @@
-import { prisma } from "@/lib/db";
+import { prisma, withFreshPrismaRetry } from "@/lib/db";
+import { logDbFailure, noteDbSuccess } from "@/lib/db-error";
 import type { ModuleSlug, ContentItem } from "@/lib/content";
 import { formatPostDateFa, publicPostDateWhere } from "@/lib/post-date";
 import { estimateReadingMinutes, formatReadingTime } from "@/lib/reading-time";
@@ -12,7 +13,11 @@ export async function getDbModulePosts(
   if (!process.env.DATABASE_URL) return [];
 
   try {
-    const posts = await prisma.post.findMany({
+    // A module page is the user's primary read, so it gets the same one-shot
+    // fresh-pool recovery as authentication. Without this, a stale/saturated
+    // dev pool was caught as `[]` and a populated magazine falsely rendered
+    // "هنوز مقاله‌ای منتشر نشده" with an HTTP 200.
+    const posts = await withFreshPrismaRetry(() => prisma.post.findMany({
       where: {
         module,
         published: true,
@@ -41,7 +46,8 @@ export async function getDbModulePosts(
           },
         },
       },
-    });
+    }));
+    noteDbSuccess(`server-posts:${module}`);
 
     let rates: any = null;
     if (module === "shop") {
@@ -65,7 +71,7 @@ export async function getDbModulePosts(
         counts.forEach((c: any) => commentMap.set(c.postId, c._count._all || 0));
       }
     } catch (error) {
-      console.error(`[server-posts] Failed to count comments for ${module}:`, error);
+      logDbFailure(`server-posts:${module}:comments`, error);
     }
 
     return posts.map((p: any) => {
@@ -142,7 +148,7 @@ export async function getDbModulePosts(
       };
     });
   } catch (error) {
-    console.error(`[server-posts] Failed to fetch ${module}:`, error);
+    logDbFailure(`server-posts:${module}`, error);
     return [];
   }
 }

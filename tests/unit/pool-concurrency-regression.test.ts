@@ -38,19 +38,30 @@ describe("local connection-pool pressure controls", () => {
 
   it("gives the single local dev process enough bounded pool headroom", () => {
     const db = read("lib/db.ts");
-    expect(db).toMatch(/const fallback = isDev \? 8 : 1/);
-    expect(db).toMatch(/configured > 0 && configured <= 10/);
+    expect(db).toMatch(/const fallbackLimit = isDev \? 8 : 1/);
+    expect(db).toMatch(/configuredLimit > 0 && configuredLimit <= 10/);
+    expect(db).toMatch(/fallbackPoolTimeout = isDev \? 30 : 15/);
   });
 
-  it("reuses production clients and retries auth once through a fresh pool", () => {
+  it("reuses production clients and retries primary reads once through a fresh pool", () => {
     const db = read("lib/db.ts");
     const login = read("app/api/auth/login/route.ts");
     const register = read("app/api/auth/register/route.ts");
+    const modulePosts = read("lib/server-posts.ts");
     expect(db).toMatch(/globalForPrisma\.prisma = client/);
     expect(db).toMatch(/resetPrismaPool/);
+    expect(db).toMatch(/expectedGeneration/);
     expect(db).toMatch(/withFreshPrismaRetry/);
     expect(login).toMatch(/withFreshPrismaRetry/);
     expect(register).toMatch(/withFreshPrismaRetry/);
+    expect(modulePosts).toMatch(/withFreshPrismaRetry/);
     expect(login).toMatch(/database_temporarily_unavailable/);
+  });
+
+  it("keeps one stable authentication boundary above every layout branch", () => {
+    const root = read("app/layout.tsx");
+    const shell = read("components/layout/LayoutShell.tsx");
+    expect(root).toMatch(/<AuthProvider>[\s\S]*<LayoutShell/);
+    expect(shell).not.toMatch(/<AuthProvider>/);
   });
 });

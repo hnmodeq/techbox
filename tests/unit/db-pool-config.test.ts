@@ -22,7 +22,7 @@ function buildUrl(dbUrl: string, isDev: boolean, envLimit?: string) {
     const configured = Number(envLimit || String(fallback));
     const limit =
       Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : fallback;
-    const poolTimeout = isDev ? 10 : 15;
+    const poolTimeout = isDev ? 30 : 15;
     const sep = dbUrl.includes("?") ? "&" : "?";
     dbUrl = `${dbUrl}${sep}connection_limit=${limit}&pool_timeout=${poolTimeout}`;
   }
@@ -44,7 +44,7 @@ describe("development connection pool", () => {
     const dev = buildUrl(DOCUMENTED, true);
     expect(dev).toContain("connection_limit=8");
     expect(dev).not.toContain("connection_limit=1");
-    expect(dev).toContain("pool_timeout=10");
+    expect(dev).toContain("pool_timeout=30");
   });
 
   it("leaves production exactly as configured", () => {
@@ -75,7 +75,8 @@ describe("development connection pool", () => {
   it("bumps the client cache version so the change takes effect", () => {
     // The client is cached on globalThis across HMR; without a version bump
     // the old pool survives and the fix appears to do nothing.
-    expect(db).toMatch(/const CLIENT_CONFIG_VERSION = 5;/);
+    expect(db).toMatch(/const CLIENT_CONFIG_VERSION = 6;/);
+    expect(db).toMatch(/globalForPrisma\.prismaUrl === dbUrl/);
   });
 });
 

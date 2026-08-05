@@ -22,6 +22,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { RuntimeEffects } from "@/components/layout/RuntimeEffects";
 import { WebSiteJsonLd, OrganizationJsonLd } from "@/components/seo/SiteJsonLd";
+import { AuthProvider } from "@/providers/auth.provider";
 
 // Critical inline styles (inlined for performance)
 const criticalStyles = `
@@ -129,8 +130,12 @@ export default async function RootLayout({
     moduleConfig = undefined;
   }
 
-  // Fire-and-forget: auto-publish any overdue scheduled posts (60s cooldown built in)
-  autoPublishScheduled().catch(() => {});
+  // This best-effort write is useful on production traffic, but in local dev it
+  // needlessly competes with the first page/auth reads while Neon is waking.
+  // Editors can publish explicitly during development.
+  if (process.env.NODE_ENV === "production") {
+    autoPublishScheduled().catch(() => {});
+  }
   const colorsEnabled = moduleConfig?.moduleColorsEnabled !== false;
   // First visit has no cookie and opens the navigation. Subsequent document
   // visits use the state written by SidebarProvider when the reader toggles it.
@@ -160,7 +165,14 @@ export default async function RootLayout({
         <RuntimeEffects />
         <TooltipProvider>
           <ScrollRestoration />
-          <LayoutShell homeData={homeData} serverModuleConfig={moduleConfig} defaultSidebarOpen={defaultSidebarOpen}>{children}</LayoutShell>
+          {/* Keep one auth boundary above every shell branch. Putting the
+              provider inside LayoutShell made its identity depend on the
+              current pathname; during dev full reloads/RSC transitions a
+              child client island could hydrate before that branch's provider
+              and useAuth() would throw. */}
+          <AuthProvider>
+            <LayoutShell homeData={homeData} serverModuleConfig={moduleConfig} defaultSidebarOpen={defaultSidebarOpen}>{children}</LayoutShell>
+          </AuthProvider>
           <Analytics />
           <SpeedInsights />
           <Toaster />
