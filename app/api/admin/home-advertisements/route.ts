@@ -9,6 +9,7 @@ import {
   DEFAULT_HOME_ADVERTISEMENTS,
   HOME_AD_PLACEMENTS,
   isSafeAdvertisementHref,
+  isSafeAdvertisementImage,
   parseHomeAdvertisements,
 } from "@/features/home/lib/home-advertisements";
 
@@ -16,8 +17,8 @@ const KEY = "home.advertisements";
 
 const advertisementSchema = z.object({
   id: z.string().trim().regex(/^[-a-zA-Z0-9_]{2,80}$/),
-  image: z.string().trim().url().refine((value) => value.startsWith("https://") && value.toLowerCase().endsWith(".webp"), {
-    message: "advertisement image must be an HTTPS WebP URL",
+  image: z.string().trim().max(1000).refine(isSafeAdvertisementImage, {
+    message: "advertisement image must be an internal or HTTPS WebP/GIF URL",
   }),
   alt: z.string().trim().min(1).max(180),
   href: z.string().trim().max(500).optional().default("").refine(isSafeAdvertisementHref, {

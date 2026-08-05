@@ -48,6 +48,7 @@ model User {
   verificationRequests VerificationRequest[]
   timelineComments TimelineComment[]
   timelineLikes TimelineLike[]
+  commentVotes CommentVote[]
 
   // Follow system
   followers Follow[] @relation("UserFollowers")
@@ -236,15 +237,20 @@ model Comment {
 }
 
 model CommentVote {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   fingerprint String
   commentId   String
+  userId      String?
   vote        Int
+  createdAt   DateTime @default(now())
 
   comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([fingerprint, commentId], name: "fingerprint_commentId")
   @@index([commentId], name: "comment_vote_comment_idx")
+  @@index([userId, createdAt], name: "comment_vote_user_created_idx")
+  @@index([createdAt], name: "comment_vote_created_idx")
 }
 
 model Like {

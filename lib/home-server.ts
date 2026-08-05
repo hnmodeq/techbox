@@ -22,7 +22,7 @@ import {
   getPartners,
 } from "@/lib/home-sections";
 import { getSettings } from "@/lib/settings";
-import { parseHomeAdvertisements } from "@/features/home/lib/home-advertisements";
+import { DEFAULT_HOME_ADVERTISEMENTS, parseHomeAdvertisements } from "@/features/home/lib/home-advertisements";
 import { logDbFailure, noteDbSuccess, isDbUnreachable } from "@/lib/db-error";
 import { withCircuit, isCircuitOpenError, circuitState } from "@/lib/db-circuit";
 
@@ -52,7 +52,7 @@ async function section<T>(name: string, fallback: T, run: () => Promise<T>): Pro
 const moduleTakes: Record<string, number> = {
   blog: 5,   // §1 lead + 4-item list (Spiceworks Articles)
   media: 10, // §2 video rail
-  shop: 8,   // §7 deals grid (4-up x 2 rows)
+  shop: 12,  // §7: 8 rackmount enterprise + 4 tower/home storage systems
   forum: 6,  // §9 featured + 5-row list
   review: 3, // §5 top picks
   download: 8,
@@ -480,6 +480,16 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
   }
   let news: any[] = [];
   let ticker: any[] = [];
+  let advertisements = DEFAULT_HOME_ADVERTISEMENTS;
+  try {
+    const settings = await getSettings(["home.advertisements"]);
+    const parsed = parseHomeAdvertisements(settings["home.advertisements"]);
+    // An explicitly saved [] disables all ads; an absent setting is already
+    // populated by getSettings with the defaults.
+    advertisements = parsed;
+  } catch {
+    advertisements = DEFAULT_HOME_ADVERTISEMENTS;
+  }
   try {
     if (enabledModules.includes("news" as any)) {
       news = await prisma.post.findMany({
@@ -522,11 +532,12 @@ async function getLayoutHomeDataUncached(): Promise<HomeData> {
   return {
     modules: { news: normalizedNews },
     ticker: ticker.map(normalizeTickerCard),
+    advertisements,
     generatedAt: new Date().toISOString(),
   };
 }
 
-const cachedLayoutHomeData = unstable_cache(getLayoutHomeDataUncached, ["layout-home-data-v1"], {
+const cachedLayoutHomeData = unstable_cache(getLayoutHomeDataUncached, ["layout-home-data-v2-site-ads"], {
   revalidate: 86400,
   tags: ["home-data"],
 });
@@ -638,7 +649,7 @@ export async function getHomeDataUncached(): Promise<HomeData> {
     getDeals(normalizeCard, cardSelect, moduleTakes.shop ?? 8));
   if (deals.length) modules.shop = deals;
   const driveDeals = await section("driveDeals", [] as any[], () =>
-    getDriveDeals(normalizeCard, cardSelect, 8));
+    getDriveDeals(normalizeCard, cardSelect, 4));
 
   const timeline = await section("timeline", [] as any[], () => getTimeline());
 
@@ -745,8 +756,8 @@ export async function getHomeDataUncached(): Promise<HomeData> {
   };
 }
 
-// v13: the shop section includes a separately selected HDD/SSD catalogue.
-const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v13"], {
+// v14: homepage shop is 8 rack + 4 tower + 2 HDD + 2 SSD.
+const cachedHomeData = unstable_cache(getHomeDataUncached, ["home-data-v14-shop-groups"], {
   revalidate: 3600,
   tags: ["home-data"],
 });

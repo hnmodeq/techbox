@@ -1,4 +1,4 @@
-/** Homepage tools: one RAID feature plus a 2×2 image grid. */
+/** Homepage tools: five transparent visual shortcuts plus consultation. */
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,17 +24,13 @@ export function ToolsSection({
   accentColor,
 }: ToolsSectionProps) {
   const all = [...toolRoutes];
-  // Admin ordering still matters, but the homepage always keeps all five
-  // shipped tools. RAID is promoted independently into the full-width slot.
   const preferred = featured?.length
     ? featured
         .map((slug) => all.find((tool) => tool.slug === slug))
         .filter((tool): tool is ToolRoute => Boolean(tool))
     : [];
-  const ordered = [...preferred, ...all.filter((tool) => !preferred.some((item) => item.slug === tool.slug))];
-  const raid = ordered.find((tool) => tool.slug === "raid-calculator");
-  const compact = ordered.filter((tool) => tool.slug !== "raid-calculator").slice(0, 4);
-  if (!raid || compact.length < 4) return null;
+  const ordered = [...preferred, ...all.filter((tool) => !preferred.some((item) => item.slug === tool.slug))].slice(0, 5);
+  if (ordered.length < 5) return null;
 
   const toolAccent = accentColor || "var(--module-tools-color, var(--primary))";
   const style: ToolsStyle = { "--tools-accent": toolAccent, "--hp-brand": toolAccent };
@@ -47,16 +43,15 @@ export function ToolsSection({
     >
       <div className="mx-auto w-full max-w-[1280px]">
         <h2 id={HEADING_ID} className="sr-only">{title}</h2>
-        <p className="mb-6 text-center text-xl font-bold text-foreground sm:text-2xl">
+        <p className="mb-7 text-center text-xl font-bold text-foreground sm:text-2xl">
           ابزارهایی که کار شما رو شاید راحت‌تر کنه
         </p>
 
-        <ToolTile tool={raid} />
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {compact.map((tool) => <ToolTile key={tool.slug} tool={tool} />)}
+        <div className="grid grid-cols-2 items-start gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
+          {ordered.map((tool) => <ToolTile key={tool.slug} tool={tool} />)}
         </div>
 
-        <div className="my-7 flex items-center gap-4" aria-label="یا">
+        <div className="my-8 flex items-center gap-4" aria-label="یا">
           <span aria-hidden="true" className="h-px flex-1 bg-border" />
           <span className="text-sm font-black text-muted-foreground">یا</span>
           <span aria-hidden="true" className="h-px flex-1 bg-border" />
@@ -72,22 +67,20 @@ function ToolTile({ tool }: { tool: ToolRoute }) {
   return (
     <Link
       href={tool.href}
-      className="group relative isolate flex min-h-[90px] w-full overflow-hidden border border-border bg-black text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)] sm:min-h-[96px]"
+      className="group flex min-w-0 flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tools-accent)]"
     >
-      <Image
-        src={tool.image}
-        alt=""
-        fill
-        quality={95}
-        sizes={tool.slug === "raid-calculator" ? "(min-width: 1280px) 1280px, 100vw" : "(min-width: 640px) 50vw, 100vw"}
-        className="-z-20 object-cover saturate-100"
-      />
-      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-t from-black/95 via-black/70 to-black/55" />
-      <span className="mt-auto block w-full p-3 text-right sm:p-4">
-        <span className="block text-xl font-bold leading-8 text-white/90 transition-colors group-hover:text-[color:var(--tools-accent)] sm:text-2xl">{tool.titleFa}</span>
-        <span className="mt-1 block max-w-3xl text-sm leading-6 text-white/78 sm:text-[15px]">
-          {tool.descriptionFa}
-        </span>
+      <span className="relative block h-32 w-full sm:h-36 lg:h-40">
+        <Image
+          src={tool.image}
+          alt=""
+          fill
+          quality={100}
+          sizes="(min-width: 1024px) 220px, (min-width: 640px) 33vw, 50vw"
+          className="object-contain transition-transform duration-200 group-hover:-translate-y-1 motion-reduce:transform-none"
+        />
+      </span>
+      <span className="mt-2 block text-sm font-bold leading-6 text-foreground transition-colors group-hover:text-[color:var(--tools-accent)] sm:text-base">
+        {tool.titleFa}
       </span>
     </Link>
   );

@@ -8,6 +8,8 @@ import { TechboxNavMain } from "./techbox-nav-main"
 import { TechboxNavSecondary } from "./techbox-nav-secondary"
 import { TechboxNavUser } from "./techbox-nav-user"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { SidebarAdvertisementRail } from "./site-advertisements"
+import type { HomeAdvertisement } from "@/features/home/lib/home-advertisements"
 
 /**
  * Main site sidebar.
@@ -17,12 +19,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
  * This makes the navigation a persistent part of the application shell
  * rather than an overlay hiding page content.
  */
-export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function TechboxAppSidebar({
+  advertisements = [],
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { advertisements?: HomeAdvertisement[] }) {
   return (
     <Sidebar
       side="right"
       dir="rtl"
-      className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
+      className="top-(--site-chrome-height) h-[calc(100svh-var(--site-chrome-height))]!"
       {...props}
     >
       <SidebarHeader>
@@ -46,6 +51,7 @@ export function TechboxAppSidebar({ ...props }: React.ComponentProps<typeof Side
       </SidebarHeader>
       <SidebarContent>
         <TechboxNavMain />
+        <SidebarAdvertisementRail advertisements={advertisements} />
         <TechboxNavSecondary className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

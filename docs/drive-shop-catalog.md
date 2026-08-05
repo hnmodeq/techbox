@@ -27,8 +27,8 @@ check the exact model against their storage vendor's compatibility list.
 
 ## Images
 
-Nine product-family visuals are stored as real 1000×1000 WebP files at quality
-94 under `public/assets/shop/drives/`. The production import uploads those
+Nine product-family visuals are stored as real 1000×1000 lossless WebP files
+with transparent alpha backgrounds under `public/assets/shop/drives/`. The production import uploads those
 files to the public Supabase `techbox` bucket under `shop/drives/` and stores
 the resulting public URL on each product.
 

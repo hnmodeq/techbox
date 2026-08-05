@@ -12,17 +12,21 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 const MAX_ADVERTISEMENT_BYTES = 8 * 1024 * 1024;
 
 function isWebP(bytes: Uint8Array) {
-  if (bytes.byteLength < 12) return false;
-  return (
-    String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" &&
-    String.fromCharCode(...bytes.slice(8, 12)) === "WEBP"
-  );
+  return bytes.byteLength >= 12
+    && String.fromCharCode(...bytes.slice(0, 4)) === "RIFF"
+    && String.fromCharCode(...bytes.slice(8, 12)) === "WEBP";
+}
+
+function isGif(bytes: Uint8Array) {
+  if (bytes.byteLength < 6) return false;
+  const signature = String.fromCharCode(...bytes.slice(0, 6));
+  return signature === "GIF87a" || signature === "GIF89a";
 }
 
 function safeBaseName(name: string) {
   const base = name.replace(/\\/g, "/").split("/").pop() || "advertisement";
   return base
-    .replace(/\.webp$/i, "")
+    .replace(/\.(?:webp|gif)$/i, "")
     .replace(/[^a-zA-Z0-9_-]+/g, "-")
     .replace(/-{2,}/g, "-")
     .replace(/^-+|-+$/g, "")
@@ -58,24 +62,28 @@ export async function POST(req: NextRequest) {
     }
 
     const bytes = new Uint8Array(await file.arrayBuffer());
-    // MIME and extension are client-controlled; validate the actual RIFF/WebP
-    // signature before an object reaches the WebP-only campaign folder.
-    if (file.type !== "image/webp" || !/\.webp$/i.test(file.name) || !isWebP(bytes)) {
+    // MIME and extension are client-controlled; validate the real binary
+    // signature. GIF is stored untouched so every animation frame survives.
+    const webp = file.type === "image/webp" && /\.webp$/i.test(file.name) && isWebP(bytes);
+    const gif = file.type === "image/gif" && /\.gif$/i.test(file.name) && isGif(bytes);
+    if (!webp && !gif) {
       return NextResponse.json(
-        { error: "webp_required", message: "فقط فایل WebP پذیرفته می‌شود." },
+        { error: "advertisement_image_required", message: "فقط فایل معتبر WebP یا GIF پذیرفته می‌شود." },
         { status: 415, headers: cacheHeaders(PRIVATE_NO_STORE) },
       );
     }
 
+    const extension = gif ? "gif" : "webp";
+    const contentType = gif ? "image/gif" : "image/webp";
     const { publicBucket } = getSupabaseStorageConfig();
-    const fileName = `${safeBaseName(file.name)}-${randomUUID()}.webp`;
+    const fileName = `${safeBaseName(file.name)}-${randomUUID()}.${extension}`;
     const path = `advertisements/home/${fileName}`;
 
     await uploadSupabaseObject({
       bucket: publicBucket,
       path,
-      body: new Blob([bytes], { type: "image/webp" }),
-      contentType: "image/webp",
+      body: new Blob([bytes], { type: contentType }),
+      contentType,
     });
 
     return NextResponse.json(
@@ -83,7 +91,7 @@ export async function POST(req: NextRequest) {
         ok: true,
         path,
         url: getSupabasePublicUrl(publicBucket, path),
-        contentType: "image/webp",
+        contentType,
         size: file.size,
       },
       { headers: cacheHeaders(PRIVATE_NO_STORE) },

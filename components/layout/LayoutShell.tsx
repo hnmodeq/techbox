@@ -20,8 +20,9 @@ import { ModuleConfigProvider } from "@/providers/module-config.provider"
 import { ModuleColorApplier } from "@/components/layout/ModuleColorApplier"
 import { TooltipColorScope } from "@/components/ui/tooltip"
 import { TimelineLikesProvider } from "@/providers/timeline-likes.provider"
-import { useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
+import { useHomeData, useHomeModule, useHomeTicker } from "@/features/home/lib/home-data"
 import NewsTicker from "@/features/news/components/NewsTicker"
+import { SiteTopAdvertisement } from "./site-advertisements"
 import type { SiteLayoutConfig } from "@/lib/module-config"
 
 const ChatLauncherFallback = () => (
@@ -109,7 +110,15 @@ function LayoutInner({
 }) {
   const pathname = usePathname()
   const { user } = useAuth()
+  const { data: homeData } = useHomeData()
   const userId = user?.id ?? ""
+  const siteTopAdvertisement = homeData.advertisements?.find((item) => item.section === "siteTop" && item.enabled)
+  const sidebarAdvertisements = ["sidebarPrimary", "sidebarSecondary"]
+    .flatMap((placement) => homeData.advertisements?.filter((item) => item.section === placement && item.enabled) ?? [])
+  const chromeStyle = {
+    "--site-top-ad-height": siteTopAdvertisement ? "50px" : "0px",
+    "--site-chrome-height": "calc(var(--header-height) + var(--site-top-ad-height))",
+  } as React.CSSProperties
   const [newsOpen, setNewsOpen] = React.useState(false)
   const [unreadNewsSlugs, setUnreadNewsSlugs] = React.useState<string[]>([])
   const [openedUnreadNewsSlugs, setOpenedUnreadNewsSlugs] = React.useState<string[]>([])
@@ -205,24 +214,27 @@ function LayoutInner({
 
   return (
     <TooltipColorScope color={tooltipColorForPath(pathname)}>
-    <div className="[--header-height:calc(var(--spacing)*14)]">
+    <div className="[--header-height:calc(var(--spacing)*14)]" style={chromeStyle}>
       {/*
         The main sidebar reserves its desktop width in the flex layout. It
         opens on a visitor's first entry, then the sidebar_state cookie keeps
         their most recent open/closed choice across refreshes and visits.
       */}
       <SidebarProvider className="min-h-svh w-full flex-col" defaultOpen={defaultSidebarOpen}>
-        <SiteHeader
-          hasUnreadNews={hasUnreadNews}
-          newsOpen={newsOpen}
-          onToggleNews={() => setNewsOpen((o) => !o)}
-        />
+        <div className="sticky top-0 z-50 w-full">
+          <SiteTopAdvertisement advertisement={siteTopAdvertisement} />
+          <SiteHeader
+            hasUnreadNews={hasUnreadNews}
+            newsOpen={newsOpen}
+            onToggleNews={() => setNewsOpen((o) => !o)}
+          />
+        </div>
 
         <div
-          className="flex min-h-[calc(100svh-var(--header-height))] w-full"
+          className="flex min-h-[calc(100svh-var(--site-chrome-height))] w-full"
           dir="rtl"
         >
-          <TechboxAppSidebar />
+          <TechboxAppSidebar advertisements={sidebarAdvertisements} />
 
           <SidebarInset className="min-w-0 overflow-visible [container-type:inline-size]">
             {tickerItems.length > 0 && (
@@ -233,7 +245,7 @@ function LayoutInner({
             <div
               id="main-content"
               tabIndex={-1}
-              className="flex min-h-[calc(100svh-var(--header-height))] flex-col focus:outline-none pb-[calc(4rem+env(safe-area-inset-bottom))] sm:pb-0"
+              className="flex min-h-[calc(100svh-var(--site-chrome-height))] flex-col focus:outline-none pb-[calc(4rem+env(safe-area-inset-bottom))] sm:pb-0"
             >
               <div className="w-full max-w-full flex-1">{children}</div>
               <FooterSection />
@@ -245,8 +257,7 @@ function LayoutInner({
 
       {/*
         News sidebar — fixed to the viewport, same as <Sidebar> in shadcn/ui.
-        Uses top-(--header-height) which is Tailwind v4 CSS-variable syntax,
-        identical to what TechboxAppSidebar uses — resolves to var(--header-height).
+        Uses the combined top-ad + header offset shared with the main sidebar.
         The CSS variable is defined on the outermost div of LayoutInner.
         fixed means it is completely outside the document scroll flow.
       */}
@@ -254,7 +265,7 @@ function LayoutInner({
         ref={newsSidebarRef}
         onMouseEnter={lockScroll}
         onMouseLeave={unlockScroll}
-        className={`fixed left-0 top-(--header-height) h-[calc(100svh-var(--header-height))] z-40 hidden md:flex flex-col overflow-hidden border-r border-[var(--sidebar-border)] bg-[var(--sidebar-background)] transition-[width] duration-300 ease-in-out ${
+        className={`fixed left-0 top-(--site-chrome-height) h-[calc(100svh-var(--site-chrome-height))] z-40 hidden md:flex flex-col overflow-hidden border-r border-[var(--sidebar-border)] bg-[var(--sidebar-background)] transition-[width] duration-300 ease-in-out ${
           newsOpen ? "w-[20rem] shadow-xl" : "w-0 border-r-0"
         }`}
       >

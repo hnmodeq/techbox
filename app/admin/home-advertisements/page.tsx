@@ -30,6 +30,9 @@ const PLACEMENT_LABELS: Record<HomeAdPlacement, string> = {
   community: "بالای بخش انجمن",
   websiteInfo: "بالای بخش اطلاعات سایت",
   partners: "بالای بخش همکاران تجاری",
+  siteTop: "نوار تبلیغاتی بالای هدر سایت",
+  sidebarPrimary: "تبلیغ اول نوار کناری اصلی",
+  sidebarSecondary: "تبلیغ دوم نوار کناری اصلی",
 };
 
 function newId() {
@@ -108,8 +111,8 @@ function AdvertisementsContent() {
 
   const upload = async (advertisement: HomeAdvertisement, file: File | undefined) => {
     if (!file) return;
-    if (file.type !== "image/webp" || !file.name.toLowerCase().endsWith(".webp")) {
-      toast.error("فقط فایل WebP انتخاب کنید.");
+    if (!["image/webp", "image/gif"].includes(file.type) || !/\.(?:webp|gif)$/i.test(file.name)) {
+      toast.error("فقط فایل WebP یا GIF انتخاب کنید.");
       return;
     }
 
@@ -125,9 +128,9 @@ function AdvertisementsContent() {
       if (!response.ok) throw new Error(data?.message || data?.error || "upload_failed");
       update(advertisement.id, "image", data.url);
       if (!advertisement.alt.trim()) {
-        update(advertisement.id, "alt", file.name.replace(/\.webp$/i, "").replace(/[-_]+/g, " "));
+        update(advertisement.id, "alt", file.name.replace(/\.(?:webp|gif)$/i, "").replace(/[-_]+/g, " "));
       }
-      toast.success("تصویر WebP آپلود شد.");
+      toast.success("تصویر تبلیغاتی آپلود شد.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "خطا در آپلود تصویر");
     } finally {
@@ -159,7 +162,7 @@ function AdvertisementsContent() {
       }
       setAdvertisements(data.advertisements || payload);
       setUsingDefaults(false);
-      toast.success("تبلیغات صفحه اصلی ذخیره شد.");
+      toast.success("تبلیغات سایت ذخیره شد.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "خطا در ذخیره تبلیغات");
     } finally {
@@ -172,9 +175,9 @@ function AdvertisementsContent() {
       <section className="mx-auto max-w-5xl space-y-6">
         <PageHeader
           colorVar="--admin"
-          title="تبلیغات صفحه اصلی"
+          title="مدیریت تبلیغات سایت"
           titleClassName="text-[var(--admin)]"
-          description="آپلود WebP، تعیین بخش میزبان، ترتیب و وضعیت نمایش بنرها"
+          description="آپلود WebP یا GIF، تعیین جایگاه، ترتیب و وضعیت نمایش بنرها"
         >
           <ButtonLink href="/" variant="ghost" size="sm">پیش‌نمایش سایت</ButtonLink>
           <Button type="button" variant="ghost" size="sm" onClick={load} disabled={loading || saving}>
@@ -194,7 +197,7 @@ function AdvertisementsContent() {
           <Card className="p-10 text-center">
             <ImagePlus className="mx-auto mb-3 size-8 text-muted-foreground" />
             <p className="text-sm font-semibold">هیچ تبلیغی تعریف نشده است.</p>
-            <p className="mt-1 text-xs text-muted-foreground">برای ساخت اولین جایگاه، یک بنر WebP اضافه کنید.</p>
+            <p className="mt-1 text-xs text-muted-foreground">برای ساخت اولین جایگاه، یک بنر WebP یا GIF اضافه کنید.</p>
           </Card>
         ) : (
           <div className="space-y-4">
@@ -237,7 +240,7 @@ function AdvertisementsContent() {
                     </div>
                   ) : (
                     <div className="flex aspect-[24/5] items-center justify-center rounded-lg border border-dashed bg-muted/30 text-xs text-muted-foreground">
-                      ابتدا یک فایل WebP آپلود کنید
+                      ابتدا یک فایل WebP یا GIF آپلود کنید
                     </div>
                   )}
 
@@ -276,13 +279,13 @@ function AdvertisementsContent() {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor={`ad-image-${advertisement.id}`}>آدرس WebP</Label>
+                      <Label htmlFor={`ad-image-${advertisement.id}`}>آدرس تصویر</Label>
                       <Input
                         id={`ad-image-${advertisement.id}`}
                         dir="ltr"
                         value={advertisement.image}
                         onChange={(event) => update(advertisement.id, "image", event.target.value)}
-                        placeholder="https://…/advertisement.webp"
+                        placeholder="https://…/advertisement.webp یا .gif"
                       />
                     </div>
                   </div>
@@ -302,10 +305,10 @@ function AdvertisementsContent() {
 
                     <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-xs font-semibold transition-colors hover:bg-muted">
                       <Upload className="size-4" />
-                      {uploadingId === advertisement.id ? "در حال آپلود…" : "آپلود WebP"}
+                      {uploadingId === advertisement.id ? "در حال آپلود…" : "آپلود WebP / GIF"}
                       <input
                         type="file"
-                        accept="image/webp,.webp"
+                        accept="image/webp,image/gif,.webp,.gif"
                         className="sr-only"
                         disabled={uploadingId !== null}
                         onChange={(event) => {

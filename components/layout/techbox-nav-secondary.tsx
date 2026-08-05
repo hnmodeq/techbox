@@ -9,14 +9,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { TicketIcon, HelpCircleIcon } from "lucide-react"
+import { Handshake, HelpCircleIcon } from "lucide-react"
 
 export function TechboxNavSecondary({ ...props }: React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const items = [
     {
-      title: "مشاوره",
+      title: "مشاوره زیرساخت",
       event: "tb_open_support",
-      icon: TicketIcon,
+      icon: Handshake,
       className: "text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
     },
     {

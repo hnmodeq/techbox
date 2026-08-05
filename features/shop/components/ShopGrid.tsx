@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SlidersHorizontal, X, Search, ChevronDown, ChevronUp, ArrowUpDown, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import { driveType, hasEnoughShopSpecs, isDriveProduct, shopSpec, type ShopProductKind } from "@/lib/shop-product-kind";
 import ShopProductCard from "./ShopProductCard";
 import ShopBanner, { type ShopBannerItem } from "./ShopBanner";
@@ -906,7 +907,7 @@ export default function ShopGrid({
 
                 {visibleCount < sorted.length && (
                   <div ref={loaderRef} className="flex justify-center py-8">
-                    <div className="h-6 w-6 rounded-full border-2 border-[#ef394e] border-t-transparent animate-spin" />
+                    <Spinner className="text-[color:var(--module-shop-color,var(--primary))]" />
                   </div>
                 )}
 

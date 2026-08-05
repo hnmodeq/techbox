@@ -17,6 +17,7 @@ import MarkdownContent from "@/features/content/components/MarkdownContent";
 import { formatRelativeDate } from "@/lib/date-format";
 import { blurProps } from "@/lib/image-placeholder";
 import { zIndex } from "@/design";
+import { TechboxLoader } from "@/components/ui/techbox-loader";
 
 interface ArticleModalProps {
   item: ContentItem;
@@ -98,9 +99,8 @@ export function ArticleModal({ item, onClose, onPrev, onNext }: ArticleModalProp
           >
             {/* ── Full-screen navigation loading overlay ── */}
             {navigating && (
-              <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-background/90 backdrop-blur-md">
-                <div className="w-12 h-12 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-                <span className="text-sm font-medium text-muted-foreground">در حال باز کردن مقاله...</span>
+              <div className="fixed inset-0 z-[9999] bg-background/90 backdrop-blur-md">
+                <TechboxLoader fullPage label="در حال باز کردن مقاله" className="min-h-svh bg-transparent" />
               </div>
             )}
 

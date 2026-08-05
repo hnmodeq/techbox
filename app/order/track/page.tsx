@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, CheckCircle, Clock, CreditCard, Package, RefreshCw, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { TechboxLoader } from "@/components/ui/techbox-loader";
 
 type OrderStatus = "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
 
@@ -81,14 +82,7 @@ export default function OrderTrackPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-16 text-center" dir="rtl">
-        <div className="mx-auto size-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        <p className="mt-4 text-[13px] text-muted-foreground">در حال بارگذاری اطلاعات سفارش...</p>
-      </main>
-    );
-  }
+  if (loading) return <TechboxLoader fullPage label="در حال بارگذاری اطلاعات سفارش" />;
 
   if (error || !order) {
     return (

@@ -712,13 +712,13 @@ export async function getTopPicks(
 
 /**
  * Homepage shop mix: alternating best-selling and highest-discount products,
- * constrained to six rackmount systems and two tower/desktop systems.
+ * constrained to eight rackmount systems and four tower/desktop systems.
  * Prices still resolve from one shared currency-rate read.
  */
 export async function getDeals(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
-  take = 8,
+  take = 12,
 ): Promise<ContentItem[]> {
   const priceSelect = {
     ...cardSelect,
@@ -809,10 +809,10 @@ export async function getDeals(
     return picked.slice(0, quota);
   };
 
-  // Editorial quota: six rackmount storage systems and two tower/desktop NAS.
+  // Editorial quota: eight rackmount enterprise systems and four tower/home NAS.
   const selectedMeta = [
-    ...chooseMixed(rackCandidates, 6),
-    ...chooseMixed(towerCandidates, 2),
+    ...chooseMixed(rackCandidates, 8),
+    ...chooseMixed(towerCandidates, 4),
   ].slice(0, take);
   const selectedIds = selectedMeta.map((row) => row.id);
   if (selectedIds.length === 0) return [];
@@ -848,7 +848,7 @@ export async function getDeals(
 export async function getDriveDeals(
   normalize: (p: any) => ContentItem,
   cardSelect: any,
-  take = 8,
+  take = 4,
 ): Promise<ContentItem[]> {
   const priceSelect = {
     ...cardSelect,

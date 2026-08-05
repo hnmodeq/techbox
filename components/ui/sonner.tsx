@@ -1,8 +1,9 @@
 "use client"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps, toast } from "sonner"
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon } from "lucide-react"
 import { useEffect } from "react"
+import { Spinner } from "@/components/ui/spinner"
 
 /** Adds a click-to-dismiss handler for all toasts rendered by Sonner */
 function ToastDismissOnClick() {
@@ -51,7 +52,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             <OctagonXIcon className="size-4" />
           ),
           loading: (
-            <Loader2Icon className="size-4 animate-spin" />
+            <Spinner className="size-4" />
           ),
         }}
         style={

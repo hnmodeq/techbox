@@ -10,6 +10,9 @@ export const HOME_AD_PLACEMENTS = [
   "community",
   "websiteInfo",
   "partners",
+  "siteTop",
+  "sidebarPrimary",
+  "sidebarSecondary",
 ] as const;
 
 export type HomeAdPlacement = (typeof HOME_AD_PLACEMENTS)[number];
@@ -117,9 +120,48 @@ export const DEFAULT_HOME_ADVERTISEMENTS: HomeAdvertisement[] = [
     order: 7,
     version: 1,
   },
+  {
+    id: "site-top-campaign",
+    image: "/assets/advertisements/site/ad-banner.gif",
+    alt: "پیشنهاد ویژه بالای سایت",
+    section: "siteTop",
+    enabled: true,
+    order: 8,
+    version: 1,
+  },
+  {
+    id: "sidebar-primary",
+    image: "/assets/advertisements/site/sidebar-ad-1.webp",
+    alt: "تبلیغ خدمات اینترنت پرسرعت",
+    section: "sidebarPrimary",
+    enabled: true,
+    order: 9,
+    version: 1,
+  },
+  {
+    id: "sidebar-secondary",
+    image: "/assets/advertisements/site/sidebar-ad-2.webp",
+    alt: "تبلیغ سرورهای ابری و اختصاصی",
+    section: "sidebarSecondary",
+    enabled: true,
+    order: 10,
+    version: 1,
+  },
 ];
 
 const PLACEMENTS = new Set<string>(HOME_AD_PLACEMENTS);
+
+export function isSafeAdvertisementImage(value: string): boolean {
+  const image = value.trim();
+  const hasSupportedExtension = /\.(?:webp|gif)(?:\?.*)?$/i.test(image);
+  if (!hasSupportedExtension) return false;
+  if (image.startsWith("/") && !image.startsWith("//")) return true;
+  try {
+    return new URL(image).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export function isSafeAdvertisementHref(value: string): boolean {
   const href = value.trim();
@@ -163,7 +205,7 @@ export function parseHomeAdvertisements(raw: unknown): HomeAdvertisement[] {
         : "";
 
     if (!id || seen.has(id) || !/^[-a-zA-Z0-9_]{2,80}$/.test(id)) continue;
-    if (!image.startsWith("https://") || !image.toLowerCase().endsWith(".webp")) continue;
+    if (!isSafeAdvertisementImage(image)) continue;
     if (!alt || alt.length > 180) continue;
     if (!PLACEMENTS.has(section)) continue;
     if (!isSafeAdvertisementHref(href)) continue;

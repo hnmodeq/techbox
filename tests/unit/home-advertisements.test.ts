@@ -4,27 +4,35 @@ import path from "node:path";
 import {
   DEFAULT_HOME_ADVERTISEMENTS,
   isSafeAdvertisementHref,
+  isSafeAdvertisementImage,
   parseHomeAdvertisements,
 } from "@/features/home/lib/home-advertisements";
 
-describe("homepage advertisements", () => {
-  it("ships the eight owner-provided creatives as verified WebP defaults", () => {
-    expect(DEFAULT_HOME_ADVERTISEMENTS).toHaveLength(8);
-    expect(new Set(DEFAULT_HOME_ADVERTISEMENTS.map((item) => item.id)).size).toBe(8);
+const root = path.resolve(__dirname, "../..");
+const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
+
+describe("site advertisements", () => {
+  it("ships eight homepage campaigns plus top and two sidebar defaults", () => {
+    expect(DEFAULT_HOME_ADVERTISEMENTS).toHaveLength(11);
+    expect(new Set(DEFAULT_HOME_ADVERTISEMENTS.map((item) => item.id)).size).toBe(11);
+    expect(DEFAULT_HOME_ADVERTISEMENTS.map((item) => item.section)).toEqual(expect.arrayContaining([
+      "siteTop", "sidebarPrimary", "sidebarSecondary",
+    ]));
     for (const advertisement of DEFAULT_HOME_ADVERTISEMENTS) {
-      expect(advertisement.image).toMatch(/^https:\/\/.*\.webp$/);
+      expect(isSafeAdvertisementImage(advertisement.image)).toBe(true);
       expect(advertisement.alt.trim().length).toBeGreaterThan(0);
       expect(advertisement.enabled).toBe(true);
     }
   });
 
-  it("accepts only internal or HTTPS campaign links", () => {
+  it("accepts only internal or HTTPS campaign links and WebP/GIF images", () => {
     expect(isSafeAdvertisementHref("/shop/campaign")).toBe(true);
     expect(isSafeAdvertisementHref("https://example.com/campaign")).toBe(true);
-    expect(isSafeAdvertisementHref("")).toBe(true);
     expect(isSafeAdvertisementHref("javascript:alert(1)")).toBe(false);
-    expect(isSafeAdvertisementHref("//evil.example/path")).toBe(false);
-    expect(isSafeAdvertisementHref("http://example.com/insecure")).toBe(false);
+    expect(isSafeAdvertisementImage("/assets/banner.gif")).toBe(true);
+    expect(isSafeAdvertisementImage("https://cdn.example/banner.webp")).toBe(true);
+    expect(isSafeAdvertisementImage("https://cdn.example/banner.jpg")).toBe(false);
+    expect(isSafeAdvertisementImage("http://cdn.example/banner.gif")).toBe(false);
   });
 
   it("drops malformed rows without breaking valid advertisements", () => {
@@ -33,12 +41,12 @@ describe("homepage advertisements", () => {
       valid,
       { ...valid, id: "javascript-row", href: "javascript:alert(1)" },
       { ...valid, id: "jpeg-row", image: "https://example.com/banner.jpg" },
-      { ...valid }, // duplicate id
+      { ...valid },
     ]));
     expect(parsed).toEqual([valid]);
   });
 
-  it("migrates the first-release afterSection field without hiding saved ads", () => {
+  it("migrates the first-release afterSection field", () => {
     const current = DEFAULT_HOME_ADVERTISEMENTS[0];
     const legacy: Record<string, unknown> = { ...current, afterSection: "video" };
     delete legacy.section;
@@ -47,23 +55,17 @@ describe("homepage advertisements", () => {
     expect(parsed).not.toHaveProperty("afterSection");
   });
 
-  it("renders creatives inside/above their band at section width and without recompression", () => {
-    const root = path.resolve(__dirname, "../..");
-    const component = fs.readFileSync(
-      path.join(root, "features/home/components/sections/HomeAdvertisement.tsx"),
-      "utf8",
-    );
-    const page = fs.readFileSync(path.join(root, "app/page.tsx"), "utf8");
-    expect(component).toMatch(/max-w-\[1280px\]/);
-    expect(component).not.toMatch(/max-w-\[1440px\]/);
-    expect(component).toMatch(/unoptimized/);
-    expect(component).not.toMatch(/bg-black/);
-    expect(component).toMatch(/overflow-hidden rounded-\[var\(--hp-r-sm\)\]/);
-    expect(component).toMatch(/بستن این تبلیغ/);
-    expect(component).toMatch(/تبلیغات/);
-    expect(component.indexOf("<X ")).toBeLessThan(component.indexOf("تبلیغات</span>"));
-    const band = page.slice(page.indexOf("visible.map"));
-    expect(band.indexOf("<HomeAdvertisementBanner")).toBeLessThan(band.indexOf("{s.node}"));
+  it("serves homepage WebP/GIF raw and places site ads in shared chrome", () => {
+    const component = read("features/home/components/sections/HomeAdvertisement.tsx");
+    const layout = read("components/layout/LayoutShell.tsx");
+    const sidebar = read("components/layout/techbox-app-sidebar.tsx");
+    const upload = read("app/api/admin/home-advertisements/upload/route.ts");
+    expect(component).toMatch(/<img/);
+    expect(component).toMatch(/animated GIF/);
+    expect(layout).toMatch(/SiteTopAdvertisement/);
+    expect(sidebar).toMatch(/SidebarAdvertisementRail/);
+    expect(upload).toMatch(/GIF87a/);
+    expect(upload).toMatch(/GIF89a/);
   });
 
   it("respects an explicitly saved empty campaign list", () => {

@@ -1,109 +1,99 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { buildNotificationsForUser } from "@/lib/notifications";
 
-/**
- * Regression test for the notifications ownership query (security review TB-04).
- *
- * The original query matched likes by a fragile (module, slug) OR-chain. The
- * fix scopes likes by the Like.postId FK to posts authored by the user. This
- * test proves that likes on ANOTHER author's post never appear in a user's
- * notification feed — even if the other author's post happens to share a slug
- * shape. We inject a mock Prisma client so we control exactly which rows the
- * query "sees".
- */
-
-function makeMockClient(overrides: Record<string, any>) {
+function makeMockClient(overrides: Record<string, any> = {}) {
   return {
-    post: { findMany: vi.fn().mockResolvedValue([]) },
+    follow: { findMany: vi.fn().mockResolvedValue([]) },
     comment: { findMany: vi.fn().mockResolvedValue([]) },
-    like: { findMany: vi.fn().mockResolvedValue([]) },
-    user: { findMany: vi.fn().mockResolvedValue([]) },
-    siteSetting: { findMany: vi.fn().mockResolvedValue([]) },
+    commentVote: { findMany: vi.fn().mockResolvedValue([]) },
+    post: { findMany: vi.fn().mockResolvedValue([]) },
     ...overrides,
   } as any;
 }
 
-describe("notifications ownership (TB-04)", () => {
-  it("only returns likes on posts authored by the requesting user", async () => {
-    // Alice authored post pA. Bob authored post pB. Carol likes BOTH.
-    const alicePosts = [{ id: "pA", module: "blog", slug: "alice-post", title: "Alice's post" }];
-    // Alice's own likes (on Bob's post) must NOT surface as "someone liked your post".
-    const aliceOwnLikeOnBobsPost = { id: "lkA", userId: "alice", postId: "pB", module: "blog", slug: "bob-post", createdAt: new Date("2026-07-18T10:00:00Z") };
-    // Carol's like on Alice's post — this SHOULD appear.
-    const carolLikeOnAlicePost = { id: "lkC", userId: "carol", postId: "pA", module: "blog", slug: "alice-post", createdAt: new Date("2026-07-18T11:00:00Z") };
-    // Carol's like on Bob's post — must NOT appear for Alice.
-    const carolLikeOnBobsPost = { id: "lkC2", userId: "carol", postId: "pB", module: "blog", slug: "bob-post", createdAt: new Date("2026-07-18T12:00:00Z") };
+const actor = { name: "کاربر دنبال‌شده", username: "followed", avatar: null };
+const post = { module: "blog", slug: "article", title: "مقاله", authorName: actor.name, author: actor };
 
+describe("approved top-bar notification contract", () => {
+  it("emits exactly the seven approved notification types", async () => {
     const client = makeMockClient({
-      post: { findMany: vi.fn().mockResolvedValue(alicePosts) },
-      comment: { findMany: vi.fn().mockResolvedValue([]) },
-      like: {
+      follow: {
         findMany: vi.fn().mockImplementation((args: any) => {
-          // Emulate the real query: scope likes by postId ∈ Alice's post ids.
-          const allowedPostIds = args.where?.postId?.in ?? [];
-          return Promise.resolve(
-            [aliceOwnLikeOnBobsPost, carolLikeOnAlicePost, carolLikeOnBobsPost].filter(
-              (l) => allowedPostIds.includes(l.postId) && l.userId !== "alice"
-            )
-          );
+          if (args.where.followerId) return Promise.resolve([{ followingId: "followed-id" }]);
+          return Promise.resolve([{ id: "follow-1", createdAt: new Date("2026-08-05T07:00:00Z"), follower: { name: "دنبال‌کننده", username: "fan", avatar: null } }]);
         }),
       },
-      user: { findMany: vi.fn().mockResolvedValue([{ id: "carol", name: "Carol", username: "carol", avatar: null }]) },
-    });
-
-    const items = await buildNotificationsForUser("alice", client);
-
-    // The only like notification must be Carol liking Alice's post.
-    const likeItems = items.filter((i) => i.type === "like");
-    expect(likeItems).toHaveLength(1);
-    expect(likeItems[0].id).toBe("like-lkC");
-    expect(likeItems[0].slug).toBe("alice-post");
-    expect(likeItems[0].actor).toBe("Carol");
-
-    // Bob's post must never leak in.
-    expect(items.some((i) => i.slug === "bob-post")).toBe(false);
-  });
-
-  it("passes only the user's own post ids into the like query (FK scoping)", async () => {
-    const likeSpy = vi.fn().mockResolvedValue([]);
-    const client = makeMockClient({
-      post: { findMany: vi.fn().mockResolvedValue([{ id: "pA", module: "blog", slug: "a", title: "A" }]) },
-      like: { findMany: likeSpy },
-    });
-
-    await buildNotificationsForUser("alice", client);
-
-    expect(likeSpy).toHaveBeenCalledTimes(1);
-    const where = likeSpy.mock.calls[0][0].where;
-    expect(where.postId).toEqual({ in: ["pA"] });
-    // No OR / module-slug text matching remains.
-    expect(where.OR ?? where.or).toBeUndefined();
-  });
-
-  it("returns nothing for a user with no activity", async () => {
-    const client = makeMockClient({ post: { findMany: vi.fn().mockResolvedValue([]) } });
-    const items = await buildNotificationsForUser("nobody", client);
-    expect(items).toEqual([]);
-  });
-
-  it("still returns verification notifications when the user has no posts", async () => {
-    const client = makeMockClient({
-      post: { findMany: vi.fn().mockResolvedValue([]) },
-      siteSetting: {
+      comment: {
+        findMany: vi.fn().mockImplementation((args: any) => {
+          if (args.where.authorId === "me") return Promise.resolve([{ id: "my-comment" }]);
+          if (args.where.parentId?.in) return Promise.resolve([{
+            id: "reply", authorName: "پاسخ‌دهنده", text: "پاسخ", createdAt: new Date("2026-08-05T06:00:00Z"),
+            author: { name: "پاسخ‌دهنده", username: "reply-user", avatar: null }, post: { module: "blog", slug: "article", title: "مقاله" },
+          }]);
+          if (args.where.authorId?.in) return Promise.resolve([{
+            id: "following-comment", authorName: actor.name, text: "دیدگاه", createdAt: new Date("2026-08-05T05:00:00Z"),
+            author: actor, post: { module: "media", slug: "video", title: "ویدیو" },
+          }]);
+          return Promise.resolve([]);
+        }),
+      },
+      commentVote: {
+        findMany: vi.fn().mockResolvedValue([{
+          id: "vote", createdAt: new Date("2026-08-05T04:00:00Z"), user: { name: "پسندکننده", username: "liker", avatar: null },
+          comment: { id: "my-comment", text: "دیدگاه من", post: { module: "blog", slug: "article", title: "مقاله" } },
+        }]),
+      },
+      post: {
         findMany: vi.fn().mockResolvedValue([
-          {
-            key: "verif_notif_alice_request-1",
-            value: JSON.stringify({
-              decision: "approved",
-              type: "user",
-              reviewedAt: "2026-07-25T10:00:00.000Z",
-            }),
-          },
+          { ...post, id: "topic", module: "forum", slug: "topic", title: "موضوع", excerpt: "", date: new Date("2026-08-05T03:00:00Z") },
+          { ...post, id: "review", module: "review", slug: "review", title: "بررسی", excerpt: "", date: new Date("2026-08-05T02:00:00Z") },
+          { ...post, id: "blog", module: "blog", slug: "blog", title: "مقاله", excerpt: "", date: new Date("2026-08-05T01:00:00Z") },
         ]),
       },
     });
-    const items = await buildNotificationsForUser("alice", client);
-    expect(items).toHaveLength(1);
-    expect(items[0].id).toBe("verif-request-1");
+
+    const items = await buildNotificationsForUser("me", client);
+    expect(new Set(items.map((item) => item.type))).toEqual(new Set([
+      "comment_like",
+      "comment_reply",
+      "following_comment",
+      "following_topic",
+      "following_review",
+      "following_article",
+      "new_follower",
+    ]));
+  });
+
+  it("attributes comment likes through CommentVote user identity", async () => {
+    const voteSpy = vi.fn().mockResolvedValue([]);
+    const client = makeMockClient({
+      comment: { findMany: vi.fn().mockResolvedValueOnce([{ id: "mine" }]).mockResolvedValueOnce([]) },
+      commentVote: { findMany: voteSpy },
+    });
+    await buildNotificationsForUser("me", client);
+    const where = voteSpy.mock.calls[0][0].where;
+    expect(where.commentId).toEqual({ in: ["mine"] });
+    expect(where.userId).toEqual({ not: "me" });
+    expect(where.vote).toBe(1);
+  });
+
+  it("queries only comments and forum/review/blog posts from followed accounts", async () => {
+    const postSpy = vi.fn().mockResolvedValue([]);
+    const commentSpy = vi.fn().mockResolvedValue([]);
+    const client = makeMockClient({
+      follow: { findMany: vi.fn().mockResolvedValueOnce([{ followingId: "u2" }]).mockResolvedValueOnce([]) },
+      comment: { findMany: commentSpy },
+      post: { findMany: postSpy },
+    });
+    await buildNotificationsForUser("me", client);
+    expect(postSpy.mock.calls[0][0].where.authorId).toEqual({ in: ["u2"] });
+    expect(postSpy.mock.calls[0][0].where.module).toEqual({ in: ["forum", "review", "blog"] });
+    const followingCommentCall = commentSpy.mock.calls.find((call) => call[0].where.authorId?.in);
+    expect(followingCommentCall?.[0].where.parentId).toBeNull();
+  });
+
+  it("returns no system or verification events for a quiet user", async () => {
+    const items = await buildNotificationsForUser("nobody", makeMockClient());
+    expect(items).toEqual([]);
   });
 });

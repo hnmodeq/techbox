@@ -270,11 +270,11 @@ export default function Chatbot() {
                 className="flex-1 flex flex-col min-h-0"
               >
                 <TabsList variant="line" className="w-full justify-start rounded-none border-b border-border/50 bg-transparent px-2 pb-3 pt-2 h-auto">
-                  <TabsTrigger value="chatbot" className="gap-1 border-0 bg-transparent text-xs shadow-none hover:bg-transparent data-active:bg-transparent data-active:shadow-none dark:data-active:bg-transparent">
+                  <TabsTrigger value="chatbot" className="gap-1 border-0 bg-transparent text-xs shadow-none after:hidden hover:bg-transparent data-active:bg-transparent data-active:shadow-none dark:data-active:bg-transparent">
                     <Sparkles className="size-3" />
                     پشتیبانی هوشمند
                   </TabsTrigger>
-                  <TabsTrigger value="support" className="gap-1 border-0 bg-transparent text-xs shadow-none hover:bg-transparent data-active:bg-transparent data-active:shadow-none dark:data-active:bg-transparent">
+                  <TabsTrigger value="support" className="gap-1 border-0 bg-transparent text-xs shadow-none after:hidden hover:bg-transparent data-active:bg-transparent data-active:shadow-none dark:data-active:bg-transparent">
                     <LifeBuoy className="size-3" />
                     پشتیبانی برخط
                   </TabsTrigger>

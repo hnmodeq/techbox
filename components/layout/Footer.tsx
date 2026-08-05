@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ReactNode, type SVGProps } from "react";
-import { MessageSquarePlus } from "lucide-react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DEFAULT_FOOTER_SOCIALS, parseFooterSocials, type FooterSocialKey } from "@/features/footer/footer-socials";
@@ -72,11 +71,11 @@ export default function FooterSection() {
   return (
     <footer className="mt-auto w-full bg-white dark:bg-black">
       <div
-        className="mx-auto grid w-full max-w-[1280px] gap-x-10 gap-y-6 px-6 pb-7 pt-8 md:grid-cols-2 md:grid-rows-2 md:items-center"
+        className="mx-auto grid w-full max-w-[1280px] gap-x-8 gap-y-7 px-6 pb-8 pt-9 sm:grid-cols-2 lg:grid-cols-[auto_minmax(280px,1fr)_auto_minmax(320px,1.35fr)] lg:grid-rows-1 lg:items-start"
         dir="ltr"
       >
-        {/* Top right */}
-        <p className="text-center text-[11px] leading-6 text-muted-foreground md:col-start-2 md:row-start-1 md:text-right" dir="rtl">
+        {/* Physical right: copyright, like the identity column in the reference footer. */}
+        <p className="text-center text-[11px] leading-6 text-muted-foreground sm:text-right lg:col-start-4 lg:row-start-1" dir="rtl">
           © 1405 تمامی حقوق مادی و معنوی این وب‌سایت محفوظ و متعلق به شرکت{" "}
           <Tooltip>
             <TooltipTrigger render={<span tabIndex={0} className="cursor-help font-semibold text-sky-500" />}>
@@ -87,8 +86,8 @@ export default function FooterSection() {
           می‌باشد.
         </p>
 
-        {/* Top left: four navigation links + Suggestions = five controls. */}
-        <div className="flex flex-wrap items-center justify-center gap-1 md:col-start-1 md:row-start-1 md:justify-start" dir="rtl">
+        {/* Navigation column: four links + Suggestions = five text-only controls. */}
+        <div className="flex flex-wrap items-start justify-center gap-x-1 gap-y-2 sm:justify-start lg:col-start-2 lg:row-start-1" dir="rtl">
           {links.map((item) => (
             <ButtonLink
               key={item.name}
@@ -107,13 +106,12 @@ export default function FooterSection() {
             onClick={() => window.dispatchEvent(new CustomEvent("tb_open_feedback"))}
             className="bg-transparent text-xs font-normal text-muted-foreground hover:bg-transparent! hover:text-foreground dark:hover:bg-transparent!"
           >
-            <MessageSquarePlus className="size-3.5" />
             پیشنهادات
           </Button>
         </div>
 
-        {/* Bottom right */}
-        <p className="text-center text-[11px] text-muted-foreground md:col-start-2 md:row-start-2 md:text-right" dir="rtl">
+        {/* Designer credit. */}
+        <p className="text-center text-[11px] leading-6 text-muted-foreground sm:text-right lg:col-start-3 lg:row-start-1" dir="rtl">
           طراحی شده توسط{" "}
           <Tooltip>
             <TooltipTrigger render={<span tabIndex={0} className="cursor-help font-semibold text-[#f5b301]" />}>
@@ -123,8 +121,8 @@ export default function FooterSection() {
           </Tooltip>
         </p>
 
-        {/* Bottom left */}
-        <div className="flex items-center justify-center gap-2 md:col-start-1 md:row-start-2 md:justify-start">
+        {/* Physical left: platform-colour social controls. */}
+        <div className="flex items-center justify-center gap-2 sm:justify-start lg:col-start-1 lg:row-start-1">
           {socialItems.map((item) => {
             const setting = socials[item.key];
             if (!setting.enabled) return null;

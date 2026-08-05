@@ -13,10 +13,10 @@ describe("homepage review, timeline and tools polish", () => {
     expect(card).toMatch(/group-hover:text-\[color:var\(--module-timeline-color,var\(--primary\)\)\]/);
   });
 
-  it("reduces tool cards to about two thirds height and strengthens their dark overlay", () => {
+  it("uses transparent tool visuals with compact text-only labels", () => {
     const tools = read("features/home/components/sections/ToolsSection.tsx");
-    expect(tools).toMatch(/min-h-\[90px\]/);
-    expect(tools).toMatch(/sm:min-h-\[96px\]/);
-    expect(tools).toMatch(/from-black\/95 via-black\/70 to-black\/55/);
+    expect(tools).toMatch(/lg:grid-cols-5/);
+    expect(tools).toMatch(/object-contain/);
+    expect(tools).not.toMatch(/bg-gradient-to-t|descriptionFa/);
   });
 });

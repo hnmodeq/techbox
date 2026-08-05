@@ -82,7 +82,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       { title: "سفارشات", href: "/admin/orders", icon: ShoppingCart },
       { title: "بنرهای فروشگاه", href: "/admin/shop-banners", icon: Image },
-      { title: "تبلیغات صفحه اصلی", href: "/admin/home-advertisements", icon: ImageIcon },
+      { title: "تبلیغات سایت", href: "/admin/home-advertisements", icon: ImageIcon },
     ],
   },
   {

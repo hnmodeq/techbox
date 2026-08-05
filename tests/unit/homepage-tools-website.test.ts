@@ -19,15 +19,14 @@ describe("homepage tools and website-info requirements", () => {
     expect(tools).not.toMatch(/<SectionHeader/);
   });
 
-  it("uses one RAID feature and a 2x2 fully-colour image grid", () => {
-    expect(tools).not.toMatch(/ToolIcon/);
-    expect(tools).toMatch(/<ToolTile tool=\{raid\} \/>/);
-    expect(tools).toMatch(/sm:grid-cols-2/);
-    expect(tools).toMatch(/object-cover saturate-100/);
-    expect(tools).not.toMatch(/grayscale|saturate-0|group-hover:saturate/);
+  it("uses five transparent image shortcuts with small titles", () => {
+    expect(tools).not.toMatch(/ToolIcon|descriptionFa/);
+    expect(tools).toMatch(/lg:grid-cols-5/);
+    expect(tools).toMatch(/object-contain/);
     expect(tools).toMatch(/group-hover:text-\[color:var\(--tools-accent\)\]/);
     expect(tools).toMatch(/ابزارهایی که کار شما رو شاید راحت‌تر کنه/);
-    expect(registry.match(/tools\/home-cards\/.*\.webp/g)).toHaveLength(5);
+    expect(registry.match(/tools-transparent\/.*\.webp/g)).toHaveLength(5);
+    expect(websiteInfo).toMatch(/website-info\.webp/);
   });
 
   it("restores real contributors when the editorial-team mapping is empty", () => {

@@ -66,11 +66,11 @@ describe("homepage request series", () => {
     expect(data).toMatch(/reviewedProduct/);
   });
 
-  it("mixes sold/discounted shop products with a six-rack/two-tower quota", () => {
+  it("mixes sold/discounted shop products with an eight-rack/four-tower quota", () => {
     const data = read("lib/home-sections.ts");
     expect(data).toMatch(/prisma\.orderItem\.groupBy/);
-    expect(data).toMatch(/chooseMixed\(rackCandidates, 6\)/);
-    expect(data).toMatch(/chooseMixed\(towerCandidates, 2\)/);
+    expect(data).toMatch(/chooseMixed\(rackCandidates, 8\)/);
+    expect(data).toMatch(/chooseMixed\(towerCandidates, 4\)/);
     expect(data).toMatch(/rackExclusionSignals/);
     expect(data).toMatch(/specs: true/);
     expect(data).toMatch(/warranty: true/);
@@ -114,11 +114,12 @@ describe("homepage request series", () => {
     expect(feature).toMatch(/<div className="relative mx-6 mt-5/);
   });
 
-  it("uses equal compact tool heights, no transform hover and module-coloured titles", () => {
+  it("uses transparent tool artwork and module-coloured title hover", () => {
     const tools = read("features/home/components/sections/ToolsSection.tsx");
-    expect(tools).toMatch(/min-h-\[90px\]/);
-    expect(tools).not.toMatch(/group-hover:scale/);
-    expect(tools).toMatch(/text-\[color:var\(--tools-accent\)\]/);
+    const registry = read("config/modules.config.ts");
+    expect(registry).toMatch(/tools-transparent/);
+    expect(tools).toMatch(/object-contain/);
+    expect(tools).toMatch(/group-hover:text-\[color:var\(--tools-accent\)\]/);
   });
 
   it("adds membership and authenticated author-request flows", () => {
@@ -140,6 +141,7 @@ describe("homepage request series", () => {
     expect(footer).not.toMatch(/<footer className="border-t/);
     expect(chat).toMatch(/variant="line"/);
     expect(chat.match(/data-active:bg-transparent/g)?.length).toBeGreaterThanOrEqual(2);
+    expect(chat.match(/after:hidden/g)?.length).toBeGreaterThanOrEqual(2);
   });
 
   it("extracts and stores ten WebP storyboard frames for video hover", () => {

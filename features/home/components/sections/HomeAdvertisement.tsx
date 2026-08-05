@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import { X } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { HomeAdvertisement } from "@/features/home/lib/home-advertisements";
@@ -40,15 +39,16 @@ export function HomeAdvertisementBanner({ advertisement }: HomeAdvertisementBann
   };
 
   const creative = (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src={advertisement.image}
       alt={advertisement.alt}
       width={2880}
       height={600}
-      sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), 1280px"
-      // The supplied files are already 2880×600 WebP. Serving the originals
-      // avoids a second WebP encode by Next, which was the visible quality loss.
-      unoptimized
+      loading="lazy"
+      decoding="async"
+      // Raw delivery is intentional: WebP is not re-encoded and animated GIF
+      // keeps every frame rather than becoming a static optimizer result.
       className="block h-auto w-full"
     />
   );

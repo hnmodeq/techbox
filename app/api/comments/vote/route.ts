@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
         const { incLikes, incDislikes } = delta(existing.vote, vote);
         if (incLikes !== 0 || incDislikes !== 0) {
           await prisma.$transaction([
-            prisma.commentVote.update({ where: { id: existing.id }, data: { vote } }),
+            prisma.commentVote.update({ where: { id: existing.id }, data: { vote, userId: user.id } }),
             prisma.comment.update({
               where: { id: commentId },
               data: {
@@ -127,13 +127,13 @@ export async function POST(req: NextRequest) {
             }),
           ]);
         } else {
-          await prisma.commentVote.update({ where: { id: existing.id }, data: { vote } });
+          await prisma.commentVote.update({ where: { id: existing.id }, data: { vote, userId: user.id } });
         }
       } else {
         const { incLikes, incDislikes } = delta(0, vote);
         if (incLikes !== 0 || incDislikes !== 0) {
           await prisma.$transaction([
-            prisma.commentVote.create({ data: { commentId, fingerprint, vote } }),
+            prisma.commentVote.create({ data: { commentId, fingerprint, userId: user.id, vote } }),
             prisma.comment.update({
               where: { id: commentId },
               data: {
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
             }),
           ]);
         } else {
-          await prisma.commentVote.create({ data: { commentId, fingerprint, vote } });
+          await prisma.commentVote.create({ data: { commentId, fingerprint, userId: user.id, vote } });
         }
       }
     }

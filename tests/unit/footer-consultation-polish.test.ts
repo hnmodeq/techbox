@@ -15,13 +15,14 @@ describe("footer and consultation navigation", () => {
     expect(footer).toMatch(/links\.map/);
   });
 
-  it("uses the requested desktop 2x2 placement", () => {
+  it("uses one balanced four-column row on desktop", () => {
     const footer = read("components/layout/Footer.tsx");
-    expect(footer).toMatch(/md:grid-cols-2 md:grid-rows-2/);
-    expect(footer).toMatch(/md:col-start-2 md:row-start-1/); // copyright, top right
-    expect(footer).toMatch(/md:col-start-1 md:row-start-1/); // controls, top left
-    expect(footer).toMatch(/md:col-start-2 md:row-start-2/); // designer, bottom right
-    expect(footer).toMatch(/md:col-start-1 md:row-start-2/); // social, bottom left
+    expect(footer).toMatch(/lg:grid-cols-\[auto_minmax\(280px,1fr\)_auto_minmax\(320px,1\.35fr\)\]/);
+    expect(footer).toMatch(/lg:col-start-4 lg:row-start-1/); // copyright, physical right
+    expect(footer).toMatch(/lg:col-start-3 lg:row-start-1/); // designer
+    expect(footer).toMatch(/lg:col-start-2 lg:row-start-1/); // buttons
+    expect(footer).toMatch(/lg:col-start-1 lg:row-start-1/); // socials, physical left
+    expect(footer).not.toMatch(/MessageSquarePlus/);
   });
 
   it("removes X and uses platform-colour Instagram, YouTube and Telegram icons", () => {
@@ -51,7 +52,8 @@ describe("footer and consultation navigation", () => {
     const secondary = read("components/layout/techbox-nav-secondary.tsx");
     const modal = read("components/layout/help-modals.tsx");
     const tools = read("features/home/components/sections/ToolsConsultationPanel.tsx");
-    expect(secondary).toMatch(/title: "مشاوره"/);
+    expect(secondary).toMatch(/title: "مشاوره زیرساخت"/);
+    expect(secondary).toMatch(/icon: Handshake/);
     expect(secondary).toMatch(/text-red-600/);
     expect(secondary).toMatch(/tb_open_support/);
     expect(modal).toMatch(/درخواست مشاوره جدید/);

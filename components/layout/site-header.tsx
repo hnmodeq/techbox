@@ -607,7 +607,7 @@ function NotificationsButton() {
         <div className="space-y-2" dir="rtl">
           <div className="px-2 py-1">
             <div className="text-sm font-bold">اعلان‌ها</div>
-            <div className="text-xs text-muted-foreground">آخرین دیدگاه‌ها و واکنش‌ها</div>
+            <div className="text-xs text-muted-foreground">پاسخ‌ها، دنبال‌کردن‌ها و فعالیت افراد مورد علاقه شما</div>
           </div>
           <ScrollArea className="h-80 pe-2">
             <div className="space-y-2">
@@ -690,7 +690,7 @@ export function SiteHeader({
 
   return (
     <header
-      className="sticky top-0 z-50 flex w-full items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80"
+      className="flex w-full items-center border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80"
       suppressHydrationWarning
     >
       <div className="flex h-(--header-height) w-full items-center justify-around gap-3 px-4">

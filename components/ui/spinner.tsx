@@ -1,25 +1,14 @@
 import { cn } from "@/lib/utils";
-import { Loader2Icon } from "lucide-react";
+import { TechboxInlineLoader, TechboxLoader } from "@/components/ui/techbox-loader";
 
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
-  return (
-    <Loader2Icon
-      data-slot="spinner"
-      role="status"
-      aria-label="Loading"
-      className={cn("size-4 animate-spin", className)}
-      {...props}
-    />
-  );
+function Spinner({ className, ...props }: React.ComponentProps<"span">) {
+  return <TechboxInlineLoader data-slot="spinner" className={cn("shrink-0", className)} {...props} />;
 }
 
 function SpinnerCenter({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div
-      className={cn("flex items-center justify-center p-4", className)}
-      {...props}
-    >
-      <Spinner />
+    <div className={cn("w-full", className)} {...props}>
+      <TechboxLoader />
     </div>
   );
 }

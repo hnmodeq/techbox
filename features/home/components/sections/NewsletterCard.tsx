@@ -15,6 +15,7 @@
  */
 import * as React from "react";
 import { TermsDialog } from "@/features/legal/components/TermsDialog";
+import { Spinner } from "@/components/ui/spinner";
 
 type Status = "idle" | "loading" | "ok" | "error";
 
@@ -100,7 +101,7 @@ export function NewsletterCard({ accentColor }: { accentColor?: string } = {}) {
               className="grid h-10 w-10 shrink-0 place-items-center rounded-[8px] bg-[color:var(--hp-accent)] text-[color:var(--hp-on-accent)] transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {status === "loading" ? (
-                <span className="block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none" />
+                <Spinner className="text-white" />
               ) : (
                 <span aria-hidden="true" className="text-lg leading-none">←</span>
               )}

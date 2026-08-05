@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { MessageSquareText, ShieldCheck, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -9,7 +10,15 @@ export function ToolsConsultationPanel() {
   };
 
   return (
-    <div className="grid gap-5 border border-red-500/25 bg-red-500/[0.04] p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+    <div className="relative isolate grid min-h-44 overflow-hidden border border-red-500/25 bg-red-500/[0.04] p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center lg:ps-52">
+      <Image
+        src="/assets/home/decorations/consultation.webp"
+        alt=""
+        width={214}
+        height={162}
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 start-2 -z-10 h-36 w-auto object-contain opacity-90 sm:h-40"
+      />
       <div className="min-w-0">
         <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
           <MessageSquareText className="size-5" />

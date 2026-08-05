@@ -1,0 +1,49 @@
+name: One-time Site Visuals Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Apply notification migration and upload site visuals
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DATABASE_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL || secrets.DATABASE_URL }}
+      SUPABASE_URL: https://nggwgcfkceuadvhxnczf.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_PUBLIC_BUCKET: ${{ vars.SUPABASE_PUBLIC_BUCKET }}
+      SITE_VISUALS_CONFIRM: yes
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          version: 10.12.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Refuse missing production configuration
+        run: |
+          test -n "$DATABASE_URL" || (echo "DATABASE_URL/DIRECT_URL secret is missing" && exit 1)
+          test -n "$SUPABASE_SERVICE_ROLE_KEY" || (echo "SUPABASE_SERVICE_ROLE_KEY secret is missing" && exit 1)
+
+      - name: Apply additive notification migration
+        run: pnpm exec prisma migrate deploy
+
+      - name: Upload alpha WebP/GIF assets and update production rows
+        run: pnpm content:seed-site-visuals

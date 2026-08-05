@@ -35,6 +35,7 @@
     "content:seed-timeline-engagement": "tsx scripts/content/seed-timeline-engagement.ts",
     "content:seed-home-advertisements": "tsx scripts/content/seed-home-advertisements.ts",
     "content:seed-drive-catalog": "tsx scripts/content/seed-drive-catalog.ts",
+    "content:seed-site-visuals": "tsx scripts/content/seed-site-visuals.ts",
     "check:content": "tsx scripts/checks/content.ts",
     "check:storage": "tsx scripts/checks/storage.ts",
     "check:db": "tsx scripts/checks/db.ts",

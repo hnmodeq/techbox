@@ -1,20 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { TechboxLoader } from "@/components/ui/techbox-loader";
 import { AlertTriangle, Inbox, RefreshCw } from "lucide-react";
 
 /** Consistent loading skeleton for admin pages */
-export function AdminLoading({ rows = 3 }: { rows?: number }) {
-  return (
-    <div className="space-y-3">
-      {Array.from({ length: rows }).map((_, i) => (
-        <Card key={i} className="p-4">
-          <Skeleton className="h-5 w-48 mb-2" />
-          <Skeleton className="h-3 w-32" />
-        </Card>
-      ))}
-    </div>
-  );
+export function AdminLoading({ rows: _rows = 3 }: { rows?: number }) {
+  return <TechboxLoader className="min-h-64 rounded-md border border-border" label="در حال دریافت اطلاعات مدیریت" />;
 }
 
 /** Consistent error state for admin pages */
