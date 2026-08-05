@@ -1,16 +1,30 @@
 import { NextResponse } from "next/server";
-import { getSessionUserPublic } from "@/lib/auth-server";
+import { getSessionUserPublic, getSessionUserPublicStrict } from "@/lib/auth-server";
 import { hasPermission } from "@/lib/permissions";
 import { getEffectivePermissions } from "@/lib/user-permissions";
 import { prisma } from "@/lib/db";
 import { logAudit } from "@/lib/audit-log";
+import { logDbFailure } from "@/lib/db-error";
 
 export type AuthorizedUser = NonNullable<Awaited<ReturnType<typeof getSessionUserPublic>>> & {
   permissions: string[];
 };
 
+async function permissionSession() {
+  try {
+    return await getSessionUserPublicStrict();
+  } catch (error) {
+    logDbFailure("permission-session", error);
+    return NextResponse.json(
+      { error: "auth_temporarily_unavailable", message: "نشست شما معتبر است اما پایگاه داده موقتاً شلوغ است؛ دوباره تلاش کنید." },
+      { status: 503 },
+    );
+  }
+}
+
 async function authorize(required: string[], mode: "any" | "all"): Promise<AuthorizedUser | NextResponse> {
-  const user = await getSessionUserPublic();
+  const user = await permissionSession();
+  if (user instanceof NextResponse) return user;
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const permissions = await getEffectivePermissions(user);
@@ -46,7 +60,8 @@ export function requireAllPermissions(permissions: string[]) {
 }
 
 export async function requireStaff() {
-  const user = await getSessionUserPublic();
+  const user = await permissionSession();
+  if (user instanceof NextResponse) return user;
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const permissions = await getEffectivePermissions(user);
   if (user.role !== "super_admin" && permissions.length === 0) {

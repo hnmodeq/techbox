@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { SlidersHorizontal, X, Search, ChevronDown, ChevronUp, ArrowUpDown, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
+import { sharedJsonRequest } from "@/lib/client-request-dedupe";
 import { driveType, hasEnoughShopSpecs, isDriveProduct, shopSpec, type ShopProductKind } from "@/lib/shop-product-kind";
 import ShopProductCard from "./ShopProductCard";
 import ShopBanner, { type ShopBannerItem } from "./ShopBanner";
@@ -89,9 +90,8 @@ function resolvePrice(item: ContentItem): number {
 function useShopBanners(): ShopBannerItem[] {
   const [banners, setBanners] = useState<ShopBannerItem[]>([]);
   useEffect(() => {
-    fetch("/api/settings?key=shop.banners", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((d) => {
+    sharedJsonRequest<Record<string, string | null>>("shop-banners:get", "/api/settings?key=shop.banners", { cache: "no-store" })
+      .then(({ data: d }) => {
         try {
           const raw = d["shop.banners"];
           if (raw) setBanners(JSON.parse(raw));

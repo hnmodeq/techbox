@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { sharedJsonRequest } from "@/lib/client-request-dedupe";
 import {
   HOME_AD_PLACEMENTS,
   type HomeAdvertisement,
@@ -51,9 +52,12 @@ function AdvertisementsContent() {
   const load = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/home-advertisements", { cache: "no-store" });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error || "advertisements_load_failed");
+      const { ok, data } = await sharedJsonRequest<{ advertisements?: HomeAdvertisement[]; usingDefaults?: boolean; error?: string }>(
+        "admin-home-advertisements:get",
+        "/api/admin/home-advertisements",
+        { cache: "no-store", credentials: "include" },
+      );
+      if (!ok) throw new Error(data?.error || "advertisements_load_failed");
       setAdvertisements(Array.isArray(data.advertisements) ? data.advertisements : []);
       setUsingDefaults(Boolean(data.usingDefaults));
     } catch (error) {

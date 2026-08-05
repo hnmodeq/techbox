@@ -25,7 +25,7 @@ type PrismaClientInstance = InstanceType<typeof PrismaClient>;
  * Versioning the key means a config change discards the stale client and
  * builds a fresh one on the next request.
  */
-const CLIENT_CONFIG_VERSION = 3;
+const CLIENT_CONFIG_VERSION = 4;
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClientInstance;
@@ -80,7 +80,7 @@ function getPrismaClient(): PrismaClientInstance {
   }
 
   if (dbUrl && !dbUrl.includes("connection_limit=")) {
-    const fallback = isDev ? 5 : 1;
+    const fallback = isDev ? 8 : 1;
     const configured = Number(process.env.PRISMA_CONNECTION_LIMIT || String(fallback));
     const connectionLimit =
       Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : fallback;

@@ -17,8 +17,7 @@ const CONTENT_MODULES = [
 ] as const;
 
 type ContentModule = typeof CONTENT_MODULES[number];
-type DashboardPostGroup = { module: string; count: number; views: number };
-type LatestPost = { module: ContentModule; post: { date: Date; dateFa: string } | null };
+type DashboardPostGroup = { module: string; count: number; views: number; latest: Date | null };
 
 export async function GET() {
   const user = await requireStaff();
@@ -40,33 +39,28 @@ export async function GET() {
         where: { module: { in: postModules }, deletedAt: null },
         _count: { _all: true },
         _sum: { views: true },
+        _max: { date: true },
       });
       postGroups = groups.map((group: any) => ({
         module: group.module,
         count: group._count._all,
         views: group._sum.views ?? 0,
+        latest: group._max.date,
       }));
     }
 
-    const latestPosts: LatestPost[] = postModules.length
-      ? await Promise.all(
-          postModules.map(async (module) => ({
-            module,
-            post: await prisma.post.findFirst({
-              where: { module, deletedAt: null },
-              orderBy: { date: "desc" },
-              select: { date: true, dateFa: true },
-            }),
-          }))
-        )
-      : [];
+    // The group query above also returns each module's latest date. The old
+    // implementation launched one findFirst per module in Promise.all.
 
-    const [timelineCount, latestTimeline] = await Promise.all([
-      allowedModules.includes("timeline") ? prisma.timelineEvent.count() : Promise.resolve(0),
-      allowedModules.includes("timeline")
-        ? prisma.timelineEvent.findFirst({ orderBy: { dateGr: "desc" }, select: { dateFa: true, dateGr: true } })
-        : Promise.resolve(null),
-    ]);
+    let timelineCount = 0;
+    let latestTimeline: { dateFa: string; dateGr: Date } | null = null;
+    if (allowedModules.includes("timeline")) {
+      timelineCount = await prisma.timelineEvent.count();
+      latestTimeline = await prisma.timelineEvent.findFirst({
+        orderBy: { dateGr: "desc" },
+        select: { dateFa: true, dateGr: true },
+      });
+    }
 
     const postGroupMap = new Map(
       postGroups.map((group) => [
@@ -74,13 +68,8 @@ export async function GET() {
         {
           count: group.count,
           views: group.views,
+          latest: group.latest,
         },
-      ])
-    );
-    const latestMap = new Map(
-      latestPosts.map(({ module, post }) => [
-        module,
-        post?.dateFa || (post?.date ? new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(post.date) : ""),
       ])
     );
 
@@ -98,12 +87,14 @@ export async function GET() {
         };
       }
 
-      const group = postGroupMap.get(module) || { count: 0, views: 0 };
+      const group = postGroupMap.get(module) || { count: 0, views: 0, latest: null };
       return {
         module,
         count: group.count,
         views: group.views,
-        latest: latestMap.get(module) || "",
+        latest: group.latest
+          ? new Intl.DateTimeFormat("fa-IR", { dateStyle: "long" }).format(group.latest)
+          : "",
       };
     });
 

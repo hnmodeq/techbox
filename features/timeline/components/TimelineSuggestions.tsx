@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { sharedJsonRequest } from '@/lib/client-request-dedupe';
 
 type Suggestion = {
   id: string;
@@ -33,9 +34,8 @@ export function TimelineSuggestions() {
 
   useEffect(() => {
     let mounted = true;
-    fetch('/api/timeline/suggestions', { cache: 'no-store' })
-      .then((r) => r.ok ? r.json() : [])
-      .then((data) => { if (mounted) setSuggestions(Array.isArray(data) ? data : []); })
+    sharedJsonRequest<Suggestion[]>('timeline-suggestions:get', '/api/timeline/suggestions', { cache: 'no-store' })
+      .then(({ ok, data }) => { if (mounted) setSuggestions(ok && Array.isArray(data) ? data : []); })
       .catch(() => {})
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ContentItem, ModuleSlug } from "@/lib/content";
 
 type DbPost = ContentItem & {
@@ -24,8 +24,19 @@ export function useDbPosts(module: ModuleSlug, fallback: ContentItem[] = [], tak
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
   const [error, setError] = useState("");
+  const fallbackRef = useRef(fallback);
 
   useEffect(() => {
+    const serverFallback = fallbackRef.current;
+    if (serverFallback.length > 0) {
+      // The server already queried and priced this exact listing. Refetching
+      // immediately doubled /api/posts in Strict Mode and competed with auth.
+      setItems(serverFallback);
+      setFromDb(true);
+      setLoading(false);
+      setError("");
+      return;
+    }
     let mounted = true;
     setLoading(true);
     setError("");
@@ -54,8 +65,17 @@ export function useDbPost(module: ModuleSlug, slug: string, fallback: ContentIte
   const [loading, setLoading] = useState(true);
   const [fromDb, setFromDb] = useState(false);
   const [error, setError] = useState("");
+  const fallbackRef = useRef(fallback);
 
   useEffect(() => {
+    const serverFallback = fallbackRef.current;
+    if (serverFallback) {
+      setItem(serverFallback);
+      setFromDb(true);
+      setLoading(false);
+      setError("");
+      return;
+    }
     let mounted = true;
     setLoading(true);
     setError("");

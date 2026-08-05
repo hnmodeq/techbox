@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode, type SVGProps } from "react";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DEFAULT_FOOTER_SOCIALS, parseFooterSocials, type FooterSocialKey } from "@/features/footer/footer-socials";
+import { sharedJsonRequest } from "@/lib/client-request-dedupe";
 
 const links = [
   { name: "درباره ما", href: "/about" },
@@ -62,9 +63,8 @@ export default function FooterSection() {
   const [socials, setSocials] = useState(DEFAULT_FOOTER_SOCIALS);
 
   useEffect(() => {
-    fetch("/api/settings?key=footer.socials", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data) => setSocials(parseFooterSocials(data?.["footer.socials"])))
+    sharedJsonRequest<Record<string, string | null>>("footer-socials:get", "/api/settings?key=footer.socials", { cache: "no-store" })
+      .then(({ data }) => setSocials(parseFooterSocials(data?.["footer.socials"])))
       .catch(() => {});
   }, []);
 

@@ -18,7 +18,7 @@ function buildUrl(dbUrl: string, isDev: boolean, envLimit?: string) {
       .replace(/&&+/g, "&");
   }
   if (dbUrl && !dbUrl.includes("connection_limit=")) {
-    const fallback = isDev ? 5 : 1;
+    const fallback = isDev ? 8 : 1;
     const configured = Number(envLimit || String(fallback));
     const limit =
       Number.isInteger(configured) && configured > 0 && configured <= 10 ? configured : fallback;
@@ -42,7 +42,7 @@ describe("development connection pool", () => {
     // same time; everything past the first query queued to pool_timeout and
     // failed P2024, tripping the circuit breaker on a healthy database.
     const dev = buildUrl(DOCUMENTED, true);
-    expect(dev).toContain("connection_limit=5");
+    expect(dev).toContain("connection_limit=8");
     expect(dev).not.toContain("connection_limit=1");
     expect(dev).toContain("pool_timeout=10");
   });
@@ -63,7 +63,7 @@ describe("development connection pool", () => {
       expect(() => new URL(out)).not.toThrow();
       expect(out).not.toMatch(/[?&]{2}/);
       expect(out).not.toMatch(/[?&]$/);
-      expect(out).toContain("connection_limit=5");
+      expect(out).toContain("connection_limit=8");
     }
   });
 
@@ -75,7 +75,7 @@ describe("development connection pool", () => {
   it("bumps the client cache version so the change takes effect", () => {
     // The client is cached on globalThis across HMR; without a version bump
     // the old pool survives and the fix appears to do nothing.
-    expect(db).toMatch(/const CLIENT_CONFIG_VERSION = 3;/);
+    expect(db).toMatch(/const CLIENT_CONFIG_VERSION = 4;/);
   });
 });
 

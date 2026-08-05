@@ -45,7 +45,7 @@ export function TechboxLoader({
       />
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_80%,color-mix(in_srgb,var(--module-tools-color,var(--primary))_20%,transparent),transparent_35%),radial-gradient(circle_at_75%_20%,rgba(239,68,68,.12),transparent_32%)]" />
       <div className="flex min-h-36 w-full max-w-[260px] flex-col items-center justify-center rounded-md border border-border bg-card/95 px-8 py-7 shadow-xl backdrop-blur">
-        <Image src="/logo.png" alt="تکباکس" width={92} height={48} className="h-12 w-auto object-contain" priority={fullPage} />
+        <Image src="/logo.png" alt="تکباکس" width={48} height={48} className="size-12 object-contain" priority={fullPage} />
         <LoadingDots className="mt-4" />
         <span className="sr-only">{label}</span>
       </div>

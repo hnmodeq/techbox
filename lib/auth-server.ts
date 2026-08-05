@@ -17,6 +17,68 @@ function getAuthSecret(): Uint8Array {
 
 const COOKIE = "tb_session";
 
+const publicUserSelect = {
+  id: true,
+  name: true,
+  username: true,
+  email: true,
+  role: true,
+  roleFa: true,
+  status: true,
+  job: true,
+  bio: true,
+  birthday: true,
+  modules: true,
+  avatar: true,
+  emailVerified: true,
+  sessionsInvalidatedAt: true,
+  verifiedType: true,
+  verifiedLabel: true,
+  mutedUntil: true,
+  bannedAt: true,
+  banReason: true,
+} as const;
+
+function queryPublicUser(id: string) {
+  return prisma.user.findUnique({ where: { id }, select: publicUserSelect });
+}
+type PublicSessionUser = Awaited<ReturnType<typeof queryPublicUser>>;
+type PublicLookupEntry = {
+  promise: Promise<PublicSessionUser>;
+  expiresAt: number;
+  settled: boolean;
+};
+
+const authGlobal = globalThis as typeof globalThis & {
+  __publicSessionLookups?: Map<string, PublicLookupEntry>;
+};
+const publicSessionLookups = authGlobal.__publicSessionLookups ??= new Map();
+const PUBLIC_LOOKUP_TTL_MS = process.env.NODE_ENV === "production" ? 750 : 2_000;
+
+/** Collapse concurrent auth checks for one JWT subject into one Prisma read.
+ * Admin dashboards fan out to several permissioned APIs at once; without this,
+ * every route consumed its own pool slot merely to identify the same user. */
+async function getPublicUserShared(id: string): Promise<PublicSessionUser> {
+  const now = Date.now();
+  let entry = publicSessionLookups.get(id);
+  if (!entry || (entry.settled && entry.expiresAt <= now)) {
+    entry = {
+      promise: queryPublicUser(id),
+      expiresAt: Number.POSITIVE_INFINITY,
+      settled: false,
+    };
+    publicSessionLookups.set(id, entry);
+    entry.promise.then(
+      () => {
+        entry!.settled = true;
+        entry!.expiresAt = Date.now() + PUBLIC_LOOKUP_TTL_MS;
+      },
+      () => publicSessionLookups.delete(id),
+    );
+  }
+  return entry.promise;
+}
+
 export async function hashPassword(p: string){ return bcrypt.hash(p, 12); }
 export async function verifyPassword(p: string, hash: string){ return bcrypt.compare(p, hash); }
 
@@ -136,30 +198,7 @@ export async function getSessionUserPublic(){
   if (!sub) return null;
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: sub },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        role: true,
-        roleFa: true,
-        status: true,
-        job: true,
-        bio: true,
-        birthday: true,
-        modules: true,
-        avatar: true,
-        emailVerified: true,
-        sessionsInvalidatedAt: true,
-        verifiedType: true,
-        verifiedLabel: true,
-        mutedUntil: true,
-        bannedAt: true,
-        banReason: true,
-      },
-    });
+    const user = await getPublicUserShared(sub);
     if (!user) return null;
     if (user.status === "banned" || user.status === "suspended") return null;
     if (isSessionRevoked(payload, user.sessionsInvalidatedAt)) return null;
@@ -169,6 +208,28 @@ export async function getSessionUserPublic(){
   }
 
   return null;
+}
+
+/** Permission gates use the strict variant so a saturated database returns
+ * 503 (retryable) rather than pretending a valid signed-in user is anonymous. */
+export async function getSessionUserPublicStrict() {
+  const c = await cookies();
+  const token = c.get(COOKIE)?.value;
+  if (!token) return null;
+
+  let payload: JWTPayload;
+  try {
+    payload = (await jwtVerify(token, getAuthSecret())).payload;
+  } catch {
+    return null;
+  }
+  const sub = String(payload.sub || "");
+  if (!sub) return null;
+
+  const user = await getPublicUserShared(sub);
+  if (!user || user.status === "banned" || user.status === "suspended") return null;
+  if (isSessionRevoked(payload, user.sessionsInvalidatedAt)) return null;
+  return user;
 }
 
 export async function setSessionCookie(token: string){

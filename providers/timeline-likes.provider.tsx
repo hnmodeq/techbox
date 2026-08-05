@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { sharedJsonRequest } from "@/lib/client-request-dedupe";
 
 type LikesStatus = "loading" | "ready" | "error";
 
@@ -33,11 +34,10 @@ export function TimelineLikesProvider({ children, enabled = true }: { children: 
     }
     let mounted = true;
     setStatus("loading");
-    fetch("/api/timeline/liked-events", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
+    sharedJsonRequest<{ likedEventIds?: string[] }>("timeline-liked-events:get", "/api/timeline/liked-events", { cache: "no-store" })
+      .then(({ ok, data }) => {
         if (!mounted) return;
-        if (data && Array.isArray(data.likedEventIds)) {
+        if (ok && data && Array.isArray(data.likedEventIds)) {
           setLikedIds(new Set(data.likedEventIds));
           setStatus("ready");
         } else {

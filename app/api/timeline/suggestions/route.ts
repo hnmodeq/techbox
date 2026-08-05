@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSessionUserPublic } from "@/lib/auth-server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { logDbFailure } from "@/lib/db-error";
 
 const SUGGESTIONS_EVENT_ID = "__timeline_suggestions";
 
@@ -32,17 +33,18 @@ async function ensureSuggestionsEvent() {
 
 export async function GET() {
   try {
-    await ensureSuggestionsEvent();
+    // Read-only by design. The previous GET upserted the hidden system event
+    // on every page load, consuming a write connection before this query.
+    const suggestions = await prisma.timelineComment.findMany({
+      where: { eventId: SUGGESTIONS_EVENT_ID, status: "approved" },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    return NextResponse.json(suggestions);
   } catch (error) {
-    console.error("[timeline:suggestions] failed to ensure system event", error);
+    logDbFailure("timeline:suggestions", error);
+    return NextResponse.json([], { status: 503 });
   }
-
-  const suggestions = await prisma.timelineComment.findMany({
-    where: { eventId: SUGGESTIONS_EVENT_ID, status: "approved" },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
-  return NextResponse.json(suggestions);
 }
 
 export async function POST(req: NextRequest) {
