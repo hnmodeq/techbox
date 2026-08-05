@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { formatRelativeFa, formatAbsoluteFa } from "@/lib/date-format";
+import { formatRelativeDate, formatRelativeFa, formatAbsoluteFa } from "@/lib/date-format";
 
 const ago = (ms: number) => new Date(Date.now() - ms).toISOString();
 const S = 1000, M = 60 * S, H = 60 * M, D = 24 * H;
@@ -35,6 +35,18 @@ describe("the RelativeDate ladder", () => {
 
   it("puts a real Jalali date in the tooltip", () => {
     expect(formatAbsoluteFa("2026-06-22T00:00:00.000Z")).toMatch(/^۱ تیر/);
+  });
+
+  it("uses Tehran calendar days consistently around Tehran midnight", () => {
+    vi.useFakeTimers();
+    try {
+      // 00:30 on 14 Mordad in Tehran; the target is 00:29 one calendar day
+      // earlier there, even though its UTC date is two labels behind.
+      vi.setSystemTime(new Date("2026-08-04T21:00:00.000Z"));
+      expect(formatRelativeDate("2026-08-03T20:59:00.000Z")).toBe("دیروز");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

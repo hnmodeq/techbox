@@ -25,22 +25,33 @@ export function toFa(n: number): string {
  * Returns the Gregorian date at Asia/Tehran midnight so day boundaries
  * match Iran's timezone, not the server's local timezone.
  */
+const tehranCalendar = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Asia/Tehran",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+function tehranDateParts(value: Date) {
+  const mapped: Record<string, string> = {};
+  for (const part of tehranCalendar.formatToParts(value)) mapped[part.type] = part.value;
+  return {
+    year: parseInt(mapped.year!, 10),
+    month: parseInt(mapped.month!, 10),
+    day: parseInt(mapped.day!, 10),
+  };
+}
+
+/** A timezone-independent serial day. Date.UTC is used only as arithmetic for
+ * the Tehran calendar parts; it does not reinterpret the source timestamp. */
+function tehranDaySerial(value: Date) {
+  const { year, month, day } = tehranDateParts(value);
+  return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
+}
+
 function getTehranToday(): Date {
-  const now = new Date();
-  // Use Intl to get the current date in Asia/Tehran
-  const fmt = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Tehran",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  const parts = fmt.formatToParts(now);
-  const m: Record<string, string> = {};
-  for (const p of parts) m[p.type] = p.value;
-  const y = parseInt(m.year!, 10);
-  const mo = parseInt(m.month!, 10);
-  const d = parseInt(m.day!, 10);
-  return new Date(y, mo - 1, d);
+  const { year, month, day } = tehranDateParts(new Date());
+  return new Date(year, month - 1, day);
 }
 
 /**
@@ -70,10 +81,10 @@ export function formatRelativeDate(date: Date | string | undefined | null): stri
 
   const today = getTehranToday();
   const target = new Date(value);
-  // Normalize both to midnight for day calculation
-  const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate());
-  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const diffDays = Math.round((todayMidnight.getTime() - targetMidnight.getTime()) / 86400000);
+  // Compare Tehran calendar days—not host-local midnights. The old mixed
+  // calculation rendered "۲ روز پیش" on the UTC server and "دیروز" in a
+  // browser around Tehran midnight, causing a hydration mismatch.
+  const diffDays = tehranDaySerial(new Date()) - tehranDaySerial(target);
 
   if (diffDays < 0) {
     // Future date — show absolute
