@@ -6,6 +6,7 @@ import { canEdit as canEditModuleForUser, type AppUser } from "@/lib/auth";
 type AuthContextValue = {
   user: AppUser | null;
   loading: boolean;
+  unavailable: boolean;
   login: () => Promise<AppUser | null>;
   logout: () => Promise<void>;
   refresh: () => Promise<AppUser | null>;
@@ -25,6 +26,7 @@ function broadcastAuthChanged() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<AppUser | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [unavailable, setUnavailable] = React.useState(false);
 
   const refresh = React.useCallback(async (): Promise<AppUser | null> => {
     try {
@@ -33,12 +35,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         credentials: "include",
       });
       const data = await response.json().catch(() => ({}));
-      const nextUser = response.ok ? (data?.user ?? null) : null;
+      if (!response.ok) throw new Error(data?.error || "auth_unavailable");
+      const nextUser = data?.user ?? null;
+      setUnavailable(false);
       setUser(nextUser);
       return nextUser;
     } catch {
-      // Do not invent or restore a browser-cached identity on network failure.
-      // Existing in-memory state is retained for transient failures.
+      // Existing in-memory identity is retained; guards must not turn a 503
+      // database outage into a logout redirect.
+      setUnavailable(true);
       return null;
     } finally {
       setLoading(false);
@@ -67,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     } finally {
       setUser(null);
+      setUnavailable(false);
       setLoading(false);
       broadcastAuthChanged();
     }
@@ -78,8 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const value = React.useMemo<AuthContextValue>(
-    () => ({ user, loading, login, logout, refresh, canEdit }),
-    [user, loading, login, logout, refresh, canEdit]
+    () => ({ user, loading, unavailable, login, logout, refresh, canEdit }),
+    [user, loading, unavailable, login, logout, refresh, canEdit]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -173,7 +173,7 @@ export default function AdminPage() {
         <Card className="max-w-sm p-6 text-center">
           <CardTitle className="mb-2">ورود ادمین</CardTitle>
           <p className="text-sm text-muted-foreground mb-4">برای مدیریت محتوا ابتدا وارد شوید.</p>
-          <ButtonLink href="/admin/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
+          <ButtonLink href="/login" className="w-full">رفتن به صفحه ورود</ButtonLink>
         </Card>
       </main>
     );

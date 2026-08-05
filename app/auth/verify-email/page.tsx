@@ -85,7 +85,7 @@ export default function VerifyEmailPage() {
             <p className="text-xs text-muted-foreground leading-5">
               می‌توانید در صفحه ورود، گزینه «ارسال مجدد ایمیل تأیید» را بزنید تا لینک جدیدی دریافت کنید.
             </p>
-            <ButtonLink href="/account" className="w-full">بازگشت به ورود</ButtonLink>
+            <ButtonLink href="/login" className="w-full">بازگشت به ورود</ButtonLink>
           </div>
         )}
       </Card>

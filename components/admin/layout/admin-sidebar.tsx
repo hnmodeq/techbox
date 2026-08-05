@@ -185,7 +185,7 @@ export function AdminSidebar({ user }: { user: AppUser | null }) {
             className="w-full justify-start group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-8"
             onClick={async () => {
               await logout();
-              window.location.href = "/admin/login";
+              window.location.href = "/login";
             }}
           >
             خروج

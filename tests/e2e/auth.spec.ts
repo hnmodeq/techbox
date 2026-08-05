@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Authentication Flows', () => {
   test('User can navigate to admin login and see form', async ({ page }) => {
     await page.goto('/admin/login');
-    await expect(page.locator('h1')).toContainText('ورود به پنل تکباکس');
+    await expect(page.locator('h1')).toContainText('ورود به تکباکس');
     await expect(page.locator('input[autocomplete="username"]')).toBeVisible();
     await expect(page.locator('input[placeholder="••••••••"]')).toBeVisible();
   });

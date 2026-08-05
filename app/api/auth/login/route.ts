@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, withFreshPrismaRetry } from "@/lib/db";
+import { isDbUnreachable, logDbFailure } from "@/lib/db-error";
 import { verifyPassword, createSession, setSessionCookie } from "@/lib/auth-server";
 import { z } from "zod";
 import { captureAuthError } from "@/lib/sentry";
@@ -47,14 +48,14 @@ export async function POST(req: NextRequest) {
     const cleanUser = username.trim().toLowerCase();
 
     // Allow signing in with either username or email.
-    const user = await prisma.user.findFirst({
+    const user = await withFreshPrismaRetry(() => prisma.user.findFirst({
       where: {
         OR: [
           { username: cleanUser },
           { email: cleanUser }
         ]
       }
-    });
+    }));
 
     // Uniform error: don't reveal whether user exists or password is wrong
     if (!user) {
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check IP bans
-    const ipBan = await prisma.ipBan.findUnique({ where: { ip } });
+    const ipBan = await withFreshPrismaRetry(() => prisma.ipBan.findUnique({ where: { ip } }));
     if (ipBan) {
       return NextResponse.json(
         { error: "ip_banned", message: "دسترسی شما مسدود شده است." },
@@ -124,6 +125,13 @@ export async function POST(req: NextRequest) {
       }
     });
   } catch (err: any) {
+    if (isDbUnreachable(err)) {
+      logDbFailure("login", err);
+      return NextResponse.json(
+        { error: "database_temporarily_unavailable", message: "ارتباط با پایگاه داده موقتاً برقرار نیست؛ چند لحظه بعد دوباره تلاش کنید." },
+        { status: 503 },
+      );
+    }
     console.error("Login route error:", err);
     captureAuthError(err, "login");
     return NextResponse.json({ error: err?.message || "خطای سرور در پردازش ورود" }, { status: 500 });

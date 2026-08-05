@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { isDbUnreachable } from "@/lib/db-error";
 
 // IMPORTANT: never hardcode database credentials here. Set DATABASE_URL and
 // DIRECT_URL in your environment (.env / .env.local for local dev, or your
@@ -25,7 +26,7 @@ type PrismaClientInstance = InstanceType<typeof PrismaClient>;
  * Versioning the key means a config change discards the stale client and
  * builds a fresh one on the next request.
  */
-const CLIENT_CONFIG_VERSION = 4;
+const CLIENT_CONFIG_VERSION = 5;
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClientInstance;
@@ -130,11 +131,45 @@ function getPrismaClient(): PrismaClientInstance {
     log: process.env.PRISMA_VERBOSE === "1" ? ["query", "warn", "error"] : ["warn"],
     datasources: { db: { url: dbUrl } },
   });
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = client;
-    globalForPrisma.prismaConfigVersion = CLIENT_CONFIG_VERSION;
-  }
+  // Cache one client per Node process in every environment. The previous lazy
+  // wrapper cached only in development, so every production proxy property
+  // access constructed another Prisma pool inside the same serverless worker.
+  globalForPrisma.prisma = client;
+  globalForPrisma.prismaConfigVersion = CLIENT_CONFIG_VERSION;
   return client;
+}
+
+let resetInFlight: Promise<void> | null = null;
+
+/** Drop a poisoned/stale pool once, then let the next proxy access build a
+ * fresh client. Concurrent failures share the same reset instead of creating
+ * a disconnect/reconnect storm. */
+export function resetPrismaPool(): Promise<void> {
+  if (resetInFlight) return resetInFlight;
+  resetInFlight = (async () => {
+    const client = globalForPrisma.prisma;
+    globalForPrisma.prisma = undefined;
+    globalForPrisma.prismaConfigVersion = undefined;
+    if (client) {
+      await Promise.race([
+        client.$disconnect().catch(() => {}),
+        new Promise<void>((resolve) => setTimeout(resolve, 750)),
+      ]);
+    }
+  })().finally(() => { resetInFlight = null; });
+  return resetInFlight;
+}
+
+/** Retry one connectivity/pool failure through a newly-created Prisma pool.
+ * Never retries validation, uniqueness, permission, or other application errors. */
+export async function withFreshPrismaRetry<T>(run: () => Promise<T>): Promise<T> {
+  try {
+    return await run();
+  } catch (error) {
+    if (!isDbUnreachable(error)) throw error;
+    await resetPrismaPool();
+    return run();
+  }
 }
 
 export const prisma = new Proxy({} as PrismaClientInstance, {

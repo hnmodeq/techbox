@@ -3,9 +3,6 @@ import { jwtVerify } from "jose";
 
 const COOKIE = "tb_session";
 
-// Routes that should be accessible without authentication
-const PUBLIC_ADMIN_ROUTES = ["/admin/login"];
-
 function getSecret(): Uint8Array {
   const envSecret = process.env.AUTH_SECRET;
   if (!envSecret || envSecret.length < 32) {
@@ -16,50 +13,25 @@ function getSecret(): Uint8Array {
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const protectedAdmin = pathname.startsWith("/admin") && pathname !== "/admin/login";
+  const protectedAccount = pathname === "/account" || pathname.startsWith("/account/");
+  if (!protectedAdmin && !protectedAccount) return NextResponse.next();
 
-  // Only protect /admin/* routes
-  if (!pathname.startsWith("/admin")) return NextResponse.next();
-
-  // Allow public admin routes (login page)
-  if (PUBLIC_ADMIN_ROUTES.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
-  }
-
-  // Static files and API routes are handled separately
-  if (pathname.startsWith("/admin/") && pathname.includes(".")) {
-    return NextResponse.next();
-  }
-
-  // Check for session cookie
+  const loginUrl = new URL("/login", req.url);
+  loginUrl.searchParams.set("redirect", pathname);
   const token = req.cookies.get(COOKIE)?.value;
+  if (!token) return NextResponse.redirect(loginUrl);
 
-  if (!token) {
-    const loginUrl = new URL("/admin/login", req.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // Verify the JWT
   try {
-    const secret = getSecret();
-    const { payload } = await jwtVerify(token, secret);
-
-    if (!payload.sub) {
-      throw new Error("No subject in token");
-    }
-
-    // We can't do a DB lookup in proxy (edge runtime),
-    // but we verify the JWT is valid. Role checks happen in API routes.
-    // Redirect to login if token is invalid
+    const { payload } = await jwtVerify(token, getSecret());
+    if (!payload.sub) throw new Error("No subject in token");
+    // Database-backed role and status checks remain authoritative in pages/APIs.
     return NextResponse.next();
   } catch {
-    // Invalid, expired, or unverifiable token → redirect to login
-    const loginUrl = new URL("/admin/login", req.url);
-    loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/account/:path*", "/account"],
 };

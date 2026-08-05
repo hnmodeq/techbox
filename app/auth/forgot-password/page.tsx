@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
               <p className="text-xs text-muted-foreground">{message}</p>
               <p className="text-xs text-muted-foreground">صندوق ورودی و هرزنامه خود را بررسی کنید. لینک تا ۱ ساعت معتبر است.</p>
             </div>
-            <Link href="/account">
+            <Link href="/login">
               <Button variant="outline" className="w-full">بازگشت به ورود</Button>
             </Link>
           </CardContent>
@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
                 <Button type="submit" className="w-full" loading={form.formState.isSubmitting}>
                   {form.formState.isSubmitting ? "در حال ارسال..." : "ارسال لینک بازیابی"}
                 </Button>
-                <Link href="/account" className="text-xs text-muted-foreground hover:text-foreground">
+                <Link href="/login" className="text-xs text-muted-foreground hover:text-foreground">
                   بازگشت به ورود
                 </Link>
               </CardFooter>

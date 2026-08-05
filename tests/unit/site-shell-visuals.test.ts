@@ -6,12 +6,17 @@ const root = path.resolve(__dirname, "../..");
 const read = (file: string) => fs.readFileSync(path.join(root, file), "utf8");
 
 describe("site shell visual upgrade", () => {
-  it("builds a Neon-inspired split admin login without fake providers", () => {
-    const login = read("app/admin/login/page.tsx");
+  it("uses one Neon-inspired auth page for users, authors and admins", () => {
+    const login = read("features/auth/components/unified-login-page.tsx");
+    const bridge = read("features/auth/components/auth-modal.tsx");
+    const admin = read("app/admin/login/page.tsx");
     expect(login).toMatch(/lg:grid-cols-\[36%_64%\]/);
-    expect(login).toMatch(/مدیریت زیرساخت دانشی تکباکس/);
-    expect(login).toMatch(/\/api\/auth\/login/);
+    expect(login).toMatch(/کاربران، نویسندگان و مدیران/);
+    expect(login).toMatch(/\/api\/auth\/(login|register)/);
     expect(login).not.toMatch(/Google|GitHub|Microsoft|Hasura/);
+    expect(bridge).not.toMatch(/<Dialog/);
+    expect(bridge).toMatch(/router\.push\(`\/login/);
+    expect(admin).toMatch(/redirect\(`\/login/);
   });
 
   it("uses the branded loader across route, detail, admin and timeline surfaces", () => {

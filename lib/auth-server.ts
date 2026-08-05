@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
-import { prisma } from "./db";
+import { prisma, withFreshPrismaRetry } from "./db";
 import bcrypt from "bcryptjs";
 import { logDbFailure } from "@/lib/db-error";
 
@@ -40,7 +40,7 @@ const publicUserSelect = {
 } as const;
 
 function queryPublicUser(id: string) {
-  return prisma.user.findUnique({ where: { id }, select: publicUserSelect });
+  return withFreshPrismaRetry(() => prisma.user.findUnique({ where: { id }, select: publicUserSelect }));
 }
 type PublicSessionUser = Awaited<ReturnType<typeof queryPublicUser>>;
 type PublicLookupEntry = {

@@ -372,7 +372,7 @@ function NewPostInner() {
     return (
       <main className="p-10 text-center" dir="rtl">
         ابتدا{" "}
-        <Link className="text-primary underline" href="/admin/login">
+        <Link className="text-primary underline" href="/login">
           وارد شوید
         </Link>
       </main>

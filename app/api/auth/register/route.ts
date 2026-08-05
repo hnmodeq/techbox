@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, withFreshPrismaRetry } from "@/lib/db";
+import { isDbUnreachable, logDbFailure } from "@/lib/db-error";
 import { hashPassword, createSession, setSessionCookie, createEmailVerification } from "@/lib/auth-server";
 import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -26,12 +27,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Check IP bans — prevent registration from banned IPs
-  const ipBan = await prisma.ipBan.findUnique({ where: { ip } });
-  if (ipBan) {
+  // Check IP bans through a fresh-pool retry; a database outage is not a
+  // validation failure and must remain visibly retryable.
+  try {
+    const ipBan = await withFreshPrismaRetry(() => prisma.ipBan.findUnique({ where: { ip } }));
+    if (ipBan) {
+      return NextResponse.json(
+        { error: "ip_banned", message: "دسترسی شما مسدود شده است." },
+        { status: 403 }
+      );
+    }
+  } catch (error) {
+    logDbFailure("register", error);
     return NextResponse.json(
-      { error: "ip_banned", message: "دسترسی شما مسدود شده است." },
-      { status: 403 }
+      { error: "database_temporarily_unavailable", message: "ارتباط با پایگاه داده موقتاً برقرار نیست؛ دوباره تلاش کنید." },
+      { status: 503 },
     );
   }
 
@@ -50,14 +60,14 @@ export async function POST(req: NextRequest) {
 
     const cleanUsername = username.toLowerCase();
     
-    const existing = await prisma.user.findFirst({
+    const existing = await withFreshPrismaRetry(() => prisma.user.findFirst({
       where: {
         OR: [
           { username: cleanUsername },
           { email: email.toLowerCase() }
         ]
       }
-    });
+    }));
 
     if (existing) {
       if (existing.username === cleanUsername) {
@@ -170,6 +180,13 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+    }
+    if (isDbUnreachable(error)) {
+      logDbFailure("register", error);
+      return NextResponse.json(
+        { error: "database_temporarily_unavailable", message: "ارتباط با پایگاه داده موقتاً برقرار نیست؛ دوباره تلاش کنید." },
+        { status: 503 },
+      );
     }
     console.error("[auth:register]", error);
     return NextResponse.json({ error: "خطا در ثبت‌نام" }, { status: 500 });

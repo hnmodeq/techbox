@@ -75,7 +75,7 @@ describe("development connection pool", () => {
   it("bumps the client cache version so the change takes effect", () => {
     // The client is cached on globalThis across HMR; without a version bump
     // the old pool survives and the fix appears to do nothing.
-    expect(db).toMatch(/const CLIENT_CONFIG_VERSION = 4;/);
+    expect(db).toMatch(/const CLIENT_CONFIG_VERSION = 5;/);
   });
 });
 

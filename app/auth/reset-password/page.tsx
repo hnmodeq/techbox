@@ -39,7 +39,7 @@ export default function ResetPasswordPage() {
         <Card className="p-8 space-y-4 text-center">
           <CardTitle>لینک نامعتبر</CardTitle>
           <CardDescription>لینک بازیابی رمز عبور معتبر نیست یا ناقص است. لطفاً دوباره درخواست بازیابی بدهید.</CardDescription>
-          <ButtonLink href="/account" className="mt-4">بازگشت به حساب کاربری</ButtonLink>
+          <ButtonLink href="/login" className="mt-4">بازگشت به حساب کاربری</ButtonLink>
         </Card>
       </main>
     );
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
         {status === "success" ? (
           <Card className="p-4 bg-green-500/10 border-green-500/30 text-center space-y-3">
             <p className="text-sm text-green-600">{message}</p>
-            <ButtonLink href="/account" className="w-full">ورود به حساب</ButtonLink>
+            <ButtonLink href="/login" className="w-full">ورود به حساب</ButtonLink>
           </Card>
         ) : (
           <Form {...form}>

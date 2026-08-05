@@ -41,4 +41,16 @@ describe("local connection-pool pressure controls", () => {
     expect(db).toMatch(/const fallback = isDev \? 8 : 1/);
     expect(db).toMatch(/configured > 0 && configured <= 10/);
   });
+
+  it("reuses production clients and retries auth once through a fresh pool", () => {
+    const db = read("lib/db.ts");
+    const login = read("app/api/auth/login/route.ts");
+    const register = read("app/api/auth/register/route.ts");
+    expect(db).toMatch(/globalForPrisma\.prisma = client/);
+    expect(db).toMatch(/resetPrismaPool/);
+    expect(db).toMatch(/withFreshPrismaRetry/);
+    expect(login).toMatch(/withFreshPrismaRetry/);
+    expect(register).toMatch(/withFreshPrismaRetry/);
+    expect(login).toMatch(/database_temporarily_unavailable/);
+  });
 });
